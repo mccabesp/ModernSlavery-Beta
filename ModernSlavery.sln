@@ -2,51 +2,51 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.Core", "ModernSlavery.Core\GenderPayGap.Core.csproj", "{7A23F343-E179-4866-B40C-CC5B8FD87695}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Core", "ModernSlavery.Core\ModernSlavery.Core.csproj", "{7A23F343-E179-4866-B40C-CC5B8FD87695}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.Database", "ModernSlavery.Database\GenderPayGap.Database.csproj", "{F3DB4C50-110C-44BB-A308-B924FA0BE635}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Database", "ModernSlavery.Database\ModernSlavery.Database.csproj", "{F3DB4C50-110C-44BB-A308-B924FA0BE635}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.WebUI", "ModernSlavery.WebUI\GenderPayGap.WebUI.csproj", "{73D4A349-7276-4C72-9C67-A8FD08D7ED82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI", "ModernSlavery.WebUI\ModernSlavery.WebUI.csproj", "{73D4A349-7276-4C72-9C67-A8FD08D7ED82}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.WebJob", "ModernSlavery.WebJob\GenderPayGap.WebJob.csproj", "{1DF71C5E-2C26-43ED-80EA-79317303909F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebJob", "ModernSlavery.WebJob\ModernSlavery.WebJob.csproj", "{1DF71C5E-2C26-43ED-80EA-79317303909F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.IdentityServer4", "ModernSlavery.IdentityServer4\GenderPayGap.IdentityServer4.csproj", "{F0DBFCDC-2EC9-4181-BF63-1B8F3D585A4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.IdentityServer4", "ModernSlavery.IdentityServer4\ModernSlavery.IdentityServer4.csproj", "{F0DBFCDC-2EC9-4181-BF63-1B8F3D585A4E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.BusinessLogic", "ModernSlavery.BusinessLogic\GenderPayGap.BusinessLogic.csproj", "{700A7499-DF43-4E1D-8519-4A45FAB7C782}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic", "ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj", "{700A7499-DF43-4E1D-8519-4A45FAB7C782}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.Tests.Common", "ModernSlavery.Tests.Common\GenderPayGap.Tests.Common.csproj", "{71785F78-2960-4329-997B-2CF7677CA594}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Tests.Common", "ModernSlavery.Tests.Common\ModernSlavery.Tests.Common.csproj", "{71785F78-2960-4329-997B-2CF7677CA594}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{165A87E4-ED4A-4509-A52C-81748DE7286F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{6EB28909-F4E9-402E-A247-01532AAC6841}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.Extensions", "ModernSlavery.Extensions\GenderPayGap.Extensions.csproj", "{EF13B99F-16E1-4F04-BC21-882D146AA7FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Extensions", "ModernSlavery.Extensions\ModernSlavery.Extensions.csproj", "{EF13B99F-16E1-4F04-BC21-882D146AA7FD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.BusinessLogic.Tests", "ModernSlavery.BusinessLogic.Tests\GenderPayGap.BusinessLogic.Tests.csproj", "{ACF2521C-403C-4C9E-9724-C1B2CC17B2F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Tests", "ModernSlavery.BusinessLogic.Tests\ModernSlavery.BusinessLogic.Tests.csproj", "{ACF2521C-403C-4C9E-9724-C1B2CC17B2F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.WebJob.Tests", "ModernSlavery.WebJob.Tests\GenderPayGap.WebJob.Tests.csproj", "{A4D035C6-DDC6-4064-81F4-3184765B177D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebJob.Tests", "ModernSlavery.WebJob.Tests\ModernSlavery.WebJob.Tests.csproj", "{A4D035C6-DDC6-4064-81F4-3184765B177D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.WebUI.Tests", "ModernSlavery.WebUI.Tests\GenderPayGap.WebUI.Tests.csproj", "{ADB4DCF7-1D43-41EF-9FD3-DA4C36D923AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Tests", "ModernSlavery.WebUI.Tests\ModernSlavery.WebUI.Tests.csproj", "{ADB4DCF7-1D43-41EF-9FD3-DA4C36D923AB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{B5E90979-D1B2-4B06-90D7-2CDFAA261B00}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.Database.Models", "ModernSlavery.Database.Models\GenderPayGap.Database.Models.csproj", "{373FD2AD-1EC2-4415-BBA2-6D1098961D03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Database.Models", "ModernSlavery.Database.Models\ModernSlavery.Database.Models.csproj", "{373FD2AD-1EC2-4415-BBA2-6D1098961D03}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.Extensions.AspNetCore", "ModernSlavery.Extensions.AspNetCore\GenderPayGap.Extensions.AspNetCore.csproj", "{280CF592-7FE9-4DDE-9F9E-42F417F8A0C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Extensions.AspNetCore", "ModernSlavery.Extensions.AspNetCore\ModernSlavery.Extensions.AspNetCore.csproj", "{280CF592-7FE9-4DDE-9F9E-42F417F8A0C2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.Core.Tests", "ModernSlavery.Core.Tests\GenderPayGap.Core.Tests.csproj", "{0DE531BB-3B5C-47C1-8644-0251F73B31A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Core.Tests", "ModernSlavery.Core.Tests\ModernSlavery.Core.Tests.csproj", "{0DE531BB-3B5C-47C1-8644-0251F73B31A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.Database.Tests", "ModernSlavery.Database.Tests\GenderPayGap.Database.Tests.csproj", "{6E500FE9-E063-4F07-89EF-C94F8345A0AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Database.Tests", "ModernSlavery.Database.Tests\ModernSlavery.Database.Tests.csproj", "{6E500FE9-E063-4F07-89EF-C94F8345A0AB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.Extensions.AspNetCore.Tests", "ModernSlavery.Extensions.AspNetCore.Tests\GenderPayGap.Extensions.AspNetCore.Tests.csproj", "{F68B4A44-85EF-4DAA-AC28-DB14C10D83C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Extensions.AspNetCore.Tests", "ModernSlavery.Extensions.AspNetCore.Tests\ModernSlavery.Extensions.AspNetCore.Tests.csproj", "{F68B4A44-85EF-4DAA-AC28-DB14C10D83C7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.Extensions.Tests", "ModernSlavery.Extensions.Tests\GenderPayGap.Extensions.Tests.csproj", "{FE05F883-4F1C-4C8E-AF41-A08B07C799F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Extensions.Tests", "ModernSlavery.Extensions.Tests\ModernSlavery.Extensions.Tests.csproj", "{FE05F883-4F1C-4C8E-AF41-A08B07C799F2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenderPayGap.Integration.Tests", "ModernSlavery.Integration.Tests\GenderPayGap.Integration.Tests.csproj", "{26013934-6DF5-49C7-A825-7FC40D651C3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Integration.Tests", "ModernSlavery.Integration.Tests\ModernSlavery.Integration.Tests.csproj", "{26013934-6DF5-49C7-A825-7FC40D651C3A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUkDesignSystem", "GovUkDesignSystem\GovUkDesignSystem.csproj", "{AE3D6DDB-5C46-4149-A74B-4C631FFC1C33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WarmUp", "ModernSlavery.WarmUp\WarmUp.csproj", "{BE071C9E-B424-4F70-A1EC-6ECB15399C6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WarmUp", "ModernSlavery.WarmUp\ModernSlavery.WarmUp.csproj", "{BE071C9E-B424-4F70-A1EC-6ECB15399C6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
