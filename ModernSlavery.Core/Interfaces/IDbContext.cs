@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace GenderPayGap.Core.Interfaces
+namespace ModernSlavery.Core.Interfaces
 {
     public interface IDbContext : IDisposable
     {

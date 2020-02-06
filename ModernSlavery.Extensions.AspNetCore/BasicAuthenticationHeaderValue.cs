@@ -2,7 +2,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace GenderPayGap.Extensions.AspNetCore
+namespace ModernSlavery.Extensions.AspNetCore
 {
     public class BasicAuthenticationHeaderValue : AuthenticationHeaderValue
     {

@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     public static class Extensions
     {

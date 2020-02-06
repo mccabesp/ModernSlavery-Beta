@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
 
-namespace GenderPayGap.BusinessLogic.Account.Abstractions
+namespace ModernSlavery.BusinessLogic.Account.Abstractions
 {
 
     public interface IRegistrationRepository : IDataTransaction

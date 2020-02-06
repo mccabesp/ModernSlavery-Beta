@@ -48,10 +48,10 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\GenderPayGap.BusinessLogic\GenderPayGap.BusinessLogic.csproj" />
-    <ProjectReference Include="..\..\GenderPayGap.Extensions\GenderPayGap.Extensions.csproj" />
-    <ProjectReference Include="..\..\GenderPayGap.Tests.Common\GenderPayGap.Tests.Common.csproj" />
-    <ProjectReference Include="..\..\GenderPayGap.WebJob\GenderPayGap.WebJob.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Tests.Common\ModernSlavery.Tests.Common.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebJob\ModernSlavery.WebJob.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.Database;
+using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.Database;
 using IdentityModel;
 using IdentityServer4.Validation;
 
-namespace GenderPayGap.IdentityServer4.Classes
+namespace ModernSlavery.IdentityServer4.Classes
 {
     public class CustomResourceOwnerPasswordValidator : IResourceOwnerPasswordValidator
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenderPayGap.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes
 {
 
     [AttributeUsage(AttributeTargets.Class)]

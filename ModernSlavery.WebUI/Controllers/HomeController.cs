@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Repositories;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes.Logger;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Core.Models.Cookies;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Classes.Services;
-using GenderPayGap.WebUI.Models.Admin;
-using GenderPayGap.WebUI.Views.Home;
+using ModernSlavery.BusinessLogic.Repositories;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes.Logger;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Models.Cookies;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Classes.Services;
+using ModernSlavery.WebUI.Models.Admin;
+using ModernSlavery.WebUI.Views.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebUI.Controllers
+namespace ModernSlavery.WebUI.Controllers
 {
     public class HomeController : BaseController
     {

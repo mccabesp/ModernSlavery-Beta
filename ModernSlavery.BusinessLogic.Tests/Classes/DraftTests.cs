@@ -1,8 +1,8 @@
-﻿using GenderPayGap.BusinessLogic.Classes;
-using GenderPayGap.BusinessLogic.Models.Submit;
+﻿using ModernSlavery.BusinessLogic.Classes;
+using ModernSlavery.BusinessLogic.Models.Submit;
 using NUnit.Framework;
 
-namespace GenderPayGap.BusinessLogic.Tests.Classes
+namespace ModernSlavery.BusinessLogic.Tests.Classes
 {
     [TestFixture]
     public class DraftTests

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.Extensions.AspNetCore
+namespace ModernSlavery.Extensions.AspNetCore
 {
     public interface IHttpCache
     {

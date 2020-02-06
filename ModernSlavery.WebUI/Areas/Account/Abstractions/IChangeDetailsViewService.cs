@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.Database;
-using GenderPayGap.WebUI.Areas.Account.ViewModels;
+using ModernSlavery.Database;
+using ModernSlavery.WebUI.Areas.Account.ViewModels;
 
-namespace GenderPayGap.WebUI.Areas.Account.Abstractions
+namespace ModernSlavery.WebUI.Areas.Account.Abstractions
 {
 
     public interface IChangeDetailsViewService

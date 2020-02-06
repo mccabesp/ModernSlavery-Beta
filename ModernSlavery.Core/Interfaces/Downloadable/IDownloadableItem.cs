@@ -1,4 +1,4 @@
-﻿namespace GenderPayGap.Core.Interfaces.Downloadable
+﻿namespace ModernSlavery.Core.Interfaces.Downloadable
 {
     public interface IDownloadableItem
     {

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using GenderPayGap.Core.Classes;
+using ModernSlavery.Core.Classes;
 using Notify.Models.Responses;
 
-namespace GenderPayGap.Core.Interfaces
+namespace ModernSlavery.Core.Interfaces
 {
     public interface IGovNotifyAPI
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenderPayGap.WebUI.Models.Organisation
+namespace ModernSlavery.WebUI.Models.Organisation
 {
     [Serializable]
     public class RemoveOrganisationModel

@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
-using GenderPayGap.Core;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 
-namespace GenderPayGap.Database
+namespace ModernSlavery.Database
 {
 
     [Serializable]

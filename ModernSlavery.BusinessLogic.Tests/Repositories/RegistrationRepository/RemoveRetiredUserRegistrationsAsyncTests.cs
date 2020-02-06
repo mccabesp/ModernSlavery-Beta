@@ -1,12 +1,12 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.BusinessLogic.LogRecords;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.LogRecords;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
 using NUnit.Framework;
 
@@ -22,14 +22,14 @@ namespace Repositories.UserRepository
         public void BeforeEach()
         {
             // mock data
-            GpgDatabaseContext dbContext = AutoFacHelpers.CreateInMemoryTestDatabase(UserOrganisationHelper.CreateRegistrations());
+            DatabaseContext dbContext = AutoFacHelpers.CreateInMemoryTestDatabase(UserOrganisationHelper.CreateRegistrations());
 
             mockDataRepo = new SqlRepository(dbContext);
             mockLogRecordLogger = new Mock<IRegistrationLogRecord>();
 
             // service under test
             testRegistrationRepo =
-                new GenderPayGap.BusinessLogic.Repositories.RegistrationRepository(mockDataRepo, mockLogRecordLogger.Object);
+                new ModernSlavery.BusinessLogic.Repositories.RegistrationRepository(mockDataRepo, mockLogRecordLogger.Object);
         }
 
         private IDataRepository mockDataRepo;

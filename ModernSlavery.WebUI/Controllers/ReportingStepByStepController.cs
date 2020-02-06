@@ -1,8 +1,8 @@
-﻿using GenderPayGap.Core;
-using GenderPayGap.Core.Models.HttpResultModels;
+﻿using ModernSlavery.Core;
+using ModernSlavery.Core.Models.HttpResultModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.WebUI.Controllers.ReportingStepByStep
+namespace ModernSlavery.WebUI.Controllers.ReportingStepByStep
 {
     public class ReportingStepByStepController : Controller
     {

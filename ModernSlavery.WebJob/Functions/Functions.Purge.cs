@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.WebJob
+namespace ModernSlavery.WebJob
 {
 
     public partial class Functions
@@ -273,7 +273,7 @@ namespace GenderPayGap.WebJob
 
             try
             {
-                GpgDatabaseContext.DeleteAllTestRecords(VirtualDateTime.Now.AddDays(-1));
+                DatabaseContext.DeleteAllTestRecords(VirtualDateTime.Now.AddDays(-1));
 
                 log.LogDebug($"Executed {nameof(PurgeTestDataAsync)} successfully");
             }

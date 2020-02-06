@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
 
     public static class Attributes

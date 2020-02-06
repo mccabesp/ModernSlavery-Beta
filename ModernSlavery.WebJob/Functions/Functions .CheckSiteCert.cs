@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebJob
+namespace ModernSlavery.WebJob
 {
     public partial class Functions
     {

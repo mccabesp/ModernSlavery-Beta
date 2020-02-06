@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.Tests.Common.TestHelpers;
-using GenderPayGap.Tests.TestHelpers;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Controllers;
-using GenderPayGap.WebUI.Models.Register;
-using GenderPayGap.WebUI.Tests;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.Tests.TestHelpers;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Controllers;
+using ModernSlavery.WebUI.Models.Register;
+using ModernSlavery.WebUI.Tests;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -25,7 +25,7 @@ using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.Tests
+namespace ModernSlavery.Tests
 {
     [TestFixture]
     [SetCulture("en-GB")]

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using GenderPayGap.BusinessLogic.Models.Organisation;
-using GenderPayGap.Database;
+using ModernSlavery.BusinessLogic.Models.Organisation;
+using ModernSlavery.Database;
 
-namespace GenderPayGap.WebUI.Models.Organisation
+namespace ModernSlavery.WebUI.Models.Organisation
 {
 
     [Serializable]

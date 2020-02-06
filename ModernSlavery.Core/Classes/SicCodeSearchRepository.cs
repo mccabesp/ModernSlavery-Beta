@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Models;
+using ModernSlavery.Core.Models;
 using Microsoft.Azure.Search;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     public class SicCodeSearchRepository : ASearchRepository<SicCodeSearchModel>
     {

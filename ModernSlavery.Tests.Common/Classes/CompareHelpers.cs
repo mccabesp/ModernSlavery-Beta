@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 using NUnit.Framework;
 
-namespace GenderPayGap.Tests.Common.Classes
+namespace ModernSlavery.Tests.Common.Classes
 {
     public static class CompareHelpers
     {

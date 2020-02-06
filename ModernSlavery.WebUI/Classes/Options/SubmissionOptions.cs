@@ -1,4 +1,4 @@
-﻿namespace GenderPayGap.WebUI.Options
+﻿namespace ModernSlavery.WebUI.Options
 {
 
     public class SubmissionOptions

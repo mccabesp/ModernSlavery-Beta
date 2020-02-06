@@ -2,7 +2,7 @@
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.LogRecordLogger
+namespace ModernSlavery.Core.Tests.LogRecordLogger
 {
 
     [TestFixture]

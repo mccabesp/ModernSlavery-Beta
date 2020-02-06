@@ -2,7 +2,7 @@
 using System.Reflection;
 using Moq;
 
-namespace GenderPayGap.Tests.Common.TestHelpers
+namespace ModernSlavery.Tests.Common.TestHelpers
 {
     public static class MoqHelper
     {

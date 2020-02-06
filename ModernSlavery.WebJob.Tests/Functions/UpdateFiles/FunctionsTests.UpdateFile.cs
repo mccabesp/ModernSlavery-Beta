@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebJob.Tests.TestHelpers;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebJob.Tests.TestHelpers;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebJob.Tests.Functions
+namespace ModernSlavery.WebJob.Tests.Functions
 {
     [TestFixture]
     [SetCulture("en-GB")]

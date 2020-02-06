@@ -6,16 +6,16 @@ using System.Security.Cryptography.X509Certificates;
 using System.Web;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using GenderPayGap.BusinessLogic.LogRecords;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.Queues;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.IdentityServer4.Classes;
-using GenderPayGap.Infrastructure.AzureQueues.Extensions;
+using ModernSlavery.BusinessLogic.LogRecords;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.Queues;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.IdentityServer4.Classes;
+using ModernSlavery.Infrastructure.AzureQueues.Extensions;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,7 +27,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
-namespace GenderPayGap.IdentityServer4
+namespace ModernSlavery.IdentityServer4
 {
     public class Startup
     {
@@ -149,7 +149,7 @@ namespace GenderPayGap.IdentityServer4
             //Register the configuration
             builder.RegisterInstance(Config.Configuration).SingleInstance();
 
-            builder.Register(c => new SqlRepository(new GpgDatabaseContext(Global.DatabaseConnectionString)))
+            builder.Register(c => new SqlRepository(new DatabaseContext(Global.DatabaseConnectionString)))
                 .As<IDataRepository>()
                 .InstancePerLifetimeScope();
 

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace GenderPayGap.WebUI.Areas.Account.Resources {
+namespace ModernSlavery.WebUI.Areas.Account.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace GenderPayGap.WebUI.Areas.Account.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GenderPayGap.WebUI.Areas.Account.Resources.AccountResources", typeof(AccountResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ModernSlavery.WebUI.Areas.Account.Resources.AccountResources", typeof(AccountResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.Core;
-using GenderPayGap.Database;
-using GenderPayGap.Tests.TestHelpers;
-using GenderPayGap.WebUI.Areas.Account.Abstractions;
-using GenderPayGap.WebUI.Areas.Account.ViewServices;
+using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.Core;
+using ModernSlavery.Database;
+using ModernSlavery.Tests.TestHelpers;
+using ModernSlavery.WebUI.Areas.Account.Abstractions;
+using ModernSlavery.WebUI.Areas.Account.ViewServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;

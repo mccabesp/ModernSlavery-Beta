@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.Extensions.AspNetCore
+namespace ModernSlavery.Extensions.AspNetCore
 {
     /// <summary>
     ///     The caching settings for the application.

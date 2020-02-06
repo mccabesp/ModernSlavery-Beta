@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Core.Models
+namespace ModernSlavery.Core.Models
 {
     [Serializable]
     public class DnBOrgsModel

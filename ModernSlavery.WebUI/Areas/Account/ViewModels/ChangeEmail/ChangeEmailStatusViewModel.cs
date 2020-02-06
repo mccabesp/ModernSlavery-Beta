@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenderPayGap.WebUI.Areas.Account.ViewModels
+namespace ModernSlavery.WebUI.Areas.Account.ViewModels
 {
 
     [Serializable]

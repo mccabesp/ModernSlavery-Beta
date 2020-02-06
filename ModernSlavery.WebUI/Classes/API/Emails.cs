@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Abstractions;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.WebUI;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Abstractions;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap
+namespace ModernSlavery
 {
 
     public static class Emails

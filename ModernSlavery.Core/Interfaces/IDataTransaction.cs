@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace GenderPayGap.Core.Interfaces
+namespace ModernSlavery.Core.Interfaces
 {
     public interface IDataTransaction
     {

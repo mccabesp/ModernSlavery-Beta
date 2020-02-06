@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Models.Scope;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.ErrorMessages;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
+using ModernSlavery.BusinessLogic.Models.Scope;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace GenderPayGap.BusinessLogic
+namespace ModernSlavery.BusinessLogic
 {
 
     public interface IScopeBusinessLogic

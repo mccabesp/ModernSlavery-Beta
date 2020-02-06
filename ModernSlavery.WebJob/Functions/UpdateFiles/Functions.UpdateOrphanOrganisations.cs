@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebJob
+namespace ModernSlavery.WebJob
 {
     public partial class Functions
     {

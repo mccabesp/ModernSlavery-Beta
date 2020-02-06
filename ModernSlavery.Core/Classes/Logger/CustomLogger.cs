@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Serilog;
 
-namespace GenderPayGap.Core.Classes.Logger
+namespace ModernSlavery.Core.Classes.Logger
 {
     public static class CustomLogger
     {

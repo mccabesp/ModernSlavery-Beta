@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Models.Organisation;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Models.HttpResultModels;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Models.Organisation;
+using ModernSlavery.BusinessLogic.Models.Organisation;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Models.HttpResultModels;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Models.Organisation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.WebUI.Controllers
+namespace ModernSlavery.WebUI.Controllers
 {
 
     public partial class OrganisationController : BaseController

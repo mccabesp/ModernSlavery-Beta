@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
-namespace GenderPayGap.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes
 {
 
     public static class ControllerActionExtensions

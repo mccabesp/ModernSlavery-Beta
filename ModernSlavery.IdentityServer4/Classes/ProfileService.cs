@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.Core;
-using GenderPayGap.Database;
+using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.Core;
+using ModernSlavery.Database;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.IdentityServer4.Classes
+namespace ModernSlavery.IdentityServer4.Classes
 {
     public class CustomProfileService : IProfileService
     {

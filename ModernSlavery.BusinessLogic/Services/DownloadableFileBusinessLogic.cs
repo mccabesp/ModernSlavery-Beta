@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Classes.Downloadable;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Interfaces.Downloadable;
-using GenderPayGap.Core.Models.Downloadable;
+using ModernSlavery.Core.Classes.Downloadable;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Interfaces.Downloadable;
+using ModernSlavery.Core.Models.Downloadable;
 
-namespace GenderPayGap.BusinessLogic.Services
+namespace ModernSlavery.BusinessLogic.Services
 {
     public interface IDownloadableFileBusinessLogic
     {

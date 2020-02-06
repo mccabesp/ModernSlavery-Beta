@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace GenderPayGap.Core.Models.CompaniesHouse
+namespace ModernSlavery.Core.Models.CompaniesHouse
 {
     public class CompaniesHouseAddress
     {

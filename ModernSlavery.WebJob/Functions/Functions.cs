@@ -1,12 +1,12 @@
 ﻿using System;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core.API;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Extensions;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core.API;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 
-namespace GenderPayGap.WebJob
+namespace ModernSlavery.WebJob
 {
     public partial class Functions
     {

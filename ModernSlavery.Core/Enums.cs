@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Core
+namespace ModernSlavery.Core
 {
     public enum UserStatuses : byte
     {

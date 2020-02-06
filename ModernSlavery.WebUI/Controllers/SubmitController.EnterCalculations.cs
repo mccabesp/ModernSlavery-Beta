@@ -1,13 +1,13 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Models.Submit;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebUI.Classes;
+using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.WebUI.Controllers.Submission
+namespace ModernSlavery.WebUI.Controllers.Submission
 {
     public partial class SubmitController : BaseController
     {

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace GenderPayGap.Extensions.AspNetCore
+namespace ModernSlavery.Extensions.AspNetCore
 {
     public class StickySessionMiddleware
     {

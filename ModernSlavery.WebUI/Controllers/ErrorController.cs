@@ -1,13 +1,13 @@
-﻿using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.WebUI.Classes;
+﻿using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebUI.Controllers
+namespace ModernSlavery.WebUI.Controllers
 {
     [Route("Error")]
     public class ErrorController : BaseController

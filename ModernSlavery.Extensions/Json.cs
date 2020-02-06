@@ -3,7 +3,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public static class Json
     {

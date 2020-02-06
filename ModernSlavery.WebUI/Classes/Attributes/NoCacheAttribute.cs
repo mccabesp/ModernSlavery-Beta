@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public sealed class NoCacheAttribute : ResponseCacheAttribute

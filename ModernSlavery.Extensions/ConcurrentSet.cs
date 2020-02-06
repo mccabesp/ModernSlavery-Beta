@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public class ConcurrentSet<T> : IEnumerable<T>, ISet<T>, ICollection<T>
     {

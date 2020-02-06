@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.Database;
+using ModernSlavery.Database;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace GenderPayGap.WebUI.Areas.Account.Abstractions
+namespace ModernSlavery.WebUI.Areas.Account.Abstractions
 {
 
     public interface IChangePasswordViewService

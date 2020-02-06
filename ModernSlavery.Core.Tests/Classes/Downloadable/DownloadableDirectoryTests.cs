@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using GenderPayGap.Core.Classes.Downloadable;
-using GenderPayGap.Core.Interfaces.Downloadable;
+using ModernSlavery.Core.Classes.Downloadable;
+using ModernSlavery.Core.Interfaces.Downloadable;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.Classes.Downloadable
+namespace ModernSlavery.Core.Tests.Classes.Downloadable
 {
     [TestFixture]
     public class DownloadableDirectoryTests

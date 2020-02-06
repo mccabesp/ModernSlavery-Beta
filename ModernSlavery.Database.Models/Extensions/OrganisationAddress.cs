@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Database
+namespace ModernSlavery.Database
 {
     [Serializable]
     public partial class OrganisationAddress

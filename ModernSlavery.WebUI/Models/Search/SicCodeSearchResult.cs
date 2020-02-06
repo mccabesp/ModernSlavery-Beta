@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.WebUI.Models.Search
+namespace ModernSlavery.WebUI.Models.Search
 {
     public class SicCodeSearchResult
     {

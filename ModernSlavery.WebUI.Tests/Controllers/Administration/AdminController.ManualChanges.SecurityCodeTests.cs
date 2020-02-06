@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.Tests.Common.TestHelpers;
-using GenderPayGap.Tests.TestHelpers;
-using GenderPayGap.WebUI.Controllers.Administration;
-using GenderPayGap.WebUI.Models.Admin;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.Tests.TestHelpers;
+using ModernSlavery.WebUI.Controllers.Administration;
+using ModernSlavery.WebUI.Models.Admin;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebUI.Tests.Controllers.Administration
+namespace ModernSlavery.WebUI.Tests.Controllers.Administration
 {
     [TestFixture]
     [SetCulture("en-GB")]

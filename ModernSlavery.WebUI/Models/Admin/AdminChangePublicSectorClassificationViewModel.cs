@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using GenderPayGap.Database;
+using ModernSlavery.Database;
 using GovUkDesignSystem;
 using GovUkDesignSystem.Attributes.ValidationAttributes;
 
-namespace GenderPayGap.WebUI.Models.Admin
+namespace ModernSlavery.WebUI.Models.Admin
 {
     public class AdminChangePublicSectorClassificationViewModel : GovUkViewModel
     {

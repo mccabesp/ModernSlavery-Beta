@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Castle.Core.Internal;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Api;
-using GenderPayGap.Core.API;
-using GenderPayGap.Core.Classes.Logger;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models.CompaniesHouse;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Api;
+using ModernSlavery.Core.API;
+using ModernSlavery.Core.Classes.Logger;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models.CompaniesHouse;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.BusinessLogic.Services
+namespace ModernSlavery.BusinessLogic.Services
 {
     public class UpdateFromCompaniesHouseService
     {

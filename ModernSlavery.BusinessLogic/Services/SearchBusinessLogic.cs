@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
 
-namespace GenderPayGap.BusinessLogic
+namespace ModernSlavery.BusinessLogic
 {
     public interface ISearchBusinessLogic
     {

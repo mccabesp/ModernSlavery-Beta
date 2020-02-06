@@ -1,26 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GenderPayGap.Extensions;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Repositories;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Controllers;
-using GenderPayGap.WebUI.Models.Register;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.Extensions;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Repositories;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Controllers;
+using ModernSlavery.WebUI.Models.Register;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
 using NUnit.Framework;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc;
-using GenderPayGap.WebUI.Models;
+using ModernSlavery.WebUI.Models;
 using System.Threading.Tasks;
 
-namespace GenderPayGap.WebUI.Tests.Controllers.Registration
+namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 {
     [TestFixture]
     public partial class RegisterControllerTests

@@ -7,11 +7,11 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes.ErrorMessages;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes
 {
     public static partial class Extensions
     {

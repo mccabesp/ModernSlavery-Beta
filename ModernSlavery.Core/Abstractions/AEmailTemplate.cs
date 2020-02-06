@@ -1,4 +1,4 @@
-﻿namespace GenderPayGap.Core.Abstractions
+﻿namespace ModernSlavery.Core.Abstractions
 {
 
     public abstract class AEmailTemplate

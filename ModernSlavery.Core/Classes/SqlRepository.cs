@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
-using GenderPayGap.Core.Interfaces;
+using ModernSlavery.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
 
     public class SqlRepository : IDataRepository, IDataTransaction

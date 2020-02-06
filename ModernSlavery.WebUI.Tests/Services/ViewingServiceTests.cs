@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.WebUI.Classes.Presentation;
-using GenderPayGap.WebUI.Models.Search;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.WebUI.Classes.Presentation;
+using ModernSlavery.WebUI.Models.Search;
 using MockQueryable.Moq;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebUI.Tests.Services
+namespace ModernSlavery.WebUI.Tests.Services
 {
     [TestFixture]
     [SetCulture("en-GB")]

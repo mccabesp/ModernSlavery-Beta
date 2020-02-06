@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     [Serializable]
     public class PagedResult<T>

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.WebUI.Models.Scope
+namespace ModernSlavery.WebUI.Models.Scope
 {
 
     [Serializable]

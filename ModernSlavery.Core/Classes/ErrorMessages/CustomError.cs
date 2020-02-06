@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Net;
-using GenderPayGap.Core.Models.HttpResultModels;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Models.HttpResultModels;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Core.Classes.ErrorMessages
+namespace ModernSlavery.Core.Classes.ErrorMessages
 {
     [Serializable]
     public class CustomError

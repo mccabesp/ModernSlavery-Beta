@@ -1,4 +1,4 @@
-﻿namespace GenderPayGap.WebUI.Models.Register
+﻿namespace ModernSlavery.WebUI.Models.Register
 {
     public class PinFailedToSendViewModel
     {

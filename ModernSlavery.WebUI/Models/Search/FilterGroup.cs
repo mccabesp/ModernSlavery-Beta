@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GenderPayGap.WebUI.Models.Search
+namespace ModernSlavery.WebUI.Models.Search
 {
 
     public class FilterGroup

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Web;
-using GenderPayGap.Core;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace GenderPayGap.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes
 {
     public class SpamProtectionAttribute : ActionFilterAttribute
     {

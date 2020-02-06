@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Extensions;
 using Microsoft.Azure.Search.Models;
 
-namespace GenderPayGap.Tests.Common.Mocks
+namespace ModernSlavery.Tests.Common.Mocks
 {
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 

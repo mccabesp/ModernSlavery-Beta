@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Database.Models;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Database.Models;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes
 {
     public class AuditLogger
     {

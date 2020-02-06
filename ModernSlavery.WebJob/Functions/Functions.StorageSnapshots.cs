@@ -7,14 +7,14 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using GenderPayGap.Core;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GenderPayGap.Extensions.Web;
+using static ModernSlavery.Extensions.Web;
 
-namespace GenderPayGap.WebJob
+namespace ModernSlavery.WebJob
 {
     public partial class Functions
     {

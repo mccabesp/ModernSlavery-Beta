@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using HttpContext = System.Web.HttpContext;
 
-namespace GenderPayGap.Extensions.AspNetCore
+namespace ModernSlavery.Extensions.AspNetCore
 {
     public static partial class Extensions
     {

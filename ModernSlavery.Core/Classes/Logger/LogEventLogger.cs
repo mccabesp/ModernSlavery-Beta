@@ -1,9 +1,9 @@
 ﻿using System;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     public class LogEventLogger : ILogger
     {

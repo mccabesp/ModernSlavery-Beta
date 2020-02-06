@@ -1,8 +1,8 @@
 ﻿using Cryptography.Obfuscation;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     public interface IObfuscator
     {

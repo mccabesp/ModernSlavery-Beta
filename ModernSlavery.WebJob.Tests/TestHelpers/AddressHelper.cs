@@ -1,7 +1,7 @@
-﻿using GenderPayGap.Core;
-using GenderPayGap.Database;
+﻿using ModernSlavery.Core;
+using ModernSlavery.Database;
 
-namespace GenderPayGap.WebJob.Tests.TestHelpers
+namespace ModernSlavery.WebJob.Tests.TestHelpers
 {
     public static class AddressHelper
     {

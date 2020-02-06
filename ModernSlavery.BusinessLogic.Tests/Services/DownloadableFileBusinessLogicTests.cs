@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core.Classes.Downloadable;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Interfaces.Downloadable;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core.Classes.Downloadable;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Interfaces.Downloadable;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.BusinessLogic.Tests.Services
+namespace ModernSlavery.BusinessLogic.Tests.Services
 {
     [TestFixture]
     public class DownloadableFileBusinessLogicTests

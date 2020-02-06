@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.Logger;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Database.Models;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.Logger;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Database.Models;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.WebJob
+namespace ModernSlavery.WebJob
 {
     public partial class Functions
     {

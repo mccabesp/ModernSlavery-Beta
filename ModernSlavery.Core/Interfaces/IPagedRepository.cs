@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.Core.Classes;
+using ModernSlavery.Core.Classes;
 
-namespace GenderPayGap.Core.Interfaces
+namespace ModernSlavery.Core.Interfaces
 {
     public interface IPagedRepository<T>
     {

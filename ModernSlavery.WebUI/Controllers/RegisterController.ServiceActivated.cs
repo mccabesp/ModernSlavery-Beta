@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Models.Register;
-using GenderPayGap.WebUI.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Models.Register;
+using ModernSlavery.WebUI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebUI.Controllers
+namespace ModernSlavery.WebUI.Controllers
 {
     public partial class RegisterController : BaseController
     {

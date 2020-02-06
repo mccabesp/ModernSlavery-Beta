@@ -3,7 +3,7 @@ using IdentityServer4.Events;
 using IdentityServer4.Services;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.IdentityServer4.Classes
+namespace ModernSlavery.IdentityServer4.Classes
 {
     public class AuditEventSink : IEventSink
     {

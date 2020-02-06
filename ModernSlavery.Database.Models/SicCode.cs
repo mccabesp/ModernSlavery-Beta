@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Database
+namespace ModernSlavery.Database
 {
     public partial class SicCode
     {

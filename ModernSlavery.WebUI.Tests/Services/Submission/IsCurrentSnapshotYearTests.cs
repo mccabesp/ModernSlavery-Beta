@@ -1,14 +1,14 @@
 ﻿using System;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.Tests.Common.Classes;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Tests.Common.Classes;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.Tests.Services.SubmissionService
+namespace ModernSlavery.Tests.Services.SubmissionService
 {
 
     public class IsCurrentSnapshotYearTests

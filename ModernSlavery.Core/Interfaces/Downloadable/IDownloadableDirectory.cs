@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GenderPayGap.Core.Interfaces.Downloadable
+namespace ModernSlavery.Core.Interfaces.Downloadable
 {
     public interface IDownloadableDirectory : IDownloadableItem
     {

@@ -1,18 +1,18 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Models.HttpResultModels;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebUI.Controllers;
-using GenderPayGap.WebUI.Models.Organisation;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Models.HttpResultModels;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Controllers;
+using ModernSlavery.WebUI.Models.Organisation;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebUI.Tests.Controllers
+namespace ModernSlavery.WebUI.Tests.Controllers
 {
 
     public partial class OrganisationControllerTests

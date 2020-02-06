@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Core.Classes.ErrorMessages
+namespace ModernSlavery.Core.Classes.ErrorMessages
 {
     public class CustomErrorMessagesSection : ConfigurationSection
     {

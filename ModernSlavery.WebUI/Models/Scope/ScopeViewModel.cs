@@ -1,7 +1,7 @@
 ﻿using System;
-using GenderPayGap.Core;
+using ModernSlavery.Core;
 
-namespace GenderPayGap.WebUI.Models.Scope
+namespace ModernSlavery.WebUI.Models.Scope
 {
     [Serializable]
     public class ScopeViewModel

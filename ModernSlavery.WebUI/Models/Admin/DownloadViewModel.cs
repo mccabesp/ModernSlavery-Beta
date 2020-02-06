@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Xml.Serialization;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.WebUI.Models.Admin
+namespace ModernSlavery.WebUI.Models.Admin
 {
     [Serializable]
     public class DownloadViewModel

@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using GenderPayGap.Core;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Database
+namespace ModernSlavery.Database
 {
     [Serializable]
     [DebuggerDisplay("({Organisation}),({User})")]

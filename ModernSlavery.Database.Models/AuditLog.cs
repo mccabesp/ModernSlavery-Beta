@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using GenderPayGap.Core;
+using ModernSlavery.Core;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.Database.Models
+namespace ModernSlavery.Database.Models
 {
     public class AuditLog
     {

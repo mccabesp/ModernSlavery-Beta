@@ -1,8 +1,8 @@
-﻿using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.BusinessLogic.Account.Repositories;
+﻿using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.Account.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GenderPayGap.IdentityServer4.Classes
+namespace ModernSlavery.IdentityServer4.Classes
 {
     public static class CustomIdentityServerBuilderExtensions
     {

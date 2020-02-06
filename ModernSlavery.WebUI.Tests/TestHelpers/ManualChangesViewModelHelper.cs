@@ -1,7 +1,7 @@
-﻿using GenderPayGap.WebUI.Models.Admin;
+﻿using ModernSlavery.WebUI.Models.Admin;
 using Moq;
 
-namespace GenderPayGap.Tests.TestHelpers
+namespace ModernSlavery.Tests.TestHelpers
 {
     public class ManualChangesViewModelHelper
     {

@@ -1,8 +1,8 @@
 ﻿using System;
-using GenderPayGap.Core.Abstractions;
-using GenderPayGap.Core.Models;
+using ModernSlavery.Core.Abstractions;
+using ModernSlavery.Core.Models;
 
-namespace GenderPayGap.Core.Interfaces
+namespace ModernSlavery.Core.Interfaces
 {
     public interface IEmailTemplateRepository
     {

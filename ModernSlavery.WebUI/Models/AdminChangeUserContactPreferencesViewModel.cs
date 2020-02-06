@@ -1,7 +1,7 @@
 ﻿using GovUkDesignSystem;
 using GovUkDesignSystem.Attributes.ValidationAttributes;
 
-namespace GenderPayGap.WebUI.Models
+namespace ModernSlavery.WebUI.Models
 {
     public class AdminChangeUserContactPreferencesViewModel : GovUkViewModel
     {

@@ -2,12 +2,12 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Database;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Database;
 using Moq;
 
-namespace GenderPayGap.Tests.Common.TestHelpers
+namespace ModernSlavery.Tests.Common.TestHelpers
 {
     public static class ReturnHelper
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public static class Url
     {

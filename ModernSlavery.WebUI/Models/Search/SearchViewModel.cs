@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Models;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models;
 
-namespace GenderPayGap.WebUI.Models.Search
+namespace ModernSlavery.WebUI.Models.Search
 {
     [Serializable]
     public class SearchViewModel

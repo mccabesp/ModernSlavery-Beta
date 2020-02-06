@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Models.HttpResultModels;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Models.HttpResultModels;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.WebUI.Models
+namespace ModernSlavery.WebUI.Models
 {
 
     [Serializable]

@@ -6,7 +6,7 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public static class Email
     {

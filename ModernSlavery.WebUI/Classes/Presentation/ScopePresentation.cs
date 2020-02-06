@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.WebUI.Models.Register;
-using GenderPayGap.WebUI.Models.Scope;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.WebUI.Models.Register;
+using ModernSlavery.WebUI.Models.Scope;
 using Microsoft.EntityFrameworkCore;
 
-namespace GenderPayGap.WebUI.Classes.Services
+namespace ModernSlavery.WebUI.Classes.Services
 {
 
     public interface IScopePresentation

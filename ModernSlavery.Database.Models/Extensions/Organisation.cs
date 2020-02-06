@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.ErrorMessages;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Database
+namespace ModernSlavery.Database
 {
 
     [Serializable]

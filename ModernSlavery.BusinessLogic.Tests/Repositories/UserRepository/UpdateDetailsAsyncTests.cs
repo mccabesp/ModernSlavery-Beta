@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AutoMapper;
-using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.BusinessLogic.Account.Models;
-using GenderPayGap.BusinessLogic.LogRecords;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.Tests.Common.TestHelpers;
+using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.Account.Models;
+using ModernSlavery.BusinessLogic.LogRecords;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
 using NUnit.Framework;
 
@@ -25,7 +25,7 @@ namespace Repositories.UserRepository
         {
             // init mapper
             Mapper.Reset();
-            Mapper.Initialize(config => config.AddMaps(typeof(GenderPayGap.BusinessLogic.Account.Repositories.UserRepository).Assembly));
+            Mapper.Initialize(config => config.AddMaps(typeof(ModernSlavery.BusinessLogic.Account.Repositories.UserRepository).Assembly));
 
             // mock data 
             mockDataRepo = new Mock<IDataRepository>().SetupGetAll(UserHelpers.CreateUsers());
@@ -34,7 +34,7 @@ namespace Repositories.UserRepository
 
             // service under test
             testUserRepo =
-                new GenderPayGap.BusinessLogic.Account.Repositories.UserRepository(mockDataRepo.Object, mockLogRecordLogger.Object);
+                new ModernSlavery.BusinessLogic.Account.Repositories.UserRepository(mockDataRepo.Object, mockLogRecordLogger.Object);
         }
 
         private Mock<IDataRepository> mockDataRepo;

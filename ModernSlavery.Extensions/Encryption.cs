@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public static class Encryption
     {

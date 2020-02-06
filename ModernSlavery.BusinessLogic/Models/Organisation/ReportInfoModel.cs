@@ -1,8 +1,8 @@
 ﻿using System;
-using GenderPayGap.BusinessLogic.Classes;
-using GenderPayGap.Core;
+using ModernSlavery.BusinessLogic.Classes;
+using ModernSlavery.Core;
 
-namespace GenderPayGap.BusinessLogic.Models.Organisation
+namespace ModernSlavery.BusinessLogic.Models.Organisation
 {
     /// <summary>
     /// </summary>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace GenderPayGap.WebUI.Models.Admin
+namespace ModernSlavery.WebUI.Models.Admin
 {
     [Serializable]
     public class UploadViewModel

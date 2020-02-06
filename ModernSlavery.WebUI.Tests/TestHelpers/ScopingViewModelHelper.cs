@@ -1,7 +1,7 @@
-﻿using GenderPayGap.WebUI.Models.Scope;
+﻿using ModernSlavery.WebUI.Models.Scope;
 using Moq;
 
-namespace GenderPayGap.WebUI.Tests.TestHelpers
+namespace ModernSlavery.WebUI.Tests.TestHelpers
 {
     public class ScopingViewModelHelper
     {

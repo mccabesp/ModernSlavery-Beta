@@ -6,20 +6,20 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.ErrorMessages;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Core.Models.HttpResultModels;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Models.Admin;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Models.HttpResultModels;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Models.Admin;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.WebUI.Controllers.Administration
+namespace ModernSlavery.WebUI.Controllers.Administration
 {
     public partial class AdminController : BaseController
     {

@@ -8,7 +8,7 @@ using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.IdentityServer4.Models.Diagnostics
+namespace ModernSlavery.IdentityServer4.Models.Diagnostics
 {
     public class DiagnosticsViewModel
     {

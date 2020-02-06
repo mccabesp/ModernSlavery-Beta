@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Account.Models;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.Queues;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
+using ModernSlavery.BusinessLogic.Account.Models;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.Queues;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.BusinessLogic.LogRecords
+namespace ModernSlavery.BusinessLogic.LogRecords
 {
 
     public interface IUserLogRecord : ILogRecordLogger

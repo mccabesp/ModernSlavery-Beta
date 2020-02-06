@@ -1,4 +1,4 @@
-﻿namespace GenderPayGap.WebUI.Views.Home
+﻿namespace ModernSlavery.WebUI.Views.Home
 {
     public class CookieSettingsViewModel
     {

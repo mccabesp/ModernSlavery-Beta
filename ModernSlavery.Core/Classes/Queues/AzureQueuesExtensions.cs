@@ -1,13 +1,13 @@
 ﻿using System;
 using Autofac;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.Queues;
-using GenderPayGap.Core.Interfaces;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.Queues;
+using ModernSlavery.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace GenderPayGap.Infrastructure.AzureQueues.Extensions
+namespace ModernSlavery.Infrastructure.AzureQueues.Extensions
 {
     public static class AzureQueuesExtensions
     {

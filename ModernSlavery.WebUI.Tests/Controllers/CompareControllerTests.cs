@@ -1,16 +1,16 @@
-﻿using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Models.Compare;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Models.HttpResultModels;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.Tests.Common.TestHelpers;
-using GenderPayGap.WebUI.Controllers;
-using GenderPayGap.WebUI.Models;
-using GenderPayGap.WebUI.Models.Search;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+﻿using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Models.Compare;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models.HttpResultModels;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebUI.Controllers;
+using ModernSlavery.WebUI.Models;
+using ModernSlavery.WebUI.Models.Search;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
@@ -21,7 +21,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace GenderPayGap.WebUI.Tests.Controllers
+namespace ModernSlavery.WebUI.Tests.Controllers
 {
     public class CompareControllerTests
     {

@@ -1,7 +1,7 @@
 ﻿using System;
-using GenderPayGap.BusinessLogic.Models.Organisation;
+using ModernSlavery.BusinessLogic.Models.Organisation;
 
-namespace GenderPayGap.WebUI.Models.Organisation
+namespace ModernSlavery.WebUI.Models.Organisation
 {
 
     [Serializable]

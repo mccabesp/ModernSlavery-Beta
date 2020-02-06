@@ -1,7 +1,7 @@
-﻿using GenderPayGap.Core.Classes.Downloadable;
+﻿using ModernSlavery.Core.Classes.Downloadable;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.Classes.Downloadable
+namespace ModernSlavery.Core.Tests.Classes.Downloadable
 {
     [TestFixture]
     public class DownloadableFileTests

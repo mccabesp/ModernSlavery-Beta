@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace GenderPayGap.WebUI.Classes.TagHelpers
+namespace ModernSlavery.WebUI.Classes.TagHelpers
 {
     [HtmlTargetElement("a", TagStructure = TagStructure.NormalOrSelfClosing)]
     public class AnchorTagHelper : TagHelper

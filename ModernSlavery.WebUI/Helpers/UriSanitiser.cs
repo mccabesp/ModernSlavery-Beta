@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenderPayGap.WebUI.Helpers
+namespace ModernSlavery.WebUI.Helpers
 {
     public static class UriSanitiser
     {

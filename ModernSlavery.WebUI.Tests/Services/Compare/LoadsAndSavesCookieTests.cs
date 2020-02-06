@@ -1,13 +1,13 @@
-﻿using GenderPayGap.Core;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.WebUI.Classes.Presentation;
-using GenderPayGap.WebUI.Options;
+﻿using ModernSlavery.Core;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.WebUI.Classes.Presentation;
+using ModernSlavery.WebUI.Options;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.Tests.Services.Compare
+namespace ModernSlavery.Tests.Services.Compare
 {
 
     public class LoadsAndSavesCookieTests

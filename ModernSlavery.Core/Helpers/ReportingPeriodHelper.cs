@@ -1,4 +1,4 @@
-﻿namespace GenderPayGap.Core.Helpers
+﻿namespace ModernSlavery.Core.Helpers
 {
     public static class ReportingPeriodHelper
     {

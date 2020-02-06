@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Interfaces;
+using ModernSlavery.Core.Interfaces;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.AzureQueue
+namespace ModernSlavery.Core.Tests.AzureQueue
 {
 
     [TestFixture]

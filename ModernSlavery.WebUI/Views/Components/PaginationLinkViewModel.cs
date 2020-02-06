@@ -1,4 +1,4 @@
-namespace GenderPayGap.WebUI.Views.Components
+namespace ModernSlavery.WebUI.Views.Components
 {
     public class PaginationLinkViewModel
     {

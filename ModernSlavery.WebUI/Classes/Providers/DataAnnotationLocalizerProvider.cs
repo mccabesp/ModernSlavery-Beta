@@ -2,7 +2,7 @@
 using System.Reflection;
 using Microsoft.Extensions.Localization;
 
-namespace GenderPayGap.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes
 {
 
     public static class DataAnnotationLocalizerProvider

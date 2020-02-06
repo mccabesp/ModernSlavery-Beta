@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 
-namespace GenderPayGap.IdentityServer4.Models.Consent
+namespace ModernSlavery.IdentityServer4.Models.Consent
 {
     public class ConsentViewModel : ConsentInputModel
     {

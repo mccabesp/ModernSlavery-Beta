@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GenderPayGap.Tests.Common.TestHelpers;
+using ModernSlavery.Tests.Common.TestHelpers;
 using NUnit.Framework;
 
-namespace GenderPayGap.Database.Tests
+namespace ModernSlavery.Database.Tests
 {
     [TestFixture]
     public class OrganisationTests

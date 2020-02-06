@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Models.Organisation;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.WebUI.Options;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Models.Organisation;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.WebUI.Options;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.Tests.Services.SubmissionService
+namespace ModernSlavery.Tests.Services.SubmissionService
 {
 
     public class GetAllEditableReportsAsyncTests

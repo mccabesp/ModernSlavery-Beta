@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Extensions;
 using Microsoft.Azure.Search.Models;
 using NUnit.Framework;
 
-namespace GenderPayGap.Integration.Tests
+namespace ModernSlavery.Integration.Tests
 {
     [TestFixture]
     public class AzureFileRepositoryTests

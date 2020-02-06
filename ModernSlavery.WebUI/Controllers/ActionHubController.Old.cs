@@ -1,7 +1,7 @@
-﻿using GenderPayGap.Core.Models.HttpResultModels;
+﻿using ModernSlavery.Core.Models.HttpResultModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.WebUI.Controllers
+namespace ModernSlavery.WebUI.Controllers
 {
 
     public partial class ActionHubController

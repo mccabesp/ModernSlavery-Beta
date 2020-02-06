@@ -1,10 +1,10 @@
 ﻿using System;
-using GenderPayGap.Core;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
 using Moq;
 
-namespace GenderPayGap.Tests.TestHelpers
+namespace ModernSlavery.Tests.TestHelpers
 {
     public static class UserHelper
     {

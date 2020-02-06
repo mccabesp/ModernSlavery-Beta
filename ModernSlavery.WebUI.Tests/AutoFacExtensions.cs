@@ -1,8 +1,8 @@
 ﻿using Autofac;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
 
-namespace GenderPayGap.WebUI.Tests
+namespace ModernSlavery.WebUI.Tests
 {
     public static class AutoFacExtensions
     {

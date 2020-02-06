@@ -1,6 +1,6 @@
-﻿using GenderPayGap.Core.Abstractions;
+﻿using ModernSlavery.Core.Abstractions;
 
-namespace GenderPayGap.Core.Models
+namespace ModernSlavery.Core.Models
 {
 
     public class OrganisationRegistrationApprovedTemplate : AEmailTemplate

@@ -2,14 +2,14 @@
 using System.Collections.Concurrent;
 using System.Text;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Classes;
-using GenderPayGap.BusinessLogic.Models.Submit;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Extensions;
+using ModernSlavery.BusinessLogic.Classes;
+using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace GenderPayGap.BusinessLogic.Services
+namespace ModernSlavery.BusinessLogic.Services
 {
     public interface IDraftFileBusinessLogic
     {

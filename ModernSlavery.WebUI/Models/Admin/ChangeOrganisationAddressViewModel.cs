@@ -1,9 +1,9 @@
-﻿using GenderPayGap.Database;
+﻿using ModernSlavery.Database;
 using GovUkDesignSystem;
 using GovUkDesignSystem.Attributes;
 using GovUkDesignSystem.Attributes.ValidationAttributes;
 
-namespace GenderPayGap.WebUI.Models.Admin
+namespace ModernSlavery.WebUI.Models.Admin
 {
     public class ChangeOrganisationAddressViewModel : GovUkViewModel
     {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.Logger;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.Logger;
+using ModernSlavery.Extensions.AspNetCore;
 
-namespace GenderPayGap.WebUI.Services
+namespace ModernSlavery.WebUI.Services
 {
     public class EmailSendingService
     {

@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace GenderPayGap.WebUI.Tests.Mocks
+namespace ModernSlavery.WebUI.Tests.Mocks
 {
     public class MockCache : IDistributedCache
     {

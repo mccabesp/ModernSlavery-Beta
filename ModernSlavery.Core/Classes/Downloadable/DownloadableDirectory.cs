@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using GenderPayGap.Core.Interfaces.Downloadable;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Interfaces.Downloadable;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Core.Classes.Downloadable
+namespace ModernSlavery.Core.Classes.Downloadable
 {
     public class DownloadableDirectory : IDownloadableDirectory
     {

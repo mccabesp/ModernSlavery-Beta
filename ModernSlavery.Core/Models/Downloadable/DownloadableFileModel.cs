@@ -1,10 +1,10 @@
 ﻿using System.Data;
 using System.IO;
 using System.Text;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Core.Models.Downloadable
+namespace ModernSlavery.Core.Models.Downloadable
 {
     public class DownloadableFileModel
     {

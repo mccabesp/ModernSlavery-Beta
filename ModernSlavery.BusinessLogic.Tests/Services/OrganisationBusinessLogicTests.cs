@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Models.Compare;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.Tests.Common.TestHelpers;
+using ModernSlavery.BusinessLogic.Models.Compare;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.BusinessLogic.Tests.Services
+namespace ModernSlavery.BusinessLogic.Tests.Services
 {
     [TestFixture]
     [SetCulture("en-GB")]

@@ -5,14 +5,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.IdentityServer4.Models.Grants;
+using ModernSlavery.IdentityServer4.Models.Grants;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.IdentityServer4.Controllers
+namespace ModernSlavery.IdentityServer4.Controllers
 {
     /// <summary>
     ///     This sample controller allows a user to revoke grants given to clients

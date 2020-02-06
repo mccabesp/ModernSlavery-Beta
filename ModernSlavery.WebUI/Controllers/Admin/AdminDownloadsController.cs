@@ -2,12 +2,12 @@
 using System.IO;
 using System.Linq;
 using CsvHelper;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database.Models;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.WebUI.Controllers
+namespace ModernSlavery.WebUI.Controllers
 {
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]

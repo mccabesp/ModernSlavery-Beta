@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using GenderPayGap.WebUI.Classes.Attributes;
+using ModernSlavery.WebUI.Classes.Attributes;
 
-namespace GenderPayGap.WebUI.Models.Shared
+namespace ModernSlavery.WebUI.Models.Shared
 {
 
     [Partial("Patterns/Pagination")]

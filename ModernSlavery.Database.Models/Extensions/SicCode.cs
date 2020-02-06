@@ -1,6 +1,6 @@
 using System;
 
-namespace GenderPayGap.Database
+namespace ModernSlavery.Database
 {
     [Serializable]
     public partial class SicCode

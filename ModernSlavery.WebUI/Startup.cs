@@ -6,29 +6,29 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.BusinessLogic.Account.Repositories;
-using GenderPayGap.BusinessLogic.LogRecords;
-using GenderPayGap.BusinessLogic.Repositories;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core;
-using GenderPayGap.Core.API;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.Queues;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.Infrastructure.AzureQueues.Extensions;
-using GenderPayGap.WebUI.Areas.Account.Abstractions;
-using GenderPayGap.WebUI.Areas.Account.ViewServices;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Classes.Presentation;
-using GenderPayGap.WebUI.Classes.Services;
-using GenderPayGap.WebUI.Options;
-using GenderPayGap.WebUI.Services;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.Account.Repositories;
+using ModernSlavery.BusinessLogic.LogRecords;
+using ModernSlavery.BusinessLogic.Repositories;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.API;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.Queues;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Infrastructure.AzureQueues.Extensions;
+using ModernSlavery.WebUI.Areas.Account.Abstractions;
+using ModernSlavery.WebUI.Areas.Account.ViewServices;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Classes.Presentation;
+using ModernSlavery.WebUI.Classes.Services;
+using ModernSlavery.WebUI.Options;
+using ModernSlavery.WebUI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -43,9 +43,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using Newtonsoft.Json.Serialization;
-using HttpSession = GenderPayGap.Extensions.AspNetCore.HttpSession;
+using HttpSession = ModernSlavery.Extensions.AspNetCore.HttpSession;
 
-namespace GenderPayGap.WebUI
+namespace ModernSlavery.WebUI
 {
     public class Startup
     {
@@ -186,7 +186,7 @@ namespace GenderPayGap.WebUI
             //Register the configuration
             builder.RegisterInstance(Config.Configuration).SingleInstance();
 
-            builder.Register(c => new SqlRepository(new GpgDatabaseContext(Global.DatabaseConnectionString, true)))
+            builder.Register(c => new SqlRepository(new DatabaseContext(Global.DatabaseConnectionString, true)))
                 .As<IDataRepository>()
                 .InstancePerLifetimeScope();
 

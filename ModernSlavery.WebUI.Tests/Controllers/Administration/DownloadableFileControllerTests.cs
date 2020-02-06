@@ -5,18 +5,18 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Autofac;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core.Classes.Downloadable;
-using GenderPayGap.Core.Interfaces.Downloadable;
-using GenderPayGap.Core.Models.Downloadable;
-using GenderPayGap.WebUI.Controllers.Administration;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core.Classes.Downloadable;
+using ModernSlavery.Core.Interfaces.Downloadable;
+using ModernSlavery.Core.Models.Downloadable;
+using ModernSlavery.WebUI.Controllers.Administration;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebUI.Tests.Controllers.Administration
+namespace ModernSlavery.WebUI.Tests.Controllers.Administration
 {
     [TestFixture]
     public class DownloadableFileControllerTests
@@ -260,9 +260,9 @@ namespace GenderPayGap.WebUI.Tests.Controllers.Administration
             Assert.AreEqual("someName", expectedFileContentResult.FileDownloadName);
         }
 
-        [TestCase(null, "Logs/GenderPayGap.WebUI")]
-        [TestCase("", "Logs/GenderPayGap.WebUI")]
-        [TestCase("   ", "Logs/GenderPayGap.WebUI")]
+        [TestCase(null, "Logs/ModernSlavery.WebUI")]
+        [TestCase("", "Logs/ModernSlavery.WebUI")]
+        [TestCase("   ", "Logs/ModernSlavery.WebUI")]
         [TestCase("Some/Given/Path", "Some/Given/Path")]
         public async Task POST_WebsiteLogs_Defaults_To_Base_Logs_Path_When_Not_Provided(string filePath, string expectedPath)
         {
@@ -316,9 +316,9 @@ namespace GenderPayGap.WebUI.Tests.Controllers.Administration
                 "Expected Directory1 to have been returned as it was configured as a response at the beginning of this test");
         }
 
-        [TestCase(null, "Logs/GenderPayGap.WebJob")]
-        [TestCase("", "Logs/GenderPayGap.WebJob")]
-        [TestCase("   ", "Logs/GenderPayGap.WebJob")]
+        [TestCase(null, "Logs/ModernSlavery.WebJob")]
+        [TestCase("", "Logs/ModernSlavery.WebJob")]
+        [TestCase("   ", "Logs/ModernSlavery.WebJob")]
         [TestCase("Some/Given/Path", "Some/Given/Path")]
         public async Task POST_WebjobLogs_Defaults_To_Base_Logs_Path_When_Not_Provided(string filePath, string expectedPath)
         {
@@ -372,9 +372,9 @@ namespace GenderPayGap.WebUI.Tests.Controllers.Administration
                 "Expected Directory2 to have been returned as it was configured as a response at the beginning of this test");
         }
 
-        [TestCase(null, "Logs/GenderPayGap.IdentityServer4")]
-        [TestCase("", "Logs/GenderPayGap.IdentityServer4")]
-        [TestCase("   ", "Logs/GenderPayGap.IdentityServer4")]
+        [TestCase(null, "Logs/ModernSlavery.IdentityServer4")]
+        [TestCase("", "Logs/ModernSlavery.IdentityServer4")]
+        [TestCase("   ", "Logs/ModernSlavery.IdentityServer4")]
         [TestCase("Some/Given/Path", "Some/Given/Path")]
         public async Task POST_IdentityLogs_Defaults_To_Base_Logs_Path_When_Not_Provided(string filePath, string expectedPath)
         {

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json.Linq;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public static class Lists
     {

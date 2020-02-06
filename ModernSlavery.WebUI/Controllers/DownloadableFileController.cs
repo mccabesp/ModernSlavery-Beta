@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Filters;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Interfaces.Downloadable;
-using GenderPayGap.Core.Models.Downloadable;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.WebUI.Classes;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Filters;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Interfaces.Downloadable;
+using ModernSlavery.Core.Models.Downloadable;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebUI.Controllers.Administration
+namespace ModernSlavery.WebUI.Controllers.Administration
 {
     [Route("~/")]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -74,7 +74,7 @@ namespace GenderPayGap.WebUI.Controllers.Administration
         [HttpGet("admin/WebsiteLogs")]
         public async Task<IActionResult> WebsiteLogs(string fp)
         {
-            IEnumerable<IDownloadableItem> downloadViewModelToReturn = await FetchDownloadablesFromSubfolderAsync(fp, "GenderPayGap.WebUI");
+            IEnumerable<IDownloadableItem> downloadViewModelToReturn = await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.WebUI");
             return View("WebsiteLogs", downloadViewModelToReturn);
         }
 
@@ -82,7 +82,7 @@ namespace GenderPayGap.WebUI.Controllers.Administration
         public async Task<IActionResult> WebjobLogs(string fp)
         {
             IEnumerable<IDownloadableItem> downloadViewModelToReturn =
-                await FetchDownloadablesFromSubfolderAsync(fp, "GenderPayGap.WebJob");
+                await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.WebJob");
             return View("WebjobLogs", downloadViewModelToReturn);
         }
 
@@ -90,7 +90,7 @@ namespace GenderPayGap.WebUI.Controllers.Administration
         public async Task<IActionResult> IdentityLogs(string fp)
         {
             IEnumerable<IDownloadableItem> downloadViewModelToReturn =
-                await FetchDownloadablesFromSubfolderAsync(fp, "GenderPayGap.IdentityServer4");
+                await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.IdentityServer4");
             return View("IdentityLogs", downloadViewModelToReturn);
         }
 

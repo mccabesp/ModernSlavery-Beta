@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
 using Notify.Models.Responses;
 
 public class MockGovNotify : IGovNotifyAPI

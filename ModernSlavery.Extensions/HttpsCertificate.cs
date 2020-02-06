@@ -2,7 +2,7 @@
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public static class HttpsCertificate
     {

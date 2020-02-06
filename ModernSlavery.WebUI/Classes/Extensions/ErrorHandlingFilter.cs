@@ -1,12 +1,12 @@
-﻿using GenderPayGap.Core.Models;
-using GenderPayGap.Extensions;
+﻿using ModernSlavery.Core.Models;
+using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes
 {
     public class ErrorHandlingFilter : ExceptionFilterAttribute
     {

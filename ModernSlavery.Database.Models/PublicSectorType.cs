@@ -1,7 +1,7 @@
 ﻿using System;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Database
+namespace ModernSlavery.Database
 {
 
     [Serializable]

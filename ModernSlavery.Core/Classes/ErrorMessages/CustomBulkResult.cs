@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace GenderPayGap.Core.Classes.ErrorMessages
+namespace ModernSlavery.Core.Classes.ErrorMessages
 {
     public class CustomBulkResult<T>
     {

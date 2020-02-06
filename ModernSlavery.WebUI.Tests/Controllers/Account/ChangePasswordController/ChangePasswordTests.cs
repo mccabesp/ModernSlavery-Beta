@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Tests.TestHelpers;
-using GenderPayGap.WebUI;
-using GenderPayGap.WebUI.Areas.Account.ViewModels;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Tests.TestHelpers;
+using ModernSlavery.WebUI;
+using ModernSlavery.WebUI.Areas.Account.ViewModels;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
@@ -29,7 +29,7 @@ namespace Account.Controllers.ChangePasswordController
             mockRouteData = new RouteData();
             mockRouteData.Values.Add(
                 "Action",
-                nameof(GenderPayGap.WebUI.Areas.Account.Controllers.ChangePasswordController.ChangePassword));
+                nameof(ModernSlavery.WebUI.Areas.Account.Controllers.ChangePasswordController.ChangePassword));
             mockRouteData.Values.Add("Controller", "ChangePassword");
         }
 
@@ -39,7 +39,7 @@ namespace Account.Controllers.ChangePasswordController
             // Arrange
             User unverifiedUser = UserHelper.GetNotAdminUserWithoutVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ChangePasswordController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ChangePasswordController>(
                     0,
                     mockRouteData,
                     unverifiedUser);
@@ -58,7 +58,7 @@ namespace Account.Controllers.ChangePasswordController
             // Arrange
             User unverifiedUser = UserHelper.GetNotAdminUserWithoutVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ChangePasswordController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ChangePasswordController>(
                     0,
                     mockRouteData,
                     unverifiedUser);
@@ -82,7 +82,7 @@ namespace Account.Controllers.ChangePasswordController
             verifiedUser.Salt = salt;
             verifiedUser.HashingAlgorithm = HashingAlgorithm.PBKDF2;
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ChangePasswordController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ChangePasswordController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);
@@ -110,7 +110,7 @@ namespace Account.Controllers.ChangePasswordController
 
             Assert.NotNull(redirectToActionResult);
             Assert.AreEqual(
-                nameof(GenderPayGap.WebUI.Areas.Account.Controllers.ManageAccountController.ManageAccount),
+                nameof(ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController.ManageAccount),
                 redirectToActionResult.ActionName);
 
             Assert.AreEqual(controller.CurrentUser.PasswordHash, Crypto.GetPBKDF2(testNewPassword, Convert.FromBase64String(controller.CurrentUser.Salt)), "Expected password to be updated");

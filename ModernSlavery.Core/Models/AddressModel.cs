@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Core.Models
+namespace ModernSlavery.Core.Models
 {
     [Serializable]
     public class AddressModel

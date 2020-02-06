@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using GovUkDesignSystem.GovUkDesignSystemComponents.SubComponents;
 
-namespace GenderPayGap.WebUI.Views.Components.StepByStep
+namespace ModernSlavery.WebUI.Views.Components.StepByStep
 {
 
     public class StepViewModel

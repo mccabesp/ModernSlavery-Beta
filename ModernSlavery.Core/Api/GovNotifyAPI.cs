@@ -1,13 +1,13 @@
 using System.Collections.Generic;
-using GenderPayGap.Core.Classes.Logger;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core.Classes.Logger;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Extensions.AspNetCore;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Exceptions;
 using Notify.Models.Responses;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     public class GovNotifyAPI : IGovNotifyAPI
     {

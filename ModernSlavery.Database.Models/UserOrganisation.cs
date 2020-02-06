@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using GenderPayGap.Core;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Database
+namespace ModernSlavery.Database
 {
     public partial class UserOrganisation
     {

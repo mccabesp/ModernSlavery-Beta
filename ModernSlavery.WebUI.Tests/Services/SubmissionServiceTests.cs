@@ -3,27 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Classes;
-using GenderPayGap.BusinessLogic.Models.Submit;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.Tests.Common.TestHelpers;
-using GenderPayGap.Tests.TestHelpers;
-using GenderPayGap.WebUI.Classes.Services;
-using GenderPayGap.WebUI.Models.Submit;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Classes;
+using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.Tests.TestHelpers;
+using ModernSlavery.WebUI.Classes.Services;
+using ModernSlavery.WebUI.Models.Submit;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using MockQueryable.Moq;
 using Moq;
 using NUnit.Framework;
 using RangeAttribute = System.ComponentModel.DataAnnotations.RangeAttribute;
 
-namespace GenderPayGap.Tests
+namespace ModernSlavery.Tests
 {
 
     [TestFixture]

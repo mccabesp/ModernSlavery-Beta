@@ -4,22 +4,22 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Classes;
-using GenderPayGap.BusinessLogic.Models.Organisation;
-using GenderPayGap.BusinessLogic.Models.Submit;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebUI.Models.Submit;
-using GenderPayGap.WebUI.Options;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Classes;
+using ModernSlavery.BusinessLogic.Models.Organisation;
+using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Models.Submit;
+using ModernSlavery.WebUI.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace GenderPayGap.WebUI.Classes.Services
+namespace ModernSlavery.WebUI.Classes.Services
 {
 
     public interface ISubmissionService

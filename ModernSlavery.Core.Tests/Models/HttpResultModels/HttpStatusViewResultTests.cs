@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Models.HttpResultModels;
+using ModernSlavery.Core.Models.HttpResultModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.Models.HttpResultModels
+namespace ModernSlavery.Core.Tests.Models.HttpResultModels
 {
     [TestFixture]
     public class HttpStatusViewResultTests

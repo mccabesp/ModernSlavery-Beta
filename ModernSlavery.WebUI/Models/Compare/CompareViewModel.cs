@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using GenderPayGap.BusinessLogic.Models.Compare;
-using GenderPayGap.Extensions;
+using ModernSlavery.BusinessLogic.Models.Compare;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.WebUI.Models
+namespace ModernSlavery.WebUI.Models
 {
     public class CompareViewModel
     {

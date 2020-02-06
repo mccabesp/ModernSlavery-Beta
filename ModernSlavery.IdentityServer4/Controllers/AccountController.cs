@@ -10,13 +10,13 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
-using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.IdentityServer4.Classes;
-using GenderPayGap.IdentityServer4.Models.Account;
+using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.IdentityServer4.Classes;
+using ModernSlavery.IdentityServer4.Models.Account;
 using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Events;
@@ -30,7 +30,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.IdentityServer4.Controllers
+namespace ModernSlavery.IdentityServer4.Controllers
 {
     /// <summary>
     ///     This sample controller implements a typical login/logout/provision workflow for local and external accounts.

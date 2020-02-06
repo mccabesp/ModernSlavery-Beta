@@ -7,7 +7,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public static class Networking
     {

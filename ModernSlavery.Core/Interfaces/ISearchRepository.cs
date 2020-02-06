@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Classes;
+using ModernSlavery.Core.Classes;
 using Microsoft.Azure.Search.Models;
 
-namespace GenderPayGap.Core.Interfaces
+namespace ModernSlavery.Core.Interfaces
 {
     public interface ISearchRepository<T>
     {

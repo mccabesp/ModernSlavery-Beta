@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public class HttpException : Exception
     {

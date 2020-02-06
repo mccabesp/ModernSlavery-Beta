@@ -1,6 +1,6 @@
 using System;
 
-namespace GenderPayGap.Core.Models
+namespace ModernSlavery.Core.Models
 {
     public class DownloadResult
     {

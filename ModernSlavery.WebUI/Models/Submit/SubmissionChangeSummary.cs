@@ -1,4 +1,4 @@
-﻿namespace GenderPayGap.WebUI.Models.Submit
+﻿namespace ModernSlavery.WebUI.Models.Submit
 {
 
     public class SubmissionChangeSummary

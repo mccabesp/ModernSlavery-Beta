@@ -1,9 +1,9 @@
 ﻿using System;
-using GenderPayGap.Core;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Extensions;
 using Microsoft.Extensions.Configuration;
 
-namespace GenderPayGap.BusinessLogic
+namespace ModernSlavery.BusinessLogic
 {
     public interface ICommonBusinessLogic
     {

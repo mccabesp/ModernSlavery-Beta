@@ -1,6 +1,6 @@
-﻿using GenderPayGap.Core.Classes;
+﻿using ModernSlavery.Core.Classes;
 
-namespace GenderPayGap.WebUI.Models
+namespace ModernSlavery.WebUI.Models
 {
     public class EmployerDetailsViewModel
     {

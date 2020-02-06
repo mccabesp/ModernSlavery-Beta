@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using GenderPayGap.Database;
-using GenderPayGap.WebUI.Services;
+using ModernSlavery.Database;
+using ModernSlavery.WebUI.Services;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebUI.Tests.Services
+namespace ModernSlavery.WebUI.Tests.Services
 {
     [TestFixture]
     public class PinInThePostServiceTests

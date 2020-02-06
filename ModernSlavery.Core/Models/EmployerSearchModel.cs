@@ -1,10 +1,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 
-namespace GenderPayGap.Core.Models
+namespace ModernSlavery.Core.Models
 {
     [Serializable]
     public class EmployerSearchModel

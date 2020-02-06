@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.WebUI.Models.Shared;
+using ModernSlavery.WebUI.Models.Shared;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace GenderPayGap.WebUI.Classes.TagHelpers
+namespace ModernSlavery.WebUI.Classes.TagHelpers
 {
     [HtmlTargetElement("Expand", TagStructure = TagStructure.NormalOrSelfClosing)]
     public class ExpandDetailsTagHelper : TagHelper

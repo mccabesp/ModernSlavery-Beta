@@ -1,13 +1,13 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Tests.Common.Classes;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Tests.Common.Classes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.LogEventLoggerProvider
+namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
 {
 
     [TestFixture]

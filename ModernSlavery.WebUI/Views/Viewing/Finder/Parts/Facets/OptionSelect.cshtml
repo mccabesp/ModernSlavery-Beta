@@ -1,6 +1,6 @@
-﻿@using GenderPayGap.WebUI.Models.Search
+﻿@using ModernSlavery.WebUI.Models.Search
 @using Microsoft.Extensions.Primitives
-@model GenderPayGap.WebUI.Models.Search.FilterGroup
+@model ModernSlavery.WebUI.Models.Search.FilterGroup
 @{
     string maxHeight = string.IsNullOrWhiteSpace(Model.MaxHeight) ? "100%" : Model.MaxHeight;
     StringValues queryLookup = Context.Request.Query[Model.Group];

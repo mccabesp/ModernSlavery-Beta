@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Models.Submit;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Classes.Services;
-using GenderPayGap.WebUI.Controllers.Submission;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Classes.Services;
+using ModernSlavery.WebUI.Controllers.Submission;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebUI.Tests.Controllers
+namespace ModernSlavery.WebUI.Tests.Controllers
 {
 
     public partial class SubmitControllerTests

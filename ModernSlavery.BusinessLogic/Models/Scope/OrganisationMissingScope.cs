@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GenderPayGap.BusinessLogic.Models.Scope
+namespace ModernSlavery.BusinessLogic.Models.Scope
 {
     public class OrganisationMissingScope
     {

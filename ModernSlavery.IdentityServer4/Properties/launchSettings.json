@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iis": {
-      "applicationUrl": "http://localhost/GenderPayGap.IdentityServer4",
+      "applicationUrl": "http://localhost/ModernSlavery.IdentityServer4",
       "sslPort": 0
     },
     "iisExpress": {
@@ -21,7 +21,7 @@
       "ancmHostingModel": "OutOfProcess",
       "applicationUrl": " http://localhost:5000/"
     },
-    "GenderPayGap.IdentityServer4": {
+    "ModernSlavery.IdentityServer4": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Local"

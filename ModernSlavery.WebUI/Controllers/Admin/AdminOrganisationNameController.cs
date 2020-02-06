@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Linq;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core;
-using GenderPayGap.Core.API;
-using GenderPayGap.Core.Classes.Logger;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models.CompaniesHouse;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Models.Admin;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.API;
+using ModernSlavery.Core.Classes.Logger;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models.CompaniesHouse;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Models.Admin;
 using GovUkDesignSystem.Parsers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.WebUI.Controllers.Admin
+namespace ModernSlavery.WebUI.Controllers.Admin
 {
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]

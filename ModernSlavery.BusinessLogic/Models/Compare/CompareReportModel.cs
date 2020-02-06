@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using GenderPayGap.Core;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.BusinessLogic.Models.Compare
+namespace ModernSlavery.BusinessLogic.Models.Compare
 {
 
     [Serializable]

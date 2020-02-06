@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 using Microsoft.Extensions.Configuration;
 
-namespace GenderPayGap.WebJob
+namespace ModernSlavery.WebJob
 {
     //Allows disabling of named webjob methods in DisabledWebjobs section of appsettings.json
     //This only applies to timed-functions

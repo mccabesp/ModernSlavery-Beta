@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Models.Cookies;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.WebUI.Options;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models.Cookies;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using HttpContext = Microsoft.AspNetCore.Http.HttpContext;
 
-namespace GenderPayGap.WebUI.Classes.Presentation
+namespace ModernSlavery.WebUI.Classes.Presentation
 {
 
     public interface ICompareViewService

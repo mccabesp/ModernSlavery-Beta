@@ -1,9 +1,9 @@
-﻿using GenderPayGap.Core.Classes;
-using GenderPayGap.Extensions.AspNetCore;
+﻿using ModernSlavery.Core.Classes;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.Search;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.Classes
+namespace ModernSlavery.Core.Tests.Classes
 {
     [TestFixture]
     public class SicCodeSearchRepositoryTests

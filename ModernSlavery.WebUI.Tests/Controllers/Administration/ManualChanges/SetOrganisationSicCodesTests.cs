@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Tests.TestHelpers;
-using GenderPayGap.WebUI.Controllers.Administration;
-using GenderPayGap.WebUI.Models.Admin;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Tests.TestHelpers;
+using ModernSlavery.WebUI.Controllers.Administration;
+using ModernSlavery.WebUI.Models.Admin;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebUI.Tests.Controllers.Administration.ManualChanges
+namespace ModernSlavery.WebUI.Tests.Controllers.Administration.ManualChanges
 {
 
     [TestFixture]

@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "GenderPayGap.WebJob": {
+    "ModernSlavery.WebJob": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Local"

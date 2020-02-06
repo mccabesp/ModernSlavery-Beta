@@ -1,14 +1,14 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Controllers;
-using GenderPayGap.WebUI.Models.Scope;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Controllers;
+using ModernSlavery.WebUI.Models.Scope;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebUI.Tests.Classes.BaseClasses
+namespace ModernSlavery.WebUI.Tests.Classes.BaseClasses
 {
     [TestFixture]
     [SetCulture("en-GB")]

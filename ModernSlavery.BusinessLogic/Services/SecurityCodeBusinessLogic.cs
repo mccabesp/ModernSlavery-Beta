@@ -1,9 +1,9 @@
 ﻿using System;
-using GenderPayGap.Core.Classes.ErrorMessages;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.BusinessLogic.Services
+namespace ModernSlavery.BusinessLogic.Services
 {
     public interface ISecurityCodeBusinessLogic
     {

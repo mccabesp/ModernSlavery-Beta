@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.StaticFiles;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public static class FileSystem
     {

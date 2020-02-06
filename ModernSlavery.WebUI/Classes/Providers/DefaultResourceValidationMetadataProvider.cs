@@ -2,7 +2,7 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
-namespace GenderPayGap.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes
 {
 
     public class DefaultResourceValidationMetadataProvider : IValidationMetadataProvider

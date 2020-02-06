@@ -1,21 +1,21 @@
 ﻿using Autofac;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core;
-using GenderPayGap.Core.API;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.Tests.Common.Mocks;
-using GenderPayGap.Tests.Common.TestHelpers;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.API;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.Mocks;
+using ModernSlavery.Tests.Common.TestHelpers;
 using Microsoft.Azure.Search;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace GenderPayGap.WebJob.Tests.TestHelpers
+namespace ModernSlavery.WebJob.Tests.TestHelpers
 {
     internal static class WebJobTestHelper
     {

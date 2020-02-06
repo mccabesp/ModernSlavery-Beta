@@ -1,7 +1,7 @@
-﻿using GenderPayGap.Core.Models;
+﻿using ModernSlavery.Core.Models;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.Models
+namespace ModernSlavery.Core.Tests.Models
 {
     /// <summary>
     ///     Tests in this class have been extracted from the examples here:

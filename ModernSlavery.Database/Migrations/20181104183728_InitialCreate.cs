@@ -1,9 +1,9 @@
 ﻿using System;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace GenderPayGap.Database.Core21.Migrations
+namespace ModernSlavery.Database.Core21.Migrations
 {
     public partial class InitialCreate : Migration
     {

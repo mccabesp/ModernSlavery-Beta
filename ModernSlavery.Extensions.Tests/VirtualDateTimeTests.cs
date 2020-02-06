@@ -1,8 +1,8 @@
 using System;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Extensions.AspNetCore;
 using NUnit.Framework;
 
-namespace GenderPayGap.Extensions.Tests
+namespace ModernSlavery.Extensions.Tests
 {
     [TestFixture]
     public class VirtualDateTimeTests

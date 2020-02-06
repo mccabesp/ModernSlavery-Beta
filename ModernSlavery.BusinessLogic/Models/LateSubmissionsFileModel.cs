@@ -1,7 +1,7 @@
 ﻿using System;
-using GenderPayGap.Core;
+using ModernSlavery.Core;
 
-namespace GenderPayGap.BusinessLogic.Models
+namespace ModernSlavery.BusinessLogic.Models
 {
     [Serializable]
     public class LateSubmissionsFileModel

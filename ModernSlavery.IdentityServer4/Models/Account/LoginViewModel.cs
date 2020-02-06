@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GenderPayGap.IdentityServer4.Models.Account
+namespace ModernSlavery.IdentityServer4.Models.Account
 {
     public class LoginViewModel : LoginInputModel
     {

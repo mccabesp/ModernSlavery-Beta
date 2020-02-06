@@ -1,9 +1,9 @@
 ﻿using System;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebJob.Tests
+namespace ModernSlavery.WebJob.Tests
 {
     [TestFixture]
     public class WebJobConfigurationTests

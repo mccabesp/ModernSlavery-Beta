@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.LogEventLoggerProvider
+namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
 {
 
     [TestFixture]

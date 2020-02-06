@@ -1,7 +1,7 @@
-﻿using GenderPayGap.WebUI.Models.Search;
+﻿using ModernSlavery.WebUI.Models.Search;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebUI.Tests.Models.Search
+namespace ModernSlavery.WebUI.Tests.Models.Search
 {
     [TestFixture]
     public class EmployerSearchParametersTests

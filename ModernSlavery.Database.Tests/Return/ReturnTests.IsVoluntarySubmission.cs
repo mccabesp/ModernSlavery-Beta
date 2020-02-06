@@ -1,11 +1,11 @@
 ﻿using System;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Extensions;
-using GenderPayGap.Tests.Common.TestHelpers;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Extensions;
+using ModernSlavery.Tests.Common.TestHelpers;
 using NUnit.Framework;
 
-namespace GenderPayGap.Database.ReturnTests
+namespace ModernSlavery.Database.ReturnTests
 {
     [TestFixture]
     public class IsVoluntarySubmissionTests

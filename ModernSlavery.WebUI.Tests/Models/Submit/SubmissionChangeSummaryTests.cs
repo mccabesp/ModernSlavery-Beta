@@ -1,7 +1,7 @@
-﻿using GenderPayGap.WebUI.Models.Submit;
+﻿using ModernSlavery.WebUI.Models.Submit;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebUI.Tests.Models.Submit
+namespace ModernSlavery.WebUI.Tests.Models.Submit
 {
     [TestFixture]
     public class SubmissionChangeSummaryTests

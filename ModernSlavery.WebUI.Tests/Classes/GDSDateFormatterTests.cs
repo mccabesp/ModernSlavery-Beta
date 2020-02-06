@@ -1,8 +1,8 @@
 ﻿using System;
-using GenderPayGap.WebUI.Classes.Formatters;
+using ModernSlavery.WebUI.Classes.Formatters;
 using NUnit.Framework;
 
-namespace GenderPayGap.Tests
+namespace ModernSlavery.Tests
 {
 
     [TestFixture]

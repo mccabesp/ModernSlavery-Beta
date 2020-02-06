@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     /// <summary>
     ///     Miscellaneous and parsing methods for DateTime

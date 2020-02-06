@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.IdentityServer4.Models.Consent;
+using ModernSlavery.IdentityServer4.Models.Consent;
 using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.IdentityServer4.Controllers
+namespace ModernSlavery.IdentityServer4.Controllers
 {
     /// <summary>
     ///     This controller processes the consent UI

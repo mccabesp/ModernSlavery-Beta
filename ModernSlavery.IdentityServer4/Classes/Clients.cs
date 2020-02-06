@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 using IdentityServer4;
 using IdentityServer4.Models;
 
-namespace GenderPayGap.IdentityServer4.Classes
+namespace ModernSlavery.IdentityServer4.Classes
 {
     public static class Clients
     {

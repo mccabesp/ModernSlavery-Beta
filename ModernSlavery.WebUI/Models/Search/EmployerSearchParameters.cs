@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GenderPayGap.Core;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Extensions;
 using Microsoft.Azure.Search.Models;
 
-namespace GenderPayGap.WebUI.Models.Search
+namespace ModernSlavery.WebUI.Models.Search
 {
     [Serializable]
     public class EmployerSearchParameters

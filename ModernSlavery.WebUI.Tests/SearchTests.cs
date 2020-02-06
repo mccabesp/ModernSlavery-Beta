@@ -1,12 +1,12 @@
 ﻿using System.Linq;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Tests.Common.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Tests.Common.Classes;
 using MockQueryable.Moq;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.Tests
+namespace ModernSlavery.Tests
 {
     [TestFixture]
     [SetCulture("en-GB")]

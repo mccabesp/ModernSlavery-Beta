@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace GenderPayGap.Database.Core21.Migrations
+namespace ModernSlavery.Database.Core21.Migrations
 {
     public partial class AddOptOutFlagsToOrganisation : Migration
     {

@@ -3,10 +3,10 @@
 
 
 using System.Linq;
-using GenderPayGap.IdentityServer4.Classes;
+using ModernSlavery.IdentityServer4.Classes;
 using IdentityServer4.Models;
 
-namespace GenderPayGap.IdentityServer4.Models.Account
+namespace ModernSlavery.IdentityServer4.Models.Account
 {
     public class LogoutViewModel : LogoutInputModel
     {

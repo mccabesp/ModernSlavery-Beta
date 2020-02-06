@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Net;
 using System.Web;
-using GenderPayGap.Core.Models.HttpResultModels;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core.Models.HttpResultModels;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.Core.Filters
+namespace ModernSlavery.Core.Filters
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class AllowOnlyTrustedIps : ActionFilterAttribute

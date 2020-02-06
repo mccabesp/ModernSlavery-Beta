@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenderPayGap.BusinessLogic.Account.Models
+namespace ModernSlavery.BusinessLogic.Account.Models
 {
 
     [Serializable]

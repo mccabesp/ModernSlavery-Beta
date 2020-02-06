@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.Core;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.WebUI.Areas.Account.Abstractions;
-using GenderPayGap.WebUI.Areas.Account.ViewModels;
+using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.Core;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Areas.Account.Abstractions;
+using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebUI.Areas.Account.ViewServices
+namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 {
 
     public class CloseAccountViewService : ICloseAccountViewService

@@ -1,4 +1,4 @@
-﻿namespace GenderPayGap.WebUI.Models
+﻿namespace ModernSlavery.WebUI.Models
 {
     public class AddRemoveButtonViewModel
     {

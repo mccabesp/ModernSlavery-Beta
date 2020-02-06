@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.Database;
-using GenderPayGap.WebUI.Areas.Account.Abstractions;
-using GenderPayGap.WebUI.Areas.Account.Resources;
-using GenderPayGap.WebUI.Areas.Account.ViewModels;
+using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.Database;
+using ModernSlavery.WebUI.Areas.Account.Abstractions;
+using ModernSlavery.WebUI.Areas.Account.Resources;
+using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace GenderPayGap.WebUI.Areas.Account.ViewServices
+namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 {
 
     public class ChangePasswordViewService : IChangePasswordViewService

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Abstractions;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core.Abstractions;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Notify.Client;
@@ -13,7 +13,7 @@ using Notify.Interfaces;
 using Notify.Models;
 using Notify.Models.Responses;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
 
     public class GovNotifyEmailProvider : AEmailProvider

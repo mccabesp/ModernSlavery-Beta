@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.Core.Models.HttpResultModels
+namespace ModernSlavery.Core.Models.HttpResultModels
 {
     public class HttpForbiddenResult : HttpStatusViewResult
     {

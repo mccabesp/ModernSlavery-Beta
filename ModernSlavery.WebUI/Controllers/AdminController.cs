@@ -9,21 +9,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
 using CsvHelper;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Api;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Core.Models.HttpResultModels;
-using GenderPayGap.Database;
-using GenderPayGap.Database.Models;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Classes.Services;
-using GenderPayGap.WebUI.Models.Admin;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Api;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Models.HttpResultModels;
+using ModernSlavery.Database;
+using ModernSlavery.Database.Models;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Classes.Services;
+using ModernSlavery.WebUI.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -31,7 +31,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebUI.Controllers.Administration
+namespace ModernSlavery.WebUI.Controllers.Administration
 {
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]

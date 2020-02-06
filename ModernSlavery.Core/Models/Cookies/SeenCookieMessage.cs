@@ -1,4 +1,4 @@
-﻿namespace GenderPayGap.Core.Models.Cookies
+﻿namespace ModernSlavery.Core.Models.Cookies
 {
     public class SeenCookieMessage
     {

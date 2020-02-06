@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NUnit.Framework;
 
-namespace GenderPayGap.Tests.Common.Classes
+namespace ModernSlavery.Tests.Common.Classes
 {
     public static class TestHelpers
     {
@@ -26,15 +26,15 @@ namespace GenderPayGap.Tests.Common.Classes
                 testName = MethodBase.GetCurrentMethod().FindParentWithAttribute<TestAttribute>().Name;
             }
 
-            DbContextOptionsBuilder<GpgDatabaseContext> optionsBuilder =
-                new DbContextOptionsBuilder<GpgDatabaseContext>().UseInMemoryDatabase(testName);
+            DbContextOptionsBuilder<DatabaseContext> optionsBuilder =
+                new DbContextOptionsBuilder<DatabaseContext>().UseInMemoryDatabase(testName);
 
             optionsBuilder.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning));
 
             // show more detailed EF errors i.e. ReturnId value instead of '{ReturnId}' n the logs etc...
             optionsBuilder.EnableSensitiveDataLogging();
 
-            var dbContext = new GpgDatabaseContext(optionsBuilder.Options);
+            var dbContext = new DatabaseContext(optionsBuilder.Options);
             if (dbObjects != null && dbObjects.Length > 0)
             {
                 foreach (object item in dbObjects)

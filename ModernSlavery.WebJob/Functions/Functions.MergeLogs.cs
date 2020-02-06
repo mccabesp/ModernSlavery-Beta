@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebJob
+namespace ModernSlavery.WebJob
 {
     public partial class Functions
     {
@@ -29,7 +29,7 @@ namespace GenderPayGap.WebJob
 
                 #region WebServer Logs
 
-                string webServerlogPath = Path.Combine(Global.LogPath, "GenderPayGap.WebUI");
+                string webServerlogPath = Path.Combine(Global.LogPath, "ModernSlavery.WebUI");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "WarningLog"));
@@ -44,7 +44,7 @@ namespace GenderPayGap.WebJob
 
                 #region IdentityServer Logs
 
-                string identityServerlogPath = Path.Combine(Global.LogPath, "GenderPayGap.IdentityServer4");
+                string identityServerlogPath = Path.Combine(Global.LogPath, "ModernSlavery.IdentityServer4");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "WarningLog"));
@@ -54,7 +54,7 @@ namespace GenderPayGap.WebJob
 
                 #region Webjob Logs
 
-                string webJoblogPath = Path.Combine(Global.LogPath, "GenderPayGap.WebJob");
+                string webJoblogPath = Path.Combine(Global.LogPath, "ModernSlavery.WebJob");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "WarningLog"));

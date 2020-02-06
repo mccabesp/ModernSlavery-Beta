@@ -1,11 +1,11 @@
 ﻿using System.Collections.Specialized;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.WebUI.Controllers;
-using GenderPayGap.WebUI.Models.Search;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Controllers;
+using ModernSlavery.WebUI.Models.Search;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.WebUI.Classes.Presentation
+namespace ModernSlavery.WebUI.Classes.Presentation
 {
 
     public interface ISearchViewService

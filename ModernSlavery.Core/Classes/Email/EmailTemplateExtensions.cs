@@ -1,12 +1,12 @@
 ﻿using System;
 using Autofac;
-using GenderPayGap.Core.Abstractions;
-using GenderPayGap.Core.Interfaces;
+using ModernSlavery.Core.Abstractions;
+using ModernSlavery.Core.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     public static class EmailTemplateExtensions
     {

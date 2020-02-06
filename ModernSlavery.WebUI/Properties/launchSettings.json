@@ -16,7 +16,7 @@
       },
       "ancmHostingModel": "OutOfProcess"
     },
-    "GenderPayGap.WebUI": {
+    "ModernSlavery.WebUI": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

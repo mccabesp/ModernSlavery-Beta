@@ -1,8 +1,8 @@
-using GenderPayGap.Core;
+using ModernSlavery.Core;
 using GovUkDesignSystem;
 using GovUkDesignSystem.Attributes.ValidationAttributes;
 
-namespace GenderPayGap.WebUI.Models.Admin
+namespace ModernSlavery.WebUI.Models.Admin
 {
     public class AdminChangeScopeViewModel : GovUkViewModel
     {

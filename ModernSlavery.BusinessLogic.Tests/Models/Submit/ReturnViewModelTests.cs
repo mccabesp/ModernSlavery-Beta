@@ -1,9 +1,9 @@
-﻿using GenderPayGap.BusinessLogic.Classes;
-using GenderPayGap.BusinessLogic.Models.Organisation;
-using GenderPayGap.BusinessLogic.Models.Submit;
+﻿using ModernSlavery.BusinessLogic.Classes;
+using ModernSlavery.BusinessLogic.Models.Organisation;
+using ModernSlavery.BusinessLogic.Models.Submit;
 using NUnit.Framework;
 
-namespace GenderPayGap.BusinessLogic.Tests.Models.Submit
+namespace ModernSlavery.BusinessLogic.Tests.Models.Submit
 {
     [TestFixture]
     public class ReturnViewModelTests

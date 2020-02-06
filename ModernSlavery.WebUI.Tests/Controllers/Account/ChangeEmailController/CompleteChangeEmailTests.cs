@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Tests.TestHelpers;
-using GenderPayGap.WebUI;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Tests.TestHelpers;
+using ModernSlavery.WebUI;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
@@ -26,7 +26,7 @@ namespace Account.Controllers.ChangeEmailController
             mockRouteData = new RouteData();
             mockRouteData.Values.Add(
                 "Action",
-                nameof(GenderPayGap.WebUI.Areas.Account.Controllers.ChangeEmailController.CompleteChangeEmailAsync));
+                nameof(ModernSlavery.WebUI.Areas.Account.Controllers.ChangeEmailController.CompleteChangeEmailAsync));
             mockRouteData.Values.Add("Controller", "ChangeEmail");
         }
 
@@ -37,7 +37,7 @@ namespace Account.Controllers.ChangeEmailController
             var testNewEmail = "new@testemail.com";
             User verifiedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ChangeEmailController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ChangeEmailController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);
@@ -70,7 +70,7 @@ namespace Account.Controllers.ChangeEmailController
             User existingUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             string testNewEmail = existingUser.EmailAddress;
 
-            var controller = UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ChangeEmailController>(
+            var controller = UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ChangeEmailController>(
                 verifiedUser.UserId,
                 mockRouteData,
                 verifiedUser,
@@ -104,7 +104,7 @@ namespace Account.Controllers.ChangeEmailController
             var testNewEmail = "new@testemail.com";
             User verifiedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ChangeEmailController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ChangeEmailController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);
@@ -132,7 +132,7 @@ namespace Account.Controllers.ChangeEmailController
             var testNewEmail = "new@testemail.com";
             User verifiedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ChangeEmailController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ChangeEmailController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);

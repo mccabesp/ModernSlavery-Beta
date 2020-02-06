@@ -1,8 +1,8 @@
-using GenderPayGap.Core.Models.CompaniesHouse;
+using ModernSlavery.Core.Models.CompaniesHouse;
 using GovUkDesignSystem;
 using GovUkDesignSystem.Attributes.ValidationAttributes;
 
-namespace GenderPayGap.WebUI.Models.Admin
+namespace ModernSlavery.WebUI.Models.Admin
 {
     public class AdminChangeCompaniesHouseOptInOutViewModel : GovUkViewModel
     {

@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Autofac;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.Tests.Common.Classes
+namespace ModernSlavery.Tests.Common.Classes
 {
     public static class AutoFacHelpers
     {
@@ -50,11 +50,11 @@ namespace GenderPayGap.Tests.Common.Classes
         /// <param name="dbObjects"></param>
         public static void RegisterInMemoryTestDatabase(this ContainerBuilder builder, params object[] dbObjects)
         {
-            GpgDatabaseContext dbContext = CreateInMemoryTestDatabase(dbObjects);
+            DatabaseContext dbContext = CreateInMemoryTestDatabase(dbObjects);
             builder.Register(c => new SqlRepository(dbContext)).As<IDataRepository>().InstancePerLifetimeScope();
         }
 
-        public static GpgDatabaseContext CreateInMemoryTestDatabase(params object[] dbObjects)
+        public static DatabaseContext CreateInMemoryTestDatabase(params object[] dbObjects)
         {
             //Get the method name of the unit test or the parent
             string testName = TestContext.CurrentContext.Test.FullName;
@@ -63,15 +63,15 @@ namespace GenderPayGap.Tests.Common.Classes
                 testName = MethodBase.GetCurrentMethod().FindParentWithAttribute<TestAttribute>().Name;
             }
 
-            DbContextOptionsBuilder<GpgDatabaseContext> optionsBuilder =
-                new DbContextOptionsBuilder<GpgDatabaseContext>().UseInMemoryDatabase(testName);
+            DbContextOptionsBuilder<DatabaseContext> optionsBuilder =
+                new DbContextOptionsBuilder<DatabaseContext>().UseInMemoryDatabase(testName);
 
             optionsBuilder.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning));
 
             // show more detailed EF errors i.e. ReturnId value instead of '{ReturnId}' n the logs etc...
             optionsBuilder.EnableSensitiveDataLogging();
 
-            var dbContext = new GpgDatabaseContext(optionsBuilder.Options);
+            var dbContext = new DatabaseContext(optionsBuilder.Options);
             if (dbObjects != null && dbObjects.Length > 0)
             {
                 foreach (object item in dbObjects)

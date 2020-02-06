@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Account.Models;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
+using ModernSlavery.BusinessLogic.Account.Models;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
 
-namespace GenderPayGap.BusinessLogic.Account.Abstractions
+namespace ModernSlavery.BusinessLogic.Account.Abstractions
 {
 
     public interface IUserRepository : IDataTransaction

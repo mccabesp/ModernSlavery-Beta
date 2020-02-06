@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes.Logger;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebUI.Controllers;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes.Logger;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Notify.Models.Responses;
 
-namespace GenderPayGap.WebUI.Services
+namespace ModernSlavery.WebUI.Services
 {
     public class PinInThePostService
     {

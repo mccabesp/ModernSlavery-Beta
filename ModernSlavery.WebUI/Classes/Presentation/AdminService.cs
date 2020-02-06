@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 
-namespace GenderPayGap.WebUI.Classes.Services
+namespace ModernSlavery.WebUI.Classes.Services
 {
     public interface IAdminService
     {

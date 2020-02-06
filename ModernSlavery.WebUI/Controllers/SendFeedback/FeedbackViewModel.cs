@@ -4,7 +4,7 @@ using GovUkDesignSystem;
 using GovUkDesignSystem.Attributes;
 using GovUkDesignSystem.Attributes.ValidationAttributes;
 
-namespace GenderPayGap.WebUI.Controllers.SendFeedback {
+namespace ModernSlavery.WebUI.Controllers.SendFeedback {
 
     public class FeedbackViewModel : GovUkViewModel
     {

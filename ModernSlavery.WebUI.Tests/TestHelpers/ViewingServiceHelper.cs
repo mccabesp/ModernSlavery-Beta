@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using GenderPayGap.BusinessLogic.Models.Compare;
-using GenderPayGap.Core;
-using GenderPayGap.Extensions;
+using ModernSlavery.BusinessLogic.Models.Compare;
+using ModernSlavery.Core;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.WebUI.Tests.TestHelpers
+namespace ModernSlavery.WebUI.Tests.TestHelpers
 {
     public static class ViewingServiceHelper
     {

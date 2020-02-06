@@ -1,9 +1,9 @@
-﻿using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
+﻿using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.WebUI.Controllers
+namespace ModernSlavery.WebUI.Controllers
 {
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]

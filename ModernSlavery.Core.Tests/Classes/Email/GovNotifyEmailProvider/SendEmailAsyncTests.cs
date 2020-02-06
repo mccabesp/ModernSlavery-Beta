@@ -4,9 +4,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 using Notify.Authentication;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.Email.GovNotifyEmailProvider
+namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
 {
 
     [TestFixture]

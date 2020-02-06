@@ -1,10 +1,10 @@
 ﻿using Autofac;
-using GenderPayGap.BusinessLogic.LogRecords;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
+using ModernSlavery.BusinessLogic.LogRecords;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
 using Moq;
 
-namespace GenderPayGap.Tests.Common.TestHelpers
+namespace ModernSlavery.Tests.Common.TestHelpers
 {
 
     public static class SetupHelpers

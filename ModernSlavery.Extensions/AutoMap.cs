@@ -3,7 +3,7 @@ using System.Linq;
 using AutoMapper;
 using KellermanSoftware.CompareNetObjects;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public static class AutoMap
     {

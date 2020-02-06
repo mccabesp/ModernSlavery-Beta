@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebUI.Classes;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Classes;
 
-namespace GenderPayGap.WebUI.Controllers.Administration
+namespace ModernSlavery.WebUI.Controllers.Administration
 {
     public partial class AdminController : BaseController
     {

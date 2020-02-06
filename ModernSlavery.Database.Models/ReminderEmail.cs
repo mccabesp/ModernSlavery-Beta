@@ -1,7 +1,7 @@
 ﻿using System;
-using GenderPayGap.Core;
+using ModernSlavery.Core;
 
-namespace GenderPayGap.Database.Models
+namespace ModernSlavery.Database.Models
 {
     public class ReminderEmail
     {

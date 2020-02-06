@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Interfaces;
+using ModernSlavery.Core.Interfaces;
 
 public class MockClassQueue : IQueue
 {

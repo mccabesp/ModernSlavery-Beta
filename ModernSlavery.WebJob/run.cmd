@@ -1,1 +1,1 @@
-"%ProgramFiles%\dotnet\dotnet.exe" GenderPayGap.WebJob.dll %*
+"%ProgramFiles%\dotnet\dotnet.exe" ModernSlavery.WebJob.dll %*

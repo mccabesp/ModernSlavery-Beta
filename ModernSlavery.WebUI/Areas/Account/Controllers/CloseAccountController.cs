@@ -1,16 +1,16 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.WebUI.Areas.Account.Abstractions;
-using GenderPayGap.WebUI.Areas.Account.ViewModels;
-using GenderPayGap.WebUI.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Areas.Account.Abstractions;
+using ModernSlavery.WebUI.Areas.Account.ViewModels;
+using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebUI.Areas.Account.Controllers
+namespace ModernSlavery.WebUI.Areas.Account.Controllers
 {
 
     [Area("Account")]

@@ -2,25 +2,25 @@
 using System.Net.Http;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.LogRecords;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core;
-using GenderPayGap.Core.API;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.Queues;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.Infrastructure.AzureQueues.Extensions;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.LogRecords;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core;
+using ModernSlavery.Core.API;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.Queues;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Infrastructure.AzureQueues.Extensions;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
-namespace GenderPayGap.WebJob
+namespace ModernSlavery.WebJob
 {
     public class Startup
     {
@@ -67,7 +67,7 @@ namespace GenderPayGap.WebJob
             builder.RegisterType<Functions>().InstancePerDependency();
             builder.RegisterType<DisableWebjobProvider>().SingleInstance();
 
-            builder.Register(c => new SqlRepository(new GpgDatabaseContext(Global.DatabaseConnectionString)))
+            builder.Register(c => new SqlRepository(new DatabaseContext(Global.DatabaseConnectionString)))
                 .As<IDataRepository>()
                 .InstancePerDependency();
             builder.RegisterType<CompaniesHouseAPI>()

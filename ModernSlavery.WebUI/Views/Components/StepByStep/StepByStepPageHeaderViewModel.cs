@@ -1,4 +1,4 @@
-namespace GenderPayGap.WebUI.Views.Components.StepByStep {
+namespace ModernSlavery.WebUI.Views.Components.StepByStep {
     public class StepByStepPageHeaderViewModel
     {
 

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GenderPayGap.Core.Interfaces
+namespace ModernSlavery.Core.Interfaces
 {
     public interface IHashSet<T>
     {

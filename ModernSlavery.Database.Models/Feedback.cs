@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace GenderPayGap.Database.Models
+namespace ModernSlavery.Database.Models
 {
     public class Feedback
     {

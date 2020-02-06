@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using GenderPayGap.BusinessLogic.Models.Organisation;
-using GenderPayGap.Core;
+using ModernSlavery.BusinessLogic.Models.Organisation;
+using ModernSlavery.Core;
 
-namespace GenderPayGap.BusinessLogic.Models.Submit
+namespace ModernSlavery.BusinessLogic.Models.Submit
 {
     [Serializable]
     public class ReturnViewModel

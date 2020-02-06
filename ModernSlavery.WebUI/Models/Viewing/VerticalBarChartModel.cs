@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenderPayGap.WebUI.Models.Viewing
+namespace ModernSlavery.WebUI.Models.Viewing
 {
     public class VerticalBarChartModel
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using GenderPayGap.WebUI.Classes;
+using ModernSlavery.WebUI.Classes;
 
-namespace GenderPayGap.WebUI.Models.Register
+namespace ModernSlavery.WebUI.Models.Register
 {
     [Serializable]
     public class ResetViewModel

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Tests.Common.TestHelpers;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
 
-namespace GenderPayGap.WebUI.Tests.TestHelpers
+namespace ModernSlavery.WebUI.Tests.TestHelpers
 {
     public static class UserOrganisationHelper
     {

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.Core.Models.Cookies
+namespace ModernSlavery.Core.Models.Cookies
 {
     public class CookieHelper
     {

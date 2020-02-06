@@ -5,7 +5,7 @@
     <LangVersion>7.1</LangVersion>
     <AspNetCoreModuleName>AspNetCoreModule</AspNetCoreModuleName>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
-    <RootNamespace>GenderPayGap.WebUI</RootNamespace>
+    <RootNamespace>ModernSlavery.WebUI</RootNamespace>
     <UserSecretsId>9636f8df-5c1c-4066-b955-0c607fe30b2d</UserSecretsId>
     <Copyright>Crown Copyright © $([System.DateTime]::UtcNow.Year) ($([System.DateTime]::UtcNow.ToLocalTime()))</Copyright>
     <ProjectGuid>73D4A349-7276-4C72-9C67-A8FD08D7ED82</ProjectGuid>
@@ -113,11 +113,11 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\GenderPayGap.BusinessLogic\GenderPayGap.BusinessLogic.csproj" />
-    <ProjectReference Include="..\GenderPayGap.Core\GenderPayGap.Core.csproj" />
-    <ProjectReference Include="..\GenderPayGap.Database\GenderPayGap.Database.csproj" />
-    <ProjectReference Include="..\GenderPayGap.Extensions.AspNetCore\GenderPayGap.Extensions.AspNetCore.csproj" />
-    <ProjectReference Include="..\GenderPayGap.Extensions\GenderPayGap.Extensions.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Database\ModernSlavery.Database.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Extensions.AspNetCore\ModernSlavery.Extensions.AspNetCore.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
     <ProjectReference Include="..\GovUkDesignSystem\GovUkDesignSystem.csproj" />
   </ItemGroup>
 
@@ -155,7 +155,7 @@
       CopyWebJobs;
     </MSDeployPackagePublishDependsOn>
 
-    <WebJobProjects>$(MSBuildProjectDirectory)\..\GenderPayGap.WebJob\GenderPayGap.WebJob.csproj</WebJobProjects>
+    <WebJobProjects>$(MSBuildProjectDirectory)\..\ModernSlavery.WebJob\ModernSlavery.WebJob.csproj</WebJobProjects>
 
     <LangVersion>7.1</LangVersion>
 

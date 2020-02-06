@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenderPayGap.WebUI.Models.Register
+namespace ModernSlavery.WebUI.Models.Register
 {
     [Serializable]
     public class VerifyViewModel

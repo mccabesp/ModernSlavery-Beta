@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Filters;
-using GenderPayGap.Core.Models.HttpResultModels;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Filters;
+using ModernSlavery.Core.Models.HttpResultModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.API.Tests.Filters
+namespace ModernSlavery.API.Tests.Filters
 {
     public class AllowOnlyTrustedIpsAttributeTests
     {
@@ -266,7 +266,7 @@ namespace GenderPayGap.API.Tests.Filters
             Assert.IsNull(expectedHttpStatusCodeResult403.ContentType);
 
             var expectedLoggedMessage =
-                "Access to controller GenderPayGap.API.Tests.Filters.AllowOnlyTrustedIpsAttributeTests+OnlyForTestingPleaseIgnoreThisController was forbidden for address 96.97.98.99 as it is not part of the configured ips TrustedIPDomains";
+                "Access to controller ModernSlavery.API.Tests.Filters.AllowOnlyTrustedIpsAttributeTests+OnlyForTestingPleaseIgnoreThisController was forbidden for address 96.97.98.99 as it is not part of the configured ips TrustedIPDomains";
             Assert.AreEqual(expectedLoggedMessage, actualLoggedMessage);
         }
 

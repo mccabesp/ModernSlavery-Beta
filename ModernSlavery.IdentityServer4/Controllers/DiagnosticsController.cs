@@ -4,12 +4,12 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.IdentityServer4.Models.Diagnostics;
+using ModernSlavery.IdentityServer4.Models.Diagnostics;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.IdentityServer4.Controllers
+namespace ModernSlavery.IdentityServer4.Controllers
 {
     [Authorize]
     public class DiagnosticsController : Controller

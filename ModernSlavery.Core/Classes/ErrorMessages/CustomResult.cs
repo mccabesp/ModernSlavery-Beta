@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenderPayGap.Core.Classes.ErrorMessages
+namespace ModernSlavery.Core.Classes.ErrorMessages
 {
     [Serializable]
     public class CustomResult<T>

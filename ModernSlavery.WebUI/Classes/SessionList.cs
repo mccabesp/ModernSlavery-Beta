@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     public class SessionList<T> : IHashSet<T>
     {

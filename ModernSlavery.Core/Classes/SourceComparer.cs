@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     /// <summary>
     ///     Compares two data source types to see if one can replace the other

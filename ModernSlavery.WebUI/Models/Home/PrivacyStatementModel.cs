@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace GenderPayGap.WebUI.Models.Home
+namespace ModernSlavery.WebUI.Models.Home
 {
     [Serializable]
     public class PrivacyStatementModel

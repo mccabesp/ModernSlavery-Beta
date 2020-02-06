@@ -1,4 +1,4 @@
-﻿namespace GenderPayGap.WebUI.Models.Search
+﻿namespace ModernSlavery.WebUI.Models.Search
 {
 
     public class SuggestEmployerResult

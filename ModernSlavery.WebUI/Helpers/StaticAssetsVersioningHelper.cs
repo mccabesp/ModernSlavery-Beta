@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Extensions.AspNetCore;
 
-namespace GenderPayGap.WebUI.Helpers
+namespace ModernSlavery.WebUI.Helpers
 {
     public static class StaticAssetsVersioningHelper
     {

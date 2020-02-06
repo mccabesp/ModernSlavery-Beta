@@ -1,9 +1,9 @@
-﻿using GenderPayGap.Database;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.Tests.TestHelpers;
-using GenderPayGap.WebUI.Areas.Account.Resources;
-using GenderPayGap.WebUI.Areas.Account.ViewModels;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+﻿using ModernSlavery.Database;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.TestHelpers;
+using ModernSlavery.WebUI.Areas.Account.Resources;
+using ModernSlavery.WebUI.Areas.Account.ViewModels;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
@@ -25,7 +25,7 @@ namespace Account.Controllers.ManageAccountController
         public void BeforeEach()
         {
             mockRouteData = new RouteData();
-            mockRouteData.Values.Add("Action", nameof(GenderPayGap.WebUI.Areas.Account.Controllers.ManageAccountController.ManageAccount));
+            mockRouteData.Values.Add("Action", nameof(ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController.ManageAccount));
             mockRouteData.Values.Add("Controller", "ManageAccount");
         }
 
@@ -35,7 +35,7 @@ namespace Account.Controllers.ManageAccountController
             // Arrange
             User unverifiedUser = UserHelper.GetNotAdminUserWithoutVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ManageAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController>(
                     0,
                     mockRouteData,
                     unverifiedUser);
@@ -54,7 +54,7 @@ namespace Account.Controllers.ManageAccountController
             // Arrange
             User verifiedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ManageAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);
@@ -76,7 +76,7 @@ namespace Account.Controllers.ManageAccountController
             // Arrange
             User verifiedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ManageAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);

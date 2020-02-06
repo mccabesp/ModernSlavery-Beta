@@ -5,12 +5,12 @@ using System.Linq;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
-using GenderPayGap.Core.Abstractions;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
+using ModernSlavery.Core.Abstractions;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
 
     public class EmailTemplateRepository : IEmailTemplateRepository

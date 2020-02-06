@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.Queues;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.Queues;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.BusinessLogic.LogRecords
+namespace ModernSlavery.BusinessLogic.LogRecords
 {
 
     public interface IRegistrationLogRecord : ILogRecordLogger

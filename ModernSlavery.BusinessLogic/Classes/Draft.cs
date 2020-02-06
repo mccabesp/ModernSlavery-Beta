@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
-using GenderPayGap.BusinessLogic.Models.Submit;
-using GenderPayGap.Core;
+using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.Core;
 
-namespace GenderPayGap.BusinessLogic.Classes
+namespace ModernSlavery.BusinessLogic.Classes
 {
     [Serializable]
     public class Draft

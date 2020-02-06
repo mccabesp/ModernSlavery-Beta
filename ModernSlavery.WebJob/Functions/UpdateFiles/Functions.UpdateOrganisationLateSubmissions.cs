@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Models;
-using GenderPayGap.Core;
+using ModernSlavery.BusinessLogic.Models;
+using ModernSlavery.Core;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.WebJob
+namespace ModernSlavery.WebJob
 {
     public partial class Functions
     {

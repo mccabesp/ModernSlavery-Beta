@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 
-namespace GenderPayGap
+namespace ModernSlavery
 {
     public class ControllerExtension : Controller
     {

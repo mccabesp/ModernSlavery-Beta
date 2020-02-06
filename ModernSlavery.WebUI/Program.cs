@@ -2,12 +2,12 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace GenderPayGap.WebUI
+namespace ModernSlavery.WebUI
 {
     public class Program
     {
@@ -16,7 +16,7 @@ namespace GenderPayGap.WebUI
 
         public static void Main(string[] args)
         {
-            Console.Title = "GenderPayGap.WebUI";
+            Console.Title = "ModernSlavery.WebUI";
 
             //Add a handler for unhandled exceptions
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;

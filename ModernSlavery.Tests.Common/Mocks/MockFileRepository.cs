@@ -4,12 +4,12 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models.Downloadable;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models.Downloadable;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Tests.Common.Mocks
+namespace ModernSlavery.Tests.Common.Mocks
 {
     public class MockFileRepository : IFileRepository
     {

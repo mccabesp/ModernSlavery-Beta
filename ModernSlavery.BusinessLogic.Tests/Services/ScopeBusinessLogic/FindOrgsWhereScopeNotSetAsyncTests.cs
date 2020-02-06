@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Models.Scope;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.Tests.Common.Classes;
+using ModernSlavery.BusinessLogic.Models.Scope;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Tests.Common.Classes;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.BusinessLogic.Tests.ScopeBusinessLogic
+namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
 {
 
     [TestFixture]

@@ -1,5 +1,5 @@
 using System;
-using GenderPayGap.Extensions.AspNetCore;
+using ModernSlavery.Extensions.AspNetCore;
 using NUnit.Framework;
 
 namespace Tests

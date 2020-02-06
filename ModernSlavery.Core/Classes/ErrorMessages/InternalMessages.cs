@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace GenderPayGap.Core.Classes.ErrorMessages
+namespace ModernSlavery.Core.Classes.ErrorMessages
 {
     public class InternalMessages
     {

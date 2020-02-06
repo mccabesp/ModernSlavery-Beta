@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using GenderPayGap.Database;
-using GenderPayGap.Database.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Database.Models;
 using GovUkDesignSystem;
 
-namespace GenderPayGap.WebUI.Models.Admin
+namespace ModernSlavery.WebUI.Models.Admin
 {
     public class AdminViewAuditLogsViewModel : GovUkViewModel
     {

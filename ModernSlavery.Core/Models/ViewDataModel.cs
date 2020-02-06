@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Core.Models
+namespace ModernSlavery.Core.Models
 {
     [Serializable]
     public class ViewDataModel

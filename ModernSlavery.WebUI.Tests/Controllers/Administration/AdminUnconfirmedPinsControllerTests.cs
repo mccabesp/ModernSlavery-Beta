@@ -1,19 +1,19 @@
 using System;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Tests.TestHelpers;
-using GenderPayGap.WebUI.Controllers.Admin;
-using GenderPayGap.WebUI.Services;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Tests.TestHelpers;
+using ModernSlavery.WebUI.Controllers.Admin;
+using ModernSlavery.WebUI.Services;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.WebUI.Tests.Controllers.Administration
+namespace ModernSlavery.WebUI.Tests.Controllers.Administration
 {
     [TestFixture]
     [SetCulture("en-GB")]

@@ -1,8 +1,8 @@
 ﻿using System;
-using GenderPayGap.Core.Classes;
+using ModernSlavery.Core.Classes;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.Classes
+namespace ModernSlavery.Core.Tests.Classes
 {
     [TestFixture]
     public class SystemFileRepositoryTests

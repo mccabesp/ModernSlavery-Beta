@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     public static class VirtualDateTime
     {

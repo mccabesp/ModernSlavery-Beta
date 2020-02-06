@@ -45,7 +45,7 @@ namespace GovUkDesignSystem.GovUkDesignSystemComponents
         ///     HTML attributes (for example data attributes) to add to the individual crumb.
         /// </summary>
         [Obsolete(
-            "This doesn't work yet - The GenderPayGap.WebUI.Classes.TagHelpers.AnchorTagHelper doesn't currently allow arbitrary attributes")]
+            "This doesn't work yet - The ModernSlavery.WebUI.Classes.TagHelpers.AnchorTagHelper doesn't currently allow arbitrary attributes")]
         public string Attributes { get; set; }
 
     }

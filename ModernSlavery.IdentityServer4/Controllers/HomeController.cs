@@ -3,9 +3,9 @@
 
 
 using System.Threading.Tasks;
-using GenderPayGap.Extensions;
-using GenderPayGap.IdentityServer4.Classes;
-using GenderPayGap.IdentityServer4.Models.Home;
+using ModernSlavery.Extensions;
+using ModernSlavery.IdentityServer4.Classes;
+using ModernSlavery.IdentityServer4.Models.Home;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Diagnostics;
@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
-namespace GenderPayGap.IdentityServer4.Controllers
+namespace ModernSlavery.IdentityServer4.Controllers
 {
     [Route("Home")]
     public class HomeController : BaseController

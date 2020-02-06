@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace GenderPayGap.WebUI.Models.Scope
+namespace ModernSlavery.WebUI.Models.Scope
 {
 
     [Serializable]

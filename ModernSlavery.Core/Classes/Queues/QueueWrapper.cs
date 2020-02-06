@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     public class QueueWrapper
     {

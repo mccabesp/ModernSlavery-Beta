@@ -7,27 +7,27 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Web;
 using AutoMapper;
-using GenderPayGap.BusinessLogic;
-using GenderPayGap.BusinessLogic.Models.Submit;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Classes.ErrorMessages;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Core.Models.HttpResultModels;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.WebUI.Classes;
-using GenderPayGap.WebUI.Classes.Presentation;
-using GenderPayGap.WebUI.Models;
-using GenderPayGap.WebUI.Models.Search;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Models.HttpResultModels;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Classes.Presentation;
+using ModernSlavery.WebUI.Models;
+using ModernSlavery.WebUI.Models.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 
-namespace GenderPayGap.WebUI.Controllers
+namespace ModernSlavery.WebUI.Controllers
 {
     [Route("viewing")]
     public class ViewingController : BaseController

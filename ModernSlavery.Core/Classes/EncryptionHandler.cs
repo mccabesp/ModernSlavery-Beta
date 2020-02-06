@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Web;
-using GenderPayGap.Extensions;
+using ModernSlavery.Extensions;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     /// <summary>
     ///     This class exists as a response to code that encrypted id's and created some long URL strings. Please do not use,

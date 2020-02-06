@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace GenderPayGap.IdentityServer4.Models.Grants
+namespace ModernSlavery.IdentityServer4.Models.Grants
 {
     public class GrantsViewModel
     {

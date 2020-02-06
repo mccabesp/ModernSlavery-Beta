@@ -1,7 +1,7 @@
-﻿using GenderPayGap.WebUI.Classes.Attributes;
+﻿using ModernSlavery.WebUI.Classes.Attributes;
 using Microsoft.AspNetCore.Html;
 
-namespace GenderPayGap.WebUI.Models.Shared
+namespace ModernSlavery.WebUI.Models.Shared
 {
 
     [Partial("Patterns/Details")]

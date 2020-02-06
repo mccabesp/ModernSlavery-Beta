@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using GenderPayGap.Database;
+using ModernSlavery.Database;
 
-namespace GenderPayGap.WebUI.Services
+namespace ModernSlavery.WebUI.Services
 {
     public class EmailSendingServiceHelpers
     {

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
-using GenderPayGap.Database;
-using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
-using GenderPayGap.Tests.TestHelpers;
-using GenderPayGap.WebUI;
-using GenderPayGap.WebUI.Areas.Account.ViewModels;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Tests.TestHelpers;
+using ModernSlavery.WebUI;
+using ModernSlavery.WebUI.Areas.Account.ViewModels;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
@@ -28,7 +28,7 @@ namespace Account.Controllers.CloseAccountController
         public void BeforeEach()
         {
             mockRouteData = new RouteData();
-            mockRouteData.Values.Add("Action", nameof(GenderPayGap.WebUI.Areas.Account.Controllers.CloseAccountController.CloseAccount));
+            mockRouteData.Values.Add("Action", nameof(ModernSlavery.WebUI.Areas.Account.Controllers.CloseAccountController.CloseAccount));
             mockRouteData.Values.Add("Controller", "CloseAccount");
         }
 
@@ -38,7 +38,7 @@ namespace Account.Controllers.CloseAccountController
             // Arrange
             User unverifiedUser = UserHelper.GetNotAdminUserWithoutVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.CloseAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.CloseAccountController>(
                     0,
                     mockRouteData,
                     unverifiedUser);
@@ -59,7 +59,7 @@ namespace Account.Controllers.CloseAccountController
             object[] registations = UserOrganisationHelper.CreateRegistrations();
 
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.CloseAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.CloseAccountController>(
                     testUserId,
                     mockRouteData,
                     registations);
@@ -81,7 +81,7 @@ namespace Account.Controllers.CloseAccountController
             // Arrange
             User unverifiedUser = UserHelper.GetNotAdminUserWithoutVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.CloseAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.CloseAccountController>(
                     0,
                     mockRouteData,
                     unverifiedUser);
@@ -106,7 +106,7 @@ namespace Account.Controllers.CloseAccountController
             verifiedUser.HashingAlgorithm = HashingAlgorithm.PBKDF2;
 
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.CloseAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.CloseAccountController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);
@@ -116,7 +116,7 @@ namespace Account.Controllers.CloseAccountController
 
             // Assert
             Assert.NotNull(viewResult, "Expected a ViewResult");
-            Assert.AreEqual(nameof(GenderPayGap.WebUI.Areas.Account.Controllers.CloseAccountController.CloseAccount), viewResult.ViewName);
+            Assert.AreEqual(nameof(ModernSlavery.WebUI.Areas.Account.Controllers.CloseAccountController.CloseAccount), viewResult.ViewName);
             Assert.AreEqual(
                 "Could not verify your current password",
                 viewResult.ViewData.ModelState["CurrentPassword"].Errors[0].ErrorMessage);
@@ -134,7 +134,7 @@ namespace Account.Controllers.CloseAccountController
             verifiedUser.HashingAlgorithm = HashingAlgorithm.PBKDF2;
 
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.CloseAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.CloseAccountController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);
@@ -155,7 +155,7 @@ namespace Account.Controllers.CloseAccountController
             object[] registrations = UserOrganisationHelper.CreateRegistrationsInScope();
 
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.CloseAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.CloseAccountController>(
                     23322,
                     mockRouteData,
                     registrations);
@@ -182,7 +182,7 @@ namespace Account.Controllers.CloseAccountController
             verifiedUser.HashingAlgorithm = HashingAlgorithm.PBKDF2;
 
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.CloseAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.CloseAccountController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);
@@ -220,7 +220,7 @@ namespace Account.Controllers.CloseAccountController
             object[] registrations = UserOrganisationHelper.CreateRegistrationsInScope();
 
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.CloseAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.CloseAccountController>(
                     23322,
                     mockRouteData,
                     registrations);
@@ -267,7 +267,7 @@ namespace Account.Controllers.CloseAccountController
             verifiedUser.Status = UserStatuses.Unknown;
 
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.CloseAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.CloseAccountController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);

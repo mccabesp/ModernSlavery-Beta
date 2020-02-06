@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-namespace GenderPayGap.Extensions
+namespace ModernSlavery.Extensions
 {
     [Serializable]
     public class NameValueList : List<NameValueElement>

@@ -1,8 +1,8 @@
 ﻿using System;
-using GenderPayGap.Core;
-using GenderPayGap.Database;
+using ModernSlavery.Core;
+using ModernSlavery.Database;
 
-namespace GenderPayGap.Tests.Common.TestHelpers
+namespace ModernSlavery.Tests.Common.TestHelpers
 {
     public static class ScopeHelper
     {

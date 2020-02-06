@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Interfaces;
+using ModernSlavery.Core.Interfaces;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
 
-namespace GenderPayGap.Core.Classes.Queues
+namespace ModernSlavery.Core.Classes.Queues
 {
 
     public class AzureQueue : IQueue

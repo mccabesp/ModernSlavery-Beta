@@ -1,7 +1,7 @@
-﻿using GenderPayGap.Extensions;
-using GenderPayGap.Extensions.AspNetCore;
+﻿using ModernSlavery.Extensions;
+using ModernSlavery.Extensions.AspNetCore;
 
-namespace GenderPayGap.Core
+namespace ModernSlavery.Core
 {
     public static class FeatureFlagHelper
     {

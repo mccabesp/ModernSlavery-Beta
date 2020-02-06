@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GenderPayGap.BusinessLogic.Account.Abstractions;
-using GenderPayGap.BusinessLogic.LogRecords;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
+using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.LogRecords;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
 using MockQueryable.Moq;
 using Moq;
 using NUnit.Framework;
 
-namespace GenderPayGap.BusinessLogic.Tests.Repositories.UserRepository
+namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
 {
     [TestFixture]
     public class FindByNameAsyncTests

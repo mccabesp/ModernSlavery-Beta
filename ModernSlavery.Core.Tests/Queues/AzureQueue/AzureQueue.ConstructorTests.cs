@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace GenderPayGap.Core.Tests.AzureQueue
+namespace ModernSlavery.Core.Tests.AzureQueue
 {
 
     [TestFixture]

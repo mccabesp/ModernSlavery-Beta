@@ -1,6 +1,6 @@
-﻿using GenderPayGap.Core.Interfaces;
+﻿using ModernSlavery.Core.Interfaces;
 
-namespace GenderPayGap.Core.Classes.Queues
+namespace ModernSlavery.Core.Classes.Queues
 {
 
     public class LogRecordQueue : AzureQueue

@@ -4,14 +4,14 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Extensions;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Polly;
 using Polly.Extensions.Http;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     /// <summary>
     ///     Uses open HttpClient see

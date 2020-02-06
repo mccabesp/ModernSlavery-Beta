@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using GenderPayGap.Database;
-using GenderPayGap.Tests.Common.Classes;
-using GenderPayGap.Tests.TestHelpers;
-using GenderPayGap.WebUI.Areas.Account.Resources;
-using GenderPayGap.WebUI.Areas.Account.ViewModels;
-using GenderPayGap.WebUI.Tests.TestHelpers;
+using ModernSlavery.Database;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.TestHelpers;
+using ModernSlavery.WebUI.Areas.Account.Resources;
+using ModernSlavery.WebUI.Areas.Account.ViewModels;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
@@ -21,7 +21,7 @@ namespace Account.Controllers.ChangeDetailsController
         public void BeforeEach()
         {
             mockRouteData = new RouteData();
-            mockRouteData.Values.Add("Action", nameof(GenderPayGap.WebUI.Areas.Account.Controllers.ChangeDetailsController.ChangeDetails));
+            mockRouteData.Values.Add("Action", nameof(ModernSlavery.WebUI.Areas.Account.Controllers.ChangeDetailsController.ChangeDetails));
             mockRouteData.Values.Add("Controller", "ChangeDetails");
         }
 
@@ -31,7 +31,7 @@ namespace Account.Controllers.ChangeDetailsController
             // Arrange
             User unverifiedUser = UserHelper.GetNotAdminUserWithoutVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ChangeDetailsController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ChangeDetailsController>(
                     0,
                     mockRouteData,
                     unverifiedUser);
@@ -50,7 +50,7 @@ namespace Account.Controllers.ChangeDetailsController
             // Arrange
             User verifiedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ChangeDetailsController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ChangeDetailsController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);
@@ -72,7 +72,7 @@ namespace Account.Controllers.ChangeDetailsController
             // Arrange
             User verifiedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ChangeDetailsController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ChangeDetailsController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);
@@ -85,7 +85,7 @@ namespace Account.Controllers.ChangeDetailsController
             // Assert
             Assert.NotNull(viewResult);
             Assert.AreEqual(
-                nameof(GenderPayGap.WebUI.Areas.Account.Controllers.ChangeDetailsController.ChangeDetails),
+                nameof(ModernSlavery.WebUI.Areas.Account.Controllers.ChangeDetailsController.ChangeDetails),
                 viewResult.ViewName);
             Assert.IsFalse(controller.TempData.ContainsKey(AccountResources.ChangeDetailsSuccessAlert));
             Assert.IsInstanceOf(typeof(ChangeDetailsViewModel), viewResult.Model);
@@ -97,7 +97,7 @@ namespace Account.Controllers.ChangeDetailsController
             // Arrange
             User verifiedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<GenderPayGap.WebUI.Areas.Account.Controllers.ChangeDetailsController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ChangeDetailsController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);
@@ -117,7 +117,7 @@ namespace Account.Controllers.ChangeDetailsController
             // Assert
             Assert.NotNull(redirectToActionResult);
             Assert.AreEqual(
-                nameof(GenderPayGap.WebUI.Areas.Account.Controllers.ManageAccountController.ManageAccount),
+                nameof(ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController.ManageAccount),
                 redirectToActionResult.ActionName);
 
             // Assert success flag

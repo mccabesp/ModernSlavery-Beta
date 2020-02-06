@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 
-namespace GenderPayGap.Extensions.AspNetCore
+namespace ModernSlavery.Extensions.AspNetCore
 {
     public static partial class Extensions
     {

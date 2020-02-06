@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using GenderPayGap.Database;
+using ModernSlavery.Database;
 
-namespace GenderPayGap.WebUI.Models.Admin
+namespace ModernSlavery.WebUI.Models.Admin
 {
     public class PendingRegistrationsViewModel
     {

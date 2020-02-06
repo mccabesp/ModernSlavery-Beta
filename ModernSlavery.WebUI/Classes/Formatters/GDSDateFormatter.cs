@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenderPayGap.WebUI.Classes.Formatters
+namespace ModernSlavery.WebUI.Classes.Formatters
 {
 
     [Serializable]

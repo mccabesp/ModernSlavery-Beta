@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using GenderPayGap.WebUI.Models;
-using GenderPayGap.WebUI.Models.Search;
+using ModernSlavery.WebUI.Models;
+using ModernSlavery.WebUI.Models.Search;
 
-namespace GenderPayGap.WebUI.Classes.Mappers
+namespace ModernSlavery.WebUI.Classes.Mappers
 {
 
     public class ViewingMapperProfile : Profile

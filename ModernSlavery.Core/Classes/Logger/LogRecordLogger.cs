@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Core.Models;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 
-namespace GenderPayGap.Core.Classes
+namespace ModernSlavery.Core.Classes
 {
     public interface ILogRecordLogger
     {

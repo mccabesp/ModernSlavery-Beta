@@ -1,10 +1,10 @@
 ﻿using Autofac;
-using GenderPayGap.BusinessLogic.Services;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Core.Interfaces;
+using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
 using Moq;
 
-namespace GenderPayGap.BusinessLogic.Tests
+namespace ModernSlavery.BusinessLogic.Tests
 {
     public class BaseBusinessLogicTests
     {

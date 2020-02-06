@@ -4,12 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GenderPayGap.Core;
-using GenderPayGap.Core.Classes;
-using GenderPayGap.Extensions;
-using GenderPayGap.WebUI.Models.Admin;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Models.Admin;
 
-namespace GenderPayGap
+namespace ModernSlavery
 {
     public class ShortCodesRepository
     {

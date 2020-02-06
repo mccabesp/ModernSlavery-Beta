@@ -96,12 +96,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\GenderPayGap.BusinessLogic\GenderPayGap.BusinessLogic.csproj" />
-    <ProjectReference Include="..\..\GenderPayGap.Database.Models\GenderPayGap.Database.Models.csproj" />
-    <ProjectReference Include="..\..\GenderPayGap.Extensions.AspNetCore\GenderPayGap.Extensions.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\GenderPayGap.Extensions\GenderPayGap.Extensions.csproj" />
-    <ProjectReference Include="..\..\GenderPayGap.Tests.Common\GenderPayGap.Tests.Common.csproj" />
-    <ProjectReference Include="..\..\GenderPayGap.WebUI\GenderPayGap.WebUI.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Database.Models\ModernSlavery.Database.Models.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Extensions.AspNetCore\ModernSlavery.Extensions.AspNetCore.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Tests.Common\ModernSlavery.Tests.Common.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI\ModernSlavery.WebUI.csproj" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1unittests_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

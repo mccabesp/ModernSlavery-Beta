@@ -2,15 +2,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using GenderPayGap.Core.Classes.Logger;
-using GenderPayGap.Core.Interfaces;
-using GenderPayGap.Database;
-using GenderPayGap.Database.Models;
-using GenderPayGap.WebUI.Classes;
+using ModernSlavery.Core.Classes.Logger;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Database.Models;
+using ModernSlavery.WebUI.Classes;
 using GovUkDesignSystem.Parsers;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GenderPayGap.WebUI.Controllers.SendFeedback
+namespace ModernSlavery.WebUI.Controllers.SendFeedback
 {
     [Route("send-feedback")]
     public class FeedbackController : Controller

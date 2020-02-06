@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using GenderPayGap.WebUI.Areas.Account.Resources;
-using GenderPayGap.WebUI.Classes;
+using ModernSlavery.WebUI.Areas.Account.Resources;
+using ModernSlavery.WebUI.Classes;
 
-namespace GenderPayGap.WebUI.Models.Register
+namespace ModernSlavery.WebUI.Models.Register
 {
     [Serializable]
     [DefaultResource(typeof(AccountResources))]

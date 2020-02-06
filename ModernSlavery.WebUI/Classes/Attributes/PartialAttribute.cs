@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GenderPayGap.WebUI.Classes.Attributes
+namespace ModernSlavery.WebUI.Classes.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class PartialAttribute : Attribute

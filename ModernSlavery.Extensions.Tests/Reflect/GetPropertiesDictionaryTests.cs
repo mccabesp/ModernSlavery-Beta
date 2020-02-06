@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace GenderPayGap.Extensions.Tests.Reflect
+namespace ModernSlavery.Extensions.Tests.Reflect
 {
 
     [TestFixture]
