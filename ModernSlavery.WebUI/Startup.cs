@@ -44,6 +44,7 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using Newtonsoft.Json.Serialization;
 using HttpSession = ModernSlavery.Extensions.AspNetCore.HttpSession;
+using System.Text.Json;
 
 namespace ModernSlavery.WebUI
 {
@@ -95,8 +96,7 @@ namespace ModernSlavery.WebUI
             //Allow creation of a static http context anywhere
             services.AddHttpContextAccessor();
 
-            //Create the MVC service
-            services.AddMvc(
+            services.AddControllersWithViews(
                     options => {
                         options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
                         options.ModelMetadataDetailsProviders.Add(
@@ -107,15 +107,21 @@ namespace ModernSlavery.WebUI
                         options.Filters.Add<ErrorHandlingFilter>();
                     })
                 .AddControllersAsServices() // Add controllers as services so attribute filters be resolved in contructors.
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 // Set the default resolver to use Pascalcase instead of the default camelCase which may break Ajaz responses
-                .AddJsonOptions(options => { options.SerializerSettings.ContractResolver = new DefaultContractResolver(); })
-                .AddRazorOptions(
-                    // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
-                    // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-2.2#runtime-compilation
-                    options => options.AllowRecompilingViewsOnFileChange = env.IsDevelopment() || Config.IsLocal())
+                .AddJsonOptions(options => 
+                { 
+                    options.JsonSerializerOptions.PropertyNameCaseInsensitive=true;
+                    options.JsonSerializerOptions.PropertyNamingPolicy = null; 
+                })
                 .AddDataAnnotationsLocalization(
                     options => { options.DataAnnotationLocalizerProvider = DataAnnotationLocalizerProvider.DefaultResourceHandler; });
+
+            var mvcBuilder=services.AddRazorPages();
+
+            // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
+            // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
+            if (env.IsDevelopment() || Config.IsLocal())mvcBuilder.AddRazorRuntimeCompilation();
+
 
             //Add antiforgery token by default to forms
             services.AddAntiforgery();
@@ -415,6 +421,7 @@ namespace ModernSlavery.WebUI
                     });
             }
 
+            app.UseRouting();
             app.UseResponseCaching();
             app.UseResponseBuffering(); //required otherwise JsonResult uses chunking and adds extra characters
             app.UseStaticHttpContext(); //Temporary fix for old static HttpContext 
@@ -425,8 +432,11 @@ namespace ModernSlavery.WebUI
             app.UseStickySessionMiddleware(Global.StickySessions); //Enable/Disable sticky sessions based on  
             app.UseSecurityHeaderMiddleware(); //Add/remove security headers from all responses
             app.UseMvCApplication(); //Creates the global instance of Program.MvcApplication (equavalent in old Global.asax.cs)
-            app.UseMvcWithDefaultRoute();
-
+            //app.UseMvcWithDefaultRoute();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
             lifetime.ApplicationStarted.Register(
                 async () => {
                     // Summary:

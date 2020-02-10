@@ -102,12 +102,14 @@ namespace ModernSlavery.IdentityServer4
             //This is to allow access to the current http context anywhere
             services.AddHttpContextAccessor();
 
-            services.AddMvc(options => { options.AddCacheProfiles(); })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddRazorOptions(
-                    // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
-                    // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-2.2#runtime-compilation
-                    options => options.AllowRecompilingViewsOnFileChange = env.IsDevelopment() || Config.IsLocal());
+            services.AddControllersWithViews();
+
+            var mvcBuilder = services.AddRazorPages();
+
+            // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
+            // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
+            if (env.IsDevelopment() || Config.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
+
 
             //Add the distributed redis cache
             services.AddRedisCache();
@@ -235,11 +237,16 @@ namespace ModernSlavery.IdentityServer4
                     });
             }
 
+            app.UseRouting();
             app.UseStaticHttpContext(); //Temporary fix for old static HttpContext 
             app.UseMaintenancePageMiddleware(Global.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
             app.UseStickySessionMiddleware(Global.StickySessions); //Enable/Disable sticky sessions based on  
             app.UseSecurityHeaderMiddleware(); //Add/remove security headers from all responses
-            app.UseMvcWithDefaultRoute();
+            //app.UseMvcWithDefaultRoute();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
 
             lifetime.ApplicationStarted.Register(
                 () => {

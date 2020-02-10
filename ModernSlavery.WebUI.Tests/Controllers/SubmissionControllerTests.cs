@@ -24,7 +24,6 @@ using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Controllers.Submission;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;

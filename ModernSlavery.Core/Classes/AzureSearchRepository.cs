@@ -11,6 +11,7 @@ using ModernSlavery.Extensions;
 using Microsoft.ApplicationInsights;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
+using Index = Microsoft.Azure.Search.Models.Index;
 
 namespace ModernSlavery.Core.Classes
 {
