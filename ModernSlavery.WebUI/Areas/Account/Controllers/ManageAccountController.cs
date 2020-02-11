@@ -20,8 +20,8 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
             IHttpCache cache,
             IHttpSession session,
             IDataRepository dataRepo,
-            IWebTracker webTracker) :
-            base(logger, cache, session, dataRepo, webTracker) { }
+            IWebTracker webTracker, IMapper autoMapper) :
+            base(logger, cache, session, dataRepo, webTracker,autoMapper) { }
 
         [HttpGet]
         public IActionResult ManageAccount()
@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
             }
 
             // map the user to the view model
-            var model = Mapper.Map<ManageAccountViewModel>(currentUser);
+            var model = AutoMapper.Map<ManageAccountViewModel>(currentUser);
 
             // check if we have any successful changes
             if (TempData.ContainsKey(nameof(AccountResources.ChangeDetailsSuccessAlert)))

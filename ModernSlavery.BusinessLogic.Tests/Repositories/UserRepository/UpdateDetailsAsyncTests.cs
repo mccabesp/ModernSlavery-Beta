@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Autofac;
 using AutoMapper;
 using ModernSlavery.BusinessLogic.Account.Abstractions;
 using ModernSlavery.BusinessLogic.Account.Models;
@@ -7,6 +8,7 @@ using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
+using ModernSlavery.Tests.Common;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
@@ -17,24 +19,30 @@ namespace Repositories.UserRepository
 
     [TestFixture]
     [SetCulture("en-GB")]
-    public class UpdateDetailsAsyncTests
+    public class UpdateDetailsAsyncTests: BaseTestFixture<UpdateDetailsAsyncTests.DependencyModule>
     {
+        public class DependencyModule : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                // Initialise AutoMapper
+                MapperConfiguration mapperConfig = new MapperConfiguration(config => {
+                    config.AddMaps(typeof(ModernSlavery.BusinessLogic.Account.Repositories.UserRepository));
+                });
+                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            }
+        }
 
         [SetUp]
         public void BeforeEach()
         {
-            // init mapper
-            Mapper.Reset();
-            Mapper.Initialize(config => config.AddMaps(typeof(ModernSlavery.BusinessLogic.Account.Repositories.UserRepository).Assembly));
-
             // mock data 
             mockDataRepo = new Mock<IDataRepository>().SetupGetAll(UserHelpers.CreateUsers());
 
             mockLogRecordLogger = new Mock<IUserLogRecord>();
 
             // service under test
-            testUserRepo =
-                new ModernSlavery.BusinessLogic.Account.Repositories.UserRepository(mockDataRepo.Object, mockLogRecordLogger.Object);
+            testUserRepo = new ModernSlavery.BusinessLogic.Account.Repositories.UserRepository(mockDataRepo.Object, mockLogRecordLogger.Object, DependencyContainer.Resolve<IMapper>());
         }
 
         private Mock<IDataRepository> mockDataRepo;

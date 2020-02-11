@@ -20,6 +20,7 @@ using ModernSlavery.WebUI.Classes.Presentation;
 using ModernSlavery.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -35,7 +36,10 @@ namespace ModernSlavery.WebUI.Controllers
             ICompareViewService compareViewService,
             IDataRepository dataRepository,
             IOrganisationBusinessLogic organisationBusinessLogic,
-            IWebTracker webTracker) : base(logger, cache, session, dataRepository, webTracker)
+            IWebTracker webTracker,
+            IMapper autoMapper) :
+            base(logger, cache, session, dataRepository, webTracker, autoMapper)
+
         {
             OrganisationBusinessLogic = organisationBusinessLogic;
             SearchViewService = searchViewService;

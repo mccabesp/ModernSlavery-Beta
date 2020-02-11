@@ -384,16 +384,19 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
 
             SetupHelpers.SetupMockLogRecordGlobals(builder);
 
-            IContainer container = builder.Build();
+            // Initialise AutoMapper
+            MapperConfiguration mapperConfig = new MapperConfiguration(config => {
+                // register all out mapper profiles (classes/mappers/*)
+                config.AddMaps(typeof(MvcApplication));
+                // allows auto mapper to inject our dependencies
+                //config.ConstructServicesUsing(serviceTypeToConstruct =>
+                //{
+                //    //TODO
+                //});
+            });
 
-            Mapper.Reset();
-            Mapper.Initialize(
-                config => {
-                    // allows auto mapper to inject our dependencies
-                    config.ConstructServicesUsing(container.Resolve);
-                    // register all out mapper profiles (classes/mappers/*)
-                    config.AddMaps(typeof(MvcApplication).Assembly);
-                });
+            builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            IContainer container = builder.Build();
 
             return container;
         }

@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
 
 namespace ModernSlavery.WebUI.Classes
 {
@@ -30,11 +31,13 @@ namespace ModernSlavery.WebUI.Classes
             IHttpCache cache,
             IHttpSession session,
             IDataRepository dataRepository,
-            IWebTracker webTracker) : base(cache, session)
+            IWebTracker webTracker,
+            IMapper autoMapper) : base(cache, session)
         {
             _logger = logger;
             DataRepository = dataRepository;
             WebTracker = webTracker;
+            AutoMapper = autoMapper;
         }
 
         #endregion
@@ -273,6 +276,8 @@ namespace ModernSlavery.WebUI.Classes
 
         public IDataRepository DataRepository { get; protected set; }
         public IWebTracker WebTracker { get; }
+
+        public IMapper AutoMapper { get; }
 
         #endregion
 

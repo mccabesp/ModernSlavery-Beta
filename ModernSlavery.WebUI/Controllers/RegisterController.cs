@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -44,12 +45,14 @@ namespace ModernSlavery.WebUI.Controllers
             IWebTracker webTracker,
             PinInThePostService pinInThePostService,
             [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
-            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository) : base(
+            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
+            IMapper autoMapper) : base(
             logger,
             cache,
             session,
             dataRepository,
-            webTracker)
+            webTracker,
+            autoMapper)
         {
             ScopePresentation = scopePresentation;
             ScopeBusinessLogic = scopeBL;

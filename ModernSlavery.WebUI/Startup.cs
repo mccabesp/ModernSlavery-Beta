@@ -54,7 +54,6 @@ namespace ModernSlavery.WebUI
         public static Action<IServiceCollection> ConfigureTestServices;
         public static Action<ContainerBuilder> ConfigureTestContainer;
 
-        private static bool AutoMapperInitialised;
         private readonly IConfiguration config;
         private readonly IHostingEnvironment env;
         private readonly ILogger logger;
@@ -354,18 +353,20 @@ namespace ModernSlavery.WebUI
             //Override any test services
             ConfigureTestContainer?.Invoke(builder);
 
+            // Initialise AutoMapper
+            MapperConfiguration mapperConfig = new MapperConfiguration(config => {
+                // register all out mapper profiles (classes/mappers/*)
+                config.AddMaps(typeof(MvcApplication));
+                // allows auto mapper to inject our dependencies
+                //config.ConstructServicesUsing(serviceTypeToConstruct =>
+                //{
+                //    //TODO
+                //});
+            });
+
+            builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+
             IContainer container = builder.Build();
-            if (!AutoMapperInitialised)
-            {
-                Mapper.Initialize(
-                    config => {
-                        // allows auto mapper to inject our dependencies
-                        config.ConstructServicesUsing(container.Resolve);
-                        // register all out mapper profiles (classes/mappers/*)
-                        config.AddMaps(typeof(MvcApplication).Assembly);
-                        AutoMapperInitialised = true;
-                    });
-            }
 
             return container;
         }

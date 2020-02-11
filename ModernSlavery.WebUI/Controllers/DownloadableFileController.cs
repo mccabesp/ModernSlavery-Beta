@@ -12,6 +12,7 @@ using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
 
 namespace ModernSlavery.WebUI.Controllers.Administration
 {
@@ -29,7 +30,7 @@ namespace ModernSlavery.WebUI.Controllers.Administration
             IHttpSession session,
             IDataRepository dataRepository,
             IWebTracker webTracker,
-            IDownloadableFileBusinessLogic downloadableFileBusinessLogic) : base(logger, cache, session, dataRepository, webTracker)
+            IDownloadableFileBusinessLogic downloadableFileBusinessLogic,IMapper autoMapper) : base(logger, cache, session, dataRepository, webTracker,autoMapper)
         {
             _downloadableFileBusinessLogic = downloadableFileBusinessLogic;
         }

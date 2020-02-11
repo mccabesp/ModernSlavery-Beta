@@ -30,6 +30,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using CsvHelper.Configuration;
+using System.Globalization;
+using AutoMapper;
 
 namespace ModernSlavery.WebUI.Controllers.Administration
 {
@@ -52,8 +55,9 @@ namespace ModernSlavery.WebUI.Controllers.Administration
             IDataRepository dataRepository,
             IWebTracker webTracker,
             [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
-            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository
-        ) : base(logger, cache, session, dataRepository, webTracker)
+            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
+            IMapper autoMapper
+        ) : base(logger, cache, session, dataRepository, webTracker,autoMapper)
         {
             HostingEnvironment = hostingEnvironment;
             AdminService = adminService;
@@ -839,10 +843,14 @@ namespace ModernSlavery.WebUI.Controllers.Administration
                 {
                     using (var reader = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
                     {
-                        var csvReader = new CsvReader(reader);
-                        csvReader.Configuration.WillThrowOnMissingField = false;
-                        csvReader.Configuration.TrimFields = true;
-                        csvReader.Configuration.IgnoreQuotes = false;
+                        var config = new CsvConfiguration(CultureInfo.CurrentCulture);
+                        config.ShouldQuote = (field, context) => true;
+                        config.TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim;
+                        config.MissingFieldFound = null;
+                        config.IgnoreQuotes = false;
+
+                        using var csvReader = new CsvReader(reader,config);
+
                         List<object> records;
                         switch (upload.Type)
                         {

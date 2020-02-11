@@ -17,6 +17,7 @@ using ModernSlavery.WebUI.Models.Admin;
 using ModernSlavery.WebUI.Views.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -31,7 +32,8 @@ namespace ModernSlavery.WebUI.Controllers
             IHttpSession session,
             IScopePresentation scopeUIService,
             IDataRepository dataRepository,
-            IWebTracker webTracker) : base(logger, cache, session, dataRepository, webTracker)
+            IWebTracker webTracker,
+            IMapper autoMapper) : base(logger, cache, session, dataRepository, webTracker,autoMapper)
         {
             ScopePresentation = scopeUIService;
         }

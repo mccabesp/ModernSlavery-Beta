@@ -7,6 +7,7 @@ using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -23,7 +24,9 @@ namespace ModernSlavery.WebUI.Controllers
             IHttpCache cache,
             IHttpSession session,
             IDataRepository dataRepository,
-            IWebTracker webTracker) : base(logger, cache, session, dataRepository, webTracker)
+            IWebTracker webTracker,
+            IMapper autoMapper) :
+            base(logger, cache, session, dataRepository, webTracker, autoMapper)
         {
         }
 

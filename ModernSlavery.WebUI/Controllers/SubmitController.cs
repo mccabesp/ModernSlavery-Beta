@@ -10,6 +10,7 @@ using ModernSlavery.WebUI.Classes.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
 
 namespace ModernSlavery.WebUI.Controllers.Submission
 {
@@ -41,7 +42,8 @@ namespace ModernSlavery.WebUI.Controllers.Submission
             IHttpSession session,
             ISubmissionService submitService,
             IDataRepository dataRepository,
-            IWebTracker webTracker) : base(logger, cache, session, dataRepository, webTracker)
+            IWebTracker webTracker,
+            IMapper autoMapper) : base(logger, cache, session, dataRepository, webTracker,autoMapper)
         {
             submissionService = submitService;
         }

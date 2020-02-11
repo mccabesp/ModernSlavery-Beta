@@ -1,10 +1,13 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Autofac;
+using AutoMapper;
 using ModernSlavery.BusinessLogic.Account.Abstractions;
 using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
+using ModernSlavery.Tests.Common;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
@@ -15,8 +18,20 @@ namespace Repositories.UserRepository
 
     [TestFixture]
     [SetCulture("en-GB")]
-    public class FindBySubjectIdAsyncTests
+    public class FindBySubjectIdAsyncTests : BaseTestFixture<FindBySubjectIdAsyncTests.DependencyModule>
     {
+        public class DependencyModule : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                // Initialise AutoMapper
+                MapperConfiguration mapperConfig = new MapperConfiguration(config => {
+                    config.AddMaps(typeof(ModernSlavery.BusinessLogic.Account.Repositories.UserRepository));
+                });
+                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            }
+        }
+
 
         [SetUp]
         public void BeforeEach()
@@ -26,7 +41,7 @@ namespace Repositories.UserRepository
 
             // service under test
             testUserRepo =
-                new ModernSlavery.BusinessLogic.Account.Repositories.UserRepository(mockDataRepo.Object, Mock.Of<IUserLogRecord>());
+                new ModernSlavery.BusinessLogic.Account.Repositories.UserRepository(mockDataRepo.Object, Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
         }
 
         private Mock<IDataRepository> mockDataRepo;

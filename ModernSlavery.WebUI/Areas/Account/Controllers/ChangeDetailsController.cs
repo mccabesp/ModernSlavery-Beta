@@ -24,8 +24,9 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
             IHttpCache cache,
             IHttpSession session,
             IDataRepository dataRepo,
-            IWebTracker webTracker) :
-            base(logger, cache, session, dataRepo, webTracker)
+            IWebTracker webTracker,
+            IMapper autoMapper) :
+            base(logger, cache, session, dataRepo, webTracker,autoMapper)
         {
             ChangeDetailsService = changeDetailsService;
         }
@@ -48,7 +49,7 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
             }
 
             // map the user to the edit view model
-            var model = Mapper.Map<ChangeDetailsViewModel>(currentUser);
+            var model = AutoMapper.Map<ChangeDetailsViewModel>(currentUser);
 
             return View(model);
         }

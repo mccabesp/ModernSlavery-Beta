@@ -8,12 +8,26 @@ using ModernSlavery.Database;
 using MockQueryable.Moq;
 using Moq;
 using NUnit.Framework;
+using ModernSlavery.Tests.Common;
+using Autofac;
+using AutoMapper;
 
 namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
 {
     [TestFixture]
-    public class FindByNameAsyncTests
+    public class FindByNameAsyncTests : BaseTestFixture<FindByNameAsyncTests.DependencyModule>
     {
+        public class DependencyModule : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                // Initialise AutoMapper
+                MapperConfiguration mapperConfig = new MapperConfiguration(config => {
+                    config.AddMaps(typeof(ModernSlavery.BusinessLogic.Account.Repositories.UserRepository));
+                });
+                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            }
+        }
 
         [SetUp]
         public void SetUp()
@@ -115,7 +129,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
 
             _configuredIUserRepository = new Account.Repositories.UserRepository(
                 configurableDataRepository.Object,
-                Mock.Of<IUserLogRecord>());
+                Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
         }
 
         private IUserRepository _configuredIUserRepository;

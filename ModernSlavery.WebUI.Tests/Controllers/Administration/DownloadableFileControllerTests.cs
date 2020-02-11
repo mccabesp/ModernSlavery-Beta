@@ -15,12 +15,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using ModernSlavery.Tests.Common;
+using AutoMapper;
 
 namespace ModernSlavery.WebUI.Tests.Controllers.Administration
 {
     [TestFixture]
-    public class DownloadableFileControllerTests
+    public class DownloadableFileControllerTests : BaseTestFixture<DownloadableFileControllerTests.DependencyModule>
     {
+        public class DependencyModule : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                // Initialise AutoMapper
+                MapperConfiguration mapperConfig = new MapperConfiguration(config => {
+                    config.AddMaps(typeof(ModernSlavery.BusinessLogic.Account.Repositories.UserRepository));
+                });
+                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            }
+        }
 
         private DownloadableFileController _TestDownloadableFileController;
         private IContainer IocContainer;
@@ -71,7 +84,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Administration
                 null,
                 null,
                 null,
-                downloadableFileBusinessLogic);
+                downloadableFileBusinessLogic, DependencyContainer.Resolve<IMapper>());
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile(filePath);
@@ -137,7 +150,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Administration
                 null,
                 null,
                 null,
-                downloadableFileBusinessLogic);
+                downloadableFileBusinessLogic, DependencyContainer.Resolve<IMapper>());
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile(filePath);
@@ -205,7 +218,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Administration
                 null,
                 null,
                 null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile("AFilePath");
@@ -248,7 +261,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Administration
                 null,
                 null,
                 null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile("AFilePath");
@@ -281,7 +294,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Administration
                 null,
                 null,
                 null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
 
             // Act
             await _TestDownloadableFileController.WebsiteLogs(filePath);
@@ -337,7 +350,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Administration
                 null,
                 null,
                 null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
 
             // Act
             await _TestDownloadableFileController.WebjobLogs(filePath);
@@ -393,7 +406,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Administration
                 null,
                 null,
                 null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
 
             // Act
             await _TestDownloadableFileController.IdentityLogs(filePath);
@@ -447,7 +460,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Administration
                 null,
                 null,
                 null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
         }
 
     }

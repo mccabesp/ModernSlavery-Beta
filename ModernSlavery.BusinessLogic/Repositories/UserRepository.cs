@@ -20,10 +20,11 @@ namespace ModernSlavery.BusinessLogic.Account.Repositories
     public class UserRepository : IUserRepository
     {
 
-        public UserRepository(IDataRepository dataRepository, IUserLogRecord userRecordLog)
+        public UserRepository(IDataRepository dataRepository, IUserLogRecord userRecordLog, IMapper autoMapper)
         {
             DataRepository = dataRepository ?? throw new ArgumentNullException(nameof(dataRepository));
             UserRecordLog = userRecordLog ?? throw new ArgumentNullException(nameof(userRecordLog));
+            AutoMapper = autoMapper ?? throw new ArgumentNullException(nameof(autoMapper));
         }
 
         public async Task<User> FindBySubjectIdAsync(string subjectId, params UserStatuses[] filterStatuses)
@@ -169,7 +170,7 @@ namespace ModernSlavery.BusinessLogic.Account.Repositories
             }
 
             // check we have changes
-            var originalDetails = Mapper.Map<UpdateDetailsModel>(userToUpdate);
+            var originalDetails = AutoMapper.Map<UpdateDetailsModel>(userToUpdate);
             if (originalDetails.Equals(changeDetails))
             {
                 return false;
@@ -267,6 +268,7 @@ namespace ModernSlavery.BusinessLogic.Account.Repositories
         public IDataRepository DataRepository { get; }
 
         public IUserLogRecord UserRecordLog { get; }
+        public IMapper AutoMapper { get; }
 
         #endregion
 

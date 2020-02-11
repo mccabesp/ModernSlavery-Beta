@@ -1,23 +1,39 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
+using Autofac;
+using AutoMapper;
 using ModernSlavery.BusinessLogic.Account.Abstractions;
 using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
 using ModernSlavery.Extensions;
+using ModernSlavery.Tests.Common;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
 using NUnit.Framework;
+using Module = Autofac.Module;
 
 namespace Repositories.UserRepository
 {
 
     [TestFixture]
     [SetCulture("en-GB")]
-    public class UpdatePasswordAsyncTests
+    public class UpdatePasswordAsyncTests : BaseTestFixture<UpdatePasswordAsyncTests.DependencyModule>
     {
+        public class DependencyModule : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                // Initialise AutoMapper
+                MapperConfiguration mapperConfig = new MapperConfiguration(config => {
+                    config.AddMaps(typeof(ModernSlavery.BusinessLogic.Account.Repositories.UserRepository));
+                });
+                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            }
+        }
 
         [SetUp]
         public void BeforeEach()
@@ -29,7 +45,7 @@ namespace Repositories.UserRepository
 
             // service under test
             testUserRepo =
-                new ModernSlavery.BusinessLogic.Account.Repositories.UserRepository(mockDataRepo.Object, mockUserLogRecord.Object);
+                new ModernSlavery.BusinessLogic.Account.Repositories.UserRepository(mockDataRepo.Object, mockUserLogRecord.Object, DependencyContainer.Resolve<IMapper>());
         }
 
         private Mock<IDataRepository> mockDataRepo;

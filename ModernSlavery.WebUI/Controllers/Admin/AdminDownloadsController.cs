@@ -6,6 +6,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -29,7 +30,7 @@ namespace ModernSlavery.WebUI.Controllers
             var memoryStream = new MemoryStream();
             using (var writer = new StreamWriter(memoryStream))
             {
-                using (var csv = new CsvWriter(writer))
+                using (var csv = new CsvWriter(writer,CultureInfo.CurrentCulture))
                 {
                     csv.WriteRecords(feedback);
                 }

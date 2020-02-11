@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
@@ -58,6 +60,29 @@ namespace ModernSlavery.Core.Classes
         }
 
         #region FileSystem
+        public class CsvBadDataException : CsvHelperException
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CsvBadDataException"/> class.
+            /// </summary>
+            public CsvBadDataException() { }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CsvBadDataException"/> class
+            /// with a specified error message.
+            /// </summary>
+            /// <param name="message">The message that describes the error.</param>
+            public CsvBadDataException(string message) : base(message) { }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="CsvBadDataException"/> class
+            /// with a specified error message and a reference to the inner exception that 
+            /// is the cause of this exception.
+            /// </summary>
+            /// <param name="message">The error message that explains the reason for the exception.</param>
+            /// <param name="innerException">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+            public CsvBadDataException(string message, Exception innerException) : base(message, innerException) { }
+        }
 
         public static async Task<List<T>> ReadCSVAsync<T>(this IFileRepository fileRepository, string filePath)
         {
@@ -72,27 +97,29 @@ namespace ModernSlavery.Core.Classes
 
         public static List<T> ReadCSV<T>(string content)
         {
-            using (var codeStream = new MemoryStream(Encoding.UTF8.GetBytes(content)))
-            using (var reader = new StreamReader(codeStream, Encoding.UTF8))
+            using (TextReader textReader = new StringReader(content))
             {
-                var csvReader = new CsvReader(reader);
-                csvReader.Configuration.WillThrowOnMissingField = false;
-                csvReader.Configuration.TrimFields = true;
-                csvReader.Configuration.IgnoreQuotes = false;
+                var config = new CsvConfiguration(CultureInfo.CurrentCulture);
+                config.ShouldQuote = (field, context) => true;
+                config.TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim;
+                config.MissingFieldFound = null;
 
-                try
+                using (var csvReader = new CsvReader(textReader, config))
                 {
-                    return csvReader.GetRecords<T>().ToList();
-                }
-                catch (CsvTypeConverterException ex)
-                {
-                    if (ex.Data.Count > 0)
+                    try
                     {
-                        throw new CsvBadDataException(ex.Data.Values.ToList<string>()[0]);
+                        return csvReader.GetRecords<T>().ToList();
                     }
+                    catch (CsvHelperException ex)
+                    {
+                        if (ex.Data.Count > 0)
+                        {
+                            throw new CsvBadDataException(ex.Data.Values.ToList<string>()[0]);
+                        }
 
-                    //ex.Data.Values has more info...
-                    throw;
+                        //ex.Data.Values has more info...
+                        throw;
+                    }
                 }
             }
         }
@@ -103,20 +130,21 @@ namespace ModernSlavery.Core.Classes
 
             using (TextReader sr = new StringReader(csvContent))
             {
-                using (var csv = new CsvReader(sr))
+                using (var csvReader = new CsvReader(sr,CultureInfo.CurrentCulture))
                 {
-                    csv.ReadHeader();
-                    foreach (string header in csv.FieldHeaders)
+                    csvReader.Read();
+                    csvReader.ReadHeader();
+                    foreach (var header in csvReader.Context.HeaderRecord)
                     {
                         table.Columns.Add(header);
                     }
 
-                    while (csv.Read())
+                    while (csvReader.Read())
                     {
                         DataRow row = table.NewRow();
                         foreach (DataColumn col in table.Columns)
                         {
-                            row[col.ColumnName] = csv.GetField(col.DataType, col.ColumnName);
+                            row[col.ColumnName] = csvReader.GetField(col.DataType, col.ColumnName);
                         }
 
                         table.Rows.Add(row);
@@ -149,7 +177,10 @@ namespace ModernSlavery.Core.Classes
             {
                 using (StreamWriter textWriter = tempfile.CreateText())
                 {
-                    var config = new CsvConfiguration {QuoteAllFields = true, TrimFields = true, TrimHeaders = true};
+                    var config = new CsvConfiguration(CultureInfo.CurrentCulture);
+                    config.ShouldQuote = (field, context) => true;
+                    config.TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim;
+
                     using (var writer = new CsvWriter(textWriter, config))
                     {
                         writer.WriteRecords(records);
@@ -195,9 +226,14 @@ namespace ModernSlavery.Core.Classes
                 {
                     using (var textWriter = new StreamWriter(stream))
                     {
-                        var config = new CsvConfiguration {QuoteAllFields = true, TrimFields = true, TrimHeaders = true};
+                        var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.CurrentCulture);
+                        config.ShouldQuote = (field, context) => true;
+                        config.TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim;
+
                         using (var writer = new CsvWriter(textWriter, config))
                         {
+                            writer.Configuration.ShouldQuote = (field, context) => true;
+
                             // Write columns
                             foreach (DataColumn column in datatable.Columns) //copy datatable CHAIN to DT, or just use CHAIN
                             {
@@ -237,8 +273,10 @@ namespace ModernSlavery.Core.Classes
 
             using (var textWriter = new StringWriter())
             {
-                var config = new CsvConfiguration {QuoteAllFields = true, TrimFields = true, TrimHeaders = true};
-
+                var config= new CsvConfiguration(CultureInfo.CurrentCulture);
+                config.ShouldQuote = (field, context) => true;
+                config.TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim;
+                
                 using (var writer = new CsvWriter(textWriter, config))
                 {
                     if (!await fileRepository.GetFileExistsAsync(filePath))

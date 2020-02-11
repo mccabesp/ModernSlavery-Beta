@@ -46,7 +46,8 @@ namespace ModernSlavery.WebUI.Controllers
             ISubmissionBusinessLogic submissionBusinessLogic,
             IObfuscator obfuscator,
             IDataRepository dataRepository,
-            IWebTracker webTracker) : base(logger, cache, session, dataRepository, webTracker)
+            IWebTracker webTracker,
+            IMapper autoMapper) : base(logger, cache, session, dataRepository, webTracker,autoMapper)
         {
             ViewingService = viewingService;
             SearchViewService = searchViewService;
@@ -166,7 +167,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             // generate result view model
-            var searchParams = Mapper.Map<EmployerSearchParameters>(searchQuery);
+            var searchParams = AutoMapper.Map<EmployerSearchParameters>(searchQuery);
             SearchViewModel model = await ViewingService.SearchAsync(searchParams);
 
             ViewBag.ReturnUrl = SearchViewService.GetLastSearchUrl();
@@ -195,7 +196,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             // generate result view model
-            var searchParams = Mapper.Map<EmployerSearchParameters>(searchQuery);
+            var searchParams = AutoMapper.Map<EmployerSearchParameters>(searchQuery);
             SearchViewModel model = await ViewingService.SearchAsync(searchParams);
 
             ViewBag.ReturnUrl = SearchViewService.GetLastSearchUrl();
@@ -515,7 +516,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             // generate compare list
-            var searchParams = Mapper.Map<EmployerSearchParameters>(searchQuery);
+            var searchParams = AutoMapper.Map<EmployerSearchParameters>(searchQuery);
 
             // set maximum search size
             searchParams.Page = 1;

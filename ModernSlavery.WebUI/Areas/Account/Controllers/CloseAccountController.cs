@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
 
 namespace ModernSlavery.WebUI.Areas.Account.Controllers
 {
@@ -24,8 +25,9 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
             IHttpCache cache,
             IHttpSession session,
             IDataRepository dataRepo,
-            IWebTracker webTracker) :
-            base(logger, cache, session, dataRepo, webTracker)
+            IWebTracker webTracker,
+            IMapper autoMapper) :
+            base(logger, cache, session, dataRepo, webTracker,autoMapper)
         {
             CloseAccountService = closeAccountService;
         }
