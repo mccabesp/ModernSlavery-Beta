@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
+using Microsoft.AspNetCore.Authentication;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {
@@ -5082,10 +5083,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
         [Description("SubmitController_SubmissionComplete_POST_Success")]
         public void SubmitController_SubmissionComplete_POST_Success()
         {
-            var mockedAuthenticationManager = new Mock<AuthenticationManager>();
-            mockedAuthenticationManager.Setup(x => x.SignOutAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
-
             var contextMock = new Mock<HttpContext>();
+
+            var mockedAuthenticationService = new Mock<IAuthenticationService>();
+            mockedAuthenticationService.Setup(x => x.SignOutAsync(contextMock.Object, It.IsAny<string>(), It.IsAny<AuthenticationProperties>())).Returns(Task.CompletedTask);
 
             var controllerContextMock = new Mock<ControllerContext>();
             controllerContextMock.Setup(con => con.HttpContext).Returns(contextMock.Object);

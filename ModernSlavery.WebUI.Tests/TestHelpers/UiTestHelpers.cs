@@ -52,6 +52,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
+using Microsoft.AspNetCore.Mvc.ViewFeatures.Infrastructure;
 
 namespace ModernSlavery.WebUI.Tests.TestHelpers
 {
@@ -117,18 +118,30 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
             //Mock HttpRequest
             var requestMock = new Mock<HttpRequest>();
 
+            var httpContext = new DefaultHttpContext();
+            var requestCookies = httpContext.Request.Cookies.Append(new KeyValuePair<string, string>("cookie_settings", JsonConvert.SerializeObject(
+                new CookieSettings
+                {
+                    GoogleAnalyticsGpg = true,
+                    GoogleAnalyticsGovUk = true,
+                    ApplicationInsights = true,
+                    RememberSettings = true
+                }))) as IRequestCookieCollection;
+
+
             var requestHeaders = new HeaderDictionary();
             //requestMock.Setup(x => x.GetUri()).Returns(Uri);
-            var requestCookies = new RequestCookieCollection(
-                new Dictionary<string, string> {
-                    {
-                        "cookie_settings",
-                        JsonConvert.SerializeObject(
-                            new CookieSettings {
-                                GoogleAnalyticsGpg = true, GoogleAnalyticsGovUk = true, ApplicationInsights = true, RememberSettings = true
-                            })
-                    }
-                });
+            //var requestCookies = new RequestCookieCollection(
+            //    new Dictionary<string, string> {
+            //        {
+            //            "cookie_settings",
+            //            JsonConvert.SerializeObject(
+            //                new CookieSettings {
+            //                    GoogleAnalyticsGpg = true, GoogleAnalyticsGovUk = true, ApplicationInsights = true, RememberSettings = true
+            //                })
+            //        }
+            //    });
+
             requestMock.SetupGet(x => x.Cookies).Returns(requestCookies);
             requestMock.SetupGet(x => x.Headers).Returns(requestHeaders);
 
@@ -204,8 +217,10 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
             {
                 baseController.ControllerContext = controllerContextMock;
 
+                var mockTempDataSerializer=new Mock<TempDataSerializer>();
+
                 //Setup temp data
-                baseController.TempData = new TempDataDictionary(httpContextMock.Object, new SessionStateTempDataProvider());
+                baseController.TempData = new TempDataDictionary(httpContextMock.Object, new SessionStateTempDataProvider(mockTempDataSerializer.Object));
 
                 //Setup the mockUrlHelper for the controller with the calling action from the Route Data
                 if (baseController.RouteData != null
