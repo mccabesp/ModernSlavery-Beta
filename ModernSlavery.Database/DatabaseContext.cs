@@ -16,7 +16,7 @@ namespace ModernSlavery.Database
     public partial class DatabaseContext : DbContext, IDbContext
     {
 
-        public static string ConnectionString = @"Server=(localdb)\ProjectsV13;Database=ModernSlaveryDatabase;Trusted_Connection=True;";
+        public static string ConnectionString = @"Server=(localdb)\ProjectsV13;Database=ModernSlaveryDatabase4;Trusted_Connection=True;";
 
         public DatabaseContext(string connectionString = null, bool useMigrations = false)
         {
@@ -39,7 +39,7 @@ namespace ModernSlavery.Database
             }
         }
 
-
+        #region Tables
         public virtual DbSet<AddressStatus> AddressStatus { get; set; }
         public virtual DbSet<Organisation> Organisation { get; set; }
         public virtual DbSet<OrganisationAddress> OrganisationAddress { get; set; }
@@ -61,6 +61,21 @@ namespace ModernSlavery.Database
         public virtual DbSet<Feedback> Feedback { get; set; }
         public virtual DbSet<AuditLog> AuditLogs { get; set; }
         public virtual DbSet<ReminderEmail> ReminderEmails { get; set; }
+        #endregion
+
+        #region Views
+        public virtual DbSet<UserInfoView> UserInfoView { get; set; }
+        public virtual DbSet<OrganisationAddressInfoView> OrganisationAddressInfoView { get; set; }
+        public virtual DbSet<OrganisationInfoView> OrganisationInfoView { get; set; }
+        public virtual DbSet<OrganisationRegistrationInfoView> OrganisationRegistrationInfoView { get; set; }
+        public virtual DbSet<OrganisationScopeAndReturnInfoView> OrganisationScopeAndReturnInfoView { get; set; }
+        public virtual DbSet<OrganisationScopeInfoView> OrganisationScopeInfoView { get; set; }
+        public virtual DbSet<OrganisationSearchInfoView> OrganisationSearchInfoView { get; set; }
+        public virtual DbSet<OrganisationSicCodeInfoView> OrganisationSicCodeInfoView { get; set; }
+        public virtual DbSet<OrganisationSubmissionInfoView> OrganisationSubmissionInfoView { get; set; }
+        public virtual DbSet<UserLinkedOrganisationsView> UserLinkedOrganisationsView { get; set; }
+        public virtual DbSet<UserStatusInfoView> UserStatusInfoView { get; set; }
+        #endregion
 
         public async Task<int> SaveChangesAsync()
         {

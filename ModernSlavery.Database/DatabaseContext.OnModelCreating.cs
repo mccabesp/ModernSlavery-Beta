@@ -695,6 +695,338 @@ namespace ModernSlavery.Database
                 .HasDefaultValueSql("getdate()");
 
             #endregion
+
+            #region Views
+            modelBuilder.Entity<OrganisationAddressInfoView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("OrganisationAddressInfoView");
+
+                entity.Property(e => e.AddressSource).HasMaxLength(255);
+
+                entity.Property(e => e.AddressStatus)
+                    .HasMaxLength(14)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AddressStatusDetails).HasMaxLength(255);
+
+                entity.Property(e => e.FullAddress).HasMaxLength(4000);
+            });
+
+            modelBuilder.Entity<OrganisationInfoView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("OrganisationInfoView");
+
+                entity.Property(e => e.CompanyNumber).HasMaxLength(10);
+
+                entity.Property(e => e.Dunsnumber)
+                    .HasColumnName("DUNSNumber")
+                    .HasMaxLength(10);
+
+                entity.Property(e => e.EmployerReference).HasMaxLength(10);
+
+                entity.Property(e => e.OrganisationId).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.OrganisationName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.OrganisationStatus)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SectorType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<OrganisationRegistrationInfoView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("OrganisationRegistrationInfoView");
+
+                entity.Property(e => e.ContactInfo).HasMaxLength(154);
+
+                entity.Property(e => e.PinconfirmedDate).HasColumnName("PINConfirmedDate");
+
+                entity.Property(e => e.PinsentDate).HasColumnName("PINSentDate");
+
+                entity.Property(e => e.RegistrationMethod)
+                    .HasMaxLength(16)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserInfo)
+                    .IsRequired()
+                    .HasMaxLength(154);
+            });
+
+            modelBuilder.Entity<OrganisationScopeAndReturnInfoView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("OrganisationScopeAndReturnInfoView");
+
+                entity.Property(e => e.CompanyNumber).HasMaxLength(10);
+
+                entity.Property(e => e.EmployerReference).HasMaxLength(10);
+
+                entity.Property(e => e.OrganisationName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.OrganisationSize)
+                    .HasMaxLength(79)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OrganisationStatus)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PublicSectorDescription).HasMaxLength(250);
+
+                entity.Property(e => e.ScopeStatus)
+                    .HasMaxLength(27)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SectorType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SicCodeSectionDescription).HasMaxLength(250);
+            });
+
+            modelBuilder.Entity<OrganisationScopeInfoView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("OrganisationScopeInfoView");
+
+                entity.Property(e => e.RegisterStatus)
+                    .HasMaxLength(22)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ScopeStatus)
+                    .HasMaxLength(26)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SnapshotYear).HasColumnName("snapshotYear");
+            });
+
+            modelBuilder.Entity<OrganisationSearchInfoView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("OrganisationSearchInfoView");
+
+                entity.Property(e => e.CompanyNumber).HasMaxLength(10);
+
+                entity.Property(e => e.Dunsnumber)
+                    .HasColumnName("DUNSNumber")
+                    .HasMaxLength(10);
+
+                entity.Property(e => e.EmployerReference).HasMaxLength(10);
+
+                entity.Property(e => e.OrganisationId).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.OrganisationName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.OrganisationStatus)
+                    .HasMaxLength(14)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SectorType)
+                    .HasMaxLength(12)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<OrganisationSicCodeInfoView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("OrganisationSicCodeInfoView");
+
+                entity.Property(e => e.CodeDescription).HasMaxLength(250);
+
+                entity.Property(e => e.SectionDescription).HasMaxLength(250);
+
+                entity.Property(e => e.SicSectionId).HasMaxLength(1);
+
+                entity.Property(e => e.Source).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<OrganisationSubmissionInfoView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("OrganisationSubmissionInfoView");
+
+                entity.Property(e => e.CompanyLinkToGpginfo)
+                    .HasColumnName("CompanyLinkToGPGInfo")
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.DateFirstReportedInYear).HasColumnName("dateFirstReportedInYear");
+
+                entity.Property(e => e.DiffMeanBonusPercent).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.DiffMeanHourlyPayPercent).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.DiffMedianBonusPercent).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.DiffMedianHourlyPercent).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.Ehrcresponse)
+                    .IsRequired()
+                    .HasColumnName("EHRCResponse")
+                    .HasMaxLength(5)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FemaleLowerPayBand).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.FemaleMedianBonusPayPercent).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.FemaleMiddlePayBand).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.FemaleUpperPayBand).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.FemaleUpperQuartilePayBand).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.LatestReturnAccountingDate).HasColumnType("date");
+
+                entity.Property(e => e.LatestReturnLateReason).HasMaxLength(200);
+
+                entity.Property(e => e.LatestReturnStatus)
+                    .HasColumnName("latestReturnStatus")
+                    .HasMaxLength(14)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LatestReturnStatusDate).HasColumnName("latestReturnStatusDate");
+
+                entity.Property(e => e.LatestReturnStatusDetails).HasMaxLength(255);
+
+                entity.Property(e => e.MaleLowerPayBand).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.MaleMedianBonusPayPercent).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.MaleMiddlePayBand).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.MaleUpperPayBand).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.MaleUpperQuartilePayBand).HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.OrganisationSize)
+                    .IsRequired()
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ReportedLate)
+                    .IsRequired()
+                    .HasMaxLength(5)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ReturnModifiedFields).HasMaxLength(200);
+
+                entity.Property(e => e.StatusDetails).HasMaxLength(255);
+
+                entity.Property(e => e.StatusId)
+                    .HasMaxLength(14)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SubmittedBy).HasMaxLength(204);
+            });
+
+            modelBuilder.Entity<UserLinkedOrganisationsView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("UserLinkedOrganisationsView");
+
+                entity.Property(e => e.CompanyNumber).HasMaxLength(10);
+
+                entity.Property(e => e.Dunsnumber)
+                    .HasColumnName("DUNSNumber")
+                    .HasMaxLength(10);
+
+                entity.Property(e => e.EmployerReference).HasMaxLength(10);
+
+                entity.Property(e => e.OrganisationName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.SectorTypeId)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StatusId)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<UserInfoView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("UserInfoView");
+
+                entity.Property(e => e.ContactFirstName).HasMaxLength(50);
+
+                entity.Property(e => e.ContactJobTitle).HasMaxLength(50);
+
+                entity.Property(e => e.ContactLastName).HasMaxLength(50);
+
+                entity.Property(e => e.ContactOrganisation).HasMaxLength(100);
+
+                entity.Property(e => e.ContactPhoneNumber).HasMaxLength(20);
+
+                entity.Property(e => e.Firstname)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.JobTitle)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Lastname)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.StatusDetails).HasMaxLength(255);
+
+                entity.Property(e => e.StatusId)
+                    .HasMaxLength(14)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserId).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<UserStatusInfoView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("UserStatusInfoView");
+
+                entity.Property(e => e.StatusChangedBy)
+                    .IsRequired()
+                    .HasMaxLength(154);
+
+                entity.Property(e => e.StatusDetails).HasMaxLength(255);
+
+                entity.Property(e => e.StatusId)
+                    .HasMaxLength(14)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserName)
+                    .IsRequired()
+                    .HasMaxLength(154);
+            });
+
+
+            #endregion
         }
 
     }
