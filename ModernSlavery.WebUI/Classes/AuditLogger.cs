@@ -76,7 +76,7 @@ namespace ModernSlavery.WebUI.Classes
                     OriginalUser = originalUser,
                     ImpersonatedUser = impersonatedUser,
                     Organisation = organisation,
-                    Details = details
+                    DetailsDictionary = details
                 });
 
             dataRepository.SaveChangesAsync().Wait();
@@ -108,7 +108,7 @@ namespace ModernSlavery.WebUI.Classes
                     OriginalUser = originalUser,
                     ImpersonatedUser = impersonatedUser,
                     Organisation = null,
-                    Details = details
+                    DetailsDictionary = details
                 });
 
             dataRepository.SaveChangesAsync().Wait();

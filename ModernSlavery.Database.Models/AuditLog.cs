@@ -9,7 +9,6 @@ namespace ModernSlavery.Database.Models
     public class AuditLog
     {
 
-        private string _details;
         public long AuditLogId { get; set; }
         public AuditedAction Action { get; set; }
         public DateTime CreatedDate { get; set; }
@@ -21,11 +20,13 @@ namespace ModernSlavery.Database.Models
         [ForeignKey("ImpersonatedUserId")]
         public virtual User ImpersonatedUser { get; set; }
 
+        public string Details { get; set; }
+
         [NotMapped]
-        public Dictionary<string, string> Details
+        public Dictionary<string, string> DetailsDictionary
         {
-            get => JsonConvert.DeserializeObject<Dictionary<string, string>>(string.IsNullOrEmpty(_details) ? "{}" : _details);
-            set => _details = JsonConvert.SerializeObject(value);
+            get => JsonConvert.DeserializeObject<Dictionary<string, string>>(string.IsNullOrEmpty(Details) ? "{}" : Details);
+            set => Details = JsonConvert.SerializeObject(value);
         }
 
     }

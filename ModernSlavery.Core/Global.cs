@@ -113,7 +113,7 @@ namespace ModernSlavery.Core
         public static Version Version => Misc.GetTopAssembly().GetName().Version;
         public static DateTime AssemblyDate => Misc.GetTopAssembly().GetAssemblyCreationTime();
         public static string AssemblyCopyright => Misc.GetTopAssembly().GetAssemblyCopyright();
-        public static string DatabaseConnectionName => Config.GetAppSetting("DatabaseConnectionName") ?? "GpgDatabase";
+        public static string DatabaseConnectionName => Config.GetAppSetting("DatabaseConnectionName") ?? "ModernSlaveryDatabase";
         public static string DatabaseConnectionString => Config.GetConnectionString(DatabaseConnectionName);
         public static string AzureStorageConnectionString => Config.GetConnectionString("AzureStorage");
 

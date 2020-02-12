@@ -693,9 +693,6 @@ namespace ModernSlavery.Database
             modelBuilder.Entity<AuditLog>()
                 .Property(e => e.CreatedDate)
                 .HasDefaultValueSql("getdate()");
-            modelBuilder.Entity<AuditLog>()
-                .Property<string>("DetailsString")
-                .HasField("_details");
 
             #endregion
         }

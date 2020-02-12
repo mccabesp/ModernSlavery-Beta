@@ -1242,7 +1242,7 @@ namespace ModernSlavery.Database.Core21.Migrations
 
             #endregion
 
-            #region Synchronise GpgDatabaseContextModelSnapshot and current estate of the database
+            #region Synchronise DatabaseContextModelSnapshot and current estate of the database
 
             // These instructions were run directly onto the database and were needed to be included here to synchronise the context and the database
 
@@ -1413,7 +1413,7 @@ namespace ModernSlavery.Database.Core21.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            #region Revert synchronise GpgDatabaseContextModelSnapshot
+            #region Revert synchronise DatabaseContextModelSnapshot
 
             migrationBuilder.DropForeignKey(
                 "FK_dbo.Organisations_dbo.OrganisationPublicSectorTypes_LatestPublicSectorTypeId",

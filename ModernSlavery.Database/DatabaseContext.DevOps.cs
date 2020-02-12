@@ -50,7 +50,7 @@ namespace ModernSlavery.Database
 
         private static void ExecuteSqlCommand(string query, int timeOut = 120)
         {
-            using (var sqlConnection1 = new SqlConnection(Config.GetConnectionString("GpgDatabase")))
+            using (var sqlConnection1 = new SqlConnection(Config.GetConnectionString("ModernSlaveryDatabase")))
             {
                 using (var cmd = new SqlCommand(query, sqlConnection1))
                 {

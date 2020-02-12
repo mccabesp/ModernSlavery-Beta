@@ -85,7 +85,7 @@
         @foreach (AuditLog item in Model.AuditLogs)
         {
             <tr class="govuk-table__row">
-                <td class="govuk-table__cell" rowspan="@(Math.Max(item.Details.Count, 1))">
+                <td class="govuk-table__cell" rowspan="@(Math.Max(item.DetailsDictionary.Count, 1))">
                     <span style="white-space: nowrap;">
                         @(item.CreatedDate.ToString("d MMM yyyy"))
                     </span>
@@ -98,7 +98,7 @@
                     // If this audit page is in the context of a User
                     // then each item is in the context of an Organisation
                     // so we must show which Organisation each item relates to
-                    <td class="govuk-table__cell" rowspan="@(Math.Max(item.Details.Count, 1))">
+                    <td class="govuk-table__cell" rowspan="@(Math.Max(item.DetailsDictionary.Count, 1))">
                         @if (item.Organisation != null)
                         {
                             <a href="@Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = item.Organisation.OrganisationId})"
@@ -110,7 +110,7 @@
                     // If this audit page is in the context of a User
                     // then we also show the user who took the action
                     // but only if it wasn't this current user
-                    <td class="govuk-table__cell" rowspan="@(Math.Max(item.Details.Count, 1))">
+                    <td class="govuk-table__cell" rowspan="@(Math.Max(item.DetailsDictionary.Count, 1))">
                         @if (item.OriginalUser != Model.User)
                         {
                             <a href="@Url.Action("ViewUser", "AdminViewUser", new {id = item.OriginalUser.UserId})"
@@ -133,7 +133,7 @@
                 }
                 else
                 {
-                    <td class="govuk-table__cell" rowspan="@(Math.Max(item.Details.Count, 1))">
+                    <td class="govuk-table__cell" rowspan="@(Math.Max(item.DetailsDictionary.Count, 1))">
                         <a href="@Url.Action("ViewUser", "AdminViewUser", new { id = item.OriginalUser.UserId })"
                            class="govuk-link">
                             @(item.OriginalUser.Fullname)
@@ -151,29 +151,29 @@
                         }
                     </td>
                 }
-                <td class="govuk-table__cell" rowspan="@(Math.Max(item.Details.Count, 1))">
+                <td class="govuk-table__cell" rowspan="@(Math.Max(item.DetailsDictionary.Count, 1))">
                     @(EnumHelper.DisplayNameOf(item.Action))
                 </td>
                 <td class="govuk-table__cell">
-                    @if (item.Details.Count > 0)
+                    @if (item.DetailsDictionary.Count > 0)
                     {
-                        KeyValuePair<string, string> detail = item.Details.First();
+                        KeyValuePair<string, string> detail = item.DetailsDictionary.First();
                         <span>
                             <b>@(detail.Key)</b>:
                         </span>
                     }
                 </td>
                 <td class="govuk-table__cell">
-                    @if (item.Details.Count > 0)
+                    @if (item.DetailsDictionary.Count > 0)
                     {
-                        KeyValuePair<string, string> detail = item.Details.First();
+                        KeyValuePair<string, string> detail = item.DetailsDictionary.First();
                         <span>
                             @detail.Value
                         </span>
                     }
                 </td>
             </tr>
-            @foreach (KeyValuePair<string, string> detail in item.Details.Skip(1))
+            @foreach (KeyValuePair<string, string> detail in item.DetailsDictionary.Skip(1))
             {
                 <tr class="govuk-table__row">
                     <td class="govuk-table__cell">

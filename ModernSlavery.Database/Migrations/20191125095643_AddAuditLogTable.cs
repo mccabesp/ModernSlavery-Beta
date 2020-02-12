@@ -19,7 +19,7 @@ namespace ModernSlavery.Database.Core21.Migrations
                     OrganisationId = table.Column<long>(nullable: true),
                     OriginalUserId = table.Column<long>(nullable: true),
                     ImpersonatedUserId = table.Column<long>(nullable: true),
-                    DetailsString = table.Column<string>(nullable: true)
+                    Details = table.Column<string>(nullable: true)
                 },
                 constraints: table => {
                     table.PrimaryKey("PK_AuditLogs", x => x.AuditLogId);

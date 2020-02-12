@@ -66,7 +66,7 @@ namespace ModernSlavery.Database.Core21.Migrations
                         .ValueGeneratedOnAdd()
                         .HasDefaultValueSql("getdate()");
 
-                    b.Property<string>("DetailsString");
+                    b.Property<string>("Details");
 
                     b.Property<long?>("ImpersonatedUserId");
 
