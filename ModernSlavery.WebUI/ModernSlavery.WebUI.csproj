@@ -109,8 +109,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="App_Data\SicCodes.csv" />
-    <Content Include="App_Data\SicSections.csv" />
+    <Content Include="App_Data\SicCodes.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="App_Data\SicSections.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   
   <ItemGroup>
@@ -167,5 +171,9 @@
 
   <Target Name="CopyWebJobs">
     <MSBuild Projects="$(WebJobProjects)" Targets="Restore;Build;Publish;" Properties="DeployOnBuild=true;Configuration=$(Configuration);WebPublishMethod=FileSystem;PublishUrl=$(PublishIntermediateOutputPath)" RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+  </Target>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="npm run build" />
   </Target>
 </Project>

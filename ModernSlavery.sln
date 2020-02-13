@@ -48,6 +48,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUkDesignSystem", "GovUkD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WarmUp", "ModernSlavery.WarmUp\ModernSlavery.WarmUp.csproj", "{BE071C9E-B424-4F70-A1EC-6ECB15399C6E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Files", "_Solution Files", "{B6D69B70-7603-463C-955C-EEB92FF2EC25}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		.order = .order
+		global.json = global.json
+		LICENSE = LICENSE
+		ModernSlavery.DotSettings = ModernSlavery.DotSettings
+		NuGet.config = NuGet.config
+		NuGetVSTS.config = NuGetVSTS.config
+		README.md = README.md
+		ModernSlavery.WebUI\node_modules\govuk-frontend\README.md = ModernSlavery.WebUI\node_modules\govuk-frontend\README.md
+		SolutionInfo.cs = SolutionInfo.cs
+		SolutionVersionInfo.cs = SolutionVersionInfo.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
