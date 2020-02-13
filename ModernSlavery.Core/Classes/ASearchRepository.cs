@@ -22,8 +22,17 @@ namespace ModernSlavery.Core.Classes
         protected Lazy<Task<ISearchIndexClient>> _searchIndexClient;
         protected string _suggesterName;
 
-        protected ASearchRepository(ISearchServiceClient searchServiceClient)
+        public bool Disabled { get; set; }
+
+        protected ASearchRepository(ISearchServiceClient searchServiceClient,bool disabled=false)
         {
+            Disabled = disabled;
+            if (disabled)
+            {
+                Console.WriteLine($"{nameof(ASearchRepository<T>)} is disabled");
+                return;
+            }
+
             _searchServiceClient = new Lazy<Task<ISearchServiceClient>>(
                 async () => {
                     //Ensure the index exists

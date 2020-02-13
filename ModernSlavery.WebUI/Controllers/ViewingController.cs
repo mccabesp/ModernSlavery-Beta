@@ -146,6 +146,9 @@ namespace ModernSlavery.WebUI.Controllers
         [HttpGet("search-results")]
         public async Task<IActionResult> SearchResults([FromQuery] SearchResultsQuery searchQuery)
         {
+            //Ensure search service is enabled
+            if (Global.SearchRepository.Disabled) return View("CustomError", new ErrorViewModel(1151,new {featureName="Search Service" }));
+
             //When never searched in this session
             if (string.IsNullOrWhiteSpace(SearchViewService.LastSearchParameters))
             {

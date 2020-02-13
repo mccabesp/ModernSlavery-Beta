@@ -7,6 +7,7 @@ namespace ModernSlavery.Core.Interfaces
 {
     public interface ISearchRepository<T>
     {
+        public bool Disabled { get; set; }
 
         Task RefreshIndexDataAsync(IEnumerable<T> allRecords);
         Task AddOrUpdateIndexDataAsync(IEnumerable<T> records);

@@ -26,11 +26,21 @@ namespace ModernSlavery.Core.Classes
 
         private readonly Lazy<Task<ISearchServiceClient>> _serviceClient;
 
+        public bool Disabled { get; set; }
+
         public AzureSearchRepository(string serviceName,
             string adminApiKey = null,
             string queryApiKey = null,
-            TelemetryClient telemetryClient = null)
+            TelemetryClient telemetryClient = null, 
+            bool disabled=false)
         {
+            Disabled = disabled;
+            if (disabled)
+            {
+                Console.WriteLine($"{nameof(AzureSearchRepository)} is disabled");
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(serviceName))
             {
                 throw new ArgumentNullException(nameof(serviceName));

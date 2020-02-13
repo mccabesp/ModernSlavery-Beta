@@ -262,6 +262,7 @@ namespace ModernSlavery.WebUI
             // Setup azure search
             string azureSearchServiceName = Config.GetAppSetting("SearchService:ServiceName");
             string azureSearchAdminKey = Config.GetAppSetting("SearchService:AdminApiKey");
+            var azureSearchDisabled = Config.GetAppSetting("SearchService:Disabled").ToBoolean();
 
             builder.Register(c => new SearchServiceClient(azureSearchServiceName, new SearchCredentials(azureSearchAdminKey)))
                 .As<ISearchServiceClient>()
@@ -271,9 +272,13 @@ namespace ModernSlavery.WebUI
                 .As<ISearchRepository<EmployerSearchModel>>()
                 .SingleInstance()
                 .WithParameter("serviceName", azureSearchServiceName)
-                .WithParameter("adminApiKey", azureSearchAdminKey);
-            builder.RegisterType<SicCodeSearchRepository>().As<ISearchRepository<SicCodeSearchModel>>().SingleInstance();
+                .WithParameter("adminApiKey", azureSearchAdminKey)
+                .WithParameter("disabled", azureSearchDisabled);
 
+            builder.RegisterType<SicCodeSearchRepository>()
+                .As<ISearchRepository<SicCodeSearchModel>>()
+                .SingleInstance()
+                .WithParameter("disabled", azureSearchDisabled);
 
             builder.RegisterInstance(Config.Configuration).SingleInstance();
 

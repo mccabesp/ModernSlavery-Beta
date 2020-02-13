@@ -9,8 +9,10 @@ namespace ModernSlavery.Core.Classes
     public class SicCodeSearchRepository : ASearchRepository<SicCodeSearchModel>
     {
 
-        public SicCodeSearchRepository(ISearchServiceClient searchServiceClient) : base(searchServiceClient)
+        public SicCodeSearchRepository(ISearchServiceClient searchServiceClient, bool disabled=false) : base(searchServiceClient, disabled)
         {
+            if (Disabled) return;
+
             _suggesterName = "sicCodeSuggester";
 
             _searchIndexClient = new Lazy<Task<ISearchIndexClient>>(

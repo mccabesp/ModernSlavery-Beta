@@ -109,9 +109,10 @@ namespace ModernSlavery.WebJob
             builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
 
             // Setup azure search
-            string azureSearchServiceName = Config.GetAppSetting("SearchService:ServiceName");
+            var azureSearchServiceName = Config.GetAppSetting("SearchService:ServiceName");
             //var azureSearchQueryKey = Config.GetAppSetting("SearchService:QueryApiKey");
-            string azureSearchAdminKey = Config.GetAppSetting("SearchService:AdminApiKey");
+            var azureSearchAdminKey = Config.GetAppSetting("SearchService:AdminApiKey");
+            var azureSearchDisabled = Config.GetAppSetting("SearchService:Disabled").ToBoolean();
 
             builder.Register(c => new SearchServiceClient(azureSearchServiceName, new SearchCredentials(azureSearchAdminKey)))
                 .As<ISearchServiceClient>()
@@ -121,12 +122,14 @@ namespace ModernSlavery.WebJob
                 .As<ISearchRepository<EmployerSearchModel>>()
                 .SingleInstance()
                 .WithParameter("serviceName", azureSearchServiceName)
-                .WithParameter("adminApiKey", azureSearchAdminKey);
+                .WithParameter("adminApiKey", azureSearchAdminKey)
+                .WithParameter("disabled", azureSearchDisabled);
+
             builder.RegisterType<SicCodeSearchRepository>()
                 .As<ISearchRepository<SicCodeSearchModel>>()
                 .SingleInstance()
-                .WithParameter("serviceName", azureSearchServiceName)
-                .WithParameter("adminApiKey", azureSearchAdminKey);
+                .WithParameter("disabled", azureSearchDisabled);
+
             builder.RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates")))
                 .As<IEmailTemplateRepository>()
                 .SingleInstance();
