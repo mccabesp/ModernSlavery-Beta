@@ -13,6 +13,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.Extensions.AspNetCore;
 
 namespace ModernSlavery.BusinessLogic.Account.Repositories
 {
@@ -235,6 +236,9 @@ namespace ModernSlavery.BusinessLogic.Account.Repositories
         {
             switch (user.HashingAlgorithm)
             {
+                case HashingAlgorithm.Unhashed:
+                    if (Config.IsProduction()) break;
+                    return user.PasswordHash == password;
                 case HashingAlgorithm.SHA512:
                     return user.PasswordHash == Crypto.GetSHA512Checksum(password);
                 case HashingAlgorithm.PBKDF2:
@@ -242,10 +246,11 @@ namespace ModernSlavery.BusinessLogic.Account.Repositories
                 case HashingAlgorithm.PBKDF2AppliedToSHA512:
                     return user.PasswordHash == Crypto.GetPBKDF2(Crypto.GetSHA512Checksum(password), Convert.FromBase64String(user.Salt));
                 case HashingAlgorithm.Unknown:
-                    throw new InvalidOperationException($"Hashing algorithm should not be unknown {user.HashingAlgorithm}");
+                    break;
                 default:
                     throw new InvalidEnumArgumentException($"Invalid enum argument: {user.HashingAlgorithm}");
             }
+            throw new InvalidOperationException($"Hashing algorithm should not be {user.HashingAlgorithm}");
         }
 
         public void UpdateUserPasswordUsingPBKDF2(User user, string password)

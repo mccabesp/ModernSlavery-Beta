@@ -236,6 +236,7 @@ namespace ModernSlavery.Core
 
     public enum HashingAlgorithm
     {
+        Unhashed=-1,
         Unknown = 0,
         SHA512 = 1,
         PBKDF2 = 2,
