@@ -59,7 +59,6 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             return new User {
                 UserId = userId,
                 EmailAddress = emailAddress,
-                EmailAddressDB = emailAddress,
                 Firstname = "FirstName" + userId,
                 Lastname = "LastName" + userId,
                 EmailVerifiedDate = VirtualDateTime.Now,

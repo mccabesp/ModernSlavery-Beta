@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Cryptography;
 using ModernSlavery.Core;
 using ModernSlavery.Extensions;
 
@@ -23,12 +25,60 @@ namespace ModernSlavery.Database
         public string JobTitle { get; set; }
         public string Firstname { get; set; }
         public string Lastname { get; set; }
-        public string EmailAddressDB { get; set; }
+
+        [NotMapped]
+        public string _EmailAddress;
+
+        public string EmailAddress
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(_EmailAddress))
+                {
+                    try
+                    {
+                        return Encryption.DecryptData(_EmailAddress);
+                    }
+                    catch (CryptographicException) { }
+                }
+
+                return _EmailAddress;
+            }
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value) && EncryptEmails)
+                {
+                    _EmailAddress = Encryption.EncryptData(value.ToLower());
+                }
+                else
+                {
+                    _EmailAddress = value;
+                }
+            }
+        }
+
         public string ContactJobTitle { get; set; }
         public string ContactFirstName { get; set; }
         public string ContactLastName { get; set; }
         public string ContactOrganisation { get; set; }
-        public string ContactEmailAddressDB { get; set; }
+
+        private string _ContactEmailAddress;
+        public string ContactEmailAddress
+        {
+            get => string.IsNullOrWhiteSpace(_ContactEmailAddress) ? _ContactEmailAddress : Encryption.DecryptData(_ContactEmailAddress);
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value) && EncryptEmails)
+                {
+                    _ContactEmailAddress = Encryption.EncryptData(value);
+                }
+                else
+                {
+                    _ContactEmailAddress = value;
+                }
+            }
+        }
+
         public string ContactPhoneNumber { get; set; }
         public string PasswordHash { get; set; }
         public string Salt { get; set; }

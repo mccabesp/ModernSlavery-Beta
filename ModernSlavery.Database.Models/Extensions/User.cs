@@ -19,52 +19,6 @@ namespace ModernSlavery.Database
         public static bool EncryptEmails = Config.GetAppSetting("EncryptEmails").ToBoolean(true);
 
         [NotMapped]
-        public string EmailAddress
-        {
-            get
-            {
-                if (!string.IsNullOrWhiteSpace(EmailAddressDB))
-                {
-                    try
-                    {
-                        return Encryption.DecryptData(EmailAddressDB);
-                    }
-                    catch (CryptographicException) { }
-                }
-
-                return EmailAddressDB;
-            }
-            set
-            {
-                if (!string.IsNullOrWhiteSpace(value) && EncryptEmails)
-                {
-                    EmailAddressDB = Encryption.EncryptData(value.ToLower());
-                }
-                else
-                {
-                    EmailAddressDB = value;
-                }
-            }
-        }
-
-        [NotMapped]
-        public string ContactEmailAddress
-        {
-            get => string.IsNullOrWhiteSpace(ContactEmailAddressDB) ? ContactEmailAddressDB : Encryption.DecryptData(ContactEmailAddressDB);
-            set
-            {
-                if (!string.IsNullOrWhiteSpace(value) && EncryptEmails)
-                {
-                    ContactEmailAddressDB = Encryption.EncryptData(value);
-                }
-                else
-                {
-                    ContactEmailAddressDB = value;
-                }
-            }
-        }
-
-        [NotMapped]
         public string Fullname => (Firstname + " " + Lastname).TrimI();
 
         [NotMapped]

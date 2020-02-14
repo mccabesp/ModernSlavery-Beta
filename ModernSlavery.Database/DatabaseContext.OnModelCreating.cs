@@ -533,23 +533,21 @@ namespace ModernSlavery.Database
                 entity => {
                     entity.HasKey(e => e.UserId).HasName("PK_dbo.Users");
 
-                    entity.HasIndex(e => e.ContactEmailAddressDB)
+                    entity.HasIndex(e => e.ContactEmailAddress)
                         .HasName("IX_ContactEmailAddress");
 
                     entity.HasIndex(e => e.ContactPhoneNumber)
                         .HasName("IX_ContactPhoneNumber");
 
-                    entity.HasIndex(e => e.EmailAddressDB)
+                    entity.HasIndex(e => e.EmailAddress)
                         .HasName("IX_EmailAddress");
 
                     entity.HasIndex(e => e.Status)
                         .HasName("IX_StatusId");
 
                     entity.Property(e => e.Status).HasColumnName("StatusId");
-                    entity.Property(e => e.ContactEmailAddressDB).HasColumnName("ContactEmailAddress");
-                    entity.Property(e => e.EmailAddressDB).HasColumnName("EmailAddress");
 
-                    entity.Property(e => e.ContactEmailAddressDB).HasMaxLength(255);
+                    entity.Property(e => e.ContactEmailAddress).HasMaxLength(255);
 
                     entity.Property(e => e.ContactFirstName).HasMaxLength(50);
 
@@ -561,7 +559,7 @@ namespace ModernSlavery.Database
 
                     entity.Property(e => e.ContactPhoneNumber).HasMaxLength(20);
 
-                    entity.Property(e => e.EmailAddressDB)
+                    entity.Property(e => e.EmailAddress)
                         .IsRequired()
                         .HasMaxLength(255);
 

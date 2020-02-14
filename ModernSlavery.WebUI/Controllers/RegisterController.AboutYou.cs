@@ -170,7 +170,7 @@ namespace ModernSlavery.WebUI.Controllers
             currentUser.JobTitle = model.JobTitle;
             if (model.EmailAddress.StartsWithI(Global.TestPrefix))
             {
-                currentUser.EmailAddressDB = model.EmailAddress;
+                currentUser._EmailAddress = model.EmailAddress;
             }
             else
             {
