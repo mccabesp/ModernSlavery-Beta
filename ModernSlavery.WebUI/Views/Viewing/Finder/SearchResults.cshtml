@@ -1,7 +1,7 @@
 ﻿@model ModernSlavery.WebUI.Models.Search.SearchViewModel
 @{
     ViewBag.Title = "Modern Slavery search results";
-    ViewBag.pageDescription = "Employers that have published their Modern Slavery data.";
+    ViewBag.pageDescription = "Employers that have published their Modern Slavery statement.";
     if (string.IsNullOrWhiteSpace(ViewBag.ReturnUrl))
     {
         ViewBag.ReturnUrl = Context.GetUri().PathAndQuery;

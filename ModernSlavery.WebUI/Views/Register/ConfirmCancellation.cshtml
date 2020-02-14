@@ -20,7 +20,7 @@
                 </p>
 
                 <p> @Model.ContactFirstName @Model.ContactLastName (@Model.ContactJobTitle)</p>
-                <p class="bold-small"> to report Modern Slavery data for:</p>
+                <p class="bold-small"> to report Modern Slavery statement for:</p>
                 <p class="dynamic-content" style="display: block;"> @Model.OrganisationName,<br> @Html.Raw(Model.GetFullAddress().Replace(", ", ",<br/>"))</p>
                 <div class="form-group @Html.SetErrorClass(model => model.CancellationReason, "error")">
                     <label class="form-label" for="textarea-a">

@@ -15,13 +15,13 @@
         @if (controller.CurrentUser.UserId == userId && controller.IsImpersonatingUser == false)
         {
             <p>
-                You have successfully removed yourself from reporting Modern Slavery data for @Model.OrganisationName. You will receive an email notification shortly.
+                You have successfully removed yourself from reporting Modern Slavery statement for @Model.OrganisationName. You will receive an email notification shortly.
             </p>
         }
         else
         {
             <p>
-                You have successfully removed @Model.UserName from reporting Modern Slavery data for @Model.OrganisationName. They will receive an email notification shortly.
+                You have successfully removed @Model.UserName from reporting Modern Slavery statement for @Model.OrganisationName. They will receive an email notification shortly.
             </p>
         }
 

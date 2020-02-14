@@ -160,7 +160,7 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
 
         [Display(
             Name =
-                "Please explain why your organisation is reporting or changing your Modern Slavery figures or senior responsible person after the deadline.")]
+                "Please explain why your organisation is reporting or changing your Modern Slavery statement or senior responsible person after the deadline.")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "You must provide your reason for being late")]
         [MaxLength(200, ErrorMessage = "Your reason can only be 200 characters or less")]
         public string LateReason { get; set; } = "";

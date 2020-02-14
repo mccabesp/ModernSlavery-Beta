@@ -7,17 +7,17 @@
     {
         new StepViewModel
         {
-            Title = "Find out what the Modern Slavery is",
+            Title = "Find out what Modern Slavery is",
             StepType = StepType.Number,
             StepNumber = 1,
             Description = new StepDescription
             {
-                Text = "A number of factors contribute to the Modern Slavery.",
+                Text = "A number of factors contribute to Modern Slavery.",
             },
             StepTasks = new List<StepTask>
             {
                 new StepTask {
-                    TaskText = "Learn about the Modern Slavery and what contributes to it", 
+                    TaskText = "Learn about Modern Slavery and what contributes to it", 
                     TaskUrl = "/reporting-step-by-step/find-out-what-the-gender-pay-gap-is"
                 },
                 new StepTask
@@ -93,7 +93,7 @@
         },
         new StepViewModel
         {
-            Title = "Calculate your Modern Slavery",
+            Title = "Calculate your Modern Slavery statement",
             StepType = StepType.Number,
             StepNumber = 5,
             StepTasks = new List<StepTask>
@@ -107,16 +107,16 @@
         },
         new StepViewModel
         {
-            Title = "Diagnose your Modern Slavery and learn how to close it",
+            Title = "Diagnose your Modern Slavery statement and learn how to eliminate modern slavery it",
             StepType = StepType.Number,
             StepNumber = 6,
             Description = new StepDescription
             {
-                Text = "There are many contributing factors to the Modern Slavery, and effective actions you can take to help close it."
+                Text = "There are many contributing factors to Modern Slavery, and effective actions you can take to help close it."
             },
             StepTasks = new List<StepTask>
             {
-                new StepTask {TaskText = "Find out what actions you can take to close your Modern Slavery", TaskUrl = "/reporting-step-by-step"},
+                new StepTask {TaskText = "Find out what actions you can take to eliminate Modern Slavery", TaskUrl = "/reporting-step-by-step"},
                 new StepTask {
                     TaskText = "Create a Modern Slavery action plan", 
                     TaskUrl = "/reporting-step-by-step"
@@ -125,24 +125,24 @@
         },
         new StepViewModel
         {
-            Title = "Report your Modern Slavery data",
+            Title = "Report your Modern Slavery statement",
             StepType = StepType.Number,
             StepNumber = 7,
             StepTasks = new List<StepTask>
             {
                 new StepTask {
-                    TaskText = "Submit your Modern Slavery data", 
+                    TaskText = "Submit your Modern Slavery statement", 
                     TaskUrl = @Global.StartUrl ?? Url.Action(nameof(OrganisationController.ManageOrganisations), "Organisation") },
             }
         },
         new StepViewModel
         {
-            Title = "Publish a statement and narrative response to your Modern Slavery",
+            Title = "Publish a statement and narrative response to your Modern Slavery statement",
             StepType = StepType.Number,
             StepNumber = 8,
             Description = new StepDescription
             {
-                Text = "The statement must be published on your website, and on the Modern Slavery service."
+                Text = "The statement must be published on your website, and on the Modern Slavery Reporting service."
             },
             StepTasks = new List<StepTask>
             {

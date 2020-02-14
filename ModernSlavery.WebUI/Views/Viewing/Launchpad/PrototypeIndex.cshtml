@@ -1,7 +1,7 @@
 @using ModernSlavery.Core
 @{
-    ViewBag.Title = "Modern Slavery data";
-    ViewBag.pageDescription = "Find and compare Modern Slavery information reported by employers. Learn more about the Modern Slavery and how to close it.";
+    ViewBag.Title = "Modern Slavery statement";
+    ViewBag.pageDescription = "Find and compare Modern Slavery information reported by employers. Learn more about Modern Slavery and how to eliminate it.";
     ViewBag.pageClass = "landing-page";
     Layout = "~/Views/GovUkFrontend/GovUkFrontendLayout.cshtml";
     var controller = ViewData["Controller"] as ViewingController;
@@ -11,7 +11,7 @@
     <div class="hero-banner">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
-                <h1 class="govuk-heading-xl hero-banner-content govuk-!-margin-top-6">Search and compare Modern Slavery data</h1>
+                <h1 class="govuk-heading-xl hero-banner-content govuk-!-margin-top-6">Search and compare Modern Slavery statements</h1>
                 <p class="govuk-body hero-banner-content">Employers with 250 or more employees have published their figures comparing men and women&rsquo;s average pay across the organisation.</p>
                 <partial name="Launchpad/Parts/SearchByEmployer"/>
             </div>
@@ -25,7 +25,7 @@
                 </p>
                 <p class="govuk-body">
                     <a href="/viewing/download" class="govuk-link hero-banner-content">
-                        Download all Modern Slavery data
+                        Download all Modern Slavery statement
                     </a>
                 </p>
 
@@ -36,7 +36,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h2 class="govuk-heading-l">Report your Modern Slavery</h2>
+        <h2 class="govuk-heading-l">Report your Modern Slavery statement</h2>
     </div>
 </div>
 <div class="govuk-grid-row">
@@ -48,14 +48,14 @@
         <p class="govuk-body">Find out about the process involved, and find links to detailed guidance that will help you to use this service.</p>
     </div>
     <div class="govuk-grid-column-one-third">
-        <h3 class="govuk-heading-m">Report your Modern Slavery</h3>
+        <h3 class="govuk-heading-m">Report your Modern Slavery statement</h3>
         <p class="govuk-body">
             <a href="@(Global.StartUrl ?? Url.Action(nameof(OrganisationController.ManageOrganisations), "Organisation"))"
                class="govuk-link govuk-!-font-weight-bold">
-                Submit Modern Slavery data
+                Submit Modern Slavery statement
             </a>
         </p>
-        <p class="govuk-body">For employers to submit their Modern Slavery data and supporting statement.</p>
+        <p class="govuk-body">For employers to submit their Modern Slavery statement and supporting statement.</p>
     </div>
 </div>
 
@@ -63,7 +63,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h3 class="govuk-heading-m">Understanding the Modern Slavery</h3>
+        <h3 class="govuk-heading-m">Understanding Modern Slavery</h3>
     </div>
 </div>
 <div class="govuk-grid-row">
@@ -74,7 +74,7 @@
                 Eight ways to understand your organisation's Modern Slavery
             </a>
         </p>
-        <p class="govuk-body">Identify potential causes of the Modern Slavery in your organisation.</p>
+        <p class="govuk-body">Identify potential causes of Modern Slavery in your organisation.</p>
     </div>
     <div class="govuk-grid-column-one-third">
         <p class="govuk-body">
@@ -89,7 +89,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h3 class="govuk-heading-m">How to close the Modern Slavery</h3>
+        <h3 class="govuk-heading-m">How to eliminate Modern Slavery</h3>
     </div>
 </div>
 <div class="govuk-grid-row">

@@ -47,7 +47,7 @@
 
     <h1 class="heading-large">
         @await Html.PartialAsync("ReportingOrgPart", controller.ReportingOrganisation.OrganisationName)
-        Review your Modern Slavery data
+        Review your Modern Slavery statement
     </h1>
 
     @await Html.CustomValidationSummaryAsync()
@@ -64,7 +64,7 @@
     }
 
     <h2>
-        Your organisation&rsquo;s @(reportDateFormatter.StartYear) to @(reportDateFormatter.EndYear) Modern Slavery data
+        Your organisation&rsquo;s @(reportDateFormatter.StartYear) to @(reportDateFormatter.EndYear) Modern Slavery statement
     </h2>
 
     <table class="table gpg-data">
@@ -490,7 +490,7 @@
 
     <div class="panel panel-border-wide">
         <p>
-            <span class="bold-small">On submission your data will be published on the Modern Slavery service.</span>
+            <span class="bold-small">On submission your data will be published on the Modern Slavery Reporting service.</span>
             <br/>
             <br/>
             <span>
