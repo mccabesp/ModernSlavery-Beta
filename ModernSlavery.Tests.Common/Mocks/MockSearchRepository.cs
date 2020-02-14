@@ -17,6 +17,8 @@ namespace ModernSlavery.Tests.Common.Mocks
 
         private List<EmployerSearchModel> _documents = new List<EmployerSearchModel>();
 
+        public bool Disabled { get; set; }
+
         public MockSearchRepository(List<EmployerSearchModel> documents = null)
         {
             if (documents != null)
