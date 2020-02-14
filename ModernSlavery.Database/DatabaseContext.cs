@@ -16,7 +16,7 @@ namespace ModernSlavery.Database
     public partial class DatabaseContext : DbContext, IDbContext
     {
 
-        public static string ConnectionString = @"Server=(localdb)\ProjectsV13;Database=ModernSlaveryDatabase;Trusted_Connection=True;";
+        public static string ConnectionString = @"Server=(localdb)\ProjectsV13;Initial Catalog=ModernSlaveryDb;Trusted_Connection=True;";
 
         public DatabaseContext(string connectionString = null, bool useMigrations = false)
         {

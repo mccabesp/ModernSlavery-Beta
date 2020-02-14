@@ -1,6 +1,6 @@
 ﻿[
   {
-    "ClientId": "gpgWeb",
+    "ClientId": "ModernSlaveryServiceWebsite",
     "ClientName": "Modern Slavery reporting service",
     "RequireConsent": false,
     "AllowedGrantTypes": [

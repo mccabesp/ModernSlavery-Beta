@@ -23,108 +23,85 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="appsettings.DEV.json" />
-    <None Remove="appsettings.json" />
-    <None Remove="appsettings.loadtest.json" />
-    <None Remove="appsettings.PREPROD.json" />
-    <None Remove="appsettings.PROD.json" />
-    <None Remove="AppSettings.secret.json" />
-    <None Remove="appsettings.TEST.json" />
-    <None Remove="App_Data\EmailTemplates\ChangeEmailCompletedNotificationTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\ChangeEmailCompletedVerificationTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\ChangeEmailPendingVerificationTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\ChangePasswordCompletedTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\CloseAccountCompletedTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\CreateAccountPendingVerificationTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\GeoOrganisationRegistrationRequestTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\OrganisationRegistrationApprovedTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\OrganisationRegistrationDeclinedTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\OrganisationRegistrationRemovedTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\OrphanOrganisationTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\ResetPasswordCompletedTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\ResetPasswordVerificationTemplate.html" />
-    <None Remove="App_Data\EmailTemplates\SendEmailTemplate.html" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="App_Data\EmailTemplates\ChangeEmailCompletedNotificationTemplate.html">
+    <Content Update="App_Data\EmailTemplates\ChangeEmailCompletedNotificationTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\ChangeEmailCompletedVerificationTemplate.html">
+    <Content Update="App_Data\EmailTemplates\ChangeEmailCompletedVerificationTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\ChangeEmailPendingVerificationTemplate.html">
+    <Content Update="App_Data\EmailTemplates\ChangeEmailPendingVerificationTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\ChangePasswordCompletedTemplate.html">
+    <Content Update="App_Data\EmailTemplates\ChangePasswordCompletedTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\OrphanOrganisationTemplate.html">
+    <Content Update="App_Data\EmailTemplates\OrphanOrganisationTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\CloseAccountCompletedTemplate.html">
+    <Content Update="App_Data\EmailTemplates\CloseAccountCompletedTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\CreateAccountPendingVerificationTemplate.html">
+    <Content Update="App_Data\EmailTemplates\CreateAccountPendingVerificationTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\GeoOrganisationRegistrationRequestTemplate.html">
+    <Content Update="App_Data\EmailTemplates\GeoOrganisationRegistrationRequestTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\OrganisationRegistrationRemovedTemplate.html">
+    <Content Update="App_Data\EmailTemplates\OrganisationRegistrationRemovedTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\ResetPasswordCompletedTemplate.html">
+    <Content Update="App_Data\EmailTemplates\ResetPasswordCompletedTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\OrganisationRegistrationDeclinedTemplate.html">
+    <Content Update="App_Data\EmailTemplates\OrganisationRegistrationDeclinedTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\ResetPasswordVerificationTemplate.html">
+    <Content Update="App_Data\EmailTemplates\ResetPasswordVerificationTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\OrganisationRegistrationApprovedTemplate.html">
+    <Content Update="App_Data\EmailTemplates\OrganisationRegistrationApprovedTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\EmailTemplates\SendEmailTemplate.html">
+    <Content Update="App_Data\EmailTemplates\SendEmailTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="run.cmd">
+    <Content Update="run.cmd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.json">
+    <Content Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.loadtest.json">
+    <Content Update="appsettings.loadtest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>never</CopyToPublishDirectory>
     </Content>
-    <Content Include="AppSettings.secret.json" Condition="Exists('AppSettings.secret.json')">
+    <Content Update="AppSettings.secret.json" Condition="Exists('AppSettings.secret.json')">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
-    <Content Include="appsettings.DEV.json">
+    <Content Update="appsettings.DEV.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.PREPROD.json">
+    <Content Update="appsettings.PREPROD.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.PROD.json">
+    <Content Update="appsettings.PROD.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.TEST.json">
+    <Content Update="appsettings.TEST.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
@@ -160,7 +137,7 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project> 
 

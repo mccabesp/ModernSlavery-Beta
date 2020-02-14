@@ -22,7 +22,7 @@ namespace ModernSlavery.IdentityServer4.Classes
             return new[] {
                 new Client {
                     ClientName = "Modern Slavery reporting service",
-                    ClientId = "gpgWeb",
+                    ClientId = "ModernSlaveryServiceWebsite",
                     ClientSecrets = new List<Secret> {new Secret(GpgClientSecret.GetSHA256Checksum())},
                     ClientUri = Startup.SiteAuthority,
                     AllowedGrantTypes = GrantTypes.Implicit,

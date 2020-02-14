@@ -26,6 +26,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
+using AutoMapper;
 
 namespace ModernSlavery.IdentityServer4
 {
@@ -186,6 +187,19 @@ namespace ModernSlavery.IdentityServer4
 
             //Override any test services
             ConfigureTestContainer?.Invoke(builder);
+
+            // Initialise AutoMapper
+            MapperConfiguration mapperConfig = new MapperConfiguration(config => {
+                // register all out mapper profiles (classes/mappers/*)
+                // config.AddMaps(typeof(MvcApplication));
+                // allows auto mapper to inject our dependencies
+                //config.ConstructServicesUsing(serviceTypeToConstruct =>
+                //{
+                //    //TODO
+                //});
+            });
+
+            builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
 
             return builder.Build();
         }

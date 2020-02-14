@@ -148,7 +148,7 @@ namespace ModernSlavery.WebUI
             services.AddIdentityServerClient(
                 authority,
                 Config.SiteAuthority,
-                "gpgWeb",
+                "ModernSlaveryServiceWebsite",
                 Config.GetAppSetting("AuthSecret", "secret"),
                 BackChannelHandler);
 
@@ -433,6 +433,7 @@ namespace ModernSlavery.WebUI
             app.UseStaticHttpContext(); //Temporary fix for old static HttpContext 
             app.UseSession(); //Must be before UseMvC or any middleware which requires session
             app.UseAuthentication(); //Ensure the OIDC IDentity Server authentication services execute on each http request - Must be before UseMVC
+            app.UseAuthorization();
             app.UseCookiePolicy();
             app.UseMaintenancePageMiddleware(Global.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
             app.UseStickySessionMiddleware(Global.StickySessions); //Enable/Disable sticky sessions based on  
