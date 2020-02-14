@@ -291,7 +291,7 @@ namespace ModernSlavery.IdentityServer4.Controllers
                 {
                     HttpOnly = false,
                     Secure = true,
-                    Path = "/account",
+                    Path = "/",
                     IsEssential = true,
                     SameSite = SameSiteMode.Strict,
                     Expires = DateTimeOffset.UnixEpoch
