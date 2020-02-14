@@ -4,7 +4,7 @@
 @using Microsoft.AspNetCore.Html
 @model ModernSlavery.WebUI.Models.Scope.ScopingViewModel
 @{
-    ViewBag.Title = "Tell us why your organisation is not in scope - Gender pay gap reporting service";
+    ViewBag.Title = "Tell us why your organisation is not in scope - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
     string backLink = Model.IsChangeJourney && Model.IsOutOfScopeJourney ? Model.StartUrl : Url.Action("ConfirmOutOfScopeDetails");
 
@@ -39,7 +39,7 @@
                 <fieldset>
                     <legend>
                         <h1 class="heading-medium" style="margin-top: 15px">
-                            Why is your organisation not required to report their gender pay gap data for
+                            Why is your organisation not required to report their Modern Slavery data for
                             @if (Model.IsChangeJourney)
                             {
                                 <span>the snapshot date @(new GDSDateFormatter(Model.AccountingDate).FullStartDate)?</span>

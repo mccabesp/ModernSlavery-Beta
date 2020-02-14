@@ -21,7 +21,7 @@ namespace ModernSlavery.IdentityServer4.Classes
 
             return new[] {
                 new Client {
-                    ClientName = "Gender pay gap reporting service",
+                    ClientName = "Modern Slavery reporting service",
                     ClientId = "gpgWeb",
                     ClientSecrets = new List<Secret> {new Secret(GpgClientSecret.GetSHA256Checksum())},
                     ClientUri = Startup.SiteAuthority,

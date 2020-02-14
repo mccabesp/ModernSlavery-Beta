@@ -627,7 +627,7 @@ namespace ModernSlavery.WebUI.Controllers.Administration
                 Type = "User Consent",
                 Filepath = Path.Combine(Global.DownloadsPath, Filenames.AllowFeedback),
                 Title = "Users to contact for feedback",
-                Description = "Users who answered \"Yes\" to \"I'm happy to be contacted for feedback on this service and take part in gender pay gap surveys\""
+                Description = "Users who answered \"Yes\" to \"I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys\""
             };
             download.ShowUpdateButton = !await GetFileUpdatingAsync(download.Filepath);
             model.Downloads.Add(download);

@@ -1,6 +1,6 @@
 ﻿@model ModernSlavery.WebUI.Models.Organisation.RemoveOrganisationModel
 @{
-    ViewBag.Title = "Confirm removal of organisation - Gender pay gap reporting service";
+    ViewBag.Title = "Confirm removal of organisation - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
 
     long userId = Encryption.DecryptQuerystring(Model.EncUserId).ToInt64();
@@ -21,7 +21,7 @@
                 <h1 class="heading-large">
                     Confirm removal of user
                 </h1>
-                <p>You are about to remove the following user from reporting Gender Pay Gap data for this organisation.</p>
+                <p>You are about to remove the following user from reporting Modern Slavery data for this organisation.</p>
                 <dl class="govuk-check-your-answers cya-questions-short">
                     <div>
                         <dt class="cya-question">

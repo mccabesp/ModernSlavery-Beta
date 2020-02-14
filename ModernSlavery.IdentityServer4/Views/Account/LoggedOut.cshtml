@@ -3,7 +3,7 @@
 @{
     // set this so the layout rendering sees an anonymous user
     ViewData["signed-out"] = true;
-    ViewData["PageTitle"] = "Sign out - Gender pay gap reporting service - GOV.UK";
+    ViewData["PageTitle"] = "Sign out - Modern Slavery reporting service - GOV.UK";
 }
 
 <div class="grid-row">
@@ -11,7 +11,7 @@
         <div class="govuk-box-highlight">
             <h1 class="bold-large">Signed Out</h1>
         </div>
-        <p>You are now signed out of the @(Model.ClientName ?? "Gender pay gap reporting service").</p>
+        <p>You are now signed out of the @(Model.ClientName ?? "Modern Slavery reporting service").</p>
 
         @if (Model.PostLogoutRedirectUri != null)
         {

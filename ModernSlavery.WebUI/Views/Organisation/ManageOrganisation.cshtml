@@ -7,7 +7,7 @@
 @{
     var controller = ViewData["Controller"] as OrganisationController;
     Organisation currentOrg = Model.Organisation;
-    ViewBag.Title = "Manage " + currentOrg.OrganisationName + " organisation - Gender pay gap reporting service";
+    ViewBag.Title = "Manage " + currentOrg.OrganisationName + " organisation - Modern Slavery reporting service";
 }
 
 @await Html.PartialAsync("~/Areas/Account/Views/Shared/AccountNavigation.cshtml")
@@ -115,7 +115,7 @@
         else
         {
             <p>
-                The following people are registered to report gender pay gap data for this organisation.
+                The following people are registered to report Modern Slavery data for this organisation.
             </p>
         }
 

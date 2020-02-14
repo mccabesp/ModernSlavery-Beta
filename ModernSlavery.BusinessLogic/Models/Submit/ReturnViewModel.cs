@@ -138,7 +138,7 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
 
         [Url]
         [MaxLength(255, ErrorMessage = "The web address (URL) cannot be longer than 255 characters.")]
-        [Display(Name = "Link to your gender pay gap information")]
+        [Display(Name = "Link to your Modern Slavery information")]
         public string CompanyLinkToGPGInfo { get; set; }
 
         public string ReturnUrl { get; set; }
@@ -160,7 +160,7 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
 
         [Display(
             Name =
-                "Please explain why your organisation is reporting or changing your gender pay gap figures or senior responsible person after the deadline.")]
+                "Please explain why your organisation is reporting or changing your Modern Slavery figures or senior responsible person after the deadline.")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "You must provide your reason for being late")]
         [MaxLength(200, ErrorMessage = "Your reason can only be 200 characters or less")]
         public string LateReason { get; set; } = "";

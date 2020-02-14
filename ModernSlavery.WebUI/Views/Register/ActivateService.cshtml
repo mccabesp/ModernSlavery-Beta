@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Enter your PIN - Gender pay gap reporting service";
+    ViewBag.Title = "Enter your PIN - Modern Slavery reporting service";
 }
 @model ModernSlavery.WebUI.Models.Register.CompleteViewModel
 
@@ -14,10 +14,10 @@
             <div class="column-two-thirds">
                 @await Html.CustomValidationSummaryAsync()
                 <h1 class="heading-large">
-                    Please enter your gender pay gap PIN
+                    Please enter your Modern Slavery PIN
                 </h1>
                 <p>
-                    Enter the PIN to enable you to report Gender Pay Gap information for this organisation.
+                    Enter the PIN to enable you to report Modern Slavery information for this organisation.
                 </p>
                 <div class="form-group @Html.SetErrorClass(model => model.PIN, "error") ">
                     @Html.LabelFor(model => model.PIN, "Enter PIN", new {@class = "form-label"})

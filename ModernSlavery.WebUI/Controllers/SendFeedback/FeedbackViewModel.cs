@@ -84,7 +84,7 @@ namespace ModernSlavery.WebUI.Controllers.SendFeedback {
         [GovUkRadioCheckboxLabelText(Text = "Lobby group")]
         LobbyGroup,
 
-        [GovUkRadioCheckboxLabelText(Text = "By having to report gender pay gap data")]
+        [GovUkRadioCheckboxLabelText(Text = "By having to report Modern Slavery data")]
         Report,
 
         [GovUkRadioCheckboxLabelText(Text = "Other")]
@@ -93,19 +93,19 @@ namespace ModernSlavery.WebUI.Controllers.SendFeedback {
 
     public enum WhyVisitGpgSite
     {
-        [GovUkRadioCheckboxLabelText(Text = "I wanted to find out what the gender pay gap is")]
+        [GovUkRadioCheckboxLabelText(Text = "I wanted to find out what the Modern Slavery is")]
         FindOutAboutGpg,
 
-        [GovUkRadioCheckboxLabelText(Text = "I reported my organisation's gender pay gap data")]
+        [GovUkRadioCheckboxLabelText(Text = "I reported my organisation's Modern Slavery data")]
         ReportOrganisationGpgData,
 
-        [GovUkRadioCheckboxLabelText(Text = "I wanted to understand how I can close my organisation's gender pay gap")]
+        [GovUkRadioCheckboxLabelText(Text = "I wanted to understand how I can close my organisation's Modern Slavery")]
         CloseOrganisationGpg,
 
-        [GovUkRadioCheckboxLabelText(Text = "I viewed a specific organisation's gender pay gap")]
+        [GovUkRadioCheckboxLabelText(Text = "I viewed a specific organisation's Modern Slavery")]
         ViewSpecificOrganisationGpg,
 
-        [GovUkRadioCheckboxLabelText(Text = "I wanted to know what action other organisations are taking to close the gender pay gap")]
+        [GovUkRadioCheckboxLabelText(Text = "I wanted to know what action other organisations are taking to close the Modern Slavery")]
         ActionsToCloseGpg,
 
         [GovUkRadioCheckboxLabelText(Text = "Other")]
@@ -114,19 +114,19 @@ namespace ModernSlavery.WebUI.Controllers.SendFeedback {
 
     public enum WhoAreYou
     {
-        [GovUkRadioCheckboxLabelText(Text = "An employee interested in your organisation’s gender pay gap data?")]
+        [GovUkRadioCheckboxLabelText(Text = "An employee interested in your organisation’s Modern Slavery data?")]
         EmployeeInterestedInOrganisationData,
 
-        [GovUkRadioCheckboxLabelText(Text = "A manager involved in gender pay gap reporting or diversity and inclusion?")]
+        [GovUkRadioCheckboxLabelText(Text = "A manager involved in Modern Slavery reporting or diversity and inclusion?")]
         ManagerInvolvedInGpgReport,
 
-        [GovUkRadioCheckboxLabelText(Text = "A person responsible for reporting your organisation’s gender pay gap?")]
+        [GovUkRadioCheckboxLabelText(Text = "A person responsible for reporting your organisation’s Modern Slavery?")]
         ResponsibleForReportingGpg,
 
-        [GovUkRadioCheckboxLabelText(Text = "A person interested in the gender pay gap generally?")]
+        [GovUkRadioCheckboxLabelText(Text = "A person interested in the Modern Slavery generally?")]
         PersonInterestedInGeneralGpg,
 
-        [GovUkRadioCheckboxLabelText(Text = "A person interested in a specific organisation’s gender pay gap?")]
+        [GovUkRadioCheckboxLabelText(Text = "A person interested in a specific organisation’s Modern Slavery?")]
         PersonInterestedInSpecificOrganisationGpg,
 
         [GovUkRadioCheckboxLabelText(Text = "Other")]

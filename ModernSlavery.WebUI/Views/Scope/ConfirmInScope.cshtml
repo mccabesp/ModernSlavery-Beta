@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Confirm In Scope - Gender pay gap reporting service";
+    ViewBag.Title = "Confirm In Scope - Modern Slavery reporting service";
     string emailAdd = Global.GpgReportingEmail;
     string emailSubject = System.Net.WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));
 
@@ -29,7 +29,7 @@
             <br/>
 
             <p class="text">
-                <span>Please confirm your organisation is in scope to report Gender Pay Gap data for snapshot date @(reportDateFormatter.FullStartDate)</span>
+                <span>Please confirm your organisation is in scope to report Modern Slavery data for snapshot date @(reportDateFormatter.FullStartDate)</span>
             </p>
 
             <div class="form-group">

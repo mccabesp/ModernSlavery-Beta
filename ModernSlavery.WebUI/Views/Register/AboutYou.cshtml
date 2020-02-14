@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "About you - Gender pay gap reporting service";
+    ViewBag.Title = "About you - Modern Slavery reporting service";
 }
 @model ModernSlavery.WebUI.Models.Register.RegisterViewModel
 <div class="grid-row">
@@ -15,7 +15,7 @@
             if (!User.Identity.IsAuthenticated)
             {
                 <p>
-                    You will need to create an account to register organisations for Gender pay gap reporting.
+                    You will need to create an account to register organisations for Modern Slavery reporting.
                     <br/>
                     If you already have an account please @Html.ActionLink("sign in", nameof(OrganisationController.ManageOrganisations), "Organisation") to report data and manage your organisations.
                 </p>
@@ -101,7 +101,7 @@
 
             <fieldset>
                 <legend class="visually-hidden">Your email preferences</legend>
-                <p>We will only use your contact details to send you information relating to gender pay gap reporting and, with your consent, for the following purpose.</p>
+                <p>We will only use your contact details to send you information relating to Modern Slavery reporting and, with your consent, for the following purpose.</p>
 
                 <div class="multiple-choice @Html.SetErrorClass(model => model.SendUpdates, "error")">
                     @Html.CheckBoxFor(model => model.SendUpdates, new {@class = "form-control"})

@@ -47,7 +47,7 @@
 
     <h1 class="heading-large">
         @await Html.PartialAsync("ReportingOrgPart", controller.ReportingOrganisation.OrganisationName)
-        Review your gender pay gap data
+        Review your Modern Slavery data
     </h1>
 
     @await Html.CustomValidationSummaryAsync()
@@ -64,7 +64,7 @@
     }
 
     <h2>
-        Your organisation&rsquo;s @(reportDateFormatter.StartYear) to @(reportDateFormatter.EndYear) gender pay gap data
+        Your organisation&rsquo;s @(reportDateFormatter.StartYear) to @(reportDateFormatter.EndYear) Modern Slavery data
     </h2>
 
     <table class="table gpg-data">
@@ -456,7 +456,7 @@
         <thead>
         <tr>
             <th class="question" colspan="3">
-                Link to your gender pay gap information
+                Link to your Modern Slavery information
                 <span class="edit">@Html.ActionLink("Edit", "EmployerWebsite", new {returnUrl = "CheckData"}, new {id = "ChangeEmployerWebsite"})</span>
             </th>
         </tr>
@@ -490,11 +490,11 @@
 
     <div class="panel panel-border-wide">
         <p>
-            <span class="bold-small">On submission your data will be published on the gender pay gap service.</span>
+            <span class="bold-small">On submission your data will be published on the Modern Slavery service.</span>
             <br/>
             <br/>
             <span>
-                Please note that submission of inaccurate data means you have not complied with the gender pay gap regulations.
+                Please note that submission of inaccurate data means you have not complied with the Modern Slavery regulations.
             </span>
         </p>
     </div>

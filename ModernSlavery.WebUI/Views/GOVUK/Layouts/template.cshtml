@@ -5,7 +5,7 @@
     string assetsPath = "/assets/images";
 
     ViewBag.assetsPath = Url.Content("/public/govuk_template/assets");
-    dynamic title = !string.IsNullOrEmpty(ViewBag.Title) ? ViewBag.Title : "Gender pay gap";
+    dynamic title = !string.IsNullOrEmpty(ViewBag.Title) ? ViewBag.Title : "Modern Slavery";
     dynamic documentTitle = string.Format("{0} - {1}", title, "GOV.UK");
 
     ViewBag.hidePhase = ViewBag.hidePhase == null ? false : true;
@@ -105,7 +105,7 @@
             <div class="content">
                 <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
                 <nav id="proposition-menu" aria-label="proposition menu">
-                    <a href="~/" id="proposition-name">Gender pay gap service</a>
+                    <a href="~/" id="proposition-name">Modern Slavery service</a>
                     @{
                         string controllerName = ViewContext.RouteData.Values["Controller"].ToString();
                     }

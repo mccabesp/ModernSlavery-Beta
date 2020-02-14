@@ -1,7 +1,7 @@
 ﻿@using ModernSlavery.Core
 @model ModernSlavery.WebUI.Models.Scope.ScopingViewModel
 @{
-    ViewBag.Title = "Scope already known - Gender pay gap reporting service";
+    ViewBag.Title = "Scope already known - Modern Slavery reporting service";
 }
 <div class="grid-row">
     <div class="column-two-thirds">
@@ -16,7 +16,7 @@
                 Scope already declared
             </h1>
             <p>
-                Your organisation is showing as @(Model.LastScope.ScopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.PresumedInScope) ? "in" : "out of") scope of the gender pay gap reporting regulations for snapshot date <span class="nowrap">@(Model.LastScope.SnapshotDate.ToString("d MMMM yyyy"))</span>
+                Your organisation is showing as @(Model.LastScope.ScopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.PresumedInScope) ? "in" : "out of") scope of the Modern Slavery reporting regulations for snapshot date <span class="nowrap">@(Model.LastScope.SnapshotDate.ToString("d MMMM yyyy"))</span>
                 and @(Model.ThisScope.ScopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.PresumedInScope) ? "in" : "out of") scope for snapshot date <span class="nowrap">@(Model.ThisScope.SnapshotDate.ToString("d MMMM yyyy"))</span>.
             </p>
             @await Html.PartialAsync("Parts/EmployerDetailsPart", Model)

@@ -294,7 +294,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             //Setup the HTTP response
             var contentDisposition = new ContentDisposition {
-                FileName = $"UK Gender Pay Gap Data - {year} to {year + 1}.csv", Inline = false
+                FileName = $"UK Modern Slavery Data - {year} to {year + 1}.csv", Inline = false
             };
             HttpContext.SetResponseHeader("Content-Disposition", contentDisposition.ToString());
 

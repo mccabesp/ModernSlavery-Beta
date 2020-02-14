@@ -61,7 +61,7 @@ namespace ModernSlavery.WebUI.Areas.Account.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I&apos;m happy to be contacted for feedback on this service and take part in gender pay gap surveys.
+        ///   Looks up a localized string similar to I&apos;m happy to be contacted for feedback on this service and take part in Modern Slavery surveys.
         /// </summary>
         public static string AllowContact {
             get {

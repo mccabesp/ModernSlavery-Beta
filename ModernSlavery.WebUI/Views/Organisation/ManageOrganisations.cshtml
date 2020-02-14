@@ -3,7 +3,7 @@
 @using ModernSlavery.Database
 @model IEnumerable<ModernSlavery.Database.UserOrganisation>
 @{
-    ViewBag.Title = "Manage your organisation - Gender pay gap reporting service";
+    ViewBag.Title = "Manage your organisation - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
     bool hasRegisteredOrgs = Model.Any();
 }
@@ -19,8 +19,8 @@
         <p>Once you have selected an organisation you can:</p>
 
         <ul class="list-bullet">
-            <li>Enter gender pay gap data and save it as a draft for publication at a later date</li>
-            <li>Publish your data on the <a href="~/">gender pay gap service</a></li>
+            <li>Enter Modern Slavery data and save it as a draft for publication at a later date</li>
+            <li>Publish your data on the <a href="~/">Modern Slavery service</a></li>
             <li>Declare whether your organisation is required to report for each reporting year </li>
         </ul>
 
@@ -107,7 +107,7 @@
             <h2 class="heading-small">Need to close your account?</h2>
             <p>
                 If you created an account by mistake or no longer responsible
-                for reporting gender pay gap data you can close your account in <a href="@(Url.Action<ManageAccountController>(nameof(ManageAccountController.ManageAccount)))">manage account</a>.
+                for reporting Modern Slavery data you can close your account in <a href="@(Url.Action<ManageAccountController>(nameof(ManageAccountController.ManageAccount)))">manage account</a>.
             </p>
         }
 

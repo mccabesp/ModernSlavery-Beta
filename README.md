@@ -1,12 +1,12 @@
-# Gender Pay Gap Service
+# Modern Slavery Service
 
-This is the code for the [Gender Pay Gap service](https://gender-pay-gap.service.gov.uk).
+This is the code for the [Modern Slavery service](https://gender-pay-gap.service.gov.uk).
 
-From 2017, any organisation that has 250 or more employees must publish and report specific figures about their gender pay gap. 
-The gender pay gap is the difference between the average earnings of men and women, expressed relative to men’s earnings. 
+From 2017, any organisation that has 250 or more employees must publish and report specific figures about their Modern Slavery. 
+The Modern Slavery is the difference between the average earnings of men and women, expressed relative to men’s earnings. 
 For example, ‘women earn 15% less than men per hour’.
 
-This service allows organisations to report their gender pay gap data. It then makes this data available to the general public. 
+This service allows organisations to report their Modern Slavery data. It then makes this data available to the general public. 
 It is managed by the Government Equalities Office (GEO) which forms part of the Cabinet Office.
 
 

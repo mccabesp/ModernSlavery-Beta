@@ -1,7 +1,7 @@
 ﻿[
   {
     "ClientId": "gpgWeb",
-    "ClientName": "Gender pay gap reporting service",
+    "ClientName": "Modern Slavery reporting service",
     "RequireConsent": false,
     "AllowedGrantTypes": [
       "Implicit"
