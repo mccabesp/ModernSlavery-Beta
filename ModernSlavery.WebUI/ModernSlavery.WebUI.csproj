@@ -164,6 +164,8 @@
 
     <LangVersion>8.0</LangVersion>
 
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning;</WarningsAsErrors>
