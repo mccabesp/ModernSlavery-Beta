@@ -87,12 +87,16 @@ namespace ModernSlavery.Core.Classes
 
         public async Task CreateIndexIfNotExistsAsync(string indexName)
         {
+            if (Disabled)throw new Exception($"{nameof(AzureSearchRepository)} is disabled");
+
             ISearchServiceClient serviceClient = await _serviceClient.Value;
             await CreateIndexIfNotExistsAsync(serviceClient, indexName);
         }
 
         public async Task RefreshIndexDataAsync(IEnumerable<EmployerSearchModel> allRecords)
         {
+            if (Disabled) throw new Exception($"{nameof(AzureSearchRepository)} is disabled");
+
             //Add (or update) the records to the index
             await AddOrUpdateIndexDataAsync(allRecords);
 
@@ -113,6 +117,8 @@ namespace ModernSlavery.Core.Classes
         /// <param name="newRecords">The new or existing records which should be indexed.</param>
         public async Task AddOrUpdateIndexDataAsync(IEnumerable<EmployerSearchModel> newRecords)
         {
+            if (Disabled) throw new Exception($"{nameof(AzureSearchRepository)} is disabled");
+
             if (newRecords == null || !newRecords.Any())
             {
                 throw new ArgumentNullException(nameof(newRecords), "You must supply at least one record to index");
@@ -170,6 +176,8 @@ namespace ModernSlavery.Core.Classes
         /// <param name="oldRecords">The old records which should be deleted from the index.</param>
         public async Task<int> RemoveFromIndexAsync(IEnumerable<EmployerSearchModel> oldRecords)
         {
+            if (Disabled) throw new Exception($"{nameof(AzureSearchRepository)} is disabled");
+
             if (oldRecords == null || !oldRecords.Any())
             {
                 throw new ArgumentNullException(nameof(oldRecords), "You must supply at least one record to index");
@@ -228,6 +236,8 @@ namespace ModernSlavery.Core.Classes
 
         public async Task<EmployerSearchModel> GetAsync(string key, string selectFields = null)
         {
+            if (Disabled) throw new Exception($"{nameof(AzureSearchRepository)} is disabled");
+
             //Limit result fields
             List<string> selectedFields = string.IsNullOrWhiteSpace(selectFields) ? null : selectFields.SplitI().ToList();
 
@@ -240,6 +250,8 @@ namespace ModernSlavery.Core.Classes
 
         public async Task<IList<EmployerSearchModel>> ListAsync(string selectFields = null)
         {
+            if (Disabled) throw new Exception($"{nameof(AzureSearchRepository)} is disabled");
+
             long totalPages = 0;
             var currentPage = 1;
             var resultsList = new List<EmployerSearchModel>();
@@ -260,6 +272,8 @@ namespace ModernSlavery.Core.Classes
 
         public async Task<long> GetDocumentCountAsync()
         {
+            if (Disabled) throw new Exception($"{nameof(AzureSearchRepository)} is disabled");
+
             ISearchServiceClient serviceClient = await _serviceClient.Value;
 
             if (!await serviceClient.Indexes.ExistsAsync(Global.SearchIndexName))
@@ -291,6 +305,8 @@ namespace ModernSlavery.Core.Classes
             bool fuzzy = true,
             int maxRecords = 10)
         {
+            if (Disabled) throw new Exception($"{nameof(AzureSearchRepository)} is disabled");
+
             // Execute search based on query string
             var sp = new SuggestParameters {UseFuzzyMatching = fuzzy, Top = maxRecords};
 
@@ -378,6 +394,8 @@ namespace ModernSlavery.Core.Classes
             string highlights = null,
             SearchMode searchMode = SearchMode.Any)
         {
+            if (Disabled) throw new Exception($"{nameof(AzureSearchRepository)} is disabled");
+
             ISearchIndexClient indexClient = await _indexClient.Value;
 
             // Execute search based on query string
@@ -474,6 +492,8 @@ namespace ModernSlavery.Core.Classes
         /// <returns>The existing or new index</returns>
         private async Task CreateIndexIfNotExistsAsync(ISearchServiceClient serviceClient, string indexName)
         {
+            if (Disabled) throw new Exception($"{nameof(AzureSearchRepository)} is disabled");
+
             if (await serviceClient.Indexes.ExistsAsync(indexName))
             {
                 return;
