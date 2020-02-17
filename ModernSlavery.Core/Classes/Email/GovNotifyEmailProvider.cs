@@ -32,12 +32,6 @@ namespace ModernSlavery.Core.Classes
             if (Enabled)
             {
                 // ensure we have api keys
-                if (string.IsNullOrWhiteSpace(Options.Value.ClientReference))
-                {
-                    throw new NullReferenceException(
-                        $"{nameof(Options.Value.ClientReference)}: You must supply a client reference for GovNotify");
-                }
-
                 if (string.IsNullOrWhiteSpace(Options.Value.ApiKey))
                 {
                     throw new NullReferenceException($"{nameof(Options.Value.ApiKey)}: You must supply a production api key for GovNotify");
