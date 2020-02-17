@@ -31,66 +31,55 @@ namespace ModernSlavery.WebUI.Services
         public string EmailAddress { get; set; }
     }
 
-    public class AdminSearchServiceCacheUpdater : IHostedService, IDisposable
-    {
-        private Timer timer;
-
-        public Task StartAsync(CancellationToken stoppingToken)
-        {
-            CustomLogger.Information("Starting timer (AdminSearchService.StartCacheUpdateThread)");
-
-            timer = new Timer(
-                DoWork,
-                null,
-                dueTime: TimeSpan.FromSeconds(10), // How long to wait before the cache is first updated 
-                period: TimeSpan.FromMinutes(1));  // How often is the cache updated 
-
-            CustomLogger.Information("Started timer (AdminSearchService.StartCacheUpdateThread)");
-            
-            return Task.CompletedTask;
-        }
-
-        private void DoWork(object state)
-        {
-            CustomLogger.Information("Starting cache update (AdminSearchService.StartCacheUpdateThread)");
-
-            var dataRepository = MvcApplication.ContainerIoC.Resolve<IDataRepository>();
-            List<AdminSearchServiceOrganisation> allOrganisations = AdminSearchService.LoadAllOrganisations(dataRepository);
-            List<AdminSearchServiceUser> allUsers = AdminSearchService.LoadAllUsers(dataRepository);
-
-            AdminSearchService.cachedOrganisations = allOrganisations;
-            AdminSearchService.cachedUsers = allUsers;
-            AdminSearchService.cacheLastUpdated = VirtualDateTime.Now;
-
-            CustomLogger.Information("Finished cache update (AdminSearchService.StartCacheUpdateThread)");
-        }
-
-        public Task StopAsync(CancellationToken stoppingToken)
-        {
-            CustomLogger.Information("Timed Hosted Service is stopping.");
-
-            timer?.Change(Timeout.Infinite, 0);
-
-            return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            timer?.Dispose();
-        }
-    }
-
     public class AdminSearchService
     {
         private readonly IDataRepository dataRepository;
 
-        internal static List<AdminSearchServiceOrganisation> cachedOrganisations;
-        internal static List<AdminSearchServiceUser> cachedUsers;
-        internal static DateTime cacheLastUpdated = DateTime.MinValue;
+        private static object cacheLock=new object();
+        private static DateTime cacheLastUpdated = DateTime.MinValue;
+
+        private static List<AdminSearchServiceOrganisation> _cachedOrganisations;
+        internal static List<AdminSearchServiceOrganisation> cachedOrganisations
+        {
+            get
+            {
+                EnsureCacheUpdated();
+                return _cachedOrganisations;
+            }
+        }
+
+        private static List<AdminSearchServiceUser> _cachedUsers;
+        internal static List<AdminSearchServiceUser> cachedUsers
+        {
+            get
+            {
+                EnsureCacheUpdated();
+                return _cachedUsers;
+            }
+        }
 
         public AdminSearchService(IDataRepository dataRepository)
         {
             this.dataRepository = dataRepository;
+            EnsureCacheUpdated();
+        }
+
+        private static void EnsureCacheUpdated()
+        {
+            lock (cacheLock)
+            {
+                if (cacheLastUpdated.AddMinutes(1) > VirtualDateTime.Now) return;
+
+                CustomLogger.Information("Starting cache update (AdminSearchService.StartCacheUpdateThread)");
+
+                var dataRepository = MvcApplication.ContainerIoC.Resolve<IDataRepository>();
+                _cachedOrganisations = AdminSearchService.LoadAllOrganisations(dataRepository);
+                _cachedUsers = AdminSearchService.LoadAllUsers(dataRepository);
+
+                cacheLastUpdated = VirtualDateTime.Now;
+
+                CustomLogger.Information("Finished cache update (AdminSearchService.StartCacheUpdateThread)");
+            }
         }
 
         public AdminSearchResultsViewModel Search(string query)

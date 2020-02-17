@@ -152,8 +152,6 @@ namespace ModernSlavery.WebUI
                 Config.GetAppSetting("AuthSecret", "secret"),
                 BackChannelHandler);
 
-            services.AddHostedService<AdminSearchServiceCacheUpdater>();
-
             //Override any test services
             ConfigureTestServices?.Invoke(services);
 
@@ -368,6 +366,10 @@ namespace ModernSlavery.WebUI
                 //    //TODO
                 //});
             });
+
+            // only during development, validate your mappings; remove it before release
+            if (Config.IsLocal() || Config.IsDevelopment())
+                mapperConfig.AssertConfigurationIsValid();
 
             builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
 
