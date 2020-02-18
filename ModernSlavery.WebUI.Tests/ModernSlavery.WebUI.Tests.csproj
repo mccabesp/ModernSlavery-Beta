@@ -12,56 +12,45 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="appsettings.DEV.json" />
-    <None Remove="appsettings.PREPROD.json" />
-    <None Remove="appsettings.PREPRODSTAGING.json" />
-    <None Remove="appsettings.PROD.json" />
-    <None Remove="AppSettings.secret.json" />
-    <None Remove="appsettings.STAGING.json" />
-    <None Remove="appsettings.TEST.json" />
-    <None Remove="appsettings.UR.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="appsettings.json">
+    <Content Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="AppSettings.secret.json" Condition="Exists('AppSettings.secret.json')">
+    <Content Update="AppSettings.secret.json" Condition="Exists('AppSettings.secret.json')">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
-    <Content Include="AppSettings.UnitTests.json" Condition="Exists('AppSettings.UnitTests.json')">
+    <Content Update="AppSettings.UnitTests.json" Condition="Exists('AppSettings.UnitTests.json')">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.DEV.json">
+    <Content Update="appsettings.DEV.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="appsettings.PREPROD.json">
+    <Content Update="appsettings.PREPROD.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="appsettings.PREPRODSTAGING.json">
+    <Content Update="appsettings.PREPRODSTAGING.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="appsettings.PROD.json">
+    <Content Update="appsettings.PROD.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="appsettings.STAGING.json">
+    <Content Update="appsettings.STAGING.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="appsettings.TEST.json">
+    <Content Update="appsettings.TEST.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="appsettings.UR.json">
+    <Content Update="appsettings.UR.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -25,54 +25,40 @@
 
   <!-- Only need these files during publish phase. Not needed for deployment phase. -->
   <ItemGroup>
-    <Content Remove="Web.Debug.config" />
-    <Content Remove="Web.loadtest.config" />
-    <Content Remove="Web.Release.config" />
-    <None Include="Web.Debug.config" />
-    <None Include="Web.loadtest.config" />
-    <None Include="Web.Release.config" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="wwwroot\assets\javascripts\application.min.js" />
-    <None Include="wwwroot\assets\stylesheets\application.min.css" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="appsettings.json">
+    <Content Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.loadtest.json">
+    <Content Update="appsettings.loadtest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>never</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.LOCAL.json">
+    <Content Update="appsettings.LOCAL.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="AppSettings.secret.json" Condition="Exists('AppSettings.secret.json')">
+    <Content Update="AppSettings.secret.json" Condition="Exists('AppSettings.secret.json')">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.DEV.json">
+    <Content Update="appsettings.DEV.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.PREPROD.json">
+    <Content Update="appsettings.PREPROD.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.PROD.json">
+    <Content Update="appsettings.PROD.json">
       <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.TEST.json">
+    <Content Update="appsettings.TEST.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
@@ -109,10 +95,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="App_Data\SicCodes.csv">
+    <Content Update="App_Data\SicCodes.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="App_Data\SicSections.csv">
+    <Content Update="App_Data\SicSections.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

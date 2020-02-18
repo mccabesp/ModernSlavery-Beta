@@ -84,7 +84,7 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="App_Data\CustomErrorMessages.config">
+    <Content Update="App_Data\CustomErrorMessages.config">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
