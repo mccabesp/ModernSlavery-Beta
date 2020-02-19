@@ -123,7 +123,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="LocalHost.pfx">
+    <Content Include="LocalHost.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
