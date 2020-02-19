@@ -5,65 +5,10 @@
     <AspNetCoreModuleName>AspNetCoreModule</AspNetCoreModuleName>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <RootNamespace>ModernSlavery.WebUI</RootNamespace>
-    <UserSecretsId>9636f8df-5c1c-4066-b955-0c607fe30b2d</UserSecretsId>
     <Copyright>Crown Copyright © $([System.DateTime]::UtcNow.Year) ($([System.DateTime]::UtcNow.ToLocalTime()))</Copyright>
     <ProjectGuid>73D4A349-7276-4C72-9C67-A8FD08D7ED82</ProjectGuid>
-    <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
-
-  <ItemGroup Condition="'$(Configuration)'=='Debug'">
-    <None Include="Content\**\*">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Scripts\**\*">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="wwwroot\**\*">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <!-- Only need these files during publish phase. Not needed for deployment phase. -->
-  <ItemGroup>
-    <Content Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Update="appsettings.loadtest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToPublishDirectory>never</CopyToPublishDirectory>
-    </Content>
-    <Content Update="appsettings.LOCAL.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="AppSettings.secret.json" Condition="Exists('AppSettings.secret.json')">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
-    <Content Update="appsettings.DEV.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Update="appsettings.PREPROD.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Update="appsettings.PROD.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Update="appsettings.TEST.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
@@ -93,15 +38,6 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="App_Data\SicCodes.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="App_Data\SicSections.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
@@ -125,7 +61,101 @@
       <LastGenOutput>AccountResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning;</WarningsAsErrors>
+  </PropertyGroup>
 
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+    <Content Update="Content\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Scripts\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="App_Data\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="appsettings.DEV.json"/>
+    <Content Remove="appsettings.json"/>
+    <Content Remove="appsettings.loadtest.json"/>
+    <Content Remove="appsettings.LOCAL.json"/>
+    <Content Remove="appsettings.PREPROD.json"/>
+    <Content Remove="appsettings.PROD.json"/>
+    <Content Remove="AppSettings.secret.json" Condition="Exists('AppSettings.secret.json')"/>
+    <Content Remove="appsettings.TEST.json"/>
+    <Content Remove="web.config"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.DEV.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.loadtest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToPublishDirectory>never</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.LOCAL.json" Condition="Exists('appsettings.LOCAL.json')">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>never</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.PREPROD.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.PROD.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="AppSettings.secret.json" Condition="Exists('AppSettings.secret.json')">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.TEST.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="web.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- *** THIS IS REQUIRED TO EXCLUDE Web.*.config from Publish folder *** -->
+  <ItemGroup>
+    <Content Remove="Web.*.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Web.*.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  
   <!-- *** THIS IS REQUIRED TO DEPLY WEBJOBS WITH WEBUI ON AZURE *** -->
   <PropertyGroup>
     <MSDeployPackagePublishDependsOn>
@@ -138,9 +168,6 @@
 
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
 
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning;</WarningsAsErrors>
   </PropertyGroup>
 
   <Target Name="CopyWebJobs">
