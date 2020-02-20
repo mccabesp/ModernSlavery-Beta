@@ -34,6 +34,8 @@ namespace ModernSlavery.WebJob
             //Culture is required so UK dates can be parsed correctly
             Thread.CurrentThread.CurrentCulture = new CultureInfo(Config.GetAppSetting("Culture").ToStringOr("en-GB"));
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
+            CultureInfo.DefaultThreadCurrentCulture = Thread.CurrentThread.CurrentCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = Thread.CurrentThread.CurrentCulture;
 
             if (!Config.IsProduction() && Config.GetAppSetting("DUMP_APPSETTINGS") == "1")
             {

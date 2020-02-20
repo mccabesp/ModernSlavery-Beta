@@ -24,6 +24,8 @@ namespace ModernSlavery.WebUI
             //Culture is required so UK dates can be parsed correctly
             Thread.CurrentThread.CurrentCulture = new CultureInfo(Config.GetAppSetting("Culture").ToStringOr("en-GB"));
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
+            CultureInfo.DefaultThreadCurrentCulture = Thread.CurrentThread.CurrentCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = Thread.CurrentThread.CurrentCulture;
 
             //Create the web host
             IWebHost host = BuildWebHost(args);
