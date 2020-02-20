@@ -439,7 +439,13 @@ namespace ModernSlavery.WebUI
             app.UseCookiePolicy();
             app.UseMaintenancePageMiddleware(Global.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
             app.UseStickySessionMiddleware(Global.StickySessions); //Enable/Disable sticky sessions based on  
+
+            //Force basic authentication
+            if (Config.GetAppSetting<bool>("BasicAuthentication:Enabled"))
+                app.UseMiddleware<BasicAuthenticationMiddleware>(Config.GetAppSetting("BasicAuthentication:Username"), Config.GetAppSetting("BasicAuthentication:Password")); 
+
             app.UseSecurityHeaderMiddleware(); //Add/remove security headers from all responses
+
             app.UseMvCApplication(); //Creates the global instance of Program.MvcApplication (equavalent in old Global.asax.cs)
             //app.UseMvcWithDefaultRoute();
             app.UseEndpoints(endpoints =>

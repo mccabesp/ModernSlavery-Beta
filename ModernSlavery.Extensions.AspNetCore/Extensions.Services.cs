@@ -7,6 +7,11 @@ using System.Web;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Storage;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Azure.Storage.Auth;
+using Microsoft.AspNetCore.DataProtection.AzureStorage;
+using Microsoft.Azure.Storage.Blob;
+using System.IO;
 
 namespace ModernSlavery.Extensions.AspNetCore
 {
@@ -21,7 +26,8 @@ namespace ModernSlavery.Extensions.AspNetCore
                 //Use a memory cache
                 services.AddDistributedMemoryCache();
                 services.AddDataProtection(
-                    options => {
+                    options =>
+                    {
                         if (!string.IsNullOrWhiteSpace(applicationDiscriminator))
                         {
                             options.ApplicationDiscriminator = applicationDiscriminator;
@@ -45,17 +51,24 @@ namespace ModernSlavery.Extensions.AspNetCore
                     throw new ArgumentNullException("AzureStorage", "Cannot find 'AzureStorage' ConnectionString");
                 }
 
-                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+
+                //Get or create the container automatically
+                var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+                var blobClient = storageAccount.CreateCloudBlobClient();
+                var keyContainer = blobClient.GetContainerReference("shared-configuration");
+                keyContainer.CreateIfNotExists();
 
                 //var redis = ConnectionMultiplexer.Connect(redisConnectionString);
                 services.AddDataProtection(
-                        options => {
+                        options =>
+                        {
                             if (!string.IsNullOrWhiteSpace(applicationDiscriminator))
                             {
                                 options.ApplicationDiscriminator = applicationDiscriminator;
                             }
-                        })
-                    .PersistKeysToAzureBlobStorage(storageAccount, "/data-protection/keys.xml");
+                        });
+                    //TODO: BUG .PersistKeysToAzureBlobStorage(keyContainer, "data-protection/keys.xml");This is causing a bug
+                    //.PersistKeysToFileSystem(new DirectoryInfo(@"c:\temp-keys\")); //Used to create a file for upload to blob storage
                 //.PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
                 /* 
                  * May need to add .SetApplicationName("shared app name") to force IDSrv4 and WebUI to use same keys

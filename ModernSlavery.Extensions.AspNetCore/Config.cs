@@ -192,6 +192,12 @@ namespace ModernSlavery.Extensions.AspNetCore
             return string.IsNullOrWhiteSpace(value) ? defaultValue : value;
         }
 
+        public static T GetAppSetting<T>(string key, T defaultValue = default(T))
+        {
+            IConfiguration appSettings = GetAppSettings();
+            return appSettings.GetValue<T>(key, defaultValue);
+        }
+
         private static IConfiguration GetAppSettings()
         {
             IConfiguration appSettings = Configuration.GetSection("AppSettings");
