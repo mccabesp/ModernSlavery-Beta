@@ -9,17 +9,16 @@ namespace ModernSlavery.Extensions.AspNetCore
 {
     public class BasicAuthenticationMiddleware
     {
+        private const string SessionAuthenticatedKey= "BasicAuthentication:Authenticated";
         private const string HttpAuthorizationHeader = "Authorization";  // HTTP1.1 Authorization header 
         private const string HttpBasicSchemeName = "Basic"; // HTTP1.1 Basic Challenge Scheme Name 
         private const char HttpCredentialSeparator = ':'; // HTTP1.1 Credential username and password separator 
         private const string HttpWWWAuthenticateHeader = "WWW-Authenticate"; // HTTP1.1 Basic Challenge Scheme Name 
-        private string _Realm = "ModernSlavery-disc"; // HTTP.1.1 Basic Challenge Realm 
+        private static string _Realm = null; // HTTP.1.1 Basic Challenge Realm 
         private string _Username; 
         private string _Password;
 
         private readonly RequestDelegate _next;
-
-        public static bool Authenticated { get; private set; }
 
         public BasicAuthenticationMiddleware(RequestDelegate next, string username = null, string password = null, string realm=null)
         {
@@ -33,13 +32,14 @@ namespace ModernSlavery.Extensions.AspNetCore
 
         public async Task Invoke(HttpContext httpContext)
         {
-            if (!Authenticated) 
+            var authenticated = GetIsAuthenticated(httpContext);
+            if (!authenticated) 
             {
                 if (httpContext.Request.Headers.ContainsKey(HttpAuthorizationHeader))
                 {
 
                     var authorizationHeader = httpContext.Request.Headers[HttpAuthorizationHeader];
-
+                    httpContext.Request.Headers.Remove(HttpAuthorizationHeader);
                     try
                     {
                         // 
@@ -50,20 +50,37 @@ namespace ModernSlavery.Extensions.AspNetCore
                         // 
                         // Validate the user credentials 
                         // 
-                        Authenticated = ValidateCredentials(credentials.Username, credentials.Password);
+                        if (ValidateCredentials(credentials.Username, credentials.Password))
+                        {
+                            SetIsAuthenticated(httpContext, true);
+                            authenticated = true;
+                        }
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine(ex.Message);
-                        Authenticated = false;
                     }
                 } 
             }
 
-            if (Authenticated)
+            if (authenticated)
                 await _next.Invoke(httpContext);
             else
                 IssueAuthenticationChallenge(httpContext);
+        }
+
+        protected virtual bool GetIsAuthenticated(HttpContext httpContext)
+        {
+            var authenticated=httpContext.Session.GetString(SessionAuthenticatedKey).ToBoolean();
+            return authenticated;
+        }
+
+        protected virtual void SetIsAuthenticated(HttpContext httpContext, bool authenticated)
+        {
+            if (authenticated)
+                httpContext.Session.SetString(SessionAuthenticatedKey,"true");
+            else
+                httpContext.Session.Remove(SessionAuthenticatedKey);
         }
 
         protected virtual bool ValidateCredentials(string userName, string password)
@@ -102,7 +119,7 @@ namespace ModernSlavery.Extensions.AspNetCore
             // Issue a basic challenge
             // 
             httpContext.Response.StatusCode = (int)System.Net.HttpStatusCode.Unauthorized;
-            httpContext.SetResponseHeader(HttpWWWAuthenticateHeader, "Basic realm =\"" + _Realm + "\"");
+            httpContext.SetResponseHeader(HttpWWWAuthenticateHeader, $"Basic {(string.IsNullOrWhiteSpace(_Realm) ? "" : $"\"{_Realm}\"")}");
         }
 
     }
