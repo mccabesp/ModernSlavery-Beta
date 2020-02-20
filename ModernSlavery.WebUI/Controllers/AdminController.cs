@@ -47,7 +47,7 @@ namespace ModernSlavery.WebUI.Controllers.Administration
             ILogger<ErrorController> logger,
             IHttpCache cache,
             IHttpSession session,
-            IHostingEnvironment hostingEnvironment,
+            IWebHostEnvironment hostingEnvironment,
             IAdminService adminService,
             IOrganisationBusinessLogic organisationBusinessLogic,
             ISearchBusinessLogic searchBusinessLogic,
@@ -432,7 +432,7 @@ namespace ModernSlavery.WebUI.Controllers.Administration
 
         #region Dependencies
 
-        private readonly IHostingEnvironment HostingEnvironment;
+        private readonly IWebHostEnvironment HostingEnvironment;
 
         public IAdminService AdminService { get; }
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }

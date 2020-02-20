@@ -27,6 +27,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using AutoMapper;
+using Microsoft.Extensions.Configuration;
 
 namespace ModernSlavery.IdentityServer4
 {
@@ -36,16 +37,19 @@ namespace ModernSlavery.IdentityServer4
         public static Action<IServiceCollection> ConfigureTestServices;
         public static Action<ContainerBuilder> ConfigureTestContainer;
 
-        private static string _SiteAuthority;
-        private readonly IHostingEnvironment env;
-        private readonly ILogger logger;
+        private readonly IConfiguration _Config;
+        private readonly IWebHostEnvironment _Env;
+        private readonly ILogger _Logger;
 
-        public Startup(IHostingEnvironment env, ILogger<Startup> logger)
+        public Startup(IWebHostEnvironment env, IConfiguration config, ILogger<Startup> logger)
         {
-            this.env = env;
-            this.logger = logger;
+            this._Env = env;
+            this._Config = config;
+            this._Logger = logger;
         }
 
+
+        private static string _SiteAuthority;
         public static string SiteAuthority
         {
             get
@@ -109,11 +113,11 @@ namespace ModernSlavery.IdentityServer4
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
-            if (env.IsDevelopment() || Config.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
+            if (Config.IsDevelopment() || Config.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
 
 
-            //Add the distributed redis cache
-            services.AddRedisCache();
+            //Add the distributed cache and data protection
+            services.AddDistributedCache(_Config).AddDataProtection(_Config);
 
             //This may now be required 
             services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
@@ -291,14 +295,14 @@ namespace ModernSlavery.IdentityServer4
             if (!string.IsNullOrWhiteSpace(certThumprint))
             {
                 cert = HttpsCertificate.LoadCertificateFromThumbprint(certThumprint);
-                logger.LogInformation(
+                _Logger.LogInformation(
                     $"Successfully loaded certificate '{cert.FriendlyName}' expiring '{cert.GetExpirationDateString()}' from thumbprint '{certThumprint}'");
             }
             else
             {
                 string certPath = Path.Combine(Directory.GetCurrentDirectory(), @"LocalHost.pfx");
                 cert = HttpsCertificate.LoadCertificateFromFile(certPath, "LocalHost");
-                logger.LogInformation(
+                _Logger.LogInformation(
                     $"Successfully loaded certificate '{cert.FriendlyName}' expiring '{cert.GetExpirationDateString()}' from file '{certPath}'");
             }
 
@@ -307,7 +311,7 @@ namespace ModernSlavery.IdentityServer4
                 DateTime expires = cert.GetExpirationDateString().ToDateTime();
                 if (expires < VirtualDateTime.UtcNow)
                 {
-                    logger.LogError(
+                    _Logger.LogError(
                         $"The website certificate for '{Global.ExternalHost}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
                 }
                 else
@@ -316,7 +320,7 @@ namespace ModernSlavery.IdentityServer4
 
                     if (expires < VirtualDateTime.UtcNow.AddDays(Global.CertExpiresWarningDays))
                     {
-                        logger.LogWarning(
+                        _Logger.LogWarning(
                             $"The website certificate for '{SiteAuthority}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
                     }
                 }

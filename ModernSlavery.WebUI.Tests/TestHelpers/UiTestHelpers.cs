@@ -378,9 +378,9 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
 
             //builder.Register(c => new Mock()).As<IFileRepository>();
 
-            var environmentMock = new Mock<IHostingEnvironment>();
+            var environmentMock = new Mock<IWebHostEnvironment>();
             environmentMock.SetupGet(m => m.WebRootPath).Returns(Environment.CurrentDirectory);
-            builder.RegisterInstance(environmentMock.Object).As<IHostingEnvironment>().SingleInstance();
+            builder.RegisterInstance(environmentMock.Object).As<IWebHostEnvironment>().SingleInstance();
 
             SetupHelpers.SetupMockLogRecordGlobals(builder);
 

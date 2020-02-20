@@ -54,15 +54,15 @@ namespace ModernSlavery.WebUI
         public static Action<IServiceCollection> ConfigureTestServices;
         public static Action<ContainerBuilder> ConfigureTestContainer;
 
-        private readonly IConfiguration config;
-        private readonly IHostingEnvironment env;
-        private readonly ILogger logger;
+        private readonly IConfiguration _Config;
+        private readonly IWebHostEnvironment _Env;
+        private readonly ILogger _Logger;
 
-        public Startup(IHostingEnvironment env, IConfiguration config, ILogger<Startup> logger)
+        public Startup(IWebHostEnvironment env, IConfiguration config, ILogger<Startup> logger)
         {
-            this.env = env;
-            this.config = config;
-            this.logger = logger;
+            this._Env = env;
+            this._Config = config;
+            this._Logger = logger;
         }
 
         public static HttpMessageHandler BackChannelHandler { get; set; }
@@ -76,8 +76,8 @@ namespace ModernSlavery.WebUI
             // won't get called.
 
             // setup configuration
-            services.Configure<ViewingOptions>(config.GetSection("Gpg:Viewing"));
-            services.Configure<SubmissionOptions>(config.GetSection("Gpg:Submission"));
+            services.Configure<ViewingOptions>(_Config.GetSection("Gpg:Viewing"));
+            services.Configure<SubmissionOptions>(_Config.GetSection("Gpg:Submission"));
 
             //Allow handler for caching of http responses
             services.AddResponseCaching();
@@ -119,7 +119,7 @@ namespace ModernSlavery.WebUI
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
-            if (env.IsDevelopment() || Config.IsLocal())mvcBuilder.AddRazorRuntimeCompilation();
+            if (Config.IsDevelopment() || Config.IsLocal())mvcBuilder.AddRazorRuntimeCompilation();
 
 
             //Add antiforgery token by default to forms
@@ -137,8 +137,8 @@ namespace ModernSlavery.WebUI
                             Program.MvcApplication.SessionTimeOutMinutes); //Equivalent to <sessionState timeout="20"> from old Web.config
                 });
 
-            //Add the distributed redis cache
-            services.AddRedisCache();
+            //Add the distributed cache and data protection
+            services.AddDistributedCache(_Config).AddDataProtection(_Config);
 
             //This may now be required 
             services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
