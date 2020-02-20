@@ -20,6 +20,7 @@ namespace ModernSlavery.BusinessLogic.Account.Repositories
 
     public class UserRepository : IUserRepository
     {
+        public static bool EncryptEmails = Config.GetAppSetting("EncryptEmails").ToBoolean(true);
 
         public UserRepository(IDataRepository dataRepository, IUserLogRecord userRecordLog, IMapper autoMapper)
         {
@@ -46,6 +47,21 @@ namespace ModernSlavery.BusinessLogic.Account.Repositories
 
         public async Task<User> FindByEmailAsync(string email, params UserStatuses[] filterStatuses)
         {
+            if (EncryptEmails)
+            {
+                var encryptedEmail = Encryption.EncryptData(email.ToLower());
+
+                var user = DataRepository.GetAll<User>()
+                    // filter by email address
+                    .Where(user => user.EmailAddress == encryptedEmail)
+                    // skip or filter by user status
+                    .Where(user => filterStatuses.Length == 0 || filterStatuses.Contains(user.Status))
+                    // return first match otherwise null
+                    .FirstOrDefault();
+
+                if (user != null) return user;
+            }
+        
             return await DataRepository.GetAll<User>()
                 // filter by email address
                 .Where(user => user.EmailAddress.ToLower() == email.ToLower())
