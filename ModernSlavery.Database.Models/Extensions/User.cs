@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading;
 using ModernSlavery.Core;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
@@ -49,6 +50,8 @@ namespace ModernSlavery.Database
         {
             get
             {
+                Console.WriteLine($"AcceptedPrivacyStatement-Get: CurrentCulture is {Thread.CurrentThread.CurrentCulture} CurrentUICulture is {Thread.CurrentThread.CurrentUICulture}");
+
                 string value = GetSetting(UserSettingKeys.AcceptedPrivacyStatement);
                 if (value == null)
                 {
@@ -57,7 +60,12 @@ namespace ModernSlavery.Database
 
                 return DateTime.Parse(value);
             }
-            set => SetSetting(UserSettingKeys.AcceptedPrivacyStatement, value.HasValue ? value.Value.ToString() : null);
+            set 
+            {
+                Console.WriteLine($"AcceptedPrivacyStatement-Set: CurrentCulture is {Thread.CurrentThread.CurrentCulture} CurrentUICulture is {Thread.CurrentThread.CurrentUICulture}");
+                SetSetting(UserSettingKeys.AcceptedPrivacyStatement, value.HasValue ? value.Value.ToString() : null); 
+
+            }
         }
 
         public bool IsAdministrator()
