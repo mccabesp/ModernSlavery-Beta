@@ -285,7 +285,7 @@ namespace ModernSlavery.BusinessLogic
                 .Where(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year).ToList();
 
             // finally, generate the left join sql statement between scopes and returns
-            var dbResults = await dbScopesQuery.AsQueryable().GroupJoin(
+            var dbResults = dbScopesQuery.AsQueryable().GroupJoin(
                     // join
                     dbReturnsQuery.AsQueryable(),
                     // on
@@ -296,7 +296,7 @@ namespace ModernSlavery.BusinessLogic
                     // into
                     (Scope, Return) => new {Scope, Return = Return.LastOrDefault()})
                 // execute on sql server and return results into memory
-                .ToListAsync();
+                .ToList();
 
             // build the compare reports list
             List<CompareReportModel> compareReports = dbResults.Select(
