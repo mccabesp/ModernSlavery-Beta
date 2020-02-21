@@ -1,6 +1,6 @@
 # Modern Slavery Reporting service
 
-This is the code for the [Modern Slavery Reporting service](https://gender-pay-gap.service.gov.uk).
+This is the code for the [Modern Slavery Reporting service](https://modern-slavery.service.gov.uk).
 
 From 2017, any organisation that has 250 or more employees must publish and report specific figures about their Modern Slavery. 
 Modern Slavery is the difference between the average earnings of men and women, expressed relative to men’s earnings. 

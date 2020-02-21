@@ -31,20 +31,21 @@ namespace ModernSlavery.Core.Classes
 
         private HashSet<EmailTemplateInfo> EmailTemplateStore { get; }
 
-        public void Add<TTemplate>(string templateId, string filePath) where TTemplate : AEmailTemplate
+        public void Add<TTemplate>(string templateId, string fileName) where TTemplate : AEmailTemplate
         {
             if (string.IsNullOrWhiteSpace(templateId))
             {
                 throw new ArgumentException("You must provide an email template id", nameof(templateId));
             }
 
-            if (string.IsNullOrWhiteSpace(filePath))
+            if (string.IsNullOrWhiteSpace(fileName))
             {
-                throw new ArgumentException("You must provide an email template file path", nameof(filePath));
+                throw new ArgumentException("You must provide an email template file name", nameof(fileName));
             }
 
             // ensure file exists
-            string fileContent = File.ReadAllText($"{TemplateFolderPath}\\{filePath}");
+            var filePath = Path.Combine(TemplateFolderPath,fileName);
+            string fileContent = File.ReadAllText(filePath);
 
             // parse html file
             var parser = new HtmlParser();

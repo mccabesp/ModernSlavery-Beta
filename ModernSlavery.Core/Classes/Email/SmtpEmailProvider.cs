@@ -70,9 +70,10 @@ namespace ModernSlavery.Core.Classes
                 messageHtml = messageHtml.Replace($"(({name}))", value.ToString());
             }
 
-            string smtpServer = Options.Value.Server2 ?? Options.Value.Server;
-            int smtpServerPort = (Options.Value.Port2 ?? Options.Value.Port).ToInt32(25);
-            string smtpUsername = Options.Value.Username2 ?? Options.Value.Username;
+            string smtpServer = string.IsNullOrWhiteSpace(Options.Value.Server) ? Options.Value.Server2 : Options.Value.Server;
+            int smtpServerPort = (string.IsNullOrWhiteSpace(Options.Value.Port) ? Options.Value.Port2: Options.Value.Port).ToInt32(25);
+            string smtpUsername = string.IsNullOrWhiteSpace(Options.Value.Username) ? Options.Value.Username2 : Options.Value.Username;
+            string smtpPassword = string.IsNullOrWhiteSpace(Options.Value.Password) ? Options.Value.Password2 : Options.Value.Password;
 
             await Email.QuickSendAsync(
                 messageSubject,
@@ -83,7 +84,7 @@ namespace ModernSlavery.Core.Classes
                 messageHtml,
                 smtpServer,
                 smtpUsername,
-                Options.Value.Password2 ?? Options.Value.Password,
+                smtpPassword,
                 smtpServerPort,
                 test: test);
 
