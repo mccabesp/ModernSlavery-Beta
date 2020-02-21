@@ -332,41 +332,40 @@ namespace ModernSlavery.Core.Classes
         public static async Task PushRemoteFileAsync(IFileRepository fileRepository,
             string fileName,
             string remotePath,
-            string localPath = null)
+            string localPath = null, bool OverwriteIfNewer=false)
         {
-            if (string.IsNullOrWhiteSpace(remotePath))
-            {
-                throw new ArgumentNullException(nameof(remotePath));
-            }
+            if (string.IsNullOrWhiteSpace(remotePath)) throw new ArgumentNullException(nameof(remotePath));
+            if (string.IsNullOrWhiteSpace(fileName))throw new ArgumentNullException(nameof(fileName));
 
-            if (!await fileRepository.GetDirectoryExistsAsync(remotePath))
-            {
-                await fileRepository.CreateDirectoryAsync(remotePath);
-            }
-
-            remotePath = Path.Combine(remotePath, fileName);
-            bool remoteExists = await fileRepository.GetFileExistsAsync(remotePath);
-            if (remoteExists)
-            {
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(localPath))
-            {
-                localPath = "App_Data";
-            }
-
+            //Check the local file exists
+            if (string.IsNullOrWhiteSpace(localPath)) localPath = "App_Data";
             localPath = FileSystem.ExpandLocalPath(localPath);
             localPath = Path.Combine(localPath, fileName);
             bool localExists = File.Exists(localPath);
-            byte[] localContent = localExists ? File.ReadAllBytes(localPath) : null;
+            if (!localExists) throw new FileNotFoundException($"File '{localPath}' does not exist");
 
+            //Create the remote directory if it doesnt already exist
+            if (!await fileRepository.GetDirectoryExistsAsync(remotePath))await fileRepository.CreateDirectoryAsync(remotePath);
+
+            //Check if the remote file exists
+            remotePath = Path.Combine(remotePath, fileName);
+            bool remoteExists = await fileRepository.GetFileExistsAsync(remotePath);
+
+            if (remoteExists)
+            {
+                //Dont overwite remote file if it exists (unless local is newer)
+                if (!OverwriteIfNewer) return;
+
+                //Dont overwrite remote file unless local file is newer
+                var remoteLastWriteTime = await fileRepository.GetLastWriteTimeAsync(localPath);
+                var localLastWriteTime = File.GetLastWriteTime(remotePath);
+
+                if (remoteLastWriteTime >= localLastWriteTime) return;
+            }
 
             //Overwrite remote 
-            if (localContent != null && localContent.Length > 0)
-            {
-                await fileRepository.WriteAsync(remotePath, localContent);
-            }
+            var localContent = File.ReadAllBytes(localPath);
+            if (localContent.Length > 0)await fileRepository.WriteAsync(remotePath, localContent);
         }
 
         #endregion
