@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Extensions.AspNetCore;
 
 namespace ModernSlavery.IdentityServer4.Controllers
 {
@@ -291,7 +292,7 @@ namespace ModernSlavery.IdentityServer4.Controllers
                 {
                     HttpOnly = false,
                     Secure = true,
-                    Path = "/",
+                    Path = HttpContext.Request.Path.Value.StartsWith("/account/", StringComparison.InvariantCultureIgnoreCase) ? "/account" :"/",
                     IsEssential = true,
                     SameSite = SameSiteMode.Strict,
                     Expires = DateTimeOffset.UnixEpoch
