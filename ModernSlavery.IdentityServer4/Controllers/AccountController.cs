@@ -288,17 +288,7 @@ namespace ModernSlavery.IdentityServer4.Controllers
             if (User?.Identity.IsAuthenticated == true)
             {
                 // delete local authentication cookie
-                var options = new CookieOptions
-                {
-                    HttpOnly = false,
-                    Secure = true,
-                    Path = HttpContext.Request.Path.Value.StartsWith("/account/", StringComparison.InvariantCultureIgnoreCase) ? "/account" :"/",
-                    IsEssential = true,
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTimeOffset.UnixEpoch
-                };
-                HttpContext.Response.Cookies.Append("idsrv", "", options);
-                HttpContext.Response.Cookies.Append("idsrv.session", "", options);
+                await HttpContext.SignOutAsync();
 
                 // raise the logout event
                 await _events.RaiseAsync(new UserLogoutSuccessEvent(User.GetSubjectId(), User.GetDisplayName()));

@@ -132,6 +132,7 @@ namespace System.Web
         {
             var cookieOptions = new CookieOptions {
                 Expires = expires,
+                SameSite= Microsoft.AspNetCore.Http.SameSiteMode.Strict,
                 Domain = subdomain,
                 Path = path,
                 Secure = secure,

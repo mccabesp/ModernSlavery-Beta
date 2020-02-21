@@ -131,6 +131,7 @@ namespace ModernSlavery.WebUI
                     o.Cookie.IsEssential = true; //This is required otherwise session will not load
                     o.Cookie.SecurePolicy = CookieSecurePolicy.Always; //Equivalent to <httpCookies requireSSL="true" /> from Web.Config
                     o.Cookie.HttpOnly = false; //Always use https cookies
+                    o.Cookie.SameSite = SameSiteMode.Strict;
                     o.Cookie.Domain = Global.ExternalHost.BeforeFirst(":"); //Domain cannot be an authority and contain a port number
                     o.IdleTimeout =
                         TimeSpan.FromMinutes(
