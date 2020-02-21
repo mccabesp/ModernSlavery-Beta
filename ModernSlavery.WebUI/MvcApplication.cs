@@ -20,7 +20,7 @@ namespace ModernSlavery.WebUI
         IQueue SendNotifyEmailQueue { get; set; }
         IQueue ExecuteWebjobQueue { get; }
 
-        Task InitAsync();
+        void Init();
 
     }
 
@@ -56,14 +56,14 @@ namespace ModernSlavery.WebUI
 
         public double SessionTimeOutMinutes => Config.GetAppSetting("SessionTimeOut").ToInt32(20);
 
-        public async Task InitAsync()
+        public void Init()
         {
-            //Copy AppData to remote file storage
-            if (!Config.IsProduction())
-            {
-                await Core.Classes.Extensions.PushRemoteFileAsync(Global.FileRepository, Filenames.SicCodes, Global.DataPath);
-                await Core.Classes.Extensions.PushRemoteFileAsync(Global.FileRepository, Filenames.SicSections, Global.DataPath);
-            }
+            //Ensure ShortCodes, SicCodes and SicSections exist on remote 
+            Task.WaitAll(
+                Core.Classes.Extensions.PushRemoteFileAsync(Global.FileRepository, Filenames.ShortCodes, Global.DataPath),
+                Core.Classes.Extensions.PushRemoteFileAsync(Global.FileRepository, Filenames.SicCodes, Global.DataPath),
+                Core.Classes.Extensions.PushRemoteFileAsync(Global.FileRepository, Filenames.SicSections, Global.DataPath)
+            );
         }
 
     }

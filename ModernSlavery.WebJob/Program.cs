@@ -15,6 +15,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace ModernSlavery.WebJob
 {
@@ -77,7 +78,10 @@ namespace ModernSlavery.WebJob
             Global.EmailSendLog = ContainerIOC.ResolveKeyed<ILogRecordLogger>(Filenames.EmailSendLog);
             Global.ManualChangeLog = ContainerIOC.ResolveKeyed<ILogRecordLogger>(Filenames.ManualChangeLog);
             Global.BadSicLog = ContainerIOC.ResolveKeyed<ILogRecordLogger>(Filenames.BadSicLog);
-            
+
+            //Ensure SicSectorSynonyms exist on remote 
+            Task.WaitAll(Core.Classes.Extensions.PushRemoteFileAsync(Global.FileRepository, Filenames.SicSectorSynonyms, Global.DataPath));
+
             //Leave this check here to ensure function dependencies resolve on startup rather than when each function method is invoked
             var functions = ContainerIOC.Resolve<Functions>();
             

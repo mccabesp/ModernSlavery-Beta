@@ -453,13 +453,13 @@ namespace ModernSlavery.WebUI
                 endpoints.MapControllers();
             });
             lifetime.ApplicationStarted.Register(
-                async () => {
+                () => {
                     // Summary:
                     //     Triggered when the application host has fully started and is about to wait for
                     //     a graceful shutdown.
 
                     //Initialise the application
-                    await Program.MvcApplication.InitAsync();
+                    Program.MvcApplication.Init();
 
                     logger.LogInformation("Application Started");
                 });
