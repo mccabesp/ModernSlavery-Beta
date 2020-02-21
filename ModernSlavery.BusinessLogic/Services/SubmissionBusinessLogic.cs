@@ -83,22 +83,22 @@ namespace ModernSlavery.BusinessLogic
         {
             var scopes = DataRepository.GetAll<OrganisationScope>()
                 .Where(os => os.SnapshotDate.Year == year && os.Status == ScopeRowStatuses.Active)
-                .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SnapshotDate});
+                .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SnapshotDate}).ToList();
 
-            IQueryable<Return> returns = DataRepository.GetAll<Return>()
-                .Where(r => r.AccountingDate.Year == year && r.Status == ReturnStatuses.Submitted);
+            var returns = DataRepository.GetAll<Return>()
+                .Where(r => r.AccountingDate.Year == year && r.Status == ReturnStatuses.Submitted).ToList();
 
 #if DEBUG
             if (Debugger.IsAttached)
             {
-                returns = returns.Take(100);
+                returns = returns.Take(100).ToList();
             }
 #endif
 
             // perform left join
-            IEnumerable<SubmissionsFileModel> records = returns.GroupJoin(
+            IEnumerable<SubmissionsFileModel> records = returns.AsQueryable().GroupJoin(
                     // join
-                    scopes,
+                    scopes.AsQueryable(),
                     // on
                     // inner
                     r => new {r.OrganisationId, r.AccountingDate.Year},
@@ -187,17 +187,17 @@ namespace ModernSlavery.BusinessLogic
                         r.LastName,
                         r.JobTitle,
                         r.EHRCResponse
-                    });
+                    }).ToList();
 
             // create scope table query
             var activeScopes = DataRepository.GetAll<OrganisationScope>()
                 .Where(os => os.SnapshotDate.Year == prevPrivateSnapshotDate.Year && os.Status == ScopeRowStatuses.Active)
-                .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SnapshotDate});
+                .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SnapshotDate}).ToList();
 
             // perform a left join on lateSubmissions and activeScopes
-            var records = lateSubmissions.GroupJoin(
+            var records = lateSubmissions.AsQueryable().GroupJoin(
                     // join with
-                    activeScopes,
+                    activeScopes.AsQueryable(),
                     // on
                     // inner
                     r => new {r.OrganisationId, r.AccountingDate.Year},

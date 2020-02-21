@@ -276,18 +276,18 @@ namespace ModernSlavery.BusinessLogic
             List<long> basketOrgIds = encBasketOrgIds.Select(x => _obfuscator.DeObfuscate(x).ToInt64()).ToList();
 
             // query against scopes and filter by basket ids
-            IQueryable<OrganisationScope> dbScopesQuery = _DataRepository.GetAll<OrganisationScope>()
+            var dbScopesQuery = _DataRepository.GetAll<OrganisationScope>()
                 .Where(os => os.Status == ScopeRowStatuses.Active && os.SnapshotDate.Year == year)
-                .Where(r => basketOrgIds.Contains(r.OrganisationId));
+                .Where(r => basketOrgIds.Contains(r.OrganisationId)).ToList();
 
             // query submitted returns for current year
-            IQueryable<Return> dbReturnsQuery = _DataRepository.GetAll<Return>()
-                .Where(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year);
+            var dbReturnsQuery = _DataRepository.GetAll<Return>()
+                .Where(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year).ToList();
 
             // finally, generate the left join sql statement between scopes and returns
-            var dbResults = await dbScopesQuery.GroupJoin(
+            var dbResults = await dbScopesQuery.AsQueryable().GroupJoin(
                     // join
-                    dbReturnsQuery,
+                    dbReturnsQuery.AsQueryable(),
                     // on
                     // inner
                     Scope => Scope.OrganisationId,
