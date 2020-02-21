@@ -9,6 +9,7 @@ using ModernSlavery.WebUI.Models.Register;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Extensions.AspNetCore;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -127,7 +128,7 @@ namespace ModernSlavery.WebUI.Controllers
 
                 //If the email address is a test email then add to viewbag
 
-                if (currentUser.EmailAddress.StartsWithI(Global.TestPrefix))
+                if (currentUser.EmailAddress.StartsWithI(Global.TestPrefix) || Config.GetAppSetting("ShowEmailVerifyLink").ToBoolean())
                 {
                     ViewBag.VerifyCode = verifyCode;
                 }

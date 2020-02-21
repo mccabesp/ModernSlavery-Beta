@@ -18,7 +18,7 @@
                 </h1>
                 <p>
                     We have sent you a confirmation email to <br/>
-                    @if (Model.EmailAddress.StartsWithI(Global.TestPrefix))
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.VerifyCode))
                     {
                         <a href="@Url.Action("VerifyEmail", new {code = ViewBag.VerifyCode, login = Model.EmailAddress})">
                             <b id="SavedEmailAddress">@Model.EmailAddress</b>
