@@ -19,11 +19,12 @@
                 </div>
                 @if (!string.IsNullOrWhiteSpace(ViewBag.PinCode))
                 {
-                    <div>
-                        <b>
-                            <a href="@Url.Action("activate-service")">Your test pin code is @ViewBag.PinCode</a>
-                        </b>
-                    </div>
+            <p>
+                <b>
+                    Your test pin code is @ViewBag.PinCode
+                </b><br />
+                <a href="@Url.Action("ActivateService")">Click here to activate</a>
+            </p>
                 }
                 <div class="bold-small">What happens next.</div>
                 <p>Your PIN should arrive within 7 days.</p>
