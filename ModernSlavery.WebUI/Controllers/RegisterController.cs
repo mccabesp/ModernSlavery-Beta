@@ -153,6 +153,7 @@ namespace ModernSlavery.WebUI.Controllers
 
                     // Check if we are a test user (for load testing)
                     bool thisIsATestUser = userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix);
+                    bool pinInPostTestMode = Config.GetAppSetting<bool>("PinInPostTestMode");
 
                     // Generate a new pin
                     string pin = OrganisationBusinessLogic.GeneratePINCode(thisIsATestUser);
@@ -164,7 +165,11 @@ namespace ModernSlavery.WebUI.Controllers
                     userOrg.Method = RegistrationMethods.PinInPost;
                     await DataRepository.SaveChangesAsync();
 
-                    if (!thisIsATestUser)
+                    if (thisIsATestUser || pinInPostTestMode)
+                    {
+                        ViewBag.PinCode = pin;
+                    }
+                    else 
                     {
                         // Try and send the PIN in post
                         if (pinInThePostService.SendPinInThePost(this, userOrg, pin, out string letterId))
