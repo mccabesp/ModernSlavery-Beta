@@ -13,7 +13,7 @@ using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Classes.Services;
-using ModernSlavery.WebUI.Models.Admin;
+using ModernSlavery.WebUI.Areas.Admin.Models;
 using ModernSlavery.WebUI.Views.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

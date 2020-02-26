@@ -9,7 +9,7 @@ using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Classes.Downloadable;
 using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.Core.Models.Downloadable;
-using ModernSlavery.WebUI.Controllers.Administration;
+using ModernSlavery.WebUI.Areas.Admin.Controllers;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -18,7 +18,7 @@ using NUnit.Framework;
 using ModernSlavery.Tests.Common;
 using AutoMapper;
 
-namespace ModernSlavery.WebUI.Tests.Controllers.Administration
+namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 {
     [TestFixture]
     public class DownloadableFileControllerTests : BaseTestFixture<DownloadableFileControllerTests.DependencyModule>

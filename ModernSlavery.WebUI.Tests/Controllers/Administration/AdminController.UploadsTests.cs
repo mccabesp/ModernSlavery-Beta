@@ -3,15 +3,15 @@ using System.Threading.Tasks;
 using ModernSlavery.Database;
 using ModernSlavery.Tests.TestHelpers;
 using ModernSlavery.WebUI.Classes;
-using ModernSlavery.WebUI.Controllers.Administration;
-using ModernSlavery.WebUI.Models.Admin;
+using ModernSlavery.WebUI.Areas.Admin.Controllers;
+using ModernSlavery.WebUI.Areas.Admin.Models;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 
-namespace ModernSlavery.WebUI.Tests.Controllers.Administration
+namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 {
     [TestFixture]
     public class AdminControllerUploadsTests

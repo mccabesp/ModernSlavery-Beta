@@ -98,7 +98,7 @@
             headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
                 Text = "Admin",
-                Href = Url.Action("Home", "Admin")
+                Href = Url.Action("Home", "Admin", new { area = "Admin" })
             });
         }
 

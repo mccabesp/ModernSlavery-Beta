@@ -8,7 +8,7 @@ using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
 using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Models.Admin;
+using ModernSlavery.WebUI.Areas.Admin.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

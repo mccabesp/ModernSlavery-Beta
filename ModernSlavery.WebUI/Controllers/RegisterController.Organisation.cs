@@ -1360,7 +1360,7 @@ namespace ModernSlavery.WebUI.Controllers
 
                 if (currentUser.EmailAddress.StartsWithI(Global.TestPrefix))
                 {
-                    TempData["TestUrl"] = Url.Action("ReviewRequest", new {code = reviewCode});
+                    TempData["TestUrl"] = Url.Action("ReviewRequest", "Admin", new {area="Admin", code = reviewCode});
                 }
 
                 return RedirectToAction("RequestReceived");
@@ -1900,7 +1900,7 @@ namespace ModernSlavery.WebUI.Controllers
         {
             //Send a verification link to the email address
             string reviewCode = userOrg.GetReviewCode();
-            string reviewUrl = Url.Action("ReviewRequest", "Register", new {code = reviewCode}, "https");
+            string reviewUrl = Url.Action("ReviewRequest", "Admin", new {area="Admin", code = reviewCode}, "https");
 
             //If the email address is a test email then simulate sending
             if (userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Models.Admin;
+using ModernSlavery.WebUI.Areas.Admin.Models;
 
 namespace ModernSlavery
 {

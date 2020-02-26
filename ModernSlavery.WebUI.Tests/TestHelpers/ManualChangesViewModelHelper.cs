@@ -1,4 +1,4 @@
-﻿using ModernSlavery.WebUI.Models.Admin;
+﻿using ModernSlavery.WebUI.Areas.Admin.Models;
 using Moq;
 
 namespace ModernSlavery.Tests.TestHelpers

@@ -53,7 +53,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             var currentStateModel = this.UnstashModel<ScopingViewModel>();
@@ -80,7 +80,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             // When Spamlocked then return a CustomError view
@@ -158,7 +158,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             return RedirectToAction(nameof(OrganisationController.ManageOrganisations), "Organisation");
@@ -171,7 +171,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -194,7 +194,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>(true);
@@ -235,7 +235,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -255,7 +255,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -276,7 +276,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             // update the state model
@@ -336,7 +336,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -357,7 +357,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -401,7 +401,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -423,7 +423,7 @@ namespace ModernSlavery.WebUI.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>(true);

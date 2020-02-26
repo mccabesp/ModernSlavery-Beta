@@ -6,14 +6,14 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Controllers.Admin;
+using ModernSlavery.WebUI.Areas.Admin.Controllers;
 using ModernSlavery.WebUI.Services;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
 
-namespace ModernSlavery.WebUI.Tests.Controllers.Administration
+namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 {
     [TestFixture]
     [SetCulture("en-GB")]

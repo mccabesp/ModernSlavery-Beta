@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Controllers
             //If its an administrator go to admin home
             if (currentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
 
             return View("EmailConfirmed");
@@ -93,7 +93,7 @@ namespace ModernSlavery.WebUI.Controllers
             {
                 if (currentUser.IsAdministrator())
                 {
-                    return RedirectToAction("Home", "Admin");
+                    return RedirectToAction("Home", "Admin", new { area = "Admin" });
                 }
 
                 return RedirectToAction("EmailConfirmed");

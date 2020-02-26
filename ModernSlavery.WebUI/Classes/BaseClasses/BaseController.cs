@@ -505,7 +505,7 @@ namespace ModernSlavery.WebUI.Classes
                     return null;
                 }
 
-                return RedirectToAction("Home", "Admin");
+                return RedirectToAction("Home", "Admin", new { area = "Admin" });
                 //return View("CustomError", new ErrorViewModel(1117));
             }
 

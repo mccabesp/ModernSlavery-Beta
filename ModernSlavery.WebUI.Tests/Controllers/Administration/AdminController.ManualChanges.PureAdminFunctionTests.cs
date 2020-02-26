@@ -7,15 +7,16 @@ using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
 using ModernSlavery.WebUI.Classes.Services;
-using ModernSlavery.WebUI.Controllers.Administration;
-using ModernSlavery.WebUI.Models.Admin;
+using ModernSlavery.WebUI.Areas.Admin.Controllers;
+using ModernSlavery.WebUI.Areas.Admin.Models;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
 using NUnit.Framework;
+using ModernSlavery.WebUI.Tests;
 
-namespace ModernSlavery.WebUI.Tests.Controllers.Administration
+namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 {
     /// <summary>
     ///     This class contains tests to assert the correct functioning of calls to the 'Manual changes' method that belong to
