@@ -3,6 +3,7 @@ using ModernSlavery.BusinessLogic.Account.Abstractions;
 using ModernSlavery.Database;
 using IdentityModel;
 using IdentityServer4.Validation;
+using ModernSlavery.Entities;
 
 namespace ModernSlavery.IdentityServer4.Classes
 {

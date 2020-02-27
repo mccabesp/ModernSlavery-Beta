@@ -8,12 +8,12 @@ using AutoMapper;
 using ModernSlavery.BusinessLogic.Account.Abstractions;
 using ModernSlavery.BusinessLogic.Account.Models;
 using ModernSlavery.BusinessLogic.LogRecords;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
 using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.BusinessLogic.Account.Repositories
 {

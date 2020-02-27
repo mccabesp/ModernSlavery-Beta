@@ -1,4 +1,7 @@
-﻿namespace ModernSlavery.Core.Models
+﻿using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+
+namespace ModernSlavery.Core.Models
 {
     public class UnregisteredOrganisationsFileModel
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
     [Serializable]
     public partial class SicCode

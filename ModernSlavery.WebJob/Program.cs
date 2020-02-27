@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebJob
 {

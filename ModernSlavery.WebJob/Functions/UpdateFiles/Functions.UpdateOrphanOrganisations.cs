@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebJob
 {
@@ -71,7 +73,7 @@ namespace ModernSlavery.WebJob
                 // Cache the latest unregistered organisations
                 List<UnregisteredOrganisationsFileModel> unregisteredOrganisations = await GetOrphanOrganisationsAsync();
 
-                int year = SectorTypes.Private.GetAccountingStartDate().Year;
+                int year = _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private).Year;
 
                 // Write yearly records to csv files
                 await WriteRecordsForYearAsync(
@@ -156,7 +158,7 @@ namespace ModernSlavery.WebJob
                         string countryCode = Country.FindTwoLetterCode(latestAddress.Country);
 
                         // Retrieve the SectorType reporting snapshot date (d MMMM yyyy)
-                        string expires = org.SectorType.GetAccountingStartDate().AddYears(1).AddDays(-1).ToString("d MMMM yyyy");
+                        string expires = _snapshotDateHelper.GetSnapshotDate(org.SectorType).AddYears(1).AddDays(-1).ToString("d MMMM yyyy");
 
                         // Generate csv row
                         return new UnregisteredOrganisationsFileModel {

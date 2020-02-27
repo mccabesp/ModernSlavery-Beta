@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using ModernSlavery.Extensions;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
     public partial class SicSection
     {

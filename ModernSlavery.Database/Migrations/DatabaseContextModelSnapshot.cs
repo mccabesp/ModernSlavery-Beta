@@ -56,7 +56,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("AddressStatus");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.Models.AuditLog", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.AuditLog", b =>
                 {
                     b.Property<long>("AuditLogId")
                         .ValueGeneratedOnAdd()
@@ -94,7 +94,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("AuditLogs");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.Models.Feedback", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.Feedback", b =>
                 {
                     b.Property<long>("FeedbackId")
                         .ValueGeneratedOnAdd()
@@ -199,7 +199,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("Feedback");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.Models.ReminderEmail", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.ReminderEmail", b =>
                 {
                     b.Property<long>("ReminderEmailId")
                         .ValueGeneratedOnAdd()
@@ -1220,7 +1220,7 @@ namespace ModernSlavery.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.Models.AuditLog", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.AuditLog", b =>
                 {
                     b.HasOne("ModernSlavery.Database.User", "ImpersonatedUser")
                         .WithMany()

@@ -8,6 +8,8 @@ using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.Extensibility.Implementation;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Core
 {
@@ -58,8 +60,6 @@ namespace ModernSlavery.Core
         public static bool StickySessions => Config.GetAppSetting("StickySessions").ToBoolean(true);
         public static int StaticCacheSeconds => Config.GetAppSetting("CacheProfileSettings:StaticDuration").ToInt32(86400);
         public static DateTime PrivacyChangedDate => Config.GetAppSetting("PrivacyChangedDate").ToDateTime();
-        public static DateTime PrivateAccountingDate => Config.GetAppSetting("PrivateAccountingDate").ToDateTime();
-        public static DateTime PublicAccountingDate => Config.GetAppSetting("PublicAccountingDate").ToDateTime();
         public static int EmailVerificationExpiryHours => Config.GetAppSetting("EmailVerificationExpiryHours").ToInt32();
         public static int EmailVerificationMinResendHours => Config.GetAppSetting("EmailVerificationMinResendHours").ToInt32();
         public static int EmployerCodeLength => Config.GetAppSetting("EmployerCodeLength").ToInt32();
@@ -82,7 +82,6 @@ namespace ModernSlavery.Core
         public static int PurgeUnverifiedUserDays => Config.GetAppSetting("PurgeUnverifiedUserDays").ToInt32(7);
         public static int PurgeUnconfirmedPinDays => PinInPostExpiryDays + Config.GetAppSetting("PurgeUnconfirmedPinDays").ToInt32(14);
         public static int SecurityCodeExpiryDays => Config.GetAppSetting("SecurityCodeExpiryDays").ToInt32(90);
-        public static int SecurityCodeLength => Config.GetAppSetting("SecurityCodeLength").ToInt32();
         public static bool DisablePageCaching => Config.GetAppSetting("DisablePageCaching").ToBoolean();
         public static string AdminEmails => Config.GetAppSetting("AdminEmails");
 
@@ -102,13 +101,11 @@ namespace ModernSlavery.Core
         public static string PINChars => Config.GetAppSetting("PINChars");
         public static string PinRegex => Config.GetAppSetting("PinRegex");
         public static string PinRegexError => Config.GetAppSetting("PinRegexError");
-        public static string SecurityCodeChars => Config.GetAppSetting("SecurityCodeChars");
         public static string SuperAdminEmails => Config.GetAppSetting("SuperAdminEmails");
         public static string DatabaseAdminEmails => Config.GetAppSetting("DatabaseAdminEmails");
         public static string TestPrefix => Config.GetAppSetting("TestPrefix");
         public static string WhoNeedsToReportGuidanceLink => Config.GetAppSetting("WhoNeedsToReportGuidanceLink");
-        public static int CurrentAccountingYear => SectorTypes.Private.GetAccountingStartDate().Year;
-
+        
         public static string CompanyNumberRegexError => Config.GetAppSetting("CompanyNumberRegexError");
         public static Version Version => Misc.GetTopAssembly().GetName().Version;
         public static DateTime AssemblyDate => Misc.GetTopAssembly().GetAssemblyCreationTime();

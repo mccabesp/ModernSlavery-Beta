@@ -6,13 +6,16 @@ using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.Database;
 
 namespace ModernSlavery.WebJob
 {
@@ -136,7 +139,7 @@ namespace ModernSlavery.WebJob
                 if (orgs.Any())
                 {
                     //Remove D&B orgs
-                    string filePath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations);
+                    string filePath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations(DateTime.Now.Year));
                     bool exists = await Global.FileRepository.GetFileExistsAsync(filePath);
                     if (exists)
                     {
@@ -174,7 +177,7 @@ namespace ModernSlavery.WebJob
                                     org.DateOfCessation
                                 }),
                             null);
-                        EmployerSearchModel searchRecord = org.ToEmployerSearchResult(true);
+                        EmployerSearchModel searchRecord = EmployerSearchModel.Create(org,true);
 
                         await _DataRepository.BeginTransactionAsync(
                             async () => {
@@ -240,7 +243,7 @@ namespace ModernSlavery.WebJob
                         nameof(@return.ReturnId),
                         @return.ReturnId.ToString(),
                         null,
-                        JsonConvert.SerializeObject(@return.ToDownloadResult()),
+                        JsonConvert.SerializeObject(DownloadResult.Create(@return)),
                         null);
                     _DataRepository.Delete(@return);
                     await _DataRepository.SaveChangesAsync();

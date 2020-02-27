@@ -1,4 +1,5 @@
 ﻿using System;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Core.Models

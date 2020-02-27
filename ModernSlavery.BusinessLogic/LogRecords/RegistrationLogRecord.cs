@@ -4,8 +4,9 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.Queues;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.BusinessLogic.LogRecords
 {

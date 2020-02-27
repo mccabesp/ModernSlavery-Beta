@@ -30,6 +30,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.IdentityServer4.Controllers
 {

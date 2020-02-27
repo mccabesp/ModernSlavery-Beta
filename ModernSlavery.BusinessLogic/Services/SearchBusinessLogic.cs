@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.BusinessLogic
 {
@@ -57,13 +57,13 @@ namespace ModernSlavery.BusinessLogic
             //Batch update the included organisations
             if (includes.Any())
             {
-                await SearchRepository.AddOrUpdateIndexDataAsync(includes.Select(o => o.ToEmployerSearchResult()));
+                await SearchRepository.AddOrUpdateIndexDataAsync(includes.Select(o => EmployerSearchModel.Create(o)));
             }
 
             //Batch remove the excluded organisations
             if (excludes.Any())
             {
-                await SearchRepository.RemoveFromIndexAsync(excludes.Select(o => o.ToEmployerSearchResult(true)));
+                await SearchRepository.RemoveFromIndexAsync(excludes.Select(o => EmployerSearchModel.Create(o,true)));
             }
         }
 

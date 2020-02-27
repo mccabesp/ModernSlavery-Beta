@@ -2,9 +2,9 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Account.Models;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.BusinessLogic.Account.Abstractions
 {

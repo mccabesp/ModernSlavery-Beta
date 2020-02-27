@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebJob
 {
@@ -98,7 +99,7 @@ namespace ModernSlavery.WebJob
         public async Task<List<RegistrationAddressesFileModel>> GetLatestRegistrationAddressesAsync()
         {
             // Load the DnBOrgs file from storage"
-            string dnbOrgsPath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations);
+            string dnbOrgsPath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations(DateTime.Now.Year));
             List<DnBOrgsModel> AllDnBOrgs = await Global.FileRepository.GetFileExistsAsync(dnbOrgsPath)
                 ? await Global.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath)
                 : new List<DnBOrgsModel>();
@@ -176,7 +177,7 @@ namespace ModernSlavery.WebJob
                         }
 
                         // Retrieve the SectorType reporting snapshot date (d MMMM yyyy)
-                        string expires = vo.SectorType.GetAccountingStartDate().AddYears(1).AddDays(-1).ToString("d MMMM yyyy");
+                        string expires = _snapshotDateHelper.GetSnapshotDate(vo.SectorType).AddYears(1).AddDays(-1).ToString("d MMMM yyyy");
 
                         // Generate csv row
                         return new RegistrationAddressesFileModel {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using ModernSlavery.Core;
+using ModernSlavery.Entities.Enums;
 using Newtonsoft.Json;
 
-namespace ModernSlavery.Database.Models
+namespace ModernSlavery.Entities
 {
     public class AuditLog
     {

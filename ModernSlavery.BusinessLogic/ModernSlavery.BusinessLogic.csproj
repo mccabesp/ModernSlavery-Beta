@@ -27,8 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.Database.Models\ModernSlavery.Database.Models.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Database\ModernSlavery.Database.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Database.Models\ModernSlavery.Entities.csproj" />
     <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
   </ItemGroup>
 

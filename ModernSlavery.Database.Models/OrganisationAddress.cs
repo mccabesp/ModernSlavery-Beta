@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModernSlavery.Core;
 using ModernSlavery.Extensions;
+using ModernSlavery.Entities.Enums;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
     public partial class OrganisationAddress
     {

@@ -1,8 +1,9 @@
 ﻿using System;
-using ModernSlavery.Core;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
+using ModernSlavery.Entities.Enums;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
     public class AddressStatus
     {

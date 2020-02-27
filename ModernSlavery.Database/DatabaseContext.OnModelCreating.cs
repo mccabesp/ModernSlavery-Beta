@@ -1,5 +1,6 @@
-﻿using ModernSlavery.Database.Models;
+﻿using ModernSlavery.Entities;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.Entities;
 
 namespace ModernSlavery.Database
 {

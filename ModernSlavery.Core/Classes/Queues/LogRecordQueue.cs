@@ -1,4 +1,5 @@
 ﻿using ModernSlavery.Core.Interfaces;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Core.Classes.Queues
 {

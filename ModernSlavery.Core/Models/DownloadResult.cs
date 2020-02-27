@@ -1,4 +1,7 @@
+using ModernSlavery.Entities;
+using ModernSlavery.Extensions;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ModernSlavery.Core.Models
 {
@@ -30,6 +33,38 @@ namespace ModernSlavery.Core.Models
         public bool SubmittedAfterTheDeadline { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime DateSubmitted { get; set; }
+
+        public static DownloadResult Create(Return @return)
+        {
+            return new DownloadResult
+            {
+                EmployerName = @return.Organisation.GetName(@return.StatusDate)?.Name ?? @return.Organisation.OrganisationName,
+                Address = @return.Organisation.GetAddressString(@return.StatusDate, delimiter: "," + Environment.NewLine),
+                CompanyNumber = @return.Organisation?.CompanyNumber,
+                SicCodes = @return.Organisation?.GetSicCodeIdsString(@return.StatusDate, "," + Environment.NewLine),
+                DiffMeanHourlyPercent = @return.DiffMeanHourlyPayPercent,
+                DiffMedianHourlyPercent = @return.DiffMedianHourlyPercent,
+                DiffMeanBonusPercent = @return.DiffMeanBonusPercent,
+                DiffMedianBonusPercent = @return.DiffMedianBonusPercent,
+                MaleBonusPercent = @return.MaleMedianBonusPayPercent,
+                FemaleBonusPercent = @return.FemaleMedianBonusPayPercent,
+                MaleLowerQuartile = @return.MaleLowerPayBand,
+                FemaleLowerQuartile = @return.FemaleLowerPayBand,
+                MaleLowerMiddleQuartile = @return.MaleMiddlePayBand,
+                FemaleLowerMiddleQuartile = @return.FemaleMiddlePayBand,
+                MaleUpperMiddleQuartile = @return.MaleUpperPayBand,
+                FemaleUpperMiddleQuartile = @return.FemaleUpperPayBand,
+                MaleTopQuartile = @return.MaleUpperQuartilePayBand,
+                FemaleTopQuartile = @return.FemaleUpperQuartilePayBand,
+                CompanyLinkToGPGInfo = @return.CompanyLinkToGPGInfo,
+                ResponsiblePerson = @return.ResponsiblePerson,
+                EmployerSize = @return.OrganisationSize.GetAttribute<DisplayAttribute>().Name,
+                CurrentName = @return.Organisation?.OrganisationName,
+                SubmittedAfterTheDeadline = @return.IsLateSubmission,
+                DueDate = @return.AccountingDate.AddYears(1),
+                DateSubmitted = @return.Modified
+            };
+        }
 
     }
 }

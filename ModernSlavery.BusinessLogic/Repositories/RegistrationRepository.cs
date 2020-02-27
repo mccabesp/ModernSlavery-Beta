@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Account.Abstractions;
 using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.BusinessLogic.Repositories

@@ -9,6 +9,7 @@ using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebJob
 {

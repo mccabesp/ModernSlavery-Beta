@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+using System;
 
 namespace ModernSlavery.Core.Models
 {

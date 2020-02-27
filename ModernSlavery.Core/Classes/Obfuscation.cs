@@ -1,18 +1,10 @@
 ﻿using Cryptography.Obfuscation;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Core.Classes
 {
-    public interface IObfuscator
-    {
-
-        string Obfuscate(string value);
-        string Obfuscate(int value);
-        int DeObfuscate(string value);
-
-    }
-
     public class InternalObfuscator : IObfuscator
     {
 

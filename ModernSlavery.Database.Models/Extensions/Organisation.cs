@@ -1,43 +1,40 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Core.Models;
+using Microsoft.Extensions.Configuration;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel.Interfaces;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
 
     [Serializable]
     [DebuggerDisplay("{OrganisationName},{Status}")]
     public partial class Organisation
     {
-
+        private IConfiguration _configuration;
         private IObfuscator _obfuscator;
+        private ISnapshotDateHelper _snapshotDateHelper;
+        private readonly int PinInPostExpiryDays;
+        private readonly string SecurityCodeChars;
+        private readonly int SecurityCodeLength;
 
-        public Organisation(IObfuscator obfuscator)
+        private DateTime PinExpiresDate => VirtualDateTime.Now.AddDays(0 - PinInPostExpiryDays);
+
+        public Organisation(IConfiguration configuration, IObfuscator obfuscator, ISnapshotDateHelper snapshotDateHelper)
         {
+            _configuration = configuration;
             _obfuscator = obfuscator;
-        }
+            _snapshotDateHelper = snapshotDateHelper;
 
-        private IObfuscator obfuscator
-        {
-            get
-            {
-                if (_obfuscator == null)
-                {
-                    _obfuscator = new InternalObfuscator();
-                }
+            PinInPostExpiryDays = _configuration.GetValue("PinInPostExpiryDays", 14);
+            SecurityCodeChars = _configuration.GetValue<string>("SecurityCodeChars");
+            SecurityCodeLength = _configuration.GetValue<int>("SecurityCodeLength");
+    }
 
-                return _obfuscator;
-            }
-        }
-
-        public OrganisationStatus PreviousStatus
+    public OrganisationStatus PreviousStatus
         {
             get
             {
@@ -68,79 +65,12 @@ namespace ModernSlavery.Database
             StatusDetails = details;
         }
 
-        public EmployerRecord ToEmployerRecord(long userId = 0)
-        {
-            OrganisationAddress address = null;
-            if (userId > 0)
-            {
-                address = UserOrganisations.FirstOrDefault(uo => uo.UserId == userId)?.Address;
-            }
-
-            if (address == null)
-            {
-                address = LatestAddress;
-            }
-
-            if (address == null)
-            {
-                return new EmployerRecord {
-                    OrganisationId = OrganisationId,
-                    SectorType = SectorType,
-                    OrganisationName = OrganisationName,
-                    NameSource = GetName()?.Source,
-                    EmployerReference = EmployerReference,
-                    DateOfCessation = DateOfCessation,
-                    DUNSNumber = DUNSNumber,
-                    CompanyNumber = CompanyNumber,
-                    SicSectors = GetSicSectorsString(null, ",<br/>"),
-                    SicCodeIds = GetSicCodeIdsString(),
-                    SicSource = GetSicSource(),
-                    RegistrationStatus = GetRegistrationStatus(),
-                    References = OrganisationReferences.ToDictionary(
-                        r => r.ReferenceName,
-                        r => r.ReferenceValue,
-                        StringComparer.OrdinalIgnoreCase)
-                };
-            }
-
-            return new EmployerRecord {
-                OrganisationId = OrganisationId,
-                SectorType = SectorType,
-                OrganisationName = OrganisationName,
-                NameSource = GetName()?.Source,
-                EmployerReference = EmployerReference,
-                DateOfCessation = DateOfCessation,
-                DUNSNumber = DUNSNumber,
-                CompanyNumber = CompanyNumber,
-                SicSectors = GetSicSectorsString(null, ",<br/>"),
-                SicCodeIds = GetSicCodeIdsString(),
-                SicSource = GetSicSource(),
-                ActiveAddressId = address.AddressId,
-                AddressSource = address.Source,
-                Address1 = address.Address1,
-                Address2 = address.Address2,
-                Address3 = address.Address3,
-                City = address.TownCity,
-                County = address.County,
-                Country = address.Country,
-                PostCode = address.PostCode,
-                PoBox = address.PoBox,
-                IsUkAddress = address.IsUkAddress,
-                RegistrationStatus = GetRegistrationStatus(),
-                References = OrganisationReferences.ToDictionary(
-                    r => r.ReferenceName,
-                    r => r.ReferenceValue,
-                    StringComparer.OrdinalIgnoreCase)
-            };
-        }
-
         /// <summary>
         ///     Returns true if organisation has been made an orphan and is in scope
         /// </summary>
         public bool GetIsOrphan()
         {
-            DateTime pinExpiresDate = Global.PinExpiresDate;
-            return Status == Core.OrganisationStatuses.Active
+            return Status == Enums.OrganisationStatuses.Active
                    && (LatestScope.ScopeStatus == ScopeStatuses.InScope || LatestScope.ScopeStatus == ScopeStatuses.PresumedInScope)
                    && (UserOrganisations == null
                        || !UserOrganisations.Any(
@@ -148,96 +78,7 @@ namespace ModernSlavery.Database
                                  || uo.Method == RegistrationMethods.Manual
                                  || uo.Method == RegistrationMethods.PinInPost
                                  && uo.PINSentDate.HasValue
-                                 && uo.PINSentDate.Value > pinExpiresDate));
-        }
-
-        public EmployerSearchModel ToEmployerSearchResult(bool keyOnly = false, List<SicCodeSearchModel> listOfSicCodeSearchModels = null)
-        {
-            if (keyOnly)
-            {
-                return new EmployerSearchModel {OrganisationId = OrganisationId.ToString()};
-            }
-
-            // Get the last two names for the org. Most recent name first
-            string[] names = OrganisationNames.Select(n => n.Name).Reverse().Take(2).ToArray();
-
-            var abbreviations = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
-            names.ForEach(n => abbreviations.Add(n.ToAbbr()));
-            names.ForEach(n => abbreviations.Add(n.ToAbbr(".")));
-            var excludes = new[] {"Ltd", "Limited", "PLC", "Corporation", "Incorporated", "LLP", "The", "And", "&", "For", "Of", "To"};
-            names.ForEach(n => abbreviations.Add(n.ToAbbr(excludeWords: excludes)));
-            names.ForEach(n => abbreviations.Add(n.ToAbbr(".", excludeWords: excludes)));
-
-            abbreviations.RemoveWhere(a => string.IsNullOrWhiteSpace(a));
-            abbreviations.Remove(OrganisationName);
-
-            // extract the prev org name (if exists)
-            var prevOrganisationName = "";
-            if (names.Length > 1)
-            {
-                prevOrganisationName = names[names.Length - 1];
-                abbreviations.Remove(prevOrganisationName);
-            }
-
-            //Get the latest sic codes
-            IEnumerable<OrganisationSicCode> sicCodes = GetSicCodes();
-
-            Return[] submittedReports = GetSubmittedReports().ToArray();
-
-            var result = new EmployerSearchModel {
-                OrganisationId = OrganisationId.ToString(),
-                OrganisationIdEncrypted = GetEncryptedId(),
-                Name = OrganisationName,
-                PreviousName = prevOrganisationName,
-                PartialNameForSuffixSearches = OrganisationName,
-                PartialNameForCompleteTokenSearches = OrganisationName,
-                Abbreviations = abbreviations.ToArray(),
-                Size = LatestReturn == null ? 0 : (int) LatestReturn.OrganisationSize,
-                SicSectionIds = sicCodes.Select(sic => sic.SicCode.SicSectionId.ToString()).Distinct().ToArray(),
-                SicSectionNames = sicCodes.Select(sic => sic.SicCode.SicSection.Description).Distinct().ToArray(),
-                SicCodeIds = sicCodes.Select(sicCode => sicCode.SicCodeId.ToString()).Distinct().ToArray(),
-                Address = LatestAddress?.GetAddressString(),
-                LatestReportedDate = submittedReports.Select(x => x.Created).FirstOrDefault(),
-                ReportedYears = submittedReports.Select(x => x.AccountingDate.Year.ToString()).ToArray(),
-                ReportedLateYears =
-                    submittedReports.Where(x => x.IsLateSubmission).Select(x => x.AccountingDate.Year.ToString()).ToArray(),
-                ReportedExplanationYears = submittedReports.Where(x => string.IsNullOrEmpty(x.CompanyLinkToGPGInfo) == false)
-                    .Select(x => x.AccountingDate.Year.ToString())
-                    .ToArray()
-            };
-
-            if (listOfSicCodeSearchModels != null)
-            {
-                result.SicCodeListOfSynonyms = GetListOfSynonyms(result.SicCodeIds, listOfSicCodeSearchModels);
-            }
-
-            return result;
-        }
-
-        private string[] GetListOfSynonyms(string[] resultSicCodeIds, List<SicCodeSearchModel> listOfSicCodeSearchModels)
-        {
-            var result = new List<string>();
-
-            foreach (string resultSicCodeId in resultSicCodeIds)
-            {
-                SicCodeSearchModel sicCodeSearchModel = listOfSicCodeSearchModels.FirstOrDefault(x => x.SicCodeId == resultSicCodeId);
-
-                if (sicCodeSearchModel == null)
-                {
-                    continue;
-                }
-
-                result.Add(sicCodeSearchModel.SicCodeDescription);
-
-                if (sicCodeSearchModel.SicCodeListOfSynonyms != null && sicCodeSearchModel.SicCodeListOfSynonyms.Length > 0)
-                {
-                    result.AddRange(sicCodeSearchModel.SicCodeListOfSynonyms);
-                }
-            }
-
-            return result.Any()
-                ? result.ToArray()
-                : null;
+                                 && uo.PINSentDate.Value > PinExpiresDate));
         }
 
         public string GetRegistrationStatus()
@@ -264,7 +105,6 @@ namespace ModernSlavery.Database
 
             return "No registrations";
         }
-
         public string GetSicSectorsString(DateTime? maxDate = null, string delimiter = ", ")
         {
             IEnumerable<OrganisationSicCode> organisationSicCodes = GetSicCodes(maxDate);
@@ -283,7 +123,7 @@ namespace ModernSlavery.Database
         {
             if (maxDate == null || maxDate.Value == DateTime.MinValue)
             {
-                maxDate = SectorType.GetAccountingStartDate().AddYears(1);
+                maxDate = GetAccountingStartDate().AddYears(1);
             }
 
             return OrganisationSicCodes.Where(s => s.Created < maxDate.Value && (s.Retired == null || s.Retired.Value > maxDate.Value));
@@ -307,7 +147,7 @@ namespace ModernSlavery.Database
         {
             if (maxDate == null || maxDate.Value == DateTime.MinValue)
             {
-                maxDate = SectorType.GetAccountingStartDate().AddYears(1);
+                maxDate = GetAccountingStartDate().AddYears(1);
             }
 
             return OrganisationSicCodes
@@ -328,13 +168,13 @@ namespace ModernSlavery.Database
 
         public string GetEncryptedId()
         {
-            return obfuscator.Obfuscate(OrganisationId.ToString());
+            return _obfuscator.Obfuscate(OrganisationId.ToString());
         }
 
         //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
         public Return GetReturn(int year = 0)
         {
-            DateTime accountingStartDate = SectorType.GetAccountingStartDate(year);
+            DateTime accountingStartDate = GetAccountingStartDate(year);
             return Returns
                 .Where(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate == accountingStartDate)
                 .OrderByDescending(r => r.StatusDate)
@@ -346,20 +186,22 @@ namespace ModernSlavery.Database
         {
             if (accountingStartDate == null || accountingStartDate.Value == DateTime.MinValue)
             {
-                accountingStartDate = SectorType.GetAccountingStartDate();
+                accountingStartDate = GetAccountingStartDate();
             }
 
             return Returns.FirstOrDefault(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate == accountingStartDate);
         }
 
-        
+
         //Returns the latest scope for the current accounting date
         public OrganisationScope GetCurrentScope()
         {
-            var accountingStartDate = SectorType.GetAccountingStartDate();
+            var accountingStartDate = GetAccountingStartDate();
 
             return GetScopeForYear(accountingStartDate);
         }
+
+
 
         //Returns the scope for the specified accounting date
         public OrganisationScope GetScopeForYear(DateTime accountingStartDate)
@@ -376,7 +218,7 @@ namespace ModernSlavery.Database
 
         public ScopeStatuses GetScopeStatus(int year = 0)
         {
-            DateTime accountingStartDate = SectorType.GetAccountingStartDate(year);
+            DateTime accountingStartDate = GetAccountingStartDate(year);
             return GetScopeStatus(accountingStartDate);
         }
 
@@ -395,11 +237,12 @@ namespace ModernSlavery.Database
         {
             if (maxDate == null || maxDate.Value == DateTime.MinValue)
             {
-                maxDate = SectorType.GetAccountingStartDate().AddYears(1);
+                maxDate = GetAccountingStartDate().AddYears(1);
             }
 
             return OrganisationNames.Where(n => n.Created < maxDate.Value).OrderByDescending(n => n.Created).FirstOrDefault();
         }
+
 
         /// <summary>
         ///     Returns the latest address before specified date/time
@@ -410,10 +253,10 @@ namespace ModernSlavery.Database
         {
             if (maxDate == null || maxDate.Value == DateTime.MinValue)
             {
-                maxDate = SectorType.GetAccountingStartDate().AddYears(1);
+                maxDate = GetAccountingStartDate().AddYears(1);
             }
 
-            if (status == AddressStatuses.Active && LatestAddress != null && maxDate == SectorType.GetAccountingStartDate().AddYears(1))
+            if (status == AddressStatuses.Active && LatestAddress != null && maxDate == GetAccountingStartDate().AddYears(1))
             {
                 return LatestAddress;
             }
@@ -436,11 +279,6 @@ namespace ModernSlavery.Database
             return null;
         }
 
-        public OrganisationAddress FindAddress(AddressModel address, AddressStatuses status = AddressStatuses.Active)
-        {
-            return OrganisationAddresses.FirstOrDefault(a => a.Status == status && a.Equals(address));
-        }
-
         /// <summary>
         ///     Returns the latest organisation name before specified date/time
         /// </summary>
@@ -452,19 +290,10 @@ namespace ModernSlavery.Database
 
             return address?.GetAddressString(delimiter);
         }
-
-        public AddressModel GetAddressModel(DateTime? maxDate = null, AddressStatuses status = AddressStatuses.Active)
-        {
-            OrganisationAddress address = GetAddress(maxDate, status);
-
-            return address?.GetAddressModel();
-        }
-
         public bool GetIsDissolved()
         {
-            return DateOfCessation != null && DateOfCessation < SectorType.GetAccountingStartDate();
+            return DateOfCessation != null && DateOfCessation < GetAccountingStartDate();
         }
-
         public override bool Equals(object obj)
         {
             // Check for null values and compare run-time types.
@@ -500,14 +329,15 @@ namespace ModernSlavery.Database
                 .Select(o => o.org);
             return searchResults;
         }
-        
+
         public IEnumerable<Return> GetRecentReports(int recentCount)
         {
             foreach (int year in GetRecentReportingYears(recentCount))
-            { 
-                var defaultReturn = new Return {
+            {
+                var defaultReturn = new Return
+                {
                     Organisation = this,
-                    AccountingDate = SectorType.GetAccountingStartDate(year),
+                    AccountingDate = GetAccountingStartDate(year),
                     Modified = VirtualDateTime.Now
                 };
                 defaultReturn.IsLateSubmission = defaultReturn.CalculateIsLateSubmission();
@@ -518,12 +348,9 @@ namespace ModernSlavery.Database
 
         public IEnumerable<int> GetRecentReportingYears(int recentCount)
         {
-            int endYear = SectorType.GetAccountingStartDate().Year;
+            int endYear = GetAccountingStartDate().Year;
             int startYear = endYear - (recentCount - 1);
-            if (startYear < Global.FirstReportingYear)
-            {
-                startYear = Global.FirstReportingYear;
-            }
+            if (startYear < _snapshotDateHelper.FirstReportingYear) startYear = _snapshotDateHelper.FirstReportingYear;
 
             for (int year = endYear; year >= startYear; year--)
             {
@@ -535,34 +362,20 @@ namespace ModernSlavery.Database
         {
             return !GetScopeStatus(year).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
         }
-        
+
+
         public IEnumerable<Return> GetSubmittedReports()
         {
-            return Returns.Where(
-                    r =>
-                        r.Status == ReturnStatuses.Submitted)
-                .OrderByDescending(r => r.AccountingDate);
+            return Returns.Where(r =>r.Status == ReturnStatuses.Submitted).OrderByDescending(r => r.AccountingDate);
         }
 
-        private void RevertToLastStatus(long byUserId, string details = null)
+        public void RevertToLastStatus(long byUserId, string details = null)
         {
             OrganisationStatus previousStatus = PreviousStatus
                                                 ?? throw new InvalidOperationException(
                                                     $"The list of Statuses for Organisation '{OrganisationName}' employerReference '{EmployerReference}' isn't long enough to perform a '{nameof(RevertToLastStatus)}' command. It needs to have at least 2 statuses so these can reverted.");
 
             SetStatus(previousStatus.Status, byUserId, details);
-        }
-
-        public virtual CustomError UnRetire(long byUserId, string details = null)
-        {
-            if (Status != Core.OrganisationStatuses.Retired)
-            {
-                return InternalMessages.OrganisationRevertOnlyRetiredErrorMessage(OrganisationName, EmployerReference, Status.ToString());
-            }
-
-            RevertToLastStatus(byUserId, details);
-
-            return null;
         }
 
         public OrganisationScope GetLatestScopeForSnapshotYear(int snapshotYear)
@@ -577,23 +390,19 @@ namespace ModernSlavery.Database
         {
             OrganisationScope organisationScope = GetLatestScopeForSnapshotYear(snapshotYear);
 
-            if (organisationScope == null)
-            {
-                throw new ArgumentOutOfRangeException(
-                    $"Cannot find an scope with status 'Active' for snapshotYear '{snapshotYear}' linked to organisation '{OrganisationName}', employerReference '{EmployerReference}'.");
-            }
+            if (organisationScope == null)throw new ArgumentOutOfRangeException($"Cannot find an scope with status 'Active' for snapshotYear '{snapshotYear}' linked to organisation '{OrganisationName}', employerReference '{EmployerReference}'.");
 
             return organisationScope;
         }
 
         public bool IsActive()
         {
-            return Status == Core.OrganisationStatuses.Active;
+            return Status == Enums.OrganisationStatuses.Active;
         }
 
         public bool IsPending()
         {
-            return Status == Core.OrganisationStatuses.Pending;
+            return Status == Enums.OrganisationStatuses.Pending;
         }
 
         /// <summary>
@@ -607,7 +416,7 @@ namespace ModernSlavery.Database
             string newSecurityCode = null;
             do
             {
-                newSecurityCode = Crypto.GeneratePasscode(Global.SecurityCodeChars.ToCharArray(), Global.SecurityCodeLength);
+                newSecurityCode = Crypto.GeneratePasscode(SecurityCodeChars.ToCharArray(), SecurityCodeLength);
             } while (newSecurityCode == SecurityCode);
 
             SecurityCode = newSecurityCode;
@@ -621,11 +430,7 @@ namespace ModernSlavery.Database
         /// <param name="securityCodeExpiryDateTime"></param>
         public void SetSecurityCodeExpiryDate(DateTime securityCodeExpiryDateTime)
         {
-            if (SecurityCode == null)
-            {
-                throw new Exception(
-                    "Nothing to modify: Unable to modify the security code's expiry date of the organisation because it's security code is null");
-            }
+            if (SecurityCode == null)throw new Exception("Nothing to modify: Unable to modify the security code's expiry date of the organisation because it's security code is null");
 
             SecurityCodeExpiryDateTime = securityCodeExpiryDateTime;
             SecurityCodeCreatedDateTime = VirtualDateTime.Now;
@@ -649,5 +454,15 @@ namespace ModernSlavery.Database
             return $"ref:{EmployerReference}, name:{OrganisationName}";
         }
 
+        /// <summary>
+        ///     Returns the accounting start date for the specified sector and year
+        /// </summary>
+        /// <param name="sectorType">The sector type of the organisation</param>
+        /// <param name="year">The starting year of the accounting period. If 0 then uses current accounting period</param>
+        /// <returns></returns>
+        public DateTime GetAccountingStartDate(int year = 0)
+        {
+            return _snapshotDateHelper.GetSnapshotDate(SectorType, year);
+        }
     }
 }

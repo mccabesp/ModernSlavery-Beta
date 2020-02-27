@@ -6,6 +6,7 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebJob
 {
@@ -63,7 +64,7 @@ namespace ModernSlavery.WebJob
             string prefix = fileName.BeforeFirst("_");
             string datePart = fileName.AfterLast("_", includeWhenNoSeparator: false);
 
-            int endYear = SectorTypes.Private.GetAccountingStartDate().Year;
+            int endYear = _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private).Year;
             int startYear = Global.FirstReportingYear;
             if (!string.IsNullOrWhiteSpace(datePart))
             {

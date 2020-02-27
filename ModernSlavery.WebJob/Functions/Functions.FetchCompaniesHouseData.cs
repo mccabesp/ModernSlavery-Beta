@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using ModernSlavery.Core.Classes.Logger;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;

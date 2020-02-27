@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using ModernSlavery.Extensions;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
 
     [Serializable]

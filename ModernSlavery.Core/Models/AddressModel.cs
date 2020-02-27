@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Core.Models
@@ -86,14 +89,35 @@ namespace ModernSlavery.Core.Models
                    && string.IsNullOrWhiteSpace(PoBox);
         }
 
+        public static AddressModel Create(OrganisationAddress address)
+        {
+            return new AddressModel
+            {
+                Address1 = address.Address1,
+                Address2 = address.Address2,
+                Address3 = address.Address3,
+                City = address.TownCity,
+                County = address.County,
+                Country = address.Country,
+                PostCode = address.PostCode,
+                PoBox = address.PoBox
+            };
+        }
+
         public override bool Equals(object obj)
         {
+            if (obj is OrganisationAddress)obj = Create((OrganisationAddress)obj);
+            
             var address = obj as AddressModel;
             if (address == null)
             {
                 return false;
             }
 
+            if (obj is OrganisationAddress)
+            {
+
+            }
             if ((!string.IsNullOrWhiteSpace(Address1) || !string.IsNullOrWhiteSpace(address.Address1))
                 && Address1?.Trim() != address.Address1?.Trim())
             {
@@ -141,6 +165,11 @@ namespace ModernSlavery.Core.Models
             }
 
             return true;
+        }
+
+        public OrganisationAddress FindAddress(Organisation org, AddressStatuses status = AddressStatuses.Active)
+        {
+            return org.OrganisationAddresses.FirstOrDefault(a => a.Status == status && this.Equals(a));
         }
 
     }

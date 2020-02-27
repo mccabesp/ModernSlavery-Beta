@@ -6,14 +6,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.BusinessLogic
 {
@@ -39,7 +39,7 @@ namespace ModernSlavery.BusinessLogic
         public SubmissionBusinessLogic(ICommonBusinessLogic commonBusinessLogic, IDataRepository dataRepo)
         {
             _commonBusinessLogic = commonBusinessLogic;
-            DataRepository = dataRepo;
+             DataRepository = dataRepo;
         }
 
         private IDataRepository DataRepository { get; }
@@ -151,8 +151,8 @@ namespace ModernSlavery.BusinessLogic
         public virtual IEnumerable<LateSubmissionsFileModel> GetLateSubmissions()
         {
             // get the snapshot dates to filter submissions by
-            DateTime curPrivateSnapshotDate = SectorTypes.Private.GetAccountingStartDate();
-            DateTime curPublicSnapshotDate = SectorTypes.Public.GetAccountingStartDate();
+            DateTime curPrivateSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Private);
+            DateTime curPublicSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Public);
             DateTime prevPrivateSnapshotDate = curPrivateSnapshotDate.AddYears(-1);
             DateTime prevPublicSnapshotDate = curPublicSnapshotDate.AddYears(-1);
 
@@ -307,6 +307,10 @@ namespace ModernSlavery.BusinessLogic
 
         #endregion
 
+        #region Entities
+        
+
+        #endregion
     }
 
 }

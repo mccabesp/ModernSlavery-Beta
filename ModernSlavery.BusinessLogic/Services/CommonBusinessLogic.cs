@@ -1,16 +1,14 @@
 ﻿using System;
-using ModernSlavery.Core;
 using ModernSlavery.Extensions;
 using Microsoft.Extensions.Configuration;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessLogic
 {
     public interface ICommonBusinessLogic
     {
-
-        DateTime PrivateAccountingDate { get; }
-        DateTime PublicAccountingDate { get; }
-
         DateTime GetAccountingStartDate(SectorTypes sector, int year = 0);
 
     }
@@ -19,14 +17,12 @@ namespace ModernSlavery.BusinessLogic
     {
 
         private readonly IConfiguration _configuration;
-
-        public CommonBusinessLogic(IConfiguration configuration)
+        private readonly ISnapshotDateHelper _snapshotDateHelper;
+        public CommonBusinessLogic(IConfiguration configuration, ISnapshotDateHelper snapshotDateHelper)
         {
             _configuration = configuration;
+            _snapshotDateHelper = snapshotDateHelper;
         }
-
-        public DateTime PrivateAccountingDate => _configuration["PrivateAccountingDate"].ToDateTime();
-        public DateTime PublicAccountingDate => _configuration["PublicAccountingDate"].ToDateTime();
 
         /// <summary>
         ///     Returns the accounting start date for the specified sector and year
@@ -36,38 +32,8 @@ namespace ModernSlavery.BusinessLogic
         /// <returns></returns>
         public DateTime GetAccountingStartDate(SectorTypes sectorType, int year = 0)
         {
-            var tempDay = 0;
-            var tempMonth = 0;
-
-            DateTime now = VirtualDateTime.Now;
-
-            switch (sectorType)
-            {
-                case SectorTypes.Private:
-                    tempDay = PrivateAccountingDate.Day;
-                    tempMonth = PrivateAccountingDate.Month;
-                    break;
-                case SectorTypes.Public:
-                    tempDay = PublicAccountingDate.Day;
-                    tempMonth = PublicAccountingDate.Month;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(
-                        nameof(sectorType),
-                        sectorType,
-                        "Cannot calculate accounting date for this sector type");
-            }
-
-            if (year == 0)
-            {
-                year = now.Year;
-            }
-
-            var tempDate = new DateTime(year, tempMonth, tempDay);
-
-            return now > tempDate ? tempDate : tempDate.AddYears(-1);
+            return _snapshotDateHelper.GetSnapshotDate(sectorType, year);
         }
-
     }
 
 }

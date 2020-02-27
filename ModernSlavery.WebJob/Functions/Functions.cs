@@ -5,6 +5,7 @@ using ModernSlavery.Core.API;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
+using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.WebJob
 {
@@ -19,7 +20,8 @@ namespace ModernSlavery.WebJob
             IOrganisationBusinessLogic orgBL,
             ISearchBusinessLogic searchBusinessLogic,
             IGovNotifyAPI govNotifyApi,
-            UpdateFromCompaniesHouseService updateFromCompaniesHouseService)
+            UpdateFromCompaniesHouseService updateFromCompaniesHouseService,
+            ISnapshotDateHelper snapshotDateHelper)
         {
             _Messenger = messenger;
             _DataRepository = dataRepository;
@@ -28,6 +30,7 @@ namespace ModernSlavery.WebJob
             _OrganisationBL = orgBL;
             _SearchBusinessLogic = searchBusinessLogic;
             _updateFromCompaniesHouseService = updateFromCompaniesHouseService;
+            _snapshotDateHelper = snapshotDateHelper;
             this.govNotifyApi = govNotifyApi;
         }
 
@@ -41,6 +44,7 @@ namespace ModernSlavery.WebJob
         private readonly ISearchBusinessLogic _SearchBusinessLogic;
         private readonly IGovNotifyAPI govNotifyApi;
         private readonly UpdateFromCompaniesHouseService _updateFromCompaniesHouseService;
+        private readonly ISnapshotDateHelper _snapshotDateHelper;
 
         private static readonly ConcurrentSet<string> RunningJobs = new ConcurrentSet<string>();
         private static readonly ConcurrentSet<string> StartedJobs = new ConcurrentSet<string>();

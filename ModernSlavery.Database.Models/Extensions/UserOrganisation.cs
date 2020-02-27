@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using ModernSlavery.Core;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
+using ModernSlavery.Entities.Enums;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
     [Serializable]
     [DebuggerDisplay("({Organisation}),({User})")]

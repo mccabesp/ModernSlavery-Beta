@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Core.Models
 {
@@ -177,5 +180,72 @@ namespace ModernSlavery.Core.Models
             return emailDomains.Count > 0 && emailAddress.LikeAny(emailDomains);
         }
 
+        public static EmployerRecord Create(Organisation org, long userId = 0)
+        {
+            OrganisationAddress address = null;
+            if (userId > 0)
+            {
+                address = org.UserOrganisations.FirstOrDefault(uo => uo.UserId == userId)?.Address;
+            }
+
+            if (address == null)
+            {
+                address = org.LatestAddress;
+            }
+
+            if (address == null)
+            {
+                return new EmployerRecord
+                {
+                    OrganisationId = org.OrganisationId,
+                    SectorType = org.SectorType,
+                    OrganisationName = org.OrganisationName,
+                    NameSource = org.GetName()?.Source,
+                    EmployerReference = org.EmployerReference,
+                    DateOfCessation = org.DateOfCessation,
+                    DUNSNumber = org.DUNSNumber,
+                    CompanyNumber = org.CompanyNumber,
+                    SicSectors = org.GetSicSectorsString(null, ",<br/>"),
+                    SicCodeIds = org.GetSicCodeIdsString(),
+                    SicSource = org.GetSicSource(),
+                    RegistrationStatus = org.GetRegistrationStatus(),
+                    References = org.OrganisationReferences.ToDictionary(
+                        r => r.ReferenceName,
+                        r => r.ReferenceValue,
+                        StringComparer.OrdinalIgnoreCase)
+                };
+            }
+
+            return new EmployerRecord
+            {
+                OrganisationId = org.OrganisationId,
+                SectorType = org.SectorType,
+                OrganisationName = org.OrganisationName,
+                NameSource = org.GetName()?.Source,
+                EmployerReference = org.EmployerReference,
+                DateOfCessation = org.DateOfCessation,
+                DUNSNumber = org.DUNSNumber,
+                CompanyNumber = org.CompanyNumber,
+                SicSectors = org.GetSicSectorsString(null, ",<br/>"),
+                SicCodeIds = org.GetSicCodeIdsString(),
+                SicSource = org.GetSicSource(),
+                ActiveAddressId = address.AddressId,
+                AddressSource = address.Source,
+                Address1 = address.Address1,
+                Address2 = address.Address2,
+                Address3 = address.Address3,
+                City = address.TownCity,
+                County = address.County,
+                Country = address.Country,
+                PostCode = address.PostCode,
+                PoBox = address.PoBox,
+                IsUkAddress = address.IsUkAddress,
+                RegistrationStatus = org.GetRegistrationStatus(),
+                References = org.OrganisationReferences.ToDictionary(
+                    r => r.ReferenceName,
+                    r => r.ReferenceValue,
+                    StringComparer.OrdinalIgnoreCase)
+            };
+        }
     }
 }

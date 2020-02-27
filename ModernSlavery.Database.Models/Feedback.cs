@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ModernSlavery.Database.Models
+namespace ModernSlavery.Entities
 {
     public class Feedback
     {

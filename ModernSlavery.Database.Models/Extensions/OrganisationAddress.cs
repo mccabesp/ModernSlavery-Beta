@@ -1,34 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
+using ModernSlavery.Entities.Enums;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
     [Serializable]
     public partial class OrganisationAddress
     {
-
         public override bool Equals(object obj)
         {
-            if (obj == null)
-            {
-                return false;
-            }
-
-            var addressModel = obj as AddressModel;
-            if (addressModel != null)
-            {
-                return GetAddressModel().Equals(addressModel);
-            }
+            if (obj == null)return false;
 
             var address = obj as OrganisationAddress;
-            if (address == null)
-            {
-                return false;
-            }
+            if (address == null)return false;
 
             return AddressId == address.AddressId;
         }
@@ -91,20 +77,6 @@ namespace ModernSlavery.Database
         public string GetAddressString(string delimiter = ", ")
         {
             return GetList().ToDelimitedString(delimiter);
-        }
-
-        public AddressModel GetAddressModel()
-        {
-            return new AddressModel {
-                Address1 = Address1,
-                Address2 = Address2,
-                Address3 = Address3,
-                City = TownCity,
-                County = County,
-                Country = Country,
-                PostCode = PostCode,
-                PoBox = PoBox
-            };
         }
 
         public UserOrganisation GetFirstRegistration()

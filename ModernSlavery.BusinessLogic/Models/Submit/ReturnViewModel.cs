@@ -1,7 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using ModernSlavery.BusinessLogic.Models.Organisation;
-using ModernSlavery.Core;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.BusinessLogic.Models.Submit
 {

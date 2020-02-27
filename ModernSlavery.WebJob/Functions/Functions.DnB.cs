@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebJob
 {
@@ -37,7 +39,7 @@ namespace ModernSlavery.WebJob
                 #region Load and Prechecks
 
                 //Load the D&B records
-                IEnumerable<string> dnbOrgsPaths = await Global.FileRepository.GetFilesAsync(Global.DataPath, Filenames.DnBOrganisations);
+                IEnumerable<string> dnbOrgsPaths = await Global.FileRepository.GetFilesAsync(Global.DataPath, Filenames.DnBOrganisations(1));
                 string dnbOrgsPath = dnbOrgsPaths.OrderByDescending(f => f).FirstOrDefault();
                 if (string.IsNullOrEmpty(dnbOrgsPath))
                 {
@@ -231,7 +233,7 @@ namespace ModernSlavery.WebJob
                                     ScopeStatus = ScopeStatuses.PresumedInScope,
                                     ScopeStatusDate = VirtualDateTime.Now,
                                     Status = ScopeRowStatuses.Active,
-                                    SnapshotDate = dbOrg.SectorType.GetAccountingStartDate()
+                                    SnapshotDate = _snapshotDateHelper.GetSnapshotDate(dbOrg.SectorType)
                                 };
                                 _DataRepository.Insert(newScope);
                                 dbOrg.OrganisationScopes.Add(newScope);

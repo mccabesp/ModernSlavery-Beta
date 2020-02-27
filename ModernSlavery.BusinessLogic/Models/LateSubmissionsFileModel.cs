@@ -1,5 +1,6 @@
-﻿using System;
-using ModernSlavery.Core;
+﻿using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+using System;
 
 namespace ModernSlavery.BusinessLogic.Models
 {

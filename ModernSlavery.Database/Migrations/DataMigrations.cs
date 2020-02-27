@@ -8,6 +8,8 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.Entities;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Database
 {

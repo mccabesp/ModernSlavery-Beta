@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using ModernSlavery.Core;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.BusinessLogic.Models.Compare

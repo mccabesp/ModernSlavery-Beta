@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebJob
 {
@@ -87,7 +88,7 @@ namespace ModernSlavery.WebJob
                     returns.RemoveAll(r => r.Organisation.OrganisationName.StartsWithI(Global.TestPrefix));
 
                     List<DownloadResult> downloadData = returns.ToList()
-                        .Select(r => r.ToDownloadResult())
+                        .Select(r => DownloadResult.Create(r))
                         .OrderBy(d => d.EmployerName)
                         .ToList();
 

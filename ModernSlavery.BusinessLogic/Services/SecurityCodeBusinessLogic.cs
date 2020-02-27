@@ -1,6 +1,6 @@
 ﻿using System;
 using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.BusinessLogic.Services

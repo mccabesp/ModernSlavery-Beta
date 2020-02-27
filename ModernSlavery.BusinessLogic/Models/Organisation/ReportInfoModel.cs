@@ -1,6 +1,6 @@
 ﻿using System;
 using ModernSlavery.BusinessLogic.Classes;
-using ModernSlavery.Core;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.BusinessLogic.Models.Organisation
 {

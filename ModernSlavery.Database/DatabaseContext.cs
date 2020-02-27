@@ -7,9 +7,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database.Models;
+using ModernSlavery.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using ModernSlavery.Entities;
 
 namespace ModernSlavery.Database
 {

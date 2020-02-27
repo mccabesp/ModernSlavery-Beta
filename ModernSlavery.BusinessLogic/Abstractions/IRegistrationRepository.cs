@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 
 namespace ModernSlavery.BusinessLogic.Account.Abstractions
 {

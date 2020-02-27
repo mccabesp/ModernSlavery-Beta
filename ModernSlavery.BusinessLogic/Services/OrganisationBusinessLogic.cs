@@ -14,15 +14,17 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessLogic
 {
     public interface IOrganisationBusinessLogic
     {
-
         // Organisation repo
         Organisation GetOrganisationById(long organisationId);
         Task<List<OrganisationsFileModel>> GetOrganisationsFileModelByYearAsync(int year);
@@ -59,12 +61,11 @@ namespace ModernSlavery.BusinessLogic
 
         DataTable GetCompareDatatable(IEnumerable<CompareReportModel> data);
         Task<Organisation> GetOrganisationByEmployerReferenceAndSecurityCodeAsync(string employerReference, string securityCode);
-
     }
 
     public class OrganisationBusinessLogic : IOrganisationBusinessLogic
     {
-
+        private IConfiguration _configuration { get; set; }
         private ICommonBusinessLogic _commonBusinessLogic;
         private readonly IEncryptionHandler _encryptionHandler;
         private readonly IObfuscator _obfuscator;
@@ -72,7 +73,10 @@ namespace ModernSlavery.BusinessLogic
         private readonly ISecurityCodeBusinessLogic _securityCodeLogic;
         private readonly ISubmissionBusinessLogic _submissionLogic;
 
-        public OrganisationBusinessLogic(ICommonBusinessLogic commonBusinessLogic,
+        public readonly DateTime PrivateAccountingDate;
+        public readonly DateTime PublicAccountingDate;
+
+        public OrganisationBusinessLogic(IConfiguration configuration,ICommonBusinessLogic commonBusinessLogic,
             IDataRepository dataRepo,
             ISubmissionBusinessLogic submissionLogic,
             IScopeBusinessLogic scopeLogic,
@@ -80,6 +84,7 @@ namespace ModernSlavery.BusinessLogic
             ISecurityCodeBusinessLogic securityCodeLogic,
             IObfuscator obfuscator = null)
         {
+            _configuration = configuration;
             _commonBusinessLogic = commonBusinessLogic;
             _DataRepository = dataRepo;
             _submissionLogic = submissionLogic;
@@ -87,9 +92,12 @@ namespace ModernSlavery.BusinessLogic
             _obfuscator = obfuscator;
             _securityCodeLogic = securityCodeLogic;
             _encryptionHandler = encryptionHandler;
-        }
 
-        private IDataRepository _DataRepository { get; }
+            PrivateAccountingDate = _configuration.GetValue<DateTime>("PrivateAccountingDate");
+            PublicAccountingDate = _configuration.GetValue<DateTime>("PublicAccountingDate");
+    }
+
+    private IDataRepository _DataRepository { get; }
 
         /// <summary>
         ///     Gets a list of organisations with latest returns and scopes for Organisations download file
@@ -120,7 +128,7 @@ namespace ModernSlavery.BusinessLogic
                     StatusDate = o.StatusDate,
                     StatusDetails = o.StatusDetails,
                     Address = o.LatestAddress?.GetAddressString(),
-                    SicCodes = o.GetSicCodeIdsString(),
+                    SicCodes = GetSicCodeIdsString(o),
                     LatestRegistrationDate = o.LatestRegistration?.PINConfirmedDate,
                     LatestRegistrationMethod = o.LatestRegistration?.Method,
                     Created = o.Created,
@@ -415,6 +423,132 @@ namespace ModernSlavery.BusinessLogic
 
             return false;
         }
+
+        #region Entity
+        public string GetSicSectorsString(Organisation org,DateTime? maxDate = null, string delimiter = ", ")
+        {
+            IEnumerable<OrganisationSicCode> organisationSicCodes = GetSicCodes(org, maxDate);
+            return organisationSicCodes.Select(s => s.SicCode.SicSection.Description.Trim())
+                .UniqueI()
+                .OrderBy(s => s)
+                .ToDelimitedString(delimiter);
+        }
+
+        /// <summary>
+        ///     Returns the latest organisation name before specified date/time
+        /// </summary>
+        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
+        /// <returns>The name of the organisation</returns>
+        public IEnumerable<OrganisationSicCode> GetSicCodes(Organisation org, DateTime? maxDate = null)
+        {
+            if (maxDate == null || maxDate.Value == DateTime.MinValue)
+            {
+                maxDate = _commonBusinessLogic.GetAccountingStartDate(org.SectorType).AddYears(1);
+            }
+
+            return org.OrganisationSicCodes.Where(s => s.Created < maxDate.Value && (s.Retired == null || s.Retired.Value > maxDate.Value));
+        }
+
+        public SortedSet<int> GetSicCodeIds(Organisation org, DateTime? maxDate = null)
+        {
+            IEnumerable<OrganisationSicCode> organisationSicCodes = GetSicCodes(org, maxDate);
+
+            var codes = new SortedSet<int>();
+            foreach (OrganisationSicCode sicCode in organisationSicCodes)
+            {
+                codes.Add(sicCode.SicCodeId);
+            }
+
+            return codes;
+        }
+
+
+        public string GetSicSource(Organisation org, DateTime? maxDate = null)
+        {
+            if (maxDate == null || maxDate.Value == DateTime.MinValue)
+            {
+                maxDate = _commonBusinessLogic.GetAccountingStartDate(org.SectorType).AddYears(1);
+            }
+
+            return org.OrganisationSicCodes
+                .FirstOrDefault(s => s.Created < maxDate.Value && (s.Retired == null || s.Retired.Value > maxDate.Value))
+                ?.Source;
+        }
+
+        public string GetSicCodeIdsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ")
+        {
+            return GetSicCodes(org,maxDate).OrderBy(s => s.SicCodeId).Select(s => s.SicCodeId).ToDelimitedString(delimiter);
+        }
+
+        public string GetSicSectionIdsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ")
+        {
+            IEnumerable<OrganisationSicCode> organisationSicCodes = GetSicCodes(org, maxDate);
+            return organisationSicCodes.Select(s => s.SicCode.SicSectionId).UniqueI().OrderBy(s => s).ToDelimitedString(delimiter);
+        }
+
+        
+
+       
+
+        public AddressModel GetAddressModel(Organisation org, DateTime? maxDate = null, AddressStatuses status = AddressStatuses.Active)
+        {
+            OrganisationAddress address = org.GetAddress(maxDate, status);
+
+            return address==null ? null : AddressModel.Create(address);
+        }
+
+        public virtual CustomError UnRetire(Organisation org, long byUserId, string details = null)
+        {
+            if (org.Status != OrganisationStatuses.Retired)
+            {
+                return InternalMessages.OrganisationRevertOnlyRetiredErrorMessage(org.OrganisationName, org.EmployerReference, org.Status.ToString());
+            }
+
+            org.RevertToLastStatus(byUserId, details);            return null;
+        }
+
+        /// <summary>
+        ///     Returns Sector followed by list of SicCodes
+        /// </summary>
+        /// <param name="dataRepository"></param>
+        /// <param name="sicCodes"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetSectors(IDataRepository dataRepository, string sicCodes)
+        {
+            var results = new SortedDictionary<string, HashSet<long>>(StringComparer.OrdinalIgnoreCase);
+
+            if (string.IsNullOrWhiteSpace(sicCodes))
+            {
+                yield break;
+            }
+
+            foreach (string sicCode in sicCodes.SplitI(@";, \n\r\t"))
+            {
+                long code = sicCode.ToInt64();
+                if (code < 1)
+                {
+                    continue;
+                }
+
+                SicCode sic = dataRepository.GetAll<SicCode>().FirstOrDefault(s => s.SicCodeId == code);
+                string sector = sic == null ? "Other" : sic.SicSection.Description;
+                HashSet<long> sics = results.ContainsKey(sector) ? results[sector] : new HashSet<long>();
+                sics.Add(code);
+                results[sector] = sics;
+            }
+
+            foreach (string sector in results.Keys)
+            {
+                if (results[sector].Count == 0)
+                {
+                    continue;
+                }
+
+                yield return $"{sector} ({results[sector].ToDelimitedString(", ")})";
+            }
+        }
+
+        #endregion
 
         #region Repo
 

@@ -1,11 +1,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Models;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
     [Serializable]
     public partial class Return
@@ -80,7 +79,7 @@ namespace ModernSlavery.Database
 
         public bool IsSubmitted()
         {
-            return Status == Core.ReturnStatuses.Submitted;
+            return Status == ModernSlavery.Entities.Enums.ReturnStatuses.Submitted;
         }
 
         public bool HasBonusesPaid()
@@ -247,36 +246,7 @@ namespace ModernSlavery.Database
             return true;
         }
 
-        public DownloadResult ToDownloadResult()
-        {
-            return new DownloadResult {
-                EmployerName = Organisation?.GetName(StatusDate)?.Name ?? Organisation.OrganisationName,
-                Address = Organisation.GetAddressString(StatusDate, delimiter: "," + Environment.NewLine),
-                CompanyNumber = Organisation?.CompanyNumber,
-                SicCodes = Organisation?.GetSicCodeIdsString(StatusDate, "," + Environment.NewLine),
-                DiffMeanHourlyPercent = DiffMeanHourlyPayPercent,
-                DiffMedianHourlyPercent = DiffMedianHourlyPercent,
-                DiffMeanBonusPercent = DiffMeanBonusPercent,
-                DiffMedianBonusPercent = DiffMedianBonusPercent,
-                MaleBonusPercent = MaleMedianBonusPayPercent,
-                FemaleBonusPercent = FemaleMedianBonusPayPercent,
-                MaleLowerQuartile = MaleLowerPayBand,
-                FemaleLowerQuartile = FemaleLowerPayBand,
-                MaleLowerMiddleQuartile = MaleMiddlePayBand,
-                FemaleLowerMiddleQuartile = FemaleMiddlePayBand,
-                MaleUpperMiddleQuartile = MaleUpperPayBand,
-                FemaleUpperMiddleQuartile = FemaleUpperPayBand,
-                MaleTopQuartile = MaleUpperQuartilePayBand,
-                FemaleTopQuartile = FemaleUpperQuartilePayBand,
-                CompanyLinkToGPGInfo = CompanyLinkToGPGInfo,
-                ResponsiblePerson = ResponsiblePerson,
-                EmployerSize = OrganisationSize.GetAttribute<DisplayAttribute>().Name,
-                CurrentName = Organisation?.OrganisationName,
-                SubmittedAfterTheDeadline = IsLateSubmission,
-                DueDate = AccountingDate.AddYears(1),
-                DateSubmitted = Modified
-            };
-        }
+        
 
         public string GetReportingPeriod()
         {

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Castle.Core.Internal;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Api;
 using ModernSlavery.Core.API;
 using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models.CompaniesHouse;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.BusinessLogic.Services
@@ -92,7 +91,7 @@ namespace ModernSlavery.BusinessLogic.Services
         {
             IEnumerable<int> sicCodeIds = organisation.GetSicCodes().Select(sicCode => sicCode.SicCodeId);
             IEnumerable<int> newSicCodeIds =
-                companySicCodes.Where(sicCode => !sicCode.IsNullOrEmpty()).Select(sicCode => int.Parse(sicCode));
+                companySicCodes.Where(sicCode => !string.IsNullOrEmpty(sicCode)).Select(sicCode => int.Parse(sicCode));
 
             IEnumerable<int> idsToBeRetired = sicCodeIds.Except(newSicCodeIds);
             IEnumerable<OrganisationSicCode> sicCodesToBeRetired =
@@ -107,7 +106,7 @@ namespace ModernSlavery.BusinessLogic.Services
         {
             IEnumerable<int> sicCodeIds = organisation.GetSicCodes().Select(sicCode => sicCode.SicCodeId);
             IEnumerable<int> newSicCodeIds =
-                companySicCodes.Where(sicCode => !sicCode.IsNullOrEmpty()).Select(sicCode => int.Parse(sicCode));
+                companySicCodes.Where(sicCode => !string.IsNullOrEmpty(sicCode)).Select(sicCode => int.Parse(sicCode));
 
             IEnumerable<int> idsToBeAdded = newSicCodeIds.Except(sicCodeIds);
             foreach (int sicCodeId in idsToBeAdded)

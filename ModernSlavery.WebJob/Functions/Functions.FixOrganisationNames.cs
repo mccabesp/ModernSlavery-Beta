@@ -3,11 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebJob
 {

@@ -6,12 +6,14 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
-using ModernSlavery.Database.Models;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Newtonsoft.Json;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebJob
 {
@@ -50,7 +52,7 @@ namespace ModernSlavery.WebJob
                     .Where(
                         o =>
                             o.LatestReturn == null
-                            || o.LatestReturn.AccountingDate != o.SectorType.GetAccountingStartDate()
+                            || o.LatestReturn.AccountingDate != _snapshotDateHelper.GetSnapshotDate(o.SectorType)
                             || o.LatestReturn.Status != ReturnStatuses.Submitted)
                     .ToList();
 
@@ -104,8 +106,8 @@ namespace ModernSlavery.WebJob
         {
             var personalisation = new Dictionary<string, dynamic>
             {
-                {"DeadlineDate", sectorType.GetAccountingStartDate().AddYears(1).AddDays(-1).ToString("d MMMM yyyy")},
-                {"DaysUntilDeadline", sectorType.GetAccountingStartDate().AddYears(1).AddDays(-1).Subtract(VirtualDateTime.Now).Days},
+                {"DeadlineDate", _snapshotDateHelper.GetSnapshotDate(sectorType).AddYears(1).AddDays(-1).ToString("d MMMM yyyy")},
+                {"DaysUntilDeadline", _snapshotDateHelper.GetSnapshotDate(sectorType).AddYears(1).AddDays(-1).Subtract(VirtualDateTime.Now).Days},
                 {"OrganisationNames", GetOrganisationNameString(organisations)},
                 {"OrganisationIsSingular", organisations.Count == 1},
                 {"OrganisationIsPlural", organisations.Count > 1},
@@ -167,7 +169,7 @@ namespace ModernSlavery.WebJob
             return latestReminderEmail.DateSent <= latestReminderEmailDate;
         }
 
-        private static DateTime GetEarliestReminderDate(SectorTypes sectorType)
+        private DateTime GetEarliestReminderDate(SectorTypes sectorType)
         {
             List<int> reminderEmailDays = GetReminderEmailDays();
             int earliestReminderDay = reminderEmailDays[reminderEmailDays.Count - 1];
@@ -176,7 +178,7 @@ namespace ModernSlavery.WebJob
             return deadlineDate.AddDays(-earliestReminderDay);
         }
 
-        private static DateTime GetLatestReminderEmailDate(SectorTypes sectorType)
+        private DateTime GetLatestReminderEmailDate(SectorTypes sectorType)
         {
             return GetReminderDates(sectorType)
                 .Where(reminderDate => reminderDate < VirtualDateTime.Now)
@@ -184,7 +186,7 @@ namespace ModernSlavery.WebJob
                 .FirstOrDefault();
         }
 
-        private static List<DateTime> GetReminderDates(SectorTypes sectorType)
+        private List<DateTime> GetReminderDates(SectorTypes sectorType)
         {
             List<int> reminderDays = GetReminderEmailDays();
             DateTime deadlineDate = GetDeadlineDate(sectorType);
@@ -192,9 +194,9 @@ namespace ModernSlavery.WebJob
             return reminderDays.Select(reminderDay => deadlineDate.AddDays(-reminderDay)).ToList();
         }
 
-        private static DateTime GetDeadlineDate(SectorTypes sectorType)
+        private DateTime GetDeadlineDate(SectorTypes sectorType)
         {
-            return sectorType.GetAccountingStartDate().AddYears(1);
+            return _snapshotDateHelper.GetSnapshotDate(sectorType).AddYears(1);
         }
 
         private static List<int> GetReminderEmailDays()

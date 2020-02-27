@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
     public partial class OrganisationInfoView
     {

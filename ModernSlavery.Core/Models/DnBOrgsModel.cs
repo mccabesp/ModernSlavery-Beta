@@ -1,13 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Core.Models
 {
     [Serializable]
     public class DnBOrgsModel
     {
+        public DnBOrgsModel(ISnapshotDateHelper snapshotDateHelper)
+        {
+            _snapshotDateHelper = snapshotDateHelper;
+        }
+        readonly ISnapshotDateHelper _snapshotDateHelper;
 
         public string DUNSNumber { get; set; }
         public string EmployerReference { get; set; }
@@ -67,7 +76,7 @@ namespace ModernSlavery.Core.Models
         //True is org dissolved before current accounting date
         public bool GetIsDissolved()
         {
-            return DateOfCessation != null && DateOfCessation < SectorType.GetAccountingStartDate();
+            return DateOfCessation != null && DateOfCessation < _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private);
         }
 
         public SortedSet<int> GetSicCodesIds()

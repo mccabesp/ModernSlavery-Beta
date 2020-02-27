@@ -5,13 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Scope;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.BusinessLogic
 {
@@ -172,7 +172,6 @@ namespace ModernSlavery.BusinessLogic
             bool saveToDatabase)
         {
             snapshotYear = organisation
-                .SectorType
                 .GetAccountingStartDate(snapshotYear)
                 .Year;
 

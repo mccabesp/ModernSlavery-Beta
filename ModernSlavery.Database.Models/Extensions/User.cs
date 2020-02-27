@@ -3,20 +3,28 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
-using ModernSlavery.Core;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
+using Microsoft.Extensions.Configuration;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
 
     [Serializable]
     [DebuggerDisplay("{UserId}, {EmailAddress}, {Status}")]
     public partial class User
     {
+        private IConfiguration _configuration;
+        private string AdminEmails => _configuration.GetValue<string>("AdminEmails");
+
+        public User(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
 
         [NotMapped]
-        public static bool EncryptEmails = Config.GetAppSetting("EncryptEmails").ToBoolean(true);
+        public bool EncryptEmails => _configuration.GetValue("EncryptEmails",true);
 
         [NotMapped]
         public string Fullname => (Firstname + " " + Lastname).TrimI();
@@ -26,9 +34,9 @@ namespace ModernSlavery.Database
 
         [NotMapped]
         public TimeSpan LockRemaining =>
-            LoginDate == null || LoginAttempts < Config.Configuration["MaxLoginAttempts"].ToInt32()
+            LoginDate == null || LoginAttempts < _configuration.GetValue("MaxLoginAttempts", 3)
                 ? TimeSpan.Zero
-                : LoginDate.Value.AddMinutes(Config.Configuration["LockoutMinutes"].ToInt32()) - VirtualDateTime.Now;
+                : LoginDate.Value.AddMinutes(_configuration.GetValue("LockoutMinutes",30)) - VirtualDateTime.Now;
 
         [NotMapped]
         public bool SendUpdates
@@ -67,12 +75,12 @@ namespace ModernSlavery.Database
                 throw new ArgumentException("Bad email address");
             }
 
-            if (string.IsNullOrWhiteSpace(Global.AdminEmails))
+            if (string.IsNullOrWhiteSpace(AdminEmails))
             {
                 throw new ArgumentException("Missing AdminEmails from web.config");
             }
 
-            return EmailAddress.LikeAny(Global.AdminEmails.SplitI(";"));
+            return EmailAddress.LikeAny(AdminEmails.SplitI(";"));
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ using ModernSlavery.BusinessLogic.Models;
 using ModernSlavery.Core;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebJob
 {

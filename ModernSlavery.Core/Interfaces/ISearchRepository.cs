@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
 using Microsoft.Azure.Search.Models;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Core.Interfaces
 {

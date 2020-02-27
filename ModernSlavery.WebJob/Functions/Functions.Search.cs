@@ -6,12 +6,13 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebJob
 {
@@ -128,7 +129,7 @@ namespace ModernSlavery.WebJob
             IEnumerable<Organisation> lookupResult = _SearchBusinessLogic.LookupSearchableOrganisations(allOrgsList);
             if (Debugger.IsAttached) lookupResult = lookupResult.Take(100);
             List<SicCodeSearchModel> listOfSicCodeRecords = await GetListOfSicCodeSearchModelsFromFileAsync(log);
-            IEnumerable<EmployerSearchModel> selection = lookupResult.Select(o => o.ToEmployerSearchResult(false, listOfSicCodeRecords));
+            IEnumerable<EmployerSearchModel> selection = lookupResult.Select(o => EmployerSearchModel.Create(o, false, listOfSicCodeRecords));
             List<EmployerSearchModel> selectionList = selection.ToList();
 
             if (selectionList.Any())

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModernSlavery.Core;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
+using ModernSlavery.Entities.Enums;
+using System.Linq;
+using ModernSlavery.SharedKernel;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
     public partial class Organisation
     {
@@ -59,6 +62,5 @@ namespace ModernSlavery.Database
         public virtual ICollection<OrganisationStatus> OrganisationStatuses { get; set; }
         public virtual ICollection<Return> Returns { get; set; }
         public virtual ICollection<UserOrganisation> UserOrganisations { get; set; }
-
     }
 }

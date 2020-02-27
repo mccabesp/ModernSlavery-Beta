@@ -1,7 +1,7 @@
 ﻿using System;
 using ModernSlavery.Extensions;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Entities
 {
     public class OrganisationName
     {
