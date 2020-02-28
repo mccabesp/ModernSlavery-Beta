@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using ModernSlavery.WebUI.Areas.Account.Resources;
-using ModernSlavery.WebUI.Classes;
+using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.WebUI.Areas.Account.ViewModels
 {

@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Register;
@@ -10,6 +9,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -64,14 +68,14 @@ namespace ModernSlavery.WebUI.Controllers
 
                 await DataRepository.SaveChangesAsync();
 
-                _logger.LogInformation(
+                Logger.LogInformation(
                     $"Email verification sent: Name {currentUser.Fullname}, Email:{currentUser.EmailAddress}, IP:{UserHostAddress}");
                 return verifyCode;
             }
             catch (Exception ex)
             {
                 //Log the exception
-                _logger.LogError(ex, ex.Message);
+                Logger.LogError(ex, ex.Message);
             }
 
             //Prompt user to open email and verification link

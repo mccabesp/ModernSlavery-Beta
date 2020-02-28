@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 
 namespace ModernSlavery.WebUI.Areas.Account.Abstractions

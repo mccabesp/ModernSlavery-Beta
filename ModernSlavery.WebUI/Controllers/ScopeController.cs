@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Models.Scope;
@@ -16,7 +13,12 @@ using ModernSlavery.WebUI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using AutoMapper;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.BusinessLogic;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -29,19 +31,19 @@ namespace ModernSlavery.WebUI.Controllers
 
         public ScopeController(
             ILogger<ScopeController> logger,
-            IHttpCache cache,
-            IHttpSession session,
+            IWebService webService,
             IScopePresentation scopeUI,
-            IDataRepository dataRepository,
-            IWebTracker webTracker,
-            IMapper autoMapper) : base(logger, cache, session, dataRepository, webTracker,autoMapper)
+            ICommonBusinessLogic commonBusinessLogic,
+            IDataRepository dataRepository) : base(logger, webService, dataRepository)
         {
+            _commonBusinessLogic = commonBusinessLogic;
             ScopePresentation = scopeUI;
         }
 
         #endregion
 
         #region Dependencies
+        public ICommonBusinessLogic _commonBusinessLogic { get; set; }
 
         public IScopePresentation ScopePresentation { get; }
 
@@ -211,13 +213,13 @@ namespace ModernSlavery.WebUI.Controllers
             await ScopePresentation.SaveScopesAsync(stateModel, snapshotYears);
 
             var organisation = DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            DateTime currentSnapshotDate = organisation.SectorType.GetAccountingStartDate();
+            DateTime currentSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(organisation.SectorType);
             if (stateModel.AccountingDate == currentSnapshotDate)
             {
                 IEnumerable<string> emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
                 foreach (string emailAddress in emailAddressesForOrganisation)
                 {
-                    EmailSendingService.SendScopeChangeInEmail(emailAddress, organisation.OrganisationName);
+                    NotificationService.SendScopeChangeInEmail(emailAddress, organisation.OrganisationName);
                 }
             }
 
@@ -381,13 +383,13 @@ namespace ModernSlavery.WebUI.Controllers
             this.StashModel(stateModel);
 
             var organisation = DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            DateTime currentSnapshotDate = organisation.SectorType.GetAccountingStartDate();
+            DateTime currentSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(organisation.SectorType);
             if (stateModel.AccountingDate == currentSnapshotDate)
             {
                 IEnumerable<string> emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
                 foreach (string emailAddress in emailAddressesForOrganisation)
                 {
-                    EmailSendingService.SendScopeChangeOutEmail(emailAddress, organisation.OrganisationName);
+                    NotificationService.SendScopeChangeOutEmail(emailAddress, organisation.OrganisationName);
                 }
             }
 

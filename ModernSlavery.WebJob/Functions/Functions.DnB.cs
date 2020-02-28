@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.BusinessLogic;
 
 namespace ModernSlavery.WebJob
 {
@@ -39,7 +40,7 @@ namespace ModernSlavery.WebJob
                 #region Load and Prechecks
 
                 //Load the D&B records
-                IEnumerable<string> dnbOrgsPaths = await Global.FileRepository.GetFilesAsync(Global.DataPath, Filenames.DnBOrganisations(1));
+                IEnumerable<string> dnbOrgsPaths = await Global.FileRepository.GetFilesAsync(Global.DataPath, Filenames.DnBOrganisations());
                 string dnbOrgsPath = dnbOrgsPaths.OrderByDescending(f => f).FirstOrDefault();
                 if (string.IsNullOrEmpty(dnbOrgsPath))
                 {
@@ -262,7 +263,7 @@ namespace ModernSlavery.WebJob
                         else if (dbOrg.OrganisationName != orgName.Name)
                         {
                             OrganisationName oldOrgName = dbOrg.GetName();
-                            if (oldOrgName == null || SourceComparer.CanReplace(orgName.Source, oldOrgName.Source))
+                            if (oldOrgName == null || _CommonBL.SourceComparer.CanReplace(orgName.Source, oldOrgName.Source))
                             {
                                 dbOrg.OrganisationName = orgName.Name;
                                 dbOrg.OrganisationNames.Add(orgName);
@@ -312,7 +313,7 @@ namespace ModernSlavery.WebJob
                         dataSource = string.IsNullOrWhiteSpace(dnbOrg.AddressSource) ? "D&B" : dnbOrg.AddressSource;
                         if (newAddress == null
                             || !newAddress.GetAddressString().EqualsI(fullAddress)
-                            && SourceComparer.CanReplace(dataSource, newAddress.Source))
+                            && _CommonBL.SourceComparer.CanReplace(dataSource, newAddress.Source))
                         {
                             DateTime statusDate = VirtualDateTime.Now;
 
@@ -378,7 +379,7 @@ namespace ModernSlavery.WebJob
                         }
 
                         dataSource = string.IsNullOrWhiteSpace(dnbOrg.SicSource) ? "D&B" : dnbOrg.SicSource;
-                        if (!newCodeIds.SetEquals(oldCodeIds) && SourceComparer.CanReplace(dataSource, oldSicSource))
+                        if (!newCodeIds.SetEquals(oldCodeIds) && _CommonBL.SourceComparer.CanReplace(dataSource, oldSicSource))
                         {
                             foreach (int code in newCodeIds)
                             {

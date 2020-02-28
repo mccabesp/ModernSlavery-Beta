@@ -8,10 +8,12 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Models.Search;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.Entities;
 
 namespace ModernSlavery.WebUI.Classes.Presentation
 {

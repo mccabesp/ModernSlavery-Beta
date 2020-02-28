@@ -118,7 +118,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             var controller = UiTestHelper.GetController<RegisterController>(user.UserId, routeData, user, org0, address0, name, sic1, sic2);
 
             var employerResult = new PagedResult<EmployerRecord>();
-            employerResult.Results = new List<EmployerRecord> {org0.ToEmployerRecord()};
+            employerResult.Results = new List<EmployerRecord> { EmployerRecord.Create(org0)};
 
             //use the include and exclude functions here to save typing
             var model = new OrganisationViewModel {

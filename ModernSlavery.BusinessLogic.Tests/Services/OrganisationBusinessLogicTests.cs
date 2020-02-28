@@ -5,7 +5,7 @@ using ModernSlavery.BusinessLogic.Models.Compare;
 using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;

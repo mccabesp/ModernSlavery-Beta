@@ -5,7 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.BusinessLogic.Account.Models;
 using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core.Interfaces;

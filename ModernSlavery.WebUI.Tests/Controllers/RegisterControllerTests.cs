@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
+using ModernSlavery.Entities;
 
 namespace ModernSlavery.Tests
 {

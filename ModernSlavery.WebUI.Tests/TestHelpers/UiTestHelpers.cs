@@ -11,7 +11,7 @@ using Autofac.Features.AttributeFilters;
 using Autofac.Integration.Mvc;
 using AutoMapper;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.BusinessLogic.Account.Repositories;
 using ModernSlavery.BusinessLogic.Repositories;
 using ModernSlavery.BusinessLogic.Services;

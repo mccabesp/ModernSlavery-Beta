@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.HttpResultModels;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
@@ -21,6 +20,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -32,23 +37,16 @@ namespace ModernSlavery.WebUI.Controllers
 
         public OrganisationController(
             ILogger<ErrorController> logger,
-            IHttpCache cache,
-            IHttpSession session,
+            IWebService webService,
             ISubmissionService submitService,
             IScopePresentation scopePresentation,
             IScopeBusinessLogic scopeBL,
             IOrganisationBusinessLogic organisationBL,
             IDataRepository dataRepository,
             IRegistrationRepository registrationRepository,
-            IWebTracker webTracker,
             [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
-            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
-            IMapper autoMapper): base(
-            logger,
-            cache,
-            session,
-            dataRepository,
-            webTracker,autoMapper)
+            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository)
+            : base(logger, webService, dataRepository)
         {
             SubmissionService = submitService;
             ScopePresentation = scopePresentation;
@@ -502,7 +500,7 @@ namespace ModernSlavery.WebUI.Controllers
             await RegistrationRepository.RemoveRegistrationAsync(userOrgToUnregister, actionByUser);
 
             // Email user that has been unregistered
-            EmailSendingService.SendRemovedUserFromOrganisationEmail(
+            NotificationService.SendRemovedUserFromOrganisationEmail(
                 userToUnregister.EmailAddress,
                 orgToRemove.OrganisationName,
                 userToUnregister.Fullname);
@@ -511,7 +509,7 @@ namespace ModernSlavery.WebUI.Controllers
             IEnumerable<string> emailAddressesForOrganisation = orgToRemove.UserOrganisations.Select(uo => uo.User.EmailAddress);
             foreach (string emailAddress in emailAddressesForOrganisation)
             {
-                EmailSendingService.SendRemovedUserFromOrganisationEmail(
+                NotificationService.SendRemovedUserFromOrganisationEmail(
                     emailAddress,
                     orgToRemove.OrganisationName,
                     userToUnregister.Fullname);
@@ -524,7 +522,7 @@ namespace ModernSlavery.WebUI.Controllers
                 bool testEmail = !Config.IsProduction();
                 if (orgToRemove.GetIsOrphan())
                 {
-                    sendEmails.Add(Emails.SendGEOOrphanOrganisationNotificationAsync(orgToRemove.OrganisationName, testEmail));
+                    sendEmails.Add(EmailSender.SendGEOOrphanOrganisationNotificationAsync(orgToRemove.OrganisationName, testEmail));
                 }
 
                 await Task.WhenAll(sendEmails);

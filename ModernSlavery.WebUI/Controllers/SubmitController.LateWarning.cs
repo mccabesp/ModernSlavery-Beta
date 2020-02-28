@@ -3,10 +3,14 @@ using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.HttpResultModels;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Controllers.Submission
 {

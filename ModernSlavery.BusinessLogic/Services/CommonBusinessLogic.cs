@@ -4,11 +4,14 @@ using Microsoft.Extensions.Configuration;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.Classes;
 
 namespace ModernSlavery.BusinessLogic
 {
     public interface ICommonBusinessLogic
     {
+        ISourceComparer SourceComparer { get; }
+
         DateTime GetAccountingStartDate(SectorTypes sector, int year = 0);
 
     }
@@ -18,10 +21,13 @@ namespace ModernSlavery.BusinessLogic
 
         private readonly IConfiguration _configuration;
         private readonly ISnapshotDateHelper _snapshotDateHelper;
-        public CommonBusinessLogic(IConfiguration configuration, ISnapshotDateHelper snapshotDateHelper)
+        public ISourceComparer SourceComparer { get; }
+
+        public CommonBusinessLogic(IConfiguration configuration, ISnapshotDateHelper snapshotDateHelper, ISourceComparer sourceComparer)
         {
             _configuration = configuration;
             _snapshotDateHelper = snapshotDateHelper;
+            SourceComparer = sourceComparer;
         }
 
         /// <summary>

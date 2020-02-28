@@ -2,22 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Repositories;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.Cookies;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Classes.Services;
-using ModernSlavery.WebUI.Areas.Admin.Models;
 using ModernSlavery.WebUI.Views.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using AutoMapper;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -28,12 +34,9 @@ namespace ModernSlavery.WebUI.Controllers
 
         public HomeController(
             ILogger<HomeController> logger,
-            IHttpCache cache,
-            IHttpSession session,
+            IWebService webService,
             IScopePresentation scopeUIService,
-            IDataRepository dataRepository,
-            IWebTracker webTracker,
-            IMapper autoMapper) : base(logger, cache, session, dataRepository, webTracker,autoMapper)
+            IDataRepository dataRepository) : base(logger, webService, dataRepository)
         {
             ScopePresentation = scopeUIService;
         }
@@ -124,7 +127,7 @@ namespace ModernSlavery.WebUI.Controllers
         {
             if (!Config.IsProduction())
             {
-                _logger.LogInformation("Home Controller Initialised");
+                Logger.LogInformation("Home Controller Initialised");
             }
 
             return new EmptyResult();

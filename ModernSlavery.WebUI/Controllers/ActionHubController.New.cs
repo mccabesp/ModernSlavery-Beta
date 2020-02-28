@@ -1,13 +1,11 @@
-﻿using System;
-using ModernSlavery.Core;
+﻿using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using AutoMapper;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -21,12 +19,8 @@ namespace ModernSlavery.WebUI.Controllers
 
         public ActionHubController(
             ILogger<ActionHubController> logger,
-            IHttpCache cache,
-            IHttpSession session,
-            IDataRepository dataRepository,
-            IWebTracker webTracker,
-            IMapper autoMapper) :
-            base(logger, cache, session, dataRepository, webTracker, autoMapper)
+            IWebService webService,
+            IDataRepository dataRepository):base(logger, webService, dataRepository)
         {
         }
 

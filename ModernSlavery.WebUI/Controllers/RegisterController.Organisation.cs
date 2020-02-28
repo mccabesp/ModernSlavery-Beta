@@ -7,15 +7,27 @@ using ModernSlavery.Core.Api;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.HttpResultModels;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Register;
-using ModernSlavery.WebUI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -188,7 +200,7 @@ namespace ModernSlavery.WebUI.Controllers
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, ex.Message);
+                        Logger.LogError(ex, ex.Message);
 
                         CompaniesHouseFailures++;
                         if (CompaniesHouseFailures < 3)
@@ -199,7 +211,7 @@ namespace ModernSlavery.WebUI.Controllers
                             return View(model);
                         }
 
-                        await Emails.SendGeoMessageAsync(
+                        await EmailSender.SendGeoMessageAsync(
                             "GPG - COMPANIES HOUSE ERROR",
                             $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
                             currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
@@ -414,7 +426,7 @@ namespace ModernSlavery.WebUI.Controllers
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError(ex, ex.Message);
+                            Logger.LogError(ex, ex.Message);
 
                             CompaniesHouseFailures++;
                             if (CompaniesHouseFailures < 3)
@@ -425,7 +437,7 @@ namespace ModernSlavery.WebUI.Controllers
                                 return View(model);
                             }
 
-                            await Emails.SendGeoMessageAsync(
+                            await EmailSender.SendGeoMessageAsync(
                                 "GPG - COMPANIES HOUSE ERROR",
                                 $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
                                 currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
@@ -512,7 +524,7 @@ namespace ModernSlavery.WebUI.Controllers
                     //Make sure the found organisation is active or pending
                     if (org.Status != OrganisationStatuses.Active && org.Status != OrganisationStatuses.Pending)
                     {
-                        _logger.LogWarning(
+                        Logger.LogWarning(
                             $"Attempt to register a {org.Status} organisation",
                             $"Organisation: '{org.OrganisationName}' Reference: '{org.EmployerReference}' User: '{currentUser.EmailAddress}'");
                         return View("CustomError", new ErrorViewModel(1149));
@@ -554,7 +566,7 @@ namespace ModernSlavery.WebUI.Controllers
                     //Get the email domains from the D&B file
                     if (string.IsNullOrWhiteSpace(employer.EmailDomains))
                     {
-                        List<DnBOrgsModel> allDnBOrgs = await DnBOrgsRepository.GetAllDnBOrgsAsync();
+                        List<DnBOrgsModel> allDnBOrgs = await IDnBOrgsRepository.GetAllDnBOrgsAsync();
                         DnBOrgsModel dnbOrg = allDnBOrgs?.FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
                         if (dnbOrg != null)
                         {
@@ -877,7 +889,7 @@ namespace ModernSlavery.WebUI.Controllers
                 .Where(o => orgIds.Contains(o.OrganisationId))
                 .OrderBy(o => o.OrganisationName)
                 .ToListAsync();
-            model.ManualEmployers = employers.Select(o => o.ToEmployerRecord()).ToList();
+            model.ManualEmployers = employers.Select(o => EmployerRecord.Create(o)).ToList();
 
             //Ensure exact match shown at top
             if (model.ManualEmployers != null && model.ManualEmployers.Count > 1)
@@ -992,7 +1004,7 @@ namespace ModernSlavery.WebUI.Controllers
             //Make sure the found organisation is active or pending
             if (org.Status != OrganisationStatuses.Active && org.Status != OrganisationStatuses.Pending)
             {
-                _logger.LogWarning(
+                Logger.LogWarning(
                     $"Attempt to register a {org.Status} organisation",
                     $"Organisation: '{org.OrganisationName}' Reference: '{org.EmployerReference}' User: '{currentUser.EmailAddress}'");
                 return View("CustomError", new ErrorViewModel(1149));
@@ -1028,7 +1040,7 @@ namespace ModernSlavery.WebUI.Controllers
                 //Get the email domains from the D&B file
                 if (string.IsNullOrWhiteSpace(employer.EmailDomains))
                 {
-                    List<DnBOrgsModel> allDnBOrgs = await DnBOrgsRepository.GetAllDnBOrgsAsync();
+                    List<DnBOrgsModel> allDnBOrgs = await IDnBOrgsRepository.GetAllDnBOrgsAsync();
                     DnBOrgsModel dnbOrg = allDnBOrgs?.FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
                     if (dnbOrg != null)
                     {
@@ -1147,7 +1159,7 @@ namespace ModernSlavery.WebUI.Controllers
                                 return View(model);
                             }
 
-                            await Emails.SendGeoMessageAsync(
+                            await EmailSender.SendGeoMessageAsync(
                                 "GPG - COMPANIES HOUSE ERROR",
                                 $"Cant get SIC Codes from Companies House API for company {employer.OrganisationName} No:{employer.CompanyNumber} due to following error:\n\n{ex.Message}",
                                 currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
@@ -1313,7 +1325,7 @@ namespace ModernSlavery.WebUI.Controllers
             catch (Exception ex)
             {
                 //This line is to help diagnose object reference not found exception raised at this point 
-                _logger.LogWarning(ex, Extensions.Json.SerializeObjectDisposed(m));
+                Logger.LogWarning(ex, Extensions.Json.SerializeObjectDisposed(m));
                 throw;
             }
 
@@ -1403,7 +1415,7 @@ namespace ModernSlavery.WebUI.Controllers
 
                 this.StashModel(
                     new CompleteViewModel {
-                        OrganisationId = userOrg.OrganisationId, AccountingDate = sector.Value.GetAccountingStartDate()
+                        OrganisationId = userOrg.OrganisationId, AccountingDate = _commonBusinessLogic.GetAccountingStartDate(sector.Value)
                     });
 
                 //BUG: the return keyword was missing here so no redirection would occur
@@ -1478,7 +1490,7 @@ namespace ModernSlavery.WebUI.Controllers
                     ScopeStatusDate = now,
                     Status = ScopeRowStatuses.Active,
                     StatusDetails = "Generated by the system",
-                    SnapshotDate = org.SectorType.GetAccountingStartDate()
+                    SnapshotDate = _commonBusinessLogic.GetAccountingStartDate(org.SectorType)
                 };
                 DataRepository.Insert(newScope);
                 org.OrganisationScopes.Add(newScope);
@@ -1706,7 +1718,7 @@ namespace ModernSlavery.WebUI.Controllers
             //This line is to help diagnose object reference not found exception raised at this point 
             if (address == null)
             {
-                _logger.LogDebug("Address should not be null", Extensions.Json.SerializeObjectDisposed(model));
+                Logger.LogDebug("Address should not be null", Extensions.Json.SerializeObjectDisposed(model));
             }
 
             #endregion
@@ -1727,7 +1739,7 @@ namespace ModernSlavery.WebUI.Controllers
             //This line is to help diagnose object reference not found exception raised at this point 
             if (address == null)
             {
-                _logger.LogWarning("Address should not be null", Extensions.Json.SerializeObjectDisposed(model));
+                Logger.LogWarning("Address should not be null", Extensions.Json.SerializeObjectDisposed(model));
             }
 
             userOrg.Address = address;
@@ -1830,7 +1842,7 @@ namespace ModernSlavery.WebUI.Controllers
                     {
                         DataRepository.RollbackTransaction();
                         sendRequest = false;
-                        _logger.LogWarning(ex, Extensions.Json.SerializeObjectDisposed(model));
+                        Logger.LogWarning(ex, Extensions.Json.SerializeObjectDisposed(model));
                         throw;
                     }
                 });
@@ -1908,7 +1920,7 @@ namespace ModernSlavery.WebUI.Controllers
                 return;
             }
 
-            await Emails.SendGEORegistrationRequestAsync(reviewUrl, contactName, reportingOrg, reportingAddress, test);
+            await EmailSender.SendGEORegistrationRequestAsync(reviewUrl, contactName, reportingOrg, reportingAddress, test);
         }
 
 

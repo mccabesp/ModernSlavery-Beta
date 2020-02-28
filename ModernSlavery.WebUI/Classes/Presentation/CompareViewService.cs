@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models.Cookies;
 using ModernSlavery.Extensions;
@@ -11,6 +10,7 @@ using ModernSlavery.WebUI.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using HttpContext = Microsoft.AspNetCore.Http.HttpContext;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebUI.Classes.Presentation
 {

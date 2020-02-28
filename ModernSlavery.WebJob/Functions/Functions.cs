@@ -15,6 +15,7 @@ namespace ModernSlavery.WebJob
         public Functions(
             IMessenger messenger,
             IDataRepository dataRepository,
+            ICommonBusinessLogic commonBL,
             IScopeBusinessLogic scopeBL,
             ISubmissionBusinessLogic submissionBL,
             IOrganisationBusinessLogic orgBL,
@@ -25,6 +26,7 @@ namespace ModernSlavery.WebJob
         {
             _Messenger = messenger;
             _DataRepository = dataRepository;
+            _CommonBL = commonBL;
             _ScopeBL = scopeBL;
             _SubmissionBL = submissionBL;
             _OrganisationBL = orgBL;
@@ -39,6 +41,7 @@ namespace ModernSlavery.WebJob
         public readonly IMessenger _Messenger;
         public readonly IDataRepository _DataRepository;
         private readonly IScopeBusinessLogic _ScopeBL;
+        private readonly ICommonBusinessLogic _CommonBL;
         private readonly ISubmissionBusinessLogic _SubmissionBL;
         private readonly IOrganisationBusinessLogic _OrganisationBL;
         private readonly ISearchBusinessLogic _SearchBusinessLogic;

@@ -1,4 +1,4 @@
-﻿using ModernSlavery.BusinessLogic.Account.Abstractions;
+﻿using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.BusinessLogic.Account.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 

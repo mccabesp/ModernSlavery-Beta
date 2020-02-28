@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Scope;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;

@@ -2,17 +2,18 @@
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Register;
-using ModernSlavery.WebUI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -150,7 +151,7 @@ namespace ModernSlavery.WebUI.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning(
+                    Logger.LogWarning(
                         $"Attempt to PIN activate a {userOrg.Organisation.Status} organisation",
                         $"Organisation: '{userOrg.Organisation.OrganisationName}' Reference: '{userOrg.Organisation.EmployerReference}' User: '{currentUser.EmailAddress}'");
                     return View("CustomError", new ErrorViewModel(1149));
@@ -177,7 +178,7 @@ namespace ModernSlavery.WebUI.Controllers
                 userOrg.Organisation.LatestAddress = userOrg.Address;
                 userOrg.ConfirmAttempts = 0;
 
-                model.AccountingDate = userOrg.Organisation.SectorType.GetAccountingStartDate();
+                model.AccountingDate = _commonBusinessLogic.GetAccountingStartDate(userOrg.Organisation.SectorType);
                 model.OrganisationId = userOrg.OrganisationId;
                 this.StashModel(model);
 

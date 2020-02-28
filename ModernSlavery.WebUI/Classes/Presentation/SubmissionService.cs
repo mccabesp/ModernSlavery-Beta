@@ -10,14 +10,25 @@ using ModernSlavery.BusinessLogic.Models.Organisation;
 using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Models.Submit;
 using ModernSlavery.WebUI.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Classes.Services
 {
@@ -70,6 +81,7 @@ namespace ModernSlavery.WebUI.Classes.Services
 
     public class SubmissionService : ISubmissionService
     {
+        public ICommonBusinessLogic _commonBusinessLogic { get; set; }
 
         private readonly IDraftFileBusinessLogic _draftFileBusinessLogic;
 
@@ -78,12 +90,14 @@ namespace ModernSlavery.WebUI.Classes.Services
             IScopeBusinessLogic scopeBL,
             IFileRepository fileRepository,
             IDraftFileBusinessLogic draftFileBusinessLogic,
+            ICommonBusinessLogic commonBusinessLogic,
             IOptionsSnapshot<SubmissionOptions> submissionOptions)
         {
             DataRepository = dataRepository;
             ScopeBusinessLogic = scopeBL;
             FileRepository = fileRepository;
             _draftFileBusinessLogic = draftFileBusinessLogic;
+            _commonBusinessLogic = commonBusinessLogic;
             SubmissionOptions = submissionOptions;
         }
 
@@ -603,7 +617,7 @@ namespace ModernSlavery.WebUI.Classes.Services
         public virtual DateTime GetSnapshotDate(SectorTypes sector = SectorTypes.Private, int snapshotYear = 0)
         {
             // Get the reporting start date for the sector and reporting start year
-            return sector.GetAccountingStartDate(snapshotYear);
+            return _commonBusinessLogic.GetAccountingStartDate(sector,snapshotYear);
         }
 
         #region Draft File

@@ -139,7 +139,7 @@ namespace ModernSlavery.WebJob
                 if (orgs.Any())
                 {
                     //Remove D&B orgs
-                    string filePath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations(DateTime.Now.Year));
+                    string filePath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations());
                     bool exists = await Global.FileRepository.GetFileExistsAsync(filePath);
                     if (exists)
                     {

@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.Core;
 using ModernSlavery.Database;
 using ModernSlavery.Tests.TestHelpers;

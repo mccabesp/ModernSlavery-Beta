@@ -11,6 +11,7 @@ using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
+using ModernSlavery.Entities;
 
 namespace ModernSlavery.Tests
 {

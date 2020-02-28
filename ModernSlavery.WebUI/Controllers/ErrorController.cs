@@ -1,12 +1,11 @@
 ﻿using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using AutoMapper;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -18,11 +17,9 @@ namespace ModernSlavery.WebUI.Controllers
 
         public ErrorController(
             ILogger<ErrorController> logger,
-            IHttpCache cache,
-            IHttpSession session,
-            IDataRepository dataRepository,
-            IWebTracker webTracker,
-            IMapper autoMapper) : base(logger, cache, session, dataRepository, webTracker,autoMapper) { }
+            IWebService webService,
+            IDataRepository dataRepository) : base(logger, webService, dataRepository)
+        { }
 
         #endregion
 
@@ -55,11 +52,11 @@ namespace ModernSlavery.WebUI.Controllers
                 {
                     if (errorCode == 404 || errorCode == 405)
                     {
-                        _logger.LogWarning($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
+                        Logger.LogWarning($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
                     }
                     else if (errorCode >= 400)
                     {
-                        _logger.LogError($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
+                        Logger.LogError($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
                     }
                 }
             }

@@ -1,21 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Core.Classes
 {
+    public interface ISourceComparer
+    {
+        bool CanReplace(string source, string target);
+        bool CanReplace(string source, IEnumerable<string> targets);
+        bool IsCoHo(string source);
+        bool IsDnB(string source);
+        int Parse(string source);
+    }
+
     /// <summary>
     ///     Compares two data source types to see if one can replace the other
     /// </summary>
-    public class SourceComparer
+    public class SourceComparer: ISourceComparer
     {
+        private readonly IConfiguration _configuration;
+        public SourceComparer(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+        private string AdminEmails => _configuration.GetValue<string>("AdminEmails");
 
-        public static bool CanReplace(string source, string target)
+        public bool CanReplace(string source, string target)
         {
             return Parse(source) >= Parse(target);
         }
 
-        public static bool CanReplace(string source, IEnumerable<string> targets)
+        public bool CanReplace(string source, IEnumerable<string> targets)
         {
             foreach (string target in targets)
             {
@@ -28,7 +44,7 @@ namespace ModernSlavery.Core.Classes
             return true;
         }
 
-        private static int Parse(string source)
+        public int Parse(string source)
         {
             if (source.EqualsI("admin", "administrator") || IsAdministrator(source))
             {
@@ -53,30 +69,27 @@ namespace ModernSlavery.Core.Classes
             return 0;
         }
 
-        public static bool IsAdministrator(string emailAddress)
-        {
-            if (!emailAddress.IsEmailAddress())
-            {
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(Global.AdminEmails))
-            {
-                throw new ArgumentException("Missing AdminEmails from web.config");
-            }
-
-            return emailAddress.LikeAny(Global.AdminEmails.SplitI(";"));
-        }
-
-        public static bool IsDnB(string source)
+        public bool IsDnB(string source)
         {
             return source.Strip(" ").EqualsI("D&B", "DNB", "dunandbradstreet", "dun&bradstreet");
         }
 
-        public static bool IsCoHo(string source)
+        public bool IsCoHo(string source)
         {
             return source.Strip(" ").EqualsI("CoHo", "CompaniesHouse", "CompanyHouse");
         }
 
+        public bool IsAdministrator(string emailAddress)
+        {
+            if (!emailAddress.IsEmailAddress()) return false;
+
+            if (string.IsNullOrWhiteSpace(AdminEmails))
+            {
+                throw new ArgumentException("Missing AdminEmails from web.config");
+            }
+
+            return emailAddress.LikeAny(AdminEmails.SplitI(";"));
+        }
     }
+
 }

@@ -52,10 +52,17 @@ namespace ModernSlavery.SharedKernel
         public const string SearchLog = "searchLog.csv";
         public const string UserLog = "UserLog.csv";
 
-        public static string DnBOrganisations(int year)=>$"GPG-DnBOrgs_{year:yyyy}-{year++:yy}.csv";
+        public static string DnBOrganisations(int year = 0)
+        {
+            if (year == 0) year = VirtualDateTime.Now.Year;
+            return $"GPG-DnBOrgs_{year:yyyy}-{year++:yy}.csv";
+        }
 
-        public static string PreviousDnBOrganisations(int year)=>$"GPG-DnBOrgs_{year--:yyyy}-{year:yy}.csv";
-
+        public static string PreviousDnBOrganisations(int year=0)
+        {
+            if (year == 0) year = VirtualDateTime.Now.Year;
+            return $"GPG-DnBOrgs_{year--:yyyy}-{year:yy}.csv";
+        }
         public static string GetRootFilename(string filePath)
         {
             string path = Path.GetDirectoryName(filePath);

@@ -99,7 +99,7 @@ namespace ModernSlavery.WebJob
         public async Task<List<RegistrationAddressesFileModel>> GetLatestRegistrationAddressesAsync()
         {
             // Load the DnBOrgs file from storage"
-            string dnbOrgsPath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations(DateTime.Now.Year));
+            string dnbOrgsPath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations());
             List<DnBOrgsModel> AllDnBOrgs = await Global.FileRepository.GetFileExistsAsync(dnbOrgsPath)
                 ? await Global.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath)
                 : new List<DnBOrgsModel>();

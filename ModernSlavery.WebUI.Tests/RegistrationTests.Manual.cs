@@ -1561,7 +1561,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             expectedModel.ConfirmReturnAction = nameof(RegisterController.AddOrganisation);
             expectedModel.MatchedReferenceCount = 1;
             expectedModel.NameSource = user.EmailAddress;
-            expectedModel.ManualEmployers = new List<EmployerRecord>() { org.ToEmployerRecord() };
+            expectedModel.ManualEmployers = new List<EmployerRecord>() { EmployerRecord.Create(org) };
             expectedModel.ContactEmailAddress = null;
             expectedModel.ContactFirstName = null;
             expectedModel.ContactLastName = null;
@@ -1663,7 +1663,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             expectedModel.AddressReturnAction = nameof(RegisterController.AddOrganisation);
             expectedModel.MatchedReferenceCount = 1;
             expectedModel.NameSource = user.EmailAddress;
-            expectedModel.ManualEmployers = new List<EmployerRecord>() { org.ToEmployerRecord() };
+            expectedModel.ManualEmployers = new List<EmployerRecord>() { EmployerRecord.Create(org) };
 
             //ACT:
             //2.Run and get the result of the test
@@ -1776,7 +1776,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             expectedModel.ManualEmployerIndex = -1;
             expectedModel.MatchedReferenceCount = 2;
             expectedModel.NameSource = user.EmailAddress;
-            expectedModel.ManualEmployers = new List<EmployerRecord>() { org1.ToEmployerRecord(), org2.ToEmployerRecord() };
+            expectedModel.ManualEmployers = new List<EmployerRecord>() { EmployerRecord.Create(org1), EmployerRecord.Create(org2) };
 
             //ACT:
             //2.Run and get the result of the test
@@ -2875,7 +2875,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 sicCode1,sicCode2
             };
 
-            var employer = org0.ToEmployerRecord();
+            var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
             controller.PrivateSectorRepository.Insert(employer);
 
@@ -3047,7 +3047,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 sicCode1,sicCode2
             };
 
-            var employer = org0.ToEmployerRecord();
+            var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
             controller.PrivateSectorRepository.Insert(employer);
 
@@ -3211,7 +3211,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 sicCode1,sicCode2
             };
 
-            var employer = org0.ToEmployerRecord();
+            var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
             controller.PrivateSectorRepository.Insert(employer);
 
@@ -3389,7 +3389,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 sicCode1,sicCode2
             };
 
-            var employer = org0.ToEmployerRecord();
+            var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
             controller.PrivateSectorRepository.Insert(employer);
 
@@ -3567,7 +3567,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 sicCode1,sicCode2
             };
 
-            var employer = org0.ToEmployerRecord();
+            var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
             controller.PrivateSectorRepository.Insert(employer);
 
@@ -3740,7 +3740,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 sicCode1,sicCode2
             };
 
-            var employer = org0.ToEmployerRecord();
+            var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
             controller.PrivateSectorRepository.Insert(employer);
 
@@ -3905,7 +3905,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 sicCode1,sicCode2
             };
 
-            var employer = org0.ToEmployerRecord();
+            var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
             controller.PrivateSectorRepository.Insert(employer);
 
@@ -4076,7 +4076,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 sicCode1,sicCode2
             };
 
-            var employer = org0.ToEmployerRecord();
+            var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
             controller.PrivateSectorRepository.Insert(employer);
 
@@ -4262,7 +4262,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var controller = UiTestHelper.GetController<RegisterController>(user2.UserId, routeData, user1, user2, org0, address0, name, sic1, sic2, userOrg, sicCodes);
 
-            var employer = org0.ToEmployerRecord();
+            var employer = EmployerRecord.Create(org0);
 
             employer.ActiveAddressId = 0;
             employer.RegistrationStatus = null;

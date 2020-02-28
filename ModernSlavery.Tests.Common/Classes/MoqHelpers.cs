@@ -5,6 +5,7 @@ using ModernSlavery.Database;
 using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
 using Moq;
+using ModernSlavery.Entities;
 
 namespace ModernSlavery.Tests.Common.Classes
 {

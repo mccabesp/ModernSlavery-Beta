@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.Resources;
@@ -10,6 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Areas.Account.Controllers
 {
@@ -22,12 +26,8 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
         public ChangePasswordController(
             IChangePasswordViewService changePasswordService,
             ILogger<ChangePasswordController> logger,
-            IHttpCache cache,
-            IHttpSession session,
-            IDataRepository dataRepo,
-            IWebTracker webTracker,
-            IMapper autoMapper) :
-            base(logger, cache, session, dataRepo, webTracker, autoMapper)
+            IWebService webService,
+            IDataRepository dataRepository) : base(logger, webService, dataRepository)
         {
             ChangePasswordService = changePasswordService;
         }

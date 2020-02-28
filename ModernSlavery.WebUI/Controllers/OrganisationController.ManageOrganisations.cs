@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Organisation;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Models.HttpResultModels;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Organisation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.Entities;
 
 namespace ModernSlavery.WebUI.Controllers
 {

@@ -6,7 +6,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 
-namespace ModernSlavery.BusinessLogic.Account.Abstractions
+namespace ModernSlavery.BusinessLogic.Abstractions
 {
 
     public interface IUserRepository : IDataTransaction

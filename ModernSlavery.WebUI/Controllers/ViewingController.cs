@@ -6,16 +6,13 @@ using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Web;
-using AutoMapper;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.HttpResultModels;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
@@ -26,6 +23,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -37,22 +40,21 @@ namespace ModernSlavery.WebUI.Controllers
 
         public ViewingController(
             ILogger<ErrorController> logger,
-            IHttpCache cache,
-            IHttpSession session,
+            IWebService webService,
             IViewingService viewingService,
             ISearchViewService searchViewService,
             ICompareViewService compareViewService,
             IOrganisationBusinessLogic organisationBusinessLogic,
+            ICommonBusinessLogic commonBusinessLogic,
             ISubmissionBusinessLogic submissionBusinessLogic,
             IObfuscator obfuscator,
-            IDataRepository dataRepository,
-            IWebTracker webTracker,
-            IMapper autoMapper) : base(logger, cache, session, dataRepository, webTracker,autoMapper)
+            IDataRepository dataRepository) : base(logger, webService, dataRepository)
         {
             ViewingService = viewingService;
             SearchViewService = searchViewService;
             CompareViewService = compareViewService;
             OrganisationBusinessLogic = organisationBusinessLogic;
+            _commonBusinessLogic = commonBusinessLogic;
             Obfuscator = obfuscator;
             SubmissionBusinessLogic = submissionBusinessLogic;
         }
@@ -75,7 +77,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Cannot decrypt return id from '{employerIdentifier}'");
+                Logger.LogError(ex, $"Cannot decrypt return id from '{employerIdentifier}'");
                 actionResult = View("CustomError", new ErrorViewModel(400));
             }
 
@@ -87,6 +89,7 @@ namespace ModernSlavery.WebUI.Controllers
         public IViewingService ViewingService { get; }
         public ISearchViewService SearchViewService { get; }
         public ICompareViewService CompareViewService { get; }
+        public ICommonBusinessLogic _commonBusinessLogic { get; set; }
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
         public ISubmissionBusinessLogic SubmissionBusinessLogic { get; set; }
         public IObfuscator Obfuscator { get; }
@@ -103,7 +106,7 @@ namespace ModernSlavery.WebUI.Controllers
         {
             if (!Config.IsProduction())
             {
-                _logger.LogInformation("Viewing Controller Initialised");
+                Logger.LogInformation("Viewing Controller Initialised");
             }
 
             return new EmptyResult();
@@ -271,7 +274,7 @@ namespace ModernSlavery.WebUI.Controllers
         {
             if (year == 0)
             {
-                year = SectorTypes.Private.GetAccountingStartDate().Year;
+                year = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Private).Year;
             }
 
             //Ensure we have a directory
@@ -341,7 +344,7 @@ namespace ModernSlavery.WebUI.Controllers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Cannot decrypt return id from query string");
+                    Logger.LogError(ex, "Cannot decrypt return id from query string");
                     return View("CustomError", new ErrorViewModel(400));
                 }
 
@@ -396,7 +399,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Cannot decrypt return employerIdentifier from '{employerIdentifier}'");
+                Logger.LogError(ex, $"Cannot decrypt return employerIdentifier from '{employerIdentifier}'");
                 return View("CustomError", new ErrorViewModel(400));
             }
 
@@ -471,7 +474,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Cannot decrypt return employerIdentifier from '{employerIdentifier}'");
+                Logger.LogError(ex, $"Cannot decrypt return employerIdentifier from '{employerIdentifier}'");
                 return View("CustomError", new ErrorViewModel(400));
             }
 
@@ -497,7 +500,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(
+                Logger.LogError(
                     ex,
                     $"Exception processing the return information for Organisation '{foundOrganisation.OrganisationId}:{foundOrganisation.OrganisationName}'");
                 return View("CustomError", new ErrorViewModel(400));

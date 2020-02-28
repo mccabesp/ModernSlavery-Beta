@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ModernSlavery.WebUI.Shared.Classes;
+using System;
 using System.ComponentModel.DataAnnotations;
-using ModernSlavery.WebUI.Classes;
 
 namespace ModernSlavery.WebUI.Models.Register
 {

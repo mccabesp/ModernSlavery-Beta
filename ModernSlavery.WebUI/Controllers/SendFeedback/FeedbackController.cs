@@ -4,11 +4,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
-using ModernSlavery.Database.Models;
-using ModernSlavery.WebUI.Classes;
+using ModernSlavery.Entities;
 using GovUkDesignSystem.Parsers;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.WebUI.Controllers.SendFeedback
 {

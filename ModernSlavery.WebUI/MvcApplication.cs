@@ -7,6 +7,7 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebUI
 {
@@ -34,8 +35,7 @@ namespace ModernSlavery.WebUI
             IFileRepository fileRepository,
             ISearchRepository<EmployerSearchModel> searchRepository,
             [KeyFilter(QueueNames.SendEmail)] IQueue sendEmailQueue,
-            [KeyFilter(QueueNames.SendNotifyEmail)]
-            IQueue sendNotifyEmailQueue,
+            [KeyFilter(QueueNames.SendNotifyEmail)]IQueue sendNotifyEmailQueue,
             [KeyFilter(QueueNames.ExecuteWebJob)] IQueue executeWebjobQueue
         )
         {

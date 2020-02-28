@@ -47,6 +47,8 @@
     <ProjectReference Include="..\ModernSlavery.Extensions.AspNetCore\ModernSlavery.Extensions.AspNetCore.csproj" />
     <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
     <ProjectReference Include="..\GovUkDesignSystem\GovUkDesignSystem.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.Admin\ModernSlavery.WebUI.Admin.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -155,6 +157,13 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Admin\" />
+    <Folder Include="Classes\API\" />
+    <Folder Include="Classes\Bundle\" />
+    <Folder Include="Models\Shared\" />
   </ItemGroup>
   
   <!-- *** THIS IS REQUIRED TO DEPLY WEBJOBS WITH WEBUI ON AZURE *** -->

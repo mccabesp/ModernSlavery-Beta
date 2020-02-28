@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessLogic.Account.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 
 namespace ModernSlavery.WebUI.Classes.Mappers

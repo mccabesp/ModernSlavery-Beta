@@ -2,15 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.Core;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 {
@@ -73,11 +77,11 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
                 // Create the close account notification to user
                 var sendEmails = new List<Task>();
                 bool testEmail = !Config.IsProduction();
-                sendEmails.Add(Emails.SendAccountClosedNotificationAsync(userToRetire.EmailAddress, testEmail));
+                sendEmails.Add(EmailSender.SendAccountClosedNotificationAsync(userToRetire.EmailAddress, testEmail));
 
                 //Create the notification to GEO for each newly orphaned organisation
                 userOrgs.Where(org => org.GetIsOrphan())
-                    .ForEach(org => sendEmails.Add(Emails.SendGEOOrphanOrganisationNotificationAsync(org.OrganisationName, testEmail)));
+                    .ForEach(org => sendEmails.Add(EmailSender.SendGEOOrphanOrganisationNotificationAsync(org.OrganisationName, testEmail)));
 
                 //Send all the notifications in parallel
                 await Task.WhenAll(sendEmails);

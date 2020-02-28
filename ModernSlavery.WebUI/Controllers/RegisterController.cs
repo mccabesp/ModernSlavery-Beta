@@ -1,26 +1,27 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Models.Register;
-using ModernSlavery.WebUI.Models.Scope;
 using ModernSlavery.WebUI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using AutoMapper;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -34,29 +35,23 @@ namespace ModernSlavery.WebUI.Controllers
 
         public RegisterController(
             ILogger<RegisterController> logger,
-            IHttpCache cache,
-            IHttpSession session,
+            IWebService webService,
             IScopePresentation scopePresentation,
             IScopeBusinessLogic scopeBL,
             IOrganisationBusinessLogic orgBL,
+            ICommonBusinessLogic commonBusinessLogic,
             ISearchBusinessLogic searchBusinessLogic,
             IUserRepository userRepository,
             IDataRepository dataRepository,
-            IWebTracker webTracker,
             PinInThePostService pinInThePostService,
             [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
-            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
-            IMapper autoMapper) : base(
-            logger,
-            cache,
-            session,
-            dataRepository,
-            webTracker,
-            autoMapper)
+            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository) 
+            : base(logger,webService,dataRepository)
         {
             ScopePresentation = scopePresentation;
             ScopeBusinessLogic = scopeBL;
             OrganisationBusinessLogic = orgBL;
+            _commonBusinessLogic = commonBusinessLogic;
             SearchBusinessLogic = searchBusinessLogic;
             PrivateSectorRepository = privateSectorRepository;
             PublicSectorRepository = publicSectorRepository;
@@ -83,6 +78,7 @@ namespace ModernSlavery.WebUI.Controllers
 
         // TODO move these in to RegisterPresentation service
         public IScopePresentation ScopePresentation { get; }
+        public ICommonBusinessLogic _commonBusinessLogic { get; set; }
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
         public IScopeBusinessLogic ScopeBusinessLogic { get; }
         public ISearchBusinessLogic SearchBusinessLogic { get; }
@@ -186,13 +182,13 @@ namespace ModernSlavery.WebUI.Controllers
                         }
                     }
 
-                    _logger.LogInformation(
+                    Logger.LogInformation(
                         "Send Pin-in-post",
                         $"Name {currentUser.Fullname}, Email:{currentUser.EmailAddress}, IP:{UserHostAddress}, Address:{userOrg?.Address.GetAddressString()}");
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, ex.Message);
+                    Logger.LogError(ex, ex.Message);
                     // TODO: maybe change this?
                     return View("CustomError", new ErrorViewModel(3014));
                 }
@@ -355,7 +351,7 @@ namespace ModernSlavery.WebUI.Controllers
             currentUser = await UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.Active);
             if (currentUser == null)
             {
-                _logger.LogWarning(
+                Logger.LogWarning(
                     "Password reset requested for unknown email address",
                     $"Email:{model.EmailAddress}, IP:{UserHostAddress}");
                 return View("PasswordResetSent");
@@ -398,14 +394,14 @@ namespace ModernSlavery.WebUI.Controllers
                     return false;
                 }
 
-                _logger.LogInformation(
+                Logger.LogInformation(
                     "Password reset sent",
                     $"Name {currentUser.Fullname}, Email:{currentUser.EmailAddress}, IP:{UserHostAddress}");
             }
             catch (Exception ex)
             {
                 //Log the exception
-                _logger.LogError(ex, ex.Message);
+                Logger.LogError(ex, ex.Message);
                 return false;
             }
 
@@ -531,7 +527,7 @@ namespace ModernSlavery.WebUI.Controllers
             await DataRepository.SaveChangesAsync();
 
             //Send completed notification email
-            await Emails.SendResetPasswordCompletedAsync(currentUser.EmailAddress);
+            await EmailSender.SendResetPasswordCompletedAsync(currentUser.EmailAddress);
 
             //Send the verification code and showconfirmation
             return View("CustomError", new ErrorViewModel(1127));

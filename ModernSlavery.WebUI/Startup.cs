@@ -7,7 +7,7 @@ using Autofac.Extensions.DependencyInjection;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Account.Abstractions;
+using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.BusinessLogic.Account.Repositories;
 using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.BusinessLogic.Repositories;
@@ -42,9 +42,11 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
-using Newtonsoft.Json.Serialization;
 using HttpSession = ModernSlavery.Extensions.AspNetCore.HttpSession;
-using System.Text.Json;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.WebUI.Admin.Classes;
 
 namespace ModernSlavery.WebUI
 {

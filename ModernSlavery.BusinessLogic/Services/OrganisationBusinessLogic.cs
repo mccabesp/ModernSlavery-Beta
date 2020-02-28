@@ -20,11 +20,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.BusinessLogic.Abstractions;
 
 namespace ModernSlavery.BusinessLogic
 {
     public interface IOrganisationBusinessLogic
     {
+        IDnBOrgsRepository DnBOrgsRepository { get; }
+
         // Organisation repo
         Organisation GetOrganisationById(long organisationId);
         Task<List<OrganisationsFileModel>> GetOrganisationsFileModelByYearAsync(int year);
@@ -61,6 +64,7 @@ namespace ModernSlavery.BusinessLogic
 
         DataTable GetCompareDatatable(IEnumerable<CompareReportModel> data);
         Task<Organisation> GetOrganisationByEmployerReferenceAndSecurityCodeAsync(string employerReference, string securityCode);
+        CustomError UnRetire(Organisation org, long byUserId, string details = null);
     }
 
     public class OrganisationBusinessLogic : IOrganisationBusinessLogic
@@ -75,13 +79,15 @@ namespace ModernSlavery.BusinessLogic
 
         public readonly DateTime PrivateAccountingDate;
         public readonly DateTime PublicAccountingDate;
-
+        public IDnBOrgsRepository DnBOrgsRepository { get; }
+        
         public OrganisationBusinessLogic(IConfiguration configuration,ICommonBusinessLogic commonBusinessLogic,
             IDataRepository dataRepo,
             ISubmissionBusinessLogic submissionLogic,
             IScopeBusinessLogic scopeLogic,
             IEncryptionHandler encryptionHandler,
             ISecurityCodeBusinessLogic securityCodeLogic,
+            IDnBOrgsRepository dnBOrgsRepository,
             IObfuscator obfuscator = null)
         {
             _configuration = configuration;
@@ -95,6 +101,7 @@ namespace ModernSlavery.BusinessLogic
 
             PrivateAccountingDate = _configuration.GetValue<DateTime>("PrivateAccountingDate");
             PublicAccountingDate = _configuration.GetValue<DateTime>("PublicAccountingDate");
+            DnBOrgsRepository = dnBOrgsRepository;
     }
 
     private IDataRepository _DataRepository { get; }
@@ -497,7 +504,7 @@ namespace ModernSlavery.BusinessLogic
             return address==null ? null : AddressModel.Create(address);
         }
 
-        public virtual CustomError UnRetire(Organisation org, long byUserId, string details = null)
+        public CustomError UnRetire(Organisation org, long byUserId, string details = null)
         {
             if (org.Status != OrganisationStatuses.Retired)
             {

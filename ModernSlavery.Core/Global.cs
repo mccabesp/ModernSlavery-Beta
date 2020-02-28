@@ -83,7 +83,6 @@ namespace ModernSlavery.Core
         public static int PurgeUnconfirmedPinDays => PinInPostExpiryDays + Config.GetAppSetting("PurgeUnconfirmedPinDays").ToInt32(14);
         public static int SecurityCodeExpiryDays => Config.GetAppSetting("SecurityCodeExpiryDays").ToInt32(90);
         public static bool DisablePageCaching => Config.GetAppSetting("DisablePageCaching").ToBoolean();
-        public static string AdminEmails => Config.GetAppSetting("AdminEmails");
 
         public static string LogPath => Config.GetAppSetting("LogPath");
         public static string DataPath => Config.GetAppSetting("DataPath");
@@ -101,8 +100,6 @@ namespace ModernSlavery.Core
         public static string PINChars => Config.GetAppSetting("PINChars");
         public static string PinRegex => Config.GetAppSetting("PinRegex");
         public static string PinRegexError => Config.GetAppSetting("PinRegexError");
-        public static string SuperAdminEmails => Config.GetAppSetting("SuperAdminEmails");
-        public static string DatabaseAdminEmails => Config.GetAppSetting("DatabaseAdminEmails");
         public static string TestPrefix => Config.GetAppSetting("TestPrefix");
         public static string WhoNeedsToReportGuidanceLink => Config.GetAppSetting("WhoNeedsToReportGuidanceLink");
         

@@ -6,7 +6,7 @@ using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
 using NUnit.Framework;

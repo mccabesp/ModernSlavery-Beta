@@ -5,12 +5,13 @@ using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Classes.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using AutoMapper;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.WebUI.Controllers.Submission
 {
@@ -38,12 +39,9 @@ namespace ModernSlavery.WebUI.Controllers.Submission
 
         public SubmitController(
             ILogger<SubmitController> logger,
-            IHttpCache cache,
-            IHttpSession session,
+            IWebService webService,
             ISubmissionService submitService,
-            IDataRepository dataRepository,
-            IWebTracker webTracker,
-            IMapper autoMapper) : base(logger, cache, session, dataRepository, webTracker,autoMapper)
+            IDataRepository dataRepository) : base(logger, webService, dataRepository)
         {
             submissionService = submitService;
         }
@@ -55,7 +53,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
         {
             if (!Config.IsProduction())
             {
-                _logger.LogInformation("Submit Controller Initialised");
+                Logger.LogInformation("Submit Controller Initialised");
             }
 
             return new EmptyResult();

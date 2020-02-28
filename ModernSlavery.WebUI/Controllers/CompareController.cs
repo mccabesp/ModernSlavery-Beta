@@ -12,7 +12,6 @@ using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.HttpResultModels;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
@@ -20,7 +19,15 @@ using ModernSlavery.WebUI.Classes.Presentation;
 using ModernSlavery.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using AutoMapper;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -29,16 +36,12 @@ namespace ModernSlavery.WebUI.Controllers
     {
 
         public CompareController(
-            ILogger<ErrorController> logger,
-            IHttpCache cache,
-            IHttpSession session,
+            ILogger<CompareController> logger,
+            IWebService webService,
             ISearchViewService searchViewService,
             ICompareViewService compareViewService,
             IDataRepository dataRepository,
-            IOrganisationBusinessLogic organisationBusinessLogic,
-            IWebTracker webTracker,
-            IMapper autoMapper) :
-            base(logger, cache, session, dataRepository, webTracker, autoMapper)
+            IOrganisationBusinessLogic organisationBusinessLogic) : base(logger, webService, dataRepository)
 
         {
             OrganisationBusinessLogic = organisationBusinessLogic;

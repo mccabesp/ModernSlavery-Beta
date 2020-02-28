@@ -17,6 +17,8 @@ namespace ModernSlavery.Entities
     {
         private IConfiguration _configuration;
         private string AdminEmails => _configuration.GetValue<string>("AdminEmails");
+        private string SuperAdminEmails => _configuration.GetValue<string>("SuperAdminEmails");
+        private string DatabaseAdminEmails => _configuration.GetValue<string>("DatabaseAdminEmails");
 
         public User(IConfiguration configuration)
         {
@@ -81,6 +83,25 @@ namespace ModernSlavery.Entities
             }
 
             return EmailAddress.LikeAny(AdminEmails.SplitI(";"));
+        }
+
+        public bool IsSuperAdministrator()
+        {
+            if (!EmailAddress.IsEmailAddress())throw new ArgumentException("Bad email address");
+
+            if (string.IsNullOrWhiteSpace(SuperAdminEmails))throw new ArgumentException("Missing SuperAdminEmails from web.config");
+
+            return EmailAddress.LikeAny(SuperAdminEmails.SplitI(";"));
+        }
+
+        public bool IsDatabaseAdministrator()
+        {
+            if (!EmailAddress.IsEmailAddress())throw new ArgumentException("Bad email address");
+
+            if (string.IsNullOrWhiteSpace(DatabaseAdminEmails))
+                return IsSuperAdministrator();
+
+            return EmailAddress.LikeAny(DatabaseAdminEmails.SplitI(";"));
         }
 
         /// <summary>

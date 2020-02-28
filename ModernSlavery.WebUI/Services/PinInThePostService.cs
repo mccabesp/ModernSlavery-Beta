@@ -4,11 +4,18 @@ using System.Linq;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Notify.Models.Responses;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Services
 {

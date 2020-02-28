@@ -2,7 +2,7 @@
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 
-namespace ModernSlavery.BusinessLogic.Account.Abstractions
+namespace ModernSlavery.BusinessLogic.Abstractions
 {
 
     public interface IRegistrationRepository : IDataTransaction
