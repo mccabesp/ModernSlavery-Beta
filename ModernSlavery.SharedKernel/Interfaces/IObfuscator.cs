@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ModernSlavery.SharedKernel.Interfaces
+﻿namespace ModernSlavery.SharedKernel.Interfaces
 {
     public interface IObfuscator
     {

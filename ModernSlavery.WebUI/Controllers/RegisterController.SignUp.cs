@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
@@ -58,10 +57,9 @@ namespace ModernSlavery.WebUI.Controllers
             try
             {
                 string verifyCode = Encryption.EncryptQuerystring(currentUser.UserId + ":" + currentUser.Created.ToSmallDateTime());
-                if (!await this.SendVerifyEmailAsync(currentUser.EmailAddress, verifyCode))
-                {
+                string verifyUrl = Url.Action("VerifyEmail", "Register", new { code = verifyCode }, "https");
+                if (!await _commonBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, currentUser.EmailAddress))
                     return null;
-                }
 
                 currentUser.EmailVerifyHash = Crypto.GetSHA512Checksum(verifyCode);
                 currentUser.EmailVerifySendDate = VirtualDateTime.Now;

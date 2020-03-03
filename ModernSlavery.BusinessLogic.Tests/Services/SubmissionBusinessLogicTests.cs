@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using ModernSlavery.BusinessLogic.Models;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
 
 namespace ModernSlavery.BusinessLogic.Tests.Services

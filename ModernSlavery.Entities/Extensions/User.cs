@@ -2,8 +2,6 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
-using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using Microsoft.Extensions.Configuration;

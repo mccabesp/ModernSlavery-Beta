@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Scope;
 using Microsoft.AspNetCore.Authorization;

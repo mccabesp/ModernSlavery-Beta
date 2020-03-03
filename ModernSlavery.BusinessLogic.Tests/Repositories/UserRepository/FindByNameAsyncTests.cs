@@ -7,6 +7,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using MockQueryable.Moq;
 using Moq;
+
 using NUnit.Framework;
 using ModernSlavery.Tests.Common;
 using Autofac;

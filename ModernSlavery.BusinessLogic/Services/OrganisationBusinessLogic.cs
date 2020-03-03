@@ -27,7 +27,6 @@ namespace ModernSlavery.BusinessLogic
     public interface IOrganisationBusinessLogic
     {
         IDnBOrgsRepository DnBOrgsRepository { get; }
-
         // Organisation repo
         Organisation GetOrganisationById(long organisationId);
         Task<List<OrganisationsFileModel>> GetOrganisationsFileModelByYearAsync(int year);
@@ -77,20 +76,17 @@ namespace ModernSlavery.BusinessLogic
         private readonly ISecurityCodeBusinessLogic _securityCodeLogic;
         private readonly ISubmissionBusinessLogic _submissionLogic;
 
-        public readonly DateTime PrivateAccountingDate;
-        public readonly DateTime PublicAccountingDate;
         public IDnBOrgsRepository DnBOrgsRepository { get; }
         
-        public OrganisationBusinessLogic(IConfiguration configuration,ICommonBusinessLogic commonBusinessLogic,
+        public OrganisationBusinessLogic(ICommonBusinessLogic commonBusinessLogic,
             IDataRepository dataRepo,
             ISubmissionBusinessLogic submissionLogic,
             IScopeBusinessLogic scopeLogic,
             IEncryptionHandler encryptionHandler,
             ISecurityCodeBusinessLogic securityCodeLogic,
             IDnBOrgsRepository dnBOrgsRepository,
-            IObfuscator obfuscator = null)
+            IObfuscator obfuscator)
         {
-            _configuration = configuration;
             _commonBusinessLogic = commonBusinessLogic;
             _DataRepository = dataRepo;
             _submissionLogic = submissionLogic;
@@ -98,13 +94,10 @@ namespace ModernSlavery.BusinessLogic
             _obfuscator = obfuscator;
             _securityCodeLogic = securityCodeLogic;
             _encryptionHandler = encryptionHandler;
-
-            PrivateAccountingDate = _configuration.GetValue<DateTime>("PrivateAccountingDate");
-            PublicAccountingDate = _configuration.GetValue<DateTime>("PublicAccountingDate");
             DnBOrgsRepository = dnBOrgsRepository;
     }
 
-    private IDataRepository _DataRepository { get; }
+        private IDataRepository _DataRepository { get; }
 
         /// <summary>
         ///     Gets a list of organisations with latest returns and scopes for Organisations download file

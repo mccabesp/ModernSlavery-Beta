@@ -9,7 +9,6 @@ using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Classes.Downloadable;
 using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.Core.Models.Downloadable;
-using ModernSlavery.WebUI.Areas.Admin.Controllers;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -17,6 +16,8 @@ using Moq;
 using NUnit.Framework;
 using ModernSlavery.Tests.Common;
 using AutoMapper;
+using ModernSlavery.WebUI.Admin.Controllers;
+using ModernSlavery.WebUI.Shared.Abstractions;
 
 namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 {
@@ -78,13 +79,11 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 
             var downloadableFileBusinessLogic = IocContainer.Resolve<IDownloadableFileBusinessLogic>();
 
+            var webService = IocContainer.Resolve<IWebService>();
             _TestDownloadableFileController = new DownloadableFileController(
-                configurableLogger.Object,
+                configurableLogger.Object,webService,
                 null,
-                null,
-                null,
-                null,
-                downloadableFileBusinessLogic, DependencyContainer.Resolve<IMapper>());
+                downloadableFileBusinessLogic);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile(filePath);
@@ -144,13 +143,11 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 
             var downloadableFileBusinessLogic = IocContainer.Resolve<IDownloadableFileBusinessLogic>();
 
+            var webService = IocContainer.Resolve<IWebService>();
             _TestDownloadableFileController = new DownloadableFileController(
-                configurableLogger.Object,
+                configurableLogger.Object, webService,
                 null,
-                null,
-                null,
-                null,
-                downloadableFileBusinessLogic, DependencyContainer.Resolve<IMapper>());
+                downloadableFileBusinessLogic);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile(filePath);
@@ -212,13 +209,11 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .Setup(x => x.GetFileRemovingSensitiveInformationAsync(It.IsAny<string>()))
                 .ThrowsAsync(new FileNotFoundException());
 
+            var webService = IocContainer.Resolve<IWebService>();
             _TestDownloadableFileController = new DownloadableFileController(
-                configurableLogger.Object,
+                configurableLogger.Object, webService,
                 null,
-                null,
-                null,
-                null,
-                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
+                configurableDownloadableFileBusinessLogic.Object);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile("AFilePath");
@@ -255,13 +250,11 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .Setup(x => x.GetFileRemovingSensitiveInformationAsync(It.IsAny<string>()))
                 .ReturnsAsync(new DownloadableFileModel("someName") {DataTable = new DataTable()});
 
+            var webService = IocContainer.Resolve<IWebService>();
             _TestDownloadableFileController = new DownloadableFileController(
+                null, webService,
                 null,
-                null,
-                null,
-                null,
-                null,
-                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
+                configurableDownloadableFileBusinessLogic.Object);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile("AFilePath");
@@ -288,13 +281,11 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .Callback((string fp) => { actualPath = fp; })
                 .ReturnsAsync(new List<IDownloadableItem>());
 
+            var webService = IocContainer.Resolve<IWebService>();
             _TestDownloadableFileController = new DownloadableFileController(
+                null, webService,
                 null,
-                null,
-                null,
-                null,
-                null,
-                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
+                configurableDownloadableFileBusinessLogic.Object);
 
             // Act
             await _TestDownloadableFileController.WebsiteLogs(filePath);
@@ -344,13 +335,11 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .Callback((string fp) => { actualPath = fp; })
                 .ReturnsAsync(new List<IDownloadableItem>());
 
+            var webService = IocContainer.Resolve<IWebService>();
             _TestDownloadableFileController = new DownloadableFileController(
+                null, webService,
                 null,
-                null,
-                null,
-                null,
-                null,
-                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
+                configurableDownloadableFileBusinessLogic.Object);
 
             // Act
             await _TestDownloadableFileController.WebjobLogs(filePath);
@@ -400,14 +389,13 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .Callback((string fp) => { actualPath = fp; })
                 .ReturnsAsync(new List<IDownloadableItem>());
 
+            var webService = IocContainer.Resolve<IWebService>();
             _TestDownloadableFileController = new DownloadableFileController(
+                null, webService,
                 null,
-                null,
-                null,
-                null,
-                null,
-                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
-
+                configurableDownloadableFileBusinessLogic.Object);
+            
+            
             // Act
             await _TestDownloadableFileController.IdentityLogs(filePath);
 
@@ -454,13 +442,11 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .Setup(x => x.GetListOfDownloadableItemsFromPathAsync(It.IsAny<string>()))
                 .ReturnsAsync(listOfDownloadableItems);
 
+            var webService = IocContainer.Resolve<IWebService>();
             _TestDownloadableFileController = new DownloadableFileController(
+                null, webService,
                 null,
-                null,
-                null,
-                null,
-                null,
-                configurableDownloadableFileBusinessLogic.Object, DependencyContainer.Resolve<IMapper>());
+                configurableDownloadableFileBusinessLogic.Object);
         }
 
     }

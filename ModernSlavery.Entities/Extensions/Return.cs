@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;

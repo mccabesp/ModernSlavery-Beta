@@ -2,6 +2,7 @@
 using System.Reflection;
 using Moq;
 
+
 namespace ModernSlavery.Tests.Common.TestHelpers
 {
     public static class MoqHelper

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.Logger;
-using ModernSlavery.Core.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Queue;

@@ -12,7 +12,7 @@ using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Shared.Abstractions;
 
-namespace ModernSlavery.WebUI.Services
+namespace ModernSlavery.WebUI.Shared.Services
 {
     public class NotificationService: INotificationService
     {

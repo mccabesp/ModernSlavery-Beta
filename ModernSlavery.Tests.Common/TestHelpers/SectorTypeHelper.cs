@@ -1,10 +1,14 @@
-﻿using System;
-using ModernSlavery.Core;
+﻿using Autofac;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Tests.Common.Classes;
+using System;
 
 namespace ModernSlavery.Tests.Common.TestHelpers
 {
     public static class SectorTypeHelper
     {
+        public static ISnapshotDateHelper SnapshotDateHelper = AutoFacHelpers.DIContainer.Resolve<ISnapshotDateHelper>();
 
         public static DateTime GetSnapshotDateForSector(int year, SectorTypes sector)
         {
@@ -19,6 +23,11 @@ namespace ModernSlavery.Tests.Common.TestHelpers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(sector), sector, null);
             }
+        }
+
+        public static DateTime GetAccountingStartDate(this SectorTypes sectorType, int year = 0)
+        {
+            return SnapshotDateHelper.GetSnapshotDate(sectorType, year);
         }
 
     }

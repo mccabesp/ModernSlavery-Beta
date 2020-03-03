@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Home;
@@ -11,7 +10,7 @@ using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
-using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.Tests
 {

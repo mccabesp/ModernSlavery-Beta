@@ -4,10 +4,8 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Controllers.Submission
 {

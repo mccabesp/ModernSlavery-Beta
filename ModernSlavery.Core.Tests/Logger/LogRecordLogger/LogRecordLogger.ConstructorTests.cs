@@ -1,5 +1,6 @@
 ﻿using System;
 using Moq;
+
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.LogRecordLogger

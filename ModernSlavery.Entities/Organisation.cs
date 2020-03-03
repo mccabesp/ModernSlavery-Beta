@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
-using ModernSlavery.Entities.Enums;
-using System.Linq;
 using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Entities

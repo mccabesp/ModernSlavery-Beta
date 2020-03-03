@@ -2,7 +2,6 @@
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;

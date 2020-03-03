@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.BusinessLogic;
 
 namespace ModernSlavery.WebUI.Controllers.Submission
 {
@@ -23,6 +24,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
         public delegate bool IsPageChanged(ReturnViewModel postedReturnViewModel, ReturnViewModel stashedReturnViewModel);
 
         public readonly ISubmissionService submissionService;
+        public readonly ICommonBusinessLogic commonBusinessLogic;
         //public ISubmissionBusinessLogic _submissionBusinessLogic;
         //public IFileRepository _fileRepository;
 
@@ -40,9 +42,11 @@ namespace ModernSlavery.WebUI.Controllers.Submission
         public SubmitController(
             ILogger<SubmitController> logger,
             IWebService webService,
+            ICommonBusinessLogic commonBusinessLogic,
             ISubmissionService submitService,
             IDataRepository dataRepository) : base(logger, webService, dataRepository)
         {
+            this.commonBusinessLogic = commonBusinessLogic;
             submissionService = submitService;
         }
 

@@ -1,13 +1,4 @@
-﻿using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {

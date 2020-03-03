@@ -10,7 +10,6 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using ModernSlavery.Entities;
 
 namespace ModernSlavery.Database
 {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
@@ -44,22 +43,6 @@ namespace ModernSlavery.WebUI.Classes
         #region User Entity
 
     
-        #endregion
-
-        #region Registraion Helpers
-
-        public static async Task<bool> SendVerifyEmailAsync(this Controller controller, string emailAddress, string verifyCode)
-        {
-            string verifyUrl = controller.Url.Action("VerifyEmail", "Register", new {code = verifyCode}, "https");
-            return await EmailSender.SendCreateAccountPendingVerificationAsync(verifyUrl, emailAddress);
-        }
-
-        public static async Task<bool> SendPasswordResetAsync(this Controller controller, string emailAddress, string resetCode)
-        {
-            string resetUrl = controller.Url.Action("NewPassword", "Register", new {code = resetCode}, "https");
-            return await EmailSender.SendResetPasswordNotificationAsync(resetUrl, emailAddress);
-        }
-
         #endregion
 
         #region Encypt Decrypt

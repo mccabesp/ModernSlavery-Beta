@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.Search.Models;
 using NUnit.Framework;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Integration.Tests
 {

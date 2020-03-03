@@ -18,7 +18,6 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.Queues;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Infrastructure.AzureQueues.Extensions;
@@ -47,6 +46,9 @@ using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.BusinessLogic.Classes;
+using ModernSlavery.Database;
 
 namespace ModernSlavery.WebUI
 {

@@ -1,12 +1,13 @@
 ﻿@inject IOptionsSnapshot<ViewingOptions> ViewingOptions
+@inject ModernSlavery.SharedKernel.Interfaces.ISnapshotDateHelper SnapshotDateHelper
 @using ModernSlavery.Core
 @model CompareViewModel
 @{
-    int endYear = Global.CurrentAccountingYear;
+    int endYear = SnapshotDateHelper.CurrentSnapshotYear;
     int startYear = endYear - (ViewingOptions.Value.ShowReportYearCount - 1);
-    if (startYear < Global.FirstReportingYear)
+    if (startYear < SnapshotDateHelper.FirstReportingYear)
     {
-        startYear = Global.FirstReportingYear;
+        startYear = SnapshotDateHelper.FirstReportingYear;
     }
 }
 <div class="no-print">

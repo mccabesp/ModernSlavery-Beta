@@ -1,18 +1,19 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Areas.Admin.Controllers;
-using ModernSlavery.WebUI.Areas.Admin.Models;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using MockQueryable.Moq;
 using Moq;
+
 using NUnit.Framework;
 using ModernSlavery.WebUI.Tests;
+using ModernSlavery.WebUI.Admin.Controllers;
+using ModernSlavery.WebUI.Admin.Models;
 
 namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 {

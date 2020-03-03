@@ -7,6 +7,7 @@ using ModernSlavery.Core.Classes.Downloadable;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Interfaces.Downloadable;
 using Moq;
+
 using NUnit.Framework;
 
 namespace ModernSlavery.BusinessLogic.Tests.Services

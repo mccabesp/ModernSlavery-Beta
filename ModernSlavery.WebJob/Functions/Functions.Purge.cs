@@ -7,14 +7,14 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.Entities.Enums;
 using ModernSlavery.Database;
 
 namespace ModernSlavery.WebJob

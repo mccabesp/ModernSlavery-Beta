@@ -1,6 +1,7 @@
 ﻿using ModernSlavery.WebUI.Models.Scope;
 using Moq;
 
+
 namespace ModernSlavery.WebUI.Tests.TestHelpers
 {
     public class ScopingViewModelHelper

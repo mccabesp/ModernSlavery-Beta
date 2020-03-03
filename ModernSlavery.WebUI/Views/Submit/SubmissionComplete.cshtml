@@ -6,8 +6,6 @@
             @Html.AntiForgeryToken()
             @Html.HiddenFor(model => Model.AccountingDate)
 
-            var controller = ViewData["Controller"] as BaseController;
-
             @await Html.CustomValidationSummaryAsync()
             <div class="govuk-box-highlight">
                 <h1 class="bold-large">You've submitted your Modern Slavery statement for @(Model.AccountingDate.Year) to @(Model.AccountingDate.AddYears(1).Year)</h1>

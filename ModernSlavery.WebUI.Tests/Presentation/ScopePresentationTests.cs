@@ -8,7 +8,7 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
@@ -16,12 +16,16 @@ using ModernSlavery.Tests.Common.Mocks;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
 using ModernSlavery.WebUI.Classes.Services;
-using ModernSlavery.WebUI.Models.Register;
 using ModernSlavery.WebUI.Models.Scope;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using MockQueryable.Moq;
 using Moq;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
 using NUnit.Framework;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.BusinessLogic.Abstractions;
 
 namespace ModernSlavery.Tests
 {
@@ -35,7 +39,7 @@ namespace ModernSlavery.Tests
         private Mock<IFileRepository> mockFileRepo;
         private Mock<OrganisationBusinessLogic> mockOrganisationBL;
         private Mock<ScopeBusinessLogic> mockScopeBL;
-        private readonly ICommonBusinessLogic testCommonBL = new CommonBusinessLogic(Config.Configuration);
+        private readonly ICommonBusinessLogic testCommonBL = MoqHelpers.CreateMockCommonBusinessLogic();
         private ScopePresentation testScopePresentation;
 
         private ISearchBusinessLogic testSearchBL;
@@ -67,7 +71,7 @@ namespace ModernSlavery.Tests
             mockOrganisationBL.CallBase = true;
 
             // service under test
-            testScopePresentation = new ScopePresentation(mockScopeBL.Object, mockDataRepo.Object, mockOrganisationBL.Object);
+            testScopePresentation = new ScopePresentation(mockScopeBL.Object, mockDataRepo.Object, mockOrganisationBL.Object, testCommonBL);
         }
 
         [Test]
@@ -91,12 +95,14 @@ namespace ModernSlavery.Tests
                 new Mock<IScopeBusinessLogic>().Object,
                 new Mock<IEncryptionHandler>().Object,
                 new Mock<ISecurityCodeBusinessLogic>().Object,
+                new Mock<IDnBOrgsRepository>().Object,
                 new Mock<IObfuscator>().Object);
 
             var scopePresentation = new ScopePresentation(
                 mockScopeBL.Object,
                 dataRepo.Object,
-                organisationBusinessLogic);
+                organisationBusinessLogic,
+                testCommonBL);
 
             var testModel = new EnterCodesViewModel {EmployerReference = "NotFoundInDB", SecurityToken = mockOrg.SecurityCode};
 
@@ -127,12 +133,14 @@ namespace ModernSlavery.Tests
                 new Mock<IScopeBusinessLogic>().Object,
                 new Mock<IEncryptionHandler>().Object,
                 new Mock<ISecurityCodeBusinessLogic>().Object,
+                new Mock<IDnBOrgsRepository>().Object,
                 new Mock<IObfuscator>().Object);
 
             var scopePresentation = new ScopePresentation(
                 mockScopeBL.Object,
                 dataRepo.Object,
-                organisationBusinessLogic);
+                organisationBusinessLogic,
+                testCommonBL);
 
             var testModel = new EnterCodesViewModel {EmployerReference = mockOrg.EmployerReference, SecurityToken = mockOrg.SecurityCode};
 

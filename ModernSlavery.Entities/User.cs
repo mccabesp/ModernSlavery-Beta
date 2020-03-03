@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography;
-using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Entities.Enums;
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,11 +6,7 @@ using System.Web;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Storage;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Azure.Storage.Auth;
-using Microsoft.AspNetCore.DataProtection.AzureStorage;
 using Microsoft.Azure.Storage.Blob;
-using System.IO;
 using StackExchange.Redis;
 using Microsoft.Extensions.Configuration;
 

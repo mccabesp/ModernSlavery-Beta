@@ -1,7 +1,6 @@
 ﻿using System;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
-using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.Entities
 {

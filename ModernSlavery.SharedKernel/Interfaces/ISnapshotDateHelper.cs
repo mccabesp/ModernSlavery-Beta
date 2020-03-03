@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using ModernSlavery.Extensions;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ModernSlavery.SharedKernel.Interfaces
 {

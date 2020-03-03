@@ -15,11 +15,9 @@ using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Models.Organisation;
 using ModernSlavery.WebUI.Models.Scope;
-using ModernSlavery.WebUI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using AutoMapper;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
@@ -41,6 +39,7 @@ namespace ModernSlavery.WebUI.Controllers
             ISubmissionService submitService,
             IScopePresentation scopePresentation,
             IScopeBusinessLogic scopeBL,
+            ICommonBusinessLogic commonBL,
             IOrganisationBusinessLogic organisationBL,
             IDataRepository dataRepository,
             IRegistrationRepository registrationRepository,
@@ -52,6 +51,7 @@ namespace ModernSlavery.WebUI.Controllers
             ScopePresentation = scopePresentation;
             ScopeBusinessLogic = scopeBL;
             OrganisationBusinessLogic = organisationBL;
+            CommonBusinessLogic = commonBL;
             PrivateSectorRepository = privateSectorRepository;
             PublicSectorRepository = publicSectorRepository;
             RegistrationRepository = registrationRepository;
@@ -365,6 +365,7 @@ namespace ModernSlavery.WebUI.Controllers
         public IScopePresentation ScopePresentation { get; }
 
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
+        public ICommonBusinessLogic CommonBusinessLogic { get; }
 
         public IScopeBusinessLogic ScopeBusinessLogic { get; }
 
@@ -500,7 +501,7 @@ namespace ModernSlavery.WebUI.Controllers
             await RegistrationRepository.RemoveRegistrationAsync(userOrgToUnregister, actionByUser);
 
             // Email user that has been unregistered
-            NotificationService.SendRemovedUserFromOrganisationEmail(
+            CommonBusinessLogic.NotificationService.SendRemovedUserFromOrganisationEmail(
                 userToUnregister.EmailAddress,
                 orgToRemove.OrganisationName,
                 userToUnregister.Fullname);
@@ -509,7 +510,7 @@ namespace ModernSlavery.WebUI.Controllers
             IEnumerable<string> emailAddressesForOrganisation = orgToRemove.UserOrganisations.Select(uo => uo.User.EmailAddress);
             foreach (string emailAddress in emailAddressesForOrganisation)
             {
-                NotificationService.SendRemovedUserFromOrganisationEmail(
+                CommonBusinessLogic.NotificationService.SendRemovedUserFromOrganisationEmail(
                     emailAddress,
                     orgToRemove.OrganisationName,
                     userToUnregister.Fullname);
@@ -522,7 +523,7 @@ namespace ModernSlavery.WebUI.Controllers
                 bool testEmail = !Config.IsProduction();
                 if (orgToRemove.GetIsOrphan())
                 {
-                    sendEmails.Add(EmailSender.SendGEOOrphanOrganisationNotificationAsync(orgToRemove.OrganisationName, testEmail));
+                    sendEmails.Add(CommonBusinessLogic.SendEmailService.SendGEOOrphanOrganisationNotificationAsync(orgToRemove.OrganisationName, testEmail));
                 }
 
                 await Task.WhenAll(sendEmails);

@@ -16,19 +16,11 @@ using ModernSlavery.WebUI.Models.Submit;
 using ModernSlavery.WebUI.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
-using ModernSlavery.WebUI.Shared.Models;
-using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.SharedKernel;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Classes.Services
 {
@@ -106,6 +98,8 @@ namespace ModernSlavery.WebUI.Classes.Services
         public IScopeBusinessLogic ScopeBusinessLogic { get; }
 
         public IFileRepository FileRepository { get; }
+        public ISendEmailService SendEmailService { get; }
+        public INotificationService NotificationService { get; }
 
         public bool IsCurrentSnapshotYear(SectorTypes sector, int snapshotYear)
         {

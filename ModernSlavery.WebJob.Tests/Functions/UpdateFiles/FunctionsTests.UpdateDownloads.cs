@@ -5,13 +5,16 @@ using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebJob.Tests.TestHelpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
 using OrganisationHelper = ModernSlavery.WebJob.Tests.TestHelpers.OrganisationHelper;
 
@@ -66,7 +69,7 @@ namespace ModernSlavery.WebJob.Tests.Functions
             List<DownloadResult> actualResults = await Global.FileRepository.ReadCSVAsync<DownloadResult>(downloadFilePath);
 
             //Generate the expected results
-            List<DownloadResult> expectedResults = returns.Select(r => r.ToDownloadResult()).OrderBy(d => d.EmployerName).ToList();
+            List<DownloadResult> expectedResults = returns.Select(r => DownloadResult.Create(r)).OrderBy(d => d.EmployerName).ToList();
 
             //Check the results
             expectedResults.Compare(actualResults);

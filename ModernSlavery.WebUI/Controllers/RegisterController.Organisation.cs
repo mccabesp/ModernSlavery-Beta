@@ -1,33 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Api;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.HttpResultModels;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Register;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.WebUI.Shared.Models;
-using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
-using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
 using ModernSlavery.WebUI.Shared.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -87,7 +79,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             //TODO validate the submitted fields
             ModelState.Clear();
-            
+
             if (!model.SectorType.EqualsI(SectorTypes.Private, SectorTypes.Public))
             {
                 AddModelError(3005, "SectorType");
@@ -211,7 +203,7 @@ namespace ModernSlavery.WebUI.Controllers
                             return View(model);
                         }
 
-                        await EmailSender.SendGeoMessageAsync(
+                        await _commonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                             "GPG - COMPANIES HOUSE ERROR",
                             $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
                             currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
@@ -258,7 +250,7 @@ namespace ModernSlavery.WebUI.Controllers
             //Go to step 5 with results
             if (Request.Query["fail"].ToBoolean())
             {
-                return RedirectToAction("ChooseOrganisation", "Register", new {fail = true});
+                return RedirectToAction("ChooseOrganisation", "Register", new { fail = true });
             }
 
             return RedirectToAction("ChooseOrganisation");
@@ -437,7 +429,7 @@ namespace ModernSlavery.WebUI.Controllers
                                 return View(model);
                             }
 
-                            await EmailSender.SendGeoMessageAsync(
+                            await _commonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                                 "GPG - COMPANIES HOUSE ERROR",
                                 $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
                                 currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
@@ -566,7 +558,7 @@ namespace ModernSlavery.WebUI.Controllers
                     //Get the email domains from the D&B file
                     if (string.IsNullOrWhiteSpace(employer.EmailDomains))
                     {
-                        List<DnBOrgsModel> allDnBOrgs = await IDnBOrgsRepository.GetAllDnBOrgsAsync();
+                        List<DnBOrgsModel> allDnBOrgs = await OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
                         DnBOrgsModel dnbOrg = allDnBOrgs?.FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
                         if (dnbOrg != null)
                         {
@@ -1040,7 +1032,7 @@ namespace ModernSlavery.WebUI.Controllers
                 //Get the email domains from the D&B file
                 if (string.IsNullOrWhiteSpace(employer.EmailDomains))
                 {
-                    List<DnBOrgsModel> allDnBOrgs = await IDnBOrgsRepository.GetAllDnBOrgsAsync();
+                    List<DnBOrgsModel> allDnBOrgs = await OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
                     DnBOrgsModel dnbOrg = allDnBOrgs?.FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
                     if (dnbOrg != null)
                     {
@@ -1159,7 +1151,7 @@ namespace ModernSlavery.WebUI.Controllers
                                 return View(model);
                             }
 
-                            await EmailSender.SendGeoMessageAsync(
+                            await _commonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                                 "GPG - COMPANIES HOUSE ERROR",
                                 $"Cant get SIC Codes from Companies House API for company {employer.OrganisationName} No:{employer.CompanyNumber} due to following error:\n\n{ex.Message}",
                                 currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
@@ -1241,7 +1233,7 @@ namespace ModernSlavery.WebUI.Controllers
                     }
                     else
                     {
-                        model.IsUkAddress = await PostcodesIoApi.IsValidPostcode(employer.PostCode) ? true : (bool?) null;
+                        model.IsUkAddress = await PostcodesIoApi.IsValidPostcode(employer.PostCode) ? true : (bool?)null;
                     }
                 }
 
@@ -1372,7 +1364,7 @@ namespace ModernSlavery.WebUI.Controllers
 
                 if (currentUser.EmailAddress.StartsWithI(Global.TestPrefix))
                 {
-                    TempData["TestUrl"] = Url.Action("ReviewRequest", "Admin", new {area="Admin", code = reviewCode});
+                    TempData["TestUrl"] = Url.Action("ReviewRequest", "Admin", new { area = "Admin", code = reviewCode });
                 }
 
                 return RedirectToAction("RequestReceived");
@@ -1385,7 +1377,8 @@ namespace ModernSlavery.WebUI.Controllers
                 if (!userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))
                 {
                     await Global.RegistrationLog.WriteAsync(
-                        new RegisterLogModel {
+                        new RegisterLogModel
+                        {
                             StatusDate = VirtualDateTime.Now,
                             Status = "Public sector email confirmed",
                             ActionBy = currentUser.EmailAddress,
@@ -1410,12 +1403,14 @@ namespace ModernSlavery.WebUI.Controllers
                 if (model.IsFastTrackAuthorised)
                 {
                     //Send notification email to existing users
-                    EmailSendingServiceHelpers.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
+                    _commonBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
                 }
 
                 this.StashModel(
-                    new CompleteViewModel {
-                        OrganisationId = userOrg.OrganisationId, AccountingDate = _commonBusinessLogic.GetAccountingStartDate(sector.Value)
+                    new CompleteViewModel
+                    {
+                        OrganisationId = userOrg.OrganisationId,
+                        AccountingDate = _commonBusinessLogic.GetAccountingStartDate(sector.Value)
                     });
 
                 //BUG: the return keyword was missing here so no redirection would occur
@@ -1484,7 +1479,8 @@ namespace ModernSlavery.WebUI.Controllers
                 org.Status = OrganisationStatuses.New;
 
                 //Create a presumed in-scope for current year
-                var newScope = new OrganisationScope {
+                var newScope = new OrganisationScope
+                {
                     Organisation = org,
                     ScopeStatus = ScopeStatuses.PresumedInScope,
                     ScopeStatusDate = now,
@@ -1496,7 +1492,8 @@ namespace ModernSlavery.WebUI.Controllers
                 org.OrganisationScopes.Add(newScope);
 
                 //Create a presumed out-of-scope for previous year
-                var oldScope = new OrganisationScope {
+                var oldScope = new OrganisationScope
+                {
                     Organisation = org,
                     ScopeStatus = ScopeStatuses.PresumedOutOfScope,
                     ScopeStatusDate = now,
@@ -1513,8 +1510,11 @@ namespace ModernSlavery.WebUI.Controllers
                     //Add the charity number
                     if (!string.IsNullOrWhiteSpace(model.CharityNumber))
                     {
-                        reference = new OrganisationReference {
-                            ReferenceName = nameof(model.CharityNumber), ReferenceValue = model.CharityNumber, Organisation = org
+                        reference = new OrganisationReference
+                        {
+                            ReferenceName = nameof(model.CharityNumber),
+                            ReferenceValue = model.CharityNumber,
+                            Organisation = org
                         };
                         DataRepository.Insert(reference);
                         org.OrganisationReferences.Add(reference);
@@ -1523,8 +1523,11 @@ namespace ModernSlavery.WebUI.Controllers
                     //Add the mutual number
                     if (!string.IsNullOrWhiteSpace(model.MutualNumber))
                     {
-                        reference = new OrganisationReference {
-                            ReferenceName = nameof(model.MutualNumber), ReferenceValue = model.MutualNumber, Organisation = org
+                        reference = new OrganisationReference
+                        {
+                            ReferenceName = nameof(model.MutualNumber),
+                            ReferenceValue = model.MutualNumber,
+                            Organisation = org
                         };
                         DataRepository.Insert(reference);
                         org.OrganisationReferences.Add(reference);
@@ -1533,8 +1536,11 @@ namespace ModernSlavery.WebUI.Controllers
                     //Add the other reference 
                     if (!string.IsNullOrWhiteSpace(model.OtherName) && !string.IsNullOrWhiteSpace(model.OtherValue))
                     {
-                        reference = new OrganisationReference {
-                            ReferenceName = model.OtherName, ReferenceValue = model.OtherValue, Organisation = org
+                        reference = new OrganisationReference
+                        {
+                            ReferenceName = model.OtherName,
+                            ReferenceValue = model.OtherValue,
+                            Organisation = org
                         };
                         DataRepository.Insert(reference);
                         org.OrganisationReferences.Add(reference);
@@ -1578,12 +1584,12 @@ namespace ModernSlavery.WebUI.Controllers
                 //Set the latest name if there isnt a name already or new name is from CoHo
                 if (oldOrgName == null
                     || oldOrgName?.Name != newName
-                    && SourceComparer.IsCoHo(newNameSource)
-                    && SourceComparer.CanReplace(newNameSource, oldOrgName.Source))
+                    && _commonBusinessLogic.SourceComparer.IsCoHo(newNameSource)
+                    && _commonBusinessLogic.SourceComparer.CanReplace(newNameSource, oldOrgName.Source))
                 {
                     org.OrganisationName = newName;
 
-                    var orgName = new OrganisationName {Name = newName, Source = newNameSource};
+                    var orgName = new OrganisationName { Name = newName, Source = newNameSource };
                     DataRepository.Insert(orgName);
                     org.OrganisationNames.Add(orgName);
                 }
@@ -1629,8 +1635,8 @@ namespace ModernSlavery.WebUI.Controllers
                     //Set the sic codes if there arent any sic codes already or new sic codes are from CoHo
                     if (!oldSicCodes.Any()
                         || !newSicCodeIds.SequenceEqual(oldSicCodeIds)
-                        && SourceComparer.IsCoHo(newSicSource)
-                        && SourceComparer.CanReplace(newSicSource, oldSicCodes.Select(s => s.Source)))
+                        && _commonBusinessLogic.SourceComparer.IsCoHo(newSicSource)
+                        && _commonBusinessLogic.SourceComparer.CanReplace(newSicSource, oldSicCodes.Select(s => s.Source)))
                     {
                         //Retire the old SicCodes
                         foreach (OrganisationSicCode oldSicCode in oldSicCodes)
@@ -1640,7 +1646,7 @@ namespace ModernSlavery.WebUI.Controllers
 
                         foreach (int newSicCodeId in newSicCodeIds)
                         {
-                            var sicCode = new OrganisationSicCode {Organisation = org, SicCodeId = newSicCodeId, Source = newSicSource};
+                            var sicCode = new OrganisationSicCode { Organisation = org, SicCodeId = newSicCodeId, Source = newSicSource };
                             DataRepository.Insert(sicCode);
                             org.OrganisationSicCodes.Add(sicCode);
                         }
@@ -1653,7 +1659,7 @@ namespace ModernSlavery.WebUI.Controllers
             #region Set the organisation address
 
             OrganisationAddress oldAddress = org.GetAddress();
-            AddressModel oldAddressModel = oldAddress?.GetAddressModel();
+            AddressModel oldAddressModel = AddressModel.Create(oldAddress);
 
             AddressModel newAddressModel = null;
             string oldAddressSource = oldAddress?.Source;
@@ -1678,11 +1684,11 @@ namespace ModernSlavery.WebUI.Controllers
 
             if (oldAddressModel == null || !oldAddressModel.Equals(newAddressModel))
             {
-                OrganisationAddress pendingAddress = org.FindAddress(newAddressModel, AddressStatuses.Pending);
+                OrganisationAddress pendingAddress = newAddressModel.FindAddress(org, AddressStatuses.Pending);
                 if (pendingAddress != null)
                 {
                     oldAddress = pendingAddress;
-                    oldAddressModel = pendingAddress.GetAddressModel();
+                    oldAddressModel = AddressModel.Create(pendingAddress);
                     oldAddressSource = pendingAddress.Source;
                 }
             }
@@ -1732,7 +1738,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             if (userOrg == null)
             {
-                userOrg = new UserOrganisation {User = currentUser, Organisation = org, Created = now};
+                userOrg = new UserOrganisation { User = currentUser, Organisation = org, Created = now };
                 DataRepository.Insert(userOrg);
             }
 
@@ -1808,7 +1814,8 @@ namespace ModernSlavery.WebUI.Controllers
             var saved = false;
             UserOrganisation tempUserOrg = userOrg; // Need to use a temporary UserOrg inside a lambda expression for out parameters
             await DataRepository.BeginTransactionAsync(
-                async () => {
+                async () =>
+                {
                     try
                     {
                         await DataRepository.SaveChangesAsync();
@@ -1866,7 +1873,8 @@ namespace ModernSlavery.WebUI.Controllers
                 badSicCodes.ForEach(
                     code => badSicLoggingtasks.Add(
                         Global.BadSicLog.WriteAsync(
-                            new BadSicLogModel {
+                            new BadSicLogModel
+                            {
                                 OrganisationId = org.OrganisationId,
                                 OrganisationName = org.OrganisationName,
                                 SicCode = code,
@@ -1912,7 +1920,7 @@ namespace ModernSlavery.WebUI.Controllers
         {
             //Send a verification link to the email address
             string reviewCode = userOrg.GetReviewCode();
-            string reviewUrl = Url.Action("ReviewRequest", "Admin", new {area="Admin", code = reviewCode}, "https");
+            string reviewUrl = Url.Action("ReviewRequest", "Admin", new { area = "Admin", code = reviewCode }, "https");
 
             //If the email address is a test email then simulate sending
             if (userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))
@@ -1920,7 +1928,7 @@ namespace ModernSlavery.WebUI.Controllers
                 return;
             }
 
-            await EmailSender.SendGEORegistrationRequestAsync(reviewUrl, contactName, reportingOrg, reportingAddress, test);
+            await _commonBusinessLogic.SendEmailService.SendGEORegistrationRequestAsync(reviewUrl, contactName, reportingOrg, reportingAddress, test);
         }
 
 

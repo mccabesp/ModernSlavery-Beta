@@ -10,7 +10,7 @@ using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
@@ -20,8 +20,12 @@ using ModernSlavery.WebUI.Models.Submit;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using MockQueryable.Moq;
 using Moq;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
 using RangeAttribute = System.ComponentModel.DataAnnotations.RangeAttribute;
+using Autofac;
 
 namespace ModernSlavery.Tests
 {
@@ -75,12 +79,15 @@ namespace ModernSlavery.Tests
                 LateReason = "A LateReason"
             };
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             // Mocks
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             mockDataRepo.Setup(x => x.Get<Organisation>(It.IsAny<long>())).Returns(mockedOrganisation);
@@ -129,7 +136,10 @@ namespace ModernSlavery.Tests
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
             var testDraftFileBL = new DraftFileBusinessLogic(new SystemFileRepository());
-            var testService = new SubmissionService(mockDataRepo.Object, null, mockFileRepo.Object, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(mockDataRepo.Object, null, mockFileRepo.Object, testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             // Act
             Draft actualDraft = await testService.GetDraftFileAsync(
@@ -174,12 +184,15 @@ namespace ModernSlavery.Tests
                 Organisation = new Organisation {SectorType = SectorTypes.Private}
             };
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             // Mocks
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             // Copy the original
@@ -236,12 +249,15 @@ namespace ModernSlavery.Tests
 
             decimal changeValue = 0;
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             // Mocks
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             // Assert all figures
@@ -270,12 +286,15 @@ namespace ModernSlavery.Tests
         {
             var testOldReturn = new Return {Organisation = new Organisation {SectorType = SectorTypes.Private}};
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             // Mocks
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             // Copy the original
@@ -307,12 +326,15 @@ namespace ModernSlavery.Tests
 
             var changeValue = "Mr T";
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             // Mocks
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             // Assert all figures
@@ -341,12 +363,15 @@ namespace ModernSlavery.Tests
         {
             var testOldReturn = new Return {CompanyLinkToGPGInfo = "", Organisation = new Organisation {SectorType = SectorTypes.Private}};
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             // Mocks
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             // Copy the original
@@ -414,11 +439,14 @@ namespace ModernSlavery.Tests
                         .BuildMock()
                         .Object);
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             // Assert
@@ -456,11 +484,14 @@ namespace ModernSlavery.Tests
                 testYear,
                 testUserId);
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 testDraftFileFileBusinessLogic,
+                commonBusinessLogic,
                 null);
 
             // Test
@@ -573,11 +604,14 @@ namespace ModernSlavery.Tests
             // Mocks
             mockDataRepo.Setup(dr => dr.GetAll<UserOrganisation>()).Returns(new UserOrganisation[] { }.AsQueryable().BuildMock().Object);
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             // Test
@@ -654,11 +688,14 @@ namespace ModernSlavery.Tests
             var testOrg = new Organisation {LatestReturn = null};
             var testSnapshotYear = 2000;
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             // Assert
@@ -674,11 +711,14 @@ namespace ModernSlavery.Tests
             var testOrg = new Organisation {LatestReturn = new Return {AccountingDate = new DateTime(2018, 4, 5)}};
             var testSnapshotYear = 2017;
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             // Assert
@@ -694,11 +734,14 @@ namespace ModernSlavery.Tests
             var testOrg = new Organisation {LatestReturn = new Return {AccountingDate = new DateTime(2017, 4, 5)}};
             var testSnapshotYear = 2017;
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             // Assert
@@ -714,11 +757,14 @@ namespace ModernSlavery.Tests
             var testOrg = new Organisation {LatestReturn = new Return {AccountingDate = new DateTime(2016, 4, 5)}};
             var testSnapshotYear = 2017;
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+
             var testService = new SubmissionService(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
                 _mockDraftFileBL.Object,
+                commonBusinessLogic,
                 null);
 
             // Assert

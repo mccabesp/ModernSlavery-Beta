@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
-namespace ModernSlavery.WebUI.Classes.Patterns
+namespace ModernSlavery.WebUI.Shared.Classes.Patterns
 {
 
     [Partial("Patterns/Pagination")]

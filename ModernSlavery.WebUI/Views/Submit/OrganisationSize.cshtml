@@ -1,4 +1,5 @@
-﻿@using System.ComponentModel.DataAnnotations
+﻿@using ModernSlavery.WebUI.Shared.Controllers
+@using System.ComponentModel.DataAnnotations
 @using ModernSlavery.Core
 @model ModernSlavery.BusinessLogic.Models.Submit.ReturnViewModel
 
@@ -66,7 +67,7 @@
                             <h1 class="heading-medium">
                                 How many employees are there in your organisation?
                             </h1>
-                            @Html.ValidationMessageFor(model => model.OrganisationSize, "", new {id = "OrganisationSizeError", @class = "error-message"})
+                            @Html.ValidationMessageFor(model => model.OrganisationSize, "", new { id = "OrganisationSizeError", @class = "error-message" })
                         </legend>
                         @foreach (OrganisationSizes orgSize in Enum.GetValues(typeof(OrganisationSizes)))
                         {
@@ -86,9 +87,9 @@
                 </div>
             </div>
             <p>
-                <input id="ContinueStep" class="button" type="submit" role="button" value="Continue"/>
-                <br/>
-                <input id="CancelStep" class="link-button" type="submit" role="button" formaction="cancel-organisation-size" value="Cancel" style="margin-top: 15px"/>
+                <input id="ContinueStep" class="button" type="submit" role="button" value="Continue" />
+                <br />
+                <input id="CancelStep" class="link-button" type="submit" role="button" formaction="cancel-organisation-size" value="Cancel" style="margin-top: 15px" />
             </p>
         }
     </div>

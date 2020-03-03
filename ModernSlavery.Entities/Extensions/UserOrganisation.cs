@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
-using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.Entities
 {

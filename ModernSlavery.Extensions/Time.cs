@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ModernSlavery.Extensions
+﻿namespace ModernSlavery.Extensions
 {
     public static class Time
     {

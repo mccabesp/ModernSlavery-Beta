@@ -1,6 +1,4 @@
-﻿using System;
-using ModernSlavery.Core;
-using ModernSlavery.Database;
+﻿using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
@@ -9,7 +7,7 @@ using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
-using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {

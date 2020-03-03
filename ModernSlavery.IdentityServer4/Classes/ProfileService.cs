@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Abstractions;
-using ModernSlavery.Core;
-using ModernSlavery.Database;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;

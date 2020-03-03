@@ -1,5 +1,5 @@
-﻿using ModernSlavery.Core;
-using ModernSlavery.Database;
+﻿using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebJob.Tests.TestHelpers
 {

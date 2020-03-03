@@ -1,7 +1,6 @@
 ﻿using System;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Services;
-using ModernSlavery.Core.API;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs.Extensions.Timers;

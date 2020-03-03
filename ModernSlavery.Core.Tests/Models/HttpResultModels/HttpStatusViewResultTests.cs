@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Models.HttpResultModels

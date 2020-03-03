@@ -9,17 +9,15 @@ using ModernSlavery.BusinessLogic.Models.Organisation;
 using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.HttpResultModels;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Controllers.Submission;
 using ModernSlavery.WebUI.Tests.TestHelpers;
@@ -28,6 +26,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Moq;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
 using Microsoft.AspNetCore.Authentication;
 
@@ -207,8 +208,9 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             #region We must load a draft if we are calling Enter calculations with a stashed model
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var testService = new SubmissionService(null, null, null, testDraftFileBL, commonBusinessLogic, null);
 
             model.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -508,7 +510,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL, 
+                commonBusinessLogic,
+                null);
 
             model.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -615,7 +624,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             model.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -746,7 +762,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             //mock entered 'return' at review CheckData view
             var model = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = "http://www.gov.uk",
                 DiffMeanBonusPercent = 10,
                 DiffMeanHourlyPayPercent = 20,
@@ -955,7 +971,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -1015,7 +1038,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 .Callback<Return>(returnSentIn => { returnSentIn.Organisation = mockedOrganisation; });
 
             var model = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = "http://www.gov.uk",
                 DiffMeanBonusPercent = 10,
                 DiffMeanHourlyPayPercent = 20,
@@ -1044,7 +1067,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             model.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -1094,7 +1124,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             //mock entered 'return' at review CheckData view
             var model = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = "http://www.gov.uk",
                 DiffMeanBonusPercent = 10,
                 DiffMeanHourlyPayPercent = 20,
@@ -1169,7 +1199,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             model.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1312,7 +1349,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             model.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1415,7 +1459,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1524,7 +1575,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1573,7 +1631,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var PrivateAccountingDate = new DateTime(2017, 4, 4);
 
             var returnViewModel = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = "http://www.gov.uk",
                 DiffMeanBonusPercent = 10,
                 DiffMeanHourlyPayPercent = 10,
@@ -1604,7 +1662,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1666,7 +1731,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var PrivateAccountingDate = new DateTime(2017, 4, 4);
 
             var returnViewModel = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = null,
                 DiffMeanBonusPercent = 0,
                 DiffMeanHourlyPayPercent = 0,
@@ -1697,7 +1762,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1826,7 +1898,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 .Returns(new[] {testUserOrganisation}.AsQueryable);
 
 
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate; //new DateTime(2017, 4, 5);
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate; //new DateTime(2017, 4, 5);
 
             //Act:
             var result = await controller.EnterCalculations() as ViewResult;
@@ -2144,7 +2216,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null,
+                null,
+                null,
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             expectedReturnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -2295,7 +2374,15 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             // Clean up
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null,
+                null,
+                null,
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
+
             await testService.DiscardDraftFileAsync(actualReturnViewModel);
         }
 
@@ -2441,7 +2528,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
 
             var returnViewModel = new ReturnViewModel {
                 AccountingDate = PrivateAccountingDate,
@@ -2466,7 +2553,15 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.Bind(returnViewModel);
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
-            var submissionServiceMock = new SubmissionService(null, null, null, new DraftFileBusinessLogic(testFileRepository), null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var submissionServiceMock = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                new DraftFileBusinessLogic(testFileRepository),
+                commonBusinessLogic,
+                null);
+
             returnViewModel.ReportInfo.Draft = await submissionServiceMock.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
@@ -2522,7 +2617,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
 
             var returnViewModel = new ReturnViewModel {
                 AccountingDate = PrivateAccountingDate,
@@ -2547,7 +2642,15 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.Bind(returnViewModel);
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
-            var submissionServiceMock = new SubmissionService(null, null, null, new DraftFileBusinessLogic(testFileRepository), null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var submissionServiceMock = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                new DraftFileBusinessLogic(testFileRepository),
+                commonBusinessLogic,
+                null);
+
             returnViewModel.ReportInfo.Draft = await submissionServiceMock.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
@@ -2711,7 +2814,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             routeData.Values.Add("controller", "submit");
 
             var returnurl = "CheckData";
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
             var maxValidValue = 99.9M;
             decimal maleEquiValue = 50;
             decimal femaleEquiValue = 50;
@@ -2740,7 +2843,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -2794,7 +2904,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             decimal minOutOfRangeValue = -201;
 
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
 
             var model = new ReturnViewModel {
                 AccountingDate = PrivateAccountingDate,
@@ -2916,7 +3026,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             routeData.Values.Add("controller", "submit");
 
             var returnurl = "CheckData";
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
             var minValidValue = 0M; //-200.9M;
             decimal maleEquiValue = 50;
             decimal femaleEquiValue = 50;
@@ -2945,7 +3055,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -2998,7 +3115,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var returnurl = "";
 
             var returnViewModel = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
 
                 // website
                 CompanyLinkToGPGInfo = null,
@@ -3040,7 +3157,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null, 
+                null, 
+                null, 
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -3145,7 +3269,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var returnurl = "";
 
             var returnViewModel = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = null,
                 DiffMeanBonusPercent = null,
                 DiffMeanHourlyPayPercent = 0,
@@ -3175,7 +3299,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null,
+                null,
+                null,
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -3278,7 +3409,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             routeData.Values.Add("controller", "submit");
 
             var returnurl = "CheckData";
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
             var validValue1 = 100M;
             var validValue2 = 95M;
 
@@ -3306,7 +3437,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null,
+                null,
+                null,
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -3538,7 +3676,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             routeData.Values.Add("controller", "submit");
 
             var returnurl = "CheckData";
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
             decimal zero = 0;
 
             var returnViewModel = new ReturnViewModel {
@@ -3565,7 +3703,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null,
+                null,
+                null,
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -3715,7 +3860,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null,
+                null,
+                null,
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -3907,7 +4059,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 .Callback<Return>(returnSentIn => { returnSentIn.Organisation = mockedOrganisation; });
 
             var model = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = "http://www.gov.uk",
                 DiffMeanBonusPercent = 10,
                 DiffMeanHourlyPayPercent = 20,
@@ -3936,7 +4088,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null,
+                null,
+                null,
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             model.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -3989,7 +4148,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 .Callback<Return>(returnSentIn => { returnSentIn.Organisation = mockedOrganisation; });
 
             var model = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = "http://www.gov.uk",
                 DiffMeanBonusPercent = 10,
                 DiffMeanHourlyPayPercent = 20,
@@ -4157,7 +4316,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var returnurl = "OrganisationSize";
 
             var returnViewModel = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = "http://www.test.com",
                 DiffMeanBonusPercent = 20,
                 DiffMeanHourlyPayPercent = 20,
@@ -4185,7 +4344,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null,
+                null,
+                null,
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -4278,7 +4444,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null,
+                null,
+                null,
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -4426,7 +4599,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null,
+                null,
+                null,
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -4666,10 +4846,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var returnurl = "OrganisationSize";
 
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
 
             var returnViewModel = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = "http://www.test.com",
                 DiffMeanBonusPercent = 20,
                 DiffMeanHourlyPayPercent = 20,
@@ -4696,7 +4876,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, null);
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var testService = new SubmissionService(
+                null,
+                null,
+                null,
+                testDraftFileBL,
+                commonBusinessLogic,
+                null);
 
             returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -4760,10 +4947,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var returnurl = "OrganisationSize";
 
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
 
             var model = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = "http://www.test.com",
                 DiffMeanBonusPercent = 20,
                 DiffMeanHourlyPayPercent = 20,
@@ -4875,10 +5062,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var returnurl = "OrganisationSize";
 
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
 
             var model = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = "http://www.test.com",
                 DiffMeanBonusPercent = 20,
                 DiffMeanHourlyPayPercent = 20,
@@ -4941,10 +5128,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var returnurl = "OrganisationSize";
 
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
 
             var model = new ReturnViewModel {
-                AccountingDate = Global.PrivateAccountingDate,
+                AccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate,
                 CompanyLinkToGPGInfo = "http://www.test.com",
                 DiffMeanBonusPercent = 20,
                 DiffMeanHourlyPayPercent = 20,

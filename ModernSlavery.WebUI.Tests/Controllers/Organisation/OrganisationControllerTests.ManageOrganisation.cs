@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Controllers;
@@ -10,6 +9,8 @@ using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
+using ModernSlavery.Entities.Enums;
+
 using NUnit.Framework;
 
 namespace ModernSlavery.WebUI.Tests.Controllers

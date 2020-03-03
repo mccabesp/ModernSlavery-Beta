@@ -4,17 +4,19 @@ using System.Reflection;
 using Autofac;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
+
 using NUnit.Framework;
+using ModernSlavery.Database;
 
 namespace ModernSlavery.Tests.Common.Classes
 {
     public static class AutoFacHelpers
     {
+        public static IContainer DIContainer { get; private set; }
 
         /// <summary>
         ///     Resolves to a Mock object for the of specified instance and resolves the constructor arguments using the container

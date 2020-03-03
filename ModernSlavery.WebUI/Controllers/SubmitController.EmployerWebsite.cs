@@ -3,18 +3,9 @@ using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.WebUI.Shared.Models;
-using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.SharedKernel;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Controllers.Submission
 {

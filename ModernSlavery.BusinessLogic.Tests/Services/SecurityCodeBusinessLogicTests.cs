@@ -1,10 +1,10 @@
 ﻿using System;
 using ModernSlavery.BusinessLogic.Services;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Moq;
+using ModernSlavery.Entities.Enums;
 using NUnit.Framework;
 
 namespace ModernSlavery.BusinessLogic.Tests.Services

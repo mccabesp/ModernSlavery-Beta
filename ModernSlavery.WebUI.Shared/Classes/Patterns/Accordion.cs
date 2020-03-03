@@ -2,7 +2,7 @@
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using Microsoft.AspNetCore.Html;
 
-namespace ModernSlavery.WebUI.Classes.Patterns
+namespace ModernSlavery.WebUI.Shared.Classes.Patterns
 {
 
     [Partial("Patterns/Accordion")]

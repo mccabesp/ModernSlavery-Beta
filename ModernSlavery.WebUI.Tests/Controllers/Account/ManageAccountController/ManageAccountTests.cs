@@ -1,4 +1,4 @@
-﻿using ModernSlavery.Database;
+﻿using ModernSlavery.Entities;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.TestHelpers;
 using ModernSlavery.WebUI.Areas.Account.Resources;

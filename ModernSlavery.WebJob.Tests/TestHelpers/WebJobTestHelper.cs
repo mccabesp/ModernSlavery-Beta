@@ -15,6 +15,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
+using ModernSlavery.SharedKernel.Interfaces;
+
 namespace ModernSlavery.WebJob.Tests.TestHelpers
 {
     internal static class WebJobTestHelper

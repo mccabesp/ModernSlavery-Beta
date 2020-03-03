@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
+
 
 namespace ModernSlavery.WebUI.Tests.TestHelpers
 {

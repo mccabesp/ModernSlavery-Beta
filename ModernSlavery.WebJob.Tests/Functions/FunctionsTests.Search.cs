@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
@@ -13,6 +13,8 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using Microsoft.Extensions.Logging;
 using Moq;
+using ModernSlavery.Entities.Enums;
+
 using NUnit.Framework;
 using OrganisationHelper = ModernSlavery.WebJob.Tests.TestHelpers.OrganisationHelper;
 
@@ -88,7 +90,7 @@ namespace ModernSlavery.WebJob.Tests.Functions
             IList<EmployerSearchModel> actualResults = await Global.SearchRepository.ListAsync();
 
             //Generate the expected results
-            IEnumerable<EmployerSearchModel> expectedResults = orgs.Select(o => o.ToEmployerSearchResult());
+            IEnumerable<EmployerSearchModel> expectedResults = orgs.Select(o => EmployerSearchModel.Create(o));
 
             //Check the results
             expectedResults.Compare(actualResults);

@@ -7,11 +7,11 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebJob
 {

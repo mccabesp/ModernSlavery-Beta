@@ -10,7 +10,7 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.HttpResultModels;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Controllers;
@@ -20,7 +20,13 @@ using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
+using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.BusinessLogic.Abstractions;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {
@@ -243,6 +249,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 UiTestHelper.DIContainer.Resolve<IScopeBusinessLogic>(),
                 UiTestHelper.DIContainer.Resolve<IEncryptionHandler>(),
                 UiTestHelper.DIContainer.Resolve<ISecurityCodeBusinessLogic>(),
+                UiTestHelper.DIContainer.Resolve<IDnBOrgsRepository>(),
                 UiTestHelper.DIContainer.Resolve<IObfuscator>());
 
             controller.OrganisationBusinessLogic = organisationBusinessLogic;
@@ -324,6 +331,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 UiTestHelper.DIContainer.Resolve<IScopeBusinessLogic>(),
                 new EncryptionHandler(),
                 UiTestHelper.DIContainer.Resolve<ISecurityCodeBusinessLogic>(),
+                UiTestHelper.DIContainer.Resolve<IDnBOrgsRepository>(),
                 UiTestHelper.DIContainer.Resolve<IObfuscator>());
 
             controller.OrganisationBusinessLogic = organisationBusinessLogic;

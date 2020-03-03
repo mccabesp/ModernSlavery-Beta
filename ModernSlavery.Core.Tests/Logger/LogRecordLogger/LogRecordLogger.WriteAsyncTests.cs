@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
+
 using Newtonsoft.Json;
 using NUnit.Framework;
 

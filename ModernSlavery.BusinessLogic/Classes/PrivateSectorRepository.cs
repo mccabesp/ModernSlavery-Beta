@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.API;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;

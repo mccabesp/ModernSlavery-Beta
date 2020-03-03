@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
 using Moq;
+
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.AzureQueue

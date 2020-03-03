@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using ModernSlavery.BusinessLogic.Models.Compare;
-using ModernSlavery.Core;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.WebUI.Tests.TestHelpers

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Services;
 using Newtonsoft.Json;
 using NUnit.Framework;

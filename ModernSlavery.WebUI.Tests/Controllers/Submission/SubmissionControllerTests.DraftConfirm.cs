@@ -4,15 +4,18 @@ using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Controllers.Submission;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.Tests.Common.TestHelpers;
+using Autofac;
+using ModernSlavery.BusinessLogic;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {
@@ -40,7 +43,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            DateTime PrivateAccountingDate = Global.PrivateAccountingDate;
+            DateTime PrivateAccountingDate = SectorTypeHelper.SnapshotDateHelper.PrivateAccountingDate;
 
             var returnViewModel = new ReturnViewModel {
                 AccountingDate = PrivateAccountingDate,
@@ -64,12 +67,15 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
             controller.Bind(returnViewModel);
 
+            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var submissionServiceMock = new SubmissionService(
                 null,
                 null,
                 null,
                 new DraftFileBusinessLogic(new SystemFileRepository()),
+                commonBusinessLogic,
                 null);
+
             returnViewModel.ReportInfo.Draft = await submissionServiceMock.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,

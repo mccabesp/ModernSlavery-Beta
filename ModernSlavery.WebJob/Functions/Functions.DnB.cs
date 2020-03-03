@@ -14,7 +14,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Entities.Enums;
-using ModernSlavery.BusinessLogic;
 
 namespace ModernSlavery.WebJob
 {

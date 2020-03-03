@@ -1,16 +1,18 @@
 ﻿using System;
-using ModernSlavery.Extensions;
 using Microsoft.Extensions.Configuration;
-using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.BusinessLogic
 {
     public interface ICommonBusinessLogic
     {
         ISourceComparer SourceComparer { get; }
+        ISendEmailService SendEmailService { get; }
+        INotificationService NotificationService { get; }
 
         DateTime GetAccountingStartDate(SectorTypes sector, int year = 0);
 
@@ -22,12 +24,16 @@ namespace ModernSlavery.BusinessLogic
         private readonly IConfiguration _configuration;
         private readonly ISnapshotDateHelper _snapshotDateHelper;
         public ISourceComparer SourceComparer { get; }
+        public ISendEmailService SendEmailService { get; }
+        public INotificationService NotificationService { get; }
 
-        public CommonBusinessLogic(IConfiguration configuration, ISnapshotDateHelper snapshotDateHelper, ISourceComparer sourceComparer)
+        public CommonBusinessLogic(IConfiguration configuration, ISnapshotDateHelper snapshotDateHelper, ISourceComparer sourceComparer, ISendEmailService sendEmailService, INotificationService notificationService)
         {
             _configuration = configuration;
             _snapshotDateHelper = snapshotDateHelper;
             SourceComparer = sourceComparer;
+            SendEmailService = SendEmailService;
+            NotificationService = notificationService;
         }
 
         /// <summary>

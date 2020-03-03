@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Abstractions;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.WebUI;
 using Microsoft.Extensions.Logging;
 using Autofac.Features.AttributeFilters;
 using ModernSlavery.SharedKernel;

@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Register;
-using ModernSlavery.WebUI.Services;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
 using NUnit.Framework;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Shared.Services;
 
 namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 {
@@ -25,14 +26,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
     public partial class RegisterControllerTests
     {
 
-        private static UserOrganisation CreateUserOrganisation(Organisation org, long userId, DateTime? pinConfirmedDate)
+        public static UserOrganisation CreateUserOrganisation(Organisation org, long userId, DateTime? pinConfirmedDate)
         {
             return new UserOrganisation {
                 Organisation = org, UserId = userId, PINConfirmedDate = pinConfirmedDate, Address = new OrganisationAddress()
             };
         }
 
-        private static Organisation createPrivateOrganisation(long organisationId, string organisationName, int companyNumber)
+        public static Organisation createPrivateOrganisation(long organisationId, string organisationName, int companyNumber)
         {
             return new Organisation {
                 OrganisationId = organisationId,
@@ -43,7 +44,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             };
         }
 
-        private static Organisation createPublicOrganisation(long organisationId, string organisationName, int companyNumber)
+        public static Organisation createPublicOrganisation(long organisationId, string organisationName, int companyNumber)
         {
             return new Organisation {
                 OrganisationId = organisationId,
@@ -54,7 +55,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             };
         }
 
-        private static User CreateUser(long userId, string emailAddress)
+        public static User CreateUser(long userId, string emailAddress)
         {
             return new User {
                 UserId = userId,
@@ -192,69 +193,6 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             // Act
             await controller.ActivateService(testModel);
-
-            //ASSERT:
-            mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.EmailAddress.Contains(existingUser1.EmailAddress))),
-                Times.Once(),
-                "Expected the existingUser1's email address to be in the email send queue");
-            mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.EmailAddress.Contains(existingUser2.EmailAddress))),
-                Times.Once(),
-                "Expected the existingUser2's email address to be in the email send queue");
-            mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.TemplateId.Contains(EmailTemplates.UserAddedToOrganisationEmail))),
-                Times.Exactly(2),
-                $"Expected the correct templateId to be in the email send queue, expected {EmailTemplates.UserAddedToOrganisationEmail}");
-            mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.EmailAddress.Contains(newUser.EmailAddress))),
-                Times.Never,
-                "Do not expect new user's email address to be in the email send queue");
-        }
-
-        [Test]
-        [Description("RegisterController POST: When User Added To Public Organisation Then Email Existing Users")]
-        public async Task RegisterController_POST_When_User_Added_To_Public_Organisation_Then_Email_Existing_Users()
-        {
-            // Arrange
-            var organisationId = 100;
-            Organisation organisation = createPublicOrganisation(organisationId, "Company1", 12345678);
-            User existingUser1 = CreateUser(1, "user1@test.com");
-            User existingUser2 = CreateUser(2, "user2@test.com");
-            User newUser = CreateUser(3, "user3@test.com");
-            UserOrganisation existingUserOrganisation1 = CreateUserOrganisation(organisation, existingUser1.UserId, VirtualDateTime.Now);
-            UserOrganisation existingUserOrganisation2 = CreateUserOrganisation(organisation, existingUser2.UserId, VirtualDateTime.Now);
-            UserOrganisation newUserOrganisation = CreateUserOrganisation(organisation, newUser.UserId, VirtualDateTime.Now);
-            newUserOrganisation.PINConfirmedDate = null;
-            User govEqualitiesOfficeUser = UserHelper.GetGovEqualitiesOfficeUser();
-            govEqualitiesOfficeUser.EmailVerifiedDate = VirtualDateTime.Now;
-
-            var routeData = new RouteData();
-            routeData.Values.Add("Action", "ReviewRequest");
-            routeData.Values.Add("Controller", "Register");
-
-            var controller = UiTestHelper.GetController<RegisterController>(
-                govEqualitiesOfficeUser.UserId,
-                routeData,
-                organisation,
-                existingUser1,
-                existingUser2,
-                newUser,
-                existingUserOrganisation1,
-                existingUserOrganisation2,
-                newUserOrganisation,
-                govEqualitiesOfficeUser);
-
-            var testModel = new OrganisationViewModel {ReviewCode = newUserOrganisation.GetReviewCode()};
-            controller.StashModel(testModel);
-
-            var mockNotifyEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendNotifyEmailQueue = mockNotifyEmailQueue.Object;
-            mockNotifyEmailQueue
-                .Setup(q => q.AddMessageAsync(It.IsAny<NotifyEmail>()));
-
-            // Act
-            await controller.ReviewRequest(testModel, "approve");
 
             //ASSERT:
             mockNotifyEmailQueue.Verify(

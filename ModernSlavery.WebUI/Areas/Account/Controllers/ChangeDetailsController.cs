@@ -1,7 +1,5 @@
 ﻿using System.Threading.Tasks;
-using AutoMapper;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.Resources;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
@@ -12,7 +10,6 @@ using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Areas.Account.Controllers
 {

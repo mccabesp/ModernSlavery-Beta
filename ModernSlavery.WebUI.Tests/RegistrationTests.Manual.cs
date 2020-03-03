@@ -3,22 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using ModernSlavery.Extensions;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Repositories;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Register;
 using ModernSlavery.WebUI.Tests.TestHelpers;
-using Moq;
 using NUnit.Framework;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.WebUI.Models;
 using System.Threading.Tasks;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.Tests.Common.TestHelpers;
 
 namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 {
@@ -2994,7 +2993,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Check the organisation exists in search
             var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
-            var expectedIndex = org.ToEmployerSearchResult();
+            var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
 
@@ -3158,7 +3157,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Check the organisation exists in search
             var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
-            var expectedIndex = org.ToEmployerSearchResult();
+            var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
 
@@ -3336,7 +3335,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Check the organisation exists in search
             var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
-            var expectedIndex = org.ToEmployerSearchResult();
+            var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
 
@@ -3514,7 +3513,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Check the organisation exists in search
             var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
-            var expectedIndex = org.ToEmployerSearchResult();
+            var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
 
@@ -3686,7 +3685,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Check the organisation exists in search
             var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
-            var expectedIndex = org.ToEmployerSearchResult();
+            var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
 
@@ -3860,7 +3859,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Check the organisation exists in search
             var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
-            var expectedIndex = org.ToEmployerSearchResult();
+            var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
         [Test]

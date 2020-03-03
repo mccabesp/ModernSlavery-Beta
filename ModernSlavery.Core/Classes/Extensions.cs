@@ -5,12 +5,9 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 

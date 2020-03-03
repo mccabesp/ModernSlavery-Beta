@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Abstractions;
-using ModernSlavery.Database;
 using IdentityModel;
 using IdentityServer4.Validation;
 using ModernSlavery.Entities;

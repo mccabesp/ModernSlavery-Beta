@@ -34,7 +34,6 @@ using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Services;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
@@ -49,7 +48,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public AdminController(
             ILogger<AdminController> logger,
             IWebService webService,
-            ISendEmailService sendEmailService,
+            ICommonBusinessLogic commonBusinessLogic,
             INotificationService notificationService,
             IAdminService adminService,
             IOrganisationBusinessLogic organisationBusinessLogic,
@@ -61,8 +60,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository
         ) : base(logger, webService, dataRepository)
         {
-            SendEmailService = sendEmailService;
-            NotificationService = notificationService;
+            CommonBusinessLogic = commonBusinessLogic;
             AdminService = adminService;
             OrganisationBusinessLogic = organisationBusinessLogic;
             SearchBusinessLogic = searchBusinessLogic;
@@ -75,8 +73,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #endregion
 
         #region Dependencies
-        protected readonly ISendEmailService SendEmailService;
-        protected readonly INotificationService NotificationService;
+        protected readonly ICommonBusinessLogic CommonBusinessLogic;
         public IAdminService AdminService { get; }
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
         public ISearchBusinessLogic SearchBusinessLogic { get; set; }

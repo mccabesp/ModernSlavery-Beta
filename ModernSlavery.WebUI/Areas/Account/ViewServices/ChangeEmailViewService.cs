@@ -11,8 +11,6 @@ using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
@@ -23,11 +21,17 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
     public class ChangeEmailViewService : IChangeEmailViewService
     {
 
-        public ChangeEmailViewService(IUserRepository userRepo, IUrlHelper urlHelper)
+        public ChangeEmailViewService(IUserRepository userRepo, IUrlHelper urlHelper, ISendEmailService sendEmailService)
         {
             UserRepository = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
             UrlHelper = urlHelper ?? throw new ArgumentNullException(nameof(urlHelper));
+            SendEmailService = sendEmailService;
         }
+
+        private IUserRepository UserRepository { get; }
+        private IUrlHelper UrlHelper { get; }
+        private ISendEmailService SendEmailService { get; }
+
 
         public async Task<ModelStateDictionary> InitiateChangeEmailAsync(string newEmailAddress, User currentUser)
         {
@@ -117,16 +121,16 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
             string returnVerifyUrl = GenerateChangeEmailVerificationUrl(code);
 
             // queue email
-            await EmailSender.SendChangeEmailPendingVerificationAsync(returnVerifyUrl, newEmailAddress);
+            await SendEmailService.SendChangeEmailPendingVerificationAsync(returnVerifyUrl, newEmailAddress);
         }
 
         private async Task SendChangeEmailCompletedAsync(string newOldAddress, string newEmailAddress)
         {
             // send to new email
-            await EmailSender.SendChangeEmailCompletedNotificationAsync(newOldAddress);
+            await SendEmailService.SendChangeEmailCompletedNotificationAsync(newOldAddress);
 
             // send to old email
-            await EmailSender.SendChangeEmailCompletedVerificationAsync(newEmailAddress);
+            await SendEmailService.SendChangeEmailCompletedVerificationAsync(newEmailAddress);
         }
 
         private string CreateEmailVerificationCode(string newEmailAddress, User user)
@@ -145,15 +149,6 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
                 new {code},
                 "https");
         }
-
-        #region Dependencies
-
-        private IUserRepository UserRepository { get; }
-
-        private IUrlHelper UrlHelper { get; }
-
-        #endregion
-
     }
 
 }

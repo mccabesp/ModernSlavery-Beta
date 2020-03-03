@@ -5,11 +5,7 @@ using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.BusinessLogic.Account.Models;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
-using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 {

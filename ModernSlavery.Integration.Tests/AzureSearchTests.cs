@@ -15,6 +15,8 @@ using ModernSlavery.WebUI.Models.Search;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using Moq;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
 
 namespace ModernSlavery.Integration.Tests

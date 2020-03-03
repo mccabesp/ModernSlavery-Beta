@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModernSlavery.Core;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
 using Moq;
+
 
 namespace ModernSlavery.Tests.Common.TestHelpers
 {

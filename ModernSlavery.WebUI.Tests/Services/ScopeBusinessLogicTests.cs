@@ -4,17 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.Mocks;
 using MockQueryable.Moq;
 using Moq;
+using ModernSlavery.Entities.Enums;
+
 using NUnit.Framework;
+using ModernSlavery.Core.Classes;
 
 namespace ModernSlavery.Tests
 {
@@ -30,7 +32,7 @@ namespace ModernSlavery.Tests
 
         private Mock<IDataRepository> mockDataRepo;
         private Mock<IFileRepository> mockFileRepo;
-        private readonly ICommonBusinessLogic testCommonBL = new CommonBusinessLogic(Config.Configuration);
+        private readonly ICommonBusinessLogic testCommonBL = MoqHelpers.CreateMockCommonBusinessLogic();
 
         private IList<Organisation> testOrgData;
         private IList<OrganisationScope> testOrgScopeData;

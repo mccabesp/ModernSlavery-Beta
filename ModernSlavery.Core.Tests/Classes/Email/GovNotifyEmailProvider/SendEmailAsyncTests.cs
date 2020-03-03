@@ -10,6 +10,7 @@ using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+
 using Moq.Protected;
 using Newtonsoft.Json;
 using Notify.Authentication;

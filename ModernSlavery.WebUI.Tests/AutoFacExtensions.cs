@@ -2,6 +2,7 @@
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
 
+
 namespace ModernSlavery.WebUI.Tests
 {
     public static class AutoFacExtensions

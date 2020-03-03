@@ -1,17 +1,19 @@
 using System;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Areas.Admin.Controllers;
-using ModernSlavery.WebUI.Services;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Routing;
 using Moq;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
+using ModernSlavery.WebUI.Shared.Services;
+using ModernSlavery.WebUI.Admin.Controllers;
 
 namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 {

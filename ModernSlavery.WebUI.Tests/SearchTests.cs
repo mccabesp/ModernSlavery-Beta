@@ -1,9 +1,10 @@
 ﻿using System.Linq;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Tests.Common.Classes;
 using MockQueryable.Moq;
 using Moq;
+
 using NUnit.Framework;
 
 namespace ModernSlavery.Tests

@@ -1,11 +1,11 @@
 ﻿using System;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Services;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
+
 using NUnit.Framework;
 
 namespace ModernSlavery.Tests.Services.SubmissionService
@@ -23,7 +23,7 @@ namespace ModernSlavery.Tests.Services.SubmissionService
         [SetUp]
         public void BeforeEach()
         {
-            mockCommonBusinessLogic = new CommonBusinessLogic(Config.Configuration);
+            mockCommonBusinessLogic = MoqHelpers.CreateMockCommonBusinessLogic();
             mockDataRepo = MoqHelpers.CreateMockAsyncDataRepository();
             mockScopeBL = new Mock<IScopeBusinessLogic>();
             mockDraftFileBL = new Mock<IDraftFileBusinessLogic>();

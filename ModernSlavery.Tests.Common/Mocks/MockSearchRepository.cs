@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.Search.Models;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Tests.Common.Mocks
 {

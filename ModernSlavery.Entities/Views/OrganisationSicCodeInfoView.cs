@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ModernSlavery.Entities
+﻿namespace ModernSlavery.Entities
 {
     public partial class OrganisationSicCodeInfoView
     {

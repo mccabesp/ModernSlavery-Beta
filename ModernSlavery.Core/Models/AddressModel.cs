@@ -91,7 +91,7 @@ namespace ModernSlavery.Core.Models
 
         public static AddressModel Create(OrganisationAddress address)
         {
-            return new AddressModel
+            return address==null ? null : new AddressModel
             {
                 Address1 = address.Address1,
                 Address2 = address.Address2,

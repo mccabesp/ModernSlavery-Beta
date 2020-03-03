@@ -623,7 +623,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await DataRepository.SaveChangesAsync();
 
             //Send notification email to existing users 
-            NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
+            CommonBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
 
             //Ensure the organisation has an employer reference
             if (userOrg.PINConfirmedDate.HasValue && string.IsNullOrWhiteSpace(userOrg.Organisation.EmployerReference))
@@ -651,7 +651,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             //Send an acceptance link to the email address
             string returnUrl = Url.Action("ManageOrganisations", "Organisation", null, "https");
-            return await SendEmailService.SendRegistrationApprovedAsync(returnUrl, emailAddress, test);
+            return await CommonBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(returnUrl, emailAddress, test);
         }
 
         /// <summary>
@@ -808,7 +808,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             //Send a verification link to the email address
-            return await SendEmailService.SendRegistrationDeclinedAsync(emailAddress, reason);
+            return await CommonBusinessLogic.SendEmailService.SendRegistrationDeclinedAsync(emailAddress, reason);
         }
 
         /// <summary>

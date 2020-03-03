@@ -10,11 +10,8 @@ using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 {
@@ -24,12 +21,20 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 
         public CloseAccountViewService(IUserRepository userRepository,
             IRegistrationRepository registrationRepository,
-            ILogger<CloseAccountViewService> logger)
+            ILogger<CloseAccountViewService> logger,
+            ISendEmailService sendEmailService)
         {
             UserRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             RegistrationRepository = registrationRepository ?? throw new ArgumentNullException(nameof(registrationRepository));
             Logger = logger;
+            SendEmailService = sendEmailService;
         }
+
+
+        private IUserRepository UserRepository { get; }
+        private IRegistrationRepository RegistrationRepository { get; }
+        private ILogger<CloseAccountViewService> Logger { get; }
+        private ISendEmailService SendEmailService { get; }
 
         public async Task<ModelStateDictionary> CloseAccountAsync(User userToRetire, string currentPassword, User actionByUser)
         {
@@ -77,11 +82,11 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
                 // Create the close account notification to user
                 var sendEmails = new List<Task>();
                 bool testEmail = !Config.IsProduction();
-                sendEmails.Add(EmailSender.SendAccountClosedNotificationAsync(userToRetire.EmailAddress, testEmail));
+                sendEmails.Add(SendEmailService.SendAccountClosedNotificationAsync(userToRetire.EmailAddress, testEmail));
 
                 //Create the notification to GEO for each newly orphaned organisation
                 userOrgs.Where(org => org.GetIsOrphan())
-                    .ForEach(org => sendEmails.Add(EmailSender.SendGEOOrphanOrganisationNotificationAsync(org.OrganisationName, testEmail)));
+                    .ForEach(org => sendEmails.Add(SendEmailService.SendGEOOrphanOrganisationNotificationAsync(org.OrganisationName, testEmail)));
 
                 //Send all the notifications in parallel
                 await Task.WhenAll(sendEmails);
@@ -89,16 +94,6 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 
             return errorState;
         }
-
-        #region Dependencies
-
-        private IUserRepository UserRepository { get; }
-
-        private IRegistrationRepository RegistrationRepository { get; }
-
-        private ILogger<CloseAccountViewService> Logger { get; }
-
-        #endregion
 
     }
 

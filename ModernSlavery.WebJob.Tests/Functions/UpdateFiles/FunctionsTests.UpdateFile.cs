@@ -4,14 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebJob.Tests.TestHelpers;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using Microsoft.Extensions.Logging;
 using Moq;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
+using ModernSlavery.Tests.Common.TestHelpers;
 
 namespace ModernSlavery.WebJob.Tests.Functions
 {

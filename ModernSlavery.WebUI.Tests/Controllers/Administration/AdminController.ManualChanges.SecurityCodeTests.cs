@@ -8,19 +8,23 @@ using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Areas.Admin.Controllers;
-using ModernSlavery.WebUI.Areas.Admin.Models;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
+using ModernSlavery.Entities.Enums;
+
 using NUnit.Framework;
 using ModernSlavery.WebUI.Tests;
+using ModernSlavery.WebUI.Admin.Controllers;
+using ModernSlavery.WebUI.Admin.Models;
+using ModernSlavery.BusinessLogic.Abstractions;
+using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 {
@@ -60,7 +64,9 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 UiTestHelper.DIContainer.Resolve<ISubmissionBusinessLogic>(),
                 UiTestHelper.DIContainer.Resolve<IScopeBusinessLogic>(),
                 UiTestHelper.DIContainer.Resolve<IEncryptionHandler>(),
-                UiTestHelper.DIContainer.Resolve<ISecurityCodeBusinessLogic>());
+                UiTestHelper.DIContainer.Resolve<ISecurityCodeBusinessLogic>(),
+                UiTestHelper.DIContainer.Resolve<IDnBOrgsRepository>(),
+                UiTestHelper.DIContainer.Resolve<IObfuscator>());
 
             mockedController.OrganisationBusinessLogic = organisationBusinessLogic;
             return mockedController;
@@ -1009,7 +1015,9 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 UiTestHelper.DIContainer.Resolve<ISubmissionBusinessLogic>(),
                 UiTestHelper.DIContainer.Resolve<IScopeBusinessLogic>(),
                 UiTestHelper.DIContainer.Resolve<IEncryptionHandler>(),
-                UiTestHelper.DIContainer.Resolve<ISecurityCodeBusinessLogic>());
+                UiTestHelper.DIContainer.Resolve<ISecurityCodeBusinessLogic>(),
+                UiTestHelper.DIContainer.Resolve<IDnBOrgsRepository>(),
+                UiTestHelper.DIContainer.Resolve<IObfuscator>());
 
             adminController.OrganisationBusinessLogic = organisationBusinessLogic;
 

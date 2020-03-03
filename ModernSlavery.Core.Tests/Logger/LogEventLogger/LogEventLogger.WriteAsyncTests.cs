@@ -4,6 +4,7 @@ using ModernSlavery.Tests.Common.Classes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+
 using Newtonsoft.Json;
 using NUnit.Framework;
 

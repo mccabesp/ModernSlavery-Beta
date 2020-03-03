@@ -1,6 +1,6 @@
-﻿using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Database;
+﻿using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Tests.Common.TestHelpers
 {

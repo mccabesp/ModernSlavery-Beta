@@ -1,7 +1,9 @@
 ﻿@inject IOptionsSnapshot<ViewingOptions> ViewingOptions
+@inject ModernSlavery.SharedKernel.Interfaces.ISnapshotDateHelper SnapshotDateHelper
+@using ModernSlavery.SharedKernel
 @using ModernSlavery.Core
 @using ModernSlavery.Database
-@using ModernSlavery.WebUI.Models.Shared
+@using ModernSlavery.WebUI.Models.Viewing
 @model EmployerDetailsViewModel
 @{
     //Required for variables in Sitemap taghelpers
@@ -21,10 +23,10 @@
     {
         ViewBag.ReturnUrl = Context.GetUri().PathAndQuery;
     }
-    var viewModel = new AddRemoveButtonViewModel {OrganisationIdEncrypted = employerIdentifier, OrganisationName = organisation.OrganisationName};
+    var viewModel = new AddRemoveButtonViewModel { OrganisationIdEncrypted = employerIdentifier, OrganisationName = organisation.OrganisationName };
 }
 
-<partial name="~/Views/Compare/ComparisonBasket.cshtml" model="ViewBag.BasketViewModel"/>
+<partial name="~/Views/Compare/ComparisonBasket.cshtml" model="ViewBag.BasketViewModel" />
 <div class="grid-row">
     <div class="column-full">
         <div class="grid-row">
@@ -56,7 +58,7 @@
                         <dd class="metadata-text-value">@organisation.GetSicSectorsString()</dd>
                     </div>
                 </dl>
-                <partial name="~/Views/Compare/AddRemoveEmployer.cshtml" model="viewModel"/>
+                <partial name="~/Views/Compare/AddRemoveEmployer.cshtml" model="viewModel" />
                 <hr>
             </div>
         </div>
@@ -92,7 +94,7 @@
                                     <span class="heading-small">@report.GetReportingPeriod()</span>
                                 </td>
                                 <td style="border-bottom: none;">
-                                    <partial name="EmployerDetails/Parts/_ReportStatusBadge" model="new ReportStatusBadgeViewModel { IsLateSubmission = report.IsLateSubmission, IsVoluntarySubmission = report.IsVoluntarySubmission() }"/>
+                                    <partial name="EmployerDetails/Parts/_ReportStatusBadge" model="new ReportStatusBadgeViewModel { IsLateSubmission = report.IsLateSubmission, IsVoluntarySubmission = report.IsVoluntarySubmission() }" />
                                 </td>
                             </tr>
                             @if (report.ReturnId == 0)
@@ -103,7 +105,7 @@
                                         {
                                             <span>
                                                 This organisation
-                                                @(report.AccountingDate.Year == Global.CurrentAccountingYear ? "is" : "was")
+                                                @(report.AccountingDate.Year == SnapshotDateHelper.CurrentSnapshotYear ? "is" : "was")
                                                 required to report by @(report.AccountingDate.AddYears(1).AddDays(-1).ToString("d MMMM yyyy"))
                                             </span>
                                         }
@@ -118,7 +120,7 @@
                             {
                                 <tr>
                                     <td colspan="2" style="border-bottom: none;">
-                                        @Html.ActionLink("View Report", "Report", new {employerIdentifier, year = report.AccountingDate.Year}, new {style = "font-size: 19px!important;"})
+                                        @Html.ActionLink("View Report", "Report", new { employerIdentifier, year = report.AccountingDate.Year }, new { style = "font-size: 19px!important;" })
                                     </td>
                                 </tr>
                                 <tr>
@@ -143,15 +145,15 @@
                                     </td>
                                 </tr>
                             }
-                            <hr/>
+                            <hr />
                         </tbody>
                     </table>
                 </div>
             </div>
         }
-        <hr style="border: 1px solid black; background: black;"/>
-        <partial name="~/Views/Viewing/Launchpad/Parts/ServiceSurveyIntroAndLink.cshtml"/>
-        <hr/>
+        <hr style="border: 1px solid black; background: black;" />
+        <partial name="~/Views/Viewing/Launchpad/Parts/ServiceSurveyIntroAndLink.cshtml" />
+        <hr />
     </div>
 </div>
 

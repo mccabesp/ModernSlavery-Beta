@@ -1,10 +1,11 @@
-﻿using ModernSlavery.Core;
-using ModernSlavery.Extensions.AspNetCore;
+﻿using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Classes.Presentation;
 using ModernSlavery.WebUI.Options;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
 
 namespace ModernSlavery.Tests.Services.Compare

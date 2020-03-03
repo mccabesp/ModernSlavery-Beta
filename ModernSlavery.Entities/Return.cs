@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using ModernSlavery.Extensions;
 using ModernSlavery.Entities.Enums;
-using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.Entities
 {

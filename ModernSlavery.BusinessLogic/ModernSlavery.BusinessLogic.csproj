@@ -30,6 +30,7 @@
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
     <ProjectReference Include="..\ModernSlavery.Entities\ModernSlavery.Entities.csproj" />
     <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

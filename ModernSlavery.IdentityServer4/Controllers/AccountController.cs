@@ -13,7 +13,6 @@ using System.Web;
 using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.IdentityServer4.Classes;
 using ModernSlavery.IdentityServer4.Models.Account;
@@ -29,7 +28,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 

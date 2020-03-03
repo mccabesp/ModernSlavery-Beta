@@ -1,5 +1,4 @@
-﻿using ModernSlavery.Core.Interfaces;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {

@@ -14,7 +14,6 @@ using ModernSlavery.WebUI.Models.Submit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
@@ -272,13 +271,13 @@ namespace ModernSlavery.WebUI.Controllers.Submission
                 && postedReturn.Organisation.Returns.Count(r => r.AccountingDate == postedReturn.AccountingDate) == 1
                 && !currentUser.EmailAddress.StartsWithI(Global.TestPrefix))
             {
-                await EmailSender.SendGeoMessageAsync(
+                await commonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                     "GPG Data Submission Notification",
                     $"GPG data was submitted for first time in {postedReturn.AccountingDate.Year} by '{postedReturn.Organisation.OrganisationName}' on {postedReturn.StatusDate.ToShortDateString()}\n\n See {Url.Action("Report", "Viewing", new {employerIdentifier = postedReturnViewModel.EncryptedOrganisationId, year = postedReturn.AccountingDate.Year}, "https")}",
                     currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
             }
 
-            EmailSendingServiceHelpers.SendSuccessfulSubmissionEmailToRegisteredUsers(
+            commonBusinessLogic.NotificationService.SendSuccessfulSubmissionEmailToRegisteredUsers(
                 postedReturn,
                 GetReportLink(postedReturn),
                 GetSubmittedOrUpdated(postedReturn));

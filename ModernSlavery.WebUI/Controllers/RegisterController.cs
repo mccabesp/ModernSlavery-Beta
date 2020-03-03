@@ -389,10 +389,9 @@ namespace ModernSlavery.WebUI.Controllers
             try
             {
                 resetCode = Encryption.EncryptQuerystring(currentUser.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime());
-                if (!await this.SendPasswordResetAsync(currentUser.EmailAddress, resetCode))
-                {
+                string resetUrl = Url.Action("NewPassword", "Register", new { code = resetCode }, "https");
+                if (!await _commonBusinessLogic.SendEmailService.SendResetPasswordNotificationAsync(resetUrl, currentUser.EmailAddress))
                     return false;
-                }
 
                 Logger.LogInformation(
                     "Password reset sent",
@@ -527,7 +526,7 @@ namespace ModernSlavery.WebUI.Controllers
             await DataRepository.SaveChangesAsync();
 
             //Send completed notification email
-            await EmailSender.SendResetPasswordCompletedAsync(currentUser.EmailAddress);
+            await _commonBusinessLogic.SendEmailService.SendResetPasswordCompletedAsync(currentUser.EmailAddress);
 
             //Send the verification code and showconfirmation
             return View("CustomError", new ErrorViewModel(1127));

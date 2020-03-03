@@ -4,11 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
-using System.Reflection;
 using System.Security.Claims;
 using Autofac;
 using Autofac.Features.AttributeFilters;
-using Autofac.Integration.Mvc;
 using AutoMapper;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Abstractions;
@@ -21,7 +19,7 @@ using ModernSlavery.Core.Classes.Queues;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.Cookies;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests;
@@ -30,11 +28,8 @@ using ModernSlavery.Tests.Common.Mocks;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewServices;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Classes.Presentation;
 using ModernSlavery.WebUI.Classes.Services;
-using ModernSlavery.WebUI.Areas.Admin;
-using ModernSlavery.WebUI.Areas.Admin.Controllers;
 using ModernSlavery.WebUI.Options;
 using ModernSlavery.WebUI.Services;
 using ModernSlavery.WebUI.Tests.Mocks;
@@ -51,9 +46,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
+using ModernSlavery.SharedKernel;
+
 using Newtonsoft.Json;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Infrastructure;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Admin.Classes;
+using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.WebUI.Admin.Controllers;
 
 namespace ModernSlavery.WebUI.Tests.TestHelpers
 {
@@ -334,6 +336,7 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
                         c.Resolve<IScopeBusinessLogic>(),
                         c.Resolve<IFileRepository>(),
                         c.Resolve<IDraftFileBusinessLogic>(),
+                        c.Resolve<ICommonBusinessLogic>(),
                         c.Resolve<IOptionsSnapshot<SubmissionOptions>>()))
                 .As<ISubmissionService>()
                 .InstancePerLifetimeScope();

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Controllers;
@@ -12,6 +10,11 @@ using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.Tests.Common.TestHelpers;
 
 namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 {
@@ -70,7 +73,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Check the organisation exists in search
             EmployerSearchModel actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
-            EmployerSearchModel expectedIndex = org.ToEmployerSearchResult();
+            EmployerSearchModel expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
 

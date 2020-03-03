@@ -8,10 +8,8 @@ using ModernSlavery.Core.Filters;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.Core.Models.Downloadable;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using AutoMapper;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;
 

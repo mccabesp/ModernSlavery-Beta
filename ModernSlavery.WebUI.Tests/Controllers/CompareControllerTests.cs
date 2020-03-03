@@ -14,12 +14,15 @@ using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {

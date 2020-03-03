@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;

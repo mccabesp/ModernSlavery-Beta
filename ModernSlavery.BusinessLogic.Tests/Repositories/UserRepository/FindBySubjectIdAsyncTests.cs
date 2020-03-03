@@ -4,7 +4,6 @@ using Autofac;
 using AutoMapper;
 using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.BusinessLogic.LogRecords;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
@@ -12,6 +11,7 @@ using ModernSlavery.Tests.Common;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
+
 using NUnit.Framework;
 
 namespace Repositories.UserRepository

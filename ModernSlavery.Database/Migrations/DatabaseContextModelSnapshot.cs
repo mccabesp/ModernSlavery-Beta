@@ -17,7 +17,7 @@ namespace ModernSlavery.Database.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("ModernSlavery.Database.AddressStatus", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.AddressStatus", b =>
                 {
                     b.Property<long>("AddressStatusId")
                         .ValueGeneratedOnAdd()
@@ -220,7 +220,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("ReminderEmails");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.Organisation", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.Organisation", b =>
                 {
                     b.Property<long>("OrganisationId")
                         .ValueGeneratedOnAdd()
@@ -347,7 +347,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("Organisations");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationAddress", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationAddress", b =>
                 {
                     b.Property<long>("AddressId")
                         .ValueGeneratedOnAdd()
@@ -431,7 +431,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("OrganisationAddresses");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationName", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationName", b =>
                 {
                     b.Property<long>("OrganisationNameId")
                         .ValueGeneratedOnAdd()
@@ -468,7 +468,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("OrganisationNames");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationPublicSectorType", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationPublicSectorType", b =>
                 {
                     b.Property<long>("OrganisationPublicSectorTypeId")
                         .ValueGeneratedOnAdd()
@@ -509,7 +509,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("OrganisationPublicSectorTypes");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationReference", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationReference", b =>
                 {
                     b.Property<long>("OrganisationReferenceId")
                         .ValueGeneratedOnAdd()
@@ -550,7 +550,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("OrganisationReferences");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationScope", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationScope", b =>
                 {
                     b.Property<long>("OrganisationScopeId")
                         .ValueGeneratedOnAdd()
@@ -636,7 +636,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("OrganisationScopes");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationSicCode", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationSicCode", b =>
                 {
                     b.Property<long>("OrganisationSicCodeId")
                         .ValueGeneratedOnAdd()
@@ -677,7 +677,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("OrganisationSicCodes");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationStatus", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationStatus", b =>
                 {
                     b.Property<long>("OrganisationStatusId")
                         .ValueGeneratedOnAdd()
@@ -716,7 +716,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("OrganisationStatus");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.PublicSectorType", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.PublicSectorType", b =>
                 {
                     b.Property<int>("PublicSectorTypeId")
                         .ValueGeneratedOnAdd()
@@ -737,7 +737,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("PublicSectorTypes");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.Return", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.Return", b =>
                 {
                     b.Property<long>("ReturnId")
                         .ValueGeneratedOnAdd()
@@ -867,7 +867,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("Returns");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.ReturnStatus", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.ReturnStatus", b =>
                 {
                     b.Property<long>("ReturnStatusId")
                         .ValueGeneratedOnAdd()
@@ -906,7 +906,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("ReturnStatus");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.SicCode", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.SicCode", b =>
                 {
                     b.Property<int>("SicCodeId")
                         .HasColumnType("int");
@@ -933,7 +933,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("SicCodes");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.SicSection", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.SicSection", b =>
                 {
                     b.Property<string>("SicSectionId")
                         .HasColumnType("nvarchar(1)")
@@ -953,7 +953,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("SicSections");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.User", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.User", b =>
                 {
                     b.Property<long>("UserId")
                         .ValueGeneratedOnAdd()
@@ -1080,7 +1080,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.UserOrganisation", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.UserOrganisation", b =>
                 {
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -1140,7 +1140,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("UserOrganisations");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.UserSetting", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.UserSetting", b =>
                 {
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -1164,7 +1164,7 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("UserSettings");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.UserStatus", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.UserStatus", b =>
                 {
                     b.Property<long>("UserStatusId")
                         .ValueGeneratedOnAdd()
@@ -1203,16 +1203,16 @@ namespace ModernSlavery.Database.Migrations
                     b.ToTable("UserStatus");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.AddressStatus", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.AddressStatus", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.OrganisationAddress", "Address")
+                    b.HasOne("ModernSlavery.Entities.OrganisationAddress", "Address")
                         .WithMany("AddressStatuses")
                         .HasForeignKey("AddressId")
                         .HasConstraintName("FK_dbo.AddressStatus_dbo.OrganisationAddresses_AddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ModernSlavery.Database.User", "ByUser")
+                    b.HasOne("ModernSlavery.Entities.User", "ByUser")
                         .WithMany("AddressStatus")
                         .HasForeignKey("ByUserId")
                         .HasConstraintName("FK_dbo.AddressStatus_dbo.Users_ByUserId")
@@ -1222,50 +1222,50 @@ namespace ModernSlavery.Database.Migrations
 
             modelBuilder.Entity("ModernSlavery.Entities.AuditLog", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.User", "ImpersonatedUser")
+                    b.HasOne("ModernSlavery.Entities.User", "ImpersonatedUser")
                         .WithMany()
                         .HasForeignKey("ImpersonatedUserId");
 
-                    b.HasOne("ModernSlavery.Database.Organisation", "Organisation")
+                    b.HasOne("ModernSlavery.Entities.Organisation", "Organisation")
                         .WithMany()
                         .HasForeignKey("OrganisationId");
 
-                    b.HasOne("ModernSlavery.Database.User", "OriginalUser")
+                    b.HasOne("ModernSlavery.Entities.User", "OriginalUser")
                         .WithMany()
                         .HasForeignKey("OriginalUserId");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.Organisation", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.Organisation", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.OrganisationAddress", "LatestAddress")
+                    b.HasOne("ModernSlavery.Entities.OrganisationAddress", "LatestAddress")
                         .WithMany("Organisations")
                         .HasForeignKey("LatestAddressId")
                         .HasConstraintName("FK_dbo.Organisations_dbo.OrganisationAddresses_LatestAddressId");
 
-                    b.HasOne("ModernSlavery.Database.OrganisationPublicSectorType", "LatestPublicSectorType")
+                    b.HasOne("ModernSlavery.Entities.OrganisationPublicSectorType", "LatestPublicSectorType")
                         .WithMany("Organisations")
                         .HasForeignKey("LatestPublicSectorTypeId")
                         .HasConstraintName("FK_dbo.Organisations_dbo.OrganisationPublicSectorTypes_LatestPublicSectorTypeId");
 
-                    b.HasOne("ModernSlavery.Database.Return", "LatestReturn")
+                    b.HasOne("ModernSlavery.Entities.Return", "LatestReturn")
                         .WithMany("Organisations")
                         .HasForeignKey("LatestReturnId")
                         .HasConstraintName("FK_dbo.Organisations_dbo.Returns_LatestReturnId");
 
-                    b.HasOne("ModernSlavery.Database.OrganisationScope", "LatestScope")
+                    b.HasOne("ModernSlavery.Entities.OrganisationScope", "LatestScope")
                         .WithMany("Organisations")
                         .HasForeignKey("LatestScopeId")
                         .HasConstraintName("FK_dbo.Organisations_dbo.OrganisationScopes_LatestScopeId");
 
-                    b.HasOne("ModernSlavery.Database.UserOrganisation", "LatestRegistration")
+                    b.HasOne("ModernSlavery.Entities.UserOrganisation", "LatestRegistration")
                         .WithMany("Organisations")
                         .HasForeignKey("LatestRegistrationUserId", "LatestRegistrationOrganisationId")
                         .HasConstraintName("FK_dbo.Organisations_dbo.UserOrganisations_LatestRegistration_UserId_LatestRegistration_OrganisationId");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationAddress", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationAddress", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.Organisation", "Organisation")
+                    b.HasOne("ModernSlavery.Entities.Organisation", "Organisation")
                         .WithMany("OrganisationAddresses")
                         .HasForeignKey("OrganisationId")
                         .HasConstraintName("FK_dbo.OrganisationAddresses_dbo.Organisations_OrganisationId")
@@ -1273,9 +1273,9 @@ namespace ModernSlavery.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationName", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationName", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.Organisation", "Organisation")
+                    b.HasOne("ModernSlavery.Entities.Organisation", "Organisation")
                         .WithMany("OrganisationNames")
                         .HasForeignKey("OrganisationId")
                         .HasConstraintName("FK_dbo.OrganisationNames_dbo.Organisations_OrganisationId")
@@ -1283,18 +1283,18 @@ namespace ModernSlavery.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationPublicSectorType", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationPublicSectorType", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.PublicSectorType", "PublicSectorType")
+                    b.HasOne("ModernSlavery.Entities.PublicSectorType", "PublicSectorType")
                         .WithMany()
                         .HasForeignKey("PublicSectorTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationReference", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationReference", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.Organisation", "Organisation")
+                    b.HasOne("ModernSlavery.Entities.Organisation", "Organisation")
                         .WithMany("OrganisationReferences")
                         .HasForeignKey("OrganisationId")
                         .HasConstraintName("FK_dbo.OrganisationReferences_dbo.Organisations_OrganisationId")
@@ -1302,9 +1302,9 @@ namespace ModernSlavery.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationScope", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationScope", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.Organisation", "Organisation")
+                    b.HasOne("ModernSlavery.Entities.Organisation", "Organisation")
                         .WithMany("OrganisationScopes")
                         .HasForeignKey("OrganisationId")
                         .HasConstraintName("FK_dbo.OrganisationScopes_dbo.Organisations_OrganisationId")
@@ -1312,16 +1312,16 @@ namespace ModernSlavery.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationSicCode", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationSicCode", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.Organisation", "Organisation")
+                    b.HasOne("ModernSlavery.Entities.Organisation", "Organisation")
                         .WithMany("OrganisationSicCodes")
                         .HasForeignKey("OrganisationId")
                         .HasConstraintName("FK_dbo.OrganisationSicCodes_dbo.Organisations_OrganisationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ModernSlavery.Database.SicCode", "SicCode")
+                    b.HasOne("ModernSlavery.Entities.SicCode", "SicCode")
                         .WithMany("OrganisationSicCodes")
                         .HasForeignKey("SicCodeId")
                         .HasConstraintName("FK_dbo.OrganisationSicCodes_dbo.SicCodes_SicCodeId")
@@ -1329,16 +1329,16 @@ namespace ModernSlavery.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.OrganisationStatus", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.OrganisationStatus", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.User", "ByUser")
+                    b.HasOne("ModernSlavery.Entities.User", "ByUser")
                         .WithMany("OrganisationStatus")
                         .HasForeignKey("ByUserId")
                         .HasConstraintName("FK_dbo.OrganisationStatus_dbo.Users_ByUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ModernSlavery.Database.Organisation", "Organisation")
+                    b.HasOne("ModernSlavery.Entities.Organisation", "Organisation")
                         .WithMany("OrganisationStatuses")
                         .HasForeignKey("OrganisationId")
                         .HasConstraintName("FK_dbo.OrganisationStatus_dbo.Organisations_OrganisationId")
@@ -1346,9 +1346,9 @@ namespace ModernSlavery.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.Return", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.Return", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.Organisation", "Organisation")
+                    b.HasOne("ModernSlavery.Entities.Organisation", "Organisation")
                         .WithMany("Returns")
                         .HasForeignKey("OrganisationId")
                         .HasConstraintName("FK_dbo.Returns_dbo.Organisations_OrganisationId")
@@ -1356,16 +1356,16 @@ namespace ModernSlavery.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.ReturnStatus", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.ReturnStatus", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.User", "ByUser")
+                    b.HasOne("ModernSlavery.Entities.User", "ByUser")
                         .WithMany("ReturnStatus")
                         .HasForeignKey("ByUserId")
                         .HasConstraintName("FK_dbo.ReturnStatus_dbo.Users_ByUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ModernSlavery.Database.Return", "Return")
+                    b.HasOne("ModernSlavery.Entities.Return", "Return")
                         .WithMany("ReturnStatuses")
                         .HasForeignKey("ReturnId")
                         .HasConstraintName("FK_dbo.ReturnStatus_dbo.Returns_ReturnId")
@@ -1373,30 +1373,30 @@ namespace ModernSlavery.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.SicCode", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.SicCode", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.SicSection", "SicSection")
+                    b.HasOne("ModernSlavery.Entities.SicSection", "SicSection")
                         .WithMany("SicCodes")
                         .HasForeignKey("SicSectionId")
                         .HasConstraintName("FK_dbo.SicCodes_dbo.SicSections_SicSectionId")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.UserOrganisation", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.UserOrganisation", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.OrganisationAddress", "Address")
+                    b.HasOne("ModernSlavery.Entities.OrganisationAddress", "Address")
                         .WithMany("UserOrganisations")
                         .HasForeignKey("AddressId")
                         .HasConstraintName("FK_dbo.UserOrganisations_dbo.OrganisationAddresses_AddressId");
 
-                    b.HasOne("ModernSlavery.Database.Organisation", "Organisation")
+                    b.HasOne("ModernSlavery.Entities.Organisation", "Organisation")
                         .WithMany("UserOrganisations")
                         .HasForeignKey("OrganisationId")
                         .HasConstraintName("FK_dbo.UserOrganisations_dbo.Organisations_OrganisationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ModernSlavery.Database.User", "User")
+                    b.HasOne("ModernSlavery.Entities.User", "User")
                         .WithMany("UserOrganisations")
                         .HasForeignKey("UserId")
                         .HasConstraintName("FK_dbo.UserOrganisations_dbo.Users_UserId")
@@ -1404,9 +1404,9 @@ namespace ModernSlavery.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.UserSetting", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.UserSetting", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.User", "User")
+                    b.HasOne("ModernSlavery.Entities.User", "User")
                         .WithMany("UserSettings")
                         .HasForeignKey("UserId")
                         .HasConstraintName("FK_dbo.UserSettings_dbo.Users_UserId")
@@ -1414,15 +1414,15 @@ namespace ModernSlavery.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Database.UserStatus", b =>
+            modelBuilder.Entity("ModernSlavery.Entities.UserStatus", b =>
                 {
-                    b.HasOne("ModernSlavery.Database.User", "ByUser")
+                    b.HasOne("ModernSlavery.Entities.User", "ByUser")
                         .WithMany("UserStatusesByUser")
                         .HasForeignKey("ByUserId")
                         .HasConstraintName("FK_dbo.UserStatus_dbo.Users_ByUserId")
                         .IsRequired();
 
-                    b.HasOne("ModernSlavery.Database.User", "User")
+                    b.HasOne("ModernSlavery.Entities.User", "User")
                         .WithMany("UserStatuses")
                         .HasForeignKey("UserId")
                         .HasConstraintName("FK_dbo.UserStatus_dbo.Users_UserId")

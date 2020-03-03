@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
@@ -45,10 +44,10 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         }
 
         protected readonly ILogger Logger;
-        protected readonly IHttpCache Cache;
-        protected readonly IHttpSession Session;
-        protected readonly IDataRepository DataRepository;
-        protected readonly IWebTracker WebTracker;
+        public readonly IHttpCache Cache;
+        public readonly IHttpSession Session;
+        public readonly IDataRepository DataRepository;
+        public readonly IWebTracker WebTracker;
         protected readonly IMapper AutoMapper;
 
         #endregion

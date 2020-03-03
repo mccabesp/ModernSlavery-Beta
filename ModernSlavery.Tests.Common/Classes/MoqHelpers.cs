@@ -1,16 +1,32 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
 using Moq;
-using ModernSlavery.Entities;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.Extensions.AspNetCore;
 
 namespace ModernSlavery.Tests.Common.Classes
 {
     public static class MoqHelpers
     {
+
+        public static ICommonBusinessLogic CreateMockCommonBusinessLogic()
+        {
+            var mockedSnapshotDateHelper = new Mock<ISnapshotDateHelper>();
+            var mockedSourceComparer = new Mock<ISourceComparer>();
+            var mockedSendEmailService = new Mock<ISendEmailService>();
+            var mockedNotificationService = new Mock<INotificationService>();
+            var mockCommonBusinessLogic = new CommonBusinessLogic(Config.Configuration, mockedSnapshotDateHelper.Object, mockedSourceComparer.Object, mockedSendEmailService.Object, mockedNotificationService.Object);
+
+            return mockCommonBusinessLogic;
+        }
 
         public static Mock<IDataRepository> CreateMockAsyncDataRepository()
         {

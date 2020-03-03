@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.CompaniesHouse;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;

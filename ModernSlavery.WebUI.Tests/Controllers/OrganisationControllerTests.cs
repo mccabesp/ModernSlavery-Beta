@@ -3,22 +3,25 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.HttpResultModels;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Organisation;
-using ModernSlavery.WebUI.Services;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
+using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebUI.Shared.Services;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {

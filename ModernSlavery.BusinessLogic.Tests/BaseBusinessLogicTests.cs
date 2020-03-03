@@ -2,7 +2,9 @@
 using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.SharedKernel.Interfaces;
 using Moq;
+
 
 namespace ModernSlavery.BusinessLogic.Tests
 {

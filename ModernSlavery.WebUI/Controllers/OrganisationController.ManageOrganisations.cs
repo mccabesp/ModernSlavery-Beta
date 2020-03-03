@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.WebUI.Controllers
 {

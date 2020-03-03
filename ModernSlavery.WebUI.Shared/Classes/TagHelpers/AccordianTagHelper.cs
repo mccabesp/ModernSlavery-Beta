@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using ModernSlavery.WebUI.Classes.Patterns;
+using ModernSlavery.WebUI.Shared.Classes.Patterns;
 
 namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
 {

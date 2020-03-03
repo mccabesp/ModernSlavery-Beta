@@ -1,14 +1,16 @@
 ﻿using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Abstractions;
-using ModernSlavery.Core;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Tests.TestHelpers;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
+using ModernSlavery.Entities.Enums;
+
 using NUnit.Framework;
+using ModernSlavery.WebUI.Shared.Classes;
 
 namespace Account.ViewServices
 {
@@ -20,7 +22,7 @@ namespace Account.ViewServices
 
         private Mock<IUrlHelper> mockUrlHelper;
         private Mock<IUserRepository> mockUserRepo;
-
+        private Mock<ISendEmailService> mockSendEmailService;
         private IChangeEmailViewService testChangeEmailService;
 
         [SetUp]
@@ -28,9 +30,10 @@ namespace Account.ViewServices
         {
             mockUserRepo = new Mock<IUserRepository>();
             mockUrlHelper = new Mock<IUrlHelper>();
+            mockSendEmailService = new Mock<ISendEmailService>();
 
             // service under test
-            testChangeEmailService = new ChangeEmailViewService(mockUserRepo.Object, mockUrlHelper.Object);
+            testChangeEmailService = new ChangeEmailViewService(mockUserRepo.Object, mockUrlHelper.Object, mockSendEmailService.Object);
         }
 
         [Test]

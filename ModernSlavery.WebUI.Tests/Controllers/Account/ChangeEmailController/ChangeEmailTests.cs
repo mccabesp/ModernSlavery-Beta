@@ -2,7 +2,7 @@
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Tests.TestHelpers;
 using ModernSlavery.WebUI;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
@@ -10,6 +10,7 @@ using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
+
 using NUnit.Framework;
 
 namespace Account.Controllers.ChangeEmailController

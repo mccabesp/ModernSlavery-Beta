@@ -2,11 +2,11 @@
 using System.Reflection;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NUnit.Framework;
+using ModernSlavery.Database;
 
 namespace ModernSlavery.Tests.Common.Classes
 {

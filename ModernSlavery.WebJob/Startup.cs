@@ -11,7 +11,7 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.Queues;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
+using ModernSlavery.SharedKernel;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Infrastructure.AzureQueues.Extensions;
@@ -19,9 +19,8 @@ using Microsoft.Azure.Search;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.Database;
 using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Database;
 
 namespace ModernSlavery.WebJob
 {

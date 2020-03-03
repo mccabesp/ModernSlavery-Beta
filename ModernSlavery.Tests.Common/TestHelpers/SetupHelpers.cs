@@ -2,7 +2,9 @@
 using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.SharedKernel;
 using Moq;
+
 
 namespace ModernSlavery.Tests.Common.TestHelpers
 {

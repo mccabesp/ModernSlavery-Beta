@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
 

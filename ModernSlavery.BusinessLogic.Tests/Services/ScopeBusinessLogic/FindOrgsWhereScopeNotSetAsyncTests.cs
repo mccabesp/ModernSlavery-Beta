@@ -9,7 +9,14 @@ using ModernSlavery.Entities;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
+using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Abstractions;
 
 namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
 {
@@ -24,7 +31,12 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
         {
             // setup mocks
             mockDataRepository = MoqHelpers.CreateMockAsyncDataRepository();
-            mockCommonBusinessLogic = new CommonBusinessLogic(Config.Configuration);
+
+            var mockedSnapshotDateHelper = Get<ISnapshotDateHelper>();
+            var mockedSourceComparer = Get<ISourceComparer>();
+            var mockedSendEmailService = Get<ISendEmailService>();
+            var mockedNotificationService = Get<INotificationService>();
+            mockCommonBusinessLogic = new CommonBusinessLogic(Config.Configuration, mockedSnapshotDateHelper, mockedSourceComparer, mockedSendEmailService, mockedNotificationService);
 
             // setup data
             DateTime currentPrivateSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(SectorTypes.Private);

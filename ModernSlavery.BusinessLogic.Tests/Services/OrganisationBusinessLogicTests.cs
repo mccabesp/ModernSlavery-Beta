@@ -1,14 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.BusinessLogic.Models.Compare;
 using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
+using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
+
 using NUnit.Framework;
 
 namespace ModernSlavery.BusinessLogic.Tests.Services
@@ -108,6 +111,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             var mockedEncryptionHandler = Get<IEncryptionHandler>();
             var mockedObfuscator = Get<IObfuscator>();
 
+            var mockedDnBRepo = Get<IDnBOrgsRepository>();
+
             var organisationBusinessLogic = new OrganisationBusinessLogic(
                 mockedCommonBusinessLogic,
                 dataRepository,
@@ -115,6 +120,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                 mockedScopeBusinessLogic,
                 mockedEncryptionHandler,
                 mockedSecurityCodeBusinessLogic,
+                mockedDnBRepo,
                 mockedObfuscator);
 
             IEnumerable<string> listEncOrgIds = listOfReturns.Select(x => mockedObfuscator.Obfuscate(x.OrganisationId.ToString()));

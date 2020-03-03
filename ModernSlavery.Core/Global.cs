@@ -8,8 +8,6 @@ using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.Extensibility.Implementation;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Core
 {

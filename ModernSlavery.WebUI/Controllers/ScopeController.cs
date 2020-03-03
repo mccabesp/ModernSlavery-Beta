@@ -9,7 +9,6 @@ using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Models.Scope;
-using ModernSlavery.WebUI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -219,7 +218,7 @@ namespace ModernSlavery.WebUI.Controllers
                 IEnumerable<string> emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
                 foreach (string emailAddress in emailAddressesForOrganisation)
                 {
-                    NotificationService.SendScopeChangeInEmail(emailAddress, organisation.OrganisationName);
+                    _commonBusinessLogic.NotificationService.SendScopeChangeInEmail(emailAddress, organisation.OrganisationName);
                 }
             }
 
@@ -389,7 +388,7 @@ namespace ModernSlavery.WebUI.Controllers
                 IEnumerable<string> emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
                 foreach (string emailAddress in emailAddressesForOrganisation)
                 {
-                    NotificationService.SendScopeChangeOutEmail(emailAddress, organisation.OrganisationName);
+                    _commonBusinessLogic.NotificationService.SendScopeChangeOutEmail(emailAddress, organisation.OrganisationName);
                 }
             }
 

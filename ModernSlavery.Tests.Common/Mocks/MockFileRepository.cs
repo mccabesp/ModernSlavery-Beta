@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models.Downloadable;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Tests.Common.Mocks

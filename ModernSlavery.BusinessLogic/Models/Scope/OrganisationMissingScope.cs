@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using ModernSlavery.Entities;
 
 namespace ModernSlavery.BusinessLogic.Models.Scope
 {

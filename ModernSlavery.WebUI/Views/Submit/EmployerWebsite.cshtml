@@ -1,4 +1,5 @@
-﻿@model ModernSlavery.BusinessLogic.Models.Submit.ReturnViewModel
+﻿@using ModernSlavery.WebUI.Shared.Controllers
+@model ModernSlavery.BusinessLogic.Models.Submit.ReturnViewModel
 <div class="grid-row">
     <div class="column-two-thirds">
         @using (Html.BeginForm())
@@ -61,9 +62,9 @@
                 <p>You can publish your Modern Slavery narrative on your organisation's website. This can provide context for your figures.</p>
                 <fieldset>
                     <div class="form-group @Html.SetErrorClass(model => model.CompanyLinkToGPGInfo, "error")">
-                        @Html.LabelFor(model => model.CompanyLinkToGPGInfo, "Enter the web address (URL)", new {@class = "form-label"})
-                        @Html.ValidationMessageFor(model => model.CompanyLinkToGPGInfo, "", new {@class = "error-message"})
-                        @Html.TextAreaFor(model => model.CompanyLinkToGPGInfo, 6, 30, new {@class = "form-control form-control-3-4"})
+                        @Html.LabelFor(model => model.CompanyLinkToGPGInfo, "Enter the web address (URL)", new { @class = "form-label" })
+                        @Html.ValidationMessageFor(model => model.CompanyLinkToGPGInfo, "", new { @class = "error-message" })
+                        @Html.TextAreaFor(model => model.CompanyLinkToGPGInfo, 6, 30, new { @class = "form-control form-control-3-4" })
                     </div>
                 </fieldset>
             </div>
@@ -71,9 +72,9 @@
                 <div class="bold-small">If you don't have the URL to hand you can return and add it later.</div>
             </div>
             <p>
-                <input id="ContinueStep" class="button" type="submit" role="button" value="Continue"/>
-                <br/>
-                <input id="CancelStep" class="link-button" type="submit" role="button" formaction="cancel-employer-website" value="Cancel" style="margin-top: 15px"/>
+                <input id="ContinueStep" class="button" type="submit" role="button" value="Continue" />
+                <br />
+                <input id="CancelStep" class="link-button" type="submit" role="button" formaction="cancel-employer-website" value="Cancel" style="margin-top: 15px" />
             </p>
         }
     </div>

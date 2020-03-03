@@ -22,12 +22,7 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -426,7 +421,7 @@ namespace ModernSlavery.WebUI.Controllers
                     throw new HttpException(HttpStatusCode.NotFound, "Employer not found");
                 }
 
-                employer = organisationResult.Result.ToEmployerSearchResult();
+                employer = EmployerSearchModel.Create(organisationResult.Result);
             }
 
             return employer;

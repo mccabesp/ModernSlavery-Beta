@@ -1,8 +1,9 @@
 ﻿using System;
-using ModernSlavery.Core;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Moq;
+using ModernSlavery.Entities.Enums;
+
 
 namespace ModernSlavery.Tests.TestHelpers
 {

@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.WebUI.Shared.Models

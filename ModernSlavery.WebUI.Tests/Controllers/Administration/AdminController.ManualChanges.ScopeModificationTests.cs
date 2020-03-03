@@ -8,19 +8,24 @@ using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
+using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Areas.Admin.Controllers;
-using ModernSlavery.WebUI.Areas.Admin.Models;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
+
 using NUnit.Framework;
 using ModernSlavery.WebUI.Tests;
+using ModernSlavery.WebUI.Admin.Models;
+using ModernSlavery.WebUI.Admin.Controllers;
+using ModernSlavery.BusinessLogic.Abstractions;
+using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 {
@@ -158,7 +163,9 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 UiTestHelper.DIContainer.Resolve<ISubmissionBusinessLogic>(),
                 scopeBusinessLogic,
                 UiTestHelper.DIContainer.Resolve<IEncryptionHandler>(),
-                UiTestHelper.DIContainer.Resolve<ISecurityCodeBusinessLogic>());
+                UiTestHelper.DIContainer.Resolve<ISecurityCodeBusinessLogic>(),
+                UiTestHelper.DIContainer.Resolve<IDnBOrgsRepository>(),
+                UiTestHelper.DIContainer.Resolve<IObfuscator>());
 
             mockedController.OrganisationBusinessLogic = organisationBusinessLogic;
             return mockedController;
@@ -686,8 +693,12 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
             #region Configure organisation
 
             var mockOrg = new Mock<Organisation>();
-            mockOrg.Setup(o => o.UnRetire(It.IsAny<long>(), It.IsAny<string>()))
+
+            var mockBL = new Mock<OrganisationBusinessLogic>();
+
+            mockBL.Setup(o => o.UnRetire(mockOrg.Object, It.IsAny<long>(), It.IsAny<string>()))
                 .Throws(new Exception("Testing exception handling"));
+
             Organisation org = mockOrg.Object;
             org.EmployerReference = TestEmployerReference;
 

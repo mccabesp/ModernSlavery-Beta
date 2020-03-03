@@ -1,10 +1,9 @@
 ﻿@using ModernSlavery.Core
 @using ModernSlavery.Core.Classes
-@using ModernSlavery.Database
-@model IEnumerable<ModernSlavery.Database.UserOrganisation>
+@inject ModernSlavery.SharedKernel.Interfaces.ISnapshotDateHelper SnapshotDateHelper
+@model IEnumerable<ModernSlavery.Entities.UserOrganisation>
 @{
     ViewBag.Title = "Manage your organisation - Modern Slavery reporting service";
-    var controller = ViewData["Controller"] as BaseController;
     bool hasRegisteredOrgs = Model.Any();
 }
 
@@ -26,66 +25,66 @@
 
         <table class="organisations-table" summary="A list of organisations registered to your account" style="margin-top: 30px">
             <thead>
-            <tr>
-                <th class="org-name" scope="col">Organisation name</th>
-                <th scope="col">Registration Status</th>
-            </tr>
+                <tr>
+                    <th class="org-name" scope="col">Organisation name</th>
+                    <th scope="col">Registration Status</th>
+                </tr>
             </thead>
             <tbody>
-            @foreach (UserOrganisation userOrg in Model)
-            {
-                // include the currrent user in the count but dont show a count to pending users
-                int assocUserCount = userOrg.GetAssociatedUsers().Count();
-                DateTime accountingDate = userOrg.Organisation.SectorType.GetAccountingStartDate();
-                int accountingStartYear = accountingDate.Year;
-                string accountingEndYear = (accountingDate.Year + 1).ToString();
+                @foreach (UserOrganisation userOrg in Model)
+                {
+                    // include the currrent user in the count but dont show a count to pending users
+                    int assocUserCount = userOrg.GetAssociatedUsers().Count();
+                    DateTime accountingDate = SnapshotDateHelper.GetSnapshotDate(userOrg.Organisation.SectorType);
+                    int accountingStartYear = accountingDate.Year;
+                    string accountingEndYear = (accountingDate.Year + 1).ToString();
 
-                string encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
-                Return latestReturn = userOrg.Organisation.LatestReturn;
-                ScopeStatuses scopeStatus = userOrg.Organisation.GetScopeStatus(accountingDate);
-                string address = userOrg.Organisation.GetAddressString();
+                    string encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
+                    Return latestReturn = userOrg.Organisation.LatestReturn;
+                    ScopeStatuses scopeStatus = userOrg.Organisation.GetScopeStatus(accountingDate);
+                    string address = userOrg.Organisation.GetAddressString();
 
-                <tr>
-                    @if (userOrg.PINSentDate != null && userOrg.PINConfirmedDate == null)
-                    {
-                        <th scope="row">
-                            <a id="ActivateOrg-@(encOrgId)" href="@(Url.Action("ActivateOrganisation", "Organisation", new {id = encOrgId}))">
+                    <tr>
+                        @if (userOrg.PINSentDate != null && userOrg.PINConfirmedDate == null)
+                        {
+                            <th scope="row">
+                                <a id="ActivateOrg-@(encOrgId)" href="@(Url.Action("ActivateOrganisation", "Organisation", new {id = encOrgId}))">
+                                    <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
+                                </a>
+                            </th>
+                            <td data-prefix="Status">
+                                Awaiting activation PIN
+                            </td>
+                        }
+                        else if (userOrg.PINSentDate == null && userOrg.PINConfirmedDate == null)
+                        {
+                            <th scope="row">
                                 <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
-                            </a>
-                        </th>
-                        <td data-prefix="Status">
-                            Awaiting activation PIN
-                        </td>
-                    }
-                    else if (userOrg.PINSentDate == null && userOrg.PINConfirmedDate == null)
-                    {
-                        <th scope="row">
-                            <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
-                        </th>
-                        <td data-prefix="Status">
-                            Awaiting registration approval
-                        </td>
-                    }
-                    else
-                    {
-                        <th scope="row">
-                            <a id="ManageOrg-@(encOrgId)" href="@Url.Action("ManageOrganisation", "Organisation", new {id = encOrgId})">
-                                <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
-                            </a>
-                        </th>
-                        <td data-prefix="Status">
-                            <span>Registration complete</span>
-                        </td>
-                    }
-                </tr>
-            }
+                            </th>
+                            <td data-prefix="Status">
+                                Awaiting registration approval
+                            </td>
+                        }
+                        else
+                        {
+                            <th scope="row">
+                                <a id="ManageOrg-@(encOrgId)" href="@Url.Action("ManageOrganisation", "Organisation", new {id = encOrgId})">
+                                    <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
+                                </a>
+                            </th>
+                            <td data-prefix="Status">
+                                <span>Registration complete</span>
+                            </td>
+                        }
+                    </tr>
+                }
 
-            @if (hasRegisteredOrgs == false)
-            {
-                <tr>
-                    <td colspan="2" style="border-bottom : none">There are no organisations registered to your account.</td>
-                </tr>
-            }
+                @if (hasRegisteredOrgs == false)
+                {
+                    <tr>
+                        <td colspan="2" style="border-bottom : none">There are no organisations registered to your account.</td>
+                    </tr>
+                }
 
             </tbody>
         </table>
@@ -114,5 +113,5 @@
     </div>
 
 </div>
-<hr style="border: 1px solid black; background: black;"/>
-<partial name="~/Views/Viewing/Launchpad/Parts/ServiceSurveyIntroAndLink.cshtml"/>
+<hr style="border: 1px solid black; background: black;" />
+<partial name="~/Views/Viewing/Launchpad/Parts/ServiceSurveyIntroAndLink.cshtml" />

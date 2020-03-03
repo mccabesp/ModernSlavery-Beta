@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
@@ -185,7 +184,7 @@ namespace ModernSlavery.WebUI.Controllers
                 result1 = RedirectToAction("ServiceActivated");
 
                 //Send notification email to existing users 
-                EmailSendingServiceHelpers.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
+                _commonBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
             }
             else
             {
