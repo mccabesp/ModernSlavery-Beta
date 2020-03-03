@@ -11,9 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
 using ModernSlavery.SharedKernel;
-using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
 using ModernSlavery.Tests.Common.TestHelpers;
 
 namespace ModernSlavery.WebUI.Tests.Controllers.Registration

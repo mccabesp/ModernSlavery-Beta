@@ -15,7 +15,6 @@ using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Admin.Controllers;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Tests;
 using ModernSlavery.Tests.TestHelpers;
 using Moq;
 using ModernSlavery.Core.Classes;

@@ -2,10 +2,7 @@
 using System.Linq;
 using ModernSlavery.Tests.Common.TestHelpers;
 using NUnit.Framework;
-using Moq;
 using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Database.Tests
 {

@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.BusinessLogic.Services;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;

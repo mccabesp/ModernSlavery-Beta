@@ -8,7 +8,6 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.Mocks;
 using MockQueryable.Moq;
@@ -16,7 +15,6 @@ using Moq;
 using ModernSlavery.Entities.Enums;
 
 using NUnit.Framework;
-using ModernSlavery.Core.Classes;
 
 namespace ModernSlavery.Tests
 {
