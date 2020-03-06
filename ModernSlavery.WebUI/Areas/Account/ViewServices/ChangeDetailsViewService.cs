@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AutoMapper;
-using ModernSlavery.BusinessLogic.Abstractions;
-using ModernSlavery.BusinessLogic.Account.Models;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using ModernSlavery.Entities;

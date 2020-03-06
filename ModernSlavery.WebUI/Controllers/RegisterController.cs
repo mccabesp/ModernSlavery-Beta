@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using System.Web;
 using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;

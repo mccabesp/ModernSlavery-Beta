@@ -3,6 +3,7 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Tests.Common.Classes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ModernSlavery.Core.Models.LogModels;
 using Moq;
 
 using Newtonsoft.Json;

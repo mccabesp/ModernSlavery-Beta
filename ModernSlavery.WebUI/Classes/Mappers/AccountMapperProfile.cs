@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using ModernSlavery.BusinessLogic.Account.Models;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 

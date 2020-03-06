@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModernSlavery.Core.Models
+namespace ModernSlavery.Core.Models.AccountModels
 {
 
     public class ChangeEmailVerificationToken

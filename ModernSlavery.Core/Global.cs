@@ -16,23 +16,12 @@ namespace ModernSlavery.Core
 
         public static string DownloadsPath = Path.Combine(DataPath, "Downloads");
         public static IFileRepository FileRepository;
-        public static ISearchRepository<EmployerSearchModel> SearchRepository;
-        public static ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository;
-
-        private static TelemetryClient _AppInsightsClient;
-
-        private static bool AppInsightsSetupComplete;
 
         public static bool SkipSpamProtection
         {
             get => Config.GetAppSetting("TESTING-SkipSpamProtection").ToBoolean();
             set => Config.SetAppSetting("TESTING-SkipSpamProtection", value.ToString());
         }
-
-        public static string SearchIndexName => Config.GetAppSetting("SearchService:IndexName", nameof(EmployerSearchModel).ToLower());
-
-        public static string SicCodesIndexName =>
-            Config.GetAppSetting("SearchService:SicCodesIndexName", nameof(SicCodeSearchModel).ToLower());
 
         public static int CertExpiresWarningDays => Config.GetAppSetting("CertExpiresWarningDays").ToInt32(30);
 
@@ -133,31 +122,7 @@ namespace ModernSlavery.Core
 
         public static string AzureInstanceId => Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID");
 
-        public static void SetupAppInsights()
-        {
-            if (AppInsightsSetupComplete)
-            {
-                return;
-            }
-
-            //Set Application Insights instrumentation key
-            //if (!Debugger.IsAttached)
-            string key = APPINSIGHTS_INSTRUMENTATIONKEY;
-            if (!string.IsNullOrWhiteSpace(key))
-            {
-                TelemetryConfiguration.Active.InstrumentationKey = key;
-
-                //Disable application insights tracing when debugger is attached
-                //if (!Debugger.IsAttached
-                TelemetryDebugWriter.IsTracingDisabled = false;
-
-                TelemetryProcessorChainBuilder builder = TelemetryConfiguration.Active.TelemetryProcessorChainBuilder;
-                builder.Use(next => new DependencyTelemetryFilter(next, "file.core.windows.net", "HEAD /common/", "404"));
-                builder.Build();
-            }
-
-            AppInsightsSetupComplete = true;
-        }
+        
 
         #region Log Declarations
 

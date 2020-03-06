@@ -13,6 +13,7 @@ using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Submit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;

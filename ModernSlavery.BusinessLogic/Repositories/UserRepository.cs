@@ -5,13 +5,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using ModernSlavery.BusinessLogic.Abstractions;
-using ModernSlavery.BusinessLogic.Account.Models;
 using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using Microsoft.EntityFrameworkCore;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Entities.Enums;
 

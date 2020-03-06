@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Abstractions;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Entities;
 

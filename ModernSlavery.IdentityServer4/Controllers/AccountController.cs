@@ -10,7 +10,6 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
-using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
@@ -28,6 +27,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models.AccountModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 

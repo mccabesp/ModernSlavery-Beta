@@ -16,11 +16,9 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.BusinessLogic.Abstractions;
 
 namespace ModernSlavery.BusinessLogic
 {
@@ -115,7 +113,7 @@ namespace ModernSlavery.BusinessLogic
 #endif
             var records = new List<OrganisationsFileModel>();
 
-            foreach (Organisation o in await orgs.ToListAsync())
+            await foreach(var o in orgs.ToListAsync())
             {
                 var record = new OrganisationsFileModel {
                     OrganisationId = o.OrganisationId,
@@ -152,8 +150,8 @@ namespace ModernSlavery.BusinessLogic
 
         public virtual async Task SetUniqueEmployerReferencesAsync()
         {
-            List<Organisation> orgs = await _DataRepository.GetAll<Organisation>().Where(o => o.EmployerReference == null).ToListAsync();
-            foreach (Organisation org in orgs)
+            var orgs = _DataRepository.GetAll<Organisation>().Where(o => o.EmployerReference == null).ToListAsync();
+            await foreach (Organisation org in orgs)
             {
                 await SetUniqueEmployerReferenceAsync(org);
             }
@@ -166,8 +164,7 @@ namespace ModernSlavery.BusinessLogic
             do
             {
                 organisation.EmployerReference = GenerateEmployerReference();
-            } while (await _DataRepository.GetAll<Organisation>()
-                .AnyAsync(o => o.OrganisationId != organisation.OrganisationId && o.EmployerReference == organisation.EmployerReference));
+            } while (await _DataRepository.AnyAsync<Organisation>(o => o.OrganisationId != organisation.OrganisationId && o.EmployerReference == organisation.EmployerReference));
 
             try
             {
@@ -381,10 +378,7 @@ namespace ModernSlavery.BusinessLogic
             IQueryable<Organisation> orgList = _DataRepository.GetAll<Organisation>()
                 .Where(o => o.Status == OrganisationStatuses.Active || o.Status == OrganisationStatuses.Pending);
 
-            if (!await orgList.AnyAsync())
-            {
-                throw new Exception("Unable to find organisations with statuses 'Active' or 'Pending' in the database");
-            }
+            if (!orgList.Any())throw new Exception("Unable to find organisations with statuses 'Active' or 'Pending' in the database");
 
             return orgList;
         }
@@ -559,15 +553,13 @@ namespace ModernSlavery.BusinessLogic
 
         public virtual async Task<Organisation> GetOrganisationByEmployerReferenceAsync(string employerReference)
         {
-            return await _DataRepository.GetAll<Organisation>()
-                .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerReference.ToUpper());
+            return await _DataRepository.FirstOrDefaultAsync<Organisation>((o => o.EmployerReference.ToUpper() == employerReference.ToUpper()));
         }
 
         public virtual async Task<Organisation> GetOrganisationByEmployerReferenceAndSecurityCodeAsync(string employerReference,
             string securityCode)
         {
-            return await _DataRepository.GetAll<Organisation>()
-                .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerReference.ToUpper() && o.SecurityCode == securityCode);
+            return await _DataRepository.FirstOrDefaultAsync<Organisation>((o => o.EmployerReference.ToUpper() == employerReference.ToUpper() && o.SecurityCode == securityCode));
         }
 
         public virtual async Task<Organisation> GetOrganisationByEmployerReferenceOrThrowAsync(string employerReference)

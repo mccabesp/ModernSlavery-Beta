@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
 

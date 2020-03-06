@@ -23,7 +23,6 @@ using NUnit.Framework;
 using ModernSlavery.WebUI.Tests;
 using ModernSlavery.WebUI.Admin.Controllers;
 using ModernSlavery.WebUI.Admin.Models;
-using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests

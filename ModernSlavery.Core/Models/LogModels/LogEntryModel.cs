@@ -2,7 +2,7 @@
 using System.Web;
 using ModernSlavery.Extensions;
 
-namespace ModernSlavery.Core.Models
+namespace ModernSlavery.Core.Models.LogModels
 {
     [Serializable]
     public class LogEntryModel

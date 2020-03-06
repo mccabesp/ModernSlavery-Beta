@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.Core;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
@@ -10,6 +9,7 @@ using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 

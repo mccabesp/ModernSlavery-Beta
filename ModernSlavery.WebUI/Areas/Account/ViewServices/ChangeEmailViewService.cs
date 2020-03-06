@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
@@ -11,6 +10,8 @@ using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models.AccountModels;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;

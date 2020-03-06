@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;

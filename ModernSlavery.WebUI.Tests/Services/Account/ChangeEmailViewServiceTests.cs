@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.Entities;
 using ModernSlavery.Tests.TestHelpers;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ModernSlavery.Core.Interfaces;
 using Moq;
 using ModernSlavery.Entities.Enums;
 

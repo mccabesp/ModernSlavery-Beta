@@ -15,6 +15,12 @@ namespace ModernSlavery.Extensions
     public static class Lists
     {
 
+        public static async IAsyncEnumerable<T> ToListAsync<T>(this IQueryable<T> query)
+        {
+            foreach (T entity in query)
+                yield return entity;
+        }
+
         public static string[] SplitI(this string list,
             string separators = ";,",
             int maxItems = 0,

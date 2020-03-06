@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.SharedKernel;
@@ -39,7 +39,8 @@ namespace ModernSlavery.WebUI.Shared.Services
                 {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
             };
 
-            var notifyEmail = new NotifyEmail {
+            var notifyEmail = new SendEmailRequestModel
+            {
                 EmailAddress = emailAddress, TemplateId = EmailTemplates.SendSuccessfulSubmissionEmail, Personalisation = personalisation
             };
 
@@ -54,7 +55,8 @@ namespace ModernSlavery.WebUI.Shared.Services
                 {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
             };
 
-            var notifyEmail = new NotifyEmail {
+            var notifyEmail = new SendEmailRequestModel
+            {
                 EmailAddress = emailAddress, TemplateId = EmailTemplates.SendPinEmail, Personalisation = personalisation
             };
 
@@ -69,7 +71,8 @@ namespace ModernSlavery.WebUI.Shared.Services
                 {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
             };
 
-            var notifyEmail = new NotifyEmail {
+            var notifyEmail = new SendEmailRequestModel
+            {
                 EmailAddress = emailAddress, TemplateId = EmailTemplates.UserAddedToOrganisationEmail, Personalisation = personalisation
             };
 
@@ -84,7 +87,8 @@ namespace ModernSlavery.WebUI.Shared.Services
                 {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
             };
 
-            var notifyEmail = new NotifyEmail {
+            var notifyEmail = new SendEmailRequestModel
+            {
                 EmailAddress = emailAddress, TemplateId = EmailTemplates.RemovedUserFromOrganisationEmail, Personalisation = personalisation
             };
 
@@ -97,7 +101,8 @@ namespace ModernSlavery.WebUI.Shared.Services
                 {"OrganisationName", organisationName}, {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
             };
 
-            var notifyEmail = new NotifyEmail {
+            var notifyEmail = new SendEmailRequestModel
+            {
                 EmailAddress = emailAddress, TemplateId = EmailTemplates.ScopeChangeInEmail, Personalisation = personalisation
             };
 
@@ -110,7 +115,8 @@ namespace ModernSlavery.WebUI.Shared.Services
                 {"OrganisationName", organisationName}, {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
             };
 
-            var notifyEmail = new NotifyEmail {
+            var notifyEmail = new SendEmailRequestModel
+            {
                 EmailAddress = emailAddress, TemplateId = EmailTemplates.ScopeChangeOutEmail, Personalisation = personalisation
             };
 
@@ -145,7 +151,7 @@ namespace ModernSlavery.WebUI.Shared.Services
             }
         }
 
-        private async Task<bool> AddEmailToQueue(NotifyEmail notifyEmail)
+        private async Task<bool> AddEmailToQueue(SendEmailRequestModel notifyEmail)
         {
             try
             {

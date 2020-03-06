@@ -16,6 +16,7 @@ using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.Core.Models.LogModels;
 using Newtonsoft.Json;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities.Enums;

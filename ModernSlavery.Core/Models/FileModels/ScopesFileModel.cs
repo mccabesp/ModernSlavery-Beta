@@ -2,7 +2,7 @@
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 
-namespace ModernSlavery.Core.Models
+namespace ModernSlavery.Core.Models.FileModels
 {
     [Serializable]
     public class ScopesFileModel

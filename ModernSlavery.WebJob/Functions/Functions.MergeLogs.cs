@@ -9,6 +9,7 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Models.LogModels;
 
 namespace ModernSlavery.WebJob
 {

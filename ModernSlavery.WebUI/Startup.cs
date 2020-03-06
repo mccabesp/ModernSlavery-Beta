@@ -7,7 +7,6 @@ using Autofac.Extensions.DependencyInjection;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.BusinessLogic.Account.Repositories;
 using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.BusinessLogic.Repositories;

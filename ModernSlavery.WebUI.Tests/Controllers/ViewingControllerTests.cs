@@ -26,7 +26,6 @@ using ModernSlavery.SharedKernel;
 using NUnit.Framework;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.BusinessLogic.Abstractions;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {

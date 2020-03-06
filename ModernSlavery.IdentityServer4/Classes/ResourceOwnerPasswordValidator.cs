@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Abstractions;
 using IdentityModel;
 using IdentityServer4.Validation;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 
 namespace ModernSlavery.IdentityServer4.Classes

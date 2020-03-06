@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
-using Microsoft.Azure.Search.Models;
 using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Core.Interfaces
@@ -34,7 +33,7 @@ namespace ModernSlavery.Core.Interfaces
             Dictionary<string, Dictionary<object, long>> facets = null,
             string filter = null,
             string highlights = null,
-            SearchMode searchMode = SearchMode.Any);
+            string searchMode = null);
 
     }
 }

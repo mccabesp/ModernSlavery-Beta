@@ -9,6 +9,7 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Models.LogModels;
 
 namespace ModernSlavery.WebJob
 {

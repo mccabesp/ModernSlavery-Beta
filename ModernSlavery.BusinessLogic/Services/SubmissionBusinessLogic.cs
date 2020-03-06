@@ -9,9 +9,9 @@ using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Models.FileModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using Microsoft.EntityFrameworkCore;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
 

@@ -1,8 +1,8 @@
-﻿using ModernSlavery.Entities.Enums;
+﻿using System;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
-using System;
 
-namespace ModernSlavery.Core.Models
+namespace ModernSlavery.Core.Models.LogModels
 {
     [Serializable]
     public class SubmissionLogModel

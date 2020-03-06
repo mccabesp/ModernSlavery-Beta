@@ -15,10 +15,6 @@ namespace ModernSlavery.Core.Classes
 {
     public static class Extensions
     {
-
-
-        
-
         #region FileSystem
         public class CsvBadDataException : CsvHelperException
         {

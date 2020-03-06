@@ -2,7 +2,7 @@
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
 
-namespace ModernSlavery.Core.Models
+namespace ModernSlavery.Core.Models.LogModels
 {
 
     [Serializable]

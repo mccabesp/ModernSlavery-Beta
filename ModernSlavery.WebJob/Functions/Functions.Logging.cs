@@ -10,6 +10,7 @@ using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Models.LogModels;
 using Newtonsoft.Json;
 using ModernSlavery.SharedKernel;
 

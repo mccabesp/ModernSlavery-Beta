@@ -9,7 +9,6 @@ using Autofac;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.BusinessLogic.Account.Repositories;
 using ModernSlavery.BusinessLogic.Repositories;
 using ModernSlavery.BusinessLogic.Services;

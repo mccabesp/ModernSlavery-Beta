@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Abstractions;
 using ModernSlavery.BusinessLogic.Models.Compare;
 using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Classes;

@@ -16,7 +16,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Tests.Common", "ModernSlavery.Tests.Common\ModernSlavery.Tests.Common.csproj", "{71785F78-2960-4329-997B-2CF7677CA594}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{165A87E4-ED4A-4509-A52C-81748DE7286F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{165A87E4-ED4A-4509-A52C-81748DE7286F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{6EB28909-F4E9-402E-A247-01532AAC6841}"
 EndProject
@@ -27,8 +27,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebJob.Tests", "ModernSlavery.WebJob.Tests\ModernSlavery.WebJob.Tests.csproj", "{A4D035C6-DDC6-4064-81F4-3184765B177D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Tests", "ModernSlavery.WebUI.Tests\ModernSlavery.WebUI.Tests.csproj", "{ADB4DCF7-1D43-41EF-9FD3-DA4C36D923AB}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{B5E90979-D1B2-4B06-90D7-2CDFAA261B00}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Extensions.AspNetCore", "ModernSlavery.Extensions.AspNetCore\ModernSlavery.Extensions.AspNetCore.csproj", "{280CF592-7FE9-4DDE-9F9E-42F417F8A0C2}"
 EndProject
@@ -83,17 +81,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BusinessLogic", "BusinessLogic", "{E0EE46B7-30A8-4679-BD26-5858DB5A9BA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.BusinessLogic.Shared", "ModernSlavery.BusinessLogic.Shared\ModernSlavery.BusinessLogic.Shared.csproj", "{0298E940-D2C0-41BA-9266-AB425FC6891D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Shared", "ModernSlavery.BusinessLogic.Shared\ModernSlavery.BusinessLogic.Shared.csproj", "{0298E940-D2C0-41BA-9266-AB425FC6891D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.BusinessLogic.Admin", "ModernSlavery.BusinessLogic.Admin\ModernSlavery.BusinessLogic.Admin.csproj", "{B24AD52C-5C38-444E-8932-97227DC42E13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Admin", "ModernSlavery.BusinessLogic.Admin\ModernSlavery.BusinessLogic.Admin.csproj", "{B24AD52C-5C38-444E-8932-97227DC42E13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.BusinessLogic.Register", "ModernSlavery.BusinessLogic.Register\ModernSlavery.BusinessLogic.Register.csproj", "{B7680916-4A4F-40FF-B744-67F39741A901}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Register", "ModernSlavery.BusinessLogic.Register\ModernSlavery.BusinessLogic.Register.csproj", "{B7680916-4A4F-40FF-B744-67F39741A901}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.BusinessLogic.Submit", "ModernSlavery.BusinessLogic.Submit\ModernSlavery.BusinessLogic.Submit.csproj", "{62BF103A-43A7-4260-B64E-E3833975950A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Submit", "ModernSlavery.BusinessLogic.Submit\ModernSlavery.BusinessLogic.Submit.csproj", "{62BF103A-43A7-4260-B64E-E3833975950A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.BusinessLogic.DevOps", "ModernSlavery.BusinessLogic.DevOps\ModernSlavery.BusinessLogic.DevOps.csproj", "{318A4FCC-454B-4A40-BE10-C19417675217}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.DevOps", "ModernSlavery.BusinessLogic.DevOps\ModernSlavery.BusinessLogic.DevOps.csproj", "{318A4FCC-454B-4A40-BE10-C19417675217}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.BusinessLogic.View", "ModernSlavery.BusinessLogic.View\ModernSlavery.BusinessLogic.View.csproj", "{27C22FC8-C51A-4094-AC55-DE27C50142BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.View", "ModernSlavery.BusinessLogic.View\ModernSlavery.BusinessLogic.View.csproj", "{27C22FC8-C51A-4094-AC55-DE27C50142BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Infrastructure", "ModernSlavery.Infrastructure\ModernSlavery.Infrastructure.csproj", "{CD90FF8F-8E1F-4493-87AC-64985CBAFF40}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -233,6 +233,10 @@ Global
 		{27C22FC8-C51A-4094-AC55-DE27C50142BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27C22FC8-C51A-4094-AC55-DE27C50142BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27C22FC8-C51A-4094-AC55-DE27C50142BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD90FF8F-8E1F-4493-87AC-64985CBAFF40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD90FF8F-8E1F-4493-87AC-64985CBAFF40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD90FF8F-8E1F-4493-87AC-64985CBAFF40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD90FF8F-8E1F-4493-87AC-64985CBAFF40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -252,7 +256,7 @@ Global
 		{6E500FE9-E063-4F07-89EF-C94F8345A0AB} = {165A87E4-ED4A-4509-A52C-81748DE7286F}
 		{F68B4A44-85EF-4DAA-AC28-DB14C10D83C7} = {165A87E4-ED4A-4509-A52C-81748DE7286F}
 		{FE05F883-4F1C-4C8E-AF41-A08B07C799F2} = {165A87E4-ED4A-4509-A52C-81748DE7286F}
-		{26013934-6DF5-49C7-A825-7FC40D651C3A} = {B5E90979-D1B2-4B06-90D7-2CDFAA261B00}
+		{26013934-6DF5-49C7-A825-7FC40D651C3A} = {165A87E4-ED4A-4509-A52C-81748DE7286F}
 		{AE3D6DDB-5C46-4149-A74B-4C631FFC1C33} = {3085FCFE-FAF9-4B1D-AB8C-F4AA1C1AAB6B}
 		{CD0DC980-B4CE-4F21-920A-2711E586C305} = {6EB28909-F4E9-402E-A247-01532AAC6841}
 		{7180FE40-A39D-482B-AEB0-E12D97AE4F5C} = {3085FCFE-FAF9-4B1D-AB8C-F4AA1C1AAB6B}
@@ -268,6 +272,7 @@ Global
 		{62BF103A-43A7-4260-B64E-E3833975950A} = {E0EE46B7-30A8-4679-BD26-5858DB5A9BA9}
 		{318A4FCC-454B-4A40-BE10-C19417675217} = {E0EE46B7-30A8-4679-BD26-5858DB5A9BA9}
 		{27C22FC8-C51A-4094-AC55-DE27C50142BD} = {E0EE46B7-30A8-4679-BD26-5858DB5A9BA9}
+		{CD90FF8F-8E1F-4493-87AC-64985CBAFF40} = {71F10B1A-9F35-4CC7-817F-B918D93DB555}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CBCD6EE1-83A9-461C-820C-9D31E0347395}

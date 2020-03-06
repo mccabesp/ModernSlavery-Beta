@@ -14,6 +14,7 @@ using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Models.LogModels;
 using Newtonsoft.Json;
 using ModernSlavery.Database;
 

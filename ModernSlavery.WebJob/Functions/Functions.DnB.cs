@@ -12,6 +12,7 @@ using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Entities.Enums;
 
