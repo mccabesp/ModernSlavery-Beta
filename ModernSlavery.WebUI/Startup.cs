@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -48,6 +49,7 @@ using ModernSlavery.Infrastructure.Message;
 using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Infrastructure.Telemetry;
+using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
@@ -81,6 +83,8 @@ namespace ModernSlavery.WebUI
             // won't get called.
 
             // setup configuration
+            services.ConfigureOptions<GlobalOptions>(_Config);
+
             services.Configure<ViewingOptions>(_Config.GetSection("Gpg:Viewing"));
             services.Configure<SubmissionOptions>(_Config.GetSection("Gpg:Submission"));
 
@@ -147,8 +151,7 @@ namespace ModernSlavery.WebUI
                     o.Cookie.SameSite = SameSiteMode.Strict;
                     o.Cookie.Domain = Global.ExternalHost.BeforeFirst(":"); //Domain cannot be an authority and contain a port number
                     o.IdleTimeout =
-                        TimeSpan.FromMinutes(
-                            Program.MvcApplication.SessionTimeOutMinutes); //Equivalent to <sessionState timeout="20"> from old Web.config
+                        TimeSpan.FromMinutes(_Config.GetValue("SessionTimeOutMinutes", 20)); //Equivalent to <sessionState timeout="20"> from old Web.config
                 });
 
             //Add the distributed cache and data protection
@@ -170,10 +173,10 @@ namespace ModernSlavery.WebUI
             ConfigureTestServices?.Invoke(services);
 
             //Create Inversion of Control container
-            MvcApplication.ContainerIoC = BuildContainerIoC(services);
+            var containerIoC = BuildContainerIoC(services);
 
             // Create the IServiceProvider based on the container.
-            return new AutofacServiceProvider(MvcApplication.ContainerIoC);
+            return new AutofacServiceProvider(containerIoC);
         }
 
         // ConfigureContainer is where you can register things directly
@@ -348,10 +351,6 @@ namespace ModernSlavery.WebUI
                     (p, ctx) => ctx.Resolve<IHttpClientFactory>().CreateClient(nameof(IWebTracker)))
                 .WithParameter("trackingId", Config.GetAppSetting("GoogleAnalyticsAccountId"));
 
-            //Register the global instance of Program.MvcApplication (equavalent in old Global.asax.cs)
-            //Specify WithAttributeFiltering for the consumer - required to resolve with Keyed attributes
-            builder.RegisterType<MvcApplication>().As<IMvcApplication>().SingleInstance().WithAttributeFiltering();
-
             //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
             builder.RegisterAssemblyTypes(typeof(BaseController).Assembly)
                 .Where(t => t.IsAssignableTo<BaseController>())
@@ -367,7 +366,7 @@ namespace ModernSlavery.WebUI
             // Initialise AutoMapper
             MapperConfiguration mapperConfig = new MapperConfiguration(config => {
                 // register all out mapper profiles (classes/mappers/*)
-                config.AddMaps(typeof(MvcApplication));
+                config.AddMaps(typeof(Program));
                 // allows auto mapper to inject our dependencies
                 //config.ConstructServicesUsing(serviceTypeToConstruct =>
                 //{
@@ -454,7 +453,6 @@ namespace ModernSlavery.WebUI
 
             app.UseSecurityHeaderMiddleware(); //Add/remove security headers from all responses
 
-            app.UseMvCApplication(); //Creates the global instance of Program.MvcApplication (equavalent in old Global.asax.cs)
             //app.UseMvcWithDefaultRoute();
             app.UseEndpoints(endpoints =>
             {
@@ -467,7 +465,14 @@ namespace ModernSlavery.WebUI
                     //     a graceful shutdown.
 
                     //Initialise the application
-                    Program.MvcApplication.Init();
+                    //Ensure ShortCodes, SicCodes and SicSections exist on remote 
+                    var _fileRepository = app.ApplicationServices.GetService<IFileRepository>();
+                    Task.WaitAll(
+                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.ShortCodes, Global.DataPath),
+                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicCodes, Global.DataPath),
+                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicSections, Global.DataPath)
+                    );
+
 
                     logger.LogInformation("Application Started");
                 });

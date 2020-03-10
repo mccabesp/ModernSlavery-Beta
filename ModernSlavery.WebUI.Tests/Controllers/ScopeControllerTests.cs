@@ -380,7 +380,6 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.StashModel(scopingViewModel);
 
             var mockEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendNotifyEmailQueue = mockEmailQueue.Object;
             mockEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));
 
@@ -448,7 +447,6 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.StashModel(scopingViewModel);
 
             var mockEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendNotifyEmailQueue = mockEmailQueue.Object;
             mockEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));
 
@@ -1189,7 +1187,6 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.StashModel(scopingViewModel);
 
             var mockEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendNotifyEmailQueue = mockEmailQueue.Object;
             mockEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));
 
@@ -1258,7 +1255,6 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.StashModel(scopingViewModel);
 
             var mockEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendNotifyEmailQueue = mockEmailQueue.Object;
             mockEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));
 

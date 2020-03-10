@@ -13,13 +13,14 @@ namespace ModernSlavery.Core
 {
     public class Global
     {
+        public double SessionTimeOutMinutes => Config.GetAppSetting("SessionTimeOut").ToInt32(20);
 
         public static string DownloadsPath = Path.Combine(DataPath, "Downloads");
 
         public static bool SkipSpamProtection
         {
-            get => Config.GetAppSetting("TESTING-SkipSpamProtection").ToBoolean();
-            set => Config.SetAppSetting("TESTING-SkipSpamProtection", value.ToString());
+            get => Config.GetAppSetting("SkipSpamProtection").ToBoolean();
+            set => Config.SetAppSetting("SkipSpamProtection", value.ToString());
         }
 
         public static int CertExpiresWarningDays => Config.GetAppSetting("CertExpiresWarningDays").ToInt32(30);
@@ -44,7 +45,7 @@ namespace ModernSlavery.Core
         public static bool EncryptEmails => Config.GetAppSetting("EncryptEmails").ToBoolean(true);
         public static bool MaintenanceMode => Config.GetAppSetting("MaintenanceMode").ToBoolean();
         public static bool StickySessions => Config.GetAppSetting("StickySessions").ToBoolean(true);
-        public static int StaticCacheSeconds => Config.GetAppSetting("CacheProfileSettings:StaticDuration").ToInt32(86400);
+        public static int StaticCacheSeconds => Config.GetAppSetting("ResponseCaching:StaticDuration").ToInt32(86400);
         public static DateTime PrivacyChangedDate => Config.GetAppSetting("PrivacyChangedDate").ToDateTime();
         public static int EmailVerificationExpiryHours => Config.GetAppSetting("EmailVerificationExpiryHours").ToInt32();
         public static int EmailVerificationMinResendHours => Config.GetAppSetting("EmailVerificationMinResendHours").ToInt32();
@@ -120,22 +121,5 @@ namespace ModernSlavery.Core
         public static bool SendGoogleAnalyticsDataToGovUk => Config.GetAppSetting("SendGoogleAnalyticsDataToGovUk").ToBoolean();
 
         public static string AzureInstanceId => Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID");
-
-        
-
-        #region Log Declarations
-
-        // WebUI
-        public static ILogRecordLogger BadSicLog { get; set; }
-        public static ILogRecordLogger ManualChangeLog { get; set; }
-        public static ILogRecordLogger RegistrationLog { get; set; }
-        public static ILogRecordLogger SubmissionLog { get; set; }
-        public static ILogRecordLogger SearchLog { get; set; }
-
-        // Webjobs
-        public static ILogRecordLogger EmailSendLog { get; set; }
-
-        #endregion
-
     }
 }

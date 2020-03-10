@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Core;
 
@@ -106,9 +108,10 @@ namespace ModernSlavery.Extensions.AspNetCore
         public static void AddCacheProfiles(this MvcOptions options)
         {
             //Control how controller actions cache content using appsettings.json file.
-            var cacheProfileSettings = new CacheProfileSettings();
-            Config.Configuration.GetSection("CacheProfileSettings:CacheProfiles").Bind(cacheProfileSettings.CacheProfiles);
-            foreach (KeyValuePair<string, CacheProfile> keyValuePair in cacheProfileSettings.CacheProfiles)
+            var cacheProfiles = new Dictionary<string, CacheProfile>();
+
+            Config.Configuration.GetSection("CacheProfileSettings:CacheProfiles").Bind(cacheProfiles);
+            foreach (KeyValuePair<string, CacheProfile> keyValuePair in cacheProfiles)
             {
                 options.CacheProfiles.Add(keyValuePair);
             }
@@ -160,6 +163,15 @@ namespace ModernSlavery.Extensions.AspNetCore
             ThreadPool.GetAvailableThreads(out int workerFree, out int ioFree);
             return
                 $"Threads (Worker busy:{workerMax - workerFree:N0} min:{workerMin:N0} max:{workerMax:N0}, I/O busy:{ioMax - ioFree:N0} min:{ioMin:N0} max:{ioMax:N0})";
+        }
+
+        public static void ConfigureOptions<T>(this IServiceCollection services, IConfiguration section=null) where T : class, new()
+        {
+            // Register the IOptions object
+            services.Configure<T>(section);
+
+            // Explicitly register the settings object by delegating to the IOptions object this allows resolution of Options class without IOptions dependency
+            services.AddSingleton(resolver =>resolver.GetRequiredService<IOptions<T>>().Value);
         }
 
         public static string SetThreadCount()

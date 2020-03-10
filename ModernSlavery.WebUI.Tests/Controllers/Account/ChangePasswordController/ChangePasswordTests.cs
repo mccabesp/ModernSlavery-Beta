@@ -90,7 +90,6 @@ namespace Account.Controllers.ChangePasswordController
                     verifiedUser);
 
             var mockEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendEmailQueue = mockEmailQueue.Object;
             mockEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<QueueWrapper>()));
 

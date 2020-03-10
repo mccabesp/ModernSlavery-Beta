@@ -11,9 +11,6 @@ namespace ModernSlavery.WebUI
 {
     public class Program
     {
-
-        public static IMvcApplication MvcApplication { get; set; }
-
         public static void Main(string[] args)
         {
             Console.Title = "ModernSlavery.WebUI";

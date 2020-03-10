@@ -2,6 +2,7 @@
 using System.Net.Http;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
@@ -12,8 +13,10 @@ using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Database;
@@ -24,18 +27,28 @@ using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Message;
 using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.Infrastructure.Search;
+using ModernSlavery.SharedKernel.Options;
+using Microsoft.Azure.WebJobs;
 
 namespace ModernSlavery.WebJob
 {
     public class Startup
     {
+        private static readonly IConfiguration _Config;
+
+        static Startup()
+        {
+            _Config = Config.Build();
+        }
 
         // ConfigureServices is where you register dependencies. This gets
         // called by the runtime before the ConfigureContainer method, below.
         public static void ConfigureServices(IServiceCollection services)
         {
             var coHoOptions = new CompaniesHouseOptions();
-            Config.Configuration.Bind("CompaniesHouse", coHoOptions);
+            services.ConfigureOptions<GlobalOptions>(_Config);
+
+            _Config.Bind("CompaniesHouse", coHoOptions);
 
             //Add a dedicated httpClient for Companies house API with exponential retry policy
 
@@ -49,10 +62,10 @@ namespace ModernSlavery.WebJob
             services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
 
             // setup configuration options
-            services.Configure<CompaniesHouseOptions>(Config.Configuration.GetSection("CompaniesHouse"));
-            services.Configure<GovNotifyOptions>(Config.Configuration.GetSection("Email:Providers:GovNotify"));
-            services.Configure<SmtpEmailOptions>(Config.Configuration.GetSection("Email:Providers:Smtp"));
-            services.Configure<GpgEmailOptions>(Config.Configuration);
+            services.Configure<CompaniesHouseOptions>(_Config.GetSection("CompaniesHouse"));
+            services.Configure<GovNotifyOptions>(_Config.GetSection("Email:Providers:GovNotify"));
+            services.Configure<SmtpEmailOptions>(_Config.GetSection("Email:Providers:Smtp"));
+            services.Configure<GpgEmailOptions>(_Config);
 
             //Create the Autofac inversion of control container
             var builder = new ContainerBuilder();
@@ -148,7 +161,7 @@ namespace ModernSlavery.WebJob
                 .SingleInstance();
 
             // BL Services
-            builder.RegisterInstance(Config.Configuration).SingleInstance();
+            builder.RegisterInstance(_Config).SingleInstance();
             builder.RegisterType<CommonBusinessLogic>().As<ICommonBusinessLogic>().SingleInstance();
             builder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>().InstancePerDependency();
             builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerDependency();
@@ -180,6 +193,5 @@ namespace ModernSlavery.WebJob
             builder.RegisterType<SmtpEmailProvider>().SingleInstance();
             builder.RegisterType<GpgEmailProvider>().SingleInstance();
         }
-
     }
 }

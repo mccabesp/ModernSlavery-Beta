@@ -87,7 +87,6 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 
             var mockNotifyEmailQueue = new Mock<IQueue>();
 
-            Program.MvcApplication.SendNotifyEmailQueue = mockNotifyEmailQueue.Object;
             mockNotifyEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));
 
@@ -143,7 +142,6 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 
             var mockNotifyEmailQueue = new Mock<IQueue>();
 
-            Program.MvcApplication.SendNotifyEmailQueue = mockNotifyEmailQueue.Object;
             mockNotifyEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));
 

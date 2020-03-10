@@ -147,7 +147,6 @@ namespace Account.Controllers.ChangeEmailController
                 });
 
             var mockEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendEmailQueue = mockEmailQueue.Object;
             mockEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<QueueWrapper>()))
                 .Callback(

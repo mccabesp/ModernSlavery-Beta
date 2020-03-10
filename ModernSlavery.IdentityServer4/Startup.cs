@@ -27,6 +27,7 @@ using ModernSlavery.Infrastructure.Data;
 using ModernSlavery.Infrastructure.File;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Queue;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.IdentityServer4
 {
@@ -70,6 +71,7 @@ namespace ModernSlavery.IdentityServer4
             // Add services to the collection. Don't build or return 
             // any IServiceProvider or the ConfigureContainer method
             // won't get called.
+            services.ConfigureOptions<GlobalOptions>(_Config);
 
             #region Configure identity server
 
@@ -153,7 +155,7 @@ namespace ModernSlavery.IdentityServer4
             Encryption.SetDefaultEncryptionKey(Config.GetAppSetting("DefaultEncryptionKey"));
 
             //Register the configuration
-            builder.RegisterInstance(Config.Configuration).SingleInstance();
+            builder.RegisterInstance(_Config).SingleInstance();
 
             builder.Register(c => new SqlRepository(new DatabaseContext(Global.DatabaseConnectionString)))
                 .As<IDataRepository>()
@@ -284,10 +286,10 @@ namespace ModernSlavery.IdentityServer4
         private X509Certificate2 LoadCertificate()
         {
             //Load the site certificate
-            string certThumprint = Config.Configuration["WEBSITE_LOAD_CERTIFICATES"].SplitI(";").FirstOrDefault();
+            string certThumprint = _Config["WEBSITE_LOAD_CERTIFICATES"].SplitI(";").FirstOrDefault();
             if (string.IsNullOrWhiteSpace(certThumprint))
             {
-                certThumprint = Config.Configuration["CertThumprint"].SplitI(";").FirstOrDefault();
+                certThumprint = _Config["CertThumprint"].SplitI(";").FirstOrDefault();
             }
 
             X509Certificate2 cert = null;

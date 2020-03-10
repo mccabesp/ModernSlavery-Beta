@@ -190,7 +190,6 @@ namespace Account.Controllers.CloseAccountController
                     verifiedUser);
 
             var mockEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendEmailQueue = mockEmailQueue.Object;
 
             mockEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<QueueWrapper>()));
@@ -229,7 +228,6 @@ namespace Account.Controllers.CloseAccountController
             var verifiedUser = controller.DataRepository.Get<User>((long) 23322);
 
             var mockEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendEmailQueue = mockEmailQueue.Object;
 
             mockEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<QueueWrapper>()));

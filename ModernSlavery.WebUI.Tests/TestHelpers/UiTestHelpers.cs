@@ -70,12 +70,8 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
 
         public static T GetController<T>(long userId = 0, RouteData routeData = null, params object[] dbObjects)
         {
-            DIContainer = BuildContainerIoC(dbObjects);
-
             //Create Inversion of Control container
-            MvcApplication.ContainerIoC = DIContainer;
-
-            Program.MvcApplication = DIContainer.Resolve<IMvcApplication>();
+            DIContainer = BuildContainerIoC(dbObjects);
 
             //Mock UserId as claim
             var claims = new List<Claim>();
@@ -339,9 +335,6 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
 
             //Register WebTracker
             builder.Register(c => Mock.Of<IWebTracker>()).As<IWebTracker>().InstancePerLifetimeScope();
-            //Register the global instance of Program.MvcApplication (equavalent in old Global.asax.cs)
-            //Specify WithAttributeFiltering for the consumer - required to resolve with Keyed attributes
-            builder.RegisterType<MvcApplication>().As<IMvcApplication>().SingleInstance().WithAttributeFiltering();
 
             //Register all BaseControllers - this is required to ensure KeyFilter is resolved in constructors
             builder.RegisterAssemblyTypes(typeof(BaseController).Assembly)
@@ -371,7 +364,7 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
             // Initialise AutoMapper
             MapperConfiguration mapperConfig = new MapperConfiguration(config => {
                 // register all out mapper profiles (classes/mappers/*)
-                config.AddMaps(typeof(MvcApplication));
+                config.AddMaps(typeof(Program));
                 // allows auto mapper to inject our dependencies
                 //config.ConstructServicesUsing(serviceTypeToConstruct =>
                 //{

@@ -116,7 +116,6 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
             controller.StashModel(testModel);
 
             var mockNotifyEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendNotifyEmailQueue = mockNotifyEmailQueue.Object;
             mockNotifyEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));
 

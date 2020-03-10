@@ -703,10 +703,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             organisation.LatestScope = new OrganisationScope {ScopeStatus = ScopeStatuses.InScope};
 
             var mockNotifyEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendNotifyEmailQueue = mockNotifyEmailQueue.Object;
 
             var mockEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendEmailQueue = mockEmailQueue.Object;
 
             mockNotifyEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));
@@ -772,10 +770,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             organisation.LatestScope = new OrganisationScope {ScopeStatus = ScopeStatuses.InScope};
 
             var mockNotifyEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendNotifyEmailQueue = mockNotifyEmailQueue.Object;
 
             var mockEmailQueue = new Mock<IQueue>();
-            Program.MvcApplication.SendEmailQueue = mockEmailQueue.Object;
 
             mockNotifyEmailQueue
                 .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));

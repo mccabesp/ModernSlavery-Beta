@@ -1,6 +1,8 @@
 ﻿@using ModernSlavery.Core
 @using ModernSlavery.Core.Models.Cookies
+@using ModernSlavery.SharedKernel.Options
 @using ModernSlavery.WebUI.Helpers
+@inject GlobalOptions options
 @{
     string assetsPath = "/assets/images";
 
@@ -21,7 +23,7 @@
 
     @if (User.Identity.IsAuthenticated)
     {
-        <meta http-equiv="refresh" content="@(Program.MvcApplication.SessionTimeOutMinutes * 60);@Url.Action("SessionExpired", "Home", null, "https")" />
+        <meta http-equiv="refresh" content="@(options.SessionTimeOutMinutes * 60);@Url.Action("SessionExpired", "Home", null, "https")" />
     }
     <meta name="google-site-verification" content="uRt7CAkfClOB8Jig6Pw2-DELUWuuyG2kYKip0UThxhg" />
 
