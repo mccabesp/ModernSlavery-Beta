@@ -128,7 +128,7 @@ namespace ModernSlavery.WebUI.Controllers
             model.EmailAddress = model.EmailAddress.ToLower();
 
             //Check this email address isn't already assigned to another user
-            User currentUser = await UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.New, UserStatuses.Active);
+            User currentUser = await RegistrationService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.New, UserStatuses.Active);
             if (currentUser != null)
             {
                 if (currentUser.EmailVerifySendDate != null)
@@ -185,7 +185,7 @@ namespace ModernSlavery.WebUI.Controllers
                 currentUser.SetSetting(UserSettingKeys.SendUpdates, model.SendUpdates.ToString());
             }
 
-            UserRepository.UpdateUserPasswordUsingPBKDF2(currentUser, model.Password);
+            RegistrationService.UserRepository.UpdateUserPasswordUsingPBKDF2(currentUser, model.Password);
 
             currentUser.EmailVerifySendDate = null;
             currentUser.EmailVerifiedDate = null;

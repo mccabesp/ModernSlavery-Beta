@@ -184,7 +184,7 @@ namespace ModernSlavery.WebUI.Controllers
                 case SectorTypes.Private:
                     try
                     {
-                        model.Employers = await PrivateSectorRepository.SearchAsync(
+                        model.Employers = await RegistrationService.PrivateSectorRepository.SearchAsync(
                             model.SearchText,
                             1,
                             Global.EmployerPageSize,
@@ -203,7 +203,7 @@ namespace ModernSlavery.WebUI.Controllers
                             return View(model);
                         }
 
-                        await _commonBusinessLogic.SendEmailService.SendGeoMessageAsync(
+                        await RegistrationService.CommonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                             "GPG - COMPANIES HOUSE ERROR",
                             $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
                             currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
@@ -212,7 +212,7 @@ namespace ModernSlavery.WebUI.Controllers
 
                     break;
                 case SectorTypes.Public:
-                    model.Employers = await PublicSectorRepository.SearchAsync(
+                    model.Employers = await RegistrationService.PublicSectorRepository.SearchAsync(
                         model.SearchText,
                         1,
                         Global.EmployerPageSize,
@@ -410,7 +410,7 @@ namespace ModernSlavery.WebUI.Controllers
                     case SectorTypes.Private:
                         try
                         {
-                            model.Employers = await PrivateSectorRepository.SearchAsync(
+                            model.Employers = await RegistrationService.PrivateSectorRepository.SearchAsync(
                                 model.SearchText,
                                 nextPage,
                                 Global.EmployerPageSize,
@@ -429,7 +429,7 @@ namespace ModernSlavery.WebUI.Controllers
                                 return View(model);
                             }
 
-                            await _commonBusinessLogic.SendEmailService.SendGeoMessageAsync(
+                            await RegistrationService.CommonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                                 "GPG - COMPANIES HOUSE ERROR",
                                 $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
                                 currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
@@ -453,7 +453,7 @@ namespace ModernSlavery.WebUI.Controllers
                         break;
 
                     case SectorTypes.Public:
-                        model.Employers = await PublicSectorRepository.SearchAsync(
+                        model.Employers = await RegistrationService.PublicSectorRepository.SearchAsync(
                             model.SearchText,
                             nextPage,
                             Global.EmployerPageSize,
@@ -558,7 +558,7 @@ namespace ModernSlavery.WebUI.Controllers
                     //Get the email domains from the D&B file
                     if (string.IsNullOrWhiteSpace(employer.EmailDomains))
                     {
-                        List<DnBOrgsModel> allDnBOrgs = await OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
+                        List<DnBOrgsModel> allDnBOrgs = await RegistrationService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
                         DnBOrgsModel dnbOrg = allDnBOrgs?.FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
                         if (dnbOrg != null)
                         {
@@ -1032,7 +1032,7 @@ namespace ModernSlavery.WebUI.Controllers
                 //Get the email domains from the D&B file
                 if (string.IsNullOrWhiteSpace(employer.EmailDomains))
                 {
-                    List<DnBOrgsModel> allDnBOrgs = await OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
+                    List<DnBOrgsModel> allDnBOrgs = await RegistrationService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
                     DnBOrgsModel dnbOrg = allDnBOrgs?.FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
                     if (dnbOrg != null)
                     {
@@ -1132,11 +1132,11 @@ namespace ModernSlavery.WebUI.Controllers
                         {
                             if (employer.SectorType == SectorTypes.Public)
                             {
-                                employer.SicCodeIds = await PublicSectorRepository.GetSicCodesAsync(employer.CompanyNumber);
+                                employer.SicCodeIds = await RegistrationService.PublicSectorRepository.GetSicCodesAsync(employer.CompanyNumber);
                             }
                             else
                             {
-                                employer.SicCodeIds = await PrivateSectorRepository.GetSicCodesAsync(employer.CompanyNumber);
+                                employer.SicCodeIds = await RegistrationService.PrivateSectorRepository.GetSicCodesAsync(employer.CompanyNumber);
                             }
 
                             employer.SicSource = "CoHo";
@@ -1151,7 +1151,7 @@ namespace ModernSlavery.WebUI.Controllers
                                 return View(model);
                             }
 
-                            await _commonBusinessLogic.SendEmailService.SendGeoMessageAsync(
+                            await RegistrationService.CommonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                                 "GPG - COMPANIES HOUSE ERROR",
                                 $"Cant get SIC Codes from Companies House API for company {employer.OrganisationName} No:{employer.CompanyNumber} due to following error:\n\n{ex.Message}",
                                 currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
@@ -1233,7 +1233,7 @@ namespace ModernSlavery.WebUI.Controllers
                     }
                     else
                     {
-                        model.IsUkAddress = await postcodeChecker.IsValidPostcode(employer.PostCode) ? true : (bool?)null;
+                        model.IsUkAddress = await RegistrationService.PostcodeChecker.IsValidPostcode(employer.PostCode) ? true : (bool?)null;
                     }
                 }
 
@@ -1330,7 +1330,7 @@ namespace ModernSlavery.WebUI.Controllers
             ReportingOrganisationId = userOrg.OrganisationId;
 
             //Remove any previous searches from the cache
-            PrivateSectorRepository.ClearSearch();
+            RegistrationService.PrivateSectorRepository.ClearSearch();
 
             var authorised = false;
             var hasAddress = false;
@@ -1376,7 +1376,7 @@ namespace ModernSlavery.WebUI.Controllers
                 //Log the registration
                 if (!userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))
                 {
-                    await Global.RegistrationLog.WriteAsync(
+                    await RegistrationService.RegistrationLog.WriteAsync(
                         new RegisterLogModel
                         {
                             StatusDate = VirtualDateTime.Now,
@@ -1403,14 +1403,14 @@ namespace ModernSlavery.WebUI.Controllers
                 if (model.IsFastTrackAuthorised)
                 {
                     //Send notification email to existing users
-                    _commonBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
+                    RegistrationService.CommonBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
                 }
 
                 this.StashModel(
                     new CompleteViewModel
                     {
                         OrganisationId = userOrg.OrganisationId,
-                        AccountingDate = _commonBusinessLogic.GetAccountingStartDate(sector.Value)
+                        AccountingDate = RegistrationService.CommonBusinessLogic.GetAccountingStartDate(sector.Value)
                     });
 
                 //BUG: the return keyword was missing here so no redirection would occur
@@ -1486,7 +1486,7 @@ namespace ModernSlavery.WebUI.Controllers
                     ScopeStatusDate = now,
                     Status = ScopeRowStatuses.Active,
                     StatusDetails = "Generated by the system",
-                    SnapshotDate = _commonBusinessLogic.GetAccountingStartDate(org.SectorType)
+                    SnapshotDate = RegistrationService.CommonBusinessLogic.GetAccountingStartDate(org.SectorType)
                 };
                 DataRepository.Insert(newScope);
                 org.OrganisationScopes.Add(newScope);
@@ -1584,8 +1584,8 @@ namespace ModernSlavery.WebUI.Controllers
                 //Set the latest name if there isnt a name already or new name is from CoHo
                 if (oldOrgName == null
                     || oldOrgName?.Name != newName
-                    && _commonBusinessLogic.SourceComparer.IsCoHo(newNameSource)
-                    && _commonBusinessLogic.SourceComparer.CanReplace(newNameSource, oldOrgName.Source))
+                    && RegistrationService.CommonBusinessLogic.SourceComparer.IsCoHo(newNameSource)
+                    && RegistrationService.CommonBusinessLogic.SourceComparer.CanReplace(newNameSource, oldOrgName.Source))
                 {
                     org.OrganisationName = newName;
 
@@ -1635,8 +1635,8 @@ namespace ModernSlavery.WebUI.Controllers
                     //Set the sic codes if there arent any sic codes already or new sic codes are from CoHo
                     if (!oldSicCodes.Any()
                         || !newSicCodeIds.SequenceEqual(oldSicCodeIds)
-                        && _commonBusinessLogic.SourceComparer.IsCoHo(newSicSource)
-                        && _commonBusinessLogic.SourceComparer.CanReplace(newSicSource, oldSicCodes.Select(s => s.Source)))
+                        && RegistrationService.CommonBusinessLogic.SourceComparer.IsCoHo(newSicSource)
+                        && RegistrationService.CommonBusinessLogic.SourceComparer.CanReplace(newSicSource, oldSicCodes.Select(s => s.Source)))
                     {
                         //Retire the old SicCodes
                         foreach (OrganisationSicCode oldSicCode in oldSicCodes)
@@ -1820,7 +1820,7 @@ namespace ModernSlavery.WebUI.Controllers
                     {
                         await DataRepository.SaveChangesAsync();
 
-                        ScopeBusinessLogic.FillMissingScopes(tempUserOrg.Organisation);
+                        RegistrationService.ScopeBusinessLogic.FillMissingScopes(tempUserOrg.Organisation);
 
                         if (tempUserOrg.PINConfirmedDate != null)
                         {
@@ -1839,7 +1839,7 @@ namespace ModernSlavery.WebUI.Controllers
                         //Ensure the organisation has an employer reference
                         if (string.IsNullOrWhiteSpace(tempUserOrg.Organisation.EmployerReference))
                         {
-                            await OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(tempUserOrg.Organisation);
+                            await RegistrationService.OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(tempUserOrg.Organisation);
                         }
 
                         DataRepository.CommitTransaction();
@@ -1862,7 +1862,7 @@ namespace ModernSlavery.WebUI.Controllers
             //Add or remove this organisation to/from the search index
             if (saved)
             {
-                await SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
+                await RegistrationService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
             }
 
             //Log the bad sic codes here to ensure organisation identifiers have been created when saved
@@ -1872,7 +1872,7 @@ namespace ModernSlavery.WebUI.Controllers
                 var badSicLoggingtasks = new List<Task>();
                 badSicCodes.ForEach(
                     code => badSicLoggingtasks.Add(
-                        Global.BadSicLog.WriteAsync(
+                        RegistrationService.BadSicLog.WriteAsync(
                             new BadSicLogModel
                             {
                                 OrganisationId = org.OrganisationId,
@@ -1928,7 +1928,7 @@ namespace ModernSlavery.WebUI.Controllers
                 return;
             }
 
-            await _commonBusinessLogic.SendEmailService.SendGEORegistrationRequestAsync(reviewUrl, contactName, reportingOrg, reportingAddress, test);
+            await RegistrationService.CommonBusinessLogic.SendEmailService.SendGEORegistrationRequestAsync(reviewUrl, contactName, reportingOrg, reportingAddress, test);
         }
 
 

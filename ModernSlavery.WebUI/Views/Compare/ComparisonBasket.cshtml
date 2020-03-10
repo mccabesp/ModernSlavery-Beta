@@ -1,5 +1,6 @@
-﻿@inject ISearchViewService SearchViewService
-@inject ICompareViewService CompareViewService
+﻿@inject ISearchPresenter SearchViewService
+@inject IComparePresenter CompareViewService
+@using ModernSlavery.WebUI.Presenters
 @model CompareBasketViewModel
 @{
     int compareCount = CompareViewService.BasketItemCount;

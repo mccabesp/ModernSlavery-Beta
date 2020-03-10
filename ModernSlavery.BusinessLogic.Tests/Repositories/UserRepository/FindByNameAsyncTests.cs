@@ -22,7 +22,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
             {
                 // Initialise AutoMapper
                 MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                    config.AddMaps(typeof(ModernSlavery.BusinessLogic.Account.Repositories.UserRepository));
+                    config.AddMaps(typeof(BusinessLogic.Repositories.UserRepository));
                 });
                 builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
             }
@@ -126,7 +126,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
                         .BuildMock()
                         .Object);
 
-            _configuredIUserRepository = new Account.Repositories.UserRepository(
+            _configuredIUserRepository = new BusinessLogic.Repositories.UserRepository(
                 configurableDataRepository.Object,
                 Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
         }

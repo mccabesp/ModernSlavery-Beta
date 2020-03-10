@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Autofac;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
@@ -239,7 +238,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var submissionBusinessLogic = new SubmissionBusinessLogic(
                 UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>(),
-                UiTestHelper.DIContainer.Resolve<IDataRepository>());
+                UiTestHelper.DIContainer.Resolve<IDataRepository>(),
+                Mock.Of<ILogRecordLogger>());
 
             var organisationBusinessLogic = new OrganisationBusinessLogic(
                 UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>(),
@@ -251,7 +251,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 UiTestHelper.DIContainer.Resolve<IDnBOrgsRepository>(),
                 UiTestHelper.DIContainer.Resolve<IObfuscator>());
 
-            controller.OrganisationBusinessLogic = organisationBusinessLogic;
+            controller.ViewingService.OrganisationBusinessLogic = organisationBusinessLogic;
 
             string encryptedReportId = ConfigureEncryptionHandler(report.ReturnId.ToString());
 
@@ -333,7 +333,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 UiTestHelper.DIContainer.Resolve<IDnBOrgsRepository>(),
                 UiTestHelper.DIContainer.Resolve<IObfuscator>());
 
-            controller.OrganisationBusinessLogic = organisationBusinessLogic;
+            controller.ViewingService.OrganisationBusinessLogic = organisationBusinessLogic;
 
             // Act
             var result = await controller.EmployerDetails(id: "?&%") as ViewResult;
@@ -952,7 +952,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 .Setup(x => x.GetSubmissionByOrganisationAndYear(It.IsAny<Organisation>(), It.IsAny<int>()))
                 .Throws(new Exception("Kaboom"));
 
-            controller.SubmissionBusinessLogic = mockedSubmissionBusinessLogicToSetup.Object;
+            controller.ViewingService.SubmissionBusinessLogic = mockedSubmissionBusinessLogicToSetup.Object;
 
             // Act
             var result = controller.Report(obfuscatedOrganisationId, Global.FirstReportingYear + 1) as ViewResult;

@@ -38,7 +38,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
             int organisationId = requestParams[0].ToInt32();
             int reportingYear = requestParams[1].ToInt32();
 
-            if (!submissionService.IsValidSnapshotYear(reportingYear))
+            if (!_SubmissionPresenter.IsValidSnapshotYear(reportingYear))
             {
                 return new HttpBadRequestResult($"Invalid snapshot year {reportingYear}");
             }

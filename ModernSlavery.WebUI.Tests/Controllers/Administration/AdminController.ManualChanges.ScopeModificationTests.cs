@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
@@ -78,7 +77,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .Returns(Task.CompletedTask)
                 .Callback(() => updateSearchIndexCalled = true);
 
-            adminControllerForOutOfScopeTests.SearchBusinessLogic = mockedSearchBusinessLogic.Object;
+            adminControllerForOutOfScopeTests.AdminService.SearchBusinessLogic = mockedSearchBusinessLogic.Object;
 
             ManualChangesViewModel manualChangesViewModelMockObject = ManualChangesViewModelHelper.GetMock(
                 SetToInScopeTestCommand,
@@ -150,23 +149,6 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
         private AdminController GetControllerForOutOfScopeTests(params object[] databaseObjects)
         {
             var mockedController = UiTestHelper.GetController<AdminController>(_databaseAdminUser.UserId, null, databaseObjects);
-
-            var scopeBusinessLogic = new ScopeBusinessLogic(
-                UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>(),
-                UiTestHelper.DIContainer.Resolve<IDataRepository>(),
-                UiTestHelper.DIContainer.Resolve<ISearchBusinessLogic>());
-
-            var organisationBusinessLogic = new OrganisationBusinessLogic(
-                UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>(),
-                UiTestHelper.DIContainer.Resolve<IDataRepository>(),
-                UiTestHelper.DIContainer.Resolve<ISubmissionBusinessLogic>(),
-                scopeBusinessLogic,
-                UiTestHelper.DIContainer.Resolve<IEncryptionHandler>(),
-                UiTestHelper.DIContainer.Resolve<ISecurityCodeBusinessLogic>(),
-                UiTestHelper.DIContainer.Resolve<IDnBOrgsRepository>(),
-                UiTestHelper.DIContainer.Resolve<IObfuscator>());
-
-            mockedController.OrganisationBusinessLogic = organisationBusinessLogic;
             return mockedController;
         }
 
@@ -930,7 +912,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .Returns(Task.CompletedTask)
                 .Callback(() => updateSearchIndexCalled = true);
 
-            adminControllerForOutOfScopeTests.SearchBusinessLogic = mockedSearchBusinessLogic.Object;
+            adminControllerForOutOfScopeTests.AdminService.SearchBusinessLogic = mockedSearchBusinessLogic.Object;
 
             ManualChangesViewModel manualChangesViewModelMockObject = ManualChangesViewModelHelper.GetMock(
                 SetToOutOfScopeTestCommand,

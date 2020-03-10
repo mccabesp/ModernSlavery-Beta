@@ -54,7 +54,7 @@ namespace ModernSlavery.WebJob
                         null);
                     DataRepository.Delete(user);
                     await DataRepository.SaveChangesAsync();
-                    await Global.ManualChangeLog.WriteAsync(logItem);
+                    await _ManualChangeLog.WriteAsync(logItem);
                 }
 
                 log.LogDebug($"Executed {nameof(PurgeUsers)} successfully");
@@ -102,7 +102,7 @@ namespace ModernSlavery.WebJob
                         null);
                     DataRepository.Delete(registration);
                     await DataRepository.SaveChangesAsync();
-                    await Global.ManualChangeLog.WriteAsync(logItem);
+                    await _ManualChangeLog.WriteAsync(logItem);
                 }
 
                 log.LogDebug($"Executed {nameof(PurgeRegistrations)} successfully");
@@ -207,7 +207,7 @@ namespace ModernSlavery.WebJob
                         //Remove this organisation from the search index
                         await _EmployerSearchRepository.RemoveFromIndexAsync(new[] {searchRecord});
 
-                        await Global.ManualChangeLog.WriteAsync(logItem);
+                        await _ManualChangeLog.WriteAsync(logItem);
                         count++;
                     }
 
@@ -248,7 +248,7 @@ namespace ModernSlavery.WebJob
                         null);
                     DataRepository.Delete(@return);
                     await DataRepository.SaveChangesAsync();
-                    await Global.ManualChangeLog.WriteAsync(logItem);
+                    await _ManualChangeLog.WriteAsync(logItem);
                 }
 
                 log.LogDebug($"Executed {nameof(PurgeGPGData)} successfully");

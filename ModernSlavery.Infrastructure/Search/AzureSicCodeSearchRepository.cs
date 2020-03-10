@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac.Features.AttributeFilters;
 using Microsoft.ApplicationInsights;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
@@ -32,6 +33,7 @@ namespace ModernSlavery.Infrastructure.Data
 {
     public class AzureSicCodeSearchRepository : ISearchRepository<SicCodeSearchModel>
     {
+        public readonly ILogRecordLogger SearchLog;
         protected readonly Lazy<Task<ISearchServiceClient>> _searchServiceClient;
         private readonly TelemetryClient _telemetryClient;
         protected Lazy<Task<ISearchIndexClient>> _searchIndexClient;
@@ -41,7 +43,9 @@ namespace ModernSlavery.Infrastructure.Data
         public bool Disabled { get; set; }
 
 
-        public AzureSicCodeSearchRepository(ISearchServiceClient searchServiceClient, string indexName, bool disabled=false)
+        public AzureSicCodeSearchRepository(
+            [KeyFilter(Filenames.SearchLog)]ILogRecordLogger searchLog,
+            ISearchServiceClient searchServiceClient, string indexName, bool disabled=false)
         {
             Disabled = disabled;
             if (disabled)
@@ -49,6 +53,8 @@ namespace ModernSlavery.Infrastructure.Data
                 Console.WriteLine($"{nameof(AzureSicCodeSearchRepository)} is disabled");
                 return;
             }
+
+            SearchLog = searchLog;
             IndexName = indexName;
 
             _searchServiceClient = new Lazy<Task<ISearchServiceClient>>(
@@ -317,7 +323,7 @@ namespace ModernSlavery.Infrastructure.Data
 
                 _telemetryClient?.TrackEvent("Gpg_Search", telemetryProperties);
 
-                await Global.SearchLog.WriteAsync(telemetryProperties);
+                await SearchLog.WriteAsync(telemetryProperties);
             }
 
             //Return the facet results

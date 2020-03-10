@@ -37,8 +37,8 @@ namespace ModernSlavery.WebUI.Controllers.Submission
                 return View("DraftComplete", stashedReturnViewModel);
             }
 
-            await submissionService.UpdateDraftFileAsync(currentUser.UserId, stashedReturnViewModel);
-            await submissionService.CommitDraftFileAsync(stashedReturnViewModel);
+            await _SubmissionPresenter.UpdateDraftFileAsync(currentUser.UserId, stashedReturnViewModel);
+            await _SubmissionPresenter.CommitDraftFileAsync(stashedReturnViewModel);
 
             return View("DraftComplete", stashedReturnViewModel);
         }

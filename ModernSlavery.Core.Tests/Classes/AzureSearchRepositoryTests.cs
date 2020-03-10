@@ -1,6 +1,8 @@
 ﻿using System;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Search;
+using Moq;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Classes
@@ -21,7 +23,7 @@ namespace ModernSlavery.Core.Tests.Classes
             string nullTestIndexName = null;
 
             // Act
-            TestDelegate testDelegate = () => new AzureEmployerSearchRepository(nullTestServiceName, nullTestIndexName);
+            TestDelegate testDelegate = () => new AzureEmployerSearchRepository(Mock.Of<ILogRecordLogger>(),nullTestServiceName, nullTestIndexName);
 
             // Assert
             Assert.That(

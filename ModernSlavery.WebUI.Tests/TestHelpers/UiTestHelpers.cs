@@ -9,9 +9,7 @@ using Autofac;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Account.Repositories;
 using ModernSlavery.BusinessLogic.Repositories;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
@@ -26,10 +24,7 @@ using ModernSlavery.Tests.Common.Mocks;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewServices;
-using ModernSlavery.WebUI.Classes.Presentation;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Options;
-using ModernSlavery.WebUI.Services;
 using ModernSlavery.WebUI.Tests.Mocks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -49,6 +44,7 @@ using ModernSlavery.SharedKernel;
 using Newtonsoft.Json;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Infrastructure;
+using ModernSlavery.BusinessLogic.Admin;
 using ModernSlavery.Infrastructure;
 using ModernSlavery.Infrastructure.File;
 using ModernSlavery.Infrastructure.Message;
@@ -59,6 +55,7 @@ using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Admin.Controllers;
+using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Tests.TestHelpers
@@ -250,7 +247,7 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
             }
             else
             {
-                Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockAsyncDataRepository();
+                Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockDataRepository();
                 builder.Register(c => mockDataRepo.Object).As<IDataRepository>().InstancePerLifetimeScope();
             }
 
@@ -312,37 +309,20 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
             // UI Presentation
             builder.Register(
                     c =>
-                        c.ResolveAsMock<ScopePresentation>(
+                        c.ResolveAsMock<ScopePresenter>(
                                 false,
                                 typeof(IScopeBusinessLogic),
                                 typeof(IDataRepository),
                                 typeof(IOrganisationBusinessLogic))
                             .Object)
-                .As<IScopePresentation>()
+                .As<IScopePresenter>()
                 .InstancePerLifetimeScope();
 
-            builder.Register(
-                    c => new ViewingService(
-                        c.Resolve<IDataRepository>(),
-                        c.Resolve<ISearchRepository<EmployerSearchModel>>(),
-                        c.Resolve<ISearchRepository<SicCodeSearchModel>>(),
-                        c.Resolve<ICommonBusinessLogic>()))
-                .As<IViewingService>()
-                .InstancePerLifetimeScope();
+            builder.RegisterType<ViewingPresenter>().As<IViewingPresenter>().InstancePerLifetimeScope();
+            builder.RegisterType<SubmissionPresenter>().As<ISubmissionPresenter>().InstancePerLifetimeScope();
 
-            builder.Register(
-                    c => new SubmissionService(
-                        c.Resolve<IDataRepository>(),
-                        c.Resolve<IScopeBusinessLogic>(),
-                        c.Resolve<IFileRepository>(),
-                        c.Resolve<IDraftFileBusinessLogic>(),
-                        c.Resolve<ICommonBusinessLogic>(),
-                        c.Resolve<IOptionsSnapshot<SubmissionOptions>>()))
-                .As<ISubmissionService>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<CompareViewService>().As<ICompareViewService>().InstancePerLifetimeScope();
-            builder.RegisterType<SearchViewService>().As<ISearchViewService>().InstancePerLifetimeScope();
+            builder.RegisterType<ComparePresenter>().As<IComparePresenter>().InstancePerLifetimeScope();
+            builder.RegisterType<SearchPresenter>().As<ISearchPresenter>().InstancePerLifetimeScope();
             builder.RegisterType<ChangeEmailViewService>().As<IChangeEmailViewService>().InstancePerLifetimeScope();
             builder.RegisterType<ChangeDetailsViewService>().As<IChangeDetailsViewService>().InstancePerLifetimeScope();
             builder.RegisterType<ChangePasswordViewService>().As<IChangePasswordViewService>().InstancePerLifetimeScope();

@@ -71,12 +71,6 @@ namespace ModernSlavery.WebJob
             // system templates
             host.RegisterEmailTemplate<SendEmailTemplate>(emailTemplatesConfigPath);
 
-
-            //Register log to Global
-            Global.EmailSendLog = ContainerIOC.ResolveKeyed<ILogRecordLogger>(Filenames.EmailSendLog);
-            Global.ManualChangeLog = ContainerIOC.ResolveKeyed<ILogRecordLogger>(Filenames.ManualChangeLog);
-            Global.BadSicLog = ContainerIOC.ResolveKeyed<ILogRecordLogger>(Filenames.BadSicLog);
-
             //Ensure SicSectorSynonyms exist on remote 
             var _FileRepository = ContainerIOC.Resolve<IFileRepository>();
             Task.WaitAll(Core.Classes.Extensions.PushRemoteFileAsync(_FileRepository, Filenames.SicSectorSynonyms, Global.DataPath));

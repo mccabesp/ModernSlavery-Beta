@@ -83,11 +83,11 @@ namespace ModernSlavery.WebJob.Tests.Functions
             //ASSERT
 
             //Check for correct number of indexes
-            long documentCount = await _functions.SearchBusinessLogic.SearchRepository.GetDocumentCountAsync();
+            long documentCount = await _functions.SearchBusinessLogic.EmployerSearchRepository.GetDocumentCountAsync();
             Assert.That(documentCount == orgs.Count(), $"Expected '{documentCount}' indexes ");
 
             //Get the actual results
-            IList<EmployerSearchModel> actualResults = await _functions.SearchBusinessLogic.SearchRepository.ListAsync();
+            IList<EmployerSearchModel> actualResults = await _functions.SearchBusinessLogic.EmployerSearchRepository.ListAsync();
 
             //Generate the expected results
             IEnumerable<EmployerSearchModel> expectedResults = orgs.Select(o => EmployerSearchModel.Create(o));

@@ -1,11 +1,12 @@
 ﻿using System;
+using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.SharedKernel;
 using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.WebJob
@@ -15,6 +16,8 @@ namespace ModernSlavery.WebJob
 
         public Functions(
             ICustomLogger customLogger,
+            [KeyFilter(Filenames.BadSicLog)]ILogRecordLogger badSicLog,
+            [KeyFilter(Filenames.ManualChangeLog)]ILogRecordLogger manualChangeLog,
             IMessenger messenger,
             IFileRepository fileRepository,
             IDataRepository dataRepository,
@@ -30,6 +33,8 @@ namespace ModernSlavery.WebJob
             ISnapshotDateHelper snapshotDateHelper)
         {
             _CustomLogger = customLogger;
+            _BadSicLog = badSicLog;
+            _ManualChangeLog = manualChangeLog;
             _Messenger = messenger;
             DataRepository = dataRepository;
             FileRepository = fileRepository;
@@ -48,6 +53,8 @@ namespace ModernSlavery.WebJob
         #region Properties
 
         private readonly ICustomLogger _CustomLogger;
+        private readonly ILogRecordLogger _BadSicLog;
+        private readonly ILogRecordLogger _ManualChangeLog;
         private readonly IMessenger _Messenger;
         public readonly IFileRepository FileRepository;
         public readonly IDataRepository DataRepository;

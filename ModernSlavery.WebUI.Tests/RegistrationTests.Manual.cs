@@ -260,7 +260,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             controller.Bind(expectedModel);
 
             //insert  some records into the db...
-            controller.PrivateSectorRepository.Insert(new EmployerRecord() {
+            controller.RegistrationService.PrivateSectorRepository.Insert(new EmployerRecord() {
                 OrganisationName = "acme inc",
                 Address1 = "123",
                 Address2 = "EverGreen Terrace",
@@ -270,7 +270,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             }
                                                      );
 
-            controller.PrivateSectorRepository.Insert(new EmployerRecord() {
+            controller.RegistrationService.PrivateSectorRepository.Insert(new EmployerRecord() {
                 OrganisationName = "smith ltd",
                 Address1 = "45",
                 Address2 = "iverson rd",
@@ -280,7 +280,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             }
                                                      );
 
-            controller.PrivateSectorRepository.Insert(new EmployerRecord() {
+            controller.RegistrationService.PrivateSectorRepository.Insert(new EmployerRecord() {
                 OrganisationName = "smith & Wes ltd",
                 Address1 = "45",
                 Address2 = "iverson rd",
@@ -290,7 +290,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             }
                                                     );
 
-            controller.PrivateSectorRepository.Insert(new EmployerRecord() {
+            controller.RegistrationService.PrivateSectorRepository.Insert(new EmployerRecord() {
                 OrganisationName = "smithers and sons ltd",
                 Address1 = "45",
                 Address2 = "iverson rd",
@@ -300,7 +300,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             }
                                                     );
 
-            controller.PrivateSectorRepository.Insert(new EmployerRecord() {
+            controller.RegistrationService.PrivateSectorRepository.Insert(new EmployerRecord() {
                 OrganisationName = "excetera ltd",
                 Address1 = "123",
                 Address2 = "Venice avenue ",
@@ -365,11 +365,11 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             controller.Bind(expectedModel);
 
             //insert  some records into the db...
-            controller.PublicSectorRepository.Insert(new EmployerRecord() { OrganisationName = "2Gether NHS Foundation Trust", EmailDomains = "nhs.uk" });
-            controller.PublicSectorRepository.Insert(new EmployerRecord() { OrganisationName = "5 Boroughs Partnership NHS Foundation Trust", EmailDomains = "nhs.uk" });
-            controller.PublicSectorRepository.Insert(new EmployerRecord() { OrganisationName = "Abbots Langley Parish Council", EmailDomains = "abbotslangley-pc.gov.uk" });
-            controller.PublicSectorRepository.Insert(new EmployerRecord() { OrganisationName = "Aberdeen City Council", EmailDomains = "aberdeencityandshire-sdpa.gov.uk" });
-            controller.PublicSectorRepository.Insert(new EmployerRecord() { OrganisationName = "Aberdeenshire Council", EmailDomains = "aberdeenshire.gov.uk" });
+            controller.RegistrationService.PublicSectorRepository.Insert(new EmployerRecord() { OrganisationName = "2Gether NHS Foundation Trust", EmailDomains = "nhs.uk" });
+            controller.RegistrationService.PublicSectorRepository.Insert(new EmployerRecord() { OrganisationName = "5 Boroughs Partnership NHS Foundation Trust", EmailDomains = "nhs.uk" });
+            controller.RegistrationService.PublicSectorRepository.Insert(new EmployerRecord() { OrganisationName = "Abbots Langley Parish Council", EmailDomains = "abbotslangley-pc.gov.uk" });
+            controller.RegistrationService.PublicSectorRepository.Insert(new EmployerRecord() { OrganisationName = "Aberdeen City Council", EmailDomains = "aberdeencityandshire-sdpa.gov.uk" });
+            controller.RegistrationService.PublicSectorRepository.Insert(new EmployerRecord() { OrganisationName = "Aberdeenshire Council", EmailDomains = "aberdeenshire.gov.uk" });
 
             //Stash the object for the unstash to happen in code
             controller.StashModel(expectedModel);
@@ -2487,7 +2487,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 SicCodeIds = "2100,10520",
                 SicSource = "CoHo"
             };
-            controller.PrivateSectorRepository.Insert(employer.GetClone());
+            controller.RegistrationService.PrivateSectorRepository.Insert(employer.GetClone());
 
             //Set the initial model
             var stashedModel = new OrganisationViewModel() {
@@ -2592,7 +2592,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 SicCodeIds = "2100,10520",
                 SicSource = "CoHo"
             };
-            controller.PublicSectorRepository.Insert(employer.GetClone());
+            controller.RegistrationService.PublicSectorRepository.Insert(employer.GetClone());
             employer.SicCodeIds = null;
 
             //Set the initial model
@@ -2700,7 +2700,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 Country = "UK",
                 PostCode = "e12 3eq"
             };
-            controller.PrivateSectorRepository.Insert(employer);
+            controller.RegistrationService.PrivateSectorRepository.Insert(employer);
             var currentSnapshotDate = employer.SectorType.GetAccountingStartDate();
 
             //Set the initial model
@@ -2821,7 +2821,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.That(userOrgs[0].Address.GetAddressString() == address.GetAddressString(), "Wrong address for user org");
 
             //Check the organisation does not appear in search index
-            var index= await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString(), nameof(EmployerSearchModel.OrganisationId));
+            var index= await controller.RegistrationService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString(), nameof(EmployerSearchModel.OrganisationId));
             Assert.IsNull(index);
         }
 
@@ -2876,7 +2876,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
-            controller.PrivateSectorRepository.Insert(employer);
+            controller.RegistrationService.PrivateSectorRepository.Insert(employer);
 
             //Set the initial model
             var stashedModel = new OrganisationViewModel() {
@@ -2992,7 +2992,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.That(userOrgs[0].Address.GetAddressString() == address.GetAddressString(), "Wrong address for user org");
 
             //Check the organisation exists in search
-            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
+            var actualIndex = await controller.RegistrationService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString());
             var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
@@ -3048,7 +3048,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
-            controller.PrivateSectorRepository.Insert(employer);
+            controller.RegistrationService.PrivateSectorRepository.Insert(employer);
 
             //Set the initial model
             var stashedModel = new OrganisationViewModel() {
@@ -3156,7 +3156,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.That(userOrgs[0].Address.GetAddressString() == address.GetAddressString(), "Wrong address for user org");
 
             //Check the organisation exists in search
-            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
+            var actualIndex = await controller.RegistrationService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString());
             var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
@@ -3212,7 +3212,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
-            controller.PrivateSectorRepository.Insert(employer);
+            controller.RegistrationService.PrivateSectorRepository.Insert(employer);
 
             //Set the initial model
             var stashedModel = new OrganisationViewModel() {
@@ -3334,7 +3334,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.That(userOrgs[0].Address.GetAddressString() == address.GetAddressString(), "Wrong address for user org");
 
             //Check the organisation exists in search
-            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
+            var actualIndex = await controller.RegistrationService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString());
             var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
@@ -3390,7 +3390,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
-            controller.PrivateSectorRepository.Insert(employer);
+            controller.RegistrationService.PrivateSectorRepository.Insert(employer);
 
             //Set the initial model
             var stashedModel = new OrganisationViewModel() {
@@ -3512,7 +3512,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.That(userOrgs[0].Address.GetAddressString() == address.GetAddressString(), "Wrong address for user org");
 
             //Check the organisation exists in search
-            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
+            var actualIndex = await controller.RegistrationService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString());
             var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
@@ -3568,7 +3568,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
-            controller.PrivateSectorRepository.Insert(employer);
+            controller.RegistrationService.PrivateSectorRepository.Insert(employer);
 
             //Set the initial model
             var stashedModel = new OrganisationViewModel() {
@@ -3684,7 +3684,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.That(userOrgs[0].Address.GetAddressString() == address.GetAddressString(), "Wrong address for user org");
 
             //Check the organisation exists in search
-            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
+            var actualIndex = await controller.RegistrationService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString());
             var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
@@ -3741,7 +3741,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
-            controller.PrivateSectorRepository.Insert(employer);
+            controller.RegistrationService.PrivateSectorRepository.Insert(employer);
 
             //Set the initial model
             var stashedModel = new OrganisationViewModel() {
@@ -3858,7 +3858,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.That(userOrgs[0].Address.GetAddressString() == address.GetAddressString(), "Wrong address for user org");
 
             //Check the organisation exists in search
-            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
+            var actualIndex = await controller.RegistrationService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString());
             var expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }
@@ -3906,7 +3906,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
-            controller.PrivateSectorRepository.Insert(employer);
+            controller.RegistrationService.PrivateSectorRepository.Insert(employer);
 
             var currentSnapshotDate = employer.SectorType.GetAccountingStartDate();
 
@@ -4028,7 +4028,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.IsNull(userOrgs[0].PINConfirmedDate, "Wrong PIN confirmed date");
 
             //Check the organisation does not exists in search
-            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString(),nameof(EmployerSearchModel.OrganisationId));
+            var actualIndex = await controller.RegistrationService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString(),nameof(EmployerSearchModel.OrganisationId));
             Assert.IsNull(actualIndex,"Organisation should not exist on search");
         }
 
@@ -4077,7 +4077,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var employer = EmployerRecord.Create(org0);
             employer.ActiveAddressId = address0.AddressId;
-            controller.PrivateSectorRepository.Insert(employer);
+            controller.RegistrationService.PrivateSectorRepository.Insert(employer);
 
             var currentSnapshotDate = employer.SectorType.GetAccountingStartDate();
 
@@ -4199,7 +4199,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.IsNull(userOrgs[0].PINConfirmedDate, "Wrong PIN confirmed date");
 
             //Check the organisation does not exists in search
-            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString(), nameof(EmployerSearchModel.OrganisationId));
+            var actualIndex = await controller.RegistrationService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString(), nameof(EmployerSearchModel.OrganisationId));
             Assert.IsNull(actualIndex, "Organisation should not exist on search");
         }
 
@@ -4357,7 +4357,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.That(userOrgs2[0].Address.GetAddressString() == address.GetAddressString(), "Wrong address for user org");
 
             //Check the organisation does not exist in search
-            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
+            var actualIndex = await controller.RegistrationService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString());
             Assert.IsNull(actualIndex, "Organisation should not exist in search index");
         }
 
@@ -4519,7 +4519,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.That(userOrgs2[0].Address.GetAddressString() == address.GetAddressString(), "Wrong address for user org");
 
             //Check the organisation does not exist in search
-            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
+            var actualIndex = await controller.RegistrationService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString());
             Assert.IsNull(actualIndex, "Organisation should not exist in search index");
         }
         #endregion

@@ -9,7 +9,6 @@ using ModernSlavery.Core.Models.Cookies;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Views.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -17,6 +16,7 @@ using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
+using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Controllers
@@ -30,7 +30,7 @@ namespace ModernSlavery.WebUI.Controllers
             ICustomLogger customLogger,
             ILogger<HomeController> logger,
             IWebService webService,
-            IScopePresentation scopeUIService,
+            IScopePresenter scopeUIService,
             IShortCodesRepository shortCodesRepository,
             IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
@@ -44,7 +44,7 @@ namespace ModernSlavery.WebUI.Controllers
         #region Dependencies
         private readonly ICustomLogger CustomLogger;
 
-        public IScopePresentation ScopePresentation { get; }
+        public IScopePresenter ScopePresentation { get; }
         public IShortCodesRepository ShortCodesRepository { get; }
 
         #endregion

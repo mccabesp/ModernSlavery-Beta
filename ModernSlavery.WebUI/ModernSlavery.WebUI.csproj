@@ -41,6 +41,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\ModernSlavery.BusinessLogic.Register\ModernSlavery.BusinessLogic.Register.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessLogic.Submit\ModernSlavery.BusinessLogic.Submit.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessLogic.View\ModernSlavery.BusinessLogic.View.csproj" />
     <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
     <ProjectReference Include="..\ModernSlavery.Database\ModernSlavery.Database.csproj" />

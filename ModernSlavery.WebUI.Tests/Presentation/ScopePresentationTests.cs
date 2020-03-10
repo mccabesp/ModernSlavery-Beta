@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
@@ -14,7 +13,6 @@ using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.Mocks;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Models.Scope;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using MockQueryable.Moq;
@@ -25,6 +23,7 @@ using ModernSlavery.SharedKernel;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.WebUI.Presenters;
 
 namespace ModernSlavery.Tests
 {
@@ -38,8 +37,8 @@ namespace ModernSlavery.Tests
         private Mock<IFileRepository> mockFileRepo;
         private Mock<OrganisationBusinessLogic> mockOrganisationBL;
         private Mock<ScopeBusinessLogic> mockScopeBL;
-        private readonly ICommonBusinessLogic testCommonBL = MoqHelpers.CreateMockCommonBusinessLogic();
-        private ScopePresentation testScopePresentation;
+        private readonly ICommonBusinessLogic testCommonBL = MoqHelpers.CreateFakeCommonBusinessLogic();
+        private ScopePresenter testScopePresenter;
 
         private ISearchBusinessLogic testSearchBL;
         private readonly ISearchRepository<EmployerSearchModel> testSearchRepo = new MockSearchRepository();
@@ -47,12 +46,12 @@ namespace ModernSlavery.Tests
         [SetUp]
         public void BeforeEach()
         {
-            mockDataRepo = MoqHelpers.CreateMockAsyncDataRepository();
+            mockDataRepo = MoqHelpers.CreateMockDataRepository();
             ;
 
             mockFileRepo = new Mock<IFileRepository>();
 
-            testSearchBL = new SearchBusinessLogic(testSearchRepo);
+            testSearchBL = new SearchBusinessLogic(testSearchRepo,Mock.Of<ISearchRepository<SicCodeSearchModel>>(),Mock.Of<ILogRecordLogger>());
 
             // setup mocks ans ensures they call their implementations. (We override calls per test when need be!)
             mockScopeBL = new Mock<ScopeBusinessLogic>(testCommonBL, mockDataRepo.Object, testSearchBL);
@@ -70,7 +69,7 @@ namespace ModernSlavery.Tests
             mockOrganisationBL.CallBase = true;
 
             // service under test
-            testScopePresentation = new ScopePresentation(mockScopeBL.Object, mockDataRepo.Object, mockOrganisationBL.Object, testCommonBL);
+            testScopePresenter = new ScopePresenter(mockScopeBL.Object, mockDataRepo.Object, mockOrganisationBL.Object, testCommonBL);
         }
 
         [Test]
@@ -97,7 +96,7 @@ namespace ModernSlavery.Tests
                 new Mock<IDnBOrgsRepository>().Object,
                 new Mock<IObfuscator>().Object);
 
-            var scopePresentation = new ScopePresentation(
+            var scopePresenter = new ScopePresenter(
                 mockScopeBL.Object,
                 dataRepo.Object,
                 organisationBusinessLogic,
@@ -106,7 +105,7 @@ namespace ModernSlavery.Tests
             var testModel = new EnterCodesViewModel {EmployerReference = "NotFoundInDB", SecurityToken = mockOrg.SecurityCode};
 
             // Act
-            OrganisationViewModel actual = await scopePresentation.CreateOrganisationViewModelAsync(testModel, mockUser);
+            OrganisationViewModel actual = await scopePresenter.CreateOrganisationViewModelAsync(testModel, mockUser);
 
             // Assert
             Assert.Null(actual, "When the combination EmployerReference/SecurityCode is not found in DB, this method must return null");
@@ -135,7 +134,7 @@ namespace ModernSlavery.Tests
                 new Mock<IDnBOrgsRepository>().Object,
                 new Mock<IObfuscator>().Object);
 
-            var scopePresentation = new ScopePresentation(
+            var scopePresenter = new ScopePresenter(
                 mockScopeBL.Object,
                 dataRepo.Object,
                 organisationBusinessLogic,
@@ -144,7 +143,7 @@ namespace ModernSlavery.Tests
             var testModel = new EnterCodesViewModel {EmployerReference = mockOrg.EmployerReference, SecurityToken = mockOrg.SecurityCode};
 
             // Act
-            OrganisationViewModel actual = await scopePresentation.CreateOrganisationViewModelAsync(testModel, mockUser);
+            OrganisationViewModel actual = await scopePresenter.CreateOrganisationViewModelAsync(testModel, mockUser);
 
             // Assert
             Assert.NotNull(actual, "Expected an organisation view model");
@@ -220,7 +219,7 @@ namespace ModernSlavery.Tests
             var testUser = new User {UserId = 1};
 
             // Act
-            TestDelegate testDelegate = async () => await testScopePresentation.CreateScopingViewModelAsync(testModel, testUser);
+            TestDelegate testDelegate = async () => await testScopePresenter.CreateScopingViewModelAsync(testModel, testUser);
 
             // Assert
             Assert.That(
@@ -248,7 +247,7 @@ namespace ModernSlavery.Tests
             var testUser = new User {UserId = 1};
 
             // Act
-            ScopingViewModel actualState = await testScopePresentation.CreateScopingViewModelAsync(testModel, testUser);
+            ScopingViewModel actualState = await testScopePresenter.CreateScopingViewModelAsync(testModel, testUser);
 
             // Assert
             //Expect(actualState.HasPrevScope == true, "Expected HasPrevScope to be true");
@@ -274,7 +273,7 @@ namespace ModernSlavery.Tests
             var testUser = new User {UserId = 1};
 
             // Act
-            Task<ScopingViewModel> actualModel = testScopePresentation.CreateScopingViewModelAsync(testModel, testUser);
+            Task<ScopingViewModel> actualModel = testScopePresenter.CreateScopingViewModelAsync(testModel, testUser);
 
             // Assert
             //Assert.That(actualModel.HasPrevScope == false, "Expected HasPrevScope to be false");
@@ -299,7 +298,7 @@ namespace ModernSlavery.Tests
             var testUser = new User {UserId = 1};
 
             // Act
-            ScopingViewModel actualModel = await testScopePresentation.CreateScopingViewModelAsync(testModel, testUser);
+            ScopingViewModel actualModel = await testScopePresenter.CreateScopingViewModelAsync(testModel, testUser);
 
             // Assert
             Assert.That(actualModel.IsSecurityCodeExpired, "Expected SecurityCodeExpired to be true");
@@ -323,7 +322,7 @@ namespace ModernSlavery.Tests
             var testUser = new User {UserId = 1};
 
             // Act
-            ScopingViewModel actualModel = await testScopePresentation.CreateScopingViewModelAsync(testModel, testUser);
+            ScopingViewModel actualModel = await testScopePresenter.CreateScopingViewModelAsync(testModel, testUser);
 
             // Assert
             Assert.That(actualModel.IsSecurityCodeExpired == false, "Expected SecurityCodeExpired to be false");
@@ -355,7 +354,7 @@ namespace ModernSlavery.Tests
             var testUser = new User {UserId = 1};
 
             // Act
-            ScopingViewModel actualModel = await testScopePresentation.CreateScopingViewModelAsync(testModel, testUser);
+            ScopingViewModel actualModel = await testScopePresenter.CreateScopingViewModelAsync(testModel, testUser);
 
             // Assert
             Assert.That(actualModel.DUNSNumber == expectedDUNSNumber, $"Expected DunsCode to be {expectedDUNSNumber}");
@@ -380,7 +379,7 @@ namespace ModernSlavery.Tests
                 Assert.ThrowsAsync<ArgumentNullException>(
                     async () => {
                         var model = new ScopingViewModel {EnterCodes = new EnterCodesViewModel {EmployerReference = whiteSpace}};
-                        await testScopePresentation.SavePresumedScopeAsync(model, 2018);
+                        await testScopePresenter.SavePresumedScopeAsync(model, 2018);
                     });
             }
         }
@@ -394,7 +393,7 @@ namespace ModernSlavery.Tests
             testState.IsSecurityCodeExpired = true;
             testState.EnterCodes = new EnterCodesViewModel {EmployerReference = "ABCD1234"};
 
-            Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => testScopePresentation.SavePresumedScopeAsync(testState, 2018));
+            Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => testScopePresenter.SavePresumedScopeAsync(testState, 2018));
         }
 
         [Test]
@@ -406,7 +405,7 @@ namespace ModernSlavery.Tests
             testState.IsSecurityCodeExpired = false;
             testState.EnterCodes = new EnterCodesViewModel {EmployerReference = "ZXCV4567"};
 
-            var ex = Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => testScopePresentation.SavePresumedScopeAsync(testState, 2018));
+            var ex = Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => testScopePresenter.SavePresumedScopeAsync(testState, 2018));
 
             Assert.That(ex.Message.Contains($"Cannot find organisation with EmployerReference: {testState.EnterCodes.EmployerReference}"));
         }
@@ -428,13 +427,13 @@ namespace ModernSlavery.Tests
             int testSnapshotYear = SectorTypes.Private.GetAccountingStartDate().Year + 1;
 
             var ex = Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                () => testScopePresentation.SavePresumedScopeAsync(testState, testSnapshotYear));
+                () => testScopePresenter.SavePresumedScopeAsync(testState, testSnapshotYear));
             Assert.That(ex.Message.Contains("Parameter name: snapshotYear"));
 
             // less than the prev snapshot year
             testSnapshotYear -= SectorTypes.Private.GetAccountingStartDate().Year - 2;
             ex = Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                () => testScopePresentation.SavePresumedScopeAsync(testState, testSnapshotYear));
+                () => testScopePresenter.SavePresumedScopeAsync(testState, testSnapshotYear));
 
             Assert.That(ex.Message.Contains("Parameter name: snapshotYear"));
         }
@@ -456,7 +455,7 @@ namespace ModernSlavery.Tests
 
             var testUser = new User {UserId = 1};
 
-            ScopingViewModel actualModel = testScopePresentation.CreateScopingViewModel(testOrg, testUser);
+            ScopingViewModel actualModel = testScopePresenter.CreateScopingViewModel(testOrg, testUser);
             //Expect(actualModel.HasPrevScope == true, "");
             //Expect(actualModel.PrevOrgScopeId == 123, "");
             //Expect(actualModel.PrevOrgScopeStatus == ScopeStatuses.OutOfScope, "");

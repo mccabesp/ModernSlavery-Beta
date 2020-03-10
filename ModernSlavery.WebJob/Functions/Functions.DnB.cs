@@ -491,7 +491,7 @@ namespace ModernSlavery.WebJob
                         var badSicLoggingtasks = new List<Task>();
                         allBadSicCodes.ForEach(
                             bsc => badSicLoggingtasks.Add(
-                                Global.BadSicLog.WriteAsync(
+                                _BadSicLog.WriteAsync(
                                     new BadSicLogModel {
                                         OrganisationId = bsc.Organisation.OrganisationId,
                                         OrganisationName = bsc.Organisation.OrganisationName,

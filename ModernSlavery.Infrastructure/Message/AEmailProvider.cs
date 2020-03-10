@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core;
 using ModernSlavery.Core.EmailTemplates;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Infrastructure.Message
 {
@@ -15,10 +18,11 @@ namespace ModernSlavery.Infrastructure.Message
     public abstract class AEmailProvider
     {
 
-        public AEmailProvider(IEmailTemplateRepository emailTemplateRepo, ILogger logger)
+        public AEmailProvider(IEmailTemplateRepository emailTemplateRepo, ILogger logger, [KeyFilter(Filenames.EmailSendLog)]ILogRecordLogger emailSendLog)
         {
             EmailTemplateRepo = emailTemplateRepo ?? throw new ArgumentNullException(nameof(emailTemplateRepo));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            EmailSendLog = emailSendLog ?? throw new ArgumentNullException(nameof(emailSendLog));
         }
 
         public virtual bool Enabled { get; } = true;
@@ -93,7 +97,7 @@ namespace ModernSlavery.Infrastructure.Message
                 {
                     SendEmailResult result = await SendEmailAsync(emailAddress, templateId, model, test);
 
-                    await Global.EmailSendLog.WriteAsync(
+                    await EmailSendLog.WriteAsync(
                         new EmailSendLogModel {
                             Message = "Email successfully sent via SMTP",
                             Subject = result.EmailSubject,
@@ -126,6 +130,7 @@ namespace ModernSlavery.Infrastructure.Message
         public IEmailTemplateRepository EmailTemplateRepo { get; }
 
         public ILogger Logger { get; }
+        public ILogRecordLogger EmailSendLog { get; }
 
         #endregion
 

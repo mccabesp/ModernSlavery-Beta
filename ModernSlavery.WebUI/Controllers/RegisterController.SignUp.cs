@@ -58,7 +58,7 @@ namespace ModernSlavery.WebUI.Controllers
             {
                 string verifyCode = Encryption.EncryptQuerystring(currentUser.UserId + ":" + currentUser.Created.ToSmallDateTime());
                 string verifyUrl = Url.Action("VerifyEmail", "Register", new { code = verifyCode }, "https");
-                if (!await _commonBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, currentUser.EmailAddress))
+                if (!await RegistrationService.CommonBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, currentUser.EmailAddress))
                     return null;
 
                 currentUser.EmailVerifyHash = Crypto.GetSHA512Checksum(verifyCode);
@@ -110,7 +110,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             if (currentUser == null)
             {
-                currentUser = await UserRepository.FindByEmailAsync(m.EmailAddress, UserStatuses.New, UserStatuses.Active);
+                currentUser = await RegistrationService.UserRepository.FindByEmailAsync(m.EmailAddress, UserStatuses.New, UserStatuses.Active);
             }
 
             var model = new VerifyViewModel {EmailAddress = currentUser.EmailAddress};

@@ -29,7 +29,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
 
             if (stashedReturnViewModel == null)
             {
-                stashedReturnViewModel = await submissionService.GetReturnViewModelAsync(
+                stashedReturnViewModel = await _SubmissionPresenter.GetReturnViewModelAsync(
                     ReportingOrganisationId,
                     ReportingOrganisationStartYear.Value,
                     currentUser.UserId);

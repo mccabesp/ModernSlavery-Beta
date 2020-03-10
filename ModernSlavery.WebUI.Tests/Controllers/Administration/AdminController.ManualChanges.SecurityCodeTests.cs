@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
@@ -67,7 +66,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 UiTestHelper.DIContainer.Resolve<IDnBOrgsRepository>(),
                 UiTestHelper.DIContainer.Resolve<IObfuscator>());
 
-            mockedController.OrganisationBusinessLogic = organisationBusinessLogic;
+            mockedController.AdminService.OrganisationBusinessLogic = organisationBusinessLogic;
             return mockedController;
         }
 
@@ -1018,7 +1017,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 UiTestHelper.DIContainer.Resolve<IDnBOrgsRepository>(),
                 UiTestHelper.DIContainer.Resolve<IObfuscator>());
 
-            adminController.OrganisationBusinessLogic = organisationBusinessLogic;
+            adminController.AdminService.OrganisationBusinessLogic = organisationBusinessLogic;
 
             DateTime securityCodeExpiryDate = VirtualDateTime.Now.AddDays(7);
             var manualChangesViewModel = Mock.Of<ManualChangesViewModel>();

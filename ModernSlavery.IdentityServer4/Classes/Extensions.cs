@@ -1,5 +1,5 @@
-﻿using ModernSlavery.BusinessLogic.Account.Repositories;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using ModernSlavery.BusinessLogic.Repositories;
 using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.IdentityServer4.Classes

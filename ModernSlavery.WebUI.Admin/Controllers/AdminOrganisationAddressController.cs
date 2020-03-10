@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models.CompaniesHouse;
 using ModernSlavery.Entities;
@@ -9,6 +8,7 @@ using ModernSlavery.WebUI.Admin.Models;
 using GovUkDesignSystem.Parsers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.BusinessLogic;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities.Enums;
 

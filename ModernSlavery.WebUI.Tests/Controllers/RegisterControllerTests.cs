@@ -8,7 +8,6 @@ using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Register;
 using ModernSlavery.WebUI.Tests.TestHelpers;
@@ -17,7 +16,7 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
-
+using ModernSlavery.WebUI.Presenters;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Shared.Models;
 
@@ -45,7 +44,7 @@ namespace ModernSlavery.Tests
             await controller.Cache.RemoveAsync($"{controller.HttpContext.GetUserHostAddress()}:lastFasttrackDate");
 
             // Ensure we call the scope service GetScopeFromFastTrackCode implementation
-            Mock<IScopePresentation> mockScopeBL = Mock.Get(controller.ScopePresentation);
+            Mock<IScopePresenter> mockScopeBL = Mock.Get(controller.ScopePresentation);
             mockScopeBL.CallBase = true;
 
             //Populate the PendingFasttrackCodes
@@ -91,7 +90,7 @@ namespace ModernSlavery.Tests
             var controller = UiTestHelper.GetController<RegisterController>(0, mockRouteData);
 
             // Ensure we call the scope service GetScopeFromFastTrackCode implementation
-            Mock<IScopePresentation> mockScopeBL = Mock.Get(controller.ScopePresentation);
+            Mock<IScopePresenter> mockScopeBL = Mock.Get(controller.ScopePresentation);
             mockScopeBL.CallBase = true;
 
             //Populate the PendingFasttrackCodes

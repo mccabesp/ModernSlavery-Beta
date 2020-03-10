@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
@@ -37,7 +36,7 @@ namespace ModernSlavery.WebJob.Tests.TestHelpers
             }
             else
             {
-                Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockAsyncDataRepository();
+                Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockDataRepository();
                 builder.Register(c => mockDataRepo.Object).As<IDataRepository>().InstancePerLifetimeScope();
             }
 

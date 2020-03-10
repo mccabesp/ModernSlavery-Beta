@@ -26,6 +26,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using CsvHelper.Configuration;
 using System.Globalization;
+using ModernSlavery.BusinessLogic.Admin;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Shared.Classes;
@@ -48,42 +49,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public AdminController(
             ILogger<AdminController> logger,
             IWebService webService,
-            IShortCodesRepository shortCodesRepository,
-            ICommonBusinessLogic commonBusinessLogic,
-            INotificationService notificationService,
             IAdminService adminService,
-            IOrganisationBusinessLogic organisationBusinessLogic,
-            ISearchBusinessLogic searchBusinessLogic,
-            IUserRepository userRepository,
-            [KeyFilter(QueueNames.ExecuteWebJob)] IQueue executeWebjobQueue,
-            [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
-            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
             IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
-            CommonBusinessLogic = commonBusinessLogic;
-            this.ShortCodesRepository = shortCodesRepository;
             AdminService = adminService;
-            OrganisationBusinessLogic = organisationBusinessLogic;
-            SearchBusinessLogic = searchBusinessLogic;
-            UserRepository = userRepository;
-            ExecuteWebjobQueue = executeWebjobQueue;
-            PrivateSectorRepository = privateSectorRepository;
-            PublicSectorRepository = publicSectorRepository;
         }
 
         #endregion
 
         #region Dependencies
 
-        private readonly IShortCodesRepository ShortCodesRepository;
-        protected readonly ICommonBusinessLogic CommonBusinessLogic;
         public IAdminService AdminService { get; }
-        public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
-        public ISearchBusinessLogic SearchBusinessLogic { get; set; }
-        public IUserRepository UserRepository { get; }
-        public IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
-        public IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
-        protected readonly IQueue ExecuteWebjobQueue;
         #endregion
 
 
@@ -192,7 +168,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (logRecords.Count > 0)
                 {
-                    await Global.RegistrationLog.WriteAsync(logRecords.OrderBy(l => l.StatusDate));
+                    await AdminService.RegistrationLog.WriteAsync(logRecords.OrderBy(l => l.StatusDate));
                 }
 
                 //Get the files again
@@ -294,7 +270,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (logRecords.Count > 0)
                 {
-                    await Global.SubmissionLog.WriteAsync(logRecords.OrderBy(l => l.StatusDate));
+                    await AdminService.SubmissionBusinessLogic.SubmissionLog.WriteAsync(logRecords.OrderBy(l => l.StatusDate));
                 }
 
                 //Get the files again
@@ -740,8 +716,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             model.Uploads.Add(upload);
 
             //Reload D&B
-            await OrganisationBusinessLogic.DnBOrgsRepository.ClearAllDnBOrgsAsync();
-            List<DnBOrgsModel> allDnBOrgs = await OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
+            await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.ClearAllDnBOrgsAsync();
+            List<DnBOrgsModel> allDnBOrgs = await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
             upload = new UploadViewModel.Upload {
                 Type = "DnBOrgs",
                 Filepath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations()),
@@ -756,7 +732,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 : DateTime.MinValue;
             model.Uploads.Add(upload);
 
-            List<ShortCodeModel> allShortCodes = await ShortCodesRepository.GetAllShortCodesAsync();
+            List<ShortCodeModel> allShortCodes = await AdminService.ShortCodesRepository.GetAllShortCodesAsync();
             upload = new UploadViewModel.Upload {
                 Type = "ShortCodes",
                 Filepath = Path.Combine(Global.DataPath, Filenames.ShortCodes),
@@ -814,7 +790,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             {
                 try
                 {
-                    await OrganisationBusinessLogic.DnBOrgsRepository.ImportAsync(DataRepository, CurrentUser);
+                    await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.ImportAsync(DataRepository, CurrentUser);
                 }
                 catch (Exception ex)
                 {
@@ -862,7 +838,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 List<DnBOrgsModel> dnbOrgs = csvReader.GetRecords<DnBOrgsModel>().ToList();
                                 if (dnbOrgs.Count > 0)
                                 {
-                                    await OrganisationBusinessLogic.DnBOrgsRepository.UploadAsync(dnbOrgs);
+                                    await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.UploadAsync(dnbOrgs);
                                 }
 
                                 records = dnbOrgs.Cast<object>().ToList();
@@ -892,7 +868,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         switch (upload.Type)
                         {
                             case "DnBOrgs":
-                                await OrganisationBusinessLogic.DnBOrgsRepository.ClearAllDnBOrgsAsync();
+                                await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.ClearAllDnBOrgsAsync();
                                 break;
                             case "SicSection":
                                 await DataMigrations.Update_SICSectionsAsync(
@@ -911,7 +887,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 await UpdateCompanySicCodesAsync(updateTime);
                                 break;
                             case "ShortCodes":
-                                await ShortCodesRepository.ClearAllShortCodesAsync();
+                                await AdminService.ShortCodesRepository.ClearAllShortCodesAsync();
                                 break;
                         }
                     }
@@ -1012,7 +988,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 try
                 {
                     //Lookup the sic codes from companies house
-                    string sicCodeResults = await PrivateSectorRepository.GetSicCodesAsync(org.CompanyNumber);
+                    string sicCodeResults = await AdminService.PrivateSectorRepository.GetSicCodesAsync(org.CompanyNumber);
                     IEnumerable<int> sicCodes = sicCodeResults.SplitI().Select(s => s.ToInt32());
                     foreach (int code in sicCodes)
                     {
@@ -1033,7 +1009,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             continue;
                         }
 
-                        await Global.BadSicLog.WriteAsync(
+                        await AdminService.BadSicLog.WriteAsync(
                             new BadSicLogModel {
                                 OrganisationId = org.OrganisationId, OrganisationName = org.OrganisationName, SicCode = code
                             });
@@ -1107,7 +1083,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             // find the latest active user by email
-            User impersonatedUser = await UserRepository.FindByEmailAsync(emailAddress, UserStatuses.Active);
+            User impersonatedUser = await AdminService.UserRepository.FindByEmailAsync(emailAddress, UserStatuses.Active);
             if (impersonatedUser == null)
             {
                 ModelState.AddModelError("", "This user does not exist");

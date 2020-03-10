@@ -1,7 +1,9 @@
 ﻿using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.Search;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Data;
+using Moq;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Classes
@@ -23,7 +25,7 @@ namespace ModernSlavery.Core.Tests.Classes
                 new SearchCredentials(sicCodeSearchAdminApiKey));
 
             // Act
-            var actualSicCodeSearchRepository = new AzureSicCodeSearchRepository(sicCodeSearchServiceClient, sicCodeSearchIndexName);
+            var actualSicCodeSearchRepository = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),sicCodeSearchServiceClient, sicCodeSearchIndexName);
 
             // Assert
             Assert.NotNull(

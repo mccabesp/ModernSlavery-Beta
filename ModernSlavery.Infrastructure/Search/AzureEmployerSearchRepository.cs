@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Autofac.Features.AttributeFilters;
 using Microsoft.ApplicationInsights;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
@@ -20,7 +21,7 @@ namespace ModernSlavery.Infrastructure.Search
 {
     public class AzureEmployerSearchRepository : ISearchRepository<EmployerSearchModel>
     {
-
+        public readonly ILogRecordLogger SearchLog;
         private const string suggestorName = "sgOrgName";
         private const string synonymMapName = "desc-synonymmap";
         private readonly TelemetryClient _telemetryClient;
@@ -32,7 +33,9 @@ namespace ModernSlavery.Infrastructure.Search
         public bool Disabled { get; set; }
         public string IndexName { get; }
 
-        public AzureEmployerSearchRepository(string serviceName,
+        public AzureEmployerSearchRepository(
+            [KeyFilter(Filenames.SearchLog)]ILogRecordLogger searchLog,
+            string serviceName,
             string indexName,
             string adminApiKey = null,
             string queryApiKey = null,
@@ -46,6 +49,7 @@ namespace ModernSlavery.Infrastructure.Search
                 return;
             }
 
+            SearchLog = searchLog;
             IndexName = indexName;
 
             if (string.IsNullOrWhiteSpace(serviceName))
@@ -461,7 +465,7 @@ namespace ModernSlavery.Infrastructure.Search
 
                 _telemetryClient?.TrackEvent("Gpg_Search", telemetryProperties);
 
-                await Global.SearchLog.WriteAsync(telemetryProperties);
+                await SearchLog.WriteAsync(telemetryProperties);
             }
 
             //Return the facet results

@@ -27,7 +27,7 @@ namespace ModernSlavery.Tests
         [SetUp]
         public void BeforeEach()
         {
-            mockDataRepo = MoqHelpers.CreateMockAsyncDataRepository();
+            mockDataRepo = MoqHelpers.CreateMockDataRepository();
         }
 
         [Test]

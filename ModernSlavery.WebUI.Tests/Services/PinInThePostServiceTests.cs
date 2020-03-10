@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using ModernSlavery.BusinessLogic;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
-using ModernSlavery.WebUI.Services;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;

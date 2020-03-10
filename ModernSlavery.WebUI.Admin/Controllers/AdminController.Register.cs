@@ -584,7 +584,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 //Log the approval
                 if (!userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))
                 {
-                    await Global.RegistrationLog.WriteAsync(
+                     await AdminService.RegistrationLog.WriteAsync(
                         new RegisterLogModel {
                             StatusDate = VirtualDateTime.Now,
                             Status = "Manually registered",
@@ -624,16 +624,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await DataRepository.SaveChangesAsync();
 
             //Send notification email to existing users 
-            CommonBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
+            AdminService.CommonBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
 
             //Ensure the organisation has an employer reference
             if (userOrg.PINConfirmedDate.HasValue && string.IsNullOrWhiteSpace(userOrg.Organisation.EmployerReference))
             {
-                await OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(userOrg.Organisation);
+                await AdminService.OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(userOrg.Organisation);
             }
 
             //Add or remove this organisation to/from the search index
-            await SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
+            await AdminService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
 
             //Save the model for the redirect
             this.StashModel(model);
@@ -652,7 +652,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             //Send an acceptance link to the email address
             string returnUrl = Url.Action("ManageOrganisations", "Organisation", null, "https");
-            return await CommonBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(returnUrl, emailAddress, test);
+            return await AdminService.CommonBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(returnUrl, emailAddress, test);
         }
 
         /// <summary>
@@ -721,7 +721,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //Log the rejection
             if (!userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))
             {
-                await Global.RegistrationLog.WriteAsync(
+                await AdminService.RegistrationLog.WriteAsync(
                     new RegisterLogModel {
                         StatusDate = VirtualDateTime.Now,
                         Status = "Manually Rejected",
@@ -754,7 +754,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             long orgId = userOrg.OrganisationId;
             string emailAddress = userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress);
 
-            List<DnBOrgsModel> allDnBOrgs = await OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
+            List<DnBOrgsModel> allDnBOrgs = await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
 
             //Delete the organisation if it has no returns, no D&B addresses, is not in D&B, is not in scopes table, and is not registered to another user
             if (userOrg.Organisation != null
@@ -789,7 +789,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await DataRepository.SaveChangesAsync();
 
             //Remove this organisation from the search index
-            await SearchBusinessLogic.SearchRepository.RemoveFromIndexAsync(new[] {searchRecord});
+            await AdminService.SearchBusinessLogic.EmployerSearchRepository.RemoveFromIndexAsync(new[] {searchRecord});
 
             //Save the model for the redirect
             this.StashModel(model);
@@ -809,7 +809,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             //Send a verification link to the email address
-            return await CommonBusinessLogic.SendEmailService.SendRegistrationDeclinedAsync(emailAddress, reason);
+            return await AdminService.CommonBusinessLogic.SendEmailService.SendRegistrationDeclinedAsync(emailAddress, reason);
         }
 
         /// <summary>

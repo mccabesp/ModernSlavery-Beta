@@ -27,7 +27,7 @@ namespace Repositories.UserRepository
             {
                 // Initialise AutoMapper
                 MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                    config.AddMaps(typeof(ModernSlavery.BusinessLogic.Account.Repositories.UserRepository));
+                    config.AddMaps(typeof(ModernSlavery.BusinessLogic.Repositories.UserRepository));
                 });
                 builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
             }
@@ -43,7 +43,7 @@ namespace Repositories.UserRepository
 
             // service under test
             testUserRepo =
-                new ModernSlavery.BusinessLogic.Account.Repositories.UserRepository(mockDataRepo.Object, mockUserLogRecord.Object, DependencyContainer.Resolve<IMapper>());
+                new ModernSlavery.BusinessLogic.Repositories.UserRepository(mockDataRepo.Object, mockUserLogRecord.Object, DependencyContainer.Resolve<IMapper>());
         }
 
         private Mock<IDataRepository> mockDataRepo;

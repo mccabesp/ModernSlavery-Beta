@@ -9,19 +9,19 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Models.Register;
-using ModernSlavery.WebUI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessLogic.Register;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Infrastructure;
+using ModernSlavery.WebUI.Presenters;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -29,37 +29,25 @@ namespace ModernSlavery.WebUI.Controllers
     public partial class RegisterController : BaseController
     {
 
-        private readonly PinInThePostService pinInThePostService;
-        private readonly IPostcodeChecker postcodeChecker;
+        public readonly IRegistrationService RegistrationService;
 
         #region Constructors
 
         public RegisterController(
             ILogger<RegisterController> logger,
             IWebService webService,
-            IScopePresentation scopePresentation,
-            IScopeBusinessLogic scopeBL,
-            IOrganisationBusinessLogic orgBL,
-            ICommonBusinessLogic commonBusinessLogic,
-            ISearchBusinessLogic searchBusinessLogic,
-            IUserRepository userRepository,
-            PinInThePostService pinInThePostService,
-            IPostcodeChecker postcodeChecker,
-            [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
-            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
+            IRegistrationService registrationService,
+            IScopePresenter scopePresentation,
             IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
+            RegistrationService = registrationService;
             ScopePresentation = scopePresentation;
-            ScopeBusinessLogic = scopeBL;
-            OrganisationBusinessLogic = orgBL;
-            _commonBusinessLogic = commonBusinessLogic;
-            SearchBusinessLogic = searchBusinessLogic;
-            PrivateSectorRepository = privateSectorRepository;
-            PublicSectorRepository = publicSectorRepository;
-            UserRepository = userRepository;
-            this.pinInThePostService = pinInThePostService;
-            this.postcodeChecker = postcodeChecker;
         }
+
+        #endregion
+
+        #region Dependencies
+        public IScopePresenter ScopePresentation { get; }
 
         #endregion
 
@@ -73,20 +61,6 @@ namespace ModernSlavery.WebUI.Controllers
         {
             return new EmptyResult();
         }
-
-        #endregion
-
-        #region Dependencies
-
-        // TODO move these in to RegisterPresentation service
-        public IScopePresentation ScopePresentation { get; }
-        public ICommonBusinessLogic _commonBusinessLogic { get; set; }
-        public IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
-        public IScopeBusinessLogic ScopeBusinessLogic { get; }
-        public ISearchBusinessLogic SearchBusinessLogic { get; }
-        public IUserRepository UserRepository { get; }
-        public IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
-        public IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
 
         #endregion
 
@@ -154,7 +128,7 @@ namespace ModernSlavery.WebUI.Controllers
                     bool pinInPostTestMode = Config.GetAppSetting<bool>("PinInPostTestMode");
 
                     // Generate a new pin
-                    string pin = OrganisationBusinessLogic.GeneratePINCode(thisIsATestUser);
+                    string pin = RegistrationService.OrganisationBusinessLogic.GeneratePINCode(thisIsATestUser);
 
                     // Save the PIN and confirm code
                     userOrg.PIN = pin;
@@ -170,7 +144,8 @@ namespace ModernSlavery.WebUI.Controllers
                     else 
                     {
                         // Try and send the PIN in post
-                        if (pinInThePostService.SendPinInThePost(this, userOrg, pin, out string letterId))
+                        string returnUrl = Url.Action(nameof(OrganisationController.ManageOrganisations),"Organisation", null, "https");
+                        if (RegistrationService.PinInThePostService.SendPinInThePost(userOrg, pin,returnUrl, out string letterId))
                         {
                             userOrg.PITPNotifyLetterId = letterId;
                             await DataRepository.SaveChangesAsync();
@@ -350,7 +325,7 @@ namespace ModernSlavery.WebUI.Controllers
                 model.EmailAddress.StartsWithI(Global.TestPrefix) ? DateTime.MinValue : VirtualDateTime.Now);
 
             // find the latest active user by email
-            currentUser = await UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.Active);
+            currentUser = await RegistrationService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.Active);
             if (currentUser == null)
             {
                 Logger.LogWarning(
@@ -392,7 +367,7 @@ namespace ModernSlavery.WebUI.Controllers
             {
                 resetCode = Encryption.EncryptQuerystring(currentUser.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime());
                 string resetUrl = Url.Action("NewPassword", "Register", new { code = resetCode }, "https");
-                if (!await _commonBusinessLogic.SendEmailService.SendResetPasswordNotificationAsync(resetUrl, currentUser.EmailAddress))
+                if (!await RegistrationService.CommonBusinessLogic.SendEmailService.SendResetPasswordNotificationAsync(resetUrl, currentUser.EmailAddress))
                     return false;
 
                 Logger.LogInformation(
@@ -521,14 +496,14 @@ namespace ModernSlavery.WebUI.Controllers
             this.ClearStash();
 
             //Save the user to ensure UserId>0 for new status
-            UserRepository.UpdateUserPasswordUsingPBKDF2(currentUser, model.Password);
+            RegistrationService.UserRepository.UpdateUserPasswordUsingPBKDF2(currentUser, model.Password);
 
             currentUser.ResetAttempts = 0;
             currentUser.ResetSendDate = null;
             await DataRepository.SaveChangesAsync();
 
             //Send completed notification email
-            await _commonBusinessLogic.SendEmailService.SendResetPasswordCompletedAsync(currentUser.EmailAddress);
+            await RegistrationService.CommonBusinessLogic.SendEmailService.SendResetPasswordCompletedAsync(currentUser.EmailAddress);
 
             //Send the verification code and showconfirmation
             return View("CustomError", new ErrorViewModel(1127));

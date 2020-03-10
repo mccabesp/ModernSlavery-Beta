@@ -75,7 +75,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
             Assert.That(address.Status == AddressStatuses.Active);
 
             //Check the organisation exists in search
-            EmployerSearchModel actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString());
+            EmployerSearchModel actualIndex = await controller.AdminService.SearchBusinessLogic.EmployerSearchRepository.GetAsync(org.OrganisationId.ToString());
             EmployerSearchModel expectedIndex = EmployerSearchModel.Create(org);
             expectedIndex.Compare(actualIndex);
         }

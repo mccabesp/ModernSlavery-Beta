@@ -10,7 +10,6 @@ using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Scope;
 using ModernSlavery.WebUI.Tests.TestHelpers;
@@ -20,7 +19,7 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
-
+using ModernSlavery.WebUI.Presenters;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Shared.Services;
 
@@ -684,7 +683,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
         {
             // Arrange
             var controller = UiTestHelper.GetController<ScopeController>();
-            AutoFacExtensions.ResolveAsMock<IScopePresentation>(true);
+            AutoFacExtensions.ResolveAsMock<IScopePresenter>(true);
 
             // Act
             var result = await controller.OutOfScope(new EnterCodesViewModel()) as ViewResult;
@@ -711,7 +710,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testPostModel = new EnterCodesViewModel {EmployerReference = "AUTH-KEY", SecurityToken = "AUTH-PASS"};
 
             // Mocks
-            Mock<IScopePresentation> mockScopePresentation = AutoFacExtensions.ResolveAsMock<IScopePresentation>();
+            Mock<IScopePresenter> mockScopePresentation = AutoFacExtensions.ResolveAsMock<IScopePresenter>();
             mockScopePresentation.Setup(x => x.CreateScopingViewModelAsync(It.IsAny<EnterCodesViewModel>(), It.IsAny<User>()))
                 .ReturnsAsync(new ScopingViewModel {IsSecurityCodeExpired = true, DUNSNumber = "1234"});
 
@@ -741,9 +740,9 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             };
 
             var testPostModel = new EnterCodesViewModel {EmployerReference = "AUTH-KEY", SecurityToken = "AUTH-PASS"};
-            AutoFacExtensions.ResolveAsMock<IScopePresentation>();
+            AutoFacExtensions.ResolveAsMock<IScopePresenter>();
 
-            Mock<IScopePresentation> mockScopePresentation = AutoFacExtensions.ResolveAsMock<IScopePresentation>();
+            Mock<IScopePresenter> mockScopePresentation = AutoFacExtensions.ResolveAsMock<IScopePresenter>();
             mockScopePresentation.Setup(x => x.CreateScopingViewModelAsync(It.IsAny<EnterCodesViewModel>(), It.IsAny<User>()))
                 .ReturnsAsync(testScopeModel);
 
@@ -771,7 +770,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var controller = UiTestHelper.GetController<ScopeController>(0, routeData);
             controller.StashModel(new ScopingViewModel());
 
-            Mock<IScopePresentation> mockScopePresentation = AutoFacExtensions.ResolveAsMock<IScopePresentation>();
+            Mock<IScopePresenter> mockScopePresentation = AutoFacExtensions.ResolveAsMock<IScopePresenter>();
             mockScopePresentation.Setup(x => x.CreateScopingViewModelAsync(It.IsAny<EnterCodesViewModel>(), It.IsAny<User>()))
                 .ReturnsAsync(new ScopingViewModel {DUNSNumber = "1234"});
 
@@ -870,7 +869,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.StashModel(testStateModel);
 
             // ensure we call CreateNewScope implementation when called from the controller
-            AutoFacExtensions.ResolveAsMock<IScopePresentation>(true);
+            AutoFacExtensions.ResolveAsMock<IScopePresenter>(true);
             AutoFacExtensions.ResolveAsMock<IScopeBusinessLogic>(true);
 
             // Act
@@ -938,7 +937,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.Session[controller + ":Model"] = testStateModel;
 
             // ensure we call CreateNewScope implementation when called from the controller
-            AutoFacExtensions.ResolveAsMock<IScopePresentation>(true);
+            AutoFacExtensions.ResolveAsMock<IScopePresenter>(true);
             AutoFacExtensions.ResolveAsMock<IScopeBusinessLogic>(true);
 
             // Act
@@ -1086,10 +1085,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             controller.Session[controller + ":Model"] = testStateModel;
 
-            AutoFacExtensions.ResolveAsMock<IScopePresentation>(true);
+            AutoFacExtensions.ResolveAsMock<IScopePresenter>(true);
 
             AutoFacExtensions.ResolveAsMock<IScopeBusinessLogic>(true);
-            AutoFacExtensions.ResolveAsMock<IScopePresentation>(true);
+            AutoFacExtensions.ResolveAsMock<IScopePresenter>(true);
             AutoFacExtensions.ResolveAsMock<IScopeBusinessLogic>(true);
 
             // Act

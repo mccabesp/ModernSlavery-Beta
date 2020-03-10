@@ -92,7 +92,7 @@ namespace ModernSlavery.WebJob
                         SmtpPassword2,
                         SmtpPort2,
                         test: test);
-                    await Global.EmailSendLog.WriteAsync(
+                    await GpgEmailProvider.EmailSendLog.WriteAsync(
                         new EmailSendLogModel {
                             Message = "Email successfully sent via SMTP",
                             Subject = subject,
@@ -143,7 +143,7 @@ namespace ModernSlavery.WebJob
                         SmtpPassword2,
                         SmtpPort2,
                         test: test);
-                    await Global.EmailSendLog.WriteAsync(
+                    await GpgEmailProvider.EmailSendLog.WriteAsync(
                         new EmailSendLogModel {
                             Message = "Email successfully sent via SMTP",
                             Subject = subject,

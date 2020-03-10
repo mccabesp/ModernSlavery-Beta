@@ -30,13 +30,13 @@ namespace ModernSlavery.Tests
 
         private Mock<IDataRepository> mockDataRepo;
         private Mock<IFileRepository> mockFileRepo;
-        private readonly ICommonBusinessLogic testCommonBL = MoqHelpers.CreateMockCommonBusinessLogic();
+        private readonly ICommonBusinessLogic testCommonBL = MoqHelpers.CreateFakeCommonBusinessLogic();
 
         private IList<Organisation> testOrgData;
         private IList<OrganisationScope> testOrgScopeData;
         public IScopeBusinessLogic testScopeBL;
         private ISearchBusinessLogic testSearchBL;
-        private readonly ISearchRepository<EmployerSearchModel> testSearchRepo = new MockSearchRepository();
+        private readonly ISearchRepository<EmployerSearchModel> testEmployerSearchRepo = new MockSearchRepository();
 
         #region Test Data
 
@@ -117,7 +117,7 @@ namespace ModernSlavery.Tests
         {
             mockDataRepo = new Mock<IDataRepository>();
             mockFileRepo = new Mock<IFileRepository>();
-            testSearchBL = new SearchBusinessLogic(testSearchRepo);
+            testSearchBL = new SearchBusinessLogic(testEmployerSearchRepo,Mock.Of<ISearchRepository<SicCodeSearchModel>>(),Mock.Of<ILogRecordLogger>());
             testScopeBL = new ScopeBusinessLogic(testCommonBL, mockDataRepo.Object, testSearchBL);
             GenerateTestData();
         }

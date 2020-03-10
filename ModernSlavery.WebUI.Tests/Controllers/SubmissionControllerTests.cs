@@ -7,7 +7,6 @@ using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.BusinessLogic.Models.Organisation;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -18,7 +17,6 @@ using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Controllers.Submission;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Http;
@@ -31,6 +29,8 @@ using ModernSlavery.SharedKernel;
 
 using NUnit.Framework;
 using Microsoft.AspNetCore.Authentication;
+using ModernSlavery.BusinessLogic.Submit;
+using ModernSlavery.WebUI.Presenters;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {
@@ -210,9 +210,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
-            var testService = new SubmissionService(null, null, null, testDraftFileBL, commonBusinessLogic, null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(),Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            model.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -239,7 +240,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 "Expected ReturnViewModel or Incorrect viewModel returned");
             Assert.That(result.ViewData.ModelState.IsValid, "Model is Invalid");
 
-            await testService.DiscardDraftFileAsync(model);
+            await testPresenter.DiscardDraftFileAsync(model);
         }
 
         [Test]
@@ -511,15 +512,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL, 
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            model.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -559,7 +555,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Assert.That(model.EncryptedOrganisationId == organisation.GetEncryptedId(), "Invalid EncryptedOrganisationId");
 
             // Clean up
-            await testService.DiscardDraftFileAsync(model);
+            await testPresenter.DiscardDraftFileAsync(model);
         }
 
         [Test(Author = "Oscar Lagatta")]
@@ -625,15 +621,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            model.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -666,7 +657,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Assert.AreEqual("SubmissionComplete", result.ActionName, "Incorrect view returned");
 
             // Clean up
-            await testService.DiscardDraftFileAsync(model);
+            await testPresenter.DiscardDraftFileAsync(model);
         }
 
         [Test]
@@ -972,15 +963,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
                 mockedOrganisation.SectorType.GetAccountingStartDate().Year,
                 mockedUser.UserId);
@@ -1068,15 +1054,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            model.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
                 mockedOrganisation.SectorType.GetAccountingStartDate().Year,
                 mockedUser.UserId);
@@ -1093,7 +1074,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Assert.AreEqual("SubmissionComplete", result.ActionName);
 
             // Clean up
-            await testService.DiscardDraftFileAsync(model);
+            await testPresenter.DiscardDraftFileAsync(model);
         }
 
         [Test(Author = "Oscar Lagatta")]
@@ -1200,15 +1181,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            model.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -1239,7 +1215,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Assert.Null(resultModel.CompanyLinkToGPGInfo, "CompanyLinkToGPGInfo:Expected a null  or empty field");
 
             // Clean up
-            await testService.DiscardDraftFileAsync(model);
+            await testPresenter.DiscardDraftFileAsync(model);
         }
 
         [Test]
@@ -1350,15 +1326,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            model.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -1383,7 +1354,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Assert.AreEqual(result.ViewName, "EmployerWebsite");
 
             // Clean up
-            await testService.DiscardDraftFileAsync(model);
+            await testPresenter.DiscardDraftFileAsync(model);
         }
 
         //I don't think this test is necessary as the above does the same thing this just does the same but in opposite
@@ -1460,15 +1431,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -1489,7 +1455,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             //TODO not really a valid test as there is no code which changes this - you should maybe just be checking there are no modelstate errors but then its a repeat test of one you did earlier
             //TODO also your not checking for the correct redirectresult and the rest of the model the correct model - why just test one field remains unchanged?
 
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test(Author = "Oscar Lagatta")]
@@ -1576,15 +1542,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -1605,7 +1566,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 controller.ModelState.Values.Select(e => e.Errors).FirstOrDefault()?[0].ErrorMessage);
 
             // Cleanup
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test]
@@ -1663,15 +1624,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -1705,7 +1661,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Assert.That(resultModel.CompanyLinkToGPGInfo.StartsWith("http://"), "Expected CompanyLinkToGPGInfoLink URL Prefix:'http://' ");
 
             // Cleanup
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test]
@@ -1763,15 +1719,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -1796,7 +1747,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             //TODO you should be checking modelstate.isvalid and also that all other fields dont fail in modelstate
 
             // Cleanup
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test]
@@ -2210,22 +2161,17 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Return clonedReturn = mockedReturn.GetClone();
 
             ReturnViewModel expectedReturnViewModel =
-                new SubmissionBusinessLogic(null, null).ConvertSubmissionReportToReturnViewModel(clonedReturn);
+                new SubmissionBusinessLogic(null, null, Mock.Of<ILogRecordLogger>()).ConvertSubmissionReportToReturnViewModel(clonedReturn);
 
             #region We must load a draft if we are calling Enter calculations with a stashed model
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null,
-                null,
-                null,
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            expectedReturnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            expectedReturnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
                 mockedOrganisation.SectorType.GetAccountingStartDate().Year,
                 mockedUser.UserId);
@@ -2244,7 +2190,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             expectedReturnViewModel.Compare(actualReturnViewModel, null, null, false, true, -1, false);
 
             // Clean up
-            await testService.DiscardDraftFileAsync(expectedReturnViewModel);
+            await testPresenter.DiscardDraftFileAsync(expectedReturnViewModel);
         }
 
         [Test(Author = "Oscar Lagatta")]
@@ -2351,7 +2297,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             Return clonedReturn = mockedReturn.GetClone();
             ReturnViewModel expectedReturnViewModel =
-                new SubmissionBusinessLogic(null, null).ConvertSubmissionReportToReturnViewModel(clonedReturn);
+                new SubmissionBusinessLogic(null, null, Mock.Of<ILogRecordLogger>()).ConvertSubmissionReportToReturnViewModel(clonedReturn);
 
             controller.ClearStash(); // empty, so it'll search for info on DB
 
@@ -2375,15 +2321,11 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null,
-                null,
-                null,
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
 
-            await testService.DiscardDraftFileAsync(actualReturnViewModel);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+
+            await testPresenter.DiscardDraftFileAsync(actualReturnViewModel);
         }
 
         [Test]
@@ -2553,16 +2495,12 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.Bind(returnViewModel);
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
+            var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var submissionServiceMock = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                new DraftFileBusinessLogic(testFileRepository),
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await submissionServiceMock.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -2642,16 +2580,12 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.Bind(returnViewModel);
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
+            var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var submissionServiceMock = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                new DraftFileBusinessLogic(testFileRepository),
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await submissionServiceMock.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -2844,15 +2778,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -2877,7 +2806,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Assert.AreEqual("CheckData", result.ActionName, "Expected a RedirectToRouteResult to CheckData");
 
             // Cleanup
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test]
@@ -3056,15 +2985,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -3089,7 +3013,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Assert.AreEqual("CheckData", result.ActionName, "Expected a RedirectToRouteResult to CheckData");
 
             // Cleanup
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test]
@@ -3158,15 +3082,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null, 
-                null, 
-                null, 
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -3243,7 +3162,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 });
 
             // Cleanup
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test]
@@ -3300,15 +3219,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null,
-                null,
-                null,
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -3384,7 +3298,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 });
 
             // Cleanup
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test]
@@ -3438,15 +3352,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null,
-                null,
-                null,
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -3523,7 +3432,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 });
 
             // Cleanup
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test(Author = "Oscar Lagatta")]
@@ -3704,15 +3613,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null,
-                null,
-                null,
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -3789,7 +3693,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 });
 
             // Cleanup
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test]
@@ -3861,15 +3765,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null,
-                null,
-                null,
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
                 mockedOrganisation.SectorType.GetAccountingStartDate().Year,
                 mockedUser.UserId);
@@ -4089,15 +3988,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null,
-                null,
-                null,
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            model.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
                 mockedOrganisation.SectorType.GetAccountingStartDate().Year,
                 mockedUser.UserId);
@@ -4345,15 +4239,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null,
-                null,
-                null,
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -4374,7 +4263,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Assert.AreEqual("EmployerWebsite", result.ActionName, "Expected a RedirectToActionResult to EmployerWebsite");
 
             // Cleanup
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test(Author = "Oscar Lagatta")]
@@ -4445,15 +4334,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null,
-                null,
-                null,
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
                 mockedOrganisation.SectorType.GetAccountingStartDate().Year,
                 mockedUser.UserId);
@@ -4467,7 +4351,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Assert.NotNull(result);
 
             // Clean up
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test(Author = "Oscar Lagatta")]
@@ -4600,15 +4484,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null,
-                null,
-                null,
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -4639,7 +4518,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Assert.Null(resultModel.JobTitle, "JobTitle:Expected a null  or empty field");
 
             // Clean up
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test(Author = "Oscar Lagatta")]
@@ -4877,15 +4756,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
             var testDraftFileBL = new DraftFileBusinessLogic(testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(
-                null,
-                null,
-                null,
-                testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await testService.GetDraftFileAsync(
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
@@ -4922,7 +4796,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             //TODO you should be checking each error message is exact as per config file
 
             // Cleanup
-            await testService.DiscardDraftFileAsync(returnViewModel);
+            await testPresenter.DiscardDraftFileAsync(returnViewModel);
         }
 
         [Test(Author = "Oscar Lagatta")]

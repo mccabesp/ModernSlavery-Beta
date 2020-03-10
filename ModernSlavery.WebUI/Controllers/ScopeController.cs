@@ -7,7 +7,6 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Classes;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Models.Scope;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +17,7 @@ using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.WebUI.Presenters;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -31,7 +31,7 @@ namespace ModernSlavery.WebUI.Controllers
         public ScopeController(
             ILogger<ScopeController> logger,
             IWebService webService,
-            IScopePresentation scopeUI,
+            IScopePresenter scopeUI,
             ICommonBusinessLogic commonBusinessLogic,
             IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
@@ -44,7 +44,7 @@ namespace ModernSlavery.WebUI.Controllers
         #region Dependencies
         public ICommonBusinessLogic _commonBusinessLogic { get; set; }
 
-        public IScopePresentation ScopePresentation { get; }
+        public IScopePresenter ScopePresentation { get; }
 
         #endregion
 

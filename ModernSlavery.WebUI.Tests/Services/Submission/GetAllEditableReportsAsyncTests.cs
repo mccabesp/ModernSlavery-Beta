@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Models.Organisation;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Options;
+using ModernSlavery.WebUI.Presenters;
 using Moq;
 
 using NUnit.Framework;
@@ -27,8 +27,8 @@ namespace ModernSlavery.Tests.Services.SubmissionService
         [SetUp]
         public void BeforeEach()
         {
-            mockCommonBusinessLogic = MoqHelpers.CreateMockCommonBusinessLogic();
-            mockDataRepo = MoqHelpers.CreateMockAsyncDataRepository();
+            mockCommonBusinessLogic = MoqHelpers.CreateFakeCommonBusinessLogic();
+            mockDataRepo = MoqHelpers.CreateMockDataRepository();
             mockScopeBL = new Mock<IScopeBusinessLogic>();
             mockDraftFileBL = new Mock<IDraftFileBusinessLogic>();
         }
@@ -47,7 +47,7 @@ namespace ModernSlavery.Tests.Services.SubmissionService
             var testUserOrg = new UserOrganisation {Organisation = testOrg};
             DateTime testSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
 
-            var mockService = new Mock<WebUI.Classes.Services.SubmissionService>(
+            var mockService = new Mock<SubmissionPresenter>(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 null,
@@ -58,7 +58,7 @@ namespace ModernSlavery.Tests.Services.SubmissionService
             mockService.CallBase = true;
 
             // Act
-            WebUI.Classes.Services.SubmissionService testService = mockService.Object;
+            SubmissionPresenter testService = mockService.Object;
             List<ReportInfoModel> actualResults = await testService.GetAllEditableReportsAsync(testUserOrg, testSnapshotDate);
 
             // Assert

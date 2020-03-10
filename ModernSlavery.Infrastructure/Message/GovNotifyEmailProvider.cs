@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.SharedKernel;
 using Notify.Client;
 using Notify.Interfaces;
 using Notify.Models;
@@ -21,8 +24,9 @@ namespace ModernSlavery.Infrastructure.Message
             IHttpClientFactory httpClientFactory,
             IEmailTemplateRepository emailTemplateRepo,
             IOptions<GovNotifyOptions> govNotifyOptions,
-            ILogger<GovNotifyEmailProvider> logger)
-            : base(emailTemplateRepo, logger)
+            ILogger<GovNotifyEmailProvider> logger,
+            [KeyFilter(Filenames.EmailSendLog)]ILogRecordLogger emailSendLog)
+            : base(emailTemplateRepo, logger,emailSendLog)
         {
             Options = govNotifyOptions
                       ?? throw new ArgumentNullException("You must provide the gov notify email options", nameof(govNotifyOptions));

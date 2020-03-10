@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
@@ -15,7 +14,6 @@ using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Models.Submit;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using MockQueryable.Moq;
@@ -26,7 +24,9 @@ using ModernSlavery.SharedKernel;
 using NUnit.Framework;
 using RangeAttribute = System.ComponentModel.DataAnnotations.RangeAttribute;
 using Autofac;
+using ModernSlavery.BusinessLogic.Submit;
 using ModernSlavery.Infrastructure.File;
+using ModernSlavery.WebUI.Presenters;
 
 namespace ModernSlavery.Tests
 {
@@ -39,7 +39,7 @@ namespace ModernSlavery.Tests
         [SetUp]
         public void BeforeEach()
         {
-            mockDataRepo = MoqHelpers.CreateMockAsyncDataRepository();
+            mockDataRepo = MoqHelpers.CreateMockDataRepository();
             mockScopeBL = new Mock<IScopeBusinessLogic>();
             mockFileRepo = new Mock<IFileRepository>();
             _mockDraftFileBL = new Mock<IDraftFileBusinessLogic>();
@@ -83,18 +83,13 @@ namespace ModernSlavery.Tests
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
             // Mocks
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             mockDataRepo.Setup(x => x.Get<Organisation>(It.IsAny<long>())).Returns(mockedOrganisation);
 
             // Assert
-            Return testReturn = testService.CreateDraftSubmissionFromViewModel(testModel);
+            Return testReturn = testPresenter.CreateDraftSubmissionFromViewModel(testModel);
 
             var testOrgSizeRange = testModel.OrganisationSize.GetAttribute<RangeAttribute>();
 
@@ -138,12 +133,11 @@ namespace ModernSlavery.Tests
 
             var testDraftFileBL = new DraftFileBusinessLogic(new SystemFileRepository());
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testService = new SubmissionService(mockDataRepo.Object, null, mockFileRepo.Object, testDraftFileBL,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Act
-            Draft actualDraft = await testService.GetDraftFileAsync(
+            Draft actualDraft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
                 mockedOrganisation.SectorType.GetAccountingStartDate().Year,
                 mockedUser.UserId);
@@ -188,19 +182,14 @@ namespace ModernSlavery.Tests
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
             // Mocks
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
-
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            
             // Copy the original
             var testNewReturn = (Return) testOldReturn.CopyProperties(new Return());
 
             // Assert
-            SubmissionChangeSummary testChangeSummary = testService.GetSubmissionChangeSummary(testNewReturn, testOldReturn);
+            SubmissionChangeSummary testChangeSummary = testPresenter.GetSubmissionChangeSummary(testNewReturn, testOldReturn);
             string failMessage = $"Assert: Failed to detect {nameof(testNewReturn.CompanyLinkToGPGInfo)} had changed";
             Expect(testChangeSummary.HasChanged == false, failMessage);
             Expect(testChangeSummary.FiguresChanged == false, failMessage);
@@ -253,13 +242,8 @@ namespace ModernSlavery.Tests
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
             // Mocks
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Assert all figures
             foreach (string figurePropName in figureProps)
@@ -271,7 +255,7 @@ namespace ModernSlavery.Tests
                 testNewReturn.SetProperty(figurePropName, changeValue);
 
                 // Assert
-                SubmissionChangeSummary testChangeSummary = testService.GetSubmissionChangeSummary(testNewReturn, testOldReturn);
+                SubmissionChangeSummary testChangeSummary = testPresenter.GetSubmissionChangeSummary(testNewReturn, testOldReturn);
                 string failMessage = $"Assert: Failed to detect {figurePropName} had changed";
                 Expect(testChangeSummary.HasChanged, failMessage);
                 Expect(testChangeSummary.FiguresChanged, failMessage);
@@ -290,13 +274,8 @@ namespace ModernSlavery.Tests
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
             // Mocks
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Copy the original
             var testNewReturn = (Return) testOldReturn.CopyProperties(new Return());
@@ -306,7 +285,7 @@ namespace ModernSlavery.Tests
             testNewReturn.MaxEmployees = 499;
 
             // Assert
-            SubmissionChangeSummary testChangeSummary = testService.GetSubmissionChangeSummary(testNewReturn, testOldReturn);
+            SubmissionChangeSummary testChangeSummary = testPresenter.GetSubmissionChangeSummary(testNewReturn, testOldReturn);
             string failMessage = $"Assert: Failed to detect {nameof(testNewReturn.CompanyLinkToGPGInfo)} had changed";
             Expect(testChangeSummary.HasChanged, failMessage);
             Expect(testChangeSummary.FiguresChanged == false, failMessage);
@@ -330,13 +309,8 @@ namespace ModernSlavery.Tests
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
             // Mocks
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Assert all figures
             foreach (string personPropName in personProps)
@@ -348,7 +322,7 @@ namespace ModernSlavery.Tests
                 testNewReturn.SetProperty(personPropName, changeValue);
 
                 // Assert
-                SubmissionChangeSummary testChangeSummary = testService.GetSubmissionChangeSummary(testNewReturn, testOldReturn);
+                SubmissionChangeSummary testChangeSummary = testPresenter.GetSubmissionChangeSummary(testNewReturn, testOldReturn);
                 string failMessage = $"Assert: Failed to detect {personPropName} had changed";
                 Expect(testChangeSummary.HasChanged, failMessage);
                 Expect(testChangeSummary.FiguresChanged == false, failMessage);
@@ -367,13 +341,8 @@ namespace ModernSlavery.Tests
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
             // Mocks
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Copy the original
             var testNewReturn = (Return) testOldReturn.CopyProperties(new Return());
@@ -382,7 +351,7 @@ namespace ModernSlavery.Tests
             testNewReturn.CompanyLinkToGPGInfo = "http://unittesting";
 
             // Assert
-            SubmissionChangeSummary testChangeSummary = testService.GetSubmissionChangeSummary(testNewReturn, testOldReturn);
+            SubmissionChangeSummary testChangeSummary = testPresenter.GetSubmissionChangeSummary(testNewReturn, testOldReturn);
             string failMessage = $"Assert: Failed to detect {nameof(testNewReturn.CompanyLinkToGPGInfo)} had changed";
             Expect(testChangeSummary.HasChanged, failMessage);
             Expect(testChangeSummary.FiguresChanged == false, failMessage);
@@ -406,7 +375,7 @@ namespace ModernSlavery.Tests
 
             mockDataRepo.SetupGetAll((ICollection<Return>) returns);
 
-            var mockService = new Mock<SubmissionService>(
+            var mockService = new Mock<SubmissionPresenter>(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
@@ -417,7 +386,7 @@ namespace ModernSlavery.Tests
             mockService.Setup(s => s.IsValidSnapshotYear(It.IsAny<int>())).Returns(true);
 
             // Assert
-            SubmissionService testService = mockService.Object;
+            SubmissionPresenter testService = mockService.Object;
             Return actualReturn = await testService.GetReturnFromDatabaseAsync(1, 2000);
             Expect(actualReturn != null);
             Expect(actualReturn.ReturnId == 4);
@@ -442,16 +411,11 @@ namespace ModernSlavery.Tests
 
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Assert
-            Return actualReturn = await testService.GetReturnFromDatabaseAsync(1, 1998);
+            Return actualReturn = await testPresenter.GetReturnFromDatabaseAsync(1, 1998);
             Expect(actualReturn == null);
         }
 
@@ -487,16 +451,11 @@ namespace ModernSlavery.Tests
 
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                testDraftFileFileBusinessLogic,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileFileBusinessLogic);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Test
-            ReturnViewModel actualModel = await testService.GetReturnViewModelAsync(testOrganisation.OrganisationId, testYear, testUserId);
+            ReturnViewModel actualModel = await testPresenter.GetReturnViewModelAsync(testOrganisation.OrganisationId, testYear, testUserId);
 
             // Assert
             Assert.NotNull(actualModel);
@@ -554,7 +513,7 @@ namespace ModernSlavery.Tests
 
             mockDataRepo.Setup(dr => dr.GetAll<Return>()).Returns(new[] {testReturn}.AsQueryable().BuildMock().Object);
 
-            var mockService = new Mock<SubmissionService>(
+            var mockService = new Mock<SubmissionPresenter>(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
@@ -564,7 +523,7 @@ namespace ModernSlavery.Tests
             mockService.Setup(s => s.IsValidSnapshotYear(It.IsIn(testYear))).Returns(true);
 
             // Test
-            SubmissionService testService = mockService.Object;
+            SubmissionPresenter testService = mockService.Object;
             ReturnViewModel actualModel = await testService.GetReturnViewModelAsync(testOrganisationId, testYear, testUserId);
 
             // Assert
@@ -607,17 +566,11 @@ namespace ModernSlavery.Tests
 
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
-
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
             // Test
             var ex = Assert.ThrowsAsync<AuthenticationException>(
-                () => testService.GetReturnViewModelAsync(testOrganisationId, 2001, testUserId));
+                () => testPresenter.GetReturnViewModelAsync(testOrganisationId, 2001, testUserId));
 
             // Assert
             Assert.That(
@@ -633,7 +586,7 @@ namespace ModernSlavery.Tests
             var testSnapshotYear = 1999;
 
             // Mocks
-            var mockService = new Mock<SubmissionService>(
+            var mockService = new Mock<SubmissionPresenter>(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
@@ -649,7 +602,7 @@ namespace ModernSlavery.Tests
             Expect(currentSnapshotYear != testSnapshotYear, "SanityCheck: curReportingYear should not equal the testReportingStartYear");
 
             // Assert
-            SubmissionService testService = mockService.Object;
+            SubmissionPresenter testService = mockService.Object;
             Expect(testService.IsCurrentSnapshotYear(SectorTypes.Private, testSnapshotYear) == false);
         }
 
@@ -661,7 +614,7 @@ namespace ModernSlavery.Tests
             var testSnapshotYear = 2001;
 
             // Mocks
-            var mockService = new Mock<SubmissionService>(
+            var mockService = new Mock<SubmissionPresenter>(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
@@ -677,7 +630,7 @@ namespace ModernSlavery.Tests
             Expect(currentSnapshotYear == testSnapshotYear, "SanityCheck: curReportingYear should equal the testReportingStartYear");
 
             // Assert
-            SubmissionService testService = mockService.Object;
+            SubmissionPresenter testService = mockService.Object;
             Expect(testService.IsCurrentSnapshotYear(SectorTypes.Private, testSnapshotYear));
         }
 
@@ -691,16 +644,11 @@ namespace ModernSlavery.Tests
 
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Assert
-            bool actual = testService.ShouldUpdateLatestReturn(testOrg, testSnapshotYear);
+            bool actual = testPresenter.ShouldUpdateLatestReturn(testOrg, testSnapshotYear);
             Expect(actual);
         }
 
@@ -714,16 +662,11 @@ namespace ModernSlavery.Tests
 
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Assert
-            bool actual = testService.ShouldUpdateLatestReturn(testOrg, testSnapshotYear);
+            bool actual = testPresenter.ShouldUpdateLatestReturn(testOrg, testSnapshotYear);
             Expect(actual == false);
         }
 
@@ -737,16 +680,11 @@ namespace ModernSlavery.Tests
 
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Assert
-            bool actual = testService.ShouldUpdateLatestReturn(testOrg, testSnapshotYear);
+            bool actual = testPresenter.ShouldUpdateLatestReturn(testOrg, testSnapshotYear);
             Expect(actual);
         }
 
@@ -760,16 +698,11 @@ namespace ModernSlavery.Tests
 
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
-            var testService = new SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                _mockDraftFileBL.Object,
-                commonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Assert
-            bool actual = testService.ShouldUpdateLatestReturn(testOrg, testSnapshotYear);
+            bool actual = testPresenter.ShouldUpdateLatestReturn(testOrg, testSnapshotYear);
             Expect(actual);
         }
 

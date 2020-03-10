@@ -1,19 +1,20 @@
 ﻿using System;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Services;
+using ModernSlavery.BusinessLogic.Submit;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.WebUI.Presenters;
 using Moq;
-
 using NUnit.Framework;
 
-namespace ModernSlavery.Tests.Services.SubmissionService
+namespace ModernSlavery.WebUI.Tests.Services.Submission
 {
 
     public class IsCurrentSnapshotYearTests
     {
 
+        private ISubmissionService mockSubmissionService;
         private ICommonBusinessLogic mockCommonBusinessLogic;
         private Mock<IDataRepository> mockDataRepo;
         private Mock<IDraftFileBusinessLogic> mockDraftFileBL;
@@ -23,8 +24,8 @@ namespace ModernSlavery.Tests.Services.SubmissionService
         [SetUp]
         public void BeforeEach()
         {
-            mockCommonBusinessLogic = MoqHelpers.CreateMockCommonBusinessLogic();
-            mockDataRepo = MoqHelpers.CreateMockAsyncDataRepository();
+            mockCommonBusinessLogic = MoqHelpers.CreateFakeCommonBusinessLogic();
+            mockDataRepo = MoqHelpers.CreateMockDataRepository();
             mockScopeBL = new Mock<IScopeBusinessLogic>();
             mockDraftFileBL = new Mock<IDraftFileBusinessLogic>();
             mockFileRepo = new Mock<IFileRepository>();
@@ -41,7 +42,7 @@ namespace ModernSlavery.Tests.Services.SubmissionService
             var expectCalledGetSnapshotDate = false;
 
             // Mocks
-            var mockService = new Mock<WebUI.Classes.Services.SubmissionService>(
+            var mockService = new Mock<SubmissionPresenter>(
                 mockDataRepo.Object,
                 mockScopeBL.Object,
                 mockFileRepo.Object,
@@ -58,7 +59,7 @@ namespace ModernSlavery.Tests.Services.SubmissionService
                     });
 
             // Assert
-            WebUI.Classes.Services.SubmissionService testService = mockService.Object;
+            SubmissionPresenter testService = mockService.Object;
             bool actual = testService.IsCurrentSnapshotYear(testSector, testYear);
 
             Assert.IsTrue(expectCalledGetSnapshotDate, "Expected to call GetSnapshotDate");
@@ -74,16 +75,11 @@ namespace ModernSlavery.Tests.Services.SubmissionService
             int testYear = testSnapshotDate.Year;
 
             // Mocks
-            var testService = new WebUI.Classes.Services.SubmissionService(
-                mockDataRepo.Object,
-                mockScopeBL.Object,
-                mockFileRepo.Object,
-                mockDraftFileBL.Object,
-                mockCommonBusinessLogic,
-                null);
+            var testSubmissionService = new SubmissionService(mockCommonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
             // Assert
-            bool actual = testService.IsCurrentSnapshotYear(testSector, testYear);
+            bool actual = testPresenter.IsCurrentSnapshotYear(testSector, testYear);
 
             Assert.IsTrue(actual, "Expected IsCurrentSnapshotYear to return true");
         }

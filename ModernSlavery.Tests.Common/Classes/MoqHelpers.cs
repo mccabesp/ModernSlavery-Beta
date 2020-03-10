@@ -6,8 +6,10 @@ using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
 using Moq;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Submit;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.Extensions.AspNetCore;
@@ -17,18 +19,56 @@ namespace ModernSlavery.Tests.Common.Classes
     public static class MoqHelpers
     {
 
-        public static ICommonBusinessLogic CreateMockCommonBusinessLogic()
+        public static ICommonBusinessLogic CreateFakeCommonBusinessLogic()
         {
             var mockedSnapshotDateHelper = new Mock<ISnapshotDateHelper>();
             var mockedSourceComparer = new Mock<ISourceComparer>();
             var mockedSendEmailService = new Mock<ISendEmailService>();
             var mockedNotificationService = new Mock<INotificationService>();
-            var mockCommonBusinessLogic = new CommonBusinessLogic(Config.Configuration, mockedSnapshotDateHelper.Object, mockedSourceComparer.Object, mockedSendEmailService.Object, mockedNotificationService.Object);
+            var mockedFileRepository = new Mock<IFileRepository>();
+            var mockedDataRepository = new Mock<IDataRepository>();
+            var mockCommonBusinessLogic = new CommonBusinessLogic(mockedSnapshotDateHelper.Object, mockedSourceComparer.Object, mockedSendEmailService.Object, mockedNotificationService.Object, mockedFileRepository.Object,mockedDataRepository.Object);
 
             return mockCommonBusinessLogic;
         }
 
-        public static Mock<IDataRepository> CreateMockAsyncDataRepository()
+        public static ISubmissionBusinessLogic CreateFakeSubmissionBusinessLogic()
+        {
+            var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
+            var fakeSubmissionBusinessLogic = new SubmissionBusinessLogic(fakeCommonBusinessLogic, fakeCommonBusinessLogic.DataRepository, Mock.Of<ILogRecordLogger>());
+            return fakeSubmissionBusinessLogic;
+        }
+
+        public static ISearchBusinessLogic CreateFakeSearchBusinessLogic()
+        {
+            var fakeSearchBusinessLogic = new SearchBusinessLogic(Mock.Of<ISearchRepository<EmployerSearchModel>>(), Mock.Of<ISearchRepository<SicCodeSearchModel>>(),Mock.Of<ILogRecordLogger>());
+            return fakeSearchBusinessLogic;
+        }
+        public static IScopeBusinessLogic CreateFakeScopeBusinessLogic()
+        {
+            var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
+            var fakeSearchBusinessLogic = CreateFakeSearchBusinessLogic();
+            var fakeScopeBusinessLogic = new ScopeBusinessLogic(fakeCommonBusinessLogic, fakeCommonBusinessLogic.DataRepository,fakeSearchBusinessLogic);
+            return fakeScopeBusinessLogic;
+        }
+        public static IDraftFileBusinessLogic CreateFakeDraftBusinessLogic()
+        {
+            var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
+            var fakeDraftBusinessLogic = new DraftFileBusinessLogic(fakeCommonBusinessLogic.FileRepository);
+            return fakeDraftBusinessLogic;
+        }
+        public static ISubmissionService CreateFakeSubmissionService()
+        {
+            var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
+            var fakeSubmissionBusinessLogic = CreateFakeSubmissionBusinessLogic();
+            var fakeScopeBusinessLogic = CreateFakeScopeBusinessLogic();
+            var fakeDraftBusinessLogic = CreateFakeDraftBusinessLogic();
+
+            var fakeSubmissionService = new SubmissionService(fakeCommonBusinessLogic,fakeSubmissionBusinessLogic, fakeScopeBusinessLogic, fakeDraftBusinessLogic);
+            return fakeSubmissionService;
+        }
+
+        public static Mock<IDataRepository> CreateMockDataRepository()
         {
             var mockDataRepo = new Mock<IDataRepository>();
             mockDataRepo.SetupEmptyDataRepository();

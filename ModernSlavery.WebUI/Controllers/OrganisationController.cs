@@ -11,7 +11,6 @@ using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Models.Organisation;
 using ModernSlavery.WebUI.Models.Scope;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +22,7 @@ using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.WebUI.Presenters;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -35,8 +35,8 @@ namespace ModernSlavery.WebUI.Controllers
         public OrganisationController(
             ILogger<ErrorController> logger,
             IWebService webService,
-            ISubmissionService submitService,
-            IScopePresentation scopePresentation,
+            ISubmissionPresenter submitService,
+            IScopePresenter scopePresentation,
             IScopeBusinessLogic scopeBL,
             ICommonBusinessLogic commonBL,
             IOrganisationBusinessLogic organisationBL,
@@ -358,9 +358,9 @@ namespace ModernSlavery.WebUI.Controllers
 
         #region Dependencies
 
-        public ISubmissionService SubmissionService { get; }
+        public ISubmissionPresenter SubmissionService { get; }
 
-        public IScopePresentation ScopePresentation { get; }
+        public IScopePresenter ScopePresentation { get; }
 
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
         public ICommonBusinessLogic CommonBusinessLogic { get; }

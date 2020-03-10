@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Compare;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
@@ -94,7 +93,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
 
             IEnumerable<Organisation> listOfOrgs = listOfReturns.Select(ret => ret.Organisation);
 
-            Mock<IDataRepository> mockedDataRepository = MoqHelpers.CreateMockAsyncDataRepository();
+            Mock<IDataRepository> mockedDataRepository = MoqHelpers.CreateMockDataRepository();
 
             mockedDataRepository.SetupGetAll(listOfOrgs, listOfReturns);
 
@@ -103,7 +102,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
 
             var mockedCommonBusinessLogic = Get<ICommonBusinessLogic>();
 
-            var submissionBusinessLogic = new SubmissionBusinessLogic(mockedCommonBusinessLogic, dataRepository);
+            var submissionBusinessLogic = new SubmissionBusinessLogic(mockedCommonBusinessLogic, dataRepository,Mock.Of<ILogRecordLogger>());
 
             var mockedScopeBusinessLogic = Get<IScopeBusinessLogic>();
             var mockedSecurityCodeBusinessLogic = Get<ISecurityCodeBusinessLogic>();

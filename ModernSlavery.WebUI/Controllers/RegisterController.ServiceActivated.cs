@@ -178,14 +178,14 @@ namespace ModernSlavery.WebUI.Controllers
                 userOrg.Organisation.LatestAddress = userOrg.Address;
                 userOrg.ConfirmAttempts = 0;
 
-                model.AccountingDate = _commonBusinessLogic.GetAccountingStartDate(userOrg.Organisation.SectorType);
+                model.AccountingDate = RegistrationService.CommonBusinessLogic.GetAccountingStartDate(userOrg.Organisation.SectorType);
                 model.OrganisationId = userOrg.OrganisationId;
                 this.StashModel(model);
 
                 result1 = RedirectToAction("ServiceActivated");
 
                 //Send notification email to existing users 
-                _commonBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
+                RegistrationService.CommonBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
             }
             else
             {
@@ -202,7 +202,7 @@ namespace ModernSlavery.WebUI.Controllers
             //Log the registration
             if (!userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))
             {
-                await Global.RegistrationLog.WriteAsync(
+                await RegistrationService.RegistrationLog.WriteAsync(
                     new RegisterLogModel {
                         StatusDate = VirtualDateTime.Now,
                         Status = "PIN Confirmed",
@@ -228,7 +228,7 @@ namespace ModernSlavery.WebUI.Controllers
             //Add this organisation to the search index
             if (updateSearchIndex)
             {
-                await SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
+                await RegistrationService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
             }
 
             //Prompt the user with confirmation

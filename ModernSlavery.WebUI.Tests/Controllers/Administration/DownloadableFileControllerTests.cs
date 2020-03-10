@@ -5,7 +5,6 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using Autofac;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.Core.Models.Downloadable;
 using ModernSlavery.WebUI.Tests.TestHelpers;
@@ -15,6 +14,8 @@ using Moq;
 using NUnit.Framework;
 using ModernSlavery.Tests.Common;
 using AutoMapper;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Repositories;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.File;
 using ModernSlavery.WebUI.Admin.Controllers;
@@ -31,7 +32,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
             {
                 // Initialise AutoMapper
                 MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                    config.AddMaps(typeof(ModernSlavery.BusinessLogic.Account.Repositories.UserRepository));
+                    config.AddMaps(typeof(UserRepository));
                 });
                 builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
             }

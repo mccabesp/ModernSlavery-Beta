@@ -16,19 +16,20 @@ using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
-using ModernSlavery.WebUI.Classes.Presentation;
 using ModernSlavery.WebUI.Models;
 using ModernSlavery.WebUI.Models.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using ModernSlavery.BusinessLogic.View;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.WebUI.Presenters;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -42,25 +43,25 @@ namespace ModernSlavery.WebUI.Controllers
             ILogger<ErrorController> logger,
             IWebService webService,
             IViewingService viewingService,
-            ISearchViewService searchViewService,
-            ICompareViewService compareViewService,
-            IOrganisationBusinessLogic organisationBusinessLogic,
-            ICommonBusinessLogic commonBusinessLogic,
-            ISubmissionBusinessLogic submissionBusinessLogic,
-            ISearchBusinessLogic searchBusinessLogic,
-            IObfuscator obfuscator,
+            IViewingPresenter viewingPresenter,
+            ISearchPresenter searchPresenter,
+            IComparePresenter comparePresenter,
             IDataRepository dataRepository, 
             IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
             ViewingService = viewingService;
-            SearchViewService = searchViewService;
-            CompareViewService = compareViewService;
-            OrganisationBusinessLogic = organisationBusinessLogic;
-            _commonBusinessLogic = commonBusinessLogic;
-            Obfuscator = obfuscator;
-            SubmissionBusinessLogic = submissionBusinessLogic;
-            SearchBusinessLogic = searchBusinessLogic;
+            ViewingPresenter = viewingPresenter;
+            SearchPresenter = searchPresenter;
+            ComparePresenter = comparePresenter;
         }
+
+        #endregion
+
+        #region Dependencies
+        public IViewingService ViewingService { get; }
+        public IViewingPresenter ViewingPresenter { get; }
+        public ISearchPresenter SearchPresenter { get; }
+        public IComparePresenter ComparePresenter { get; }
 
         #endregion
 
@@ -86,20 +87,6 @@ namespace ModernSlavery.WebUI.Controllers
 
             return result;
         }
-
-        #region Dependencies
-
-        public IViewingService ViewingService { get; }
-        public ISearchViewService SearchViewService { get; }
-        public ICompareViewService CompareViewService { get; }
-        public ICommonBusinessLogic _commonBusinessLogic { get; set; }
-        public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
-        public ISubmissionBusinessLogic SubmissionBusinessLogic { get; set; }
-        public ISearchBusinessLogic SearchBusinessLogic { get; set; }
-
-        public IObfuscator Obfuscator { get; }
-
-        #endregion
 
         #region Initialisation
 
@@ -155,15 +142,15 @@ namespace ModernSlavery.WebUI.Controllers
         public async Task<IActionResult> SearchResults([FromQuery] SearchResultsQuery searchQuery)
         {
             //Ensure search service is enabled
-            if (SearchBusinessLogic.SearchRepository.Disabled) return View("CustomError", new ErrorViewModel(1151,new {featureName="Search Service" }));
+            if (ViewingService.SearchBusinessLogic.EmployerSearchRepository.Disabled) return View("CustomError", new ErrorViewModel(1151,new {featureName="Search Service" }));
 
             //When never searched in this session
-            if (string.IsNullOrWhiteSpace(SearchViewService.LastSearchParameters))
+            if (string.IsNullOrWhiteSpace(SearchPresenter.LastSearchParameters))
             {
                 //If no compare employers in session then load employers from the cookie
-                if (CompareViewService.BasketItemCount == 0)
+                if (ComparePresenter.BasketItemCount == 0)
                 {
-                    CompareViewService.LoadComparedEmployersFromCookie();
+                    ComparePresenter.LoadComparedEmployersFromCookie();
                 }
             }
 
@@ -179,12 +166,12 @@ namespace ModernSlavery.WebUI.Controllers
 
             // generate result view model
             var searchParams = AutoMapper.Map<EmployerSearchParameters>(searchQuery);
-            SearchViewModel model = await ViewingService.SearchAsync(searchParams);
+            SearchViewModel model = await ViewingPresenter.SearchAsync(searchParams);
 
-            ViewBag.ReturnUrl = SearchViewService.GetLastSearchUrl();
+            ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
 
             ViewBag.BasketViewModel = new CompareBasketViewModel {
-                CanAddEmployers = false, CanViewCompare = CompareViewService.BasketItemCount > 1, CanClearCompare = true
+                CanAddEmployers = false, CanViewCompare = ComparePresenter.BasketItemCount > 1, CanClearCompare = true
             };
 
             return View("Finder/SearchResults", model);
@@ -208,9 +195,9 @@ namespace ModernSlavery.WebUI.Controllers
 
             // generate result view model
             var searchParams = AutoMapper.Map<EmployerSearchParameters>(searchQuery);
-            SearchViewModel model = await ViewingService.SearchAsync(searchParams);
+            SearchViewModel model = await ViewingPresenter.SearchAsync(searchParams);
 
-            ViewBag.ReturnUrl = SearchViewService.GetLastSearchUrl();
+            ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
 
             return PartialView("Finder/Parts/MainContent", model);
         }
@@ -224,7 +211,7 @@ namespace ModernSlavery.WebUI.Controllers
                 return Json(new {ErrorCode = HttpStatusCode.BadRequest, ErrorMessage = "Cannot search for a null or empty value"});
             }
 
-            List<SuggestEmployerResult> matches = await ViewingService.SuggestEmployerNameAsync(search.Trim());
+            List<SuggestEmployerResult> matches = await ViewingPresenter.SuggestEmployerNameAsync(search.Trim());
 
             return Json(new {Matches = matches});
         }
@@ -238,7 +225,7 @@ namespace ModernSlavery.WebUI.Controllers
                 return Json(new {ErrorCode = HttpStatusCode.BadRequest, ErrorMessage = "Cannot search for a null or empty value"});
             }
 
-            List<SicCodeSearchResult> matches = await ViewingService.GetListOfSicCodeSuggestionsAsync(search.Trim());
+            List<SicCodeSearchResult> matches = await ViewingPresenter.GetListOfSicCodeSuggestionsAsync(search.Trim());
 
             return Json(new {Matches = matches});
         }
@@ -279,7 +266,7 @@ namespace ModernSlavery.WebUI.Controllers
         {
             if (year == 0)
             {
-                year = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Private).Year;
+                year = ViewingService.CommonBusinessLogic.GetAccountingStartDate(SectorTypes.Private).Year;
             }
 
             //Ensure we have a directory
@@ -338,7 +325,7 @@ namespace ModernSlavery.WebUI.Controllers
                 try
                 {
                     CustomResult<Organisation> organisationLoadingOutcome =
-                        await OrganisationBusinessLogic.GetOrganisationByEncryptedReturnIdAsync(id);
+                        await ViewingService.OrganisationBusinessLogic.GetOrganisationByEncryptedReturnIdAsync(id);
 
                     if (organisationLoadingOutcome.Failed)
                     {
@@ -377,7 +364,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             int employerIdentifierId = employerIdentifier.ToInt32();
-            string shortUrlObfuscatedEmployerIdentifier = Obfuscator.Obfuscate(employerIdentifierId);
+            string shortUrlObfuscatedEmployerIdentifier = ViewingService.Obfuscator.Obfuscate(employerIdentifierId);
 
             return RedirectToActionPermanent(nameof(Employer), new {employerIdentifier = shortUrlObfuscatedEmployerIdentifier});
         }
@@ -395,7 +382,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             try
             {
-                organisationLoadingOutcome = OrganisationBusinessLogic.LoadInfoFromActiveEmployerIdentifier(employerIdentifier);
+                organisationLoadingOutcome = ViewingService.OrganisationBusinessLogic.LoadInfoFromActiveEmployerIdentifier(employerIdentifier);
 
                 if (organisationLoadingOutcome.Failed)
                 {
@@ -417,9 +404,9 @@ namespace ModernSlavery.WebUI.Controllers
                 "EmployerDetails/Employer",
                 new EmployerDetailsViewModel {
                     Organisation = organisationLoadingOutcome.Result,
-                    LastSearchUrl = SearchViewService.GetLastSearchUrl(),
+                    LastSearchUrl = SearchPresenter.GetLastSearchUrl(),
                     EmployerBackUrl = EmployerBackUrl,
-                    ComparedEmployers = CompareViewService.ComparedEmployers.Value
+                    ComparedEmployers = ComparePresenter.ComparedEmployers.Value
                 });
         }
 
@@ -445,7 +432,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             int employerIdentifierId = decodedEmployerIdentifier.ToInt32();
-            string shortUrlObfuscatedEmployerIdentifier = Obfuscator.Obfuscate(employerIdentifierId);
+            string shortUrlObfuscatedEmployerIdentifier = ViewingService.Obfuscator.Obfuscate(employerIdentifierId);
 
             return RedirectToActionPermanent(nameof(Report), new {employerIdentifier = shortUrlObfuscatedEmployerIdentifier, year});
         }
@@ -470,7 +457,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             try
             {
-                organisationLoadingOutcome = OrganisationBusinessLogic.LoadInfoFromActiveEmployerIdentifier(employerIdentifier);
+                organisationLoadingOutcome = ViewingService.OrganisationBusinessLogic.LoadInfoFromActiveEmployerIdentifier(employerIdentifier);
 
                 if (organisationLoadingOutcome.Failed)
                 {
@@ -494,14 +481,14 @@ namespace ModernSlavery.WebUI.Controllers
             try
             {
                 CustomResult<Return> getLatestSubmissionLoadingOutcome =
-                    SubmissionBusinessLogic.GetSubmissionByOrganisationAndYear(foundOrganisation, year);
+                    ViewingService.SubmissionBusinessLogic.GetSubmissionByOrganisationAndYear(foundOrganisation, year);
 
                 if (getLatestSubmissionLoadingOutcome.Failed)
                 {
                     return getLatestSubmissionLoadingOutcome.ErrorMessage.ToHttpStatusViewResult();
                 }
 
-                model = SubmissionBusinessLogic.ConvertSubmissionReportToReturnViewModel(getLatestSubmissionLoadingOutcome.Result);
+                model = ViewingService.SubmissionBusinessLogic.ConvertSubmissionReportToReturnViewModel(getLatestSubmissionLoadingOutcome.Result);
             }
             catch (Exception ex)
             {
@@ -531,20 +518,20 @@ namespace ModernSlavery.WebUI.Controllers
 
             // set maximum search size
             searchParams.Page = 1;
-            searchParams.PageSize = CompareViewService.MaxCompareBasketCount;
-            SearchViewModel searchResultsModel = await ViewingService.SearchAsync(searchParams);
+            searchParams.PageSize = ComparePresenter.MaxCompareBasketCount;
+            SearchViewModel searchResultsModel = await ViewingPresenter.SearchAsync(searchParams);
 
             // add any new items to the compare list
             string[] resultIds = searchResultsModel.Employers.Results
-                .Where(employer => CompareViewService.BasketContains(employer.OrganisationIdEncrypted) == false)
-                .Take(CompareViewService.MaxCompareBasketCount - CompareViewService.BasketItemCount)
+                .Where(employer => ComparePresenter.BasketContains(employer.OrganisationIdEncrypted) == false)
+                .Take(ComparePresenter.MaxCompareBasketCount - ComparePresenter.BasketItemCount)
                 .Select(employer => employer.OrganisationIdEncrypted)
                 .ToArray();
 
-            CompareViewService.AddRangeToBasket(resultIds);
+            ComparePresenter.AddRangeToBasket(resultIds);
 
             // save the results to the cookie
-            CompareViewService.SaveComparedEmployersToCookie(Request);
+            ComparePresenter.SaveComparedEmployersToCookie(Request);
 
             return RedirectToAction(nameof(SearchResults), "Viewing", searchQuery);
         }

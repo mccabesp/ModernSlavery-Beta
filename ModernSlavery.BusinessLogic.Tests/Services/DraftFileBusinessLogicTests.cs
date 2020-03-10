@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.TestHelpers;

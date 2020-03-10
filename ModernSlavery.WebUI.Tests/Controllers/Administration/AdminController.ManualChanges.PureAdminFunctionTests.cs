@@ -8,6 +8,7 @@ using ModernSlavery.Tests.TestHelpers;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ModernSlavery.BusinessLogic.Admin;
 using Moq;
 using ModernSlavery.Entities.Enums;
 
@@ -50,7 +51,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
             Mock<IAdminService> configurableAdmin = AutoFacExtensions.ResolveAsMock<IAdminService>();
 
             configurableAdmin
-                .Setup(x => x.GetSearchDocumentCountAsync())
+                .Setup(x => x.SearchBusinessLogic.EmployerSearchRepository.GetDocumentCountAsync())
                 .ReturnsAsync(21212L);
 
 
@@ -101,7 +102,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
             Mock<IAdminService> configurableAdmin = AutoFacExtensions.ResolveAsMock<IAdminService>();
 
             configurableAdmin
-                .Setup(x => x.GetSearchDocumentCountAsync())
+                .Setup(x => x.SearchBusinessLogic.EmployerSearchRepository.GetDocumentCountAsync())
                 .ReturnsAsync(65488L);
 
 
@@ -148,7 +149,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
             Mock<IAdminService> configurableAdmin = AutoFacExtensions.ResolveAsMock<IAdminService>();
 
             configurableAdmin
-                .Setup(x => x.GetSearchDocumentCountAsync())
+                .Setup(x => x.SearchBusinessLogic.EmployerSearchRepository.GetDocumentCountAsync())
                 .ReturnsAsync(12545L);
 
 

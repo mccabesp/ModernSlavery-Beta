@@ -5,7 +5,6 @@ using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.WebUI.Classes.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,6 +12,8 @@ using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Submit;
+using ModernSlavery.WebUI.Presenters;
 
 namespace ModernSlavery.WebUI.Controllers.Submission
 {
@@ -23,34 +24,19 @@ namespace ModernSlavery.WebUI.Controllers.Submission
 
         public delegate bool IsPageChanged(ReturnViewModel postedReturnViewModel, ReturnViewModel stashedReturnViewModel);
 
-        public readonly ISubmissionService submissionService;
-        public readonly ICommonBusinessLogic commonBusinessLogic;
-        //public ISubmissionBusinessLogic _submissionBusinessLogic;
-        //public IFileRepository _fileRepository;
-
-        #region Initialisation
-
-        //public SubmitController(ISubmissionService submitService, IFileRepository fileRepository, ISubmissionBusinessLogic submissionBusinessLogic)
-        //{
-        //    submissionService = submitService;
-        //    //_fileRepository = fileRepository;
-        //    //_submissionBusinessLogic = submissionBusinessLogic;
-        //}
-
-        #region Constructors
+        private readonly ISubmissionPresenter _SubmissionPresenter;
+        private readonly ISubmissionService _SubmissionService;
 
         public SubmitController(
             ILogger<SubmitController> logger,
             IWebService webService,
-            ICommonBusinessLogic commonBusinessLogic,
-            ISubmissionService submitService,
+            ISubmissionService submissionService,
+            ISubmissionPresenter submissionPresenter,
             IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
-            this.commonBusinessLogic = commonBusinessLogic;
-            submissionService = submitService;
+            _SubmissionService = submissionService;
+            _SubmissionPresenter = submissionPresenter;
         }
-
-        #endregion
 
         [Route("Init")]
         public IActionResult Init()
@@ -71,7 +57,6 @@ namespace ModernSlavery.WebUI.Controllers.Submission
             return RedirectToAction("EnterCalculations");
         }
 
-        #endregion
 
         #region private methods
 
@@ -106,7 +91,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
                 return View("DraftConfirm", postedReturnViewModel);
             }
 
-            await submissionService.RollbackDraftFileAsync(postedReturnViewModel);
+            await _SubmissionPresenter.RollbackDraftFileAsync(postedReturnViewModel);
             return RedirectToAction(nameof(OrganisationController.ManageOrganisations), "Organisation");
         }
 
@@ -212,7 +197,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
             if (stashedReturnViewModel == null)
             {
                 /* info is not stashed, so load the return info from somewhere (db or draft-azure) */
-                stashedReturnViewModel = await submissionService.GetReturnViewModelAsync(
+                stashedReturnViewModel = await _SubmissionPresenter.GetReturnViewModelAsync(
                     ReportingOrganisationId,
                     ReportingOrganisationStartYear.Value,
                     currentUserId);

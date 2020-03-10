@@ -38,7 +38,7 @@ namespace ModernSlavery.WebJob
                     ;
                     while (names.Count > 1 && names[1].Name.EqualsI(names[0].Name.Replace(" LTD.", " LIMITED").Replace(" Ltd", " Limited")))
                     {
-                        await Global.ManualChangeLog.WriteAsync(
+                        await _ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
                                 nameof(FixOrganisationsNamesAsync),
                                 ManualActions.Delete,
@@ -64,7 +64,7 @@ namespace ModernSlavery.WebJob
                         if (org.OrganisationName != newValue)
                         {
                             org.OrganisationName = newValue;
-                            await Global.ManualChangeLog.WriteAsync(
+                            await _ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     nameof(FixOrganisationsNamesAsync),
                                     ManualActions.Update,

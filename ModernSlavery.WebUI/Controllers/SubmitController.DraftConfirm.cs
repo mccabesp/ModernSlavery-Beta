@@ -28,11 +28,11 @@ namespace ModernSlavery.WebUI.Controllers.Submission
 
             if (stashedReturnViewModel.HasReported())
             {
-                await submissionService.DiscardDraftFileAsync(stashedReturnViewModel);
+                await _SubmissionPresenter.DiscardDraftFileAsync(stashedReturnViewModel);
             }
             else
             {
-                await submissionService.RollbackDraftFileAsync(stashedReturnViewModel);
+                await _SubmissionPresenter.RollbackDraftFileAsync(stashedReturnViewModel);
             }
 
             return RedirectToAction(nameof(OrganisationController.ManageOrganisations), "Organisation");
@@ -67,8 +67,8 @@ namespace ModernSlavery.WebUI.Controllers.Submission
                 return View(postedReturnViewModel.OriginatingAction, postedReturnViewModel);
             }
 
-            await submissionService.UpdateDraftFileAsync(currentUser.UserId, postedReturnViewModel);
-            await submissionService.CommitDraftFileAsync(postedReturnViewModel);
+            await _SubmissionPresenter.UpdateDraftFileAsync(currentUser.UserId, postedReturnViewModel);
+            await _SubmissionPresenter.CommitDraftFileAsync(postedReturnViewModel);
 
             return View("DraftComplete", postedReturnViewModel);
         }

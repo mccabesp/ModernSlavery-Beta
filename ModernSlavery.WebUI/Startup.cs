@@ -7,9 +7,7 @@ using Autofac.Extensions.DependencyInjection;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Account.Repositories;
 using ModernSlavery.BusinessLogic.Repositories;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
@@ -19,10 +17,7 @@ using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewServices;
 using ModernSlavery.WebUI.Classes;
-using ModernSlavery.WebUI.Classes.Presentation;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Options;
-using ModernSlavery.WebUI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -36,6 +31,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
+using ModernSlavery.BusinessLogic.Admin;
 using HttpSession = ModernSlavery.Extensions.AspNetCore.HttpSession;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.SharedKernel;
@@ -52,6 +48,7 @@ using ModernSlavery.Infrastructure.Message;
 using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Infrastructure.Telemetry;
+using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI
@@ -174,12 +171,6 @@ namespace ModernSlavery.WebUI
 
             //Create Inversion of Control container
             MvcApplication.ContainerIoC = BuildContainerIoC(services);
-
-            Global.BadSicLog = MvcApplication.ContainerIoC.ResolveKeyed<ILogRecordLogger>(Filenames.BadSicLog);
-            Global.ManualChangeLog = MvcApplication.ContainerIoC.ResolveKeyed<ILogRecordLogger>(Filenames.ManualChangeLog);
-            Global.RegistrationLog = MvcApplication.ContainerIoC.ResolveKeyed<ILogRecordLogger>(Filenames.RegistrationLog);
-            Global.SubmissionLog = MvcApplication.ContainerIoC.ResolveKeyed<ILogRecordLogger>(Filenames.SubmissionLog);
-            Global.SearchLog = MvcApplication.ContainerIoC.ResolveKeyed<ILogRecordLogger>(Filenames.SearchLog);
 
             // Create the IServiceProvider based on the container.
             return new AutofacServiceProvider(MvcApplication.ContainerIoC);
@@ -319,12 +310,12 @@ namespace ModernSlavery.WebUI
             builder.RegisterType<ChangeEmailViewService>().As<IChangeEmailViewService>().InstancePerLifetimeScope();
             builder.RegisterType<ChangePasswordViewService>().As<IChangePasswordViewService>().InstancePerLifetimeScope();
             builder.RegisterType<CloseAccountViewService>().As<ICloseAccountViewService>().InstancePerLifetimeScope();
-            builder.RegisterType<SubmissionService>().As<ISubmissionService>().InstancePerLifetimeScope();
-            builder.RegisterType<ViewingService>().As<IViewingService>().InstancePerLifetimeScope();
+            builder.RegisterType<SubmissionPresenter>().As<ISubmissionPresenter>().InstancePerLifetimeScope();
+            builder.RegisterType<ViewingPresenter>().As<IViewingPresenter>().InstancePerLifetimeScope();
             builder.RegisterType<AdminService>().As<IAdminService>().InstancePerLifetimeScope();
-            builder.RegisterType<SearchViewService>().As<ISearchViewService>().InstancePerLifetimeScope();
-            builder.RegisterType<CompareViewService>().As<ICompareViewService>().InstancePerLifetimeScope();
-            builder.RegisterType<ScopePresentation>().As<IScopePresentation>().InstancePerLifetimeScope();
+            builder.RegisterType<SearchPresenter>().As<ISearchPresenter>().InstancePerLifetimeScope();
+            builder.RegisterType<ComparePresenter>().As<IComparePresenter>().InstancePerLifetimeScope();
+            builder.RegisterType<ScopePresenter>().As<IScopePresenter>().InstancePerLifetimeScope();
             builder.RegisterType<AdminSearchService>().As<AdminSearchService>().InstancePerLifetimeScope();
             builder.RegisterType<AuditLogger>().As<AuditLogger>().InstancePerLifetimeScope();
 

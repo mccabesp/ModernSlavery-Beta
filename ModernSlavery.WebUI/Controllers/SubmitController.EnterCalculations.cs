@@ -32,7 +32,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
 
             if (ReportingOrganisationStartYear == 0)
             {
-                ReportingOrganisationStartYear = submissionService.GetCurrentSnapshotDate().Year;
+                ReportingOrganisationStartYear = _SubmissionPresenter.GetCurrentSnapshotDate().Year;
             }
 
             stashedReturnViewModel = await LoadReturnViewModelFromDBorFromDraftFileAsync(stashedReturnViewModel, currentUser.UserId);
@@ -82,7 +82,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
 
             #region Keep draft file locked to this user
 
-            await submissionService.KeepDraftFileLockedToUserAsync(postedReturnViewModel, CurrentUser.UserId);
+            await _SubmissionPresenter.KeepDraftFileLockedToUserAsync(postedReturnViewModel, CurrentUser.UserId);
 
             if (!postedReturnViewModel.ReportInfo.Draft.HasDraftBeenModifiedDuringThisSession)
             {

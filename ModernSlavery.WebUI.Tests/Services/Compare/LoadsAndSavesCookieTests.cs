@@ -1,11 +1,10 @@
 ﻿using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Classes.Presentation;
 using ModernSlavery.WebUI.Options;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using ModernSlavery.SharedKernel;
-
+using ModernSlavery.WebUI.Presenters;
 using NUnit.Framework;
 
 namespace ModernSlavery.Tests.Services.Compare
@@ -35,20 +34,20 @@ namespace ModernSlavery.Tests.Services.Compare
             mockHttpContext.Setup(x => x.Request.Cookies[It.Is<string>(arg => arg == CookieNames.LastCompareQuery)])
                 .Returns(string.Join(",", expectedEmployerIds));
 
-            var testService = new CompareViewService(
+            var testPresenter = new ComparePresenter(
                 MoqHelpers.CreateIOptionsSnapshotMock(new ViewingOptions()),
                 mockHttpContextAccessor.Object,
                 Mock.Of<IHttpSession>());
 
             // Act
-            testService.LoadComparedEmployersFromCookie();
+            testPresenter.LoadComparedEmployersFromCookie();
 
             // Assert
             Assert.AreEqual(
                 expectedEmployerIds.Length,
-                testService.BasketItemCount,
+                testPresenter.BasketItemCount,
                 $"Expected basket to contain {expectedEmployerIds.Length} employers");
-            Assert.IsTrue(testService.ComparedEmployers.Value.Contains(expectedEmployerIds), "Expected employer ids to match basket items");
+            Assert.IsTrue(testPresenter.ComparedEmployers.Value.Contains(expectedEmployerIds), "Expected employer ids to match basket items");
         }
 
         [TestCase]
@@ -58,21 +57,21 @@ namespace ModernSlavery.Tests.Services.Compare
             mockHttpContext.Setup(x => x.Request.Cookies[It.Is<string>(arg => arg == CookieNames.LastCompareQuery)])
                 .Returns("12345678");
 
-            var testService = new CompareViewService(
+            var testPresenter = new ComparePresenter(
                 MoqHelpers.CreateIOptionsSnapshotMock(new ViewingOptions()),
                 mockHttpContextAccessor.Object,
                 Mock.Of<IHttpSession>());
 
             var testPreviousIds = new[] {"AAA", "BBB", "CCC"};
-            testService.AddRangeToBasket(testPreviousIds);
+            testPresenter.AddRangeToBasket(testPreviousIds);
 
             // Act
-            testService.LoadComparedEmployersFromCookie();
+            testPresenter.LoadComparedEmployersFromCookie();
 
             // Assert
-            Assert.AreEqual(1, testService.BasketItemCount, "Expected basket to contain 1 employer");
+            Assert.AreEqual(1, testPresenter.BasketItemCount, "Expected basket to contain 1 employer");
             Assert.IsFalse(
-                testService.ComparedEmployers.Value.Contains(testPreviousIds),
+                testPresenter.ComparedEmployers.Value.Contains(testPreviousIds),
                 "Expected previous employer ids to be cleared from basket");
         }
 
@@ -85,13 +84,13 @@ namespace ModernSlavery.Tests.Services.Compare
             mockHttpContext.Setup(x => x.Request.Cookies[It.Is<string>(arg => arg == CookieNames.LastCompareQuery)])
                 .Returns("12345678");
 
-            var testService = new CompareViewService(
+            var testPresenter = new ComparePresenter(
                 MoqHelpers.CreateIOptionsSnapshotMock(new ViewingOptions()),
                 mockHttpContextAccessor.Object,
                 Mock.Of<IHttpSession>());
 
             var testIds = new[] {"AAA", "BBB", "CCC"};
-            testService.AddRangeToBasket(testIds);
+            testPresenter.AddRangeToBasket(testIds);
 
             mockHttpContext.Setup(
                     x => x.Response.Cookies.Append(
@@ -106,7 +105,7 @@ namespace ModernSlavery.Tests.Services.Compare
                     });
 
             // Act
-            testService.SaveComparedEmployersToCookie(null);
+            testPresenter.SaveComparedEmployersToCookie(null);
 
             // Assert
             Assert.IsTrue(AppendWasCalled);

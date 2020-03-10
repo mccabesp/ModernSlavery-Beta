@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GovUkDesignSystem\GovUkDesignSystem.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessLogic.Admin\ModernSlavery.BusinessLogic.Admin.csproj" />
     <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
     <ProjectReference Include="..\ModernSlavery.Entities\ModernSlavery.Entities.csproj" />

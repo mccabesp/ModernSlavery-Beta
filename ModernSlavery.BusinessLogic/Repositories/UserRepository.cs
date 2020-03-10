@@ -8,11 +8,11 @@ using AutoMapper;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.Entities.Enums;
 
-namespace ModernSlavery.BusinessLogic.Account.Repositories
+namespace ModernSlavery.BusinessLogic.Repositories
 {
 
     public class UserRepository : IUserRepository

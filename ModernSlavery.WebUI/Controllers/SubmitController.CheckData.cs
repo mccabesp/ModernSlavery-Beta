@@ -29,7 +29,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
 
         private async Task TryToReloadDraftContent(ReturnViewModel stashedReturnViewModel)
         {
-            Draft availableDraft = await submissionService.GetDraftIfAvailableAsync(
+            Draft availableDraft = await _SubmissionPresenter.GetDraftIfAvailableAsync(
                 stashedReturnViewModel.OrganisationId,
                 stashedReturnViewModel.AccountingDate.Year);
 
@@ -95,12 +95,12 @@ namespace ModernSlavery.WebUI.Controllers.Submission
             if (stashedReturnViewModel.ReportInfo.Draft.HasDraftBeenModifiedDuringThisSession
                 || stashedReturnViewModel.HasDraftWithContent())
             {
-                Return databaseReturn = await submissionService.GetSubmissionByIdAsync(stashedReturnViewModel.ReturnId);
+                Return databaseReturn = await _SubmissionPresenter.GetSubmissionByIdAsync(stashedReturnViewModel.ReturnId);
 
                 if (databaseReturn != null)
                 {
-                    Return stashedReturn = submissionService.CreateDraftSubmissionFromViewModel(stashedReturnViewModel);
-                    SubmissionChangeSummary changeSummary = submissionService.GetSubmissionChangeSummary(stashedReturn, databaseReturn);
+                    Return stashedReturn = _SubmissionPresenter.CreateDraftSubmissionFromViewModel(stashedReturnViewModel);
+                    SubmissionChangeSummary changeSummary = _SubmissionPresenter.GetSubmissionChangeSummary(stashedReturn, databaseReturn);
                     stashedReturnViewModel.IsDifferentFromDatabase = changeSummary.HasChanged;
                     stashedReturnViewModel.ShouldProvideLateReason = changeSummary.ShouldProvideLateReason;
                 }
@@ -109,13 +109,13 @@ namespace ModernSlavery.WebUI.Controllers.Submission
                     // We have some draft info and no DB record, therefore is definitely different
                     stashedReturnViewModel.IsDifferentFromDatabase = true;
                     // Recalculate to know if they're submitting late. This is because it is possible that a draft was created BEFORE the cut-off date ("should provide late reason" would have been marked as 'false') but are completing the submission process AFTER which is when we need them to provide a late reason and the flag is expected to be 'true'.
-                    stashedReturnViewModel.ShouldProvideLateReason = submissionService.IsHistoricSnapshotYear(
+                    stashedReturnViewModel.ShouldProvideLateReason = _SubmissionPresenter.IsHistoricSnapshotYear(
                         stashedReturnViewModel.SectorType,
                         ReportingOrganisationStartYear.Value);
                 }
             }
 
-            if (!submissionService.IsValidSnapshotYear(ReportingOrganisationStartYear.Value))
+            if (!_SubmissionPresenter.IsValidSnapshotYear(ReportingOrganisationStartYear.Value))
             {
                 return new HttpBadRequestResult($"Invalid snapshot year {ReportingOrganisationStartYear.Value}");
             }
@@ -156,13 +156,13 @@ namespace ModernSlavery.WebUI.Controllers.Submission
                     nameof(postedReturnViewModel.JobTitle));
             }
 
-            Return postedReturn = submissionService.CreateDraftSubmissionFromViewModel(postedReturnViewModel);
+            Return postedReturn = _SubmissionPresenter.CreateDraftSubmissionFromViewModel(postedReturnViewModel);
 
             SubmissionChangeSummary changeSummary = null;
-            Return databaseReturn = await submissionService.GetSubmissionByIdAsync(postedReturnViewModel.ReturnId);
+            Return databaseReturn = await _SubmissionPresenter.GetSubmissionByIdAsync(postedReturnViewModel.ReturnId);
             if (databaseReturn != null)
             {
-                changeSummary = submissionService.GetSubmissionChangeSummary(postedReturn, databaseReturn);
+                changeSummary = _SubmissionPresenter.GetSubmissionChangeSummary(postedReturn, databaseReturn);
 
                 if (!changeSummary.HasChanged)
                 {
@@ -210,7 +210,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
 
             organisationFromDatabase.Returns.Add(postedReturn);
 
-            if (submissionService.ShouldUpdateLatestReturn(organisationFromDatabase, ReportingOrganisationStartYear.Value))
+            if (_SubmissionPresenter.ShouldUpdateLatestReturn(organisationFromDatabase, ReportingOrganisationStartYear.Value))
             {
                 organisationFromDatabase.LatestReturn = postedReturn;
             }
@@ -219,7 +219,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
 
             if (!currentUser.EmailAddress.StartsWithI(Global.TestPrefix))
             {
-                await Global.SubmissionLog.WriteAsync(
+                await _SubmissionPresenter.SubmissionService.SubmissionBusinessLogic.SubmissionLog.WriteAsync(
                     new SubmissionLogModel {
                         StatusDate = VirtualDateTime.Now,
                         Status = postedReturn.Status,
@@ -272,18 +272,18 @@ namespace ModernSlavery.WebUI.Controllers.Submission
                 && postedReturn.Organisation.Returns.Count(r => r.AccountingDate == postedReturn.AccountingDate) == 1
                 && !currentUser.EmailAddress.StartsWithI(Global.TestPrefix))
             {
-                await commonBusinessLogic.SendEmailService.SendGeoMessageAsync(
+                await _SubmissionService.CommonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                     "GPG Data Submission Notification",
                     $"GPG data was submitted for first time in {postedReturn.AccountingDate.Year} by '{postedReturn.Organisation.OrganisationName}' on {postedReturn.StatusDate.ToShortDateString()}\n\n See {Url.Action("Report", "Viewing", new {employerIdentifier = postedReturnViewModel.EncryptedOrganisationId, year = postedReturn.AccountingDate.Year}, "https")}",
                     currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
             }
 
-            commonBusinessLogic.NotificationService.SendSuccessfulSubmissionEmailToRegisteredUsers(
+            _SubmissionService.CommonBusinessLogic.NotificationService.SendSuccessfulSubmissionEmailToRegisteredUsers(
                 postedReturn,
                 GetReportLink(postedReturn),
                 GetSubmittedOrUpdated(postedReturn));
 
-            await submissionService.DiscardDraftFileAsync(postedReturnViewModel);
+            await _SubmissionPresenter.DiscardDraftFileAsync(postedReturnViewModel);
 
             return RedirectToAction("SubmissionComplete");
         }

@@ -6,11 +6,14 @@ using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Infrastructure.Message
 {
@@ -20,8 +23,9 @@ namespace ModernSlavery.Infrastructure.Message
 
         public SmtpEmailProvider(IEmailTemplateRepository emailTemplateRepo,
             IOptions<SmtpEmailOptions> smtpEmailOptions,
-            ILogger<SmtpEmailProvider> logger)
-            : base(emailTemplateRepo, logger)
+            ILogger<SmtpEmailProvider> logger,
+            [KeyFilter(Filenames.EmailSendLog)]ILogRecordLogger emailSendLog)
+            : base(emailTemplateRepo, logger, emailSendLog)
         {
             Options = smtpEmailOptions ?? throw new ArgumentNullException(nameof(smtpEmailOptions));
             //TODO ensure smtp config is present (when enabled)

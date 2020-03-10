@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core;
 using ModernSlavery.Core.EmailTemplates;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Infrastructure.Message
 {
@@ -19,7 +22,8 @@ namespace ModernSlavery.Infrastructure.Message
             SmtpEmailProvider smtpEmailProvider,
             IEmailTemplateRepository emailTemplateRepo,
             IOptions<GpgEmailOptions> gpgEmailOptions,
-            ILogger<GpgEmailProvider> logger) : base(emailTemplateRepo, logger)
+            ILogger<GpgEmailProvider> logger, 
+            [KeyFilter(Filenames.EmailSendLog)]ILogRecordLogger emailSendLog) : base(emailTemplateRepo, logger, emailSendLog)
         {
             GovNotifyEmailProvider = govNotifyEmailProvider ?? throw new ArgumentNullException(nameof(govNotifyEmailProvider));
             SmtpEmailProvider = smtpEmailProvider ?? throw new ArgumentNullException(nameof(smtpEmailProvider));
@@ -60,7 +64,7 @@ namespace ModernSlavery.Infrastructure.Message
                     throw new Exception($"Unexpected status '{result.Status}' returned");
                 }
 
-                await Global.EmailSendLog.WriteAsync(
+                await EmailSendLog.WriteAsync(
                     new EmailSendLogModel {
                         Message = "Email successfully sent via GovNotify",
                         Subject = result.EmailSubject,
@@ -97,7 +101,7 @@ namespace ModernSlavery.Infrastructure.Message
             {
                 SendEmailResult result = await SmtpEmailProvider.SendEmailAsync(emailAddress, templateId, model, test);
 
-                await Global.EmailSendLog.WriteAsync(
+                await EmailSendLog.WriteAsync(
                     new EmailSendLogModel {
                         Message = "Email successfully sent via SMTP",
                         Subject = result.EmailSubject,

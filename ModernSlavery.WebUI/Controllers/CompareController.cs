@@ -15,7 +15,6 @@ using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
-using ModernSlavery.WebUI.Classes.Presentation;
 using ModernSlavery.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -23,6 +22,7 @@ using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
+using ModernSlavery.WebUI.Presenters;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -33,8 +33,8 @@ namespace ModernSlavery.WebUI.Controllers
         public CompareController(
             ILogger<CompareController> logger,
             IWebService webService,
-            ISearchViewService searchViewService,
-            ICompareViewService compareViewService,
+            ISearchPresenter searchViewService,
+            IComparePresenter compareViewService,
             IOrganisationBusinessLogic organisationBusinessLogic,
             IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
@@ -432,9 +432,9 @@ namespace ModernSlavery.WebUI.Controllers
 
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
 
-        public ISearchViewService SearchViewService { get; }
+        public ISearchPresenter SearchViewService { get; }
 
-        public ICompareViewService CompareViewService { get; }
+        public IComparePresenter CompareViewService { get; }
 
         #endregion
 

@@ -29,13 +29,15 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
         public void BeforeEach()
         {
             // setup mocks
-            mockDataRepository = MoqHelpers.CreateMockAsyncDataRepository();
+            mockDataRepository = MoqHelpers.CreateMockDataRepository();
 
             var mockedSnapshotDateHelper = Get<ISnapshotDateHelper>();
             var mockedSourceComparer = Get<ISourceComparer>();
             var mockedSendEmailService = Get<ISendEmailService>();
             var mockedNotificationService = Get<INotificationService>();
-            mockCommonBusinessLogic = new CommonBusinessLogic(Config.Configuration, mockedSnapshotDateHelper, mockedSourceComparer, mockedSendEmailService, mockedNotificationService);
+            var mockedFileRepository = Get<IFileRepository>();
+            var mockedDataRepository = Get<IDataRepository>();
+            mockCommonBusinessLogic = new CommonBusinessLogic(mockedSnapshotDateHelper, mockedSourceComparer, mockedSendEmailService, mockedNotificationService,mockedFileRepository,mockedDataRepository);
 
             // sut
             scopeBusinessLogic = new BusinessLogic.ScopeBusinessLogic(

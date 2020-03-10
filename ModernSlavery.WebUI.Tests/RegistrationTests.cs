@@ -1230,7 +1230,7 @@ namespace ModernSlavery.Tests
             controller.Bind(expectedModel);
 
             //insert  some records into the db...
-            controller.PrivateSectorRepository.Insert(
+            controller.RegistrationService.PrivateSectorRepository.Insert(
                 new EmployerRecord {
                     OrganisationName = "acme inc",
                     Address1 = "123",
@@ -1240,7 +1240,7 @@ namespace ModernSlavery.Tests
                     PostCode = "e12 3eq"
                 });
 
-            controller.PrivateSectorRepository.Insert(
+            controller.RegistrationService.PrivateSectorRepository.Insert(
                 new EmployerRecord {
                     OrganisationName = "smith ltd",
                     Address1 = "45",
@@ -1250,7 +1250,7 @@ namespace ModernSlavery.Tests
                     PostCode = "nw1 5re"
                 });
 
-            controller.PrivateSectorRepository.Insert(
+            controller.RegistrationService.PrivateSectorRepository.Insert(
                 new EmployerRecord {
                     OrganisationName = "smith & Wes ltd",
                     Address1 = "45",
@@ -1260,7 +1260,7 @@ namespace ModernSlavery.Tests
                     PostCode = "nw1 5re"
                 });
 
-            controller.PrivateSectorRepository.Insert(
+            controller.RegistrationService.PrivateSectorRepository.Insert(
                 new EmployerRecord {
                     OrganisationName = "smithers and sons ltd",
                     Address1 = "45",
@@ -1270,7 +1270,7 @@ namespace ModernSlavery.Tests
                     PostCode = "nw1 5re"
                 });
 
-            controller.PrivateSectorRepository.Insert(
+            controller.RegistrationService.PrivateSectorRepository.Insert(
                 new EmployerRecord {
                     OrganisationName = "excetera ltd",
                     Address1 = "123",
@@ -1335,15 +1335,15 @@ namespace ModernSlavery.Tests
             controller.Bind(expectedModel);
 
             //insert  some records into the db...
-            controller.PublicSectorRepository.Insert(
+            controller.RegistrationService.PublicSectorRepository.Insert(
                 new EmployerRecord {OrganisationName = "2Gether NHS Foundation Trust", EmailDomains = "nhs.uk"});
-            controller.PublicSectorRepository.Insert(
+            controller.RegistrationService.PublicSectorRepository.Insert(
                 new EmployerRecord {OrganisationName = "5 Boroughs Partnership NHS Foundation Trust", EmailDomains = "nhs.uk"});
-            controller.PublicSectorRepository.Insert(
+            controller.RegistrationService.PublicSectorRepository.Insert(
                 new EmployerRecord {OrganisationName = "Abbots Langley Parish Council", EmailDomains = "abbotslangley-pc.gov.uk"});
-            controller.PublicSectorRepository.Insert(
+            controller.RegistrationService.PublicSectorRepository.Insert(
                 new EmployerRecord {OrganisationName = "Aberdeen City Council", EmailDomains = "aberdeencityandshire-sdpa.gov.uk"});
-            controller.PublicSectorRepository.Insert(
+            controller.RegistrationService.PublicSectorRepository.Insert(
                 new EmployerRecord {OrganisationName = "Aberdeenshire Council", EmailDomains = "aberdeenshire.gov.uk"});
 
             //Stash the object for the unstash to happen in code

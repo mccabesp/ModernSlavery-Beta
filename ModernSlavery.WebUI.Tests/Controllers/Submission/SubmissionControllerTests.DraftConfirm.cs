@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Classes.Services;
 using ModernSlavery.WebUI.Controllers.Submission;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +13,10 @@ using ModernSlavery.SharedKernel;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Autofac;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Submit;
 using ModernSlavery.Infrastructure.File;
+using ModernSlavery.WebUI.Presenters;
+using Moq;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {
@@ -68,15 +69,12 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.Bind(returnViewModel);
 
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var submissionServiceMock = new SubmissionService(
-                null,
-                null,
-                null,
-                new DraftFileBusinessLogic(new SystemFileRepository()),
-                commonBusinessLogic,
-                null);
+            var testDraftFileBL = new DraftFileBusinessLogic(new SystemFileRepository());
+            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
-            returnViewModel.ReportInfo.Draft = await submissionServiceMock.GetDraftFileAsync(
+
+            returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
                 organisation.SectorType.GetAccountingStartDate().Year,
                 user.UserId);
