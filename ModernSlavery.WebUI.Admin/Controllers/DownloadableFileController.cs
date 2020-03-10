@@ -27,8 +27,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public DownloadableFileController(
             ILogger<DownloadableFileController> logger,
             IWebService webService,
-            IDataRepository dataRepository,
-            IDownloadableFileBusinessLogic downloadableFileBusinessLogic) : base(logger, webService, dataRepository)
+            IDownloadableFileBusinessLogic downloadableFileBusinessLogic,
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
             _downloadableFileBusinessLogic = downloadableFileBusinessLogic;
         }

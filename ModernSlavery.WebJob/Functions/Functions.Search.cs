@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
@@ -12,6 +11,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebJob
@@ -39,17 +39,17 @@ namespace ModernSlavery.WebJob
 
         private async Task UpdateAllSearchIndexesAsync(ILogger log, string userEmail = null, bool force = false)
         {
-            log.LogInformation($"-- Started the updating of index {Global.SearchIndexName}");
-            await UpdateSearchAsync(log, Global.SearchRepository, Global.SearchIndexName, userEmail, force);
-            log.LogInformation($"-- Updating of index {Global.SearchIndexName} completed");
-            log.LogInformation($"-- Started the updating of index {Global.SicCodesIndexName}");
-            await UpdateSearchAsync(log, Global.SicCodeSearchRepository, Global.SicCodesIndexName, userEmail, force);
-            log.LogInformation($"-- Updating of index {Global.SicCodesIndexName} completed");
+            log.LogInformation($"-- Started the updating of index {_EmployerSearchRepository.IndexName}");
+            await UpdateSearchAsync(log, _EmployerSearchRepository, _EmployerSearchRepository.IndexName, userEmail, force);
+            log.LogInformation($"-- Updating of index {_EmployerSearchRepository.IndexName} completed");
+            log.LogInformation($"-- Started the updating of index {_SicCodeSearchRepository.IndexName}");
+            await UpdateSearchAsync(log, _SicCodeSearchRepository, _SicCodeSearchRepository.IndexName, userEmail, force);
+            log.LogInformation($"-- Updating of index {_SicCodeSearchRepository.IndexName} completed");
         }
 
         public async Task UpdateSearchAsync(ILogger log, string userEmail = null, bool force = false)
         {
-            await UpdateSearchAsync(log, Global.SearchRepository, Global.SearchIndexName, userEmail, force);
+            await UpdateSearchAsync(log, _EmployerSearchRepository, _EmployerSearchRepository.IndexName, userEmail, force);
         }
 
         private async Task UpdateSearchAsync<T>(ILogger log,
@@ -108,16 +108,16 @@ namespace ModernSlavery.WebJob
 
             if (listOfSicCodeRecords == null || !listOfSicCodeRecords.Any())
             {
-                log.LogInformation($"No records to be added to index {Global.SicCodesIndexName}");
+                log.LogInformation($"No records to be added to index {_SicCodeSearchRepository.IndexName}");
                 return;
             }
 
-            await Global.SicCodeSearchRepository.RefreshIndexDataAsync(listOfSicCodeRecords);
+            await _SicCodeSearchRepository.RefreshIndexDataAsync(listOfSicCodeRecords);
         }
 
         private async Task AddDataToIndexAsync(ILogger log)
         {
-            IQueryable<Organisation> allOrgs = _DataRepository.GetAll<Organisation>();
+            IQueryable<Organisation> allOrgs = DataRepository.GetAll<Organisation>();
             List<Organisation> allOrgsList = await allOrgs.ToListAsync();
 
             //Remove the test organisations
@@ -126,7 +126,7 @@ namespace ModernSlavery.WebJob
                 allOrgsList.RemoveAll(o => o.OrganisationName.StartsWithI(Global.TestPrefix));
             }
 
-            IEnumerable<Organisation> lookupResult = _SearchBusinessLogic.LookupSearchableOrganisations(allOrgsList);
+            IEnumerable<Organisation> lookupResult = SearchBusinessLogic.LookupSearchableOrganisations(allOrgsList);
             if (Debugger.IsAttached) lookupResult = lookupResult.Take(100);
             List<SicCodeSearchModel> listOfSicCodeRecords = await GetListOfSicCodeSearchModelsFromFileAsync(log);
             IEnumerable<EmployerSearchModel> selection = lookupResult.Select(o => EmployerSearchModel.Create(o, false, listOfSicCodeRecords));
@@ -134,24 +134,24 @@ namespace ModernSlavery.WebJob
 
             if (selectionList.Any())
             {
-                await Global.SearchRepository.RefreshIndexDataAsync(selectionList);
+                await _EmployerSearchRepository.RefreshIndexDataAsync(selectionList);
             }
         }
 
-        private static async Task<List<SicCodeSearchModel>> GetListOfSicCodeSearchModelsFromFileAsync(ILogger log)
+        private async Task<List<SicCodeSearchModel>> GetListOfSicCodeSearchModelsFromFileAsync(ILogger log)
         {
             List<SicCodeSearchModel> listOfSicCodeRecords = null;
 
             try
             {
-                IEnumerable<string> files = await Global.FileRepository.GetFilesAsync(Global.DataPath, Filenames.SicSectorSynonyms);
+                IEnumerable<string> files = await FileRepository.GetFilesAsync(Global.DataPath, Filenames.SicSectorSynonyms);
                 string sicSectorSynonymsFilePath = files.OrderByDescending(f => f).FirstOrDefault();
 
                 #region Pattern
 
-                string rootDirMightIndicateCurrentLocation = string.IsNullOrEmpty(Global.FileRepository.RootDir)
+                string rootDirMightIndicateCurrentLocation = string.IsNullOrEmpty(FileRepository.RootDir)
                     ? "root"
-                    : $"path {Global.FileRepository.RootDir}";
+                    : $"path {FileRepository.RootDir}";
                 string fileInPathMessage = $"pattern {Filenames.SicSectorSynonyms} in {rootDirMightIndicateCurrentLocation}.";
                 if (string.IsNullOrEmpty(sicSectorSynonymsFilePath))
                 {
@@ -166,7 +166,7 @@ namespace ModernSlavery.WebJob
 
                 #region File exist
 
-                bool fileExists = await Global.FileRepository.GetFileExistsAsync(sicSectorSynonymsFilePath);
+                bool fileExists = await FileRepository.GetFileExistsAsync(sicSectorSynonymsFilePath);
                 if (!fileExists)
                 {
                     string fileDoesNotExistMessage = $"File does not exist {sicSectorSynonymsFilePath}.";
@@ -178,7 +178,7 @@ namespace ModernSlavery.WebJob
 
                 #endregion
 
-                List<SicCodeSearchModel> csv = await Global.FileRepository.ReadCSVAsync<SicCodeSearchModel>(sicSectorSynonymsFilePath);
+                List<SicCodeSearchModel> csv = await FileRepository.ReadCSVAsync<SicCodeSearchModel>(sicSectorSynonymsFilePath);
 
                 listOfSicCodeRecords = csv.OrderBy(o => o.SicCodeId).ToList();
 

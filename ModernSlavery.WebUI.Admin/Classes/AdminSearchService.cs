@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
@@ -29,13 +28,15 @@ namespace ModernSlavery.WebUI.Admin.Classes
 
     public class AdminSearchService
     {
-        public AdminSearchService(IDataRepository dataRepository)
+        public AdminSearchService(ICustomLogger customLogger, IDataRepository dataRepository)
         {
+            this.CustomLogger = customLogger;
             this.dataRepository = dataRepository;
             EnsureCacheUpdated();
         }
 
         private readonly IDataRepository dataRepository;
+        private readonly ICustomLogger CustomLogger;
 
         private object cacheLock=new object();
         private DateTime cacheLastUpdated = DateTime.MinValue;

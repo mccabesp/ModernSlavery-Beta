@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ModernSlavery.Infrastructure.Queue
+namespace ModernSlavery.Core.Classes
 {
     public class QueueWrapper
     {

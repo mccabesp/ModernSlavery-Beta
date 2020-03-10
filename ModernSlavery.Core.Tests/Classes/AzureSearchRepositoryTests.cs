@@ -1,5 +1,6 @@
 ﻿using System;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Infrastructure.Search;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Classes
@@ -17,9 +18,10 @@ namespace ModernSlavery.Core.Tests.Classes
         {
             // Arrange
             string nullTestServiceName = null;
+            string nullTestIndexName = null;
 
             // Act
-            TestDelegate testDelegate = () => new AzureSearchRepository(nullTestServiceName);
+            TestDelegate testDelegate = () => new AzureEmployerSearchRepository(nullTestServiceName, nullTestIndexName);
 
             // Assert
             Assert.That(

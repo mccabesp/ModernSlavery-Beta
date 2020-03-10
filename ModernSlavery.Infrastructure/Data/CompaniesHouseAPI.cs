@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.CompaniesHouse;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.Message;
 using Newtonsoft.Json;
 using Polly;
 using Polly.Extensions.Http;
@@ -18,12 +21,16 @@ namespace ModernSlavery.Infrastructure
     public class CompaniesHouseAPI : ICompaniesHouseAPI
     {
 
-        public CompaniesHouseAPI(string apiUrl, string apiKey, int maxRecords=400)
+        public CompaniesHouseAPI(IOptions<CompaniesHouseOptions> options)
         {
-            BaseUri = new Uri(apiUrl);
-            _apiKey = apiKey;
-            MaxRecords = maxRecords;
+            Options = options?.Value ?? throw new ArgumentNullException("You must provide the companies house options", nameof(CompaniesHouseOptions));
+
+            BaseUri = new Uri(Options.ApiServer);
+            _apiKey = Options.ApiKey;
+            MaxRecords = Options.MaxRecords;
         }
+
+        private readonly CompaniesHouseOptions Options;
         private readonly Uri BaseUri;
         private readonly string _apiKey;
         public int MaxRecords { get; }
@@ -300,12 +307,12 @@ namespace ModernSlavery.Infrastructure
             return json;
         }
 
-        public void SetupHttpClient(HttpClient httpClient)
+        public static void SetupHttpClient(HttpClient httpClient, string apiServer, string apiKey)
         {
-            httpClient.BaseAddress = BaseUri;
+            httpClient.BaseAddress = new Uri(apiServer);
 
             httpClient.DefaultRequestHeaders.Clear();
-            httpClient.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(_apiKey, "");
+            httpClient.DefaultRequestHeaders.Authorization = new BasicAuthenticationHeaderValue(apiKey, "");
             httpClient.DefaultRequestHeaders.ConnectionClose = false;
             ServicePointManager.FindServicePoint(httpClient.BaseAddress).ConnectionLeaseTimeout = 60 * 1000;
         }

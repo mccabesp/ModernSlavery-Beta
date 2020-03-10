@@ -6,64 +6,78 @@ using ModernSlavery.Core.Models.CompaniesHouse;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
+using ModernSlavery.Infrastructure;
+using ModernSlavery.Infrastructure.Logging;
 
 namespace ModernSlavery.BusinessLogic.Services
 {
-    public class UpdateFromCompaniesHouseService
+    public interface IUpdateFromCompaniesHouseService
+    {
+        OrganisationAddress CreateOrganisationAddressFromCompaniesHouseAddress(CompaniesHouseAddress companiesHouseAddress);
+        bool IsCompanyNameEqual(OrganisationName organisationName, string companyName);
+
+        bool AddressMatches(OrganisationAddress firstOrganisationAddress,OrganisationAddress secondOrganisationAddress);
+        bool SicCodesEqual(IEnumerable<OrganisationSicCode> sicCodes, IEnumerable<string> companiesHouseSicCodes);
+
+    }
+    public class UpdateFromCompaniesHouseService: IUpdateFromCompaniesHouseService
     {
 
         private const string SourceOfChange = "CoHo";
         private const string DetailsOfChange = "Replaced by CoHo";
 
+        private readonly ICustomLogger _CustomLogger;
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
         private readonly IDataRepository _DataRepository;
-
-        public UpdateFromCompaniesHouseService(IDataRepository dataRepository, ICompaniesHouseAPI companiesHouseAPI)
+        private readonly IPostcodeChecker _PostcodeChecker;
+        public UpdateFromCompaniesHouseService(ICustomLogger customLogger, IDataRepository dataRepository, ICompaniesHouseAPI companiesHouseAPI, IPostcodeChecker postcodeChecker)
         {
+            _CustomLogger = customLogger;
             _DataRepository = dataRepository;
             _CompaniesHouseAPI = companiesHouseAPI;
+            _PostcodeChecker = postcodeChecker;
         }
 
         public void UpdateOrganisationDetails(long organisationId)
         {
-            CustomLogger.Debug($"Loading organisation - OrganisationId({organisationId})");
+            _CustomLogger.Debug($"Loading organisation - OrganisationId({organisationId})");
             var organisation = _DataRepository.Get<Organisation>(organisationId);
 
-            CustomLogger.Debug($"Updating LastCheckedAgainstCompaniesHouse - OrganisationId({organisationId})");
+            _CustomLogger.Debug($"Updating LastCheckedAgainstCompaniesHouse - OrganisationId({organisationId})");
             organisation.LastCheckedAgainstCompaniesHouse = VirtualDateTime.Now;
             _DataRepository.SaveChangesAsync().Wait();
 
             try
             {
-                CustomLogger.Debug($"Calling CoHo API - OrganisationId({organisationId})");
+                _CustomLogger.Debug($"Calling CoHo API - OrganisationId({organisationId})");
                 CompaniesHouseCompany organisationFromCompaniesHouse =
                     _CompaniesHouseAPI.GetCompanyAsync(organisation.CompanyNumber).Result;
 
-                CustomLogger.Debug($"Starting transaction - OrganisationId({organisationId})");
+                _CustomLogger.Debug($"Starting transaction - OrganisationId({organisationId})");
                 _DataRepository.BeginTransactionAsync(
                         async () => {
                             try
                             {
-                                CustomLogger.Debug($"Updating SIC codes - OrganisationId({organisationId})");
+                                _CustomLogger.Debug($"Updating SIC codes - OrganisationId({organisationId})");
                                 UpdateSicCode(organisation, organisationFromCompaniesHouse);
 
-                                CustomLogger.Debug($"Updating Address - OrganisationId({organisationId})");
+                                _CustomLogger.Debug($"Updating Address - OrganisationId({organisationId})");
                                 UpdateAddress(organisation, organisationFromCompaniesHouse);
 
-                                CustomLogger.Debug($"Updating Name - OrganisationId({organisationId})");
+                                _CustomLogger.Debug($"Updating Name - OrganisationId({organisationId})");
                                 UpdateName(organisation, organisationFromCompaniesHouse);
 
-                                CustomLogger.Debug($"Saving - OrganisationId({organisationId})");
+                                _CustomLogger.Debug($"Saving - OrganisationId({organisationId})");
                                 _DataRepository.SaveChangesAsync().Wait();
                                 _DataRepository.CommitTransaction();
 
-                                CustomLogger.Debug($"Saved - OrganisationId({organisationId})");
+                                _CustomLogger.Debug($"Saved - OrganisationId({organisationId})");
                             }
                             catch (Exception ex)
                             {
                                 string message =
                                     $"Update from Companies House: Failed to update database, organisation id = {organisationId}";
-                                CustomLogger.Error(message, ex);
+                                _CustomLogger.Error(message, ex);
                                 _DataRepository.RollbackTransaction();
                             }
                         })
@@ -73,7 +87,7 @@ namespace ModernSlavery.BusinessLogic.Services
             {
                 string message =
                     $"Update from Companies House: Failed to get company data from companies house, organisation id = {organisationId}";
-                CustomLogger.Error(message, ex);
+                _CustomLogger.Error(message, ex);
             }
         }
 
@@ -142,7 +156,7 @@ namespace ModernSlavery.BusinessLogic.Services
             _DataRepository.Insert(newOrganisationAddressFromCompaniesHouse);
         }
 
-        private static bool IsNewOrganisationAddressNullOrEmpty(OrganisationAddress address)
+        private bool IsNewOrganisationAddressNullOrEmpty(OrganisationAddress address)
         {
             // Some organisations are not required to provide information to Companies House, and so we might get an empty
             // address. See https://wck2.companieshouse.gov.uk/goWCK/help/en/stdwc/excl_ch.html for more details. In other cases
@@ -164,11 +178,11 @@ namespace ModernSlavery.BusinessLogic.Services
             return false;
         }
 
-        public static OrganisationAddress CreateOrganisationAddressFromCompaniesHouseAddress(CompaniesHouseAddress companiesHouseAddress)
+        public OrganisationAddress CreateOrganisationAddressFromCompaniesHouseAddress(CompaniesHouseAddress companiesHouseAddress)
         {
             string premisesAndLine1 = GetAddressLineFromPremisesAndAddressLine1(companiesHouseAddress);
             bool? isUkAddress = null;
-            if (PostcodesIoApi.IsValidPostcode(companiesHouseAddress?.PostalCode).Result)
+            if (_PostcodeChecker.IsValidPostcode(companiesHouseAddress?.PostalCode).Result)
             {
                 isUkAddress = true;
             }
@@ -193,14 +207,14 @@ namespace ModernSlavery.BusinessLogic.Services
             };
         }
 
-        private static string GetAddressLineFromPremisesAndAddressLine1(CompaniesHouseAddress companiesHouseAddress)
+        private string GetAddressLineFromPremisesAndAddressLine1(CompaniesHouseAddress companiesHouseAddress)
         {
             return companiesHouseAddress?.Premises == null
                 ? companiesHouseAddress?.AddressLine1
                 : companiesHouseAddress?.Premises + "," + companiesHouseAddress?.AddressLine1;
         }
 
-        public static bool AddressMatches(OrganisationAddress firstOrganisationAddress, OrganisationAddress secondOrganisationAddress)
+        public bool AddressMatches(OrganisationAddress firstOrganisationAddress, OrganisationAddress secondOrganisationAddress)
         {
             return string.Equals(
                        firstOrganisationAddress.Address1,
@@ -254,7 +268,7 @@ namespace ModernSlavery.BusinessLogic.Services
             _DataRepository.Insert(nameToAdd);
         }
 
-        public static bool IsCompanyNameEqual(OrganisationName organisationName, string companyName)
+        public bool IsCompanyNameEqual(OrganisationName organisationName, string companyName)
         {
             return string.Equals(
                 organisationName.Name,
@@ -262,7 +276,7 @@ namespace ModernSlavery.BusinessLogic.Services
                 StringComparison.Ordinal);
         }
 
-        private static string FirstHundredChars(string str)
+        private string FirstHundredChars(string str)
         {
             if (str == null)
             {
@@ -272,7 +286,7 @@ namespace ModernSlavery.BusinessLogic.Services
             return str.Substring(0, Math.Min(str.Length, 100));
         }
 
-        public static bool SicCodesEqual(IEnumerable<OrganisationSicCode> sicCodes, IEnumerable<string> companiesHouseSicCodes)
+        public bool SicCodesEqual(IEnumerable<OrganisationSicCode> sicCodes, IEnumerable<string> companiesHouseSicCodes)
         {
             return new HashSet<int>(sicCodes.Select(sic => sic.SicCodeId)).SetEquals(companiesHouseSicCodes.Select(sic => int.Parse(sic)));
         }

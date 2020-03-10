@@ -1,7 +1,7 @@
-﻿namespace ModernSlavery.Infrastructure.Message.EmailTemplates
+﻿namespace ModernSlavery.Core.EmailTemplates
 {
 
-    public class GeoOrganisationRegistrationRequestTemplate : AEmailTemplate
+    public class GeoOrganisationRegistrationRequestTemplate : EmailTemplate
     {
 
         public string Name { get; set; }

@@ -41,8 +41,7 @@ namespace ModernSlavery.WebUI.Admin
                 await repository.CreateDirectoryAsync(dataPath);
             }
 
-            IDbContext context = dataRepository.GetDbContext();
-            DbSet<SicSection> sicSections = context.Set<SicSection>();
+            var sicSections = dataRepository.GetAll<SicSection>();
             if (force || !sicSections.Any())
             {
                 List<SicSection> sectionRecords = await repository.ReadCSVAsync<SicSection>(sectionsPath);
@@ -51,10 +50,10 @@ namespace ModernSlavery.WebUI.Admin
                     throw new Exception($"No records found in {sectionsPath}");
                 }
 
-                sicSections.UpsertRange(sectionRecords);
+                //sicSections.UpsertRange(sectionRecords);
             }
 
-            await context.SaveChangesAsync();
+            await dataRepository.SaveChangesAsync();
         }
 
         public static async Task Update_SICCodesAsync(IDataRepository dataRepository,
@@ -79,9 +78,7 @@ namespace ModernSlavery.WebUI.Admin
                 await repository.CreateDirectoryAsync(dataPath);
             }
 
-            IDbContext context = dataRepository.GetDbContext();
             List<SicCode> sicCodes = await dataRepository.GetAll<SicCode>().ToListAsync();
-            DbSet<SicCode> dset = context.Set<SicCode>();
             DateTime created = VirtualDateTime.Now;
             if (force || !sicCodes.Any())
             {
@@ -104,10 +101,10 @@ namespace ModernSlavery.WebUI.Admin
 
                         code.Created = created;
                     });
-                dset.UpsertRange(codeRecords);
+                //dset.UpsertRange(codeRecords);
             }
 
-            await context.SaveChangesAsync();
+            await dataRepository.SaveChangesAsync();
         }
 
     }

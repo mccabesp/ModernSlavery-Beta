@@ -14,6 +14,8 @@ using ModernSlavery.WebUI.Classes.Presentation;
 using ModernSlavery.WebUI.Models.Search;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
+using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.Search;
 using Moq;
 using ModernSlavery.SharedKernel;
 
@@ -26,18 +28,16 @@ namespace ModernSlavery.Integration.Tests
     public class AzureSearchTests
     {
 
-        private readonly AzureSearchRepository _azureSearchRepo;
+        private readonly AzureEmployerSearchRepository _azureSearchRepo;
 
         public AzureSearchTests()
         {
-            Global.FileRepository = Mock.Of<IFileRepository>();
-
             SetupHelpers.SetupMockLogRecordGlobals();
 
             string azureSearchServiceName = Config.GetAppSetting("SearchService:ServiceName");
             string azureSearchAdminApiKey = Config.GetAppSetting("SearchService:AdminApiKey");
             //_azureSearchRepo = new AzureSearchRepository(azureSearchServiceName, azureSearchAdminApiKey, null, Global.AppInsightsClient);
-            _azureSearchRepo = new AzureSearchRepository(azureSearchServiceName, azureSearchAdminApiKey);
+            _azureSearchRepo = new AzureEmployerSearchRepository(azureSearchServiceName, azureSearchAdminApiKey);
         }
 
         /* Tests that fail if PartialNameForSuffixSearches is missing */
@@ -123,7 +123,7 @@ namespace ModernSlavery.Integration.Tests
 
             var mockedSearchParameters =
                 Mock.Of<EmployerSearchParameters>(
-                    x => x.Keywords == searchKeyWords && x.Page == 1 && x.SearchType == SearchType.ByEmployerName);
+                    x => x.Keywords == searchKeyWords && x.Page == 1 && x.SearchType == SearchTypes.ByEmployerName);
 
             // Act
             SearchViewModel result = await viewingService.SearchAsync(mockedSearchParameters);
@@ -161,7 +161,7 @@ namespace ModernSlavery.Integration.Tests
             // Arrange
             Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockAsyncDataRepository();
 
-            const SearchType searchBy = SearchType.ByEmployerName;
+            const SearchTypes searchBy = SearchTypes.ByEmployerName;
             var viewingService = new ViewingService(
                 mockDataRepo.Object,
                 _azureSearchRepo,
@@ -191,7 +191,7 @@ namespace ModernSlavery.Integration.Tests
             // Arrange
             Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockAsyncDataRepository();
 
-            const SearchType searchType = SearchType.BySectorType;
+            const SearchTypes searchType = SearchTypes.BySectorType;
             var viewingService = new ViewingService(
                 mockDataRepo.Object,
                 _azureSearchRepo,
@@ -229,7 +229,7 @@ namespace ModernSlavery.Integration.Tests
 
             var mockedSearchParameters =
                 Mock.Of<EmployerSearchParameters>(
-                    x => x.Keywords == searchKeyWords && x.Page == 1 && x.SearchType == SearchType.ByEmployerName);
+                    x => x.Keywords == searchKeyWords && x.Page == 1 && x.SearchType == SearchTypes.ByEmployerName);
 
             // Act
             SearchViewModel result = await viewingService.SearchAsync(mockedSearchParameters);
@@ -253,13 +253,14 @@ namespace ModernSlavery.Integration.Tests
         {
             // Arrange
             string sicCodeSearchServiceName = Config.GetAppSetting("SearchService:ServiceName");
+            string sicCodeSearchIndexName = Config.GetAppSetting("SearchService:SicCodeIndexName");
             string sicCodeSearchAdminApiKey = Config.GetAppSetting("SearchService:AdminApiKey");
 
             var sicCodeSearchServiceClient = new SearchServiceClient(
                 sicCodeSearchServiceName,
                 new SearchCredentials(sicCodeSearchAdminApiKey));
 
-            var sicCodeSearchIndexClient = new SicCodeSearchRepository(sicCodeSearchServiceClient);
+            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(sicCodeSearchServiceClient,sicCodeSearchIndexName);
 
             var viewingService = new ViewingService(
                 Mock.Of<IDataRepository>(),
@@ -294,13 +295,14 @@ namespace ModernSlavery.Integration.Tests
         {
             // Arrange
             string sicCodeSearchServiceName = Config.GetAppSetting("SearchService:ServiceName");
+            string sicCodeSearchIndexName = Config.GetAppSetting("SearchService:SicCodeIndexName");
             string sicCodeSearchAdminApiKey = Config.GetAppSetting("SearchService:AdminApiKey");
 
             var sicCodeSearchServiceClient = new SearchServiceClient(
                 sicCodeSearchServiceName,
                 new SearchCredentials(sicCodeSearchAdminApiKey));
 
-            var sicCodeSearchIndexClient = new SicCodeSearchRepository(sicCodeSearchServiceClient);
+            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(sicCodeSearchServiceClient, sicCodeSearchIndexName);
 
             Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockAsyncDataRepository();
 
@@ -325,8 +327,8 @@ namespace ModernSlavery.Integration.Tests
                                 && searchParam.Page == 1
                                 && searchParam.PageSize == 3000
                                 && searchParam.SearchFields == $"{nameof(EmployerSearchModel.SicCodeIds)}"
-                                && searchParam.SearchType == SearchType.ByEmployerName
-                                && searchParam.SearchMode == SearchMode.All);
+                                && searchParam.SearchType == SearchTypes.ByEmployerName
+                                && searchParam.SearchMode == SearchModes.All);
                     });
 
             var listOfEmployerSearchModel = new List<EmployerSearchModel>();
@@ -352,8 +354,8 @@ namespace ModernSlavery.Integration.Tests
                          && x.Page == 1
                          && x.PageSize == 3000
                          && x.SearchFields == $"{nameof(EmployerSearchModel.SicCodeIds)}"
-                         && x.SearchType == SearchType.ByEmployerName
-                         && x.SearchMode == SearchMode.All);
+                         && x.SearchType == SearchTypes.ByEmployerName
+                         && x.SearchMode == SearchModes.All);
 
             // Act
             SearchViewModel keywordSearchResultSearchViewModel = await viewingService.SearchAsync(mockedSearchParameters);

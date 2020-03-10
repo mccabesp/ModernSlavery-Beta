@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Shared.Abstractions
 {

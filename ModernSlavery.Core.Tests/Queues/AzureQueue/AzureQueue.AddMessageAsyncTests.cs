@@ -16,12 +16,12 @@ namespace ModernSlavery.Core.Tests.AzureQueue
         [SetUp]
         public void BeforeEach()
         {
-            testAzureQueue = new Core.Classes.Queues.AzureQueue(testConnectionString, testQueueName);
+            testAzureQueue = new Infrastructure.Queue.AzureQueue(testConnectionString, testQueueName);
         }
 
         private readonly string testConnectionString = "LogEventUnitTests";
         private readonly string testQueueName = "LogEventUnitTests";
-        private Core.Classes.Queues.AzureQueue testAzureQueue;
+        private Infrastructure.Queue.AzureQueue testAzureQueue;
 
         [TestCase]
         public void ThrowsWhenInstanceIsNull()
@@ -78,7 +78,7 @@ namespace ModernSlavery.Core.Tests.AzureQueue
             var WriteAsyncAsyncWasCalled = false;
             var mockFileRepo = new Mock<IFileRepository>();
             var testLargeMessage = new string('a', 66000);
-            testAzureQueue = new Core.Classes.Queues.AzureQueue(testConnectionString, testQueueName, mockFileRepo.Object);
+            testAzureQueue = new Infrastructure.Queue.AzureQueue(testConnectionString, testQueueName, mockFileRepo.Object);
 
             mockFileRepo.Setup(f => f.WriteAsync(It.IsAny<string>(), It.IsAny<byte[]>()))
                 .Callback(

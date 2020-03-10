@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebJob
@@ -93,7 +93,7 @@ namespace ModernSlavery.WebJob
                     filePath = Path.Combine(path, filePath);
                 }
 
-                await Global.FileRepository.SaveCSVAsync(records, filePath);
+                await FileRepository.SaveCSVAsync(records, filePath);
             }
         }
 
@@ -112,7 +112,7 @@ namespace ModernSlavery.WebJob
                 filePath = Path.Combine(path, filePath);
             }
 
-            await Global.FileRepository.SaveCSVAsync(records, filePath);
+            await FileRepository.SaveCSVAsync(records, filePath);
         }
 
     }

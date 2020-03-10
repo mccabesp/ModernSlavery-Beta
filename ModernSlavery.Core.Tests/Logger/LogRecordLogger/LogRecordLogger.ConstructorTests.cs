@@ -13,10 +13,10 @@ namespace ModernSlavery.Core.Tests.LogRecordLogger
         [SetUp]
         public void BeforeEach()
         {
-            mockQueue = new Mock<Core.Classes.Queues.AzureQueue>("TestConnectionString", "TestQueueName") {CallBase = true};
+            mockQueue = new Mock<Infrastructure.Queue.AzureQueue>("TestConnectionString", "TestQueueName") {CallBase = true};
         }
 
-        private Mock<Core.Classes.Queues.AzureQueue> mockQueue;
+        private Mock<Infrastructure.Queue.AzureQueue> mockQueue;
 
         [TestCase("")]
         [TestCase("  ")]
@@ -25,7 +25,7 @@ namespace ModernSlavery.Core.Tests.LogRecordLogger
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Core.Classes.LogRecordLogger(mockQueue.Object, testAppName, "TestFilename"));
+                () => new Infrastructure.Logging.LogRecordLogger(mockQueue.Object, testAppName, "TestFilename"));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: applicationName", actualExpection.Message);
@@ -38,7 +38,7 @@ namespace ModernSlavery.Core.Tests.LogRecordLogger
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Core.Classes.LogRecordLogger(mockQueue.Object, "TestAppName", testFilename));
+                () => new Infrastructure.Logging.LogRecordLogger(mockQueue.Object, "TestAppName", testFilename));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: fileName", actualExpection.Message);
@@ -49,7 +49,7 @@ namespace ModernSlavery.Core.Tests.LogRecordLogger
         {
             // Act
             var actualExpection =
-                Assert.Throws<ArgumentNullException>(() => new Core.Classes.LogRecordLogger(null, "TestAppName", "TestFilename"));
+                Assert.Throws<ArgumentNullException>(() => new Infrastructure.Logging.LogRecordLogger(null, "TestAppName", "TestFilename"));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: queue", actualExpection.Message);

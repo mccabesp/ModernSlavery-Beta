@@ -8,18 +8,14 @@ using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Account.Repositories;
-using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.BusinessLogic.Repositories;
 using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
-using ModernSlavery.Core.API;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Classes.Queues;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.Infrastructure.AzureQueues.Extensions;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewServices;
 using ModernSlavery.WebUI.Classes;
@@ -48,6 +44,15 @@ using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.Database;
+using ModernSlavery.Infrastructure;
+using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.File;
+using ModernSlavery.Infrastructure.Logging;
+using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.Infrastructure.Queue;
+using ModernSlavery.Infrastructure.Search;
+using ModernSlavery.Infrastructure.Telemetry;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI
 {
@@ -91,7 +96,15 @@ namespace ModernSlavery.WebUI
                 .AddPolicyHandler(GoogleAnalyticsTracker.GetRetryPolicy());
 
             //Add a dedicated httpclient for Companies house API with exponential retry policy
-            services.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI), CompaniesHouseAPI.SetupHttpClient)
+            var coHoOptions = new CompaniesHouseOptions();
+            Config.Configuration.Bind("CompaniesHouse", coHoOptions);
+
+            //Add a dedicated httpClient for Companies house API with exponential retry policy
+
+            services.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI), (httpClient) =>
+                {
+                    CompaniesHouseAPI.SetupHttpClient(httpClient, coHoOptions.ApiServer, coHoOptions.ApiKey);
+                })
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10))
                 .AddPolicyHandler(CompaniesHouseAPI.GetRetryPolicy());
 
@@ -270,14 +283,14 @@ namespace ModernSlavery.WebUI
                 .As<ISearchServiceClient>()
                 .SingleInstance();
 
-            builder.RegisterType<AzureSearchRepository>()
+            builder.RegisterType<AzureEmployerSearchRepository>()
                 .As<ISearchRepository<EmployerSearchModel>>()
                 .SingleInstance()
                 .WithParameter("serviceName", azureSearchServiceName)
                 .WithParameter("adminApiKey", azureSearchAdminKey)
                 .WithParameter("disabled", azureSearchDisabled);
 
-            builder.RegisterType<SicCodeSearchRepository>()
+            builder.RegisterType<AzureEmployerSearchRepository>()
                 .As<ISearchRepository<SicCodeSearchModel>>()
                 .SingleInstance()
                 .WithParameter("disabled", azureSearchDisabled);

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NUnit.Framework;
 using ModernSlavery.Database;
+using ModernSlavery.Infrastructure.Data;
 
 namespace ModernSlavery.Tests.Common.Classes
 {

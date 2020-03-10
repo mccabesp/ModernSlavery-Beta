@@ -15,10 +15,10 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
         [SetUp]
         public void BeforeEach()
         {
-            mockQueue = new Mock<Core.Classes.Queues.AzureQueue>("TestConnectionString", "TestQueueName") {CallBase = true};
+            mockQueue = new Mock<Infrastructure.Queue.AzureQueue>("TestConnectionString", "TestQueueName") {CallBase = true};
         }
 
-        private Mock<Core.Classes.Queues.AzureQueue> mockQueue;
+        private Mock<Infrastructure.Queue.AzureQueue> mockQueue;
 
         [TestCase("")]
         [TestCase("  ")]
@@ -27,7 +27,7 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
         {
             // Act
             var actualExpection =
-                Assert.Throws<ArgumentNullException>(() => new Core.Classes.LogEventLoggerProvider(mockQueue.Object, testAppName, null));
+                Assert.Throws<ArgumentNullException>(() => new Infrastructure.Logging.LogEventLoggerProvider(mockQueue.Object, testAppName, null));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: applicationName", actualExpection.Message);
@@ -38,7 +38,7 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Core.Classes.LogEventLoggerProvider(null, "TestApplicationName", Options.Create(new LoggerFilterOptions())));
+                () => new Infrastructure.Logging.LogEventLoggerProvider(null, "TestApplicationName", Options.Create(new LoggerFilterOptions())));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: queue", actualExpection.Message);

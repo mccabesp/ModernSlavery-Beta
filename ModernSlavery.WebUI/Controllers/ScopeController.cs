@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Controllers
             IWebService webService,
             IScopePresentation scopeUI,
             ICommonBusinessLogic commonBusinessLogic,
-            IDataRepository dataRepository) : base(logger, webService, dataRepository)
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
             _commonBusinessLogic = commonBusinessLogic;
             ScopePresentation = scopeUI;

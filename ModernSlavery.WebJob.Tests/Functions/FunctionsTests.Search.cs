@@ -57,7 +57,7 @@ namespace ModernSlavery.WebJob.Tests.Functions
         {
             //ARRANGE
             //Ensure all orgs are in scope for current year
-            IEnumerable<Organisation> orgs = _functions._DataRepository.GetAll<Organisation>();
+            IEnumerable<Organisation> orgs = _functions.DataRepository.GetAll<Organisation>();
 
             //Add a random number of in scope orgs
             int inScope = Numeric.Rand(1, orgs.Count());
@@ -83,11 +83,11 @@ namespace ModernSlavery.WebJob.Tests.Functions
             //ASSERT
 
             //Check for correct number of indexes
-            long documentCount = await Global.SearchRepository.GetDocumentCountAsync();
+            long documentCount = await _functions.SearchBusinessLogic.SearchRepository.GetDocumentCountAsync();
             Assert.That(documentCount == orgs.Count(), $"Expected '{documentCount}' indexes ");
 
             //Get the actual results
-            IList<EmployerSearchModel> actualResults = await Global.SearchRepository.ListAsync();
+            IList<EmployerSearchModel> actualResults = await _functions.SearchBusinessLogic.SearchRepository.ListAsync();
 
             //Generate the expected results
             IEnumerable<EmployerSearchModel> expectedResults = orgs.Select(o => EmployerSearchModel.Create(o));

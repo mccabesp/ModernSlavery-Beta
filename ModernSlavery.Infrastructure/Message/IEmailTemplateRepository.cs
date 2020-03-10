@@ -1,4 +1,5 @@
 ﻿using System;
+using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Infrastructure.Message
@@ -6,7 +7,7 @@ namespace ModernSlavery.Infrastructure.Message
     public interface IEmailTemplateRepository
     {
 
-        void Add<TTemplate>(string templateId, string filePath) where TTemplate : AEmailTemplate;
+        void Add<TTemplate>(string templateId, string filePath) where TTemplate : EmailTemplate;
 
         EmailTemplateInfo GetByTemplateId(string templateId);
 

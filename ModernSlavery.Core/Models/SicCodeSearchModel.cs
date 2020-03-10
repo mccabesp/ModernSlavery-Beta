@@ -1,10 +1,8 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.Azure.Search;
 using ModernSlavery.Extensions;
 using Newtonsoft.Json;
 
-namespace ModernSlavery.Infrastructure
+namespace ModernSlavery.Core.Models
 {
     [Serializable]
     public class SicCodeSearchModel
@@ -12,15 +10,11 @@ namespace ModernSlavery.Infrastructure
 
         private string _consolidatedSynonyms;
 
-        [Key]
-        [IsSearchable]
-        public string SicCodeId { get; set; }
+        public virtual string SicCodeId { get; set; }
 
-        [IsSearchable]
-        public string SicCodeDescription { get; set; }
+        public virtual string SicCodeDescription { get; set; }
 
-        [IsSearchable]
-        public string[] SicCodeListOfSynonyms { get; set; }
+        public virtual string[] SicCodeListOfSynonyms { get; set; }
 
         [JsonIgnore]
         public string ConsolidatedSynonyms

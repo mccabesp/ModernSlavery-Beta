@@ -48,19 +48,20 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public AdminController(
             ILogger<AdminController> logger,
             IWebService webService,
+            IShortCodesRepository shortCodesRepository,
             ICommonBusinessLogic commonBusinessLogic,
             INotificationService notificationService,
             IAdminService adminService,
             IOrganisationBusinessLogic organisationBusinessLogic,
             ISearchBusinessLogic searchBusinessLogic,
             IUserRepository userRepository,
-            IDataRepository dataRepository,
             [KeyFilter(QueueNames.ExecuteWebJob)] IQueue executeWebjobQueue,
             [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
-            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository
-        ) : base(logger, webService, dataRepository)
+            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
             CommonBusinessLogic = commonBusinessLogic;
+            this.ShortCodesRepository = shortCodesRepository;
             AdminService = adminService;
             OrganisationBusinessLogic = organisationBusinessLogic;
             SearchBusinessLogic = searchBusinessLogic;
@@ -73,6 +74,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #endregion
 
         #region Dependencies
+
+        private readonly IShortCodesRepository ShortCodesRepository;
         protected readonly ICommonBusinessLogic CommonBusinessLogic;
         public IAdminService AdminService { get; }
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
@@ -136,7 +139,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Create Registration History
 
-            IEnumerable<string> files = await Global.FileRepository.GetFilesAsync(Global.LogPath, "RegistrationLog*.csv", true);
+            IEnumerable<string> files = await FileRepository.GetFilesAsync(Global.LogPath, "RegistrationLog*.csv", true);
             if (!files.Any())
             {
                 //Create the first log file
@@ -193,7 +196,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 //Get the files again
-                files = await Global.FileRepository.GetFilesAsync(Global.LogPath, "RegistrationLog*.csv", true);
+                files = await FileRepository.GetFilesAsync(Global.LogPath, "RegistrationLog*.csv", true);
             }
 
             foreach (string filePath in files)
@@ -204,9 +207,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     Title = "Registration History",
                     Description = "Audit history of approved and rejected registrations."
                 };
-                if (await Global.FileRepository.GetFileExistsAsync(download.Filepath))
+                if (await FileRepository.GetFileExistsAsync(download.Filepath))
                 {
-                    download.Modified = await Global.FileRepository.GetLastWriteTimeAsync(download.Filepath);
+                    download.Modified = await FileRepository.GetLastWriteTimeAsync(download.Filepath);
                 }
 
                 downloads.Add(download);
@@ -221,7 +224,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             downloads = new List<DownloadViewModel.Download>();
 
-            files = await Global.FileRepository.GetFilesAsync(Global.LogPath, "SubmissionLog*.csv", true);
+            files = await FileRepository.GetFilesAsync(Global.LogPath, "SubmissionLog*.csv", true);
             if (!files.Any())
             {
                 var logRecords = new List<SubmissionLogModel>();
@@ -295,7 +298,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 //Get the files again
-                files = await Global.FileRepository.GetFilesAsync(Global.LogPath, "SubmissionLog*.csv", true);
+                files = await FileRepository.GetFilesAsync(Global.LogPath, "SubmissionLog*.csv", true);
             }
 
             foreach (string filePath in files)
@@ -306,9 +309,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     Title = "Submission History",
                     Description = "Audit history of approved and rejected registrations."
                 };
-                if (await Global.FileRepository.GetFileExistsAsync(download.Filepath))
+                if (await FileRepository.GetFileExistsAsync(download.Filepath))
                 {
-                    download.Modified = await Global.FileRepository.GetLastWriteTimeAsync(download.Filepath);
+                    download.Modified = await FileRepository.GetLastWriteTimeAsync(download.Filepath);
                 }
 
                 downloads.Add(download);
@@ -340,7 +343,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 return new RedirectResult(filePath);
             }
 
-            if (!await Global.FileRepository.GetFileExistsAsync(filePath))
+            if (!await FileRepository.GetFileExistsAsync(filePath))
             {
                 return new HttpNotFoundResult($"File '{filePath}' does not exist");
             }
@@ -357,7 +360,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             Response.BufferOutput = true;
             */
 
-            return Content(await Global.FileRepository.ReadAsync(filePath), model.ContentType);
+            return Content(await FileRepository.ReadAsync(filePath), model.ContentType);
         }
 
         #endregion
@@ -368,14 +371,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public async Task<IActionResult> Read(string filePath)
         {
             //Ensure the file exists
-            if (string.IsNullOrWhiteSpace(filePath) || !await Global.FileRepository.GetFileExistsAsync(filePath))
+            if (string.IsNullOrWhiteSpace(filePath) || !await FileRepository.GetFileExistsAsync(filePath))
             {
                 return new NotFoundResult();
             }
 
             var model = new DownloadViewModel.Download();
             model.Filepath = filePath;
-            string content = await Global.FileRepository.ReadAsync(filePath);
+            string content = await FileRepository.ReadAsync(filePath);
 
             if (model.ContentType.EqualsI("text/csv"))
             {
@@ -449,14 +452,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("downloads")]
         public async Task<IActionResult> Downloads()
         {
-            await Global.FileRepository.CreateDirectoryAsync(Global.DownloadsPath);
+            await FileRepository.CreateDirectoryAsync(Global.DownloadsPath);
 
             var model = new DownloadViewModel();
 
             #region Organisation Downloads
 
             DownloadViewModel.Download download;
-            IEnumerable<string> files = await Global.FileRepository.GetFilesAsync(
+            IEnumerable<string> files = await FileRepository.GetFilesAsync(
                 Global.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.Organisations)}*{Path.GetExtension(Filenames.Organisations)}");
             foreach (string file in files.OrderByDescending(file => file))
@@ -476,7 +479,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Orphaned organisations Addresses
 
-            files = await Global.FileRepository.GetFilesAsync(
+            files = await FileRepository.GetFilesAsync(
                 Global.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.OrphanOrganisations)}*{Path.GetExtension(Filenames.OrphanOrganisations)}");
             foreach (string file in files.OrderByDescending(file => file))
@@ -496,7 +499,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Registration Addresses
 
-            files = await Global.FileRepository.GetFilesAsync(
+            files = await FileRepository.GetFilesAsync(
                 Global.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.RegistrationAddresses)}*{Path.GetExtension(Filenames.RegistrationAddresses)}");
             foreach (string file in files.OrderByDescending(file => file))
@@ -517,7 +520,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Scopes
 
-            files = await Global.FileRepository.GetFilesAsync(
+            files = await FileRepository.GetFilesAsync(
                 Global.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.OrganisationScopes)}*{Path.GetExtension(Filenames.OrganisationScopes)}");
             foreach (string file in files.OrderByDescending(file => file))
@@ -539,7 +542,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Submissions
 
-            files = await Global.FileRepository.GetFilesAsync(
+            files = await FileRepository.GetFilesAsync(
                 Global.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.OrganisationSubmissions)}*{Path.GetExtension(Filenames.OrganisationSubmissions)}");
             foreach (string file in files.OrderByDescending(file => file))
@@ -642,10 +645,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             bool isSuperAdministrator = IsSuperAdministrator;
             await model.Downloads.WaitForAllAsync(
                 async d => {
-                    if (await Global.FileRepository.GetFileExistsAsync(d.Filepath))
+                    if (await FileRepository.GetFileExistsAsync(d.Filepath))
                     {
-                        d.Modified = await Global.FileRepository.GetLastWriteTimeAsync(d.Filepath);
-                        IDictionary<string, string> metaData = await Global.FileRepository.LoadMetaDataAsync(d.Filepath);
+                        d.Modified = await FileRepository.GetLastWriteTimeAsync(d.Filepath);
+                        IDictionary<string, string> metaData = await FileRepository.LoadMetaDataAsync(d.Filepath);
 
                         d.Count = metaData != null && metaData.ContainsKey("RecordCount")
                             ? metaData["RecordCount"].ToInt32().ToString()
@@ -718,8 +721,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Description = "Standard Industrial Classification (SIC) sector titles.",
                 Count = sicSectionsCount.ToString()
             };
-            upload.Modified = await Global.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await Global.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
+            upload.Modified = await FileRepository.GetFileExistsAsync(upload.Filepath)
+                ? await FileRepository.GetLastWriteTimeAsync(upload.Filepath)
                 : DateTime.MinValue;
             model.Uploads.Add(upload);
 
@@ -731,8 +734,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Description = "Standard Industrial Classification (SIC) codes and titles.",
                 Count = sicCodesCount.ToString()
             };
-            upload.Modified = await Global.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await Global.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
+            upload.Modified = await FileRepository.GetFileExistsAsync(upload.Filepath)
+                ? await FileRepository.GetLastWriteTimeAsync(upload.Filepath)
                 : DateTime.MinValue;
             model.Uploads.Add(upload);
 
@@ -748,8 +751,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     ? "0"
                     : $"{allDnBOrgs.Count(o => o.ImportedDate != null && (o.StatusCheckedDate == null || o.ImportedDate >= o.StatusCheckedDate))}/{allDnBOrgs.Count.ToString()}"
             };
-            upload.Modified = await Global.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await Global.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
+            upload.Modified = await FileRepository.GetFileExistsAsync(upload.Filepath)
+                ? await FileRepository.GetLastWriteTimeAsync(upload.Filepath)
                 : DateTime.MinValue;
             model.Uploads.Add(upload);
 
@@ -761,8 +764,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Description = "Short codes for tracking and routing users to specific web pages.",
                 Count = allShortCodes == null ? "0" : allShortCodes.Count.ToString()
             };
-            upload.Modified = await Global.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await Global.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
+            upload.Modified = await FileRepository.GetFileExistsAsync(upload.Filepath)
+                ? await FileRepository.GetLastWriteTimeAsync(upload.Filepath)
                 : DateTime.MinValue;
             model.Uploads.Add(upload);
 
@@ -884,7 +887,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         }
 
                         //Core.Classes.Extensions
-                        await Global.FileRepository.SaveCSVAsync(records, upload.Filepath);
+                        await FileRepository.SaveCSVAsync(records, upload.Filepath);
                         DateTime updateTime = VirtualDateTime.Now.AddMinutes(-2);
                         switch (upload.Type)
                         {
@@ -894,14 +897,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             case "SicSection":
                                 await DataMigrations.Update_SICSectionsAsync(
                                     DataRepository,
-                                    Global.FileRepository,
+                                    FileRepository,
                                     Global.DataPath,
                                     true);
                                 break;
                             case "SicCode":
                                 await DataMigrations.Update_SICCodesAsync(
                                     DataRepository,
-                                    Global.FileRepository,
+                                    FileRepository,
                                     Global.DataPath,
                                     true);
                                 //TODO Recheck remaining companies with no Sic against new SicCodes and then CoHo
@@ -931,12 +934,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private async Task UpdateCompanySicCodesAsync(DateTime updateTime)
         {
             //Get all the bad sic records
-            IEnumerable<string> files = await Global.FileRepository.GetFilesAsync(Global.LogPath, "BadSicLog*.csv", true);
+            IEnumerable<string> files = await FileRepository.GetFilesAsync(Global.LogPath, "BadSicLog*.csv", true);
             var fileRecords = new Dictionary<string, List<BadSicLogModel>>();
             var changedFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (string file in files)
             {
-                List<BadSicLogModel> records = await Global.FileRepository.ReadCSVAsync<BadSicLogModel>(file);
+                List<BadSicLogModel> records = await FileRepository.ReadCSVAsync<BadSicLogModel>(file);
                 fileRecords[file] = records;
             }
 
@@ -977,11 +980,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 List<BadSicLogModel> records = fileRecords[changedFile];
                 if (records.Any())
                 {
-                    await Global.FileRepository.SaveCSVAsync(fileRecords[changedFile], changedFile);
+                    await FileRepository.SaveCSVAsync(fileRecords[changedFile], changedFile);
                 }
                 else
                 {
-                    await Global.FileRepository.DeleteFileAsync(changedFile);
+                    await FileRepository.DeleteFileAsync(changedFile);
                 }
             }
         }
@@ -989,11 +992,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private async Task RecheckCompaniesAsync()
         {
             //Get all the bad sic records
-            IEnumerable<string> files = await Global.FileRepository.GetFilesAsync(Global.LogPath, "BadSicLog*.csv", true);
+            IEnumerable<string> files = await FileRepository.GetFilesAsync(Global.LogPath, "BadSicLog*.csv", true);
             var badSicCodes = new HashSet<string>();
             foreach (string file in files)
             {
-                List<BadSicLogModel> records = await Global.FileRepository.ReadCSVAsync<BadSicLogModel>(file);
+                List<BadSicLogModel> records = await FileRepository.ReadCSVAsync<BadSicLogModel>(file);
                 badSicCodes.AddRange(records.ToList().Select(s => $"{s.OrganisationId}:{s.SicCode}").Distinct());
             }
 

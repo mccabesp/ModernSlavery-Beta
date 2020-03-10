@@ -1,7 +1,7 @@
-﻿namespace ModernSlavery.Infrastructure.Message
+﻿namespace ModernSlavery.Core.EmailTemplates
 {
 
-    public abstract class AEmailTemplate
+    public abstract class EmailTemplate
     {
 
         /// <summary>

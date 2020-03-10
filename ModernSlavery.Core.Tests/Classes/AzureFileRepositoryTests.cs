@@ -1,5 +1,6 @@
 ﻿using System;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Infrastructure.File;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Classes

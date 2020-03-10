@@ -25,7 +25,7 @@ namespace ModernSlavery.WebJob
                 string filePath = Path.Combine(Global.DownloadsPath, Filenames.Registrations);
 
                 //Dont execute on startup if file already exists
-                if (!StartedJobs.Contains(nameof(UpdateRegistrations)) && await Global.FileRepository.GetFileExistsAsync(filePath))
+                if (!StartedJobs.Contains(nameof(UpdateRegistrations)) && await FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -60,7 +60,7 @@ namespace ModernSlavery.WebJob
             RunningJobs.Add(nameof(UpdateRegistrations));
             try
             {
-                List<UserOrganisation> userOrgs = _DataRepository.GetEntities<UserOrganisation>()
+                List<UserOrganisation> userOrgs = DataRepository.GetAll<UserOrganisation>()
                     .Where(uo => uo.User.Status == UserStatuses.Active && uo.PINConfirmedDate != null)
                     .OrderBy(uo => uo.Organisation.OrganisationName)
                     .Include(uo => uo.Organisation.LatestScope)
@@ -93,7 +93,7 @@ namespace ModernSlavery.WebJob
                             Address = uo.Address?.GetAddressString()
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(Global.FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(FileRepository, records, filePath);
             }
             finally
             {

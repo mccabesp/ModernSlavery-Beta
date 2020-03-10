@@ -23,7 +23,7 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
             IChangeDetailsViewService changeDetailsService,
             ILogger<ChangeDetailsController> logger,
             IWebService webService,
-            IDataRepository dataRepository) : base(logger, webService, dataRepository)
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
             ChangeDetailsService = changeDetailsService;
         }

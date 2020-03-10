@@ -15,8 +15,14 @@ namespace ModernSlavery.Core.Interfaces
 
         IQueryable<TEntity> GetAll<TEntity>() where TEntity : class;
         
-        Task<bool> AnyAsync<TEntity>(Expression<Func<TEntity, bool>> predicate) where TEntity : class;
-        Task<TEntity> FirstOrDefaultAsync<TEntity>(Expression<Func<TEntity, bool>> predicate) where TEntity : class;
+        Task<bool> AnyAsync<TEntity>(Expression<Func<TEntity, bool>> predicate=null) where TEntity : class;
+        Task<TEntity> FirstOrDefaultAsync<TEntity>(Expression<Func<TEntity, bool>> predicate=null) where TEntity : class;
+        Task<TEntity> FirstOrDefaultByAscendingAsync<TEntity,TKey>(Expression<Func<TEntity, TKey>> keySelector, Expression<Func<TEntity, bool>> filterPredicate = null) where TEntity : class;
+        Task<TEntity> FirstOrDefaultByDescendingAsync<TEntity, TKey>(Expression<Func<TEntity, TKey>> keySelector, Expression<Func<TEntity, bool>> filterPredicate = null) where TEntity : class;
+
+        Task<List<TEntity>> ToListAsync<TEntity>(Expression<Func<TEntity, bool>> predicate=null)where TEntity : class;
+        Task<List<TEntity>> ToListAscendingAsync<TEntity, TKey>(Expression<Func<TEntity, TKey>> keySelector, Expression<Func<TEntity, bool>> filterPredicate = null) where TEntity : class;
+        Task<List<TEntity>> ToListDescendingAsync<TEntity, TKey>(Expression<Func<TEntity, TKey>> keySelector, Expression<Func<TEntity, bool>> filterPredicate = null) where TEntity : class;
 
         void Insert<TEntity>(TEntity entity) where TEntity : class;
 

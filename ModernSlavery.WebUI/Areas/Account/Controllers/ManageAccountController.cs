@@ -18,7 +18,10 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
 
         public ManageAccountController(ILogger<ManageAccountController> logger,
             IWebService webService,
-            IDataRepository dataRepository) : base(logger, webService, dataRepository) { }
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository,
+            fileRepository)
+        {
+        }
 
         [HttpGet]
         public IActionResult ManageAccount()

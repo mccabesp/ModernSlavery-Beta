@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
             ICloseAccountViewService closeAccountService,
             ILogger<CloseAccountController> logger,
             IWebService webService,
-            IDataRepository dataRepository):base(logger, webService, dataRepository)
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
             CloseAccountService = closeAccountService;
         }

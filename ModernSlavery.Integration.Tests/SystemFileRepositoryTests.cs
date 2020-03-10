@@ -5,6 +5,7 @@ using System.Web;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.Search.Models;
+using ModernSlavery.Infrastructure.File;
 using NUnit.Framework;
 using ModernSlavery.SharedKernel;
 
@@ -40,7 +41,7 @@ namespace ModernSlavery.Integration.Tests
                     {"TimeStamp", new DateTime(2019, 06, 25, 14, 40, 54).ToString("yyyy-MM-dd HH:mm:ss.fff")},
                     {"QueryTerms", "International bank of Japan"},
                     {"ResultCount", "25"},
-                    {"SearchType", SearchType.ByEmployerName.ToString()},
+                    {"SearchType", SearchTypes.ByEmployerName.ToString()},
                     {"SearchParameters", HttpUtility.UrlDecode(searchParametersSentToTheSearchEngine.ToString())}
                 };
 

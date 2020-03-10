@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Entities;
+using ModernSlavery.Infrastructure;
+using ModernSlavery.Infrastructure.Search;
 
 namespace ModernSlavery.WebUI.Classes.Presentation
 {
@@ -74,7 +76,7 @@ namespace ModernSlavery.WebUI.Classes.Presentation
 
             string searchTermEnteredOnScreen = searchParams.Keywords;
 
-            if (searchParams.SearchType == SearchType.BySectorType)
+            if (searchParams.SearchType == SearchTypes.BySectorType)
             {
                 IEnumerable<KeyValuePair<string, SicCodeSearchModel>> list =
                     await GetListOfSicCodeSuggestionsFromIndexAsync(searchParams.Keywords);
@@ -111,7 +113,7 @@ namespace ModernSlavery.WebUI.Classes.Presentation
                 }
             }
 
-            if (searchParams.SearchType == SearchType.ByEmployerName)
+            if (searchParams.SearchType == SearchTypes.ByEmployerName)
             {
                 searchParams.Keywords = searchParams.Keywords?.Trim();
                 searchParams.Keywords = searchParams.RemoveTheMostCommonTermsOnOurDatabaseFromTheKeywords();
@@ -234,7 +236,7 @@ namespace ModernSlavery.WebUI.Classes.Presentation
         public async Task<List<SearchViewModel.SicSection>> GetAllSicSectionsAsync()
         {
             var results = new List<SearchViewModel.SicSection>();
-            List<SicSection> sortedSics = await dataRepo.GetAll<SicSection>().OrderBy(sic => sic.Description).ToListAsync();
+            var sortedSics = await dataRepo.ToListAscendingAsync<SicSection,string>(sic => sic.Description);
 
             foreach (SicSection sector in sortedSics)
             {

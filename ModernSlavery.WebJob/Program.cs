@@ -5,17 +5,18 @@ using System.Globalization;
 using System.Threading;
 using Autofac;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.Infrastructure.AzureQueues.Extensions;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using ModernSlavery.Core.EmailTemplates;
+using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebJob
@@ -70,10 +71,6 @@ namespace ModernSlavery.WebJob
             // system templates
             host.RegisterEmailTemplate<SendEmailTemplate>(emailTemplatesConfigPath);
 
-            //Initialise the global file and search repositories
-            Global.FileRepository = ContainerIOC.Resolve<IFileRepository>();
-            Global.SearchRepository = ContainerIOC.Resolve<ISearchRepository<EmployerSearchModel>>();
-            Global.SicCodeSearchRepository = ContainerIOC.Resolve<ISearchRepository<SicCodeSearchModel>>();
 
             //Register log to Global
             Global.EmailSendLog = ContainerIOC.ResolveKeyed<ILogRecordLogger>(Filenames.EmailSendLog);
@@ -81,7 +78,8 @@ namespace ModernSlavery.WebJob
             Global.BadSicLog = ContainerIOC.ResolveKeyed<ILogRecordLogger>(Filenames.BadSicLog);
 
             //Ensure SicSectorSynonyms exist on remote 
-            Task.WaitAll(Core.Classes.Extensions.PushRemoteFileAsync(Global.FileRepository, Filenames.SicSectorSynonyms, Global.DataPath));
+            var _FileRepository = ContainerIOC.Resolve<IFileRepository>();
+            Task.WaitAll(Core.Classes.Extensions.PushRemoteFileAsync(_FileRepository, Filenames.SicSectorSynonyms, Global.DataPath));
 
             //Leave this check here to ensure function dependencies resolve on startup rather than when each function method is invoked
             var functions = ContainerIOC.Resolve<Functions>();

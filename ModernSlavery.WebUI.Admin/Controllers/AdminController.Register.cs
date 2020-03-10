@@ -789,7 +789,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await DataRepository.SaveChangesAsync();
 
             //Remove this organisation from the search index
-            await Global.SearchRepository.RemoveFromIndexAsync(new[] {searchRecord});
+            await SearchBusinessLogic.SearchRepository.RemoveFromIndexAsync(new[] {searchRecord});
 
             //Save the model for the redirect
             this.StashModel(model);

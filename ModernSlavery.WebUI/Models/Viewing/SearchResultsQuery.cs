@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Models
         public IEnumerable<int> st { get; set; }
 
         // Employer Type
-        public SearchType t { get; set; } = SearchType.ByEmployerName;
+        public SearchTypes t { get; set; } = SearchTypes.ByEmployerName;
 
         // Page
         public int p { get; set; } = 1;

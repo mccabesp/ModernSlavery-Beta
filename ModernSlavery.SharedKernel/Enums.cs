@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace ModernSlavery.SharedKernel
 {
@@ -35,7 +36,15 @@ namespace ModernSlavery.SharedKernel
 
     }
 
-    public enum SearchType
+    public enum SearchModes
+    {
+        [EnumMember(Value = "any")]
+        Any,
+        [EnumMember(Value = "all")]
+        All
+    }
+
+    public enum SearchTypes
     {
 
         ByEmployerName = 1,

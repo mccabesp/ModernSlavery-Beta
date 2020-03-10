@@ -3,24 +3,28 @@ using System.Net.Http;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
-using ModernSlavery.Core.API;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Classes.Queues;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.Infrastructure.AzureQueues.Extensions;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Database;
+using ModernSlavery.Infrastructure;
+using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.File;
+using ModernSlavery.Infrastructure.Logging;
+using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.Infrastructure.Queue;
+using ModernSlavery.Infrastructure.Search;
 
 namespace ModernSlavery.WebJob
 {
@@ -31,14 +35,22 @@ namespace ModernSlavery.WebJob
         // called by the runtime before the ConfigureContainer method, below.
         public static void ConfigureServices(IServiceCollection services)
         {
+            var coHoOptions = new CompaniesHouseOptions();
+            Config.Configuration.Bind("CompaniesHouse", coHoOptions);
+
             //Add a dedicated httpClient for Companies house API with exponential retry policy
-            services.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI), CompaniesHouseAPI.SetupHttpClient)
+
+            services.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI), (httpClient)=>
+                {
+                    CompaniesHouseAPI.SetupHttpClient(httpClient, coHoOptions.ApiServer, coHoOptions.ApiKey);
+                })
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10))
                 .AddPolicyHandler(CompaniesHouseAPI.GetRetryPolicy());
 
             services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
 
-            // setup email configuration
+            // setup configuration options
+            services.Configure<CompaniesHouseOptions>(Config.Configuration.GetSection("CompaniesHouse"));
             services.Configure<GovNotifyOptions>(Config.Configuration.GetSection("Email:Providers:GovNotify"));
             services.Configure<SmtpEmailOptions>(Config.Configuration.GetSection("Email:Providers:Smtp"));
             services.Configure<GpgEmailOptions>(Config.Configuration);
@@ -120,14 +132,14 @@ namespace ModernSlavery.WebJob
                 .As<ISearchServiceClient>()
                 .SingleInstance();
 
-            builder.RegisterType<AzureSearchRepository>()
+            builder.RegisterType<AzureEmployerSearchRepository>()
                 .As<ISearchRepository<EmployerSearchModel>>()
                 .SingleInstance()
                 .WithParameter("serviceName", azureSearchServiceName)
                 .WithParameter("adminApiKey", azureSearchAdminKey)
                 .WithParameter("disabled", azureSearchDisabled);
 
-            builder.RegisterType<SicCodeSearchRepository>()
+            builder.RegisterType<AzureSicCodeSearchRepository>()
                 .As<ISearchRepository<SicCodeSearchModel>>()
                 .SingleInstance()
                 .WithParameter("disabled", azureSearchDisabled);

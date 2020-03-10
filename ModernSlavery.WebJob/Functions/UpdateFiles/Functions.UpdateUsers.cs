@@ -24,7 +24,7 @@ namespace ModernSlavery.WebJob
                 string filePath = Path.Combine(Global.DownloadsPath, Filenames.Users);
 
                 //Dont execute on startup if file already exists
-                if (!StartedJobs.Contains(nameof(UpdateUsers)) && await Global.FileRepository.GetFileExistsAsync(filePath))
+                if (!StartedJobs.Contains(nameof(UpdateUsers)) && await FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -57,7 +57,7 @@ namespace ModernSlavery.WebJob
             RunningJobs.Add(nameof(UpdateUsers));
             try
             {
-                List<User> users = await _DataRepository.GetAll<User>().ToListAsync();
+                List<User> users = await DataRepository.GetAll<User>().ToListAsync();
                 var records = users.Where(u => !u.IsAdministrator())
                     .OrderBy(u => u.Lastname)
                     .Select(
@@ -82,7 +82,7 @@ namespace ModernSlavery.WebJob
                             u.Created
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(Global.FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(FileRepository, records, filePath);
             }
             finally
             {

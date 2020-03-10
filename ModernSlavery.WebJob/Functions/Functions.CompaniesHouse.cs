@@ -37,7 +37,7 @@ namespace ModernSlavery.WebJob
 
             //RunningJobs.Add(nameof(CompaniesHouseCheck));
 
-            //IEnumerable<string> filePaths = await Global.FileRepository.GetFilesAsync(Global.DataPath, "GPG-DnBOrgs_*.csv");
+            //IEnumerable<string> filePaths = await _FileRepository.GetFilesAsync(Global.DataPath, "GPG-DnBOrgs_*.csv");
             //string filePath = filePaths.OrderByDescending(f => f).FirstOrDefault();
             //var updates = 0;
             //try
@@ -47,12 +47,12 @@ namespace ModernSlavery.WebJob
             //        return;
             //    }
 
-            //    if (!await Global.FileRepository.GetFileExistsAsync(filePath))
+            //    if (!await _FileRepository.GetFileExistsAsync(filePath))
             //    {
             //        throw new Exception("Could not find " + filePath);
             //    }
 
-            //    string content = await Global.FileRepository.ReadAsync(filePath);
+            //    string content = await _FileRepository.ReadAsync(filePath);
             //    if (string.IsNullOrWhiteSpace(content))
             //    {
             //        throw new Exception("No content in file " + filePath);
@@ -146,7 +146,7 @@ namespace ModernSlavery.WebJob
             //            }
 
             //            //If doing all then save every 1000 records checked
-            //            await datatable.SaveAsync(Global.FileRepository, filePath);
+            //            await datatable.SaveAsync(_FileRepository, filePath);
             //            c = 0;
             //        }
 
@@ -374,7 +374,7 @@ namespace ModernSlavery.WebJob
             //            {
             //                if (c > 0)
             //                {
-            //                    await datatable.SaveAsync(Global.FileRepository, filePath);
+            //                    await datatable.SaveAsync(_FileRepository, filePath);
             //                    c = 0;
             //                }
 
@@ -386,7 +386,7 @@ namespace ModernSlavery.WebJob
             //            {
             //                if (c > 0)
             //                {
-            //                    await datatable.SaveAsync(Global.FileRepository, filePath);
+            //                    await datatable.SaveAsync(_FileRepository, filePath);
             //                    c = 0;
             //                }
 
@@ -409,7 +409,7 @@ namespace ModernSlavery.WebJob
             //    //Save the results
             //    if (datatable != null && c > 0)
             //    {
-            //        await datatable.SaveAsync(Global.FileRepository, filePath);
+            //        await datatable.SaveAsync(_FileRepository, filePath);
             //    }
             //}
             //finally
@@ -417,7 +417,7 @@ namespace ModernSlavery.WebJob
             //    if (updates > 0 && all)
             //    {
             //        //Update the team that the updates are complete
-            //        List<DnBOrgsModel> AllDnBOrgs = await Global.FileRepository.ReadCSVAsync<DnBOrgsModel>(filePath);
+            //        List<DnBOrgsModel> AllDnBOrgs = await _FileRepository.ReadCSVAsync<DnBOrgsModel>(filePath);
             //        int count = AllDnBOrgs.Count(
             //            o => !string.IsNullOrWhiteSpace(o.CompanyNumber)
             //                 && !o.GetIsDissolved()

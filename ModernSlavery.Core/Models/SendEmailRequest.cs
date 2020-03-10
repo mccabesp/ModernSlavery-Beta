@@ -2,7 +2,7 @@
 
 namespace ModernSlavery.Core.Models
 {
-    public class SendEmailRequestModel
+    public class SendEmailRequest
     {
 
         public string EmailAddress { get; set; }

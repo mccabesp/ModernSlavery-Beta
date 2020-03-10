@@ -7,6 +7,7 @@ using ModernSlavery.Extensions;
 using ModernSlavery.Tests.TestHelpers;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Routing;
+using ModernSlavery.Core.Models;
 using Moq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
@@ -88,18 +89,18 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 
             Program.MvcApplication.SendNotifyEmailQueue = mockNotifyEmailQueue.Object;
             mockNotifyEmailQueue
-                .Setup(q => q.AddMessageAsync(It.IsAny<NotifyEmail>()));
+                .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));
 
             // Act
             await controller.SendPin(user.UserId, organisationId);
 
             // Assert
             mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.EmailAddress.Contains(user.EmailAddress))),
+                x => x.AddMessageAsync(It.Is<SendEmailRequest>(inst => inst.EmailAddress.Contains(user.EmailAddress))),
                 Times.Once(),
                 "Expected the user's email address to be in the email send queue");
             mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.TemplateId.Contains(EmailTemplates.SendPinEmail))),
+                x => x.AddMessageAsync(It.Is<SendEmailRequest>(inst => inst.TemplateId.Contains(EmailTemplates.SendPinEmail))),
                 Times.Once,
                 $"Expected the correct templateId to be in the email send queue, expected {EmailTemplates.SendPinEmail}");
 
@@ -144,18 +145,18 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 
             Program.MvcApplication.SendNotifyEmailQueue = mockNotifyEmailQueue.Object;
             mockNotifyEmailQueue
-                .Setup(q => q.AddMessageAsync(It.IsAny<NotifyEmail>()));
+                .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));
 
             // Act
             await controller.SendPin(user.UserId, organisationId);
 
             // Assert
             mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.EmailAddress.Contains(user.EmailAddress))),
+                x => x.AddMessageAsync(It.Is<SendEmailRequest>(inst => inst.EmailAddress.Contains(user.EmailAddress))),
                 Times.Once(),
                 "Expected the user's email address to be in the email send queue");
             mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.TemplateId.Contains(EmailTemplates.SendPinEmail))),
+                x => x.AddMessageAsync(It.Is<SendEmailRequest>(inst => inst.TemplateId.Contains(EmailTemplates.SendPinEmail))),
                 Times.Once,
                 $"Expected the correct templateId to be in the email send queue, expected {EmailTemplates.SendPinEmail}");
 

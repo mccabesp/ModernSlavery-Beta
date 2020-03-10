@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autofac;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
+using ModernSlavery.Core.Models;
 using Newtonsoft.Json;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
@@ -22,22 +21,22 @@ namespace ModernSlavery.WebJob
         public void SendReminderEmails([TimerTrigger("0 * * * *")] TimerInfo timer)
         {
             DateTime start = VirtualDateTime.Now;
-            CustomLogger.Information("SendReminderEmails Function started", start);
+            _CustomLogger.Information("SendReminderEmails Function started", start);
             
             List<int> reminderDays = GetReminderEmailDays();
             if (reminderDays.Count == 0)
             {
-                CustomLogger.Information("SendReminderEmails Function finished. No ReminderEmailDays set.");
+                _CustomLogger.Information("SendReminderEmails Function finished. No ReminderEmailDays set.");
                 return;
             }
 
-            IEnumerable<User> users = _DataRepository.GetAll<User>();
+            IEnumerable<User> users = DataRepository.GetAll<User>();
 
             foreach (User user in users)
             {
                 if (VirtualDateTime.Now > start.AddMinutes(59))
                 {
-                    CustomLogger.Information("Hit timeout break");
+                    _CustomLogger.Information("Hit timeout break");
                     break;
                 }
 
@@ -61,7 +60,7 @@ namespace ModernSlavery.WebJob
                 }
             }
             
-            CustomLogger.Information("SendReminderEmails Function finished");
+            _CustomLogger.Information("SendReminderEmails Function finished");
         }
 
         private void SendReminderEmailsForSectorType(
@@ -84,7 +83,7 @@ namespace ModernSlavery.WebJob
                     }
                     catch (Exception ex)
                     {
-                        CustomLogger.Error(
+                        _CustomLogger.Error(
                             "Failed whilst sending or saving reminder email",
                             new
                             {
@@ -113,7 +112,7 @@ namespace ModernSlavery.WebJob
                 {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
             };
 
-            var notifyEmail = new NotifyEmail
+            var notifyEmail = new SendEmailRequest
             {
                 EmailAddress = user.EmailAddress, TemplateId = "db15432c-9eda-4df4-ac67-290c7232c546", Personalisation = personalisation
             };
@@ -152,7 +151,7 @@ namespace ModernSlavery.WebJob
 
         private bool ReminderEmailWasNotSentAfterLatestReminderDate(User user, SectorTypes sectorType)
         {
-            ReminderEmail latestReminderEmail = _DataRepository.GetAll<ReminderEmail>()
+            ReminderEmail latestReminderEmail = DataRepository.GetAll<ReminderEmail>()
                 .Where(re => re.UserId == user.UserId)
                 .Where(re => re.SectorType == sectorType)
                 .OrderByDescending(re => re.DateSent)

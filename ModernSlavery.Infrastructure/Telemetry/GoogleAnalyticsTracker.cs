@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Shared.Interfaces;
 using Polly;
 using Polly.Extensions.Http;
 

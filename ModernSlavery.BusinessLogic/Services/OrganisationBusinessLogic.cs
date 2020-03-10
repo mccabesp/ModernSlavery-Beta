@@ -113,7 +113,7 @@ namespace ModernSlavery.BusinessLogic
 #endif
             var records = new List<OrganisationsFileModel>();
 
-            await foreach(var o in orgs.ToListAsync())
+            await foreach(var o in orgs.ToAsyncEnumerable())
             {
                 var record = new OrganisationsFileModel {
                     OrganisationId = o.OrganisationId,
@@ -150,7 +150,7 @@ namespace ModernSlavery.BusinessLogic
 
         public virtual async Task SetUniqueEmployerReferencesAsync()
         {
-            var orgs = _DataRepository.GetAll<Organisation>().Where(o => o.EmployerReference == null).ToListAsync();
+            var orgs = _DataRepository.GetAll<Organisation>().Where(o => o.EmployerReference == null).ToAsyncEnumerable();
             await foreach (Organisation org in orgs)
             {
                 await SetUniqueEmployerReferenceAsync(org);

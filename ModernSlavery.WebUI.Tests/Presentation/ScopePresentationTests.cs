@@ -20,6 +20,7 @@ using ModernSlavery.WebUI.Tests.TestHelpers;
 using MockQueryable.Moq;
 using Moq;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Infrastructure;
 using ModernSlavery.SharedKernel;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Shared.Models;

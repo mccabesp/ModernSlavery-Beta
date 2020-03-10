@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Api;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.HttpResultModels;
@@ -1234,7 +1233,7 @@ namespace ModernSlavery.WebUI.Controllers
                     }
                     else
                     {
-                        model.IsUkAddress = await PostcodesIoApi.IsValidPostcode(employer.PostCode) ? true : (bool?)null;
+                        model.IsUkAddress = await postcodeChecker.IsValidPostcode(employer.PostCode) ? true : (bool?)null;
                     }
                 }
 

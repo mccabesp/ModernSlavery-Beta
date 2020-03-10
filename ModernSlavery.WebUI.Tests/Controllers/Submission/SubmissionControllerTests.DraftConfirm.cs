@@ -15,6 +15,7 @@ using ModernSlavery.SharedKernel;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Autofac;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.Infrastructure.File;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {

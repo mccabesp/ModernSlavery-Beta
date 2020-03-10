@@ -12,6 +12,7 @@ using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using ModernSlavery.Core.EmailTemplates;
 using Moq;
 using ModernSlavery.Entities.Enums;
 

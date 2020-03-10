@@ -104,7 +104,7 @@ namespace ModernSlavery.WebJob
             }
         }
 
-        private static async Task<string> TakeSnapshotAsync(string storageAccount, string storageKey, string shareName)
+        private async Task<string> TakeSnapshotAsync(string storageAccount, string storageKey, string shareName)
         {
             var version = "2017-04-17";
             var comp = "snapshot";
@@ -142,7 +142,7 @@ namespace ModernSlavery.WebJob
         }
 
 
-        private static async Task<string> ListSnapshotsAsync(string storageAccount, string storageKey, string shareName)
+        private async Task<string> ListSnapshotsAsync(string storageAccount, string storageKey, string shareName)
         {
             var version = "2017-04-17";
             var comp = "list";
@@ -178,7 +178,7 @@ namespace ModernSlavery.WebJob
             return response;
         }
 
-        private static async Task<string> DeleteSnapshotAsync(ILogger log,
+        private async Task<string> DeleteSnapshotAsync(ILogger log,
             string storageAccount,
             string storageKey,
             string shareName,
@@ -222,7 +222,7 @@ namespace ModernSlavery.WebJob
         }
 
 
-        private static string SignAuthHeader(string canonicalizedString, string key, string account)
+        private string SignAuthHeader(string canonicalizedString, string key, string account)
         {
             byte[] unicodeKey = Convert.FromBase64String(key);
             using (var hmacSha256 = new HMACSHA256(unicodeKey))
@@ -232,40 +232,40 @@ namespace ModernSlavery.WebJob
             }
         }
 
-        public static async Task ArchiveAzureStorageAsync()
+        public async Task ArchiveAzureStorageAsync()
         {
             const string logZipDir = @"\Archive\";
 
             //Ensure the archive directory exists
-            if (!await Global.FileRepository.GetDirectoryExistsAsync(logZipDir))
+            if (!await FileRepository.GetDirectoryExistsAsync(logZipDir))
             {
-                await Global.FileRepository.CreateDirectoryAsync(logZipDir);
+                await FileRepository.CreateDirectoryAsync(logZipDir);
             }
 
             //Create the zip file path using todays date
             string logZipFilePath = Path.Combine(logZipDir, $"{VirtualDateTime.Now.ToString("yyyyMMdd")}.zip");
 
             //Dont zip if we have one for today
-            if (await Global.FileRepository.GetFileExistsAsync(logZipFilePath))
+            if (await FileRepository.GetFileExistsAsync(logZipFilePath))
             {
                 return;
             }
 
-            string zipDir = Url.UrlToDirSeparator(Path.Combine(Global.FileRepository.RootDir, logZipDir));
+            string zipDir = Url.UrlToDirSeparator(Path.Combine(FileRepository.RootDir, logZipDir));
 
             using (var fileStream = new MemoryStream())
             {
                 var files = 0;
                 using (var zipStream = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
                 {
-                    foreach (string dir in await Global.FileRepository.GetDirectoriesAsync("\\", null, true))
+                    foreach (string dir in await FileRepository.GetDirectoriesAsync("\\", null, true))
                     {
                         if (Url.UrlToDirSeparator($"{dir}\\").StartsWithI(zipDir))
                         {
                             continue;
                         }
 
-                        foreach (string file in await Global.FileRepository.GetFilesAsync(dir, "*.*"))
+                        foreach (string file in await FileRepository.GetFilesAsync(dir, "*.*"))
                         {
                             string dirFile = Url.UrlToDirSeparator(file);
 
@@ -278,7 +278,7 @@ namespace ModernSlavery.WebJob
                             ZipArchiveEntry entry = zipStream.CreateEntry(dirFile);
                             using (Stream entryStream = entry.Open())
                             {
-                                await Global.FileRepository.ReadAsync(dirFile, entryStream);
+                                await FileRepository.ReadAsync(dirFile, entryStream);
                                 files++;
                             }
                         }
@@ -291,7 +291,7 @@ namespace ModernSlavery.WebJob
                 }
 
                 fileStream.Position = 0;
-                await Global.FileRepository.WriteAsync(logZipFilePath, fileStream);
+                await FileRepository.WriteAsync(logZipFilePath, fileStream);
             }
         }
 

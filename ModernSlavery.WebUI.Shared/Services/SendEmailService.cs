@@ -7,6 +7,7 @@ using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Extensions.Logging;
 using Autofac.Features.AttributeFilters;
+using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Core.Interfaces;
 

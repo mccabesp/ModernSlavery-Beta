@@ -21,6 +21,7 @@ using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
 using Newtonsoft.Json;
 using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Shared.Controllers
 {
@@ -32,7 +33,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         public BaseController(
             ILogger logger,
             IWebService webService,
-            IDataRepository dataRepository) : base()
+            IDataRepository dataRepository,
+            IFileRepository fileRepository) : base()
         {
             Logger = logger;
             AutoMapper = webService.AutoMapper;
@@ -41,12 +43,14 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             WebTracker = webService.WebTracker;
 
             DataRepository = dataRepository;
+            FileRepository = fileRepository;
         }
 
         protected readonly ILogger Logger;
         public readonly IHttpCache Cache;
         public readonly IHttpSession Session;
         public readonly IDataRepository DataRepository;
+        public readonly IFileRepository FileRepository;
         public readonly IWebTracker WebTracker;
         protected readonly IMapper AutoMapper;
 

@@ -8,6 +8,19 @@ using Microsoft.ApplicationInsights;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using ModernSlavery.Core;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Infrastructure.Search;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.Azure.Search;
+using Microsoft.Azure.Search.Models;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -15,35 +28,45 @@ using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
 using Index = Microsoft.Azure.Search.Models.Index;
 
-namespace ModernSlavery.Infrastructure.Search
+namespace ModernSlavery.Infrastructure.Data
 {
-    public abstract class ASearchRepository<T> : ISearchRepository<T> where T : class
+    public class AzureSicCodeSearchRepository : ISearchRepository<SicCodeSearchModel>
     {
-
         protected readonly Lazy<Task<ISearchServiceClient>> _searchServiceClient;
         private readonly TelemetryClient _telemetryClient;
         protected Lazy<Task<ISearchIndexClient>> _searchIndexClient;
         protected string _suggesterName;
-        protected string _indexName;
+        public string IndexName { get; }
 
         public bool Disabled { get; set; }
 
-        protected ASearchRepository(ISearchServiceClient searchServiceClient,string indexName, bool disabled=false)
+
+        public AzureSicCodeSearchRepository(ISearchServiceClient searchServiceClient, string indexName, bool disabled=false)
         {
             Disabled = disabled;
             if (disabled)
             {
-                Console.WriteLine($"{nameof(ASearchRepository<T>)} is disabled");
+                Console.WriteLine($"{nameof(AzureSicCodeSearchRepository)} is disabled");
                 return;
             }
-            _indexName = indexName;
+            IndexName = indexName;
 
             _searchServiceClient = new Lazy<Task<ISearchServiceClient>>(
                 async () => {
                     //Ensure the index exists
-                    await CreateIndexIfNotExistsAsync(searchServiceClient, _indexName).ConfigureAwait(false);
+                    await CreateIndexIfNotExistsAsync(searchServiceClient, IndexName).ConfigureAwait(false);
 
                     return searchServiceClient;
+                });
+
+            if (Disabled) return;
+
+            _suggesterName = "sicCodeSuggester";
+
+            _searchIndexClient = new Lazy<Task<ISearchIndexClient>>(
+                async () => {
+                    ISearchServiceClient serviceClient = await _searchServiceClient.Value;
+                    return serviceClient.Indexes?.GetClient(indexName);
                 });
         }
 
@@ -54,7 +77,8 @@ namespace ModernSlavery.Infrastructure.Search
                 return;
             }
 
-            var index = new Index {
+            var index = new Index
+            {
                 Name = sicCodesIndexName,
                 Fields = FieldBuilder.BuildForType<SicCodeSearchModel>(),
                 Suggesters = new List<Suggester> {
@@ -68,26 +92,7 @@ namespace ModernSlavery.Infrastructure.Search
             await searchServiceClient.Indexes.CreateAsync(index);
         }
 
-        protected async Task<IList<T>> ListWorkAsync(string selectFields = null)
-        {
-            long totalPages = 0;
-            var currentPage = 1;
-            var resultsList = new List<T>();
-
-            do
-            {
-                PagedResult<T> searchResults = await SearchAsync(null, currentPage, SearchType.NotSet, selectFields: selectFields);
-                totalPages = searchResults.PageCount;
-                resultsList.AddRange(searchResults.Results);
-                currentPage++;
-            } while (currentPage < totalPages);
-
-            return resultsList;
-        }
-
-        #region methods implemented by this abstract class
-
-        public async Task AddOrUpdateIndexDataAsync(IEnumerable<T> newRecords)
+        public async Task AddOrUpdateIndexDataAsync(IEnumerable<SicCodeSearchModel> newRecords)
         {
             if (newRecords == null || !newRecords.Any())
             {
@@ -95,13 +100,13 @@ namespace ModernSlavery.Infrastructure.Search
             }
 
             //Set the records to add or update
-            List<IndexAction<T>> actions = newRecords.Select(IndexAction.MergeOrUpload).ToList();
+            var actions = newRecords.Cast<AzureSicCodeSearchModel>().Select(IndexAction.MergeOrUpload).ToList();
 
-            var batches = new ConcurrentBag<IndexBatch<T>>();
+            var batches = new ConcurrentBag<IndexBatch<AzureSicCodeSearchModel>>();
             while (actions.Any())
             {
                 int batchSize = actions.Count > 1000 ? 1000 : actions.Count;
-                IndexBatch<T> batch = IndexBatch.New(actions.Take(batchSize).ToList());
+                var batch = IndexBatch.New(actions.Take(batchSize).ToList());
                 batches.Add(batch);
                 actions.RemoveRange(0, batchSize);
             }
@@ -131,14 +136,15 @@ namespace ModernSlavery.Infrastructure.Search
                 });
         }
 
-        public async Task RefreshIndexDataAsync(IEnumerable<T> listOfRecordsToAddOrUpdate)
+
+        public async Task RefreshIndexDataAsync(IEnumerable<SicCodeSearchModel> listOfRecordsToAddOrUpdate)
         {
             //Add (or update) the records to the index
             await AddOrUpdateIndexDataAsync(listOfRecordsToAddOrUpdate);
 
             //Get the old records which will need deleting
-            IList<T> currentListOfDocumentsInIndex = await ListAsync();
-            IEnumerable<T> listOfDocumentsNotPartOfThisUpdate = currentListOfDocumentsInIndex.Except(listOfRecordsToAddOrUpdate);
+            var currentListOfDocumentsInIndex = await ListAsync();
+            var listOfDocumentsNotPartOfThisUpdate = currentListOfDocumentsInIndex.Except(listOfRecordsToAddOrUpdate);
 
             //Delete the old records
             if (listOfDocumentsNotPartOfThisUpdate.Any())
@@ -160,7 +166,7 @@ namespace ModernSlavery.Infrastructure.Search
         /// </param>
         /// <param name="maxRecords">Maximum number of suggestions to return (default=10)</param>
         /// </param>
-        public async Task<IEnumerable<KeyValuePair<string, T>>> SuggestAsync(string searchText,
+        public async Task<IEnumerable<KeyValuePair<string, SicCodeSearchModel>>> SuggestAsync(string searchText,
             string searchFields = null,
             string selectFields = null,
             bool fuzzy = true,
@@ -168,11 +174,11 @@ namespace ModernSlavery.Infrastructure.Search
         {
             if (string.IsNullOrEmpty(searchText?.Trim()))
             {
-                return new List<KeyValuePair<string, T>>();
+                return new List<KeyValuePair<string, SicCodeSearchModel>>();
             }
 
             // Execute search based on query string
-            var sp = new SuggestParameters {UseFuzzyMatching = fuzzy, Top = maxRecords};
+            var sp = new SuggestParameters { UseFuzzyMatching = fuzzy, Top = maxRecords };
 
             //Specify the fields to search
             if (!string.IsNullOrWhiteSpace(searchFields))
@@ -188,9 +194,8 @@ namespace ModernSlavery.Infrastructure.Search
 
             ISearchIndexClient searchIndexClient = await _searchIndexClient.Value;
 
-            DocumentSuggestResult<T> results = await searchIndexClient.Documents.SuggestAsync<T>(searchText, _suggesterName, sp);
-            IEnumerable<KeyValuePair<string, T>>
-                suggestions = results?.Results.Select(s => new KeyValuePair<string, T>(s.Text, s.Document));
+            var results = await searchIndexClient.Documents.SuggestAsync<SicCodeSearchModel>(searchText, _suggesterName, sp);
+            var suggestions = results?.Results.Select(s => new KeyValuePair<string, SicCodeSearchModel>(s.Text, s.Document));
             return suggestions;
         }
 
@@ -243,9 +248,9 @@ namespace ModernSlavery.Infrastructure.Search
         ///         For example, highlight=title-3,description-10 returns up to 3 highlighted hits from the title field and up to
         ///         10 hits from the description field. <max # of highlights> must be an integer between 1 and 1000 inclusive.
         /// </param>
-        public async Task<PagedResult<T>> SearchAsync(string searchText,
+        public async Task<PagedResult<SicCodeSearchModel>> SearchAsync(string searchText,
             int currentPage,
-            SearchType searchType,
+            SearchTypes searchType,
             int pageSize = 20,
             string searchFields = null,
             string selectFields = null,
@@ -253,11 +258,12 @@ namespace ModernSlavery.Infrastructure.Search
             Dictionary<string, Dictionary<object, long>> facets = null,
             string filter = null,
             string highlights = null,
-            string searchMode = null)
+            SearchModes searchMode = SearchModes.Any)
         {
             // Execute search based on query string
-            var sp = new SearchParameters {
-                SearchMode = searchMode.Equals("any") ? SearchMode.Any : SearchMode.All,
+            var sp = new SearchParameters
+            {
+                SearchMode = (SearchMode)searchMode,
                 Top = pageSize,
                 Skip = (currentPage - 1) * pageSize,
                 IncludeTotalResultCount = true,
@@ -293,7 +299,7 @@ namespace ModernSlavery.Infrastructure.Search
 
             //Execute the search
             ISearchIndexClient searchIndexClient = await _searchIndexClient.Value;
-            DocumentSearchResult<T> results = searchIndexClient.Documents.Search<T>(searchText, sp);
+            var results = searchIndexClient.Documents.Search<SicCodeSearchModel>(searchText, sp);
 
             //Return the total records
             long totalRecords = results.Count.Value;
@@ -332,7 +338,8 @@ namespace ModernSlavery.Infrastructure.Search
             }
 
             //Return the results
-            var searchResults = new PagedResult<T> {
+            var searchResults = new PagedResult<SicCodeSearchModel>
+            {
                 Results = results.Results.Select(r => r.Document).ToList(),
                 CurrentPage = currentPage,
                 PageSize = pageSize,
@@ -347,7 +354,7 @@ namespace ModernSlavery.Infrastructure.Search
         ///     Removes old records from index
         /// </summary>
         /// <param name="oldRecords">The old records which should be deleted from the index.</param>
-        public async Task<int> RemoveFromIndexAsync(IEnumerable<T> oldRecords)
+        public async Task<int> RemoveFromIndexAsync(IEnumerable<SicCodeSearchModel> oldRecords)
         {
             if (oldRecords == null || !oldRecords.Any())
             {
@@ -355,14 +362,14 @@ namespace ModernSlavery.Infrastructure.Search
             }
 
             //Set the records to add or update
-            List<IndexAction<T>> actions = oldRecords.Select(IndexAction.Delete).ToList();
+            var actions = oldRecords.Select(IndexAction.Delete).ToList();
 
-            var batches = new ConcurrentBag<IndexBatch<T>>();
+            var batches = new ConcurrentBag<IndexBatch<SicCodeSearchModel>>();
 
             while (actions.Any())
             {
                 int batchSize = actions.Count > 1000 ? 1000 : actions.Count;
-                IndexBatch<T> batch = IndexBatch.New(actions.Take(batchSize).ToList());
+                var batch = IndexBatch.New(actions.Take(batchSize).ToList());
                 batches.Add(batch);
                 actions.RemoveRange(0, batchSize);
             }
@@ -395,23 +402,36 @@ namespace ModernSlavery.Infrastructure.Search
             return deleteCount;
         }
 
-        #endregion
-
-        #region methods left to be implemented by subclasses
-
-        public abstract Task<T> GetAsync(string key, string selectFields = null);
-
-        public abstract Task<IList<T>> ListAsync(string selectFields = null);
-
-        public async Task CreateIndexIfNotExistsAsync(string indexName)
+        public async Task<IList<SicCodeSearchModel>> ListAsync(string selectFields = null)
         {
-            ISearchServiceClient serviceClient = await _searchServiceClient.Value;
-            await CreateIndexIfNotExistsAsync(serviceClient, indexName);
+            long totalPages = 0;
+            var currentPage = 1;
+            var resultsList = new List<SicCodeSearchModel>();
+
+            do
+            {
+                var searchResults = await SearchAsync(null, currentPage, SearchTypes.NotSet, selectFields: selectFields);
+                totalPages = searchResults.PageCount;
+                resultsList.AddRange(searchResults.Results);
+                currentPage++;
+            } while (currentPage < totalPages);
+
+            return resultsList;
         }
 
-        public abstract Task<long> GetDocumentCountAsync();
+        public Task<SicCodeSearchModel> GetAsync(string key, string selectFields = null)
+        {
+            throw new NotImplementedException();
+        }
 
-        #endregion
+        public Task<long> GetDocumentCountAsync()
+        {
+            throw new NotImplementedException();
+        }
 
+        public Task CreateIndexIfNotExistsAsync(string indexName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

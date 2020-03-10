@@ -18,12 +18,14 @@ namespace ModernSlavery.BusinessLogic.Classes
 {
     public class DnBOrgsRepository: IDnBOrgsRepository
     {
-        public DnBOrgsRepository([KeyFilter(QueueNames.ExecuteWebJob)]IQueue executeWebjobQueue)
+        public DnBOrgsRepository([KeyFilter(QueueNames.ExecuteWebJob)]IQueue executeWebjobQueue, IFileRepository fileRepository)
         {
             ExecuteWebjobQueue = executeWebjobQueue;
+            FileRepository = fileRepository;
         }
 
         readonly IQueue ExecuteWebjobQueue;
+        private readonly IFileRepository FileRepository;
 
         #region Properties
         private DateTime _DnBOrgsLoaded;
@@ -243,16 +245,16 @@ namespace ModernSlavery.BusinessLogic.Classes
         public async Task<List<DnBOrgsModel>> LoadIfNewerAsync()
         {
             string dnbOrgsPath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations());
-            bool fileExists = await Global.FileRepository.GetFileExistsAsync(dnbOrgsPath);
+            bool fileExists = await FileRepository.GetFileExistsAsync(dnbOrgsPath);
 
             //Copy the previous years if no current year
             if (!fileExists)
             {
                 string dnbOrgsPathPrevious = Path.Combine(Global.DataPath, Filenames.PreviousDnBOrganisations());
-                if (await Global.FileRepository.GetFileExistsAsync(dnbOrgsPathPrevious))
+                if (await FileRepository.GetFileExistsAsync(dnbOrgsPathPrevious))
                 {
-                    await Global.FileRepository.WriteAsync(dnbOrgsPath, await Global.FileRepository.ReadBytesAsync(dnbOrgsPathPrevious));
-                    fileExists = await Global.FileRepository.GetFileExistsAsync(dnbOrgsPath);
+                    await FileRepository.WriteAsync(dnbOrgsPath, await FileRepository.ReadBytesAsync(dnbOrgsPathPrevious));
+                    fileExists = await FileRepository.GetFileExistsAsync(dnbOrgsPath);
                 }
             }
 
@@ -261,14 +263,14 @@ namespace ModernSlavery.BusinessLogic.Classes
                 return null;
             }
 
-            DateTime newloadTime = fileExists ? await Global.FileRepository.GetLastWriteTimeAsync(dnbOrgsPath) : DateTime.MinValue;
+            DateTime newloadTime = fileExists ? await FileRepository.GetLastWriteTimeAsync(dnbOrgsPath) : DateTime.MinValue;
 
             if (_DnBOrgsLoaded > DateTime.MinValue && newloadTime <= _DnBOrgsLoaded)
             {
                 return null;
             }
 
-            string orgs = fileExists ? await Global.FileRepository.ReadAsync(dnbOrgsPath) : null;
+            string orgs = fileExists ? await FileRepository.ReadAsync(dnbOrgsPath) : null;
             if (string.IsNullOrWhiteSpace(orgs))
             {
                 throw new Exception($"No content not load '{dnbOrgsPath}'");
@@ -276,7 +278,7 @@ namespace ModernSlavery.BusinessLogic.Classes
 
             _DnBOrgsLoaded = newloadTime;
 
-            List<DnBOrgsModel> list = await Global.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
+            List<DnBOrgsModel> list = await FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
             if (list.Count < 1)
             {
                 throw new Exception($"No records found in '{dnbOrgsPath}'");

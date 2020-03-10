@@ -29,7 +29,7 @@ namespace ModernSlavery.WebJob
                 //Update the search indexes
                 if (changedOrgs.Count > 0)
                 {
-                    await _SearchBusinessLogic.UpdateSearchIndexAsync(changedOrgs.ToArray());
+                    await SearchBusinessLogic.UpdateSearchIndexAsync(changedOrgs.ToArray());
                 }
 
                 log.LogDebug($"Executed {nameof(SetPresumedScopes)} successfully");

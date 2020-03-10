@@ -21,6 +21,7 @@ using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Infrastructure;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -29,6 +30,7 @@ namespace ModernSlavery.WebUI.Controllers
     {
 
         private readonly PinInThePostService pinInThePostService;
+        private readonly IPostcodeChecker postcodeChecker;
 
         #region Constructors
 
@@ -41,11 +43,11 @@ namespace ModernSlavery.WebUI.Controllers
             ICommonBusinessLogic commonBusinessLogic,
             ISearchBusinessLogic searchBusinessLogic,
             IUserRepository userRepository,
-            IDataRepository dataRepository,
             PinInThePostService pinInThePostService,
+            IPostcodeChecker postcodeChecker,
             [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
-            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository) 
-            : base(logger,webService,dataRepository)
+            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
             ScopePresentation = scopePresentation;
             ScopeBusinessLogic = scopeBL;
@@ -56,6 +58,7 @@ namespace ModernSlavery.WebUI.Controllers
             PublicSectorRepository = publicSectorRepository;
             UserRepository = userRepository;
             this.pinInThePostService = pinInThePostService;
+            this.postcodeChecker = postcodeChecker;
         }
 
         #endregion

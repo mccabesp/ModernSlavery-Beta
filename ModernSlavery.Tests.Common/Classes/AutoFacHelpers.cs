@@ -11,6 +11,7 @@ using Moq;
 
 using NUnit.Framework;
 using ModernSlavery.Database;
+using ModernSlavery.Infrastructure.Data;
 
 namespace ModernSlavery.Tests.Common.Classes
 {

@@ -1,7 +1,7 @@
 ﻿using Autofac;
-using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.SharedKernel;
 using Moq;
 
@@ -16,21 +16,24 @@ namespace ModernSlavery.Tests.Common.TestHelpers
         public static void SetupMockLogRecordGlobals(ContainerBuilder builder = null)
         {
             // Used by WebUI
-            Global.BadSicLog = new Mock<ILogRecordLogger>().Object;
-            Global.ManualChangeLog = new Mock<ILogRecordLogger>().Object;
-            Global.RegistrationLog = new Mock<ILogRecordLogger>().Object;
-            Global.SubmissionLog = new Mock<ILogRecordLogger>().Object;
-            Global.SearchLog = new Mock<ILogRecordLogger>().Object;
-            Global.EmailSendLog = new Mock<ILogRecordLogger>().Object;
+
+            var badSicLog = new Mock<ILogRecordLogger>().Object;
+            var manualChangeLog = new Mock<ILogRecordLogger>().Object;
+            var registrationLog = new Mock<ILogRecordLogger>().Object;
+            var submissionLog = new Mock<ILogRecordLogger>().Object;
+            var searchLog = new Mock<ILogRecordLogger>().Object;
+            var emailSendLog = new Mock<ILogRecordLogger>().Object;
 
             if (builder != null)
             {
-                builder.RegisterInstance(Global.BadSicLog).Keyed<ILogRecordLogger>(Filenames.BadSicLog).SingleInstance();
-                builder.RegisterInstance(Global.ManualChangeLog).Keyed<ILogRecordLogger>(Filenames.ManualChangeLog).SingleInstance();
-                builder.RegisterInstance(Global.RegistrationLog).Keyed<ILogRecordLogger>(Filenames.RegistrationLog).SingleInstance();
-                builder.RegisterInstance(Global.SubmissionLog).Keyed<ILogRecordLogger>(Filenames.SubmissionLog).SingleInstance();
-                builder.RegisterInstance(Global.SearchLog).Keyed<ILogRecordLogger>(Filenames.SearchLog).SingleInstance();
-                builder.RegisterInstance(Global.EmailSendLog).Keyed<ILogRecordLogger>(Filenames.EmailSendLog).SingleInstance();
+                builder.RegisterInstance(Mock.Of<IFileRepository>()).SingleInstance();
+
+                builder.RegisterInstance(badSicLog).Keyed<ILogRecordLogger>(Filenames.BadSicLog).SingleInstance();
+                builder.RegisterInstance(manualChangeLog).Keyed<ILogRecordLogger>(Filenames.ManualChangeLog).SingleInstance();
+                builder.RegisterInstance(registrationLog).Keyed<ILogRecordLogger>(Filenames.RegistrationLog).SingleInstance();
+                builder.RegisterInstance(submissionLog).Keyed<ILogRecordLogger>(Filenames.SubmissionLog).SingleInstance();
+                builder.RegisterInstance(searchLog).Keyed<ILogRecordLogger>(Filenames.SearchLog).SingleInstance();
+                builder.RegisterInstance(emailSendLog).Keyed<ILogRecordLogger>(Filenames.EmailSendLog).SingleInstance();
 
                 builder.RegisterInstance(Mock.Of<IUserLogRecord>()).SingleInstance();
                 builder.RegisterInstance(Mock.Of<IRegistrationLogRecord>()).SingleInstance();

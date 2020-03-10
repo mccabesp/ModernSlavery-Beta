@@ -24,7 +24,7 @@ namespace ModernSlavery.WebJob
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateOrganisationsAsync)))
                 {
-                    IEnumerable<string> files = await Global.FileRepository.GetFilesAsync(
+                    IEnumerable<string> files = await FileRepository.GetFilesAsync(
                         Global.DownloadsPath,
                         $"{Path.GetFileNameWithoutExtension(Filenames.Organisations)}*{Path.GetExtension(Filenames.Organisations)}");
                     if (files.Any())

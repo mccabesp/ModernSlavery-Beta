@@ -1,4 +1,4 @@
-﻿using ModernSlavery.Core.Classes.Downloadable;
+﻿using ModernSlavery.Infrastructure.File;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Classes.Downloadable

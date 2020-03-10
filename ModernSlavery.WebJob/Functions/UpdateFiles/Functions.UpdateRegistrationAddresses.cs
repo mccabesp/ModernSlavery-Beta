@@ -29,7 +29,7 @@ namespace ModernSlavery.WebJob
                 string filePath = Path.Combine(Global.DownloadsPath, Filenames.RegistrationAddresses);
 
                 //Dont execute on startup if file already exists
-                if (!StartedJobs.Contains(funcName) && await Global.FileRepository.GetFileExistsAsync(filePath))
+                if (!StartedJobs.Contains(funcName) && await FileRepository.GetFileExistsAsync(filePath))
                 {
                     log.LogDebug($"Skipped {funcName} at start up.");
                     return;
@@ -100,8 +100,8 @@ namespace ModernSlavery.WebJob
         {
             // Load the DnBOrgs file from storage"
             string dnbOrgsPath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations());
-            List<DnBOrgsModel> AllDnBOrgs = await Global.FileRepository.GetFileExistsAsync(dnbOrgsPath)
-                ? await Global.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath)
+            List<DnBOrgsModel> AllDnBOrgs = await FileRepository.GetFileExistsAsync(dnbOrgsPath)
+                ? await FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath)
                 : new List<DnBOrgsModel>();
             AllDnBOrgs = AllDnBOrgs.OrderBy(o => o.OrganisationName).ToList();
 
@@ -111,7 +111,7 @@ namespace ModernSlavery.WebJob
                 .ToList();
 
             // Get all the latest verified organisation registrations
-            List<Organisation> verifiedOrgs = await _DataRepository.GetEntities<Organisation>()
+            List<Organisation> verifiedOrgs = await DataRepository.GetAll<Organisation>()
                 .Where(uo => uo.LatestRegistration != null)
                 .Include(uo => uo.LatestRegistration)
                 .Include(uo => uo.LatestAddress)

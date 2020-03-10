@@ -6,7 +6,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Autofac;
 using ModernSlavery.BusinessLogic.Services;
-using ModernSlavery.Core.Classes.Downloadable;
 using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.Core.Models.Downloadable;
 using ModernSlavery.WebUI.Tests.TestHelpers;
@@ -16,6 +15,8 @@ using Moq;
 using NUnit.Framework;
 using ModernSlavery.Tests.Common;
 using AutoMapper;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Infrastructure.File;
 using ModernSlavery.WebUI.Admin.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;
 
@@ -80,10 +81,12 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
             var downloadableFileBusinessLogic = IocContainer.Resolve<IDownloadableFileBusinessLogic>();
 
             var webService = IocContainer.Resolve<IWebService>();
+            var fileRepo = IocContainer.Resolve<IFileRepository>();
+            var dataRepo = IocContainer.Resolve<IDataRepository>();
+
             _TestDownloadableFileController = new DownloadableFileController(
                 configurableLogger.Object,webService,
-                null,
-                downloadableFileBusinessLogic);
+                downloadableFileBusinessLogic,dataRepo, fileRepo);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile(filePath);
@@ -144,10 +147,12 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
             var downloadableFileBusinessLogic = IocContainer.Resolve<IDownloadableFileBusinessLogic>();
 
             var webService = IocContainer.Resolve<IWebService>();
+            var fileRepo = IocContainer.Resolve<IFileRepository>();
+            var dataRepo = IocContainer.Resolve<IDataRepository>();
+
             _TestDownloadableFileController = new DownloadableFileController(
                 configurableLogger.Object, webService,
-                null,
-                downloadableFileBusinessLogic);
+                downloadableFileBusinessLogic, dataRepo, fileRepo);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile(filePath);
@@ -210,10 +215,12 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .ThrowsAsync(new FileNotFoundException());
 
             var webService = IocContainer.Resolve<IWebService>();
+            var fileRepo = IocContainer.Resolve<IFileRepository>();
+            var dataRepo = IocContainer.Resolve<IDataRepository>();
+
             _TestDownloadableFileController = new DownloadableFileController(
                 configurableLogger.Object, webService,
-                null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, dataRepo, fileRepo);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile("AFilePath");
@@ -251,10 +258,12 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .ReturnsAsync(new DownloadableFileModel("someName") {DataTable = new DataTable()});
 
             var webService = IocContainer.Resolve<IWebService>();
+            var fileRepo = IocContainer.Resolve<IFileRepository>();
+            var dataRepo = IocContainer.Resolve<IDataRepository>();
+
             _TestDownloadableFileController = new DownloadableFileController(
                 null, webService,
-                null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, dataRepo, fileRepo);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile("AFilePath");
@@ -282,10 +291,12 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .ReturnsAsync(new List<IDownloadableItem>());
 
             var webService = IocContainer.Resolve<IWebService>();
+            var fileRepo = IocContainer.Resolve<IFileRepository>();
+            var dataRepo = IocContainer.Resolve<IDataRepository>();
+
             _TestDownloadableFileController = new DownloadableFileController(
                 null, webService,
-                null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, dataRepo, fileRepo);
 
             // Act
             await _TestDownloadableFileController.WebsiteLogs(filePath);
@@ -336,10 +347,12 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .ReturnsAsync(new List<IDownloadableItem>());
 
             var webService = IocContainer.Resolve<IWebService>();
+            var fileRepo = IocContainer.Resolve<IFileRepository>();
+            var dataRepo = IocContainer.Resolve<IDataRepository>();
+
             _TestDownloadableFileController = new DownloadableFileController(
                 null, webService,
-                null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, dataRepo, fileRepo);
 
             // Act
             await _TestDownloadableFileController.WebjobLogs(filePath);
@@ -390,10 +403,12 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .ReturnsAsync(new List<IDownloadableItem>());
 
             var webService = IocContainer.Resolve<IWebService>();
+            var fileRepo = IocContainer.Resolve<IFileRepository>();
+            var dataRepo = IocContainer.Resolve<IDataRepository>();
+
             _TestDownloadableFileController = new DownloadableFileController(
                 null, webService,
-                null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, dataRepo, fileRepo);
             
             
             // Act
@@ -443,10 +458,12 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
                 .ReturnsAsync(listOfDownloadableItems);
 
             var webService = IocContainer.Resolve<IWebService>();
+            var fileRepo = IocContainer.Resolve<IFileRepository>();
+            var dataRepo = IocContainer.Resolve<IDataRepository>();
+
             _TestDownloadableFileController = new DownloadableFileController(
                 null, webService,
-                null,
-                configurableDownloadableFileBusinessLogic.Object);
+                configurableDownloadableFileBusinessLogic.Object, dataRepo, fileRepo);
         }
 
     }

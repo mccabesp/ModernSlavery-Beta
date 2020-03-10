@@ -14,7 +14,6 @@ using ModernSlavery.BusinessLogic.Repositories;
 using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Classes.Queues;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.Cookies;
@@ -50,11 +49,17 @@ using ModernSlavery.SharedKernel;
 using Newtonsoft.Json;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Infrastructure;
+using ModernSlavery.Infrastructure;
+using ModernSlavery.Infrastructure.File;
+using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.Infrastructure.Queue;
+using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Admin.Controllers;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Tests.TestHelpers
 {
@@ -200,10 +205,6 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
             {
                 routeData = new RouteData();
             }
-
-            Global.FileRepository = DIContainer.Resolve<IFileRepository>();
-            Global.SearchRepository = DIContainer.Resolve<ISearchRepository<EmployerSearchModel>>();
-            Global.SicCodeSearchRepository = DIContainer.Resolve<ISearchRepository<SicCodeSearchModel>>();
 
             //Mock IHttpContextAccessor
             Mock<IHttpContextAccessor> mockHttpContextAccessor = DIContainer.Resolve<IHttpContextAccessor>().GetMockFromObject();

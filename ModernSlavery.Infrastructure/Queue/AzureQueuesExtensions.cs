@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Infrastructure.Log;
+using ModernSlavery.Infrastructure.Logging;
 
 namespace ModernSlavery.Infrastructure.Queue
 {

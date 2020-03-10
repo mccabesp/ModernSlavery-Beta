@@ -5,7 +5,7 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
-using Microsoft.Azure.Search.Models;
+using ModernSlavery.Infrastructure;
 using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Tests.Common.Mocks
@@ -18,6 +18,7 @@ namespace ModernSlavery.Tests.Common.Mocks
         private List<EmployerSearchModel> _documents = new List<EmployerSearchModel>();
 
         public bool Disabled { get; set; }
+        public string IndexName { get; set; }
 
         public MockSearchRepository(List<EmployerSearchModel> documents = null)
         {
@@ -63,7 +64,7 @@ namespace ModernSlavery.Tests.Common.Mocks
 
         public async Task<PagedResult<EmployerSearchModel>> SearchAsync(string searchText,
             int currentPage,
-            SearchType searchType,
+            SearchTypes searchType,
             int pageSize = 20,
             string searchFields = null,
             string selectFields = null,
@@ -71,7 +72,7 @@ namespace ModernSlavery.Tests.Common.Mocks
             Dictionary<string, Dictionary<object, long>> facets = null,
             string filter = null,
             string highlights = null,
-            SearchMode searchMode = SearchMode.Any)
+            SearchModes searchMode = SearchModes.Any)
         {
             var result = new PagedResult<EmployerSearchModel>();
             result.Results = new List<EmployerSearchModel>(_documents);

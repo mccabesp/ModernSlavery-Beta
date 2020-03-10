@@ -72,7 +72,7 @@ namespace ModernSlavery.WebJob.Tests.Functions
 
             //ASSERT
             //Check each return is in the download file
-            IEnumerable<string> files = await Global.FileRepository.GetFilesAsync(Global.DownloadsPath);
+            IEnumerable<string> files = await _functions.FileRepository.GetFilesAsync(Global.DownloadsPath);
             Assert.AreEqual(expectedFileCount, files.Count(), $"Expected 2 files in {Global.DownloadsPath}");
             Assert.Multiple(
                 () => {
@@ -104,7 +104,7 @@ namespace ModernSlavery.WebJob.Tests.Functions
 
             //ASSERT
             //Check each return is in the download file
-            IEnumerable<string> files = await Global.FileRepository.GetFilesAsync(
+            IEnumerable<string> files = await _functions.FileRepository.GetFilesAsync(
                 Global.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.Organisations)}_*{Path.GetExtension(Filenames.Organisations)}");
             Assert.That(files.Count() == 1, $"Expected only 1 file in {Global.DownloadsPath} got {files.Count()}");

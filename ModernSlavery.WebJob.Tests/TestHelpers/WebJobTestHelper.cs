@@ -2,10 +2,8 @@
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core;
-using ModernSlavery.Core.API;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.Mocks;
@@ -13,6 +11,11 @@ using ModernSlavery.Tests.Common.TestHelpers;
 using Microsoft.Azure.Search;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Infrastructure;
+using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.Infrastructure.Search;
 using Moq;
 
 using ModernSlavery.SharedKernel.Interfaces;
@@ -45,7 +48,7 @@ namespace ModernSlavery.WebJob.Tests.TestHelpers
             //Create the mock repositories
             builder.Register(c => new MockFileRepository()).As<IFileRepository>().SingleInstance();
             builder.Register(c => new MockSearchRepository()).As<ISearchRepository<EmployerSearchModel>>().SingleInstance();
-            builder.RegisterType(typeof(SicCodeSearchRepository)).As<ISearchRepository<SicCodeSearchModel>>().SingleInstance();
+            builder.RegisterType(typeof(AzureSicCodeSearchRepository)).As<ISearchRepository<SicCodeSearchModel>>().SingleInstance();
 
             // BL Services
             builder.RegisterInstance(Config.Configuration).SingleInstance();
@@ -79,11 +82,6 @@ namespace ModernSlavery.WebJob.Tests.TestHelpers
         {
             IContainer containerIoc = BuildContainerIoC(dbObjects);
             var functions = containerIoc.Resolve<WebJob.Functions>();
-
-            //Create the mock repositories
-            Global.FileRepository = containerIoc.Resolve<IFileRepository>();
-            Global.SearchRepository = containerIoc.Resolve<ISearchRepository<EmployerSearchModel>>();
-            Global.SicCodeSearchRepository = containerIoc.Resolve<ISearchRepository<SicCodeSearchModel>>();
 
             return functions;
         }

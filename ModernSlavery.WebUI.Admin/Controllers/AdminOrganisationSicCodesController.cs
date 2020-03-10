@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.Core.API;
-using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models.CompaniesHouse;
 using ModernSlavery.Entities;
@@ -24,15 +22,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private readonly IDataRepository dataRepository;
         private readonly ICompaniesHouseAPI companiesHouseApi;
         private readonly AuditLogger auditLogger;
-
+        private readonly ICustomLogger customLogger;
         public AdminOrganisationSicCodesController(
             IDataRepository dataRepository,
             ICompaniesHouseAPI companiesHouseApi,
-            AuditLogger auditLogger)
+            AuditLogger auditLogger, ICustomLogger customLogger)
         {
             this.dataRepository = dataRepository;
             this.companiesHouseApi = companiesHouseApi;
             this.auditLogger = auditLogger;
+            this.customLogger = customLogger;
         }
 
         [HttpGet("organisation/{id}/sic-codes")]
@@ -67,7 +66,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 catch (Exception ex)
                 {
                     // Use Manual Change page instead
-                    CustomLogger.Warning("Error from Companies House API", ex);
+                    customLogger.Warning("Error from Companies House API", ex);
                 }
             }
 

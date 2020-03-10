@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 using ModernSlavery.Entities;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Entities.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace ModernSlavery.BusinessLogic.Classes
 {
@@ -62,10 +61,11 @@ namespace ModernSlavery.BusinessLogic.Classes
 
                 if (!test)
                 {
-                    orgs = await _DataRepository.GetAll<Organisation>()
+                    orgs = _DataRepository.GetAll<Organisation>()
                         .Where(
                             o => o.SectorType == SectorTypes.Private && o.Status == OrganisationStatuses.Active && o.LatestAddress != null)
-                        .ToListAsync();
+                        .ToList();
+
                     if (searchText.IsCompanyNumber())
                     {
                         localResults = orgs.Where(o => o.CompanyNumber.EqualsI(searchText)).OrderBy(o => o.OrganisationName).ToList();

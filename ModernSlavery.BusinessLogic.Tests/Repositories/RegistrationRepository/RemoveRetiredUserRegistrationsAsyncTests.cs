@@ -1,10 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.LogRecords;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
 using ModernSlavery.Entities;
+using ModernSlavery.Infrastructure.Data;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;

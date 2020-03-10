@@ -20,7 +20,7 @@ namespace ModernSlavery.WebUI.Controllers
         public ActionHubController(
             ILogger<ActionHubController> logger,
             IWebService webService,
-            IDataRepository dataRepository):base(logger, webService, dataRepository)
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
         }
 

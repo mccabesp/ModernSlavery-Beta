@@ -15,7 +15,7 @@ namespace ModernSlavery.Extensions
     public static class Lists
     {
 
-        public static async IAsyncEnumerable<T> ToListAsync<T>(this IQueryable<T> query)
+        public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IQueryable<T> query)
         {
             foreach (T entity in query)
                 yield return entity;

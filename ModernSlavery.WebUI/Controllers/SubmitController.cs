@@ -44,7 +44,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
             IWebService webService,
             ICommonBusinessLogic commonBusinessLogic,
             ISubmissionService submitService,
-            IDataRepository dataRepository) : base(logger, webService, dataRepository)
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
             this.commonBusinessLogic = commonBusinessLogic;
             submissionService = submitService;

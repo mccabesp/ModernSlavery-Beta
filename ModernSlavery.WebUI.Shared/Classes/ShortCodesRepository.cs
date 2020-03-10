@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Shared.Models;
@@ -14,18 +15,23 @@ namespace ModernSlavery
 {
     public class ShortCodesRepository: IShortCodesRepository
     {
+        public ShortCodesRepository(IFileRepository fileRepository)
+        {
+            FileRepository = fileRepository;
+        }
 
+        private readonly IFileRepository FileRepository;
         #region Properties
 
-        private static DateTime _ShortCodesLoaded;
-        internal static DateTime _ShortCodesLastLoaded;
+        private DateTime _ShortCodesLoaded;
+        internal DateTime _ShortCodesLastLoaded;
 
-        private static List<ShortCodeModel> _ShortCodes;
+        private List<ShortCodeModel> _ShortCodes;
 
         //Instantiate a Singleton of the Semaphore with a value of 1. This means that only 1 thread can be granted access at a time.
-        private static readonly SemaphoreSlim _ShortCodesLock = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _ShortCodesLock = new SemaphoreSlim(1, 1);
 
-        public static async Task<List<ShortCodeModel>> GetAllShortCodesAsync()
+        public async Task<List<ShortCodeModel>> GetAllShortCodesAsync()
         {
             //Asynchronously wait to enter the Semaphore. If no-one has been granted access to the Semaphore, code execution will proceed, otherwise this thread waits here until the semaphore is released 
             await _ShortCodesLock.WaitAsync();
@@ -52,7 +58,7 @@ namespace ModernSlavery
             }
         }
 
-        public static async Task ClearAllShortCodesAsync()
+        public async Task ClearAllShortCodesAsync()
         {
             //Asynchronously wait to enter the Semaphore. If no-one has been granted access to the Semaphore, code execution will proceed, otherwise this thread waits here until the semaphore is released 
             await _ShortCodesLock.WaitAsync();
@@ -70,24 +76,24 @@ namespace ModernSlavery
             }
         }
 
-        public static async Task<List<ShortCodeModel>> LoadIfNewerAsync()
+        public async Task<List<ShortCodeModel>> LoadIfNewerAsync()
         {
             string shortCodesPath = Path.Combine(Global.DataPath, Filenames.ShortCodes);
-            bool fileExists = await Global.FileRepository.GetFileExistsAsync(shortCodesPath);
+            bool fileExists = await FileRepository.GetFileExistsAsync(shortCodesPath);
 
             if (!fileExists)
             {
                 return null;
             }
 
-            DateTime newloadTime = fileExists ? await Global.FileRepository.GetLastWriteTimeAsync(shortCodesPath) : DateTime.MinValue;
+            DateTime newloadTime = fileExists ? await FileRepository.GetLastWriteTimeAsync(shortCodesPath) : DateTime.MinValue;
 
             if (_ShortCodesLoaded > DateTime.MinValue && newloadTime <= _ShortCodesLoaded)
             {
                 return null;
             }
 
-            string orgs = fileExists ? await Global.FileRepository.ReadAsync(shortCodesPath) : null;
+            string orgs = fileExists ? await FileRepository.ReadAsync(shortCodesPath) : null;
             if (string.IsNullOrWhiteSpace(orgs))
             {
                 throw new Exception($"No content not load '{shortCodesPath}'");
@@ -95,7 +101,7 @@ namespace ModernSlavery
 
             _ShortCodesLoaded = newloadTime;
 
-            List<ShortCodeModel> list = await Global.FileRepository.ReadCSVAsync<ShortCodeModel>(shortCodesPath);
+            List<ShortCodeModel> list = await FileRepository.ReadCSVAsync<ShortCodeModel>(shortCodesPath);
             if (!list.Any())
             {
                 throw new Exception($"No records found in '{shortCodesPath}'");

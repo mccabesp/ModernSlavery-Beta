@@ -41,14 +41,14 @@ namespace ModernSlavery.WebUI
         {
             Logger = logger;
 
-            Global.FileRepository = fileRepository;
-            Global.SearchRepository = searchRepository;
+            _fileRepository = fileRepository;
 
             SendEmailQueue = sendEmailQueue;
             SendNotifyEmailQueue = sendNotifyEmailQueue;
             ExecuteWebjobQueue = executeWebjobQueue;
         }
 
+        private IFileRepository _fileRepository;
         public ILogger Logger { get; }
         public IQueue SendEmailQueue { get; set; }
         public IQueue SendNotifyEmailQueue { get; set; }
@@ -60,9 +60,9 @@ namespace ModernSlavery.WebUI
         {
             //Ensure ShortCodes, SicCodes and SicSections exist on remote 
             Task.WaitAll(
-                Core.Classes.Extensions.PushRemoteFileAsync(Global.FileRepository, Filenames.ShortCodes, Global.DataPath),
-                Core.Classes.Extensions.PushRemoteFileAsync(Global.FileRepository, Filenames.SicCodes, Global.DataPath),
-                Core.Classes.Extensions.PushRemoteFileAsync(Global.FileRepository, Filenames.SicSections, Global.DataPath)
+                Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.ShortCodes, Global.DataPath),
+                Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicCodes, Global.DataPath),
+                Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicSections, Global.DataPath)
             );
         }
 

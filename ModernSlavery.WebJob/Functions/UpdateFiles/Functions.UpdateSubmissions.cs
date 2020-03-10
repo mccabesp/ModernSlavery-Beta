@@ -22,7 +22,7 @@ namespace ModernSlavery.WebJob
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateSubmissions))
-                    && await Global.FileRepository.GetAnyFileExistsAsync(
+                    && await FileRepository.GetAnyFileExistsAsync(
                         Global.DownloadsPath,
                         $"{Path.GetFileNameWithoutExtension(Filenames.OrganisationSubmissions)}*{Path.GetExtension(Filenames.OrganisationSubmissions)}")
                 )

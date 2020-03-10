@@ -4,6 +4,7 @@ using ModernSlavery.Tests.Common.Classes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.SharedKernel;
 using Moq;
 
 using Newtonsoft.Json;
@@ -19,16 +20,16 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
         [SetUp]
         public void BeforeEach()
         {
-            mockQueue = new Mock<Core.Classes.Queues.AzureQueue>("TestConnectionString", "TestQueueName") {CallBase = true};
+            mockQueue = new Mock<Infrastructure.Queue.AzureQueue>("TestConnectionString", "TestQueueName") {CallBase = true};
 
-            mockLogEventLoggerProvider = new Mock<Core.Classes.LogEventLoggerProvider>(
+            mockLogEventLoggerProvider = new Mock<Infrastructure.Logging.LogEventLoggerProvider>(
                 mockQueue.Object,
                 testApplicationName,
                 Options.Create(new LoggerFilterOptions())) {CallBase = true};
         }
 
-        private Mock<Core.Classes.Queues.AzureQueue> mockQueue;
-        private Mock<Core.Classes.LogEventLoggerProvider> mockLogEventLoggerProvider;
+        private Mock<Infrastructure.Queue.AzureQueue> mockQueue;
+        private Mock<Infrastructure.Logging.LogEventLoggerProvider> mockLogEventLoggerProvider;
 
         private readonly string testApplicationName = "LogEventUnitTests";
 
@@ -50,7 +51,7 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
                 .Returns(Task.CompletedTask);
 
             // Act
-            Core.Classes.LogEventLoggerProvider logger = mockLogEventLoggerProvider.Object;
+            Infrastructure.Logging.LogEventLoggerProvider logger = mockLogEventLoggerProvider.Object;
             await logger.WriteAsync(LogLevel.Information, testEntryModel);
 
             // Assert
@@ -88,7 +89,7 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
                 .Returns(Task.CompletedTask);
 
             // Act
-            Core.Classes.LogEventLoggerProvider logger = mockLogEventLoggerProvider.Object;
+            Infrastructure.Logging.LogEventLoggerProvider logger = mockLogEventLoggerProvider.Object;
             await logger.WriteAsync(testLogLevel, testLogEntryModel);
 
             // Assert

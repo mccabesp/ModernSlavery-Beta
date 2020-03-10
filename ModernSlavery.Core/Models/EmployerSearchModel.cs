@@ -2,17 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Microsoft.Azure.Search;
-using Microsoft.Azure.Search.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 
-namespace ModernSlavery.Infrastructure
+namespace ModernSlavery.Core.Models
 {
     [Serializable]
     public class EmployerSearchModel
     {
-
         public bool Equals(EmployerSearchModel model)
         {
             return model != null && model.OrganisationId == OrganisationId;
@@ -126,70 +123,23 @@ namespace ModernSlavery.Infrastructure
 
         #region Organisation Properties
 
-        [Key]
-
-        public string OrganisationId { get; set; }
-
+        public virtual string OrganisationId { get; set; }
         public string OrganisationIdEncrypted { get; set; }
-
-        [IsSearchable]
-        [Analyzer(AnalyzerName.AsString.EnLucene)]
-        [IsFilterable]
-        [IsSortable]
-        public string Name { get; set; }
-
-        [IsSearchable]
-        [Analyzer(AnalyzerName.AsString.EnLucene)]
-        public string PreviousName { get; set; }
-
-        [IsSearchable]
-        public string PartialNameForSuffixSearches { get; set; }
-
-        [IsSearchable]
+        public virtual string Name { get; set; }
+        public virtual string PreviousName { get; set; }
+        public virtual string PartialNameForSuffixSearches { get; set; }
         public string PartialNameForCompleteTokenSearches { get; set; }
-
-        [IsSearchable]
-        [Analyzer(AnalyzerName.AsString.EnLucene)]
-        public string[] Abbreviations { get; set; }
-
-        [IsFilterable]
-        [IsSortable]
-        [IsFacetable]
-        public int Size { get; set; }
-
-        [IsFilterable]
-        [IsFacetable]
-        public string[] SicSectionIds { get; set; }
-
-        public string[] SicSectionNames { get; set; }
-
-        [IsSearchable]
-        [IsFilterable]
-        [IsFacetable]
-        public string[] SicCodeIds { get; set; }
-
-        [IsSearchable]
-        public string[] SicCodeListOfSynonyms { get; set; }
-
+        public virtual string[] Abbreviations { get; set; }
+        public virtual int Size { get; set; }
+        public virtual string[] SicSectionIds { get; set; }
+        public virtual string[] SicSectionNames { get; set; }
+        public virtual string[] SicCodeIds { get; set; }
+        public virtual string[] SicCodeListOfSynonyms { get; set; }
         public string Address { get; set; }
-
-        [IsFilterable]
-        [IsFacetable]
-        public string[] ReportedYears { get; set; }
-
-        [IsFilterable]
-        [IsFacetable]
-        public DateTimeOffset LatestReportedDate { get; set; }
-
-        [IsFilterable]
-        [IsFacetable]
-        public string[] ReportedLateYears { get; set; }
-
-        [IsFilterable]
-        [IsFacetable]
-        public string[] ReportedExplanationYears { get; set; }
-
+        public virtual string[] ReportedYears { get; set; }
+        public virtual DateTimeOffset LatestReportedDate { get; set; }
+        public virtual string[] ReportedLateYears { get; set; }
+        public virtual string[] ReportedExplanationYears { get; set; }
         #endregion
-
     }
 }

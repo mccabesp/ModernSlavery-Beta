@@ -7,7 +7,6 @@ using ModernSlavery.BusinessLogic.Models.Scope;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.FileModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
@@ -124,8 +123,8 @@ namespace ModernSlavery.BusinessLogic
         /// <param name="newStatus"></param>
         public virtual async Task<OrganisationScope> UpdateScopeStatusAsync(long existingOrgScopeId, ScopeStatuses newStatus)
         {
-            OrganisationScope oldOrgScope = await DataRepository.GetAll<OrganisationScope>()
-                .FirstOrDefaultAsync(os => os.OrganisationScopeId == existingOrgScopeId);
+            OrganisationScope oldOrgScope = await DataRepository.FirstOrDefaultAsync<OrganisationScope>(os => os.OrganisationScopeId == existingOrgScopeId);
+
             // when OrganisationScope isn't found then throw ArgumentOutOfRangeException
             if (oldOrgScope == null)
             {
@@ -134,8 +133,7 @@ namespace ModernSlavery.BusinessLogic
                     $"Cannot find organisation with OrganisationScopeId: {existingOrgScopeId}");
             }
 
-            Organisation org = await DataRepository.GetAll<Organisation>()
-                .FirstOrDefaultAsync(o => o.OrganisationId == oldOrgScope.OrganisationId);
+            Organisation org = await DataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == oldOrgScope.OrganisationId);
             // when Organisation isn't found then throw ArgumentOutOfRangeException
             if (org == null)
             {
@@ -412,9 +410,7 @@ namespace ModernSlavery.BusinessLogic
         public async Task<HashSet<OrganisationMissingScope>> FindOrgsWhereScopeNotSetAsync()
         {
             // get all orgs of any status
-            List<Organisation> allOrgs = await DataRepository
-                .GetAll<Organisation>()
-                .ToListAsync();
+            var allOrgs = await DataRepository.ToListAsync<Organisation>();
 
             int firstYear = Global.FirstReportingYear;
 
@@ -504,8 +500,7 @@ namespace ModernSlavery.BusinessLogic
 
         public async Task<Organisation> GetOrgByEmployerReferenceAsync(string employerReference)
         {
-            Organisation org = await DataRepository.GetAll<Organisation>()
-                .FirstOrDefaultAsync(o => o.EmployerReference == employerReference);
+            Organisation org = await DataRepository.FirstOrDefaultAsync<Organisation>(o => o.EmployerReference == employerReference);
             return org;
         }
 
@@ -513,8 +508,7 @@ namespace ModernSlavery.BusinessLogic
 
         public virtual async Task<OrganisationScope> GetScopeByIdAsync(long organisationScopeId)
         {
-            return await DataRepository.GetAll<OrganisationScope>()
-                .FirstOrDefaultAsync(o => o.OrganisationScopeId == organisationScopeId);
+            return await DataRepository.FirstOrDefaultAsync<OrganisationScope>(o => o.OrganisationScopeId == organisationScopeId);
         }
 
         /// <summary>
@@ -524,7 +518,7 @@ namespace ModernSlavery.BusinessLogic
         /// <param name="snapshotYear"></param>
         public virtual async Task<OrganisationScope> GetLatestScopeBySnapshotYearAsync(long organisationId, int snapshotYear = 0)
         {
-            Organisation org = await DataRepository.GetAll<Organisation>().FirstOrDefaultAsync(o => o.OrganisationId == organisationId);
+            Organisation org = await DataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == organisationId);
             if (org == null)
             {
                 throw new ArgumentException($"Cannot find organisation with id {organisationId}", nameof(organisationId));
@@ -553,9 +547,8 @@ namespace ModernSlavery.BusinessLogic
 
         public virtual async Task<OrganisationScope> GetPendingScopeRegistrationAsync(string emailAddress)
         {
-            return await DataRepository.GetAll<OrganisationScope>()
-                .OrderByDescending(s => s.RegisterStatusDate)
-                .FirstOrDefaultAsync(o => o.RegisterStatus == RegisterStatuses.RegisterPending && o.ContactEmailAddress == emailAddress);
+            var result=await DataRepository.FirstOrDefaultByDescendingAsync<OrganisationScope,DateTime>(s => s.RegisterStatusDate,o => o.RegisterStatus == RegisterStatuses.RegisterPending && o.ContactEmailAddress == emailAddress);
+            return result;
         }
 
         #endregion

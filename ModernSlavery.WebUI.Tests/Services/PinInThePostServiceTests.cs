@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Services;
+using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -9,6 +11,7 @@ namespace ModernSlavery.WebUI.Tests.Services
     [TestFixture]
     public class PinInThePostServiceTests
     {
+        private IPinInThePostService PinInThePostService=new PinInThePostService(Mock.Of<ICustomLogger>(),Mock.Of<IGovNotifyAPI>());
 
         private void AssertListEqual(List<string> listOne, List<string> listTwo)
         {

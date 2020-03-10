@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Abstractions;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.Infrastructure.Message;
 
 namespace ModernSlavery.WebJob
 {
@@ -20,7 +19,7 @@ namespace ModernSlavery.WebJob
 
         Task<bool> SendMessageAsync(string subject, string recipients, string message, bool test = false);
 
-        Task SendEmailTemplateAsync<TTemplate>(TTemplate parameters) where TTemplate : AEmailTemplate;
+        Task SendEmailTemplateAsync<TTemplate>(TTemplate parameters) where TTemplate : EmailTemplate;
 
     }
 
@@ -164,7 +163,7 @@ namespace ModernSlavery.WebJob
             return successCount == emailAddresses.Count;
         }
 
-        public async Task SendEmailTemplateAsync<TTemplate>(TTemplate parameters) where TTemplate : AEmailTemplate
+        public async Task SendEmailTemplateAsync<TTemplate>(TTemplate parameters) where TTemplate : EmailTemplate
         {
             await GpgEmailProvider.SendEmailTemplateAsync(parameters);
         }

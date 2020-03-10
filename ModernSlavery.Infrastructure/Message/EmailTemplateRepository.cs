@@ -5,6 +5,7 @@ using System.Linq;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Models;
 using Newtonsoft.Json;
 
@@ -29,7 +30,7 @@ namespace ModernSlavery.Infrastructure.Message
 
         private HashSet<EmailTemplateInfo> EmailTemplateStore { get; }
 
-        public void Add<TTemplate>(string templateId, string fileName) where TTemplate : AEmailTemplate
+        public void Add<TTemplate>(string templateId, string fileName) where TTemplate : EmailTemplate
         {
             if (string.IsNullOrWhiteSpace(templateId))
             {

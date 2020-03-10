@@ -8,6 +8,7 @@ namespace ModernSlavery.Core.Interfaces
     public interface ISearchRepository<T>
     {
         public bool Disabled { get; set; }
+        public string IndexName { get; }
 
         Task RefreshIndexDataAsync(IEnumerable<T> allRecords);
         Task AddOrUpdateIndexDataAsync(IEnumerable<T> records);
@@ -25,7 +26,7 @@ namespace ModernSlavery.Core.Interfaces
 
         Task<PagedResult<T>> SearchAsync(string searchText,
             int currentPage,
-            SearchType searchType,
+            SearchTypes searchType,
             int pageSize = 20,
             string searchFields = null,
             string selectFields = null,
@@ -33,7 +34,7 @@ namespace ModernSlavery.Core.Interfaces
             Dictionary<string, Dictionary<object, long>> facets = null,
             string filter = null,
             string highlights = null,
-            string searchMode = null);
+            SearchModes searchMode = SearchModes.Any);
 
     }
 }

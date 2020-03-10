@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +25,7 @@ namespace ModernSlavery.WebJob
             RunningJobs.Add(nameof(FixOrganisationsNamesAsync));
             try
             {
-                List<Organisation> orgs = await _DataRepository.GetAll<Organisation>().ToListAsync();
+                List<Organisation> orgs = await DataRepository.GetAll<Organisation>().ToListAsync();
 
                 var count = 0;
                 var i = 0;
@@ -53,7 +52,7 @@ namespace ModernSlavery.WebJob
                                 comment));
 
                         names[1].Created = names[0].Created;
-                        _DataRepository.Delete(names[0]);
+                        DataRepository.Delete(names[0]);
                         names.RemoveAt(0);
                         changed = true;
                     }
@@ -83,7 +82,7 @@ namespace ModernSlavery.WebJob
                     if (changed)
                     {
                         count++;
-                        await _DataRepository.SaveChangesAsync();
+                        await DataRepository.SaveChangesAsync();
                     }
                 }
 

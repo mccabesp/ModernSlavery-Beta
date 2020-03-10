@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
@@ -10,6 +11,7 @@ using ModernSlavery.Extensions;
 using ModernSlavery.Entities;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Entities.Enums;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace ModernSlavery.BusinessLogic.Classes
 {
@@ -56,7 +58,6 @@ namespace ModernSlavery.BusinessLogic.Classes
                 result.Results = employers;
                 return result;
             }
-
             List<Organisation> searchResults = await _DataRepository.GetAll<Organisation>()
                 .Where(o => o.SectorType == SectorTypes.Public && o.Status == OrganisationStatuses.Active)
                 .ToListAsync();

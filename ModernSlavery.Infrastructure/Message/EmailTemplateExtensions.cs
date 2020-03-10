@@ -3,6 +3,7 @@ using System;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ModernSlavery.Core.EmailTemplates;
 
 namespace ModernSlavery.Infrastructure.Message
 {
@@ -31,7 +32,7 @@ namespace ModernSlavery.Infrastructure.Message
         ///     // usage example
         ///     host.RegisterEmailTemplate<MyTemplateName>("Email:Templates");
         /// </example>
-        public static void RegisterEmailTemplate<TTemplate>(this IHost host, string templatesConfigPath) where TTemplate : AEmailTemplate
+        public static void RegisterEmailTemplate<TTemplate>(this IHost host, string templatesConfigPath) where TTemplate : EmailTemplate
         {
             // get the autofac container
             IServiceProvider services = host.Services;

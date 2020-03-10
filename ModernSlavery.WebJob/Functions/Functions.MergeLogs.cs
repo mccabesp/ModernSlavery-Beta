@@ -4,11 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models.LogModels;
 
 namespace ModernSlavery.WebJob
@@ -81,10 +80,10 @@ namespace ModernSlavery.WebJob
             }
         }
 
-        private static async Task MergeCsvLogsAsync<T>(ILogger log, string logPath, string prefix, string extension = ".csv")
+        private async Task MergeCsvLogsAsync<T>(ILogger log, string logPath, string prefix, string extension = ".csv")
         {
             //Get all the daily log files
-            IEnumerable<string> files = await Global.FileRepository.GetFilesAsync(logPath, $"{prefix}_*{extension}");
+            IEnumerable<string> files = await FileRepository.GetFilesAsync(logPath, $"{prefix}_*{extension}");
             List<string> fileList = files.OrderBy(o => o).ToList();
 
             //Get all files before today
@@ -119,13 +118,13 @@ namespace ModernSlavery.WebJob
                     string monthLog = Path.Combine(logPath, $"{prefix}_{date:yyMM}{extension}");
 
                     //Read all the records from this daily log file
-                    List<T> records = await Global.FileRepository.ReadCSVAsync<T>(file);
+                    List<T> records = await FileRepository.ReadCSVAsync<T>(file);
 
                     //Add the records to its monthly log file
-                    await Global.FileRepository.AppendCsvRecordsAsync(monthLog, records);
+                    await FileRepository.AppendCsvRecordsAsync(monthLog, records);
 
                     //Delete this daily log file
-                    await Global.FileRepository.DeleteFileAsync(file);
+                    await FileRepository.DeleteFileAsync(file);
                 }
                 catch (Exception ex)
                 {
@@ -166,9 +165,9 @@ namespace ModernSlavery.WebJob
                     }
 
                     string archivePath = Path.Combine(logPath, year.ToString());
-                    if (!await Global.FileRepository.GetDirectoryExistsAsync(archivePath))
+                    if (!await FileRepository.GetDirectoryExistsAsync(archivePath))
                     {
-                        await Global.FileRepository.CreateDirectoryAsync(archivePath);
+                        await FileRepository.CreateDirectoryAsync(archivePath);
                     }
 
                     //Ensure we have a unique filename
@@ -176,19 +175,19 @@ namespace ModernSlavery.WebJob
                     string archiveFilePath = Path.Combine(archivePath, fileName) + ext;
 
                     var c = 0;
-                    while (await Global.FileRepository.GetFileExistsAsync(archiveFilePath))
+                    while (await FileRepository.GetFileExistsAsync(archiveFilePath))
                     {
                         c++;
                         archiveFilePath = Path.Combine(archivePath, fileName) + $" ({c}){ext}";
                     }
 
                     //Copy to the archive folder
-                    await Global.FileRepository.CopyFileAsync(file, archiveFilePath, false);
+                    await FileRepository.CopyFileAsync(file, archiveFilePath, false);
 
                     //Delete the old file
-                    if (await Global.FileRepository.GetFileExistsAsync(archiveFilePath))
+                    if (await FileRepository.GetFileExistsAsync(archiveFilePath))
                     {
-                        await Global.FileRepository.DeleteFileAsync(file);
+                        await FileRepository.DeleteFileAsync(file);
                     }
                 }
                 catch (Exception ex)

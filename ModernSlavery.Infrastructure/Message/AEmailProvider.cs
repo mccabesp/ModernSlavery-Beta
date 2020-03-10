@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core;
+using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Extensions;
-using ModernSlavery.Infrastructure.Log;
 
 namespace ModernSlavery.Infrastructure.Message
 {
@@ -25,7 +25,7 @@ namespace ModernSlavery.Infrastructure.Message
 
         public abstract Task<SendEmailResult> SendEmailAsync<TModel>(string emailAddress, string templateId, TModel parameters, bool test);
 
-        public virtual async Task<SendEmailResult> SendEmailTemplateAsync<TTemplate>(TTemplate parameters) where TTemplate : AEmailTemplate
+        public virtual async Task<SendEmailResult> SendEmailTemplateAsync<TTemplate>(TTemplate parameters) where TTemplate : EmailTemplate
         {
             if (parameters is null)
             {

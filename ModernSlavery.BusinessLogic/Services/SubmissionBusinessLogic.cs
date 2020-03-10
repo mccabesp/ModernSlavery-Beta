@@ -8,7 +8,6 @@ using ModernSlavery.BusinessLogic.Models;
 using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.FileModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
@@ -48,8 +47,7 @@ namespace ModernSlavery.BusinessLogic
 
         public virtual async Task<Return> GetSubmissionByReturnIdAsync(long returnId)
         {
-            return await DataRepository.GetAll<Return>()
-                .FirstOrDefaultAsync(o => o.ReturnId == returnId);
+            return await DataRepository.FirstOrDefaultAsync<Return>(o => o.ReturnId == returnId);
         }
 
         /// <summary>
@@ -60,8 +58,7 @@ namespace ModernSlavery.BusinessLogic
         /// <returns></returns>
         public virtual async Task<Return> GetLatestSubmissionBySnapshotYearAsync(long organisationId, int snapshotYear)
         {
-            Return orgSubmission = await DataRepository.GetAll<Return>()
-                .FirstOrDefaultAsync(
+            Return orgSubmission = await DataRepository.FirstOrDefaultAsync<Return>(
                     s => s.AccountingDate.Year == snapshotYear
                          && s.OrganisationId == organisationId
                          && s.Status == ReturnStatuses.Submitted);

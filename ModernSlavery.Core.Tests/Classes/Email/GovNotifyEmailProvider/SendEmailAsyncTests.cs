@@ -10,11 +10,11 @@ using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-
 using Moq.Protected;
 using Newtonsoft.Json;
-using Notify.Authentication;
 using NUnit.Framework;
+using ModernSlavery.Infrastructure.Message;
+using Notify.Authentication;
 
 namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
 {
@@ -32,7 +32,7 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
 
             mockEmailTemplateRepo = new Mock<IEmailTemplateRepository>();
             mockGovNotifyOptions = new Mock<IOptions<GovNotifyOptions>>();
-            mockLogger = new Mock<ILogger<Core.Classes.GovNotifyEmailProvider>>();
+            mockLogger = new Mock<ILogger<Infrastructure.Message.GovNotifyEmailProvider>>();
 
             mockHttpClientFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
                 .Returns(new HttpClient(mockHttpMessageHandler.Object));
@@ -47,7 +47,7 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
                     });
 
             // service under test
-            testNotifyEmailProvider = new Core.Classes.GovNotifyEmailProvider(
+            testNotifyEmailProvider = new Infrastructure.Message.GovNotifyEmailProvider(
                 mockHttpClientFactory.Object,
                 mockEmailTemplateRepo.Object,
                 mockGovNotifyOptions.Object,
@@ -69,12 +69,12 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
 
         private Mock<IEmailTemplateRepository> mockEmailTemplateRepo;
         private Mock<IOptions<GovNotifyOptions>> mockGovNotifyOptions;
-        private Mock<ILogger<Core.Classes.GovNotifyEmailProvider>> mockLogger;
+        private Mock<ILogger<Infrastructure.Message.GovNotifyEmailProvider>> mockLogger;
 
         private Mock<IHttpClientFactory> mockHttpClientFactory;
         private Mock<HttpMessageHandler> mockHttpMessageHandler;
 
-        private Core.Classes.GovNotifyEmailProvider testNotifyEmailProvider;
+        private Infrastructure.Message.GovNotifyEmailProvider testNotifyEmailProvider;
 
         [TestCase(false, ProductionApiKey, ProductionServiceId)]
         [TestCase(true, TestApiKey, TestServiceId)]

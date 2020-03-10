@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Services;
-using ModernSlavery.Core.Classes.Downloadable;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Interfaces.Downloadable;
+using ModernSlavery.Infrastructure.File;
 using Moq;
 
 using NUnit.Framework;

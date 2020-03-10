@@ -11,7 +11,6 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.IdentityServer4.Classes;
 using ModernSlavery.IdentityServer4.Models.Account;

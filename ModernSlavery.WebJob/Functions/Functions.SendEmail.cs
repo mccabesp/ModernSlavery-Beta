@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using ModernSlavery.Core.Abstractions;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.EmailTemplates;
 using Newtonsoft.Json;
 using ModernSlavery.SharedKernel;
 
@@ -40,7 +40,7 @@ namespace ModernSlavery.WebJob
             {
                 try
                 {
-                    await _Messenger.SendEmailTemplateAsync((AEmailTemplate) parameters);
+                    await _Messenger.SendEmailTemplateAsync((EmailTemplate) parameters);
                 }
                 catch
                 {

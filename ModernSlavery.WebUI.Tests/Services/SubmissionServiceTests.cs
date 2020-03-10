@@ -26,6 +26,7 @@ using ModernSlavery.SharedKernel;
 using NUnit.Framework;
 using RangeAttribute = System.ComponentModel.DataAnnotations.RangeAttribute;
 using Autofac;
+using ModernSlavery.Infrastructure.File;
 
 namespace ModernSlavery.Tests
 {

@@ -47,8 +47,10 @@ namespace ModernSlavery.WebUI.Controllers
             IOrganisationBusinessLogic organisationBusinessLogic,
             ICommonBusinessLogic commonBusinessLogic,
             ISubmissionBusinessLogic submissionBusinessLogic,
+            ISearchBusinessLogic searchBusinessLogic,
             IObfuscator obfuscator,
-            IDataRepository dataRepository) : base(logger, webService, dataRepository)
+            IDataRepository dataRepository, 
+            IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
             ViewingService = viewingService;
             SearchViewService = searchViewService;
@@ -57,6 +59,7 @@ namespace ModernSlavery.WebUI.Controllers
             _commonBusinessLogic = commonBusinessLogic;
             Obfuscator = obfuscator;
             SubmissionBusinessLogic = submissionBusinessLogic;
+            SearchBusinessLogic = searchBusinessLogic;
         }
 
         #endregion
@@ -92,6 +95,8 @@ namespace ModernSlavery.WebUI.Controllers
         public ICommonBusinessLogic _commonBusinessLogic { get; set; }
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
         public ISubmissionBusinessLogic SubmissionBusinessLogic { get; set; }
+        public ISearchBusinessLogic SearchBusinessLogic { get; set; }
+
         public IObfuscator Obfuscator { get; }
 
         #endregion
@@ -150,7 +155,7 @@ namespace ModernSlavery.WebUI.Controllers
         public async Task<IActionResult> SearchResults([FromQuery] SearchResultsQuery searchQuery)
         {
             //Ensure search service is enabled
-            if (Global.SearchRepository.Disabled) return View("CustomError", new ErrorViewModel(1151,new {featureName="Search Service" }));
+            if (SearchBusinessLogic.SearchRepository.Disabled) return View("CustomError", new ErrorViewModel(1151,new {featureName="Search Service" }));
 
             //When never searched in this session
             if (string.IsNullOrWhiteSpace(SearchViewService.LastSearchParameters))
@@ -248,13 +253,13 @@ namespace ModernSlavery.WebUI.Controllers
             var model = new DownloadViewModel {Downloads = new List<DownloadViewModel.Download>()};
 
             const string filePattern = "GPGData_????-????.csv";
-            foreach (string file in await Global.FileRepository.GetFilesAsync(Global.DownloadsLocation, filePattern))
+            foreach (string file in await FileRepository.GetFilesAsync(Global.DownloadsLocation, filePattern))
             {
                 var download = new DownloadViewModel.Download {
                     Title = Path.GetFileNameWithoutExtension(file).AfterFirst("GPGData_"),
-                    Count = await Global.FileRepository.GetMetaDataAsync(file, "RecordCount"),
+                    Count = await FileRepository.GetMetaDataAsync(file, "RecordCount"),
                     Extension = Path.GetExtension(file).TrimI("."),
-                    Size = Numeric.FormatFileSize(await Global.FileRepository.GetFileSizeAsync(file))
+                    Size = Numeric.FormatFileSize(await FileRepository.GetFileSizeAsync(file))
                 };
 
                 download.Url = Url.Action("DownloadData", new {year = download.Title.BeforeFirst("-")});
@@ -278,16 +283,16 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //Ensure we have a directory
-            if (!await Global.FileRepository.GetDirectoryExistsAsync(Global.DownloadsLocation))
+            if (!await FileRepository.GetDirectoryExistsAsync(Global.DownloadsLocation))
             {
                 return new HttpNotFoundResult($"Directory '{Global.DownloadsLocation}' does not exist");
             }
 
             //Ensure we have a file
             string filePattern = $"GPGData_{year}-{year + 1}.csv";
-            IEnumerable<string> files = await Global.FileRepository.GetFilesAsync(Global.DownloadsLocation, filePattern);
+            IEnumerable<string> files = await FileRepository.GetFilesAsync(Global.DownloadsLocation, filePattern);
             string file = files.FirstOrDefault();
-            if (file == null || !await Global.FileRepository.GetFileExistsAsync(file))
+            if (file == null || !await FileRepository.GetFileExistsAsync(file))
             {
                 return new HttpNotFoundResult("Cannot find GPG data file for year: " + year);
             }
@@ -302,7 +307,7 @@ namespace ModernSlavery.WebUI.Controllers
             HttpContext.SetResponseHeader("Content-Disposition", contentDisposition.ToString());
 
             //cache old files for 1 day
-            DateTime lastWriteTime = await Global.FileRepository.GetLastWriteTimeAsync(file);
+            DateTime lastWriteTime = await FileRepository.GetLastWriteTimeAsync(file);
             if (lastWriteTime.AddMonths(12) < VirtualDateTime.Now)
             {
                 Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue {MaxAge = TimeSpan.FromDays(1), Public = true};
@@ -315,7 +320,7 @@ namespace ModernSlavery.WebUI.Controllers
             await WebTracker.TrackPageViewAsync(this, contentDisposition.FileName);
 
             //Return the data
-            return Content(await Global.FileRepository.ReadAsync(file), "text/csv");
+            return Content(await FileRepository.ReadAsync(file), "text/csv");
         }
 
         #endregion

@@ -5,13 +5,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Entities.Enums;
@@ -40,19 +40,19 @@ namespace ModernSlavery.WebJob
                 #region Load and Prechecks
 
                 //Load the D&B records
-                IEnumerable<string> dnbOrgsPaths = await Global.FileRepository.GetFilesAsync(Global.DataPath, Filenames.DnBOrganisations());
+                IEnumerable<string> dnbOrgsPaths = await FileRepository.GetFilesAsync(Global.DataPath, Filenames.DnBOrganisations());
                 string dnbOrgsPath = dnbOrgsPaths.OrderByDescending(f => f).FirstOrDefault();
                 if (string.IsNullOrEmpty(dnbOrgsPath))
                 {
                     return;
                 }
 
-                if (!await Global.FileRepository.GetFileExistsAsync(dnbOrgsPath))
+                if (!await FileRepository.GetFileExistsAsync(dnbOrgsPath))
                 {
                     throw new Exception("Could not find " + dnbOrgsPath);
                 }
 
-                List<DnBOrgsModel> AllDnBOrgs = await Global.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
+                List<DnBOrgsModel> AllDnBOrgs = await FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
 
                 if (!AllDnBOrgs.Any())
                 {
@@ -125,7 +125,7 @@ namespace ModernSlavery.WebJob
                 }
 
                 //Get the current users email address
-                User user = await _DataRepository.GetAll<User>().FirstOrDefaultAsync(u => u.UserId == currentUserId);
+                User user = await DataRepository.GetAll<User>().FirstOrDefaultAsync(u => u.UserId == currentUserId);
                 userEmail = user?.EmailAddress;
 
                 //Count records requiring import
@@ -137,7 +137,7 @@ namespace ModernSlavery.WebJob
                     return;
                 }
 
-                List<Organisation> dbOrgs = _DataRepository.GetAll<Organisation>().ToList();
+                List<Organisation> dbOrgs = DataRepository.GetAll<Organisation>().ToList();
 
                 #endregion
 
@@ -172,17 +172,17 @@ namespace ModernSlavery.WebJob
                         dnbOrg.OrganisationId = null;
                     }
 
-                    await _DataRepository.SaveChangesAsync();
-                    dbOrgs = await _DataRepository.GetAll<Organisation>().ToListAsync();
+                    await DataRepository.SaveChangesAsync();
+                    dbOrgs = await DataRepository.GetAll<Organisation>().ToListAsync();
 
-                    await Global.FileRepository.SaveCSVAsync(AllDnBOrgs, dnbOrgsPath);
-                    AllDnBOrgs = await Global.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
+                    await FileRepository.SaveCSVAsync(AllDnBOrgs, dnbOrgsPath);
+                    AllDnBOrgs = await FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
                     AllDnBOrgs = AllDnBOrgs.OrderBy(o => o.OrganisationName).ToList();
                 }
 
                 #endregion
 
-                List<SicCode> allSicCodes = await _DataRepository.GetAll<SicCode>().ToListAsync();
+                List<SicCode> allSicCodes = await DataRepository.GetAll<SicCode>().ToListAsync();
 
                 dnbOrgs = AllDnBOrgs.Where(o => o.ImportedDate == null || o.ImportedDate < o.StatusCheckedDate).ToList();
                 while (dnbOrgs.Count > 0)
@@ -236,7 +236,7 @@ namespace ModernSlavery.WebJob
                                     Status = ScopeRowStatuses.Active,
                                     SnapshotDate = _snapshotDateHelper.GetSnapshotDate(dbOrg.SectorType)
                                 };
-                                _DataRepository.Insert(newScope);
+                                DataRepository.Insert(newScope);
                                 dbOrg.OrganisationScopes.Add(newScope);
 
                                 //Create a presumed out-of-scope for previous year
@@ -247,7 +247,7 @@ namespace ModernSlavery.WebJob
                                     Status = ScopeRowStatuses.Active,
                                     SnapshotDate = newScope.SnapshotDate.AddYears(-1)
                                 };
-                                _DataRepository.Insert(oldScope);
+                                DataRepository.Insert(oldScope);
                                 dbOrg.OrganisationScopes.Add(oldScope);
 
                                 dbOrg.SetStatus(OrganisationStatuses.Active, currentUserId, "Imported from D&B");
@@ -417,14 +417,14 @@ namespace ModernSlavery.WebJob
                             }
                         }
 
-                        await _DataRepository.BeginTransactionAsync(
+                        await DataRepository.BeginTransactionAsync(
                             async () => {
                                 try
                                 {
                                     //Save the name, Sic, EmployerReference, DateOfCessasion changes
                                     if (dbChanged)
                                     {
-                                        await _DataRepository.SaveChangesAsync();
+                                        await DataRepository.SaveChangesAsync();
                                     }
 
                                     //Save the changes
@@ -433,8 +433,8 @@ namespace ModernSlavery.WebJob
                                     var insert = false;
                                     if (dbOrg.OrganisationId == 0)
                                     {
-                                        _DataRepository.Insert(dbOrg);
-                                        await _DataRepository.SaveChangesAsync();
+                                        DataRepository.Insert(dbOrg);
+                                        await DataRepository.SaveChangesAsync();
                                         dbChanged = true;
                                         insert = true;
                                     }
@@ -443,14 +443,14 @@ namespace ModernSlavery.WebJob
                                     {
                                         dbOrg.OrganisationAddresses.Add(newAddress);
                                         dbOrg.LatestAddress = newAddress;
-                                        await _DataRepository.SaveChangesAsync();
+                                        await DataRepository.SaveChangesAsync();
                                         dbChanged = true;
                                     }
 
                                     if (dbChanged)
                                     {
                                         dbChanges++;
-                                        _DataRepository.CommitTransaction();
+                                        DataRepository.CommitTransaction();
                                         totalChanges++;
                                         if (insert)
                                         {
@@ -458,12 +458,12 @@ namespace ModernSlavery.WebJob
                                         }
 
                                         //Add or remove this organisation to/from the search index
-                                        await _SearchBusinessLogic.UpdateSearchIndexAsync(dbOrg);
+                                        await SearchBusinessLogic.UpdateSearchIndexAsync(dbOrg);
                                     }
                                 }
                                 catch
                                 {
-                                    _DataRepository.RollbackTransaction();
+                                    DataRepository.RollbackTransaction();
                                 }
                             });
                         c++;
@@ -472,14 +472,14 @@ namespace ModernSlavery.WebJob
                     //Reload all the changes
                     if (dbChanges > 0)
                     {
-                        dbOrgs = await _DataRepository.GetAll<Organisation>().ToListAsync();
+                        dbOrgs = await DataRepository.GetAll<Organisation>().ToListAsync();
                     }
 
                     //Save the D&B records
                     if (dnbChanges > 0)
                     {
-                        await Global.FileRepository.SaveCSVAsync(AllDnBOrgs, dnbOrgsPath);
-                        AllDnBOrgs = await Global.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
+                        await FileRepository.SaveCSVAsync(AllDnBOrgs, dnbOrgsPath);
+                        AllDnBOrgs = await FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
                         AllDnBOrgs = AllDnBOrgs.OrderBy(o => o.OrganisationName).ToList();
                         dnbOrgs = AllDnBOrgs.Where(o => o.ImportedDate == null || o.ImportedDate < o.StatusCheckedDate).ToList();
                     }

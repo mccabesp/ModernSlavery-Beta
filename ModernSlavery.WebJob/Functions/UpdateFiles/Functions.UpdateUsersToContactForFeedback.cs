@@ -26,7 +26,7 @@ namespace ModernSlavery.WebJob
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateUsersToContactForFeedback))
-                    && await Global.FileRepository.GetFileExistsAsync(filePath))
+                    && await FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -59,7 +59,7 @@ namespace ModernSlavery.WebJob
             RunningJobs.Add(nameof(UpdateUsersToContactForFeedback));
             try
             {
-                List<User> users = await _DataRepository.GetAll<User>()
+                List<User> users = await DataRepository.GetAll<User>()
                     .Where(
                         user => user.Status == UserStatuses.Active
                                 && user.UserSettings.Any(us => us.Key == UserSettingKeys.AllowContact && us.Value.ToLower() == "true"))
@@ -78,7 +78,7 @@ namespace ModernSlavery.WebJob
                             u.ContactOrganisation
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(Global.FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(FileRepository, records, filePath);
             }
             finally
             {

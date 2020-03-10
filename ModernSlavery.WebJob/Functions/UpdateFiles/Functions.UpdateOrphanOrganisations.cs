@@ -30,7 +30,7 @@ namespace ModernSlavery.WebJob
                 string filePath = Path.Combine(Global.DownloadsPath, Filenames.OrphanOrganisations);
 
                 //Dont execute on startup if file already exists
-                if (!StartedJobs.Contains(funcName) && await Global.FileRepository.GetFileExistsAsync(filePath))
+                if (!StartedJobs.Contains(funcName) && await FileRepository.GetFileExistsAsync(filePath))
                 {
                     log.LogDebug($"Skipped {funcName} at start up.");
                     return;
@@ -104,7 +104,7 @@ namespace ModernSlavery.WebJob
         {
             // Get all the latest organisations with no registrations
             DateTime pinExpiresDate = Global.PinExpiresDate;
-            List<Organisation> unregisteredOrgs = await _DataRepository.GetEntities<Organisation>()
+            List<Organisation> unregisteredOrgs = await DataRepository.GetAll<Organisation>()
                 .Where(
                     o => o.Status == OrganisationStatuses.Active
                          && (o.LatestScope.ScopeStatus == ScopeStatuses.InScope

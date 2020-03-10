@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Autofac;
 using AutoMapper;
-using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;

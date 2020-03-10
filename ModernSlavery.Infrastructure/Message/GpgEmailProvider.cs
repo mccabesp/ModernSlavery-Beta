@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core;
+using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Extensions;
-using ModernSlavery.Infrastructure.Message.EmailTemplates;
 
 namespace ModernSlavery.Infrastructure.Message
 {

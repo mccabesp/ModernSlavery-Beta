@@ -15,10 +15,10 @@ using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Admin.Controllers;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Infrastructure;
 using ModernSlavery.Tests.TestHelpers;
-using Moq;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.WebUI.Shared.Services;
+using Moq;
 
 namespace ModernSlavery.WebUI.Tests.Controllers.Admin
 {
@@ -118,26 +118,26 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
             var mockNotifyEmailQueue = new Mock<IQueue>();
             Program.MvcApplication.SendNotifyEmailQueue = mockNotifyEmailQueue.Object;
             mockNotifyEmailQueue
-                .Setup(q => q.AddMessageAsync(It.IsAny<NotifyEmail>()));
+                .Setup(q => q.AddMessageAsync(It.IsAny<SendEmailRequest>()));
 
             // Act
             await controller.ReviewRequest(testModel, "approve");
 
             //ASSERT:
             mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.EmailAddress.Contains(existingUser1.EmailAddress))),
+                x => x.AddMessageAsync(It.Is<SendEmailRequest>(inst => inst.EmailAddress.Contains(existingUser1.EmailAddress))),
                 Times.Once(),
                 "Expected the existingUser1's email address to be in the email send queue");
             mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.EmailAddress.Contains(existingUser2.EmailAddress))),
+                x => x.AddMessageAsync(It.Is<SendEmailRequest>(inst => inst.EmailAddress.Contains(existingUser2.EmailAddress))),
                 Times.Once(),
                 "Expected the existingUser2's email address to be in the email send queue");
             mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.TemplateId.Contains(EmailTemplates.UserAddedToOrganisationEmail))),
+                x => x.AddMessageAsync(It.Is<SendEmailRequest>(inst => inst.TemplateId.Contains(EmailTemplates.UserAddedToOrganisationEmail))),
                 Times.Exactly(2),
                 $"Expected the correct templateId to be in the email send queue, expected {EmailTemplates.UserAddedToOrganisationEmail}");
             mockNotifyEmailQueue.Verify(
-                x => x.AddMessageAsync(It.Is<NotifyEmail>(inst => inst.EmailAddress.Contains(newUser.EmailAddress))),
+                x => x.AddMessageAsync(It.Is<SendEmailRequest>(inst => inst.EmailAddress.Contains(newUser.EmailAddress))),
                 Times.Never,
                 "Do not expect new user's email address to be in the email send queue");
         }

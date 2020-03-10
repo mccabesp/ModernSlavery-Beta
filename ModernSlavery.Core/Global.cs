@@ -15,7 +15,6 @@ namespace ModernSlavery.Core
     {
 
         public static string DownloadsPath = Path.Combine(DataPath, "Downloads");
-        public static IFileRepository FileRepository;
 
         public static bool SkipSpamProtection
         {

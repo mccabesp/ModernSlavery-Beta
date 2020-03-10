@@ -121,7 +121,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var controller = UiTestHelper.GetController<ViewingController>(0, mockRouteData);
 
             var searchText = "search text";
-            var sectorType = SearchType.BySectorType;
+            var sectorType = SearchTypes.BySectorType;
             // Test
             var query = new SearchResultsQuery {search = searchText, t = sectorType, p = 1};
             var result = await controller.SearchResults(query) as ViewResult;

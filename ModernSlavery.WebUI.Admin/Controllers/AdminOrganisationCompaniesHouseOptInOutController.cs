@@ -1,6 +1,5 @@
 ﻿using System;
 using ModernSlavery.BusinessLogic.Services;
-using ModernSlavery.Core.API;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models.CompaniesHouse;
 using ModernSlavery.Entities;

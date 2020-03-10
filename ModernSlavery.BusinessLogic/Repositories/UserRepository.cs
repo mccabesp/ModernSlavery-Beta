@@ -5,7 +5,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
@@ -34,13 +33,11 @@ namespace ModernSlavery.BusinessLogic.Account.Repositories
 
         public async Task<User> FindBySubjectIdAsync(long userId, params UserStatuses[] filterStatuses)
         {
-            return await DataRepository.GetAll<User>()
+            return await DataRepository.FirstOrDefaultAsync<User>(u =>
                 // filter by user id
-                .Where(x => x.UserId == userId)
+                u.UserId == userId
                 // skip or filter by user status
-                .Where(user => filterStatuses.Length == 0 || filterStatuses.Contains(user.Status))
-                // return first match otherwise null
-                .FirstOrDefaultAsync();
+                && (filterStatuses.Length == 0 || filterStatuses.Contains(u.Status)));
         }
 
         public async Task<User> FindByEmailAsync(string email, params UserStatuses[] filterStatuses)
@@ -49,35 +46,27 @@ namespace ModernSlavery.BusinessLogic.Account.Repositories
             {
                 var encryptedEmail = Encryption.EncryptData(email.ToLower());
 
-                var user = DataRepository.GetAll<User>()
+                var user = await DataRepository.FirstOrDefaultAsync<User>(u=>
                     // filter by email address
-                    .Where(user => user.EmailAddress == encryptedEmail)
+                    u.EmailAddress == encryptedEmail
                     // skip or filter by user status
-                    .Where(user => filterStatuses.Length == 0 || filterStatuses.Contains(user.Status))
-                    // return first match otherwise null
-                    .FirstOrDefault();
+                    && (filterStatuses.Length == 0 || filterStatuses.Contains(u.Status)));
 
                 if (user != null) return user;
             }
         
-            return await DataRepository.GetAll<User>()
+            return await DataRepository.FirstOrDefaultAsync<User>(u=>
                 // filter by email address
-                .Where(user => user.EmailAddress.ToLower() == email.ToLower())
+                u.EmailAddress.ToLower() == email.ToLower()
                 // skip or filter by user status
-                .Where(user => filterStatuses.Length == 0 || filterStatuses.Contains(user.Status))
-                // return first match otherwise null
-                .FirstOrDefaultAsync();
+                 && (filterStatuses.Length == 0 || filterStatuses.Contains(u.Status)));
         }
 
         public async Task<List<User>> FindAllUsersByNameAsync(string name)
         {
             string nameForSearch = name?.ToLower();
 
-            IQueryable<User> foundUsers = DataRepository
-                .GetAll<User>()
-                .Where(x => x.Fullname.ToLower().Contains(nameForSearch) || x.ContactFullname.ToLower().Contains(nameForSearch));
-
-            return await foundUsers.ToListAsync();
+            return await DataRepository.ToListAsync<User>(x => x.Fullname.ToLower().Contains(nameForSearch) || x.ContactFullname.ToLower().Contains(nameForSearch));
         }
 
         public async Task<bool> CheckPasswordAsync(User user, string password)

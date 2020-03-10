@@ -15,6 +15,8 @@ using ModernSlavery.WebUI.Models.Search;
 using MockQueryable.Moq;
 using Moq;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Infrastructure;
+using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.SharedKernel;
 
 using NUnit.Framework;
@@ -228,7 +230,7 @@ namespace ModernSlavery.WebUI.Tests.Services
                 FilterSicSectionIds = new[] {'G', 'L', 'C'},
                 FilterReportedYears = new[] {2017},
                 FilterReportingStatus = new[] {0, 3},
-                SearchType = SearchType.ByEmployerName
+                SearchType = SearchTypes.ByEmployerName
             };
 
             // Test

@@ -25,7 +25,7 @@ namespace ModernSlavery.WebJob
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateUnverifiedRegistrations))
-                    && await Global.FileRepository.GetFileExistsAsync(filePath))
+                    && await FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -64,7 +64,7 @@ namespace ModernSlavery.WebJob
             RunningJobs.Add(nameof(UpdateUnverifiedRegistrations));
             try
             {
-                List<UserOrganisation> userOrgs = _DataRepository.GetEntities<UserOrganisation>()
+                List<UserOrganisation> userOrgs = DataRepository.GetAll<UserOrganisation>()
                     .Where(uo => uo.PINConfirmedDate == null)
                     .OrderBy(uo => uo.Organisation.OrganisationName)
                     .Include(uo => uo.Organisation.LatestScope)
@@ -97,7 +97,7 @@ namespace ModernSlavery.WebJob
                             Address = uo.Address?.GetAddressString()
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(Global.FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(FileRepository, records, filePath);
             }
             finally
             {

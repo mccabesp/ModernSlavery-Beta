@@ -23,7 +23,7 @@ namespace ModernSlavery.WebJob
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateOrganisationLateSubmissions))
-                    && await Global.FileRepository.GetFileExistsAsync(filePath))
+                    && await FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -59,7 +59,7 @@ namespace ModernSlavery.WebJob
             try
             {
                 IEnumerable<LateSubmissionsFileModel> records = _SubmissionBL.GetLateSubmissions();
-                await Core.Classes.Extensions.SaveCSVAsync(Global.FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(FileRepository, records, filePath);
             }
             finally
             {

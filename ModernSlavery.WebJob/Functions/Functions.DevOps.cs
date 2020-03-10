@@ -24,7 +24,7 @@ namespace ModernSlavery.WebJob
             try
             {
                 //Load all the organisation in the database
-                List<Organisation> orgs = await _DataRepository.GetAll<Organisation>().ToListAsync();
+                List<Organisation> orgs = await DataRepository.GetAll<Organisation>().ToListAsync();
                 var count = 0;
 
                 //Loop through each organisation in the list
@@ -81,7 +81,7 @@ namespace ModernSlavery.WebJob
                     //If there were database changes then save them
                     if (changed)
                     {
-                        await _DataRepository.SaveChangesAsync();
+                        await DataRepository.SaveChangesAsync();
                     }
 
                     count++;

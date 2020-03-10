@@ -34,16 +34,17 @@ namespace ModernSlavery.Tests
             var thirdFileTitle = "2004-2005";
             string thirdFileLocation = Path.Combine(Global.DownloadsLocation, $"GPGData_{thirdFileTitle}.csv");
 
+            ViewingController controller=null;
             try
             {
                 var routeData = new RouteData();
                 routeData.Values.Add("Action", "Download");
                 routeData.Values.Add("Controller", "Viewing");
-                var controller = UiTestHelper.GetController<ViewingController>(0, routeData);
+                controller = UiTestHelper.GetController<ViewingController>(0, routeData);
 
-                await Global.FileRepository.WriteAsync(firstFileLocation, Encoding.UTF8.GetBytes($"No data for {firstFileTitle}"));
-                await Global.FileRepository.WriteAsync(secondFileLocation, Encoding.UTF8.GetBytes($"No data for {secondFileTitle}"));
-                await Global.FileRepository.WriteAsync(thirdFileLocation, Encoding.UTF8.GetBytes($"No data for {thirdFileTitle}"));
+                await controller.FileRepository.WriteAsync(firstFileLocation, Encoding.UTF8.GetBytes($"No data for {firstFileTitle}"));
+                await controller.FileRepository.WriteAsync(secondFileLocation, Encoding.UTF8.GetBytes($"No data for {secondFileTitle}"));
+                await controller.FileRepository.WriteAsync(thirdFileLocation, Encoding.UTF8.GetBytes($"No data for {thirdFileTitle}"));
 
                 // Act
                 var result = await controller.Download() as ViewResult;
@@ -64,9 +65,12 @@ namespace ModernSlavery.Tests
             finally
             {
                 // Cleanup
-                await Global.FileRepository.DeleteFileAsync(firstFileLocation);
-                await Global.FileRepository.DeleteFileAsync(secondFileLocation);
-                await Global.FileRepository.DeleteFileAsync(thirdFileLocation);
+                if (controller != null)
+                {
+                    await controller?.FileRepository.DeleteFileAsync(firstFileLocation);
+                    await controller.FileRepository.DeleteFileAsync(secondFileLocation);
+                    await controller.FileRepository.DeleteFileAsync(thirdFileLocation);
+                }
 
                 Global.DownloadsLocation = originalDownloadsLocation;
             }
@@ -85,14 +89,15 @@ namespace ModernSlavery.Tests
             string firstFileLocation = Path.Combine(Global.DownloadsLocation, $"GPGData_{firstFileTitle}.csv");
             string firstFileContent = $"No content available for years {firstFileTitle}.";
 
+            ViewingController controller = null;
             try
             {
                 var routeData = new RouteData();
                 routeData.Values.Add("Action", "DownloadData");
                 routeData.Values.Add("Controller", "Viewing");
 
-                var controller = UiTestHelper.GetController<ViewingController>(0, routeData);
-                await Global.FileRepository.WriteAsync(firstFileLocation, Encoding.UTF8.GetBytes(firstFileContent));
+                controller = UiTestHelper.GetController<ViewingController>(0, routeData);
+                await controller.FileRepository.WriteAsync(firstFileLocation, Encoding.UTF8.GetBytes(firstFileContent));
                 var year = 2001;
 
                 // Act
@@ -105,7 +110,7 @@ namespace ModernSlavery.Tests
             finally
             {
                 // Cleanup
-                await Global.FileRepository.DeleteFileAsync(firstFileLocation);
+                if (controller!=null)await controller.FileRepository.DeleteFileAsync(firstFileLocation);
                 Global.DownloadsLocation = originalDownloadsLocation;
             }
         }

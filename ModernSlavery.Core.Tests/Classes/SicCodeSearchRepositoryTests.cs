@@ -1,6 +1,7 @@
 ﻿using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.Search;
+using ModernSlavery.Infrastructure.Data;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Classes
@@ -14,6 +15,7 @@ namespace ModernSlavery.Core.Tests.Classes
         {
             // Arrange
             string sicCodeSearchServiceName = Config.GetAppSetting("SearchService:ServiceName");
+            string sicCodeSearchIndexName = Config.GetAppSetting("SearchService:IndexName");
             string sicCodeSearchAdminApiKey = Config.GetAppSetting("SearchService:AdminApiKey");
 
             var sicCodeSearchServiceClient = new SearchServiceClient(
@@ -21,7 +23,7 @@ namespace ModernSlavery.Core.Tests.Classes
                 new SearchCredentials(sicCodeSearchAdminApiKey));
 
             // Act
-            var actualSicCodeSearchRepository = new SicCodeSearchRepository(sicCodeSearchServiceClient);
+            var actualSicCodeSearchRepository = new AzureSicCodeSearchRepository(sicCodeSearchServiceClient, sicCodeSearchIndexName);
 
             // Assert
             Assert.NotNull(

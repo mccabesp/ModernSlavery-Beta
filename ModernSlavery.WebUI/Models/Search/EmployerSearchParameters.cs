@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.Search.Models;
@@ -11,7 +12,6 @@ namespace ModernSlavery.WebUI.Models.Search
     [Serializable]
     public class EmployerSearchParameters
     {
-
         public string Keywords { get; set; }
 
         public IEnumerable<char> FilterSicSectionIds { get; set; }
@@ -28,9 +28,9 @@ namespace ModernSlavery.WebUI.Models.Search
 
         public string SearchFields { get; set; }
 
-        public SearchType SearchType { get; set; }
+        public SearchTypes SearchType { get; set; }
 
-        public SearchMode SearchMode { get; set; }
+        public SearchModes SearchMode { get; set; }
 
         public int PageSize { get; set; } = 20;
 

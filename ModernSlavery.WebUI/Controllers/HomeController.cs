@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.Cookies;
@@ -28,19 +27,25 @@ namespace ModernSlavery.WebUI.Controllers
         #region Constructors
 
         public HomeController(
+            ICustomLogger customLogger,
             ILogger<HomeController> logger,
             IWebService webService,
             IScopePresentation scopeUIService,
-            IDataRepository dataRepository) : base(logger, webService, dataRepository)
+            IShortCodesRepository shortCodesRepository,
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
+            CustomLogger = customLogger;
             ScopePresentation = scopeUIService;
+            ShortCodesRepository = shortCodesRepository;
         }
 
         #endregion
 
         #region Dependencies
+        private readonly ICustomLogger CustomLogger;
 
         public IScopePresentation ScopePresentation { get; }
+        public IShortCodesRepository ShortCodesRepository { get; }
 
         #endregion
 

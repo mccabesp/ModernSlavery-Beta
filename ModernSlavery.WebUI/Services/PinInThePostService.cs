@@ -2,25 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Notify.Models.Responses;
 using ModernSlavery.Entities;
+using ModernSlavery.Infrastructure.Logging;
+using ModernSlavery.Infrastructure.Message;
 
 namespace ModernSlavery.WebUI.Services
 {
-    public class PinInThePostService
+    public interface IPinInThePostService
+    {
+        bool SendPinInThePost(Controller controller, UserOrganisation userOrganisation, string pin, out string letterId);
+        List<string> GetAddressInFourLineFormat(Organisation organisation);
+        List<string> GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(Organisation organisation);
+    }
+
+    public class PinInThePostService : IPinInThePostService
     {
 
         private const int NotifyAddressLineLength = 35;
 
         private readonly IGovNotifyAPI govNotifyApi;
+        private readonly ICustomLogger CustomLogger;
 
-        public PinInThePostService(IGovNotifyAPI govNotifyApi)
+        public PinInThePostService(ICustomLogger customLogger, IGovNotifyAPI govNotifyApi)
         {
+            this.CustomLogger = customLogger;
             this.govNotifyApi = govNotifyApi;
         }
 
@@ -56,10 +66,10 @@ namespace ModernSlavery.WebUI.Services
                 {"expires", pinExpiryDate.ToString("d MMMM yyyy")}
             };
 
-            LetterNotificationResponse response = govNotifyApi.SendLetter(templateId, personalisation);
+            var response = govNotifyApi.SendLetter(templateId, personalisation);
             if (response != null)
             {
-                letterId = response.id;
+                letterId = response.LetterId;
                 return true;
             }
 
@@ -67,7 +77,7 @@ namespace ModernSlavery.WebUI.Services
             return false;
         }
 
-        public static List<string> GetAddressInFourLineFormat(Organisation organisation)
+        public List<string> GetAddressInFourLineFormat(Organisation organisation)
         {
             List<string> address = GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(organisation);
 
@@ -76,7 +86,7 @@ namespace ModernSlavery.WebUI.Services
             return address;
         }
 
-        private static List<string> GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(Organisation organisation)
+        public List<string> GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(Organisation organisation)
         {
             var address = new List<string>();
 
@@ -130,7 +140,7 @@ namespace ModernSlavery.WebUI.Services
             return address;
         }
 
-        private static void ReduceAddressToAtMostFourLines(List<string> address)
+        private void ReduceAddressToAtMostFourLines(List<string> address)
         {
             // The address might be up to 7 lines, to start with,
             // so we might need to remove up to 3 lines

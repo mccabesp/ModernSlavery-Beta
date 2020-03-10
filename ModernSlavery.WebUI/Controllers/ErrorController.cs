@@ -18,7 +18,7 @@ namespace ModernSlavery.WebUI.Controllers
         public ErrorController(
             ILogger<ErrorController> logger,
             IWebService webService,
-            IDataRepository dataRepository) : base(logger, webService, dataRepository)
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         { }
 
         #endregion

@@ -6,16 +6,12 @@ using System.Security.Cryptography.X509Certificates;
 using System.Web;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using ModernSlavery.BusinessLogic.LogRecords;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Classes.Queues;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.IdentityServer4.Classes;
-using ModernSlavery.Infrastructure.AzureQueues.Extensions;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,6 +23,10 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
+using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.File;
+using ModernSlavery.Infrastructure.Logging;
+using ModernSlavery.Infrastructure.Queue;
 
 namespace ModernSlavery.IdentityServer4
 {

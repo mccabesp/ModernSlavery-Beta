@@ -40,11 +40,10 @@ namespace ModernSlavery.WebUI.Controllers
             IScopeBusinessLogic scopeBL,
             ICommonBusinessLogic commonBL,
             IOrganisationBusinessLogic organisationBL,
-            IDataRepository dataRepository,
             IRegistrationRepository registrationRepository,
             [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
-            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository)
-            : base(logger, webService, dataRepository)
+            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
             SubmissionService = submitService;
             ScopePresentation = scopePresentation;

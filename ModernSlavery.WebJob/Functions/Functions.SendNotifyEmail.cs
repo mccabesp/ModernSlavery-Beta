@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Classes.Logger;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Queue;
+using ModernSlavery.Core.Models;
 using Newtonsoft.Json;
 using ModernSlavery.SharedKernel;
 
@@ -22,19 +21,19 @@ namespace ModernSlavery.WebJob
             CloudQueueMessage queueMessage,
             ILogger log)
         {
-            NotifyEmail notifyEmail;
+            SendEmailRequest notifyEmail;
             try
             {
-                notifyEmail = JsonConvert.DeserializeObject<NotifyEmail>(queueMessage.AsString);
+                notifyEmail = JsonConvert.DeserializeObject<SendEmailRequest>(queueMessage.AsString);
             }
             catch (Exception ex)
             {
-                CustomLogger.Error("EMAIL FAILURE: Failed to deserialise Notify email from queue", ex);
+                _CustomLogger.Error("EMAIL FAILURE: Failed to deserialise Notify email from queue", ex);
                 throw;
             }
 
             govNotifyApi.SendEmail(notifyEmail);
-            CustomLogger.Information("Successfully received message from queue and passed to GovNotifyAPI", new {notifyEmail});
+            _CustomLogger.Information("Successfully received message from queue and passed to GovNotifyAPI", new {notifyEmail});
         }
 
         /// <summary>
@@ -46,7 +45,7 @@ namespace ModernSlavery.WebJob
         public async Task SendNotifyEmailPoisonAsync([QueueTrigger(QueueNames.SendNotifyEmail + "-poison")]
             string queueMessage)
         {
-            CustomLogger.Error("EMAIL FAILURE: Notify email in poison queue", new {queueMessage});
+            _CustomLogger.Error("EMAIL FAILURE: Notify email in poison queue", new {queueMessage});
         }
 
     }

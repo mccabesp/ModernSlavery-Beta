@@ -2821,7 +2821,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.That(userOrgs[0].Address.GetAddressString() == address.GetAddressString(), "Wrong address for user org");
 
             //Check the organisation does not appear in search index
-            var index= await Global.SearchRepository.GetAsync(org.OrganisationId.ToString(), nameof(EmployerSearchModel.OrganisationId));
+            var index= await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString(), nameof(EmployerSearchModel.OrganisationId));
             Assert.IsNull(index);
         }
 
@@ -4028,7 +4028,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.IsNull(userOrgs[0].PINConfirmedDate, "Wrong PIN confirmed date");
 
             //Check the organisation does not exists in search
-            var actualIndex = await Global.SearchRepository.GetAsync(org.OrganisationId.ToString(),nameof(EmployerSearchModel.OrganisationId));
+            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString(),nameof(EmployerSearchModel.OrganisationId));
             Assert.IsNull(actualIndex,"Organisation should not exist on search");
         }
 
@@ -4199,7 +4199,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.IsNull(userOrgs[0].PINConfirmedDate, "Wrong PIN confirmed date");
 
             //Check the organisation does not exists in search
-            var actualIndex = await Global.SearchRepository.GetAsync(org.OrganisationId.ToString(), nameof(EmployerSearchModel.OrganisationId));
+            var actualIndex = await controller.SearchBusinessLogic.SearchRepository.GetAsync(org.OrganisationId.ToString(), nameof(EmployerSearchModel.OrganisationId));
             Assert.IsNull(actualIndex, "Organisation should not exist on search");
         }
 

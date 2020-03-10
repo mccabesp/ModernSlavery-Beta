@@ -4,6 +4,8 @@ using ModernSlavery.BusinessLogic.Services;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Infrastructure.Message;
 using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.WebJob
@@ -12,8 +14,12 @@ namespace ModernSlavery.WebJob
     {
 
         public Functions(
+            ICustomLogger customLogger,
             IMessenger messenger,
+            IFileRepository fileRepository,
             IDataRepository dataRepository,
+            ISearchRepository<EmployerSearchModel> employerSearchRepository,
+            ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
             ICommonBusinessLogic commonBL,
             IScopeBusinessLogic scopeBL,
             ISubmissionBusinessLogic submissionBL,
@@ -23,13 +29,17 @@ namespace ModernSlavery.WebJob
             UpdateFromCompaniesHouseService updateFromCompaniesHouseService,
             ISnapshotDateHelper snapshotDateHelper)
         {
+            _CustomLogger = customLogger;
             _Messenger = messenger;
-            _DataRepository = dataRepository;
+            DataRepository = dataRepository;
+            FileRepository = fileRepository;
+            _EmployerSearchRepository = employerSearchRepository;
+            _SicCodeSearchRepository = sicCodeSearchRepository;
             _CommonBL = commonBL;
             _ScopeBL = scopeBL;
             _SubmissionBL = submissionBL;
             _OrganisationBL = orgBL;
-            _SearchBusinessLogic = searchBusinessLogic;
+            SearchBusinessLogic = searchBusinessLogic;
             _updateFromCompaniesHouseService = updateFromCompaniesHouseService;
             _snapshotDateHelper = snapshotDateHelper;
             this.govNotifyApi = govNotifyApi;
@@ -37,13 +47,17 @@ namespace ModernSlavery.WebJob
 
         #region Properties
 
-        public readonly IMessenger _Messenger;
-        public readonly IDataRepository _DataRepository;
+        private readonly ICustomLogger _CustomLogger;
+        private readonly IMessenger _Messenger;
+        public readonly IFileRepository FileRepository;
+        public readonly IDataRepository DataRepository;
+        private readonly ISearchRepository<EmployerSearchModel> _EmployerSearchRepository;
+        private readonly ISearchRepository<SicCodeSearchModel> _SicCodeSearchRepository;
         private readonly IScopeBusinessLogic _ScopeBL;
         private readonly ICommonBusinessLogic _CommonBL;
         private readonly ISubmissionBusinessLogic _SubmissionBL;
         private readonly IOrganisationBusinessLogic _OrganisationBL;
-        private readonly ISearchBusinessLogic _SearchBusinessLogic;
+        public readonly ISearchBusinessLogic SearchBusinessLogic;
         private readonly IGovNotifyAPI govNotifyApi;
         private readonly UpdateFromCompaniesHouseService _updateFromCompaniesHouseService;
         private readonly ISnapshotDateHelper _snapshotDateHelper;

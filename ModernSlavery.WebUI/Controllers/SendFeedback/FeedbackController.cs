@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using ModernSlavery.Core.Classes.Logger;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using GovUkDesignSystem.Parsers;
@@ -15,10 +14,13 @@ namespace ModernSlavery.WebUI.Controllers.SendFeedback
     public class FeedbackController : Controller
     {
         private readonly IDataRepository dataRepository;
+        private readonly ICustomLogger CustomLogger;
 
         public FeedbackController(
+            ICustomLogger customLogger,
             IDataRepository dataRepository)
         {
+            CustomLogger = customLogger;
             this.dataRepository = dataRepository;
         }
 

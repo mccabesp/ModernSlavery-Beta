@@ -49,9 +49,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             DateTime changed = updated;
-            if (await Global.FileRepository.GetFileExistsAsync(filePath))
+            if (await FileRepository.GetFileExistsAsync(filePath))
             {
-                changed = await Global.FileRepository.GetLastWriteTimeAsync(filePath);
+                changed = await FileRepository.GetLastWriteTimeAsync(filePath);
             }
 
             return updated == changed;
@@ -64,9 +64,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private async Task SetFileUpdatedAsync(string filePath)
         {
             filePath = filePath.ToLower();
-            if (await Global.FileRepository.GetFileExistsAsync(filePath))
+            if (await FileRepository.GetFileExistsAsync(filePath))
             {
-                Session[$"FileUpdate:{filePath}"] = await Global.FileRepository.GetLastWriteTimeAsync(filePath);
+                Session[$"FileUpdate:{filePath}"] = await FileRepository.GetLastWriteTimeAsync(filePath);
             }
             else
             {

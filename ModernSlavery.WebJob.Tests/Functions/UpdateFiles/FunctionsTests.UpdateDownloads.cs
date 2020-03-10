@@ -46,7 +46,7 @@ namespace ModernSlavery.WebJob.Tests.Functions
             var log = new Mock<ILogger>();
 
             int year = SectorTypes.Private.GetAccountingStartDate(2017).Year;
-            IEnumerable<Return> returns = await _functions._DataRepository
+            IEnumerable<Return> returns = await _functions.DataRepository
                 .GetAll<Return>()
                 .Where(
                     r => r.AccountingDate.Year == year
@@ -60,13 +60,13 @@ namespace ModernSlavery.WebJob.Tests.Functions
             //ASSERT
             //Check each return is in the download file
             string downloadFilePath =
-                Global.FileRepository.GetFullPath(Path.Combine(Global.DownloadsLocation, $"GPGData_{year}-{year + 1}.csv"));
+                _functions.FileRepository.GetFullPath(Path.Combine(Global.DownloadsLocation, $"GPGData_{year}-{year + 1}.csv"));
 
             //Check the file exists
-            Assert.That(await Global.FileRepository.GetFileExistsAsync(downloadFilePath), $"File '{downloadFilePath}' should exist");
+            Assert.That(await _functions.FileRepository.GetFileExistsAsync(downloadFilePath), $"File '{downloadFilePath}' should exist");
 
             //Get the actual results
-            List<DownloadResult> actualResults = await Global.FileRepository.ReadCSVAsync<DownloadResult>(downloadFilePath);
+            List<DownloadResult> actualResults = await _functions.FileRepository.ReadCSVAsync<DownloadResult>(downloadFilePath);
 
             //Generate the expected results
             List<DownloadResult> expectedResults = returns.Select(r => DownloadResult.Create(r)).OrderBy(d => d.EmployerName).ToList();

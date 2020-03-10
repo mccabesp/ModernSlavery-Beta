@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
@@ -12,6 +11,7 @@ using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 
 namespace ModernSlavery.WebJob
 {
@@ -46,7 +46,7 @@ namespace ModernSlavery.WebJob
 
             try
             {
-                List<int> returnYears = _DataRepository.GetAll<Return>()
+                List<int> returnYears = DataRepository.GetAll<Return>()
                     .Where(r => r.Status == ReturnStatuses.Submitted)
                     .Select(r => r.AccountingDate.Year)
                     .Distinct()
@@ -56,9 +56,9 @@ namespace ModernSlavery.WebJob
                 string downloadsLocation = Global.DownloadsLocation;
 
                 //Ensure we have a directory
-                if (!await Global.FileRepository.GetDirectoryExistsAsync(downloadsLocation))
+                if (!await FileRepository.GetDirectoryExistsAsync(downloadsLocation))
                 {
-                    await Global.FileRepository.CreateDirectoryAsync(downloadsLocation);
+                    await FileRepository.CreateDirectoryAsync(downloadsLocation);
                 }
 
                 foreach (int year in returnYears)
@@ -66,20 +66,20 @@ namespace ModernSlavery.WebJob
                     //If another server is already in process of creating a file then skip
 
                     string downloadFilePattern = $"GPGData_{year}-{year + 1}.csv";
-                    IEnumerable<string> files = await Global.FileRepository.GetFilesAsync(downloadsLocation, downloadFilePattern);
+                    IEnumerable<string> files = await FileRepository.GetFilesAsync(downloadsLocation, downloadFilePattern);
                     string oldDownloadFilePath = files.FirstOrDefault();
 
                     //Skip if the file already exists and is newer than 1 hour or older than 1 year
                     if (oldDownloadFilePath != null && !force)
                     {
-                        DateTime lastWriteTime = await Global.FileRepository.GetLastWriteTimeAsync(oldDownloadFilePath);
+                        DateTime lastWriteTime = await FileRepository.GetLastWriteTimeAsync(oldDownloadFilePath);
                         if (lastWriteTime.AddHours(1) >= VirtualDateTime.Now || lastWriteTime.AddYears(2) <= VirtualDateTime.Now)
                         {
                             continue;
                         }
                     }
 
-                    List<Return> returns = await _DataRepository.GetAll<Return>()
+                    List<Return> returns = await DataRepository.GetAll<Return>()
                         .Where(
                             r => r.AccountingDate.Year == year
                                  && r.Status == ReturnStatuses.Submitted
@@ -93,16 +93,16 @@ namespace ModernSlavery.WebJob
                         .ToList();
 
                     string newFilePath =
-                        Global.FileRepository.GetFullPath(Path.Combine(downloadsLocation, $"GPGData_{year}-{year + 1}.csv"));
+                        FileRepository.GetFullPath(Path.Combine(downloadsLocation, $"GPGData_{year}-{year + 1}.csv"));
                     try
                     {
                         if (downloadData.Any())
                         {
-                            await Global.FileRepository.SaveCSVAsync(downloadData, newFilePath, oldDownloadFilePath);
+                            await FileRepository.SaveCSVAsync(downloadData, newFilePath, oldDownloadFilePath);
                         }
                         else if (!string.IsNullOrWhiteSpace(oldDownloadFilePath))
                         {
-                            await Global.FileRepository.DeleteFileAsync(oldDownloadFilePath);
+                            await FileRepository.DeleteFileAsync(oldDownloadFilePath);
                         }
                     }
                     catch (Exception ex)

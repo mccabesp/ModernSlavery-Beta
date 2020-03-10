@@ -5,10 +5,10 @@ using Newtonsoft.Json;
 
 namespace ModernSlavery.Infrastructure
 {
-    public class PostcodesIoApi
+    public class PostcodesIoApi : IPostcodeChecker
     {
 
-        public static async Task<bool> IsValidPostcode(string postcode)
+        public async Task<bool> IsValidPostcode(string postcode)
         {
             try
             {

@@ -35,9 +35,8 @@ namespace ModernSlavery.WebUI.Controllers
             IWebService webService,
             ISearchViewService searchViewService,
             ICompareViewService compareViewService,
-            IDataRepository dataRepository,
-            IOrganisationBusinessLogic organisationBusinessLogic) : base(logger, webService, dataRepository)
-
+            IOrganisationBusinessLogic organisationBusinessLogic,
+            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
         {
             OrganisationBusinessLogic = organisationBusinessLogic;
             SearchViewService = searchViewService;

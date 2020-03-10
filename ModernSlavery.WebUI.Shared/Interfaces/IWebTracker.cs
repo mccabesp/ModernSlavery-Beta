@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ModernSlavery.Core.Interfaces
+namespace ModernSlavery.WebUI.Shared.Interfaces
 {
     public interface IWebTracker
     {

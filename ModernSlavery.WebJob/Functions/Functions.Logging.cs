@@ -4,12 +4,11 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models.LogModels;
 using Newtonsoft.Json;
 using ModernSlavery.SharedKernel;
@@ -30,7 +29,7 @@ namespace ModernSlavery.WebJob
             string filepath = GetLargeQueueFilepath(queueMessage);
             if (!string.IsNullOrWhiteSpace(filepath))
             {
-                queueMessage = await Global.FileRepository.ReadAsync(filepath);
+                queueMessage = await FileRepository.ReadAsync(filepath);
             }
 
             var wrapper = JsonConvert.DeserializeObject<LogEventWrapperModel>(queueMessage);
@@ -77,7 +76,7 @@ namespace ModernSlavery.WebJob
             try
             {
                 //Write to the log entry
-                await Global.FileRepository.AppendCsvRecordAsync(DailyPath, wrapper.LogEntry);
+                await FileRepository.AppendCsvRecordAsync(DailyPath, wrapper.LogEntry);
             }
             finally
             {
@@ -90,7 +89,7 @@ namespace ModernSlavery.WebJob
             //Delete the large file
             if (!string.IsNullOrWhiteSpace(filepath))
             {
-                await Global.FileRepository.DeleteFileAsync(filepath);
+                await FileRepository.DeleteFileAsync(filepath);
             }
 
             log.LogDebug($"Executed {nameof(LogEvent)}:{queueMessage} successfully");
@@ -105,9 +104,9 @@ namespace ModernSlavery.WebJob
             if (!string.IsNullOrWhiteSpace(filepath))
             {
                 //Get the large file
-                queueMessage = await Global.FileRepository.ReadAsync(filepath);
+                queueMessage = await FileRepository.ReadAsync(filepath);
                 //Delete the large file
-                await Global.FileRepository.DeleteFileAsync(filepath);
+                await FileRepository.DeleteFileAsync(filepath);
             }
 
             log.LogError($"Could not log event, Details: {queueMessage}");
@@ -123,7 +122,7 @@ namespace ModernSlavery.WebJob
             string filepath = GetLargeQueueFilepath(queueMessage);
             if (!string.IsNullOrWhiteSpace(filepath))
             {
-                queueMessage = await Global.FileRepository.ReadAsync(filepath);
+                queueMessage = await FileRepository.ReadAsync(filepath);
             }
 
             //Get the log event details
@@ -151,7 +150,7 @@ namespace ModernSlavery.WebJob
                 FileLocks[DailyPath] = fileLock;
 
                 //Write to the log entry
-                await Global.FileRepository.AppendCsvRecordAsync(DailyPath, wrapper.Record);
+                await FileRepository.AppendCsvRecordAsync(DailyPath, wrapper.Record);
             }
             finally
             {
@@ -163,7 +162,7 @@ namespace ModernSlavery.WebJob
             //Delete the large file
             if (!string.IsNullOrWhiteSpace(filepath))
             {
-                await Global.FileRepository.DeleteFileAsync(filepath);
+                await FileRepository.DeleteFileAsync(filepath);
             }
 
             log.LogDebug($"Executed {nameof(LogRecord)}:{queueMessage} successfully");
@@ -178,9 +177,9 @@ namespace ModernSlavery.WebJob
             if (!string.IsNullOrWhiteSpace(filepath))
             {
                 //Get the large file
-                queueMessage = await Global.FileRepository.ReadAsync(filepath);
+                queueMessage = await FileRepository.ReadAsync(filepath);
                 //Delete the large file
-                await Global.FileRepository.DeleteFileAsync(filepath);
+                await FileRepository.DeleteFileAsync(filepath);
             }
 
             log.LogError($"Could not log record: Details:{queueMessage}");
