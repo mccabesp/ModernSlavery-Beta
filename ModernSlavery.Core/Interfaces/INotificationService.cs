@@ -1,7 +1,6 @@
-﻿using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
+﻿using ModernSlavery.Entities;
 
-namespace ModernSlavery.WebUI.Shared.Abstractions
+namespace ModernSlavery.Core.Interfaces
 {
     public interface INotificationService
     {

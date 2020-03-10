@@ -18,6 +18,7 @@ using ModernSlavery.Extensions;
 using Microsoft.Extensions.Configuration;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.BusinessLogic
 {
@@ -65,7 +66,6 @@ namespace ModernSlavery.BusinessLogic
 
     public class OrganisationBusinessLogic : IOrganisationBusinessLogic
     {
-        private IConfiguration _configuration { get; set; }
         private ICommonBusinessLogic _commonBusinessLogic;
         private readonly IEncryptionHandler _encryptionHandler;
         private readonly IObfuscator _obfuscator;
@@ -76,6 +76,7 @@ namespace ModernSlavery.BusinessLogic
         public IDnBOrgsRepository DnBOrgsRepository { get; }
         
         public OrganisationBusinessLogic(ICommonBusinessLogic commonBusinessLogic,
+
             IDataRepository dataRepo,
             ISubmissionBusinessLogic submissionLogic,
             IScopeBusinessLogic scopeLogic,
@@ -192,7 +193,7 @@ namespace ModernSlavery.BusinessLogic
 
         public virtual string GenerateEmployerReference()
         {
-            return Crypto.GeneratePasscode(Global.EmployerCodeChars.ToCharArray(), Global.EmployerCodeLength);
+            return Crypto.GeneratePasscode(_commonBusinessLogic.GlobalOptions.EmployerCodeChars.ToCharArray(), _commonBusinessLogic.GlobalOptions.EmployerCodeLength);
         }
 
         public virtual string GeneratePINCode(bool isTestUser)
@@ -202,7 +203,7 @@ namespace ModernSlavery.BusinessLogic
                 return "ABCDEFG";
             }
 
-            return Crypto.GeneratePasscode(Global.PINChars.ToCharArray(), Global.PINLength);
+            return Crypto.GeneratePasscode(_commonBusinessLogic.GlobalOptions.PINChars.ToCharArray(), _commonBusinessLogic.GlobalOptions.PINLength);
         }
 
         public virtual async Task<CustomResult<OrganisationScope>> SetAsScopeAsync(string employerRef,

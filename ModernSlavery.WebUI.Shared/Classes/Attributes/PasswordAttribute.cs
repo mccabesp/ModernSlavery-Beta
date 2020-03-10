@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using ModernSlavery.Core;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {
@@ -8,9 +9,9 @@ namespace ModernSlavery.WebUI.Shared.Classes
     public class PasswordAttribute : RegularExpressionAttribute
     {
 
-        public PasswordAttribute() : base(Global.PasswordRegex)
+        public PasswordAttribute(GlobalOptions globalOptions) : base(globalOptions.PasswordRegex)
         {
-            ErrorMessage = Global.PasswordRegexError;
+            ErrorMessage = globalOptions.PasswordRegexError;
         }
 
     }

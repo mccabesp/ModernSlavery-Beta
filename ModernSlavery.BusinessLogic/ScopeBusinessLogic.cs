@@ -11,6 +11,7 @@ using ModernSlavery.Core.Models.FileModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.BusinessLogic
 {
@@ -57,14 +58,16 @@ namespace ModernSlavery.BusinessLogic
 
         private readonly ICommonBusinessLogic _commonBusinessLogic;
         private readonly ISearchBusinessLogic _searchBusinessLogic;
-
+        private readonly GlobalOptions GlobalOptions;
         public ScopeBusinessLogic(ICommonBusinessLogic commonBusinessLogic,
             IDataRepository dataRepo,
-            ISearchBusinessLogic searchBusinessLogic)
+            ISearchBusinessLogic searchBusinessLogic,
+            GlobalOptions globalOptions)
         {
             _commonBusinessLogic = commonBusinessLogic;
             _searchBusinessLogic = searchBusinessLogic;
             DataRepository = dataRepo;
+            GlobalOptions = globalOptions;
         }
 
         private IDataRepository DataRepository { get; }
@@ -340,7 +343,7 @@ namespace ModernSlavery.BusinessLogic
 
         public bool FillMissingScopes(Organisation org)
         {
-            int firstYear = Global.FirstReportingYear;
+            int firstYear = GlobalOptions.FirstReportingYear;
             DateTime currentSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(org.SectorType);
             int currentSnapshotYear = currentSnapshotDate.Year;
             var prevYearScope = ScopeStatuses.Unknown;
@@ -412,7 +415,7 @@ namespace ModernSlavery.BusinessLogic
             // get all orgs of any status
             var allOrgs = await DataRepository.ToListAsync<Organisation>();
 
-            int firstYear = Global.FirstReportingYear;
+            int firstYear = GlobalOptions.FirstReportingYear;
 
             // find all orgs who have no scope or unknown scope statuses
             var orgsWithMissingScope = new HashSet<OrganisationMissingScope>();
@@ -470,7 +473,7 @@ namespace ModernSlavery.BusinessLogic
             }
 
             //Check for conflict with previous years scope
-            if (snapshotDate.Year > Global.FirstReportingYear)
+            if (snapshotDate.Year > GlobalOptions.FirstReportingYear)
             {
                 ScopeStatuses previousScope = GetLatestScopeStatusForSnapshotYear(org, snapshotDate.Year - 1);
                 if (previousScope == ScopeStatuses.InScope && scopeStatus == ScopeStatuses.PresumedOutOfScope

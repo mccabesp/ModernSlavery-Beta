@@ -13,21 +13,22 @@ namespace ModernSlavery.BusinessLogic.Classes
 
         private Draft() { }
 
-        public Draft(long organisationId, int snapshotYear)
+        public Draft(long organisationId, int snapshotYear, string rootPath)
         {
             DraftFilename = GetDraftFileName(organisationId, snapshotYear, "json");
-            DraftPath = GetDraftFilePath(DraftFilename);
+            DraftPath = Path.Combine(rootPath, DraftFilename);
+
 
             BackupDraftFilename = GetDraftFileName(organisationId, snapshotYear, "bak");
-            BackupDraftPath = GetDraftFilePath(BackupDraftFilename);
+            BackupDraftPath = Path.Combine(rootPath, BackupDraftFilename);
         }
 
         public Draft(long organisationId,
             int snapshotYear,
             bool isUserAllowedAccess,
             DateTime? lastWrittenDateTime,
-            long lastWrittenByUserId) :
-            this(organisationId, snapshotYear)
+            long lastWrittenByUserId, string rootPath) :
+            this(organisationId, snapshotYear, rootPath)
         {
             IsUserAllowedAccess = isUserAllowedAccess;
             LastWrittenDateTime = lastWrittenDateTime;
@@ -60,11 +61,6 @@ namespace ModernSlavery.BusinessLogic.Classes
         private string GetDraftFileName(long organisationId, int snapshotYear, string fileExtension)
         {
             return $"{organisationId}_{snapshotYear}.{fileExtension}";
-        }
-
-        private string GetDraftFilePath(string draftFileName)
-        {
-            return Path.Combine(Global.DataPath, Global.SaveDraftPath, draftFileName);
         }
 
         #endregion

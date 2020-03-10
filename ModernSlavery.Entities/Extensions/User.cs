@@ -5,6 +5,7 @@ using System.Linq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using Microsoft.Extensions.Configuration;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Entities
 {
@@ -13,18 +14,19 @@ namespace ModernSlavery.Entities
     [DebuggerDisplay("{UserId}, {EmailAddress}, {Status}")]
     public partial class User
     {
-        private IConfiguration _configuration;
-        private string AdminEmails => _configuration.GetValue<string>("AdminEmails");
-        private string SuperAdminEmails => _configuration.GetValue<string>("SuperAdminEmails");
-        private string DatabaseAdminEmails => _configuration.GetValue<string>("DatabaseAdminEmails");
+        private GlobalOptions GlobalOptions;
 
-        public User(IConfiguration configuration)
+        private string AdminEmails => GlobalOptions.AdminEmails;
+        private string SuperAdminEmails => GlobalOptions.SuperAdminEmails;
+        private string DatabaseAdminEmails => GlobalOptions.DatabaseAdminEmails;
+
+        public User(GlobalOptions globalOptions)
         {
-            _configuration = configuration;
+            GlobalOptions = globalOptions;
         }
 
         [NotMapped]
-        public bool EncryptEmails => _configuration.GetValue("EncryptEmails",true);
+        public bool EncryptEmails => GlobalOptions.EncryptEmails;
 
         [NotMapped]
         public string Fullname => (Firstname + " " + Lastname).TrimI();
@@ -34,9 +36,9 @@ namespace ModernSlavery.Entities
 
         [NotMapped]
         public TimeSpan LockRemaining =>
-            LoginDate == null || LoginAttempts < _configuration.GetValue("MaxLoginAttempts", 3)
+            LoginDate == null || LoginAttempts < GlobalOptions.MaxLoginAttempts
                 ? TimeSpan.Zero
-                : LoginDate.Value.AddMinutes(_configuration.GetValue("LockoutMinutes",30)) - VirtualDateTime.Now;
+                : LoginDate.Value.AddMinutes(GlobalOptions.LockoutMinutes) - VirtualDateTime.Now;
 
         [NotMapped]
         public bool SendUpdates

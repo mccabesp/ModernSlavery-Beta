@@ -3,8 +3,8 @@ using System.Data;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Interfaces.Downloadable;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.Downloadable;
-using ModernSlavery.Infrastructure.File;
 
 namespace ModernSlavery.BusinessLogic
 {

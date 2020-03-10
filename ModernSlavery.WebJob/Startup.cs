@@ -22,7 +22,6 @@ using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Database;
 using ModernSlavery.Infrastructure;
 using ModernSlavery.Infrastructure.Data;
-using ModernSlavery.Infrastructure.File;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Message;
 using ModernSlavery.Infrastructure.Queue;

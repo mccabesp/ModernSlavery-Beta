@@ -10,16 +10,18 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Database
 {
     public partial class DatabaseContext : DbContext, IDbContext
     {
+        public readonly GlobalOptions GlobalOptions;
+        public string ConnectionString = @"Server=(localdb)\ProjectsV13;Initial Catalog=ModernSlaveryDb;Trusted_Connection=True;";
 
-        public static string ConnectionString = @"Server=(localdb)\ProjectsV13;Initial Catalog=ModernSlaveryDb;Trusted_Connection=True;";
-
-        public DatabaseContext(string connectionString = null, bool useMigrations = false)
+        public DatabaseContext(GlobalOptions globalOptions, string connectionString = null, bool useMigrations = false)
         {
+            this.GlobalOptions = globalOptions;
             if (!string.IsNullOrWhiteSpace(connectionString))
             {
                 ConnectionString = connectionString;
@@ -128,7 +130,8 @@ namespace ModernSlavery.Database
         {
             var dataTableOfOrganisations = new DataTable("MyDataTableOfOrganisations");
             dataTableOfOrganisations = ConvertToDataTable(listOfOrganisations);
-            using (var conn = new SqlConnection(Global.DatabaseConnectionString))
+            var connectionString=this.Database.GetDbConnection().ConnectionString;
+            using (var conn = new SqlConnection(connectionString))
             {
                 using (var command = new SqlCommand(string.Empty, conn))
                 {

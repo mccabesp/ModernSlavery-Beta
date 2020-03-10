@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.Core.Interfaces
 {
     public interface ISendEmailService
     {

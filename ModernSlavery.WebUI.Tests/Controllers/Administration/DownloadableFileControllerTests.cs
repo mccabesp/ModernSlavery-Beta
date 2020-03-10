@@ -17,6 +17,7 @@ using AutoMapper;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Repositories;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Infrastructure.File;
 using ModernSlavery.WebUI.Admin.Controllers;
 using ModernSlavery.WebUI.Shared.Abstractions;

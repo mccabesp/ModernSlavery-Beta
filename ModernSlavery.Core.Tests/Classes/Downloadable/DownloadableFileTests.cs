@@ -1,4 +1,5 @@
-﻿using ModernSlavery.Infrastructure.File;
+﻿using ModernSlavery.Core.Models;
+using ModernSlavery.Infrastructure.File;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Classes.Downloadable

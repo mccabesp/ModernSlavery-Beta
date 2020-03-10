@@ -11,7 +11,7 @@ using Microsoft.ApplicationInsights.Extensibility.Implementation;
 
 namespace ModernSlavery.Core
 {
-    public class Global
+    class OldGlobal
     {
         public double SessionTimeOutMinutes => Config.GetAppSetting("SessionTimeOut").ToInt32(20);
 

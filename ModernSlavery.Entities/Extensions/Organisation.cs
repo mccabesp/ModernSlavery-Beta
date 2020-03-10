@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Entities
 {
@@ -14,7 +15,7 @@ namespace ModernSlavery.Entities
     [DebuggerDisplay("{OrganisationName},{Status}")]
     public partial class Organisation
     {
-        private IConfiguration _configuration;
+        private GlobalOptions GlobalOptions;
         private IObfuscator _obfuscator;
         private ISnapshotDateHelper _snapshotDateHelper;
         private readonly int PinInPostExpiryDays;
@@ -23,15 +24,15 @@ namespace ModernSlavery.Entities
 
         private DateTime PinExpiresDate => VirtualDateTime.Now.AddDays(0 - PinInPostExpiryDays);
 
-        public Organisation(IConfiguration configuration, IObfuscator obfuscator, ISnapshotDateHelper snapshotDateHelper)
+        public Organisation(GlobalOptions globalOptions, IObfuscator obfuscator, ISnapshotDateHelper snapshotDateHelper)
         {
-            _configuration = configuration;
+            GlobalOptions = globalOptions;
             _obfuscator = obfuscator;
             _snapshotDateHelper = snapshotDateHelper;
 
-            PinInPostExpiryDays = _configuration.GetValue("PinInPostExpiryDays", 14);
-            SecurityCodeChars = _configuration.GetValue<string>("SecurityCodeChars");
-            SecurityCodeLength = _configuration.GetValue<int>("SecurityCodeLength");
+            PinInPostExpiryDays = globalOptions.PinInPostExpiryDays;
+            SecurityCodeChars = globalOptions.SecurityCodeChars;
+            SecurityCodeLength = globalOptions.SecurityCodeLength;
     }
 
     public OrganisationStatus PreviousStatus

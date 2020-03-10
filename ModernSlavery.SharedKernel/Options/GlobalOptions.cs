@@ -6,6 +6,10 @@ namespace ModernSlavery.SharedKernel.Options
 {
     public class GlobalOptions
     {
+        public string AdminEmails { get; set; }
+        public string SuperAdminEmails { get; set; }
+        public string DatabaseAdminEmails { get; set; }
+
         public int SessionTimeOutMinutes { get; set; } = 20;
 
         #region Files and Directories
@@ -45,8 +49,8 @@ namespace ModernSlavery.SharedKernel.Options
         public int LevenshteinDistance { get; set; } = 5;
         public int LockoutMinutes { get; set; }
         public int MaxEmailVerifyAttempts { get; set; }
-        public int MaxLoginAttempts { get; set; } = 5;
-        public int MaxPinAttempts { get; set; } = 5;
+        public int MaxLoginAttempts { get; set; } = 3;
+        public int MaxPinAttempts { get; set; } = 3;
         public int MinPasswordResetMinutes { get; set; }=30;
         public int MinSignupMinutes { get; set; }
         public int PinInPostExpiryDays { get; set; }
@@ -58,6 +62,8 @@ namespace ModernSlavery.SharedKernel.Options
         public int PurgeUnusedOrganisationDays { get; set; } = 30;
         public int PurgeUnverifiedUserDays { get; set; } = 7;
         public int PurgeUnconfirmedPinDays { get; set; } = 14;
+        public string SecurityCodeChars { get; set; } = "123456789ABCDEFGHKLMNPQRSTUXYZ";
+        public int SecurityCodeLength { get; set; } = 8;
         public int SecurityCodeExpiryDays { get; set; } = 90;
         public bool DisablePageCaching { get; set; }
 
@@ -89,5 +95,7 @@ namespace ModernSlavery.SharedKernel.Options
         public bool SendGoogleAnalyticsDataToGovUk { get; set; }
 
         public string WEBSITE_INSTANCE_ID { get; set; }
+
+        public bool SkipSpamProtection { get; set; }
     }
 }

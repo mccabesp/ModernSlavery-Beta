@@ -3,16 +3,20 @@ using System.Web;
 using ModernSlavery.Core;
 using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Mvc.Filters;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {
     public class SpamProtectionAttribute : ActionFilterAttribute
     {
+        private GlobalOptions _globalOptions;
 
         private readonly int _minimumSeconds;
 
         public SpamProtectionAttribute(int minimumSeconds = 10)
         {
+            _globalOptions = Activator.CreateInstance<GlobalOptions>();
+
             _minimumSeconds = minimumSeconds;
         }
 
@@ -36,7 +40,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
             }
             catch { }
 
-            if (Global.SkipSpamProtection)
+            if (_globalOptions.SkipSpamProtection)
             {
                 return;
             }

@@ -24,7 +24,6 @@ using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using ModernSlavery.Infrastructure.Data;
-using ModernSlavery.Infrastructure.File;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.SharedKernel.Options;

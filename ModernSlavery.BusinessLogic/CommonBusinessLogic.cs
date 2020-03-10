@@ -4,13 +4,13 @@ using ModernSlavery.SharedKernel;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.WebUI.Shared.Abstractions;
-using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.BusinessLogic
 {
     public interface ICommonBusinessLogic
     {
+        GlobalOptions GlobalOptions { get; }
         IFileRepository FileRepository { get; }
         IDataRepository DataRepository { get; }
         ISourceComparer SourceComparer { get; }
@@ -23,6 +23,8 @@ namespace ModernSlavery.BusinessLogic
 
     public class CommonBusinessLogic : ICommonBusinessLogic
     {
+        public GlobalOptions GlobalOptions { get; }
+
         private readonly ISnapshotDateHelper _snapshotDateHelper;
         public IFileRepository FileRepository { get; }
         public IDataRepository DataRepository { get; }

@@ -2,7 +2,7 @@
 using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.Extensions;
 
-namespace ModernSlavery.Infrastructure.File
+namespace ModernSlavery.Core.Models
 {
     public class DownloadableFile : IDownloadableFile
     {

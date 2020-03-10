@@ -9,18 +9,22 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery
 {
     public class ShortCodesRepository: IShortCodesRepository
     {
-        public ShortCodesRepository(IFileRepository fileRepository)
+        public ShortCodesRepository(IFileRepository fileRepository, GlobalOptions globalOptions)
         {
             FileRepository = fileRepository;
+            GlobalOptions = globalOptions;
         }
 
         private readonly IFileRepository FileRepository;
+        private GlobalOptions GlobalOptions;
+
         #region Properties
 
         private DateTime _ShortCodesLoaded;
@@ -78,7 +82,7 @@ namespace ModernSlavery
 
         public async Task<List<ShortCodeModel>> LoadIfNewerAsync()
         {
-            string shortCodesPath = Path.Combine(Global.DataPath, Filenames.ShortCodes);
+            string shortCodesPath = Path.Combine(GlobalOptions.DataPath, Filenames.ShortCodes);
             bool fileExists = await FileRepository.GetFileExistsAsync(shortCodesPath);
 
             if (!fileExists)

@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace ModernSlavery.BusinessLogic
 {
@@ -30,15 +33,20 @@ namespace ModernSlavery.BusinessLogic
 
         #region Constructor
 
-        public DraftFileBusinessLogic(IFileRepository fileRepository)
+        public DraftFileBusinessLogic(GlobalOptions globalOptions,IFileRepository fileRepository)
         {
+            GlobalOptions = globalOptions;
+
             _fileRepository = fileRepository;
+            RootDraftPath = Path.Combine(globalOptions.DataPath, globalOptions.SaveDraftPath);
         }
 
         #endregion
 
         #region attributes
 
+        private readonly GlobalOptions GlobalOptions;
+        private readonly string RootDraftPath;
         private readonly IFileRepository _fileRepository;
         private const string metaDataLastWrittenByUserId = "lastWrittenByUserId";
         private const string metaDataLastWrittenTimeStamp = "lastWrittenTimeStamp";
@@ -49,7 +57,7 @@ namespace ModernSlavery.BusinessLogic
 
         public async Task<Draft> GetDraftIfAvailableAsync(long organisationId, int snapshotYear)
         {
-            var result = new Draft(organisationId, snapshotYear);
+            var result = new Draft(organisationId, snapshotYear,RootDraftPath);
 
             // When_Not_Json_Return_Null() // 1
             if (!await _fileRepository.GetFileExistsAsync(result.DraftPath))
@@ -107,7 +115,7 @@ namespace ModernSlavery.BusinessLogic
         /// <returns></returns>
         public async Task<Draft> GetExistingOrNewAsync(long organisationId, int snapshotYear, long userIdRequestingAccess)
         {
-            var resultingDraft = new Draft(organisationId, snapshotYear);
+            var resultingDraft = new Draft(organisationId, snapshotYear,RootDraftPath);
             return await GetDraftOrCreateAsync(resultingDraft, userIdRequestingAccess);
         }
 
@@ -165,7 +173,7 @@ namespace ModernSlavery.BusinessLogic
 
         public async Task RestartDraftAsync(long organisationId, int snapshotYear, long userIdRequestingRollback)
         {
-            var draftToRollback = new Draft(organisationId, snapshotYear);
+            var draftToRollback = new Draft(organisationId, snapshotYear, RootDraftPath);
             await GetDraftAccessInformationAsync(userIdRequestingRollback, draftToRollback);
             if (!draftToRollback.IsUserAllowedAccess)
             {

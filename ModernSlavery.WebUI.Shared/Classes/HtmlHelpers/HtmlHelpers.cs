@@ -18,12 +18,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing;
+using ModernSlavery.SharedKernel.Options;
 using CompareAttribute = System.ComponentModel.DataAnnotations.CompareAttribute;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {
     public static class HtmlHelpers
     {
+        private static GlobalOptions GlobalOptions = Activator.CreateInstance<GlobalOptions>();
 
         public static async Task<IHtmlContent> PartialModelAsync<T>(this IHtmlHelper htmlHelper, T viewModel)
         {
@@ -35,7 +37,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
         public static HtmlString PageIdentifier(this IHtmlHelper htmlHelper)
         {
             return new HtmlString(
-                $"Date:{VirtualDateTime.Now}, Version:{Global.Version}, File Date:{Global.AssemblyDate.ToLocalTime()}, Environment:{Config.EnvironmentName}, Machine:{Environment.MachineName}, Instance:{Global.AzureInstanceId}, {Global.AssemblyCopyright}");
+                $"Date:{VirtualDateTime.Now}, Version:{GlobalOptions.Version}, File Date:{GlobalOptions.AssemblyDate.ToLocalTime()}, Environment:{Config.EnvironmentName}, Machine:{Environment.MachineName}, Instance:{GlobalOptions.AzureInstanceId}, {GlobalOptions.AssemblyCopyright}");
         }
 
         public static HtmlString ToHtml(this IHtmlHelper htmlHelper, string text)

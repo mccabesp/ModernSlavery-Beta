@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using ModernSlavery.Core;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {
@@ -9,10 +10,11 @@ namespace ModernSlavery.WebUI.Shared.Classes
     {
 
         private const string pattern = @"^[0-9]{9}$";
-
+        private GlobalOptions _globalOptions;
         public DUNSNumberAttribute() : base(pattern)
         {
-            ErrorMessage = Global.CompanyNumberRegexError;
+            _globalOptions = Activator.CreateInstance<GlobalOptions>();
+            ErrorMessage = _globalOptions.CompanyNumberRegexError;
         }
 
     }
