@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModernSlavery.WebUI.Shared.Models
+namespace ModernSlavery.Core.Models
 {
     [Serializable]
     public class ShortCodeModel

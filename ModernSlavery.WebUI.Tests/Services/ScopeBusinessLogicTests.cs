@@ -118,7 +118,7 @@ namespace ModernSlavery.Tests
             mockDataRepo = new Mock<IDataRepository>();
             mockFileRepo = new Mock<IFileRepository>();
             testSearchBL = new SearchBusinessLogic(testEmployerSearchRepo,Mock.Of<ISearchRepository<SicCodeSearchModel>>(),Mock.Of<ILogRecordLogger>());
-            testScopeBL = new ScopeBusinessLogic(testCommonBL, mockDataRepo.Object, testSearchBL);
+            testScopeBL = new ScopeBusinessLogic(testCommonBL, mockDataRepo.Object, testSearchBL,null);
             GenerateTestData();
         }
 

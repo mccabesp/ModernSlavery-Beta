@@ -12,7 +12,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Classes
         public void HasContent_When_ReturnViewModelContent_Is_Not_Null_Returns_True()
         {
             // Arrange
-            var testDraft = new Draft(default, default) {ReturnViewModelContent = new ReturnViewModel()};
+            var testDraft = new Draft(default, default,default) {ReturnViewModelContent = new ReturnViewModel()};
 
             // Act
             bool actualHasContent = testDraft.HasContent();
@@ -25,7 +25,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Classes
         public void HasContent_When_ReturnViewModelContent_Is_Null_Returns_False()
         {
             // Arrange
-            var testDraft = new Draft(default, default) {ReturnViewModelContent = null};
+            var testDraft = new Draft(default, default,default) {ReturnViewModelContent = null};
 
             // Act
             bool actualHasContent = testDraft.HasContent();

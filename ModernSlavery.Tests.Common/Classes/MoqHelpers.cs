@@ -48,13 +48,13 @@ namespace ModernSlavery.Tests.Common.Classes
         {
             var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
             var fakeSearchBusinessLogic = CreateFakeSearchBusinessLogic();
-            var fakeScopeBusinessLogic = new ScopeBusinessLogic(fakeCommonBusinessLogic, fakeCommonBusinessLogic.DataRepository,fakeSearchBusinessLogic);
+            var fakeScopeBusinessLogic = new ScopeBusinessLogic(fakeCommonBusinessLogic, fakeCommonBusinessLogic.DataRepository,fakeSearchBusinessLogic,null);
             return fakeScopeBusinessLogic;
         }
         public static IDraftFileBusinessLogic CreateFakeDraftBusinessLogic()
         {
             var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
-            var fakeDraftBusinessLogic = new DraftFileBusinessLogic(fakeCommonBusinessLogic.FileRepository);
+            var fakeDraftBusinessLogic = new DraftFileBusinessLogic(null,fakeCommonBusinessLogic.FileRepository);
             return fakeDraftBusinessLogic;
         }
         public static ISubmissionService CreateFakeSubmissionService()

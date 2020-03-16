@@ -20,10 +20,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
-using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.File;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.SharedKernel.Options;
@@ -156,7 +157,7 @@ namespace ModernSlavery.IdentityServer4
             //Register the configuration
             builder.RegisterInstance(_Config).SingleInstance();
 
-            builder.Register(c => new SqlRepository(new DatabaseContext(Global.DatabaseConnectionString)))
+            builder.Register(c => new SqlRepository(new DatabaseContext(null,Global.DatabaseConnectionString)))
                 .As<IDataRepository>()
                 .InstancePerLifetimeScope();
 

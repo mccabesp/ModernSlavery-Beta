@@ -46,7 +46,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Models.Submit
             var returnViewModelContentUnderDraft = new ReturnViewModel();
             var testReturnViewModel = new ReturnViewModel {
                 ReportInfo = new ReportInfoModel {
-                    Draft = new Draft(default, default) {ReturnViewModelContent = returnViewModelContentUnderDraft}
+                    Draft = new Draft(default, default,default) {ReturnViewModelContent = returnViewModelContentUnderDraft}
                 }
             };
 
@@ -65,7 +65,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Models.Submit
         {
             // Arrange
             var testReturnViewModel = new ReturnViewModel {
-                ReportInfo = new ReportInfoModel {Draft = new Draft(default, default) {ReturnViewModelContent = null}}
+                ReportInfo = new ReportInfoModel {Draft = new Draft(default, default,default) {ReturnViewModelContent = null}}
             };
 
             // Act

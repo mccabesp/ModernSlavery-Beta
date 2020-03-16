@@ -60,7 +60,7 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
             scopeBusinessLogic = new BusinessLogic.ScopeBusinessLogic(
                 mockCommonBusinessLogic,
                 mockDataRepository.Object,
-                null);
+                null,null);
         }
 
         private Mock<IDataRepository> mockDataRepository;

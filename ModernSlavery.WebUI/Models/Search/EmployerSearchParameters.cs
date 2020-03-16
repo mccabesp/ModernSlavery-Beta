@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using ModernSlavery.Extensions;
-using Microsoft.Azure.Search.Models;
 using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.WebUI.Models.Search

@@ -8,8 +8,8 @@ namespace ModernSlavery.WebUI.Shared.Classes
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
     public class PasswordAttribute : RegularExpressionAttribute
     {
-
-        public PasswordAttribute(GlobalOptions globalOptions) : base(globalOptions.PasswordRegex)
+        private static GlobalOptions globalOptions = Activator.CreateInstance<GlobalOptions>();
+        public PasswordAttribute() : base(globalOptions.PasswordRegex)
         {
             ErrorMessage = globalOptions.PasswordRegexError;
         }

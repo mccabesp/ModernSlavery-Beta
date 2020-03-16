@@ -181,7 +181,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             var controller = context.Controller as Controller;
             controller.ViewData["Controller"] = controller;
 
-            if (GlobalOptions.DisablePageCaching)
+            if (Global.DisablePageCaching)
             {
                 //Disable page caching
                 context.HttpContext.DisableResponseCache();
@@ -308,7 +308,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         protected async Task<TimeSpan> GetRetryLockRemainingTimeAsync(string retryLockKey, int expiryMinutes)
         {
-            if (GlobalOptions.SkipSpamProtection)
+            if (Global.SkipSpamProtection)
             {
                 return TimeSpan.Zero;
             }
@@ -384,13 +384,13 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         public virtual User CurrentUser => VirtualUser;
 
         public bool IsTrustedIP =>
-            string.IsNullOrWhiteSpace(GlobalOptions.TrustedIPDomains) || UserHostAddress.IsTrustedAddress(GlobalOptions.TrustedIPDomains.SplitI());
+            string.IsNullOrWhiteSpace(Global.TrustedIPDomains) || UserHostAddress.IsTrustedAddress(Global.TrustedIPDomains.SplitI());
 
         public bool IsAdministrator => CurrentUser.IsAdministrator();
         public bool IsSuperAdministrator => IsTrustedIP && CurrentUser.IsSuperAdministrator();
         public bool IsDatabaseAdministrator => IsTrustedIP && CurrentUser.IsDatabaseAdministrator();
 
-        public bool IsTestUser => CurrentUser.EmailAddress.StartsWithI(GlobalOptions.TestPrefix);
+        public bool IsTestUser => CurrentUser.EmailAddress.StartsWithI(Global.TestPrefix);
         public bool IsImpersonatingUser => OriginalUser != null && OriginalUser.IsAdministrator();
 
         protected User VirtualUser =>
@@ -494,7 +494,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 //If verification code has expired
-                if (currentUser.EmailVerifySendDate.Value.AddHours(GlobalOptions.EmailVerificationExpiryHours) < VirtualDateTime.Now)
+                if (currentUser.EmailVerifySendDate.Value.AddHours(Global.EmailVerificationExpiryHours) < VirtualDateTime.Now)
                 {
                     if (IsAnyAction("Register/VerifyEmail"))
                     {
@@ -506,7 +506,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 //If code min time hasnt elapsed 
-                TimeSpan remainingTime = currentUser.EmailVerifySendDate.Value.AddHours(GlobalOptions.EmailVerificationMinResendHours)
+                TimeSpan remainingTime = currentUser.EmailVerifySendDate.Value.AddHours(Global.EmailVerificationMinResendHours)
                                          - VirtualDateTime.Now;
                 if (remainingTime > TimeSpan.Zero)
                 {
@@ -635,7 +635,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     }
 
                     //If PIN sent and expired then prompt to request a new pin
-                    if (userOrg.PINSentDate.Value.AddDays(GlobalOptions.PinInPostExpiryDays) < VirtualDateTime.Now)
+                    if (userOrg.PINSentDate.Value.AddDays(Global.PinInPostExpiryDays) < VirtualDateTime.Now)
                     {
                         if (IsAnyAction("Register/PINSent", "Register/RequestPIN"))
                         {
@@ -646,7 +646,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     }
 
                     //If PIN resends are allowed and currently on PIN send page then allow it to continue
-                    TimeSpan remainingTime = userOrg.PINSentDate.Value.AddDays(GlobalOptions.PinInPostMinRepostDays) - VirtualDateTime.Now;
+                    TimeSpan remainingTime = userOrg.PINSentDate.Value.AddDays(Global.PinInPostMinRepostDays) - VirtualDateTime.Now;
                     if (remainingTime <= TimeSpan.Zero && IsAnyAction("Register/PINSent", "Register/RequestPIN"))
                     {
                         return null;

@@ -28,6 +28,7 @@ using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.SharedKernel.Options;
 using Microsoft.Azure.WebJobs;
+using ModernSlavery.Infrastructure.File;
 
 namespace ModernSlavery.WebJob
 {
@@ -92,7 +93,7 @@ namespace ModernSlavery.WebJob
             builder.RegisterType<Functions>().InstancePerDependency();
             builder.RegisterType<DisableWebjobProvider>().SingleInstance();
 
-            builder.Register(c => new SqlRepository(new DatabaseContext(Global.DatabaseConnectionString)))
+            builder.Register(c => new SqlRepository(new DatabaseContext(null,Global.DatabaseConnectionString)))
                 .As<IDataRepository>()
                 .InstancePerDependency();
             builder.RegisterType<CompaniesHouseAPI>()

@@ -41,7 +41,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long nicolasUserId = testUserId;
             var systemFileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatNicolasWillSendFirst = new ReturnViewModel {DiffMeanBonusPercent = 10.1m};
             var returnViewModelThatNicolasWillSendSecond =
                 new ReturnViewModel {DiffMeanBonusPercent = 20.2m, DiffMedianBonusPercent = 22.2m};
@@ -156,7 +156,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long robertUserId = testUserId;
             var systemFileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,systemFileRepository);
 
             Draft emptyDraftLockedToRobert =
                 await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, robertUserId);
@@ -177,7 +177,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long clareUserId = testUserId;
             var systemFileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,systemFileRepository);
 
             Draft emptyDraftLockedToClare =
                 await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, clareUserId);
@@ -201,7 +201,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long oliviaUserId = testUserId;
             var systemFileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatOliviaWillSendFirst = new ReturnViewModel {DiffMedianBonusPercent = 11.1m};
 
             Draft emptyDraftLockedToOlivia =
@@ -226,7 +226,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long joeUserId = testUserId;
             var systemFileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,systemFileRepository);
             var returnViewModelThatJoeWillSendFirst = new ReturnViewModel {DiffMedianBonusPercent = 11.1m};
             var returnViewModelThatJoeWillSendSecond =
                 new ReturnViewModel {DiffMedianBonusPercent = 22.02m, DiffMeanHourlyPayPercent = 20.2m};
@@ -266,7 +266,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long trevorUserId = testUserId;
             var systemFileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,systemFileRepository);
             var returnViewModelThatTrevorWillSendFirst = new ReturnViewModel {DiffMedianBonusPercent = 11.1m};
 
             Draft emptyDraftLockedToTrevor =
@@ -291,7 +291,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_GetDraftIfAvailable_When_Not_Json_Return_NullAsync()
         {
             // Arrange
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(new SystemFileRepository());
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,new SystemFileRepository());
 
             // Act
             Draft availableDraft = await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
@@ -306,7 +306,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long jackUserId = testUserId;
             var systemFileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,systemFileRepository);
 
             // Act
             Draft emptyDraftLockedToJack =
@@ -323,8 +323,9 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         {
             // Arrange
             long lizzyUserId = testUserId;
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(new SystemFileRepository());
-            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, lizzyUserId);
+            var fileRepo = new SystemFileRepository();
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,new SystemFileRepository());
+            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, lizzyUserId,fileRepo.RootDir);
             var returnViewModelChangedByLizzy = new ReturnViewModel {DiffMeanBonusPercent = 78.2m};
 
             // Act
@@ -360,7 +361,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long queenElisabethId = testUserId;
             long philipDukeOfEdinburghId = testUserId * 25;
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(new SystemFileRepository());
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,new SystemFileRepository());
 
             // Act
             Draft draftLockedToQueenElisabeth = await testDraftFileBusinessLogic.GetExistingOrNewAsync(
@@ -389,8 +390,10 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_GetExistingOrNew_When_File_Does_Not_Exist_Creates_It_And_Locks_ItAsync()
         {
             // Arrange
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(new SystemFileRepository());
-            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, testUserId);
+            var fileRepo = new SystemFileRepository();
+
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,fileRepo);
+            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, testUserId, fileRepo.RootDir);
 
             // Act
             Draft actualDraft = await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, testUserId);
@@ -417,8 +420,10 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_GetExistingOrNew_When_File_Exists_And_Locks_It_To_Calling_UserAsync()
         {
             // Arrange
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(new SystemFileRepository());
-            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, testUserId);
+            var fileRepo = new SystemFileRepository();
+
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,fileRepo);
+            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, testUserId, fileRepo.RootDir);
 
             // Act
             await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, testUserId);
@@ -445,10 +450,12 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_GetExistingOrNew_When_File_Locked_It_Reports_Not_Allowed_AccessAsync()
         {
             // Arrange
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(new SystemFileRepository());
+            var fileRepo = new SystemFileRepository();
+
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,fileRepo);
             long userIdLockingTheDraft = testUserId * 45;
             long userIdRequestingTheDraft = testUserId;
-            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, userIdLockingTheDraft);
+            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, userIdLockingTheDraft, fileRepo.RootDir);
 
             // Act
             await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, userIdLockingTheDraft);
@@ -484,7 +491,9 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         {
             // Arrange
             long stewardUserId = testUserId;
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(new SystemFileRepository());
+            var fileRepo = new SystemFileRepository();
+
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepo);
             Draft emptyDraftLockedToSteward =
                 await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, stewardUserId);
             DateTime? creationTimeStamp = emptyDraftLockedToSteward.LastWrittenDateTime;
@@ -517,7 +526,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long aliciaUserId = testUserId;
             var fileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(fileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepository);
             Draft emptyDraftLockedToAlicia =
                 await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, aliciaUserId);
 
@@ -543,8 +552,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long simonUserId = testUserId;
             var fileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(fileRepository);
-            var tempDraft = new Draft(testOrganisationId, testSnapshotYear);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepository);
+            var tempDraft = new Draft(testOrganisationId, testSnapshotYear,fileRepository.RootDir);
 
             // Act
             await testDraftFileBusinessLogic.RestartDraftAsync(testOrganisationId, testSnapshotYear, simonUserId);
@@ -559,7 +568,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long andreaUserId = testUserId;
             var fileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(fileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepository);
             Draft emptyDraftLockedToAndrea =
                 await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, andreaUserId);
             await fileRepository.DeleteFileAsync(emptyDraftLockedToAndrea.DraftPath);
@@ -582,7 +591,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long anneUserId = testUserId;
             var fileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(fileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepository);
             Draft emptyDraftLockedToAnne =
                 await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, anneUserId);
             await testDraftFileBusinessLogic.CommitDraftAsync(emptyDraftLockedToAnne);
@@ -603,7 +612,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long kathyUserId = testUserId;
             var systemFileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatKathyWillSendFirst = new ReturnViewModel {DiffMeanBonusPercent = 20.2m};
             var returnViewModelThatKathyWillSendSecond = new ReturnViewModel {DiffMeanBonusPercent = 30.3m, DiffMedianBonusPercent = 33.3m};
             var returnViewModelThatKathyWillSendThird = new ReturnViewModel {
@@ -666,7 +675,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long maryUserId = testUserId;
             var systemFileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatMaryWillSendTwice = new ReturnViewModel {DiffMeanBonusPercent = 65.3m};
 
             // Act
@@ -711,7 +720,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long fredUserId = testUserId;
             var systemFileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
 
             // Act
             Draft emptyDraftLockedToFred =
@@ -731,7 +740,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             long dominicUserId = testUserId;
             var systemFileRepository = new SystemFileRepository();
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatDominicWillSendFirst = new ReturnViewModel {DiffMeanBonusPercent = 40.4m};
             var returnViewModelThatDominicWillSendSecond =
                 new ReturnViewModel {DiffMeanBonusPercent = 50.5m, DiffMedianBonusPercent = 55.5m};

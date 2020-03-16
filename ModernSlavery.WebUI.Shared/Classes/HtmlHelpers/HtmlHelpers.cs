@@ -37,7 +37,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
         public static HtmlString PageIdentifier(this IHtmlHelper htmlHelper)
         {
             return new HtmlString(
-                $"Date:{VirtualDateTime.Now}, Version:{GlobalOptions.Version}, File Date:{GlobalOptions.AssemblyDate.ToLocalTime()}, Environment:{Config.EnvironmentName}, Machine:{Environment.MachineName}, Instance:{GlobalOptions.AzureInstanceId}, {GlobalOptions.AssemblyCopyright}");
+                $"Date:{VirtualDateTime.Now}, Version:{GlobalOptions.Version}, File Date:{GlobalOptions.AssemblyDate.ToLocalTime()}, Environment:{Config.EnvironmentName}, Machine:{Environment.MachineName}, Instance:{GlobalOptions.WEBSITE_INSTANCE_ID}, {GlobalOptions.AssemblyCopyright}");
         }
 
         public static HtmlString ToHtml(this IHtmlHelper htmlHelper, string text)

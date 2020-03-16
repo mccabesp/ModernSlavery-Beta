@@ -131,7 +131,7 @@ namespace ModernSlavery.Tests
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
-            var testDraftFileBL = new DraftFileBusinessLogic(new SystemFileRepository());
+            var testDraftFileBL = new DraftFileBusinessLogic(null,new SystemFileRepository());
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
             var testPresenter = new SubmissionPresenter(testSubmissionService, null);
@@ -443,7 +443,7 @@ namespace ModernSlavery.Tests
             mockDataRepo.Setup(dr => dr.GetAll<Return>())
                 .Returns(new Return[] { }.AsQueryable().BuildMock().Object);
 
-            var testDraftFileFileBusinessLogic = new DraftFileBusinessLogic(new SystemFileRepository());
+            var testDraftFileFileBusinessLogic = new DraftFileBusinessLogic(null, new SystemFileRepository());
             Draft actualDraftFile = await testDraftFileFileBusinessLogic.GetExistingOrNewAsync(
                 testOrganisation.OrganisationId,
                 testYear,

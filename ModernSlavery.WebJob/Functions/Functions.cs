@@ -5,7 +5,6 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Infrastructure.Message;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.SharedKernel.Interfaces;
 

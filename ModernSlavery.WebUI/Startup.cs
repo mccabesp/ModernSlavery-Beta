@@ -43,6 +43,7 @@ using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.Database;
 using ModernSlavery.Infrastructure;
 using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.File;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Message;
 using ModernSlavery.Infrastructure.Queue;
@@ -199,7 +200,7 @@ namespace ModernSlavery.WebUI
             //Register the configuration
             builder.RegisterInstance(Config.Configuration).SingleInstance();
 
-            builder.Register(c => new SqlRepository(new DatabaseContext(Global.DatabaseConnectionString, true)))
+            builder.Register(c => new SqlRepository(new DatabaseContext(null,Global.DatabaseConnectionString, true)))
                 .As<IDataRepository>()
                 .InstancePerLifetimeScope();
 

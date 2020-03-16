@@ -277,7 +277,8 @@ namespace ModernSlavery.WebJob
 
             try
             {
-                DatabaseContext.DeleteAllTestRecords(VirtualDateTime.Now.AddDays(-1));
+                var databaseContext = new DatabaseContext(default,false);
+                databaseContext.DeleteAllTestRecords(VirtualDateTime.Now.AddDays(-1));
 
                 log.LogDebug($"Executed {nameof(PurgeTestDataAsync)} successfully");
             }

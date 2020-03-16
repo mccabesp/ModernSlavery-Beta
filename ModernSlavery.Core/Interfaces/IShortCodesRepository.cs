@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.Core.Models;
 
-namespace ModernSlavery
+namespace ModernSlavery.Core.Interfaces
 {
     public interface IShortCodesRepository
     {

@@ -11,9 +11,9 @@ using Microsoft.ApplicationInsights.Extensibility.Implementation;
 
 namespace ModernSlavery.Core
 {
-    class OldGlobal
+    public static class Global
     {
-        public double SessionTimeOutMinutes => Config.GetAppSetting("SessionTimeOut").ToInt32(20);
+        public static double SessionTimeOutMinutes => Config.GetAppSetting("SessionTimeOut").ToInt32(20);
 
         public static string DownloadsPath = Path.Combine(DataPath, "Downloads");
 

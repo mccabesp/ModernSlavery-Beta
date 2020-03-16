@@ -69,7 +69,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.Bind(returnViewModel);
 
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testDraftFileBL = new DraftFileBusinessLogic(new SystemFileRepository());
+            var testDraftFileBL = new DraftFileBusinessLogic(null,new SystemFileRepository());
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
             var testPresenter = new SubmissionPresenter(testSubmissionService, null);
 
