@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.BusinessLogic.Models;
-using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
-using ModernSlavery.Tests.Common.TestHelpers;
-using Moq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
-
+using ModernSlavery.Tests.Common.TestHelpers;
+using Moq;
 using NUnit.Framework;
 
 namespace ModernSlavery.BusinessLogic.Tests.Services
@@ -18,7 +15,6 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
     [SetCulture("en-GB")]
     public class SubmissionBusinessLogicTests
     {
-
         /*
          * These tests are specifically left here containing 'returnId' and 'size' because there was a discussion in regards to whether size was relevant to determine if an organisation is expected to provide data (report) or not for a given year.
          * In the end it was decided it didn't, the message 'you need to report' or 'you didn't need to report' will be based on organisationScope only.
@@ -51,14 +47,14 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                 Mock.Of<IDataRepository>(),
                 Mock.Of<ILogRecordLogger>());
 
-            Organisation organisation = OrganisationHelper.GetOrganisationInAGivenScope(scope, "employerRefInScope", 2017);
-            Return returnToConvert = ReturnHelper.CreateTestReturn(organisation);
+            var organisation = OrganisationHelper.GetOrganisationInAGivenScope(scope, "employerRefInScope", 2017);
+            var returnToConvert = ReturnHelper.CreateTestReturn(organisation);
 
             returnToConvert.ReturnId = returnId;
             returnToConvert.MaxEmployees = maxEmployees;
 
             // Act
-            ReturnViewModel actualConvertedReturnViewModel =
+            var actualConvertedReturnViewModel =
                 submissionBusinessLogic.ConvertSubmissionReportToReturnViewModel(returnToConvert);
 
             // Assert
@@ -69,21 +65,26 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public void SubmissionBusinessLogic_GetLateSubmissions_()
         {
             // Arrange
-            var camlimLimited = new Organisation {
+            var camlimLimited = new Organisation
+            {
                 OrganisationId = 127350, OrganisationName = "CAMLIN LIMITED", SectorType = SectorTypes.Private
             };
 
-            DateTime currentYearAccountingStartDate = camlimLimited.SectorType.GetAccountingStartDate(); // 2019
-            DateTime yearBeforeLastAccountingStartDate = currentYearAccountingStartDate.AddYears(-2); // 2017
-            DateTime lastYearAccountingStartDate = currentYearAccountingStartDate.AddYears(-1); // 2018
+            var currentYearAccountingStartDate = camlimLimited.SectorType.GetAccountingStartDate(); // 2019
+            var yearBeforeLastAccountingStartDate = currentYearAccountingStartDate.AddYears(-2); // 2017
+            var lastYearAccountingStartDate = currentYearAccountingStartDate.AddYears(-1); // 2018
 
-            var listOfReturns = new List<Return> {
-                new Return {
+            var listOfReturns = new List<Return>
+            {
+                new Return
+                {
                     ReturnId = 1219470,
                     OrganisationId = camlimLimited.OrganisationId,
                     Organisation = camlimLimited,
-                    AccountingDate = yearBeforeLastAccountingStartDate, // year before last must not be included in the late submissions
-                    Modified = new DateTime(lastYearAccountingStartDate.Year, 04, 04, 9, 1, 45), // 2018-04-04 09:01:45.7479162
+                    AccountingDate =
+                        yearBeforeLastAccountingStartDate, // year before last must not be included in the late submissions
+                    Modified = new DateTime(lastYearAccountingStartDate.Year, 04, 04, 9, 1,
+                        45), // 2018-04-04 09:01:45.7479162
                     Modifications = null,
                     Status = ReturnStatuses.Submitted,
                     FirstName = "Joe",
@@ -91,12 +92,14 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                     JobTitle = "Finance Director",
                     EHRCResponse = false
                 },
-                new Return {
+                new Return
+                {
                     ReturnId = 1374970,
                     OrganisationId = camlimLimited.OrganisationId,
                     Organisation = camlimLimited,
                     AccountingDate = currentYearAccountingStartDate.AddYears(-1),
-                    Modified = new DateTime(currentYearAccountingStartDate.Year, 04, 05, 18, 10, 27), // 2019-04-05 18:10:27.1811838
+                    Modified = new DateTime(currentYearAccountingStartDate.Year, 04, 05, 18, 10,
+                        27), // 2019-04-05 18:10:27.1811838
                     Modifications = null,
                     Status = ReturnStatuses.Retired, // Retired returns must not be included in the late submissions
                     FirstName = "Joe",
@@ -104,12 +107,14 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                     JobTitle = "Finance Director",
                     EHRCResponse = false
                 },
-                new Return {
+                new Return
+                {
                     ReturnId = 1375400,
                     OrganisationId = camlimLimited.OrganisationId,
                     Organisation = camlimLimited,
                     AccountingDate = currentYearAccountingStartDate.AddYears(-1),
-                    Modified = new DateTime(currentYearAccountingStartDate.Year, 04, 08, 11, 55, 48), // 2019-04-08 11:55:48.5883128
+                    Modified = new DateTime(currentYearAccountingStartDate.Year, 04, 08, 11, 55,
+                        48), // 2019-04-08 11:55:48.5883128
                     Modifications = null,
                     Status = ReturnStatuses.Retired, // must not be included in the late submissions
                     FirstName = "Joe",
@@ -117,12 +122,14 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                     JobTitle = "Finance Director",
                     EHRCResponse = false
                 },
-                new Return {
+                new Return
+                {
                     ReturnId = 1375410,
                     OrganisationId = camlimLimited.OrganisationId,
                     Organisation = camlimLimited,
                     AccountingDate = currentYearAccountingStartDate.AddYears(-1),
-                    Modified = new DateTime(currentYearAccountingStartDate.Year, 04, 08, 11, 58, 28), // 2019-04-08 11:58:28.0299466
+                    Modified = new DateTime(currentYearAccountingStartDate.Year, 04, 08, 11, 58,
+                        28), // 2019-04-08 11:58:28.0299466
                     Modifications = "Figures,LateReason",
                     LateReason =
                         "The pay gap report for female mean pay gap is lower but the female median is higher. The finished report showed that both were higher and therefore needed to be adjusted by inserting a minus sign.",
@@ -134,8 +141,10 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                 }
             };
 
-            var listOfOrganisationScope = new List<OrganisationScope> {
-                new OrganisationScope {
+            var listOfOrganisationScope = new List<OrganisationScope>
+            {
+                new OrganisationScope
+                {
                     OrganisationScopeId = 258343,
                     OrganisationId = camlimLimited.OrganisationId,
                     SnapshotDate = currentYearAccountingStartDate.AddYears(-2),
@@ -143,7 +152,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                     Status = ScopeRowStatuses.Active,
                     ScopeStatus = ScopeStatuses.InScope
                 },
-                new OrganisationScope {
+                new OrganisationScope
+                {
                     OrganisationScopeId = 2273603,
                     OrganisationId = camlimLimited.OrganisationId,
                     ScopeStatusDate = new DateTime(lastYearAccountingStartDate.Year, 06, 07, 17, 46, 22),
@@ -169,23 +179,22 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                 Mock.Of<ILogRecordLogger>());
 
             // Act
-            IEnumerable<LateSubmissionsFileModel> actualConvertedReturnViewModel = submissionBusinessLogic.GetLateSubmissions();
+            var actualConvertedReturnViewModel = submissionBusinessLogic.GetLateSubmissions();
 
             // Assert
-            LateSubmissionsFileModel yearBeforeLastReport = actualConvertedReturnViewModel.FirstOrDefault(x => x.ReportId == 1219470);
+            var yearBeforeLastReport = actualConvertedReturnViewModel.FirstOrDefault(x => x.ReportId == 1219470);
             Assert.Null(
                 yearBeforeLastReport,
                 "ReportId 21947 was marked as submitted the 'year before last', therefore it must not be included in the late submissions report");
 
-            LateSubmissionsFileModel firstRetiredReport = actualConvertedReturnViewModel.FirstOrDefault(x => x.ReportId == 1374970);
+            var firstRetiredReport = actualConvertedReturnViewModel.FirstOrDefault(x => x.ReportId == 1374970);
             Assert.Null(firstRetiredReport, "Retired returns must not be included in the late submissions");
 
-            LateSubmissionsFileModel secondRetiredReport = actualConvertedReturnViewModel.FirstOrDefault(x => x.ReportId == 1375400);
+            var secondRetiredReport = actualConvertedReturnViewModel.FirstOrDefault(x => x.ReportId == 1375400);
             Assert.Null(secondRetiredReport, "Retired returns must not be included in the late submissions");
 
-            LateSubmissionsFileModel foundReport = actualConvertedReturnViewModel.FirstOrDefault(x => x.ReportId == 1375410);
+            var foundReport = actualConvertedReturnViewModel.FirstOrDefault(x => x.ReportId == 1375410);
             Assert.NotNull(foundReport, "Expected reportId 37541 to be included in the list of late submissions");
         }
-
     }
 }

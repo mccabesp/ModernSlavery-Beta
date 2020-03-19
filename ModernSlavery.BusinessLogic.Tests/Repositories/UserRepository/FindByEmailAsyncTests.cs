@@ -4,35 +4,20 @@ using Autofac;
 using AutoMapper;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
-using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Tests.Common;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
-
 using NUnit.Framework;
 
 namespace Repositories.UserRepository
 {
-
     [TestFixture]
     [SetCulture("en-GB")]
     public class FindByEmailAsyncTests : BaseTestFixture<FindByEmailAsyncTests.DependencyModule>
     {
-        public class DependencyModule : Module
-        {
-            protected override void Load(ContainerBuilder builder)
-            {
-                // Initialise AutoMapper
-                MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
-                });
-                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
-            }
-        }
-
         [SetUp]
         public void BeforeEach()
         {
@@ -41,7 +26,21 @@ namespace Repositories.UserRepository
 
             // service under test
             testUserRepo =
-                new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(), mockDataRepo.Object, Mock.Of<IUserLogRecord>(),DependencyContainer.Resolve<IMapper>());
+                new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(),
+                    mockDataRepo.Object, Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
+        }
+
+        public class DependencyModule : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                // Initialise AutoMapper
+                var mapperConfig = new MapperConfiguration(config =>
+                {
+                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
+                });
+                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            }
         }
 
         private Mock<IDataRepository> mockDataRepo;
@@ -49,7 +48,8 @@ namespace Repositories.UserRepository
 
         [TestCase("active1@ad5bda75-e514-491b-b74d-4672542cbd15.com", UserStatuses.Active)]
         [TestCase("new1@ad5bda75-e514-491b-b74d-4672542cbd15.com", UserStatuses.New, UserStatuses.New)]
-        [TestCase("suspended1@ad5bda75-e514-491b-b74d-4672542cbd15.com", UserStatuses.Suspended, UserStatuses.Suspended)]
+        [TestCase("suspended1@ad5bda75-e514-491b-b74d-4672542cbd15.com", UserStatuses.Suspended,
+            UserStatuses.Suspended)]
         [TestCase("active1@ad5bda75-e514-491b-b74d-4672542cbd15.com", UserStatuses.Active, UserStatuses.Active)]
         [TestCase("retired1@ad5bda75-e514-491b-b74d-4672542cbd15.com", UserStatuses.Retired, UserStatuses.Retired)]
         public async Task FindsMatchingEmailUsingSingleStatusFilter(string testFindEmail,
@@ -57,7 +57,7 @@ namespace Repositories.UserRepository
             params UserStatuses[] testStatusFilter)
         {
             // Act
-            User actualUser = await testUserRepo.FindByEmailAsync(testFindEmail, testStatusFilter);
+            var actualUser = await testUserRepo.FindByEmailAsync(testFindEmail, testStatusFilter);
 
             // Assert
             Assert.AreEqual(testFindEmail, actualUser.EmailAddress, "Expected email to match");
@@ -66,10 +66,11 @@ namespace Repositories.UserRepository
 
         [TestCase("new1@ad5bda75-e514-491b-b74d-4672542cbd15.com", UserStatuses.New, UserStatuses.Retired)]
         [TestCase("retired1@ad5bda75-e514-491b-b74d-4672542cbd15.com", UserStatuses.New, UserStatuses.Retired)]
-        public async Task FindsMatchingEmailUsingMultipleStatusFilters(string testFindEmail, params UserStatuses[] testStatusFilters)
+        public async Task FindsMatchingEmailUsingMultipleStatusFilters(string testFindEmail,
+            params UserStatuses[] testStatusFilters)
         {
             // Act
-            User actualUser = await testUserRepo.FindByEmailAsync(testFindEmail, testStatusFilters);
+            var actualUser = await testUserRepo.FindByEmailAsync(testFindEmail, testStatusFilters);
 
             // Assert
             Assert.AreEqual(testFindEmail, actualUser.EmailAddress, "Expected email to match");
@@ -80,12 +81,10 @@ namespace Repositories.UserRepository
         public async Task ReturnsNullWhenEmailDoesNotMatch(string testFindEmail)
         {
             // Act
-            User actualUser = await testUserRepo.FindByEmailAsync(testFindEmail);
+            var actualUser = await testUserRepo.FindByEmailAsync(testFindEmail);
 
             // Assert
             Assert.IsNull(actualUser, "Expected user to be null");
         }
-
     }
-
 }

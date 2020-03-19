@@ -1,13 +1,10 @@
 ﻿using System.Linq;
-using System.Reflection;
 using Moq;
-
 
 namespace ModernSlavery.Tests.Common.TestHelpers
 {
     public static class MoqHelper
     {
-
         /// <summary>
         ///     Returns the mock of a mocked object
         /// </summary>
@@ -16,9 +13,8 @@ namespace ModernSlavery.Tests.Common.TestHelpers
         /// <returns>The mock of the object</returns>
         public static Mock<T> GetMockFromObject<T>(this T mockedObject) where T : class
         {
-            PropertyInfo[] pis = mockedObject.GetType().GetProperties().Where(p => p.PropertyType.Name == "Mock`1").ToArray();
+            var pis = mockedObject.GetType().GetProperties().Where(p => p.PropertyType.Name == "Mock`1").ToArray();
             return pis.First().GetGetMethod().Invoke(mockedObject, null) as Mock<T>;
         }
-
     }
 }

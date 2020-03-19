@@ -1,5 +1,5 @@
-﻿using Autofac;
-using System;
+﻿using System;
+using Autofac;
 
 namespace ModernSlavery.Tests.Common
 {
@@ -14,7 +14,7 @@ namespace ModernSlavery.Tests.Common
             foreach (var module in modules)
                 builder.RegisterModule(module);
 
-            IContainer container = builder.Build();
+            var container = builder.Build();
             DependencyContainer = container;
             return container;
         }

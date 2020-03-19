@@ -5,32 +5,19 @@ using AutoMapper;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
 using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Tests.Common;
 using Moq;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel.Options;
 using NUnit.Framework;
 
 namespace Repositories.UserRepository
 {
-
     [TestFixture]
     [SetCulture("en-GB")]
     public class CheckPasswordAsyncTests : BaseTestFixture<CheckPasswordAsyncTests.DependencyModule>
     {
-        public class DependencyModule : Module
-        {
-            protected override void Load(ContainerBuilder builder)
-            {
-                // Initialise AutoMapper
-                MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
-                });
-                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
-            }
-        }
-
         [SetUp]
         public void BeforeEach()
         {
@@ -38,7 +25,22 @@ namespace Repositories.UserRepository
             mockDataRepo = new Mock<IDataRepository>();
 
             // service under test
-            testUserRepo = new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(),  mockDataRepo.Object, Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
+            testUserRepo = new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(),
+                new GlobalOptions(), mockDataRepo.Object, Mock.Of<IUserLogRecord>(),
+                DependencyContainer.Resolve<IMapper>());
+        }
+
+        public class DependencyModule : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                // Initialise AutoMapper
+                var mapperConfig = new MapperConfiguration(config =>
+                {
+                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
+                });
+                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            }
         }
 
         private Mock<IDataRepository> mockDataRepo;
@@ -51,7 +53,8 @@ namespace Repositories.UserRepository
             var saveChangesCalled = false;
             var testPassword = "currentPassword123";
             var salt = "testSalt";
-            var testUser = new User {
+            var testUser = new User
+            {
                 PasswordHash = Crypto.GetPBKDF2(testPassword, Convert.FromBase64String(salt)),
                 Salt = salt,
                 HashingAlgorithm = HashingAlgorithm.PBKDF2, LoginAttempts = 3
@@ -62,7 +65,7 @@ namespace Repositories.UserRepository
                 .Returns(Task.CompletedTask);
 
             // Act
-            bool actualResult = await testUserRepo.CheckPasswordAsync(testUser, testPassword);
+            var actualResult = await testUserRepo.CheckPasswordAsync(testUser, testPassword);
 
             // Assert
             Assert.IsTrue(actualResult, "Expected correct password to return true");
@@ -76,8 +79,10 @@ namespace Repositories.UserRepository
             // Arrange
             var testPassword = "currentPassword123";
             var salt = "testSalt";
-            var testUser = new User {
-                PasswordHash = Crypto.GetPBKDF2("WrongPassword123", Convert.FromBase64String(salt)), Salt = salt, HashingAlgorithm = HashingAlgorithm.PBKDF2, LoginAttempts = 0
+            var testUser = new User
+            {
+                PasswordHash = Crypto.GetPBKDF2("WrongPassword123", Convert.FromBase64String(salt)), Salt = salt,
+                HashingAlgorithm = HashingAlgorithm.PBKDF2, LoginAttempts = 0
             };
             var testAttempts = 3;
 
@@ -90,7 +95,7 @@ namespace Repositories.UserRepository
                     .Returns(Task.CompletedTask);
 
                 // Act
-                bool actualResult = await testUserRepo.CheckPasswordAsync(testUser, testPassword);
+                var actualResult = await testUserRepo.CheckPasswordAsync(testUser, testPassword);
 
                 // Assert
                 Assert.IsFalse(actualResult, "Expected wrong password to return false");
@@ -98,7 +103,5 @@ namespace Repositories.UserRepository
                 Assert.AreEqual(attempt, testUser.LoginAttempts, $"Expected user login attempts to be {attempt}");
             }
         }
-
     }
-
 }

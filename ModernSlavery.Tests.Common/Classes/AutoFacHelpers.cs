@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Autofac;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Moq;
-
-using NUnit.Framework;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
+using ModernSlavery.Extensions;
 using ModernSlavery.Infrastructure.Data;
+using Moq;
+using NUnit.Framework;
 
 namespace ModernSlavery.Tests.Common.Classes
 {
@@ -30,14 +29,12 @@ namespace ModernSlavery.Tests.Common.Classes
         /// </param>
         /// <param name="ctorArgs"></param>
         /// <returns></returns>
-        public static Mock<TInstance> ResolveAsMock<TInstance>(this IComponentContext context, bool callBase, params Type[] ctorArgs)
+        public static Mock<TInstance> ResolveAsMock<TInstance>(this IComponentContext context, bool callBase,
+            params Type[] ctorArgs)
             where TInstance : class
         {
             var r = new List<object>();
-            foreach (Type t in ctorArgs)
-            {
-                r.Add(context.Resolve(t));
-            }
+            foreach (var t in ctorArgs) r.Add(context.Resolve(t));
 
             var mock = new Mock<TInstance>(r.ToArray());
             mock.CallBase = callBase;
@@ -52,20 +49,18 @@ namespace ModernSlavery.Tests.Common.Classes
         /// <param name="dbObjects"></param>
         public static void RegisterInMemoryTestDatabase(this ContainerBuilder builder, params object[] dbObjects)
         {
-            DatabaseContext dbContext = CreateInMemoryTestDatabase(dbObjects);
+            var dbContext = CreateInMemoryTestDatabase(dbObjects);
             builder.Register(c => new SqlRepository(dbContext)).As<IDataRepository>().InstancePerLifetimeScope();
         }
 
         public static DatabaseContext CreateInMemoryTestDatabase(params object[] dbObjects)
         {
             //Get the method name of the unit test or the parent
-            string testName = TestContext.CurrentContext.Test.FullName;
+            var testName = TestContext.CurrentContext.Test.FullName;
             if (string.IsNullOrWhiteSpace(testName))
-            {
                 testName = MethodBase.GetCurrentMethod().FindParentWithAttribute<TestAttribute>().Name;
-            }
 
-            DbContextOptionsBuilder<DatabaseContext> optionsBuilder =
+            var optionsBuilder =
                 new DbContextOptionsBuilder<DatabaseContext>().UseInMemoryDatabase(testName);
 
             optionsBuilder.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning));
@@ -76,17 +71,13 @@ namespace ModernSlavery.Tests.Common.Classes
             var dbContext = new DatabaseContext(optionsBuilder.Options);
             if (dbObjects != null && dbObjects.Length > 0)
             {
-                foreach (object item in dbObjects)
+                foreach (var item in dbObjects)
                 {
                     var enumerable = item as IEnumerable<object>;
                     if (enumerable == null)
-                    {
                         dbContext.Add(item);
-                    }
                     else
-                    {
                         dbContext.AddRange(enumerable);
-                    }
                 }
 
                 dbContext.SaveChanges();
@@ -94,6 +85,5 @@ namespace ModernSlavery.Tests.Common.Classes
 
             return dbContext;
         }
-
     }
 }

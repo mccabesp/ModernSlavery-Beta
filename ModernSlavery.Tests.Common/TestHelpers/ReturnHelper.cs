@@ -6,12 +6,10 @@ using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using Moq;
 
-
 namespace ModernSlavery.Tests.Common.TestHelpers
 {
     public static class ReturnHelper
     {
-
         private static Return GetSubmittedReturnWithAllDataPoints(User user)
         {
             var result = Mock.Of<Return>(report => report.Status == ReturnStatuses.Submitted);
@@ -23,27 +21,27 @@ namespace ModernSlavery.Tests.Common.TestHelpers
             result.DiffMedianBonusPercent = new Random().Next(1, 99);
             result.DiffMedianHourlyPercent = new Random().Next(1, 99);
 
-            GetRandomValues(0, 100, out int diffMaleLowerPayBand, out int diffFemaleLowerPayBand);
+            GetRandomValues(0, 100, out var diffMaleLowerPayBand, out var diffFemaleLowerPayBand);
             result.FemaleLowerPayBand = diffFemaleLowerPayBand;
             result.MaleLowerPayBand = diffMaleLowerPayBand;
 
-            GetRandomValues(1, 100, out int diffMaleMedianBonusPayPercent, out int diffFemaleMedianBonusPayPercent);
+            GetRandomValues(1, 100, out var diffMaleMedianBonusPayPercent, out var diffFemaleMedianBonusPayPercent);
             result.FemaleMedianBonusPayPercent = diffFemaleMedianBonusPayPercent;
             result.MaleMedianBonusPayPercent = diffMaleMedianBonusPayPercent;
 
-            GetRandomValues(1, 100, out int diffMaleMiddlePayBand, out int diffFemaleMiddlePayBand);
+            GetRandomValues(1, 100, out var diffMaleMiddlePayBand, out var diffFemaleMiddlePayBand);
             result.FemaleMiddlePayBand = diffFemaleMiddlePayBand;
             result.MaleMiddlePayBand = diffMaleMiddlePayBand;
 
-            GetRandomValues(1, 100, out int diffMaleUpperPayBand, out int diffFemaleUpperPayBand);
+            GetRandomValues(1, 100, out var diffMaleUpperPayBand, out var diffFemaleUpperPayBand);
             result.FemaleUpperPayBand = diffFemaleUpperPayBand;
             result.MaleUpperPayBand = diffMaleUpperPayBand;
 
-            GetRandomValues(1, 100, out int diffMaleUpperQuartilePayBand, out int diffFemaleUpperQuartilePayBand);
+            GetRandomValues(1, 100, out var diffMaleUpperQuartilePayBand, out var diffFemaleUpperQuartilePayBand);
             result.FemaleUpperQuartilePayBand = diffFemaleUpperQuartilePayBand;
             result.MaleUpperQuartilePayBand = diffMaleUpperQuartilePayBand;
 
-            int randomString = new Random().Next(10000, 99999);
+            var randomString = new Random().Next(10000, 99999);
 
             result.JobTitle = $"JobTitle_{randomString}";
             result.FirstName = $"Name_{randomString}";
@@ -54,9 +52,10 @@ namespace ModernSlavery.Tests.Common.TestHelpers
             return result;
         }
 
-        public static Return GetSubmittedReturnForOrganisationAndYear(UserOrganisation userOrganisation, int snapshotYear)
+        public static Return GetSubmittedReturnForOrganisationAndYear(UserOrganisation userOrganisation,
+            int snapshotYear)
         {
-            Return result = GetSubmittedReturnWithAllDataPoints(userOrganisation.User);
+            var result = GetSubmittedReturnWithAllDataPoints(userOrganisation.User);
             result.Organisation = userOrganisation.Organisation;
             result.OrganisationId = userOrganisation.Organisation.OrganisationId;
             result.AccountingDate = userOrganisation.Organisation.SectorType.GetAccountingStartDate(snapshotYear);
@@ -102,7 +101,8 @@ namespace ModernSlavery.Tests.Common.TestHelpers
             decimal diffMedianBonusPercent,
             int testYear = 2017)
         {
-            return new Return {
+            return new Return
+            {
                 ReturnId = organisation.OrganisationId + 100,
                 Organisation = organisation,
                 OrganisationId = organisation.OrganisationId,
@@ -144,23 +144,27 @@ namespace ModernSlavery.Tests.Common.TestHelpers
                 testYear);
         }
 
-        public static IEnumerable<Return> CreateTestReturns(IEnumerable<Organisation> testOrganisations, int testYear = 2017)
+        public static IEnumerable<Return> CreateTestReturns(IEnumerable<Organisation> testOrganisations,
+            int testYear = 2017)
         {
             //Create the test returns
             var results = new ConcurrentBag<Return>();
             Parallel.ForEach(
                 testOrganisations,
-                testOrg => {
-                    Return returns = CreateTestReturn(testOrg);
+                testOrg =>
+                {
+                    var returns = CreateTestReturn(testOrg);
                     testOrg.Returns.Add(returns);
                     results.Add(returns);
                 });
             return results;
         }
 
-        public static Return CreateLateReturn(Organisation organisation, DateTime snapshotDate, DateTime modifiedDate, OrganisationScope scope)
+        public static Return CreateLateReturn(Organisation organisation, DateTime snapshotDate, DateTime modifiedDate,
+            OrganisationScope scope)
         {
-            var lateReturn = new Return {
+            var lateReturn = new Return
+            {
                 Organisation = organisation,
                 ReturnId = organisation.OrganisationId + 100,
                 AccountingDate = snapshotDate,
@@ -176,6 +180,5 @@ namespace ModernSlavery.Tests.Common.TestHelpers
             lateReturn.IsLateSubmission = lateReturn.CalculateIsLateSubmission();
             return lateReturn;
         }
-
     }
 }

@@ -5,12 +5,10 @@ using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
 using Moq;
 
-
 namespace ModernSlavery.Tests.Common.TestHelpers
 {
     public static class OrganisationHelper
     {
-
         public static Organisation GetConcreteOrganisation(string employerRef,
             string organisationName = "Org123",
             OrganisationStatuses organisationStatus = OrganisationStatuses.Active,
@@ -18,12 +16,13 @@ namespace ModernSlavery.Tests.Common.TestHelpers
         {
             if (string.IsNullOrWhiteSpace(employerRef))
             {
-                int someId = new Random().Next(1000, 9999);
+                var someId = new Random().Next(1000, 9999);
                 employerRef = employerRef ?? $"Org_{someId}";
             }
 
             // todo: Use Moq
-            return new Organisation {
+            return new Organisation
+            {
                 EmployerReference = employerRef,
                 //OrganisationId = 123,
                 OrganisationName = organisationName,
@@ -36,21 +35,21 @@ namespace ModernSlavery.Tests.Common.TestHelpers
 
         public static Organisation GetPublicOrganisation(string employerRef = null)
         {
-            Organisation organisation = GetConcreteOrganisation(employerRef);
+            var organisation = GetConcreteOrganisation(employerRef);
             organisation.SectorType = SectorTypes.Public;
             return organisation;
         }
 
         public static Organisation GetPrivateOrganisation(string employerRef = null)
         {
-            Organisation organisation = GetConcreteOrganisation(employerRef);
+            var organisation = GetConcreteOrganisation(employerRef);
             organisation.SectorType = SectorTypes.Private;
             return organisation;
         }
 
         public static Organisation GetMockedOrganisation(string employerRef = null)
         {
-            int someId = new Random().Next(1000, 9999);
+            var someId = new Random().Next(1000, 9999);
             var mockedOrg = Mock.Of<Organisation>(org => org.OrganisationId == someId);
             mockedOrg.EmployerReference = employerRef ?? $"Org_{someId}";
             mockedOrg.SectorType = SectorTypes.Private;
@@ -69,11 +68,13 @@ namespace ModernSlavery.Tests.Common.TestHelpers
             return GetOrganisationInAGivenScope(ScopeStatuses.OutOfScope, employerRef, snapshotYear);
         }
 
-        public static Organisation GetOrganisationInAGivenScope(ScopeStatuses scope, string employerRef = null, int snapshotYear = 0)
+        public static Organisation GetOrganisationInAGivenScope(ScopeStatuses scope, string employerRef = null,
+            int snapshotYear = 0)
         {
-            Organisation org = GetPrivateOrganisation(employerRef);
+            var org = GetPrivateOrganisation(employerRef);
 
-            OrganisationScope organisationScope = OrganisationScopeHelper.GetOrgScopeWithThisScope(snapshotYear, org.SectorType, scope);
+            var organisationScope =
+                OrganisationScopeHelper.GetOrgScopeWithThisScope(snapshotYear, org.SectorType, scope);
             org.OrganisationScopes.Add(organisationScope);
             org.LatestScope = organisationScope;
             return org;
@@ -91,6 +92,5 @@ namespace ModernSlavery.Tests.Common.TestHelpers
             org.LatestScope = isLatestScope ? scope : org.LatestScope;
             scope.Organisation = org;
         }
-
     }
 }

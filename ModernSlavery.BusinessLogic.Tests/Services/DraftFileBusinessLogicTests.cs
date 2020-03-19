@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions;
-using ModernSlavery.Tests.Common.TestHelpers;
-using Moq;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Extensions;
 using ModernSlavery.Infrastructure.File;
 using ModernSlavery.Infrastructure.Options;
+using ModernSlavery.Tests.Common.TestHelpers;
+using Moq;
 using NUnit.Framework;
 
 namespace ModernSlavery.BusinessLogic.Tests.Services
@@ -18,7 +18,6 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
     [SetCulture("en-GB")]
     public class DraftFileBusinessLogicTests : BaseBusinessLogicTests
     {
-
         [SetUp]
         public void BeforeEach()
         {
@@ -37,44 +36,52 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         private long testUserId;
 
         [Test]
-        public async Task DraftFileBusinessLogic_CommitDraft_And_Then_RollbackDraft_Leaves_The_File_In_A_Consistent_StateAsync()
+        public async Task
+            DraftFileBusinessLogic_CommitDraft_And_Then_RollbackDraft_Leaves_The_File_In_A_Consistent_StateAsync()
         {
             // Arrange
-            long nicolasUserId = testUserId;
+            var nicolasUserId = testUserId;
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
             testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatNicolasWillSendFirst = new ReturnViewModel {DiffMeanBonusPercent = 10.1m};
             var returnViewModelThatNicolasWillSendSecond =
                 new ReturnViewModel {DiffMeanBonusPercent = 20.2m, DiffMedianBonusPercent = 22.2m};
-            var returnViewModelThatNicolasWillSendThird = new ReturnViewModel {
-                DiffMeanBonusPercent = 30.3m, DiffMedianBonusPercent = 33.3m, OrganisationSize = OrganisationSizes.Employees250To499
+            var returnViewModelThatNicolasWillSendThird = new ReturnViewModel
+            {
+                DiffMeanBonusPercent = 30.3m, DiffMedianBonusPercent = 33.3m,
+                OrganisationSize = OrganisationSizes.Employees250To499
             };
-            var returnViewModelThatNicolasWillSendFourth = new ReturnViewModel {
-                DiffMeanBonusPercent = 40.4m, DiffMedianBonusPercent = 44.4m, OrganisationSize = OrganisationSizes.Employees1000To4999
+            var returnViewModelThatNicolasWillSendFourth = new ReturnViewModel
+            {
+                DiffMeanBonusPercent = 40.4m, DiffMedianBonusPercent = 44.4m,
+                OrganisationSize = OrganisationSizes.Employees1000To4999
             };
 
             // Act
-            Draft emptyDraftLockedToNicolas =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, nicolasUserId);
+            var emptyDraftLockedToNicolas =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    nicolasUserId);
             Assert.False(emptyDraftLockedToNicolas.HasDraftBeenModifiedDuringThisSession);
 
-            Draft draftWithFirstLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftWithFirstLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatNicolasWillSendFirst,
                 emptyDraftLockedToNicolas,
                 nicolasUserId); // send data
-            Assert.False(draftWithFirstLoadOfData.HasDraftBeenModifiedDuringThisSession, "this flag is set up by the front end");
+            Assert.False(draftWithFirstLoadOfData.HasDraftBeenModifiedDuringThisSession,
+                "this flag is set up by the front end");
 
             #region Confirm file status
 
-            Draft intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, nicolasUserId);
+            var intermediateDraftInfo =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    nicolasUserId);
             Assert.AreEqual(10.1m, intermediateDraftInfo.ReturnViewModelContent.DiffMeanBonusPercent);
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithFirstLoadOfData.DraftPath));
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithFirstLoadOfData.BackupDraftPath));
 
             #endregion
 
-            Draft draftWithSecondLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftWithSecondLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatNicolasWillSendSecond,
                 draftWithFirstLoadOfData,
                 nicolasUserId); // send data
@@ -85,7 +92,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             #region Confirm file status
 
             intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, nicolasUserId);
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    nicolasUserId);
             Assert.AreEqual(20.2m, intermediateDraftInfo.ReturnViewModelContent.DiffMeanBonusPercent);
             Assert.AreEqual(22.2m, intermediateDraftInfo.ReturnViewModelContent.DiffMedianBonusPercent);
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithFirstLoadOfData.DraftPath));
@@ -96,7 +104,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             await testDraftFileBusinessLogic.CommitDraftAsync(draftWithSecondLoadOfData);
             Assert.False(await systemFileRepository.GetFileExistsAsync(draftWithSecondLoadOfData.BackupDraftPath));
 
-            Draft draftWithThirdLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftWithThirdLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatNicolasWillSendThird,
                 draftWithSecondLoadOfData,
                 nicolasUserId); // send data
@@ -107,14 +115,16 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             #region Confirm file status
 
             intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, nicolasUserId);
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    nicolasUserId);
             Assert.AreEqual(30.3m, intermediateDraftInfo.ReturnViewModelContent.DiffMeanBonusPercent);
             Assert.AreEqual(33.3m, intermediateDraftInfo.ReturnViewModelContent.DiffMedianBonusPercent);
-            Assert.AreEqual(OrganisationSizes.Employees250To499, intermediateDraftInfo.ReturnViewModelContent.OrganisationSize);
+            Assert.AreEqual(OrganisationSizes.Employees250To499,
+                intermediateDraftInfo.ReturnViewModelContent.OrganisationSize);
 
             #endregion
 
-            Draft draftWithFourthLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftWithFourthLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatNicolasWillSendFourth,
                 draftWithThirdLoadOfData,
                 nicolasUserId); // send data
@@ -125,10 +135,12 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             #region Confirm file status
 
             intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, nicolasUserId);
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    nicolasUserId);
             Assert.AreEqual(40.4m, intermediateDraftInfo.ReturnViewModelContent.DiffMeanBonusPercent);
             Assert.AreEqual(44.4m, intermediateDraftInfo.ReturnViewModelContent.DiffMedianBonusPercent);
-            Assert.AreEqual(OrganisationSizes.Employees1000To4999, intermediateDraftInfo.ReturnViewModelContent.OrganisationSize);
+            Assert.AreEqual(OrganisationSizes.Employees1000To4999,
+                intermediateDraftInfo.ReturnViewModelContent.OrganisationSize);
 
             #endregion
 
@@ -137,7 +149,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             #region Confirm file status
 
             intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, nicolasUserId);
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    nicolasUserId);
             Assert.AreEqual(20.2m, intermediateDraftInfo.ReturnViewModelContent.DiffMeanBonusPercent);
             Assert.AreEqual(22.2m, intermediateDraftInfo.ReturnViewModelContent.DiffMedianBonusPercent);
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithFirstLoadOfData.BackupDraftPath));
@@ -152,18 +165,21 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         }
 
         [Test]
-        public async Task DraftFileBusinessLogic_GetDraftIfAvailable_When_Json_Empty_And_Bak_File_Empty_Return_NullAsync()
+        public async Task
+            DraftFileBusinessLogic_GetDraftIfAvailable_When_Json_Empty_And_Bak_File_Empty_Return_NullAsync()
         {
             // Arrange
-            long robertUserId = testUserId;
+            var robertUserId = testUserId;
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
 
-            Draft emptyDraftLockedToRobert =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, robertUserId);
+            var emptyDraftLockedToRobert =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    robertUserId);
 
             // Act
-            Draft availableDraft = await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
+            var availableDraft =
+                await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
 
             // Assert
             Assert.Null(availableDraft, "Both files exist but both empty, so no draft");
@@ -176,16 +192,18 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_GetDraftIfAvailable_When_Json_Empty_And_Not_Bak_File_Return_NullAsync()
         {
             // Arrange
-            long clareUserId = testUserId;
+            var clareUserId = testUserId;
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
 
-            Draft emptyDraftLockedToClare =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, clareUserId);
+            var emptyDraftLockedToClare =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    clareUserId);
             await testDraftFileBusinessLogic.CommitDraftAsync(emptyDraftLockedToClare);
 
             // Act
-            Draft availableDraft = await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
+            var availableDraft =
+                await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
 
             // Assert
             Assert.Null(
@@ -197,20 +215,24 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         }
 
         [Test]
-        public async Task DraftFileBusinessLogic_GetDraftIfAvailable_When_Json_Has_Data_And_Bak_File_Empty_Return_NullAsync()
+        public async Task
+            DraftFileBusinessLogic_GetDraftIfAvailable_When_Json_Has_Data_And_Bak_File_Empty_Return_NullAsync()
         {
             // Arrange
-            long oliviaUserId = testUserId;
+            var oliviaUserId = testUserId;
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
             testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatOliviaWillSendFirst = new ReturnViewModel {DiffMedianBonusPercent = 11.1m};
 
-            Draft emptyDraftLockedToOlivia =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, oliviaUserId);
-            await testDraftFileBusinessLogic.UpdateAsync(returnViewModelThatOliviaWillSendFirst, emptyDraftLockedToOlivia, oliviaUserId);
+            var emptyDraftLockedToOlivia =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    oliviaUserId);
+            await testDraftFileBusinessLogic.UpdateAsync(returnViewModelThatOliviaWillSendFirst,
+                emptyDraftLockedToOlivia, oliviaUserId);
 
             // Act
-            Draft availableDraft = await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
+            var availableDraft =
+                await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
 
             // Assert
             Assert.Null(
@@ -222,31 +244,34 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         }
 
         [Test]
-        public async Task DraftFileBusinessLogic_GetDraftIfAvailable_When_Json_Has_Data_And_Bak_File_Has_Data_Return_Bak_Draft_InfoAsync()
+        public async Task
+            DraftFileBusinessLogic_GetDraftIfAvailable_When_Json_Has_Data_And_Bak_File_Has_Data_Return_Bak_Draft_InfoAsync()
         {
             // Arrange
-            long joeUserId = testUserId;
+            var joeUserId = testUserId;
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatJoeWillSendFirst = new ReturnViewModel {DiffMedianBonusPercent = 11.1m};
             var returnViewModelThatJoeWillSendSecond =
                 new ReturnViewModel {DiffMedianBonusPercent = 22.02m, DiffMeanHourlyPayPercent = 20.2m};
 
-            Draft emptyDraftLockedToJoe =
+            var emptyDraftLockedToJoe =
                 await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, joeUserId);
-            Draft draftWithFirstLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftWithFirstLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatJoeWillSendFirst,
                 emptyDraftLockedToJoe,
                 joeUserId);
             await testDraftFileBusinessLogic.CommitDraftAsync(draftWithFirstLoadOfData);
-            emptyDraftLockedToJoe = await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, joeUserId);
+            emptyDraftLockedToJoe =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, joeUserId);
             draftWithFirstLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatJoeWillSendSecond,
                 emptyDraftLockedToJoe,
                 joeUserId);
 
             // Act
-            Draft availableDraft = await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
+            var availableDraft =
+                await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
 
             // Assert
             Assert.NotNull(
@@ -262,27 +287,31 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         }
 
         [Test]
-        public async Task DraftFileBusinessLogic_GetDraftIfAvailable_When_Json_Has_Data_And_Not_Bak_File_Return_DraftAsync()
+        public async Task
+            DraftFileBusinessLogic_GetDraftIfAvailable_When_Json_Has_Data_And_Not_Bak_File_Return_DraftAsync()
         {
             // Arrange
-            long trevorUserId = testUserId;
+            var trevorUserId = testUserId;
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatTrevorWillSendFirst = new ReturnViewModel {DiffMedianBonusPercent = 11.1m};
 
-            Draft emptyDraftLockedToTrevor =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, trevorUserId);
-            Draft draftWithFirstLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
+            var emptyDraftLockedToTrevor =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    trevorUserId);
+            var draftWithFirstLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatTrevorWillSendFirst,
                 emptyDraftLockedToTrevor,
                 trevorUserId);
             await testDraftFileBusinessLogic.CommitDraftAsync(draftWithFirstLoadOfData);
 
             // Act
-            Draft availableDraft = await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
+            var availableDraft =
+                await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
 
             // Assert
-            Assert.NotNull(availableDraft, "Json has data and there isn't a bak file, this is a consistent state, so a draft is available");
+            Assert.NotNull(availableDraft,
+                "Json has data and there isn't a bak file, this is a consistent state, so a draft is available");
 
             // Cleanup
             await testDraftFileBusinessLogic.DiscardDraftAsync(availableDraft);
@@ -292,10 +321,12 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_GetDraftIfAvailable_When_Not_Json_Return_NullAsync()
         {
             // Arrange
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,new SystemFileRepository(new StorageOptions()));
+            testDraftFileBusinessLogic =
+                new DraftFileBusinessLogic(null, new SystemFileRepository(new StorageOptions()));
 
             // Act
-            Draft availableDraft = await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
+            var availableDraft =
+                await testDraftFileBusinessLogic.GetDraftIfAvailableAsync(testOrganisationId, testSnapshotYear);
 
             // Assert
             Assert.Null(availableDraft, "Json isn't available, so it is expected that 'available draft' is null");
@@ -305,15 +336,18 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_GetExistingOrNew_Creates_Empty_Json_And_Bak_FilesAsync()
         {
             // Arrange
-            long jackUserId = testUserId;
+            var jackUserId = testUserId;
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,systemFileRepository);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
 
             // Act
-            Draft emptyDraftLockedToJack =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, jackUserId);
-            Assert.True(await systemFileRepository.GetFileExistsAsync(emptyDraftLockedToJack.DraftPath), "Expected a draft json file");
-            Assert.True(await systemFileRepository.GetFileExistsAsync(emptyDraftLockedToJack.BackupDraftPath), "Expected a backup file");
+            var emptyDraftLockedToJack =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    jackUserId);
+            Assert.True(await systemFileRepository.GetFileExistsAsync(emptyDraftLockedToJack.DraftPath),
+                "Expected a draft json file");
+            Assert.True(await systemFileRepository.GetFileExistsAsync(emptyDraftLockedToJack.BackupDraftPath),
+                "Expected a backup file");
 
             // Cleanup
             await testDraftFileBusinessLogic.DiscardDraftAsync(emptyDraftLockedToJack);
@@ -323,23 +357,27 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_GetExistingOrNew_User_Can_Create_And_Update_DraftAsync()
         {
             // Arrange
-            long lizzyUserId = testUserId;
+            var lizzyUserId = testUserId;
             var fileRepo = new SystemFileRepository(new StorageOptions());
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,new SystemFileRepository(new StorageOptions()));
-            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, lizzyUserId,fileRepo.RootDir);
+            testDraftFileBusinessLogic =
+                new DraftFileBusinessLogic(null, new SystemFileRepository(new StorageOptions()));
+            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, lizzyUserId,
+                fileRepo.RootDir);
             var returnViewModelChangedByLizzy = new ReturnViewModel {DiffMeanBonusPercent = 78.2m};
 
             // Act
-            Draft draftLockedToLizzy =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, lizzyUserId);
-            Draft updatedDraft = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftLockedToLizzy =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    lizzyUserId);
+            var updatedDraft = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelChangedByLizzy,
                 draftLockedToLizzy,
                 lizzyUserId);
 
             // Assert
             Assert.Multiple(
-                () => {
+                () =>
+                {
                     Assert.NotNull(updatedDraft.ReturnViewModelContent);
                     Assert.AreEqual(expectedDraft.DraftPath, updatedDraft.DraftPath);
                     Assert.AreEqual(expectedDraft.DraftFilename, updatedDraft.DraftFilename);
@@ -360,16 +398,17 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_GetExistingOrNew_User_Wont_Be_Allowed_To_Access_A_Locked_FileAsync()
         {
             // Arrange
-            long queenElisabethId = testUserId;
-            long philipDukeOfEdinburghId = testUserId * 25;
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,new SystemFileRepository(new StorageOptions()));
+            var queenElisabethId = testUserId;
+            var philipDukeOfEdinburghId = testUserId * 25;
+            testDraftFileBusinessLogic =
+                new DraftFileBusinessLogic(null, new SystemFileRepository(new StorageOptions()));
 
             // Act
-            Draft draftLockedToQueenElisabeth = await testDraftFileBusinessLogic.GetExistingOrNewAsync(
+            var draftLockedToQueenElisabeth = await testDraftFileBusinessLogic.GetExistingOrNewAsync(
                 testOrganisationId,
                 testSnapshotYear,
                 queenElisabethId);
-            Draft draftRequestedByPhilip = await testDraftFileBusinessLogic.GetExistingOrNewAsync(
+            var draftRequestedByPhilip = await testDraftFileBusinessLogic.GetExistingOrNewAsync(
                 testOrganisationId,
                 testSnapshotYear,
                 philipDukeOfEdinburghId);
@@ -388,20 +427,25 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         }
 
         [Test]
-        public async Task DraftFileBusinessLogic_GetExistingOrNew_When_File_Does_Not_Exist_Creates_It_And_Locks_ItAsync()
+        public async Task
+            DraftFileBusinessLogic_GetExistingOrNew_When_File_Does_Not_Exist_Creates_It_And_Locks_ItAsync()
         {
             // Arrange
             var fileRepo = new SystemFileRepository(new StorageOptions());
 
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,fileRepo);
-            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, testUserId, fileRepo.RootDir);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepo);
+            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, testUserId,
+                fileRepo.RootDir);
 
             // Act
-            Draft actualDraft = await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, testUserId);
+            var actualDraft =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    testUserId);
 
             // Assert
             Assert.Multiple(
-                () => {
+                () =>
+                {
                     Assert.AreEqual(expectedDraft.ReturnViewModelContent, actualDraft.ReturnViewModelContent);
                     Assert.AreEqual(expectedDraft.DraftPath, actualDraft.DraftPath);
                     Assert.AreEqual(expectedDraft.DraftFilename, actualDraft.DraftFilename);
@@ -409,7 +453,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                     Assert.AreEqual(expectedDraft.LastWrittenByUserId, actualDraft.LastWrittenByUserId);
                     Assert.AreEqual(expectedDraft.BackupDraftFilename, actualDraft.BackupDraftFilename);
                     Assert.AreEqual(expectedDraft.BackupDraftPath, actualDraft.BackupDraftPath);
-                    Assert.AreEqual(expectedDraft.HasDraftBeenModifiedDuringThisSession, actualDraft.HasDraftBeenModifiedDuringThisSession);
+                    Assert.AreEqual(expectedDraft.HasDraftBeenModifiedDuringThisSession,
+                        actualDraft.HasDraftBeenModifiedDuringThisSession);
                     // Assert.AreEqual(expected.LastWrittenDateTime, actual.LastWrittenDateTime); // todo: consider 'equal' when 45 sec apart
                 });
 
@@ -423,16 +468,20 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             var fileRepo = new SystemFileRepository(new StorageOptions());
 
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,fileRepo);
-            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, testUserId, fileRepo.RootDir);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepo);
+            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, testUserId,
+                fileRepo.RootDir);
 
             // Act
             await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, testUserId);
-            Draft actualDraft = await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, testUserId);
+            var actualDraft =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    testUserId);
 
             // Assert
             Assert.Multiple(
-                () => {
+                () =>
+                {
                     Assert.AreEqual(expectedDraft.ReturnViewModelContent, actualDraft.ReturnViewModelContent);
                     Assert.AreEqual(expectedDraft.DraftPath, actualDraft.DraftPath);
                     Assert.AreEqual(expectedDraft.DraftFilename, actualDraft.DraftFilename);
@@ -440,7 +489,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                     Assert.AreEqual(expectedDraft.LastWrittenByUserId, actualDraft.LastWrittenByUserId);
                     Assert.AreEqual(expectedDraft.BackupDraftFilename, actualDraft.BackupDraftFilename);
                     Assert.AreEqual(expectedDraft.BackupDraftPath, actualDraft.BackupDraftPath);
-                    Assert.AreEqual(expectedDraft.HasDraftBeenModifiedDuringThisSession, actualDraft.HasDraftBeenModifiedDuringThisSession);
+                    Assert.AreEqual(expectedDraft.HasDraftBeenModifiedDuringThisSession,
+                        actualDraft.HasDraftBeenModifiedDuringThisSession);
                 });
 
             // Remove test file
@@ -453,21 +503,24 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             var fileRepo = new SystemFileRepository(new StorageOptions());
 
-            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null,fileRepo);
-            long userIdLockingTheDraft = testUserId * 45;
-            long userIdRequestingTheDraft = testUserId;
-            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now, userIdLockingTheDraft, fileRepo.RootDir);
+            testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepo);
+            var userIdLockingTheDraft = testUserId * 45;
+            var userIdRequestingTheDraft = testUserId;
+            var expectedDraft = new Draft(testOrganisationId, testSnapshotYear, true, VirtualDateTime.Now,
+                userIdLockingTheDraft, fileRepo.RootDir);
 
             // Act
-            await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, userIdLockingTheDraft);
-            Draft actualDraft = await testDraftFileBusinessLogic.GetExistingOrNewAsync(
+            await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                userIdLockingTheDraft);
+            var actualDraft = await testDraftFileBusinessLogic.GetExistingOrNewAsync(
                 testOrganisationId,
                 testSnapshotYear,
                 userIdRequestingTheDraft);
 
             // Assert
             Assert.Multiple(
-                () => {
+                () =>
+                {
                     Assert.AreEqual(expectedDraft.ReturnViewModelContent, actualDraft.ReturnViewModelContent);
                     Assert.AreEqual(expectedDraft.DraftPath, actualDraft.DraftPath);
                     Assert.AreEqual(expectedDraft.DraftFilename, actualDraft.DraftFilename);
@@ -480,7 +533,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                         $"The user that last wrote on the file it is expected to have been {userIdLockingTheDraft}");
                     Assert.AreEqual(expectedDraft.BackupDraftFilename, actualDraft.BackupDraftFilename);
                     Assert.AreEqual(expectedDraft.BackupDraftPath, actualDraft.BackupDraftPath);
-                    Assert.AreEqual(expectedDraft.HasDraftBeenModifiedDuringThisSession, actualDraft.HasDraftBeenModifiedDuringThisSession);
+                    Assert.AreEqual(expectedDraft.HasDraftBeenModifiedDuringThisSession,
+                        actualDraft.HasDraftBeenModifiedDuringThisSession);
                 });
 
             // Remove test file
@@ -491,15 +545,17 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_KeepDraftFileLockedToUser_When_Not_Json_Return_NullAsync()
         {
             // Arrange
-            long stewardUserId = testUserId;
+            var stewardUserId = testUserId;
             var fileRepo = new SystemFileRepository(new StorageOptions());
 
             testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepo);
-            Draft emptyDraftLockedToSteward =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, stewardUserId);
-            DateTime? creationTimeStamp = emptyDraftLockedToSteward.LastWrittenDateTime;
+            var emptyDraftLockedToSteward =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    stewardUserId);
+            var creationTimeStamp = emptyDraftLockedToSteward.LastWrittenDateTime;
             emptyDraftLockedToSteward.HasDraftBeenModifiedDuringThisSession = true;
-            Thread.Sleep(1000); // Delay between creating the file and the subsequent request to keep it locked to steward.
+            Thread.Sleep(
+                1000); // Delay between creating the file and the subsequent request to keep it locked to steward.
 
             // Act
 
@@ -507,10 +563,13 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             await testDraftFileBusinessLogic.KeepDraftFileLockedToUserAsync(emptyDraftLockedToSteward, stewardUserId);
 
             // Assert
-            Assert.NotNull(emptyDraftLockedToSteward, "Expected a draft to be available as we're only requesting a lock");
-            Assert.Null(emptyDraftLockedToSteward.ReturnViewModelContent, "Haven't added any data, so the content should be empty");
+            Assert.NotNull(emptyDraftLockedToSteward,
+                "Expected a draft to be available as we're only requesting a lock");
+            Assert.Null(emptyDraftLockedToSteward.ReturnViewModelContent,
+                "Haven't added any data, so the content should be empty");
             Assert.True(emptyDraftLockedToSteward.IsUserAllowedAccess, "Steward must be able to access the draft");
-            Assert.AreEqual(stewardUserId, emptyDraftLockedToSteward.LastWrittenByUserId, "Should have been locked to Steward");
+            Assert.AreEqual(stewardUserId, emptyDraftLockedToSteward.LastWrittenByUserId,
+                "Should have been locked to Steward");
             Assert.True(
                 emptyDraftLockedToSteward.HasDraftBeenModifiedDuringThisSession,
                 "the method 'KeepDraftFileLockedToUser' is expected to modified some fields, but 'IsDraftDirty' must be left alone, as it is the front end's responsibility to determine if the draft contains new values or not - only the individual pages can determine if the user has typed something on screen");
@@ -525,11 +584,12 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_RestartDraft_Both_Files_Json_Deleted_Bak_Renamed_As_JsonAsync()
         {
             // Arrange
-            long aliciaUserId = testUserId;
+            var aliciaUserId = testUserId;
             var fileRepository = new SystemFileRepository(new StorageOptions());
             testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepository);
-            Draft emptyDraftLockedToAlicia =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, aliciaUserId);
+            var emptyDraftLockedToAlicia =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    aliciaUserId);
 
             // Confirm both files are there before we start
             Assert.True(await fileRepository.GetFileExistsAsync(emptyDraftLockedToAlicia.DraftPath));
@@ -551,10 +611,10 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_RestartDraft_No_Files_Does_Not_FailAsync()
         {
             // Arrange
-            long simonUserId = testUserId;
+            var simonUserId = testUserId;
             var fileRepository = new SystemFileRepository(new StorageOptions());
             testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepository);
-            var tempDraft = new Draft(testOrganisationId, testSnapshotYear,fileRepository.RootDir);
+            var tempDraft = new Draft(testOrganisationId, testSnapshotYear, fileRepository.RootDir);
 
             // Act
             await testDraftFileBusinessLogic.RestartDraftAsync(testOrganisationId, testSnapshotYear, simonUserId);
@@ -567,11 +627,12 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_RestartDraft_Only_Bak_Renames_As_JsonAsync()
         {
             // Arrange
-            long andreaUserId = testUserId;
+            var andreaUserId = testUserId;
             var fileRepository = new SystemFileRepository(new StorageOptions());
             testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepository);
-            Draft emptyDraftLockedToAndrea =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, andreaUserId);
+            var emptyDraftLockedToAndrea =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    andreaUserId);
             await fileRepository.DeleteFileAsync(emptyDraftLockedToAndrea.DraftPath);
 
             // Act
@@ -590,11 +651,12 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_RestartDraft_Only_Json_Ignored_Nothing_To_Rollback_FromAsync()
         {
             // Arrange
-            long anneUserId = testUserId;
+            var anneUserId = testUserId;
             var fileRepository = new SystemFileRepository(new StorageOptions());
             testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, fileRepository);
-            Draft emptyDraftLockedToAnne =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, anneUserId);
+            var emptyDraftLockedToAnne =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    anneUserId);
             await testDraftFileBusinessLogic.CommitDraftAsync(emptyDraftLockedToAnne);
 
             // Act
@@ -611,58 +673,67 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_RollbackDraft_Maintains_Initial_Information_Added_In_One_SessionAsync()
         {
             // Arrange
-            long kathyUserId = testUserId;
+            var kathyUserId = testUserId;
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
             testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatKathyWillSendFirst = new ReturnViewModel {DiffMeanBonusPercent = 20.2m};
-            var returnViewModelThatKathyWillSendSecond = new ReturnViewModel {DiffMeanBonusPercent = 30.3m, DiffMedianBonusPercent = 33.3m};
-            var returnViewModelThatKathyWillSendThird = new ReturnViewModel {
-                DiffMeanBonusPercent = 40.4m, DiffMedianBonusPercent = 44.4m, OrganisationSize = OrganisationSizes.Employees250To499
+            var returnViewModelThatKathyWillSendSecond = new ReturnViewModel
+                {DiffMeanBonusPercent = 30.3m, DiffMedianBonusPercent = 33.3m};
+            var returnViewModelThatKathyWillSendThird = new ReturnViewModel
+            {
+                DiffMeanBonusPercent = 40.4m, DiffMedianBonusPercent = 44.4m,
+                OrganisationSize = OrganisationSizes.Employees250To499
             };
 
             // Act
-            Draft emptyDraftLockedToKathy =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, kathyUserId);
+            var emptyDraftLockedToKathy =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    kathyUserId);
             Assert.True(await systemFileRepository.GetFileExistsAsync(emptyDraftLockedToKathy.DraftPath));
             Assert.True(await systemFileRepository.GetFileExistsAsync(emptyDraftLockedToKathy.BackupDraftPath));
 
-            Draft draftWithFirstLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftWithFirstLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatKathyWillSendFirst,
                 emptyDraftLockedToKathy,
                 kathyUserId); // send data
-            Draft intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, kathyUserId);
+            var intermediateDraftInfo =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    kathyUserId);
             Assert.AreEqual(20.2m, intermediateDraftInfo.ReturnViewModelContent.DiffMeanBonusPercent);
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithFirstLoadOfData.DraftPath));
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithFirstLoadOfData.BackupDraftPath));
 
-            Draft draftWithSecondLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftWithSecondLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatKathyWillSendSecond,
                 draftWithFirstLoadOfData,
                 kathyUserId); // send data
             intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, kathyUserId);
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    kathyUserId);
             Assert.AreEqual(30.3m, intermediateDraftInfo.ReturnViewModelContent.DiffMeanBonusPercent);
             Assert.AreEqual(33.3m, intermediateDraftInfo.ReturnViewModelContent.DiffMedianBonusPercent);
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithSecondLoadOfData.DraftPath));
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithSecondLoadOfData.BackupDraftPath));
 
-            Draft draftWithThirdLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftWithThirdLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatKathyWillSendThird,
                 draftWithSecondLoadOfData,
                 kathyUserId); // send data
             intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, kathyUserId);
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    kathyUserId);
             Assert.AreEqual(40.4m, intermediateDraftInfo.ReturnViewModelContent.DiffMeanBonusPercent);
             Assert.AreEqual(44.4m, intermediateDraftInfo.ReturnViewModelContent.DiffMedianBonusPercent);
-            Assert.AreEqual(OrganisationSizes.Employees250To499, intermediateDraftInfo.ReturnViewModelContent.OrganisationSize);
+            Assert.AreEqual(OrganisationSizes.Employees250To499,
+                intermediateDraftInfo.ReturnViewModelContent.OrganisationSize);
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithThirdLoadOfData.DraftPath));
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithThirdLoadOfData.BackupDraftPath));
 
             await testDraftFileBusinessLogic.RollbackDraftAsync(draftWithThirdLoadOfData);
 
             intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, kathyUserId);
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    kathyUserId);
             Assert.Null(intermediateDraftInfo.ReturnViewModelContent);
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithFirstLoadOfData.BackupDraftPath));
 
@@ -671,41 +742,46 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         }
 
         [Test]
-        public async Task DraftFileBusinessLogic_Update_When_Data_Is_Sent_Repeatedly_Draft_Integrity_Is_MaintainedAsync()
+        public async Task
+            DraftFileBusinessLogic_Update_When_Data_Is_Sent_Repeatedly_Draft_Integrity_Is_MaintainedAsync()
         {
             // Arrange
-            long maryUserId = testUserId;
+            var maryUserId = testUserId;
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
             testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatMaryWillSendTwice = new ReturnViewModel {DiffMeanBonusPercent = 65.3m};
 
             // Act
-            Draft emptyDraftLockedToMary =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, maryUserId);
-            Draft intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, maryUserId);
+            var emptyDraftLockedToMary =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    maryUserId);
+            var intermediateDraftInfo =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    maryUserId);
             Assert.Null(intermediateDraftInfo.ReturnViewModelContent, "Expected file to be empty");
             Assert.AreEqual(maryUserId, intermediateDraftInfo.LastWrittenByUserId, "Should have been locked to Mary");
             Assert.True(await systemFileRepository.GetFileExistsAsync(intermediateDraftInfo.DraftPath));
             Assert.True(await systemFileRepository.GetFileExistsAsync(intermediateDraftInfo.BackupDraftPath));
 
-            Draft draftWithData = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftWithData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatMaryWillSendTwice,
                 emptyDraftLockedToMary,
                 maryUserId);
             intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, maryUserId);
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    maryUserId);
             Assert.AreEqual(65.3m, intermediateDraftInfo.ReturnViewModelContent.DiffMeanBonusPercent);
             Assert.AreEqual(maryUserId, intermediateDraftInfo.LastWrittenByUserId, "Should have been locked to Mary");
             Assert.True(await systemFileRepository.GetFileExistsAsync(intermediateDraftInfo.DraftPath));
             Assert.True(await systemFileRepository.GetFileExistsAsync(intermediateDraftInfo.BackupDraftPath));
 
-            Draft updatedDraft = await testDraftFileBusinessLogic.UpdateAsync(
+            var updatedDraft = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatMaryWillSendTwice,
                 draftWithData,
                 maryUserId);
             intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, maryUserId);
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    maryUserId);
             Assert.AreEqual(65.3m, intermediateDraftInfo.ReturnViewModelContent.DiffMeanBonusPercent);
             Assert.AreEqual(maryUserId, intermediateDraftInfo.LastWrittenByUserId, "Should have been locked to Mary");
             Assert.True(await systemFileRepository.GetFileExistsAsync(intermediateDraftInfo.DraftPath));
@@ -719,14 +795,16 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_Update_When_Json_Exists_But_Does_Not_Have_Data_Backup_Is_CreatedAsync()
         {
             // Arrange
-            long fredUserId = testUserId;
+            var fredUserId = testUserId;
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
             testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
 
             // Act
-            Draft emptyDraftLockedToFred =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, fredUserId);
-            Draft updatedDraft = await testDraftFileBusinessLogic.UpdateAsync(new ReturnViewModel(), emptyDraftLockedToFred, fredUserId);
+            var emptyDraftLockedToFred =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    fredUserId);
+            var updatedDraft =
+                await testDraftFileBusinessLogic.UpdateAsync(new ReturnViewModel(), emptyDraftLockedToFred, fredUserId);
 
             // Assert
             Assert.True(await systemFileRepository.GetFileExistsAsync(updatedDraft.BackupDraftPath));
@@ -739,7 +817,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task DraftFileBusinessLogic_Update_When_New_Data_Is_Received_Backup_Is_MaintainedAsync()
         {
             // Arrange
-            long dominicUserId = testUserId;
+            var dominicUserId = testUserId;
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
             testDraftFileBusinessLogic = new DraftFileBusinessLogic(null, systemFileRepository);
             var returnViewModelThatDominicWillSendFirst = new ReturnViewModel {DiffMeanBonusPercent = 40.4m};
@@ -747,22 +825,24 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                 new ReturnViewModel {DiffMeanBonusPercent = 50.5m, DiffMedianBonusPercent = 55.5m};
 
             // Act
-            Draft emptyDraftLockedToDominic =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, dominicUserId);
+            var emptyDraftLockedToDominic =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    dominicUserId);
             Assert.True(await systemFileRepository.GetFileExistsAsync(emptyDraftLockedToDominic.DraftPath));
             Assert.True(await systemFileRepository.GetFileExistsAsync(emptyDraftLockedToDominic.BackupDraftPath));
 
-            Draft draftWithFirstLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftWithFirstLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatDominicWillSendFirst,
                 emptyDraftLockedToDominic,
                 dominicUserId); // send data
-            Draft intermediateDraftInfo =
-                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear, dominicUserId);
+            var intermediateDraftInfo =
+                await testDraftFileBusinessLogic.GetExistingOrNewAsync(testOrganisationId, testSnapshotYear,
+                    dominicUserId);
             Assert.AreEqual(40.4m, intermediateDraftInfo.ReturnViewModelContent.DiffMeanBonusPercent);
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithFirstLoadOfData.DraftPath));
             Assert.True(await systemFileRepository.GetFileExistsAsync(draftWithFirstLoadOfData.BackupDraftPath));
 
-            Draft draftWithSecondLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
+            var draftWithSecondLoadOfData = await testDraftFileBusinessLogic.UpdateAsync(
                 returnViewModelThatDominicWillSendSecond,
                 draftWithFirstLoadOfData,
                 dominicUserId); // send data
@@ -771,6 +851,5 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Cleanup
             await testDraftFileBusinessLogic.DiscardDraftAsync(draftWithSecondLoadOfData);
         }
-
     }
 }

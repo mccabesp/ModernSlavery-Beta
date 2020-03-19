@@ -1,8 +1,6 @@
-using System;
-using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel;
 using ModernSlavery.Tests.Common.TestHelpers;
 using NUnit.Framework;
 
@@ -11,7 +9,6 @@ namespace ModernSlavery.Database.ReturnTests
     [TestFixture]
     public class IsLateSubmissionTests
     {
-
         [TestCase(SectorTypes.Public, ScopeStatuses.InScope)]
         [TestCase(SectorTypes.Public, ScopeStatuses.PresumedInScope)]
         [TestCase(SectorTypes.Private, ScopeStatuses.InScope)]
@@ -22,21 +19,21 @@ namespace ModernSlavery.Database.ReturnTests
             for (var yearOffset = 0; yearOffset < totalYearOffsets; yearOffset++)
             {
                 // Arrange 
-                int testYear = VirtualDateTime.Now.Year - yearOffset;
-                DateTime snapshotDate = sector.GetAccountingStartDate(testYear);
-                DateTime nextSnapshotDate = snapshotDate.AddYears(1);
-                DateTime modifiedDate = nextSnapshotDate.AddDays(2);
+                var testYear = VirtualDateTime.Now.Year - yearOffset;
+                var snapshotDate = sector.GetAccountingStartDate(testYear);
+                var nextSnapshotDate = snapshotDate.AddYears(1);
+                var modifiedDate = nextSnapshotDate.AddDays(2);
 
-                Organisation testOrganisation = sector == SectorTypes.Private
+                var testOrganisation = sector == SectorTypes.Private
                     ? OrganisationHelper.GetPrivateOrganisation()
                     : OrganisationHelper.GetPublicOrganisation();
 
-                OrganisationScope testScope = ScopeHelper.CreateScope(scopeStatus, snapshotDate);
+                var testScope = ScopeHelper.CreateScope(scopeStatus, snapshotDate);
 
-                Return testReturn = ReturnHelper.CreateLateReturn(testOrganisation, snapshotDate, modifiedDate, testScope);
+                var testReturn = ReturnHelper.CreateLateReturn(testOrganisation, snapshotDate, modifiedDate, testScope);
 
                 // Act
-                bool actual = testReturn.IsLateSubmission;
+                var actual = testReturn.IsLateSubmission;
 
                 // Assert
                 Assert.AreEqual(true, actual);
@@ -57,21 +54,21 @@ namespace ModernSlavery.Database.ReturnTests
             for (var yearOffset = 0; yearOffset < totalYearOffsets; yearOffset++)
             {
                 // Arrange 
-                int testYear = VirtualDateTime.Now.Year - yearOffset;
-                DateTime snapshotDate = sector.GetAccountingStartDate(testYear);
-                DateTime nextSnapshotDate = snapshotDate.AddYears(1);
-                DateTime modifiedDate = nextSnapshotDate.AddDays(-1);
+                var testYear = VirtualDateTime.Now.Year - yearOffset;
+                var snapshotDate = sector.GetAccountingStartDate(testYear);
+                var nextSnapshotDate = snapshotDate.AddYears(1);
+                var modifiedDate = nextSnapshotDate.AddDays(-1);
 
-                Organisation testOrganisation = sector == SectorTypes.Private
+                var testOrganisation = sector == SectorTypes.Private
                     ? OrganisationHelper.GetPrivateOrganisation()
                     : OrganisationHelper.GetPublicOrganisation();
 
-                OrganisationScope testScope = ScopeHelper.CreateScope(scopeStatus, snapshotDate);
+                var testScope = ScopeHelper.CreateScope(scopeStatus, snapshotDate);
 
-                Return testReturn = ReturnHelper.CreateLateReturn(testOrganisation, snapshotDate, modifiedDate, testScope);
+                var testReturn = ReturnHelper.CreateLateReturn(testOrganisation, snapshotDate, modifiedDate, testScope);
 
                 // Act
-                bool actual = testReturn.IsLateSubmission;
+                var actual = testReturn.IsLateSubmission;
 
                 // Assert
                 Assert.AreEqual(false, actual);
@@ -90,26 +87,25 @@ namespace ModernSlavery.Database.ReturnTests
             for (var yearOffset = 0; yearOffset < totalYearOffsets; yearOffset++)
             {
                 // Arrange 
-                int testYear = VirtualDateTime.Now.Year - yearOffset;
-                DateTime snapshotDate = sector.GetAccountingStartDate(testYear);
-                DateTime nextSnapshotDate = snapshotDate.AddYears(1);
-                DateTime modifiedDate = nextSnapshotDate.AddDays(2);
+                var testYear = VirtualDateTime.Now.Year - yearOffset;
+                var snapshotDate = sector.GetAccountingStartDate(testYear);
+                var nextSnapshotDate = snapshotDate.AddYears(1);
+                var modifiedDate = nextSnapshotDate.AddDays(2);
 
-                Organisation testOrganisation = sector == SectorTypes.Private
+                var testOrganisation = sector == SectorTypes.Private
                     ? OrganisationHelper.GetPrivateOrganisation()
                     : OrganisationHelper.GetPublicOrganisation();
 
-                OrganisationScope testScope = ScopeHelper.CreateScope(scopeStatus, snapshotDate);
+                var testScope = ScopeHelper.CreateScope(scopeStatus, snapshotDate);
 
-                Return testReturn = ReturnHelper.CreateLateReturn(testOrganisation, snapshotDate, modifiedDate, testScope);
+                var testReturn = ReturnHelper.CreateLateReturn(testOrganisation, snapshotDate, modifiedDate, testScope);
 
                 // Act
-                bool actual = testReturn.IsLateSubmission;
+                var actual = testReturn.IsLateSubmission;
 
                 // Assert
                 Assert.AreEqual(false, actual);
             }
         }
-
     }
 }

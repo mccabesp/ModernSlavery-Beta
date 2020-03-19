@@ -4,36 +4,20 @@ using Autofac;
 using AutoMapper;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
-using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Tests.Common;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
-
 using NUnit.Framework;
 
 namespace Repositories.UserRepository
 {
-
     [TestFixture]
     [SetCulture("en-GB")]
     public class FindBySubjectIdAsyncTests : BaseTestFixture<FindBySubjectIdAsyncTests.DependencyModule>
     {
-        public class DependencyModule : Module
-        {
-            protected override void Load(ContainerBuilder builder)
-            {
-                // Initialise AutoMapper
-                MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
-                });
-                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
-            }
-        }
-
-
         [SetUp]
         public void BeforeEach()
         {
@@ -42,7 +26,21 @@ namespace Repositories.UserRepository
 
             // service under test
             testUserRepo =
-                new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(), mockDataRepo.Object, Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
+                new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(),
+                    mockDataRepo.Object, Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
+        }
+
+        public class DependencyModule : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                // Initialise AutoMapper
+                var mapperConfig = new MapperConfiguration(config =>
+                {
+                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
+                });
+                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            }
         }
 
         private Mock<IDataRepository> mockDataRepo;
@@ -58,7 +56,7 @@ namespace Repositories.UserRepository
             params UserStatuses[] testStatusFilter)
         {
             // Act
-            User actualUser = await testUserRepo.FindBySubjectIdAsync(testFindId, testStatusFilter);
+            var actualUser = await testUserRepo.FindBySubjectIdAsync(testFindId, testStatusFilter);
 
             // Assert
             Assert.AreEqual(testFindId, actualUser.UserId, "Expected user id to match");
@@ -67,10 +65,11 @@ namespace Repositories.UserRepository
 
         [TestCase(235251, UserStatuses.New, UserStatuses.Retired)]
         [TestCase(707643, UserStatuses.New, UserStatuses.Retired)]
-        public async Task FindsMatchingUserIdUsingMultipleStatusFilters(long testFindId, params UserStatuses[] testStatusFilters)
+        public async Task FindsMatchingUserIdUsingMultipleStatusFilters(long testFindId,
+            params UserStatuses[] testStatusFilters)
         {
             // Act
-            User actualUser = await testUserRepo.FindBySubjectIdAsync(testFindId, testStatusFilters);
+            var actualUser = await testUserRepo.FindBySubjectIdAsync(testFindId, testStatusFilters);
 
             // Assert
             Assert.AreEqual(testFindId, actualUser.UserId, "Expected user id to match");
@@ -81,12 +80,10 @@ namespace Repositories.UserRepository
         public async Task ReturnsNullWhenUserIdDoesNotMatch(long testFindId)
         {
             // Act
-            User actualUser = await testUserRepo.FindBySubjectIdAsync(testFindId);
+            var actualUser = await testUserRepo.FindBySubjectIdAsync(testFindId);
 
             // Assert
             Assert.IsNull(actualUser, "Expected user to be null");
         }
-
     }
-
 }

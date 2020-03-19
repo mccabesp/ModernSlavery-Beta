@@ -2,26 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Models.Scope;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
-using ModernSlavery.Tests.Common.Classes;
-using Moq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
-
-using NUnit.Framework;
 using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.Core.Classes;
+using ModernSlavery.Tests.Common.Classes;
+using Moq;
+using NUnit.Framework;
 
 namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
 {
-
     [TestFixture]
     [SetCulture("en-GB")]
     public class FindOrgsWhereScopeNotSetAsyncTests : BaseBusinessLogicTests
     {
-
         [SetUp]
         public void BeforeEach()
         {
@@ -34,11 +30,12 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
             var mockedNotificationService = Get<INotificationService>();
             var mockedFileRepository = Get<IFileRepository>();
             var mockedDataRepository = Get<IDataRepository>();
-            mockCommonBusinessLogic = new CommonBusinessLogic(mockedSnapshotDateHelper, mockedSourceComparer, mockedSendEmailService, mockedNotificationService, mockedFileRepository, mockedDataRepository);
+            mockCommonBusinessLogic = new CommonBusinessLogic(mockedSnapshotDateHelper, mockedSourceComparer,
+                mockedSendEmailService, mockedNotificationService, mockedFileRepository, mockedDataRepository);
 
             // setup data
-            DateTime currentPrivateSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(SectorTypes.Private);
-            DateTime currentPublicSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(SectorTypes.Public);
+            var currentPrivateSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(SectorTypes.Private);
+            var currentPublicSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(SectorTypes.Public);
 
             testOrgs = new List<Organisation>();
             testOrgs.Add(CreateOrgWithExistingScopeForAllYears(1, SectorTypes.Private, currentPrivateSnapshotDate));
@@ -56,7 +53,7 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
             scopeBusinessLogic = new BusinessLogic.ScopeBusinessLogic(
                 mockCommonBusinessLogic,
                 mockDataRepository.Object,
-                null,null);
+                null, null);
         }
 
         private Mock<IDataRepository> mockDataRepository;
@@ -71,10 +68,10 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
         public async Task IgnoresOrgsWhereAllScopesAreSet(int expectedIgnoredId)
         {
             // act
-            HashSet<OrganisationMissingScope> actualMissingOrgScopes = await scopeBusinessLogic.FindOrgsWhereScopeNotSetAsync();
+            var actualMissingOrgScopes = await scopeBusinessLogic.FindOrgsWhereScopeNotSetAsync();
 
             // assert
-            OrganisationMissingScope actualMissingEntry = actualMissingOrgScopes
+            var actualMissingEntry = actualMissingOrgScopes
                 .Where(missing => missing.Organisation.OrganisationId == expectedIgnoredId)
                 .FirstOrDefault();
             Assert.IsNull(actualMissingEntry, "Expected to return organisations who have missing scopes");
@@ -87,21 +84,19 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
         public async Task FindsOrgsWhereScopeIsMissing(int expectedMissingOrgId, SectorTypes testSector)
         {
             // act
-            HashSet<OrganisationMissingScope> actualMissingOrgScopes = await scopeBusinessLogic.FindOrgsWhereScopeNotSetAsync();
+            var actualMissingOrgScopes = await scopeBusinessLogic.FindOrgsWhereScopeNotSetAsync();
 
             // assert
-            OrganisationMissingScope actualMissingEntry = actualMissingOrgScopes.Where(
+            var actualMissingEntry = actualMissingOrgScopes.Where(
                     missing => missing.Organisation.OrganisationId == expectedMissingOrgId)
                 .FirstOrDefault();
 
             Assert.IsNotNull(actualMissingEntry, "Expected to find organisations who have null scopes");
 
-            DateTime currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSector);
-            List<int> testYears = GetAllSnapshotYearsForSector(currentSnapshotDate);
-            foreach (int testYear in testYears)
-            {
+            var currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSector);
+            var testYears = GetAllSnapshotYearsForSector(currentSnapshotDate);
+            foreach (var testYear in testYears)
                 Assert.IsTrue(actualMissingEntry.MissingSnapshotYears.Contains(testYear), "Expected missing year");
-            }
         }
 
         [TestCase(5, SectorTypes.Private)]
@@ -111,78 +106,75 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
         public async Task FindsOrgsWhereScopeIsUnknown(int expectedUnknownOrgId, SectorTypes testSector)
         {
             // act
-            HashSet<OrganisationMissingScope> actualMissingOrgScopes = await scopeBusinessLogic.FindOrgsWhereScopeNotSetAsync();
+            var actualMissingOrgScopes = await scopeBusinessLogic.FindOrgsWhereScopeNotSetAsync();
 
             // assert
-            OrganisationMissingScope actualMissingEntry = actualMissingOrgScopes
+            var actualMissingEntry = actualMissingOrgScopes
                 .Where(missing => missing.Organisation.OrganisationId == expectedUnknownOrgId)
                 .FirstOrDefault();
 
             Assert.IsNotNull(actualMissingEntry, "Expected to find organisations who have unknown scopes");
 
-            DateTime currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSector);
-            List<int> testYears = GetAllSnapshotYearsForSector(currentSnapshotDate);
-            foreach (int testYear in testYears)
-            {
+            var currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSector);
+            var testYears = GetAllSnapshotYearsForSector(currentSnapshotDate);
+            foreach (var testYear in testYears)
                 Assert.IsTrue(actualMissingEntry.MissingSnapshotYears.Contains(testYear), "Expected missing year");
-            }
         }
 
-        private Organisation CreateOrgWithExistingScopeForAllYears(int testOrgId, SectorTypes testSector, DateTime testLastSnapshotDate)
+        private Organisation CreateOrgWithExistingScopeForAllYears(int testOrgId, SectorTypes testSector,
+            DateTime testLastSnapshotDate)
         {
-            var mockOrg = new Organisation {OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active};
+            var mockOrg = new Organisation
+                {OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active};
 
-            for (int year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
-            {
+            for (var year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
                 mockOrg.OrganisationScopes.Add(
-                    new OrganisationScope {
+                    new OrganisationScope
+                    {
                         OrganisationId = mockOrg.OrganisationId,
                         Organisation = mockOrg,
                         SnapshotDate = new DateTime(year, testLastSnapshotDate.Month, testLastSnapshotDate.Day),
                         ScopeStatus = ScopeStatuses.InScope,
                         Status = ScopeRowStatuses.Active
                     });
-            }
 
             return mockOrg;
         }
 
         private Organisation CreateOrgWithMissingScopesForAllYears(int testOrgId, SectorTypes testSector)
         {
-            return new Organisation {OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active};
+            return new Organisation
+                {OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active};
         }
 
-        private Organisation CreateOrgWithUnknownScopesForAllYears(int testOrgId, SectorTypes testSector, DateTime testLastSnapshotDate)
+        private Organisation CreateOrgWithUnknownScopesForAllYears(int testOrgId, SectorTypes testSector,
+            DateTime testLastSnapshotDate)
         {
-            var mockOrg = new Organisation {OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active};
+            var mockOrg = new Organisation
+                {OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active};
 
-            for (int year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
-            {
+            for (var year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
                 mockOrg.OrganisationScopes.Add(
-                    new OrganisationScope {
+                    new OrganisationScope
+                    {
                         OrganisationId = mockOrg.OrganisationId,
                         Organisation = mockOrg,
                         SnapshotDate = new DateTime(year, testLastSnapshotDate.Month, testLastSnapshotDate.Day),
                         ScopeStatus = ScopeStatuses.Unknown,
                         Status = ScopeRowStatuses.Active
                     });
-            }
 
             return mockOrg;
         }
 
         private List<int> GetAllSnapshotYearsForSector(DateTime currentSnapshotDate)
         {
-            int currentYear = currentSnapshotDate.Year;
+            var currentYear = currentSnapshotDate.Year;
             var results = new List<int>();
-            for (int year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= currentYear; year++)
-            {
+            for (var year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= currentYear; year++)
                 results.Add(year);
-            }
 
             return results;
         }
-
     }
-
 }

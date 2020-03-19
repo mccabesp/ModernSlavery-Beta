@@ -4,12 +4,10 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.SharedKernel.Interfaces;
 using Moq;
 
-
 namespace ModernSlavery.BusinessLogic.Tests
 {
     public class BaseBusinessLogicTests
     {
-
         private readonly ILifetimeScope _lifetimeScope;
 
         public BaseBusinessLogicTests()
@@ -27,7 +25,7 @@ namespace ModernSlavery.BusinessLogic.Tests
             builder.Register(c => Mock.Of<ISecurityCodeBusinessLogic>()).As<ISecurityCodeBusinessLogic>();
             builder.Register(c => Mock.Of<IObfuscator>()).As<IObfuscator>();
 
-            IContainer container = builder.Build();
+            var container = builder.Build();
 
             _lifetimeScope = container.BeginLifetimeScope();
         }
@@ -36,6 +34,5 @@ namespace ModernSlavery.BusinessLogic.Tests
         {
             return _lifetimeScope.Resolve<T>();
         }
-
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
+﻿using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Tests.Common.TestHelpers;
@@ -11,7 +9,6 @@ namespace ModernSlavery.Database.ReturnTests
     [TestFixture]
     public class IsVoluntarySubmissionTests
     {
-
         [TestCase(SectorTypes.Private, 249, ScopeStatuses.OutOfScope)]
         [TestCase(SectorTypes.Private, 249, ScopeStatuses.PresumedOutOfScope)]
         [TestCase(SectorTypes.Public, 249, ScopeStatuses.OutOfScope)]
@@ -19,13 +16,13 @@ namespace ModernSlavery.Database.ReturnTests
         public void IsTrueWhenVoluntary(SectorTypes testSector, int testOrgSize, ScopeStatuses testScopeStatus)
         {
             // Arrange 
-            Organisation testOrganisation = testSector == SectorTypes.Private
+            var testOrganisation = testSector == SectorTypes.Private
                 ? OrganisationHelper.GetPrivateOrganisation()
                 : OrganisationHelper.GetPublicOrganisation();
 
-            DateTime snapshotDate = testSector.GetAccountingStartDate(VirtualDateTime.Now.Year);
-            OrganisationScope testScope = ScopeHelper.CreateScope(testScopeStatus, snapshotDate);
-            Return testReturn = ReturnHelper.CreateTestReturn(testOrganisation, snapshotDate.Year);
+            var snapshotDate = testSector.GetAccountingStartDate(VirtualDateTime.Now.Year);
+            var testScope = ScopeHelper.CreateScope(testScopeStatus, snapshotDate);
+            var testReturn = ReturnHelper.CreateTestReturn(testOrganisation, snapshotDate.Year);
             testReturn.MinEmployees = 0;
             testReturn.MaxEmployees = testOrgSize;
 
@@ -33,7 +30,7 @@ namespace ModernSlavery.Database.ReturnTests
             OrganisationHelper.LinkOrganisationAndScope(testOrganisation, testScope, true);
 
             // Act
-            bool actual = testReturn.IsVoluntarySubmission();
+            var actual = testReturn.IsVoluntarySubmission();
 
             // Assert
             Assert.IsTrue(actual);
@@ -84,24 +81,23 @@ namespace ModernSlavery.Database.ReturnTests
         public void IsFalseWhenNotVoluntary(SectorTypes testSector, int testOrgSize, ScopeStatuses testScopeStatus)
         {
             // Arrange 
-            Organisation testOrganisation = testSector == SectorTypes.Private
+            var testOrganisation = testSector == SectorTypes.Private
                 ? OrganisationHelper.GetPrivateOrganisation()
                 : OrganisationHelper.GetPublicOrganisation();
 
-            DateTime snapshotDate = testSector.GetAccountingStartDate(VirtualDateTime.Now.Year);
-            OrganisationScope testScope = ScopeHelper.CreateScope(testScopeStatus, snapshotDate);
-            Return testReturn = ReturnHelper.CreateTestReturn(testOrganisation, snapshotDate.Year);
+            var snapshotDate = testSector.GetAccountingStartDate(VirtualDateTime.Now.Year);
+            var testScope = ScopeHelper.CreateScope(testScopeStatus, snapshotDate);
+            var testReturn = ReturnHelper.CreateTestReturn(testOrganisation, snapshotDate.Year);
             testReturn.MaxEmployees = testOrgSize;
 
             OrganisationHelper.LinkOrganisationAndReturn(testOrganisation, testReturn);
             OrganisationHelper.LinkOrganisationAndScope(testOrganisation, testScope, true);
 
             // Act
-            bool actual = testReturn.IsVoluntarySubmission();
+            var actual = testReturn.IsVoluntarySubmission();
 
             // Assert
             Assert.IsFalse(actual);
         }
-
     }
 }

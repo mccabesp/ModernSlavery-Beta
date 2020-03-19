@@ -7,7 +7,6 @@ namespace ModernSlavery.Tests.Common.Classes
 {
     public static class CompareHelpers
     {
-
         /// <summary>
         ///     Looks for properties which exist in two objects and compares them and throws an exception containing all the
         ///     differences.
@@ -45,8 +44,9 @@ namespace ModernSlavery.Tests.Common.Classes
             bool ignoreObjectTypes = true)
         {
             Assert.Multiple(
-                () => {
-                    foreach (AutoMap.Diff diff in expectedValues.GetDifferences(
+                () =>
+                {
+                    foreach (var diff in expectedValues.GetDifferences(
                             actualValues,
                             membersToIgnore,
                             membersToInclude,
@@ -56,11 +56,8 @@ namespace ModernSlavery.Tests.Common.Classes
                             compareChildren,
                             ignoreObjectTypes)
                         .ToListOrEmpty())
-                    {
                         Assert.Fail($"{diff.Name}='{diff.NewValue}' and was expecting '{diff.OldValue}'");
-                    }
                 });
         }
-
     }
 }

@@ -13,22 +13,20 @@ namespace ModernSlavery.Tests.Common.Mocks
 
     public class MockSearchRepository : ISearchRepository<EmployerSearchModel>
     {
-
         private List<EmployerSearchModel> _documents = new List<EmployerSearchModel>();
+
+        public MockSearchRepository(List<EmployerSearchModel> documents = null)
+        {
+            if (documents != null) _documents = documents;
+        }
 
         public bool Disabled { get; set; }
         public string IndexName { get; set; }
 
-        public MockSearchRepository(List<EmployerSearchModel> documents = null)
+
+        public async Task CreateIndexIfNotExistsAsync(string indexName)
         {
-            if (documents != null)
-            {
-                _documents = documents;
-            }
         }
-
-
-        public async Task CreateIndexIfNotExistsAsync(string indexName) { }
 
         public async Task<EmployerSearchModel> GetAsync(string key, string selectFields = null)
         {
@@ -48,9 +46,9 @@ namespace ModernSlavery.Tests.Common.Mocks
         public async Task<int> RemoveFromIndexAsync(IEnumerable<EmployerSearchModel> records)
         {
             var c = 0;
-            foreach (EmployerSearchModel record in records)
+            foreach (var record in records)
             {
-                int i = _documents.FindIndex(d => d.OrganisationId == record.OrganisationId);
+                var i = _documents.FindIndex(d => d.OrganisationId == record.OrganisationId);
                 if (i > -1)
                 {
                     _documents.RemoveAt(i);
@@ -78,10 +76,11 @@ namespace ModernSlavery.Tests.Common.Mocks
             //result.ActualRecordTotal = _documents.Count;
             //result.VirtualRecordTotal = _documents.Count;
 
-            int totalRecords = _documents.Count;
+            var totalRecords = _documents.Count;
 
             //Return the results
-            var searchResults = new PagedResult<EmployerSearchModel> {
+            var searchResults = new PagedResult<EmployerSearchModel>
+            {
                 Results = result.Results,
                 CurrentPage = currentPage,
                 PageSize = pageSize,
@@ -110,8 +109,6 @@ namespace ModernSlavery.Tests.Common.Mocks
         {
             return _documents;
         }
-
     }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-
 }

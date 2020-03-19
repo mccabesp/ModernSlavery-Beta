@@ -10,7 +10,6 @@ namespace ModernSlavery.Core.Tests.Models
     [TestFixture]
     public class SicCodeSearchModelTests
     {
-
         [SetUp]
         public void BeforeEach()
         {
@@ -44,7 +43,7 @@ namespace ModernSlavery.Core.Tests.Models
             _testSicCodeSearchModel.SicCodeDescription = sicCodeDescription;
 
             // Act
-            string actualLogFriendlyString = _testSicCodeSearchModel.ToLogFriendlyString();
+            var actualLogFriendlyString = _testSicCodeSearchModel.ToLogFriendlyString();
 
             // Assert
             Assert.AreEqual(expectedLogFriendlyString, actualLogFriendlyString);
@@ -59,7 +58,7 @@ namespace ModernSlavery.Core.Tests.Models
 
             // Act
             sicCodeSearchModel.ConsolidatedSynonyms = consolidatedSynonymsToSet;
-            string actualDescription = sicCodeSearchModel.ConsolidatedSynonyms;
+            var actualDescription = sicCodeSearchModel.ConsolidatedSynonyms;
 
             // Assert
             Assert.AreEqual(consolidatedSynonymsToSet, actualDescription);
@@ -95,7 +94,8 @@ namespace ModernSlavery.Core.Tests.Models
         [Test]
         public void SicCodeSearchModel_Equals_Returns_False_When_Object_Is_Null()
         {
-            var sicCodeSearchModelInstance = new SicCodeSearchModel {SicCodeId = "999", SicCodeDescription = "Some description"};
+            var sicCodeSearchModelInstance = new SicCodeSearchModel
+                {SicCodeId = "999", SicCodeDescription = "Some description"};
             var differentTypeObjectThatIsNull = (int?) null;
 
             Assert.False(sicCodeSearchModelInstance.Equals(differentTypeObjectThatIsNull));
@@ -104,8 +104,10 @@ namespace ModernSlavery.Core.Tests.Models
         [Test]
         public void SicCodeSearchModel_Equals_Returns_False_When_SicCodeIds_Are_Different()
         {
-            var sicCodeSearchModelSameDescriptionLeft = new SicCodeSearchModel {SicCodeId = "4", SicCodeDescription = "Same description"};
-            var sicCodeSearchModelSameDescriptionRight = new SicCodeSearchModel {SicCodeId = "6", SicCodeDescription = "Same description"};
+            var sicCodeSearchModelSameDescriptionLeft = new SicCodeSearchModel
+                {SicCodeId = "4", SicCodeDescription = "Same description"};
+            var sicCodeSearchModelSameDescriptionRight = new SicCodeSearchModel
+                {SicCodeId = "6", SicCodeDescription = "Same description"};
 
             Assert.False(sicCodeSearchModelSameDescriptionLeft.Equals((object) sicCodeSearchModelSameDescriptionRight));
         }
@@ -113,7 +115,8 @@ namespace ModernSlavery.Core.Tests.Models
         [Test]
         public void SicCodeSearchModel_Equals_Returns_False_When_Types_Are_Different()
         {
-            var sicCodeSearchModelInstance = new SicCodeSearchModel {SicCodeId = "121", SicCodeDescription = "Some description"};
+            var sicCodeSearchModelInstance = new SicCodeSearchModel
+                {SicCodeId = "121", SicCodeDescription = "Some description"};
             var differentTypeObject = "IAmAnStringObject";
 
             Assert.False(sicCodeSearchModelInstance.Equals(differentTypeObject));
@@ -122,7 +125,8 @@ namespace ModernSlavery.Core.Tests.Models
         [Test]
         public void SicCodeSearchModel_Equals_Returns_True_When_Compared_With_Itself()
         {
-            var sicCodeSearchModelInstance = new SicCodeSearchModel {SicCodeId = "999", SicCodeDescription = "Some description"};
+            var sicCodeSearchModelInstance = new SicCodeSearchModel
+                {SicCodeId = "999", SicCodeDescription = "Some description"};
 
             Assert.True(sicCodeSearchModelInstance.Equals((object) sicCodeSearchModelInstance));
         }
@@ -130,8 +134,10 @@ namespace ModernSlavery.Core.Tests.Models
         [Test]
         public void SicCodeSearchModel_Equals_Returns_True_When_SicCodeIds_Are_Equal()
         {
-            var sicCodeSearchModelLeft = new SicCodeSearchModel {SicCodeId = "425", SicCodeDescription = "Some description"};
-            var sicCodeSearchModelRight = new SicCodeSearchModel {SicCodeId = "425", SicCodeDescription = "No description"};
+            var sicCodeSearchModelLeft = new SicCodeSearchModel
+                {SicCodeId = "425", SicCodeDescription = "Some description"};
+            var sicCodeSearchModelRight = new SicCodeSearchModel
+                {SicCodeId = "425", SicCodeDescription = "No description"};
 
             Assert.True(sicCodeSearchModelLeft.Equals((object) sicCodeSearchModelRight));
         }
@@ -139,7 +145,8 @@ namespace ModernSlavery.Core.Tests.Models
         [Test]
         public void SicCodeSearchModel_Equals_Should_Check_For_Null()
         {
-            var sicCodeSearchModelInstance = new SicCodeSearchModel {SicCodeId = "456", SicCodeDescription = "Some description"};
+            var sicCodeSearchModelInstance = new SicCodeSearchModel
+                {SicCodeId = "456", SicCodeDescription = "Some description"};
             SicCodeSearchModel nullSicCodeSearchModel = null;
 
             Assert.False(sicCodeSearchModelInstance == nullSicCodeSearchModel); // FALSE
@@ -154,11 +161,11 @@ namespace ModernSlavery.Core.Tests.Models
         {
             // Arrange
             var testSicCode = "698";
-            int expectedHashCode = testSicCode.GetHashCode();
+            var expectedHashCode = testSicCode.GetHashCode();
             var sicCodeSearchModel = new SicCodeSearchModel {SicCodeId = testSicCode};
 
             // Act
-            int actual = sicCodeSearchModel.GetHashCode();
+            var actual = sicCodeSearchModel.GetHashCode();
 
             // Assert
             Assert.AreEqual(expectedHashCode, actual);
@@ -171,7 +178,7 @@ namespace ModernSlavery.Core.Tests.Models
             var sicCodeSearchModel = new SicCodeSearchModel {SicCodeId = null};
 
             // Act
-            int actual = sicCodeSearchModel.GetHashCode();
+            var actual = sicCodeSearchModel.GetHashCode();
 
             // Assert
             Assert.AreEqual(0, actual);
@@ -189,8 +196,10 @@ namespace ModernSlavery.Core.Tests.Models
         [Test]
         public void SicCodeSearchModel_Reference_Equality_Different_Instances()
         {
-            var sicCodeSearchModelC = new SicCodeSearchModel {SicCodeId = "123", SicCodeDescription = "Some description 1"};
-            var sicCodeSearchModelD = new SicCodeSearchModel {SicCodeId = "123", SicCodeDescription = "Some description 2"};
+            var sicCodeSearchModelC = new SicCodeSearchModel
+                {SicCodeId = "123", SicCodeDescription = "Some description 1"};
+            var sicCodeSearchModelD = new SicCodeSearchModel
+                {SicCodeId = "123", SicCodeDescription = "Some description 2"};
 
             Assert.False(
                 ReferenceEquals(sicCodeSearchModelC, sicCodeSearchModelD),
@@ -205,8 +214,8 @@ namespace ModernSlavery.Core.Tests.Models
         [Test]
         public void SicCodeSearchModel_Reference_Equality_Same_Instance()
         {
-            SicCodeSearchModel sicCodeSearchModelA = _testSicCodeSearchModel;
-            SicCodeSearchModel sicCodeSearchModelB = sicCodeSearchModelA;
+            var sicCodeSearchModelA = _testSicCodeSearchModel;
+            var sicCodeSearchModelB = sicCodeSearchModelA;
 
             // Well, of course, it's the same exact object
             Assert.True(sicCodeSearchModelA == sicCodeSearchModelB); // TRUE
@@ -225,7 +234,7 @@ namespace ModernSlavery.Core.Tests.Models
 
             // Act
             sicCodeSearchModel.SicCodeDescription = descriptionToSet;
-            string actualDescription = sicCodeSearchModel.SicCodeDescription;
+            var actualDescription = sicCodeSearchModel.SicCodeDescription;
 
             // Assert
             Assert.AreEqual(descriptionToSet, actualDescription);
@@ -240,12 +249,11 @@ namespace ModernSlavery.Core.Tests.Models
 
             // Act
             sicCodeSearchModel.ConsolidatedSynonyms = consolidatedSynonymsToSet;
-            string[] actualListOfSynonyms = sicCodeSearchModel.SicCodeListOfSynonyms;
+            var actualListOfSynonyms = sicCodeSearchModel.SicCodeListOfSynonyms;
 
             // Assert
             Assert.AreEqual("first synonym", actualListOfSynonyms[0]);
             Assert.AreEqual(" second synonym", actualListOfSynonyms[1]);
         }
-
     }
 }

@@ -1,21 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
 using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
-using Moq;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Submit;
-using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Entities;
+using ModernSlavery.SharedKernel.Interfaces;
+using Moq;
 
 namespace ModernSlavery.Tests.Common.Classes
 {
     public static class MoqHelpers
     {
-
         public static ICommonBusinessLogic CreateFakeCommonBusinessLogic()
         {
             var mockedSnapshotDateHelper = new Mock<ISnapshotDateHelper>();
@@ -24,7 +23,9 @@ namespace ModernSlavery.Tests.Common.Classes
             var mockedNotificationService = new Mock<INotificationService>();
             var mockedFileRepository = new Mock<IFileRepository>();
             var mockedDataRepository = new Mock<IDataRepository>();
-            var mockCommonBusinessLogic = new CommonBusinessLogic(mockedSnapshotDateHelper.Object, mockedSourceComparer.Object, mockedSendEmailService.Object, mockedNotificationService.Object, mockedFileRepository.Object,mockedDataRepository.Object);
+            var mockCommonBusinessLogic = new CommonBusinessLogic(mockedSnapshotDateHelper.Object,
+                mockedSourceComparer.Object, mockedSendEmailService.Object, mockedNotificationService.Object,
+                mockedFileRepository.Object, mockedDataRepository.Object);
 
             return mockCommonBusinessLogic;
         }
@@ -32,28 +33,34 @@ namespace ModernSlavery.Tests.Common.Classes
         public static ISubmissionBusinessLogic CreateFakeSubmissionBusinessLogic()
         {
             var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
-            var fakeSubmissionBusinessLogic = new SubmissionBusinessLogic(fakeCommonBusinessLogic, fakeCommonBusinessLogic.DataRepository, Mock.Of<ILogRecordLogger>());
+            var fakeSubmissionBusinessLogic = new SubmissionBusinessLogic(fakeCommonBusinessLogic,
+                fakeCommonBusinessLogic.DataRepository, Mock.Of<ILogRecordLogger>());
             return fakeSubmissionBusinessLogic;
         }
 
         public static ISearchBusinessLogic CreateFakeSearchBusinessLogic()
         {
-            var fakeSearchBusinessLogic = new SearchBusinessLogic(Mock.Of<ISearchRepository<EmployerSearchModel>>(), Mock.Of<ISearchRepository<SicCodeSearchModel>>(),Mock.Of<ILogRecordLogger>());
+            var fakeSearchBusinessLogic = new SearchBusinessLogic(Mock.Of<ISearchRepository<EmployerSearchModel>>(),
+                Mock.Of<ISearchRepository<SicCodeSearchModel>>(), Mock.Of<ILogRecordLogger>());
             return fakeSearchBusinessLogic;
         }
+
         public static IScopeBusinessLogic CreateFakeScopeBusinessLogic()
         {
             var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
             var fakeSearchBusinessLogic = CreateFakeSearchBusinessLogic();
-            var fakeScopeBusinessLogic = new ScopeBusinessLogic(fakeCommonBusinessLogic, fakeCommonBusinessLogic.DataRepository,fakeSearchBusinessLogic,null);
+            var fakeScopeBusinessLogic = new ScopeBusinessLogic(fakeCommonBusinessLogic,
+                fakeCommonBusinessLogic.DataRepository, fakeSearchBusinessLogic, null);
             return fakeScopeBusinessLogic;
         }
+
         public static IDraftFileBusinessLogic CreateFakeDraftBusinessLogic()
         {
             var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
-            var fakeDraftBusinessLogic = new DraftFileBusinessLogic(null,fakeCommonBusinessLogic.FileRepository);
+            var fakeDraftBusinessLogic = new DraftFileBusinessLogic(null, fakeCommonBusinessLogic.FileRepository);
             return fakeDraftBusinessLogic;
         }
+
         public static ISubmissionService CreateFakeSubmissionService()
         {
             var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
@@ -61,7 +68,8 @@ namespace ModernSlavery.Tests.Common.Classes
             var fakeScopeBusinessLogic = CreateFakeScopeBusinessLogic();
             var fakeDraftBusinessLogic = CreateFakeDraftBusinessLogic();
 
-            var fakeSubmissionService = new SubmissionService(fakeCommonBusinessLogic,fakeSubmissionBusinessLogic, fakeScopeBusinessLogic, fakeDraftBusinessLogic);
+            var fakeSubmissionService = new SubmissionService(fakeCommonBusinessLogic, fakeSubmissionBusinessLogic,
+                fakeScopeBusinessLogic, fakeDraftBusinessLogic);
             return fakeSubmissionService;
         }
 
@@ -95,17 +103,13 @@ namespace ModernSlavery.Tests.Common.Classes
         public static Mock<IDataRepository> SetupGetAll(this Mock<IDataRepository> mockDataRepo, params object[] items)
         {
             var objects = new List<object>();
-            foreach (object item in items)
+            foreach (var item in items)
             {
                 var enumerable = item as IEnumerable<object>;
                 if (enumerable == null)
-                {
                     objects.Add(item);
-                }
                 else
-                {
                     objects.AddRange(enumerable);
-                }
             }
 
             mockDataRepo.SetupGetAll(objects);
@@ -139,17 +143,14 @@ namespace ModernSlavery.Tests.Common.Classes
             mockDataRepo.SetupGetAllItemsOfType(items.OfType<UserStatus>());
         }
 
-        private static void SetupGetAllItemsOfType<T>(this Mock<IDataRepository> mockDataRepo, IEnumerable<T> items) where T : class
+        private static void SetupGetAllItemsOfType<T>(this Mock<IDataRepository> mockDataRepo, IEnumerable<T> items)
+            where T : class
         {
-            List<T> list = items.OfType<T>().ToList();
-            if (!list.Any())
-            {
-                list = new List<T>(new T[] { });
-            }
+            var list = items.OfType<T>().ToList();
+            if (!list.Any()) list = new List<T>(new T[] { });
 
-            Mock<IQueryable<T>> mockItems = list.AsQueryable().BuildMock();
+            var mockItems = list.AsQueryable().BuildMock();
             mockDataRepo.Setup(x => x.GetAll<T>()).Returns(mockItems.Object);
         }
-
     }
 }

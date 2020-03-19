@@ -11,9 +11,10 @@ namespace ModernSlavery.Core.Tests.Classes
     // ReSharper disable once InconsistentNaming
     public class AzureSearchRepositoryTests
     {
-
         [SetUp]
-        public void BeforeEach() { }
+        public void BeforeEach()
+        {
+        }
 
         [Test]
         public void AzureSearchRepository_Ctor_When_ServiceName_Is_Null_Then_Throw_ArgumentNullException()
@@ -23,7 +24,8 @@ namespace ModernSlavery.Core.Tests.Classes
             string nullTestIndexName = null;
 
             // Act
-            TestDelegate testDelegate = () => new AzureEmployerSearchRepository(ConfigHelpers.GlobalOptions,Mock.Of<ILogRecordLogger>(),nullTestServiceName, nullTestIndexName);
+            TestDelegate testDelegate = () => new AzureEmployerSearchRepository(ConfigHelpers.GlobalOptions,
+                Mock.Of<ILogRecordLogger>(), nullTestServiceName, nullTestIndexName);
 
             // Assert
             Assert.That(
@@ -33,6 +35,5 @@ namespace ModernSlavery.Core.Tests.Classes
                     .Message
                     .Contains("Value cannot be null." + Environment.NewLine + "Parameter name: serviceName"));
         }
-
     }
 }

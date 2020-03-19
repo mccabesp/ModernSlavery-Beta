@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.Core.Models;
 using Moq;
-
 using NUnit.Framework;
 
 namespace ModernSlavery.BusinessLogic.Tests.Services
@@ -14,7 +11,6 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
     [TestFixture]
     public class DownloadableFileBusinessLogicTests
     {
-
         [Test]
         public async Task GetListOfDownloadableItemsFromPathAsync_Returns_At_Least_The_Parent_Folder()
         {
@@ -32,13 +28,14 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             var downloadableFileBusinessLogic = new DownloadableFileBusinessLogic(configurableFileRepository.Object);
 
             // Act
-            IEnumerable<IDownloadableItem> actualListOfDownloadableItems =
+            var actualListOfDownloadableItems =
                 await downloadableFileBusinessLogic.GetListOfDownloadableItemsFromPathAsync(processedLogsPath);
 
             // Assert
             Assert.NotNull(actualListOfDownloadableItems);
-            IDownloadableItem parentDownloadableItem = actualListOfDownloadableItems.FirstOrDefault(x => x.Name == "..");
-            Assert.NotNull(parentDownloadableItem, "Expected at least one parent folder with special name two dots '..' ");
+            var parentDownloadableItem = actualListOfDownloadableItems.FirstOrDefault(x => x.Name == "..");
+            Assert.NotNull(parentDownloadableItem,
+                "Expected at least one parent folder with special name two dots '..' ");
             Assert.AreEqual("Some/Random", parentDownloadableItem.Filepath);
         }
 
@@ -59,20 +56,19 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             var downloadableFileBusinessLogic = new DownloadableFileBusinessLogic(configurableFileRepository.Object);
 
             // Act
-            IEnumerable<IDownloadableItem> actualListOfDownloadableItems =
+            var actualListOfDownloadableItems =
                 await downloadableFileBusinessLogic.GetListOfDownloadableItemsFromPathAsync(processedLogsPath);
 
             // Assert
             Assert.NotNull(actualListOfDownloadableItems);
-            IDownloadableItem directoryDownloadableItem = actualListOfDownloadableItems.FirstOrDefault(x => x.Name == "Directory_1");
+            var directoryDownloadableItem = actualListOfDownloadableItems.FirstOrDefault(x => x.Name == "Directory_1");
             Assert.NotNull(directoryDownloadableItem, "Expected one folder with name 'Directory_1' ");
             Assert.AreEqual("Root/Directory_1", ((DownloadableDirectory) directoryDownloadableItem).Filepath);
 
 
-            IDownloadableItem fileDownloadableItem = actualListOfDownloadableItems.FirstOrDefault(x => x.Name == "File1.csv");
+            var fileDownloadableItem = actualListOfDownloadableItems.FirstOrDefault(x => x.Name == "File1.csv");
             Assert.NotNull(fileDownloadableItem, "Expected one file with name 'File1.csv' ");
             Assert.AreEqual("path/File1.csv", ((DownloadableFile) fileDownloadableItem).Filepath);
         }
-
     }
 }

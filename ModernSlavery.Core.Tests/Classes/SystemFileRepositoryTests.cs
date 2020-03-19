@@ -8,7 +8,6 @@ namespace ModernSlavery.Core.Tests.Classes
     [TestFixture]
     public class SystemFileRepositoryTests
     {
-
         [Test]
         public void ReadDataTableAsync_When_FilePath_Is_Null_Throws_ArgumentNullException()
         {
@@ -17,11 +16,13 @@ namespace ModernSlavery.Core.Tests.Classes
 
             // Act
             var actualException =
-                Assert.ThrowsAsync<ArgumentNullException>(async () => { await testSystemFileRepository.ReadDataTableAsync(null); });
+                Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                {
+                    await testSystemFileRepository.ReadDataTableAsync(null);
+                });
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: filePath", actualException.Message);
         }
-
     }
 }

@@ -5,7 +5,6 @@ using ModernSlavery.Core.Interfaces;
 
 public class MockClassQueue : IQueue
 {
-
     private readonly Queue<object> _queue = new Queue<object>();
 
     public MockClassQueue(string queueName)
@@ -25,5 +24,4 @@ public class MockClassQueue : IQueue
     {
         throw new NotImplementedException();
     }
-
 }

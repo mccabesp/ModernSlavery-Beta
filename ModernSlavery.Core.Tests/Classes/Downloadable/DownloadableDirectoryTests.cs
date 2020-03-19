@@ -8,7 +8,6 @@ namespace ModernSlavery.Core.Tests.Classes.Downloadable
     [TestFixture]
     public class DownloadableDirectoryTests
     {
-
         [TestCase(null, "BlahPath")]
         [TestCase("", "BlahPath")]
         [TestCase("/FileName.csv", "FileName.csv")]
@@ -16,12 +15,12 @@ namespace ModernSlavery.Core.Tests.Classes.Downloadable
         public void When_Name_Is_Not_Set_Returns_Last_Section_Of_FilePath(string fileName, string expectedName)
         {
             // Arrange
-            string filePath = "Some/File/BlahPath" + fileName;
+            var filePath = "Some/File/BlahPath" + fileName;
 
             var testDownloadableDirectory = new DownloadableDirectory(filePath);
 
             // Act
-            string actualName = testDownloadableDirectory.Name;
+            var actualName = testDownloadableDirectory.Name;
 
             // Assert
             Assert.AreEqual(expectedName, actualName);
@@ -33,10 +32,11 @@ namespace ModernSlavery.Core.Tests.Classes.Downloadable
         [TestCase("parent\\backslash", "parent")]
         [TestCase("parent/second\\BackslashThird", "parent/second")]
         [TestCase("\\JustARoot", "")]
-        public void GetSpecialParentFolderInfo_Returns_Correct_Parent_Folder_As_Two_Dots(string directoryPath, string expectedPath)
+        public void GetSpecialParentFolderInfo_Returns_Correct_Parent_Folder_As_Two_Dots(string directoryPath,
+            string expectedPath)
         {
             // Arrange - Act
-            DownloadableDirectory actualDownloadableDirectory = DownloadableDirectory.GetSpecialParentFolderInfo(directoryPath);
+            var actualDownloadableDirectory = DownloadableDirectory.GetSpecialParentFolderInfo(directoryPath);
 
             // Assert
             Assert.AreEqual("..", actualDownloadableDirectory.Name);
@@ -48,14 +48,16 @@ namespace ModernSlavery.Core.Tests.Classes.Downloadable
         {
             // Arrange
             var listOfDownloadableItems =
-                new List<IDownloadableItem> {new DownloadableDirectory("firstDirectory"), new DownloadableFile("firstFile")};
+                new List<IDownloadableItem>
+                    {new DownloadableDirectory("firstDirectory"), new DownloadableFile("firstFile")};
 
             const string someFilePath = "Some/Filepath";
 
-            var testDownloadableDirectory = new DownloadableDirectory(someFilePath) {DownloadableItems = listOfDownloadableItems};
+            var testDownloadableDirectory = new DownloadableDirectory(someFilePath)
+                {DownloadableItems = listOfDownloadableItems};
 
             // Act
-            List<IDownloadableItem> actualListOfDownloadableItems = testDownloadableDirectory.DownloadableItems;
+            var actualListOfDownloadableItems = testDownloadableDirectory.DownloadableItems;
 
             // Assert
             Assert.AreEqual(2, actualListOfDownloadableItems.Count);
@@ -71,12 +73,11 @@ namespace ModernSlavery.Core.Tests.Classes.Downloadable
             var testDownloadableDirectory = new DownloadableDirectory(someFilePath) {Name = someName};
 
             // Act
-            string actualName = testDownloadableDirectory.Name;
+            var actualName = testDownloadableDirectory.Name;
 
             // Assert
             Assert.AreNotEqual(someFilePath, actualName);
             Assert.AreEqual(someName, actualName);
         }
-
     }
 }

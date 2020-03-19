@@ -8,13 +8,16 @@ namespace ModernSlavery.Core.Tests.Classes
     [TestFixture]
     public class AzureFileRepositoryTests
     {
-
         [TestCase("")]
         [TestCase(null)]
-        public void AzureFileRepository_Constructor_When_ConnectionString_Is_Not_Set_Throws_Exception(string connectionString)
+        public void AzureFileRepository_Constructor_When_ConnectionString_Is_Not_Set_Throws_Exception(
+            string connectionString)
         {
             // Arrange / Act
-            var actualException = Assert.Throws<ArgumentNullException>(() => { new AzureFileRepository(ConfigHelpers.StorageOptions, null); });
+            var actualException = Assert.Throws<ArgumentNullException>(() =>
+            {
+                new AzureFileRepository(ConfigHelpers.StorageOptions);
+            });
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: connectionString", actualException.Message);
@@ -26,11 +29,10 @@ namespace ModernSlavery.Core.Tests.Classes
         {
             // Arrange / Act
             var actualException =
-                Assert.Throws<ArgumentNullException>(() => { new AzureFileRepository(ConfigHelpers.StorageOptions, null); });
+                Assert.Throws<ArgumentNullException>(() => { new AzureFileRepository(ConfigHelpers.StorageOptions); });
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: shareName", actualException.Message);
         }
-
     }
 }

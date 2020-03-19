@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 using Moq;
-
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Models.HttpResultModels
@@ -17,13 +16,12 @@ namespace ModernSlavery.Core.Tests.Models.HttpResultModels
     [TestFixture]
     public class HttpStatusViewResultTests
     {
-
         [Ignore("ongoing work, currently reviewing the mocking of 'IServiceProvider' so the test completes ")]
         [TestCase(HttpStatusCode.OK, "message")]
         public async Task Blah(HttpStatusCode httpStatusCode, string expectedLoggedMessage)
         {
             // Arrange
-            string actualLoggedMessage = string.Empty;
+            var actualLoggedMessage = string.Empty;
             var actualLoggedLevel = LogLevel.None;
 
             #region ActionContext setup
@@ -42,7 +40,8 @@ namespace ModernSlavery.Core.Tests.Models.HttpResultModels
                         EventId eventId,
                         object message,
                         Exception exception,
-                        Func<object, Exception, string> formatter) => {
+                        Func<object, Exception, string> formatter) =>
+                    {
                         actualLoggedLevel = logLevel; // LogLevel.Error
                         // EventId myEventId = eventId;
                         actualLoggedMessage = message.ToString(); // 
@@ -60,7 +59,8 @@ namespace ModernSlavery.Core.Tests.Models.HttpResultModels
             var httpContext = new DefaultHttpContext();
             httpContext.RequestServices = configurableServiceProvider.Object;
 
-            var actionContext = new ActionContext {
+            var actionContext = new ActionContext
+            {
                 ActionDescriptor = new ActionDescriptor(), HttpContext = httpContext, RouteData = new RouteData()
             };
 
@@ -75,6 +75,5 @@ namespace ModernSlavery.Core.Tests.Models.HttpResultModels
             Assert.AreEqual(LogLevel.Error, actualLoggedLevel);
             Assert.AreEqual(expectedLoggedMessage, actualLoggedMessage);
         }
-
     }
 }

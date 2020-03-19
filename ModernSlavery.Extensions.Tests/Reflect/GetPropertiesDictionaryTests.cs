@@ -1,16 +1,12 @@
-﻿using System.Collections.Generic;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace ModernSlavery.Extensions.Tests.Reflect
 {
-
     [TestFixture]
     public class GetPropertiesDictionaryTests
     {
-
         public class TestClass
         {
-
             private int PrivateField1 = 1352;
 
             private int PrivateField2 = 2531;
@@ -24,7 +20,6 @@ namespace ModernSlavery.Extensions.Tests.Reflect
             private int PrivateProperty1 { get; } = 987;
 
             private int PrivateProperty2 { get; } = 654;
-
         }
 
         [Test]
@@ -32,7 +27,7 @@ namespace ModernSlavery.Extensions.Tests.Reflect
         {
             var testObject = new TestClass();
 
-            Dictionary<string, object> actual = testObject.GetPropertiesDictionary();
+            var actual = testObject.GetPropertiesDictionary();
 
             Assert.AreEqual(3, actual.Count, "Expected 2 items.");
 
@@ -67,7 +62,7 @@ namespace ModernSlavery.Extensions.Tests.Reflect
         {
             var testObject = new TestClass {PublicPropertyStr1 = null};
 
-            Dictionary<string, object> actual = testObject.GetPropertiesDictionary();
+            var actual = testObject.GetPropertiesDictionary();
 
             Assert.AreEqual(2, actual.Count, "Expected 2 items.");
 
@@ -75,7 +70,5 @@ namespace ModernSlavery.Extensions.Tests.Reflect
                 actual.ContainsKey(nameof(TestClass.PublicPropertyStr1)),
                 $"Expected '{nameof(TestClass.PublicPropertyStr1)}' to be excluded.");
         }
-
     }
-
 }

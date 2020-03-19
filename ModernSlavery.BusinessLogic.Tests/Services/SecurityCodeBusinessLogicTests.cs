@@ -1,9 +1,8 @@
 ﻿using System;
-using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using Moq;
-using ModernSlavery.Entities.Enums;
 using NUnit.Framework;
 
 namespace ModernSlavery.BusinessLogic.Tests.Services
@@ -12,7 +11,6 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
     [SetCulture("en-GB")]
     public class SecurityCodeBusinessLogicTests
     {
-
         [TestCase(OrganisationStatuses.Active, false)]
         [TestCase(OrganisationStatuses.Pending, false)]
         [TestCase(OrganisationStatuses.Deleted, true)]
@@ -20,32 +18,31 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         [TestCase(OrganisationStatuses.New, true)]
         [TestCase(OrganisationStatuses.Suspended, true)]
         [TestCase(OrganisationStatuses.Unknown, true)]
-        public void SecurityCodeBusinessLogic_CreateSecurityCode_Only_Applies_To_Active_Or_Pending(OrganisationStatuses organisationStatus,
+        public void SecurityCodeBusinessLogic_CreateSecurityCode_Only_Applies_To_Active_Or_Pending(
+            OrganisationStatuses organisationStatus,
             bool expectedToFail)
         {
             // Arrange
             var securityCodeBusinessLogic = new SecurityCodeBusinessLogic();
             var organisation = new Organisation {Status = organisationStatus};
-            DateTime securityCodeExpiryDateTime = VirtualDateTime.Now.AddDays(7);
+            var securityCodeExpiryDateTime = VirtualDateTime.Now.AddDays(7);
 
             // Act
-            CustomResult<Organisation> creationResult =
+            var creationResult =
                 securityCodeBusinessLogic.CreateSecurityCode(organisation, securityCodeExpiryDateTime);
 
             // Assert
-            string wasWasnt = expectedToFail ? "was" : "was not";
-            string didDidnt = expectedToFail ? "didn't" : "did";
+            var wasWasnt = expectedToFail ? "was" : "was not";
+            var didDidnt = expectedToFail ? "didn't" : "did";
             Assert.AreEqual(
                 expectedToFail,
                 creationResult.Failed,
                 $"Organisation status '{organisationStatus.ToString()}' {wasWasnt} expected to fail, but it {didDidnt}.");
 
             if (expectedToFail)
-            {
                 Assert.AreEqual(
                     $"Generation of security codes cannot be performed for retired organisations. Organisation '' employerReference '' has status '{organisationStatus.ToString()}'.",
                     creationResult.ErrorMessage.Description);
-            }
         }
 
         [Test]
@@ -54,15 +51,15 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             var securityCodeBusinessLogic = new SecurityCodeBusinessLogic();
             var organisation = new Organisation {Status = OrganisationStatuses.Active};
-            DateTime securityCodeExpiryDateTime = VirtualDateTime.Now.AddDays(-1);
+            var securityCodeExpiryDateTime = VirtualDateTime.Now.AddDays(-1);
 
             // Act
-            CustomResult<Organisation> creationResult =
+            var creationResult =
                 securityCodeBusinessLogic.CreateSecurityCode(organisation, securityCodeExpiryDateTime);
             Assert.True(creationResult.Failed);
             Assert.Null(creationResult.Result);
 
-            CustomError actualError = creationResult.ErrorMessage;
+            var actualError = creationResult.ErrorMessage;
 
             // Assert
             Assert.NotNull(actualError);
@@ -76,14 +73,14 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             // Arrange
             var securityCodeBusinessLogic = new SecurityCodeBusinessLogic();
             var organisation = new Organisation {Status = OrganisationStatuses.Active};
-            DateTime securityCodeExpiryDateTime = VirtualDateTime.Now.AddDays(1);
+            var securityCodeExpiryDateTime = VirtualDateTime.Now.AddDays(1);
 
             // Act
-            CustomResult<Organisation> creationResult =
+            var creationResult =
                 securityCodeBusinessLogic.CreateSecurityCode(organisation, securityCodeExpiryDateTime);
             Assert.True(creationResult.Succeeded);
 
-            Organisation modifiedOrganisation = creationResult.Result;
+            var modifiedOrganisation = creationResult.Result;
 
             // Assert
             Assert.NotNull(modifiedOrganisation.SecurityCode);
@@ -100,17 +97,17 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                 .Setup(x => x.SetSecurityCode(It.IsAny<DateTime>()))
                 .Throws(new Exception("Kaboom"));
 
-            Organisation mockedOrganisation = mockedOrganisationToSetup.Object;
+            var mockedOrganisation = mockedOrganisationToSetup.Object;
             mockedOrganisation.Status = OrganisationStatuses.Active;
 
             // Act
-            CustomResult<Organisation> creationResult =
+            var creationResult =
                 new SecurityCodeBusinessLogic().CreateSecurityCode(mockedOrganisation, VirtualDateTime.Now.AddDays(10));
 
             Assert.True(creationResult.Failed);
             Assert.Null(creationResult.Result);
 
-            CustomError actualError = creationResult.ErrorMessage;
+            var actualError = creationResult.ErrorMessage;
 
             // Assert
             Assert.NotNull(actualError);
@@ -128,7 +125,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             organisation.SetSecurityCodeExpiryDate(VirtualDateTime.Now.AddDays(-1));
 
             // Act
-            CustomResult<Organisation> creationResult = securityCodeBusinessLogic.ExpireSecurityCode(organisation);
+            var creationResult = securityCodeBusinessLogic.ExpireSecurityCode(organisation);
 
             // Assert
             Assert.True(creationResult.Failed);
@@ -150,7 +147,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             organisation.SetSecurityCodeExpiryDate(VirtualDateTime.Now.AddDays(-1));
 
             // Act
-            CustomResult<Organisation> creationResult =
+            var creationResult =
                 securityCodeBusinessLogic.ExtendSecurityCode(organisation, VirtualDateTime.Now.AddDays(7));
 
             // Assert
@@ -172,10 +169,10 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             organisation.SetSecurityCode(VirtualDateTime.Now.AddDays(1));
 
             // Act
-            CustomResult<Organisation> creationResult = securityCodeBusinessLogic.ExpireSecurityCode(organisation);
+            var creationResult = securityCodeBusinessLogic.ExpireSecurityCode(organisation);
             Assert.True(creationResult.Succeeded);
 
-            Organisation modifiedOrganisation = creationResult.Result;
+            var modifiedOrganisation = creationResult.Result;
 
             // Assert
             Assert.NotNull(modifiedOrganisation.SecurityCode);
@@ -193,20 +190,19 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             var securityCodeBusinessLogic = new SecurityCodeBusinessLogic();
             var organisation = new Organisation();
             organisation.SetSecurityCode(VirtualDateTime.Now.AddDays(1));
-            DateTime securityCodeNewExpiryDateTime = VirtualDateTime.Now.AddDays(1);
+            var securityCodeNewExpiryDateTime = VirtualDateTime.Now.AddDays(1);
 
             // Act
-            CustomResult<Organisation> creationResult =
+            var creationResult =
                 securityCodeBusinessLogic.ExtendSecurityCode(organisation, securityCodeNewExpiryDateTime);
             Assert.True(creationResult.Succeeded);
 
-            Organisation modifiedOrganisation = creationResult.Result;
+            var modifiedOrganisation = creationResult.Result;
 
             // Assert
             Assert.NotNull(modifiedOrganisation.SecurityCode);
             Assert.AreEqual(securityCodeNewExpiryDateTime, modifiedOrganisation.SecurityCodeExpiryDateTime);
             Assert.NotNull(modifiedOrganisation.SecurityCodeCreatedDateTime);
         }
-
     }
 }

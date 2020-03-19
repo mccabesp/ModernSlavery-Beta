@@ -1,23 +1,21 @@
 ﻿using System.Threading.Tasks;
-using ModernSlavery.Tests.Common.Classes;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.Tests.Common.Classes;
 using Moq;
-
 using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
 {
-
     [TestFixture]
     public class WriteAsyncTests
     {
-
         [SetUp]
         public void BeforeEach()
         {
-            mockQueue = new Mock<Infrastructure.Queue.AzureQueue>("TestConnectionString", "TestQueueName") {CallBase = true};
+            mockQueue = new Mock<Infrastructure.Queue.AzureQueue>("TestConnectionString", "TestQueueName")
+                {CallBase = true};
 
             mockLogEventLoggerProvider = new Mock<Infrastructure.Logging.LogEventLoggerProvider>(
                 mockQueue.Object,
@@ -40,15 +38,17 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
 
             mockQueue.Setup(c => c.AddMessageAsync(It.IsAny<string>()))
                 .Callback(
-                    (string message) => {
+                    (string message) =>
+                    {
                         // Assert
-                        Assert.IsTrue(message.Contains("\"WebPath\":null"), "Expected null columns to be written to the queue");
+                        Assert.IsTrue(message.Contains("\"WebPath\":null"),
+                            "Expected null columns to be written to the queue");
                         AddMessageAsyncWasCalled = true;
                     })
                 .Returns(Task.CompletedTask);
 
             // Act
-            Infrastructure.Logging.LogEventLoggerProvider logger = mockLogEventLoggerProvider.Object;
+            var logger = mockLogEventLoggerProvider.Object;
             await logger.WriteAsync(LogLevel.Information, testEntryModel);
 
             // Assert
@@ -69,13 +69,15 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
 
             var testLogEntryModel = new LogEntryModel {Details = "UnitTest"};
 
-            var expectedWrapperModel = new LogEventWrapperModel {
+            var expectedWrapperModel = new LogEventWrapperModel
+            {
                 ApplicationName = testApplicationName, LogLevel = testLogLevel, LogEntry = testLogEntryModel
             };
 
             mockQueue.Setup(c => c.AddMessageAsync(It.IsAny<string>()))
                 .Callback(
-                    (string message) => {
+                    (string message) =>
+                    {
                         var actualWrapper = JsonConvert.DeserializeObject<LogEventWrapperModel>(message);
 
                         // Assert
@@ -86,14 +88,11 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
                 .Returns(Task.CompletedTask);
 
             // Act
-            Infrastructure.Logging.LogEventLoggerProvider logger = mockLogEventLoggerProvider.Object;
+            var logger = mockLogEventLoggerProvider.Object;
             await logger.WriteAsync(testLogLevel, testLogEntryModel);
 
             // Assert
             Assert.IsTrue(AddMessageAsyncWasCalled);
         }
-
     }
-
-
 }

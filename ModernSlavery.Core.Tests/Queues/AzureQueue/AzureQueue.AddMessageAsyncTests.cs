@@ -3,15 +3,16 @@ using System.Text;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
 using Moq;
-
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.AzureQueue
 {
-
     [TestFixture]
     public class AddMessageAsyncTests
     {
+        private readonly string testConnectionString = "LogEventUnitTests";
+        private readonly string testQueueName = "LogEventUnitTests";
+        private Infrastructure.Queue.AzureQueue testAzureQueue;
 
         [SetUp]
         public void BeforeEach()
@@ -19,15 +20,13 @@ namespace ModernSlavery.Core.Tests.AzureQueue
             testAzureQueue = new Infrastructure.Queue.AzureQueue(testConnectionString, testQueueName);
         }
 
-        private readonly string testConnectionString = "LogEventUnitTests";
-        private readonly string testQueueName = "LogEventUnitTests";
-        private Infrastructure.Queue.AzureQueue testAzureQueue;
-
         [TestCase]
         public void ThrowsWhenInstanceIsNull()
         {
             // Act
-            var actualExpection = Assert.ThrowsAsync<ArgumentNullException>(async () => await testAzureQueue.AddMessageAsync<object>(null));
+            var actualExpection =
+                Assert.ThrowsAsync<ArgumentNullException>(
+                    async () => await testAzureQueue.AddMessageAsync<object>(null));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: instance", actualExpection.Message);
@@ -38,7 +37,8 @@ namespace ModernSlavery.Core.Tests.AzureQueue
         {
             // Act
             var actualExpection =
-                Assert.ThrowsAsync<ArgumentNullException>(async () => await testAzureQueue.AddMessageAsync(default(object)));
+                Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                    await testAzureQueue.AddMessageAsync(default(object)));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: instance", actualExpection.Message);
@@ -50,7 +50,9 @@ namespace ModernSlavery.Core.Tests.AzureQueue
         public void ThrowsWhenMessageIsIllegal(string testMessage)
         {
             // Act
-            var actualExpection = Assert.ThrowsAsync<ArgumentNullException>(async () => await testAzureQueue.AddMessageAsync(testMessage));
+            var actualExpection =
+                Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                    await testAzureQueue.AddMessageAsync(testMessage));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: message", actualExpection.Message);
@@ -63,7 +65,9 @@ namespace ModernSlavery.Core.Tests.AzureQueue
             var testLargeMessage = new string('a', 66000);
 
             // Act
-            var actualExpection = Assert.ThrowsAsync<ArgumentException>(async () => await testAzureQueue.AddMessageAsync(testLargeMessage));
+            var actualExpection =
+                Assert.ThrowsAsync<ArgumentException>(
+                    async () => await testAzureQueue.AddMessageAsync(testLargeMessage));
 
             // Assert
             Assert.AreEqual(
@@ -78,16 +82,20 @@ namespace ModernSlavery.Core.Tests.AzureQueue
             var WriteAsyncAsyncWasCalled = false;
             var mockFileRepo = new Mock<IFileRepository>();
             var testLargeMessage = new string('a', 66000);
-            testAzureQueue = new Infrastructure.Queue.AzureQueue(testConnectionString, testQueueName, mockFileRepo.Object);
+            testAzureQueue =
+                new Infrastructure.Queue.AzureQueue(testConnectionString, testQueueName, mockFileRepo.Object);
 
             mockFileRepo.Setup(f => f.WriteAsync(It.IsAny<string>(), It.IsAny<byte[]>()))
                 .Callback(
-                    (string filePath, byte[] data) => {
+                    (string filePath, byte[] data) =>
+                    {
                         // Assert
-                        Assert.IsTrue(filePath.StartsWith("LargeQueueFiles\\LogEventUnitTests\\"), "Expected large filepath to match");
+                        Assert.IsTrue(filePath.StartsWith("LargeQueueFiles\\LogEventUnitTests\\"),
+                            "Expected large filepath to match");
                         Assert.IsTrue(filePath.EndsWith(".json"), "Expected large filepath to be a json file");
 
-                        Assert.AreEqual(testLargeMessage, Encoding.UTF8.GetString(data), "Expected large message to be the same");
+                        Assert.AreEqual(testLargeMessage, Encoding.UTF8.GetString(data),
+                            "Expected large message to be the same");
 
                         WriteAsyncAsyncWasCalled = true;
                     })
@@ -99,6 +107,5 @@ namespace ModernSlavery.Core.Tests.AzureQueue
             // Assert
             Assert.IsTrue(WriteAsyncAsyncWasCalled, "Expected IFileRepository.WriteAsyncAsync to be called.");
         }
-
     }
 }

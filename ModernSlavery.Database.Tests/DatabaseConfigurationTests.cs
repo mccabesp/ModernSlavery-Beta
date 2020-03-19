@@ -8,7 +8,6 @@ namespace ModernSlavery.Database.Tests
     [TestFixture]
     public class DatabaseConfigurationTests
     {
-
         [SetUp]
         public void Setup()
         {
@@ -19,20 +18,19 @@ namespace ModernSlavery.Database.Tests
         public void APIConfiguration_Test_Has_OffsetCurrentDateTimeForSite_Configured_To_Zero_Days_Ahead()
         {
             // Arrange
-            DateTime expectedDateTime = DateTime.Now;
-            DateTime upperBound = expectedDateTime.AddSeconds(2);
-            DateTime lowerBound = expectedDateTime.AddSeconds(-2);
+            var expectedDateTime = DateTime.Now;
+            var upperBound = expectedDateTime.AddSeconds(2);
+            var lowerBound = expectedDateTime.AddSeconds(-2);
 
             // Act
-            DateTime actualDateTime = VirtualDateTime.Now;
+            var actualDateTime = VirtualDateTime.Now;
 
             // Assert
-            bool expectedResult = actualDateTime > lowerBound && actualDateTime < upperBound;
-            string errorMessage =
+            var expectedResult = actualDateTime > lowerBound && actualDateTime < upperBound;
+            var errorMessage =
                 $"The dateTime returned from GpgVirtualDateTime.Now was expected to be between {lowerBound} and {upperBound}, but it was actually {actualDateTime}.";
 
             Assert.IsTrue(expectedResult, errorMessage);
         }
-
     }
 }

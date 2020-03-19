@@ -6,7 +6,6 @@ namespace ModernSlavery.Core.Tests.Classes.Downloadable
     [TestFixture]
     public class DownloadableFileTests
     {
-
         [TestCase("", null)]
         [TestCase("/FileName.csv", "FileName.csv")]
         [TestCase("\\BackslashFilename.someExtension", "BackslashFilename.someExtension")]
@@ -16,7 +15,7 @@ namespace ModernSlavery.Core.Tests.Classes.Downloadable
             var testableDownloadableFile = new DownloadableFile(filePath);
 
             // Act
-            string actualName = testableDownloadableFile.Name;
+            var actualName = testableDownloadableFile.Name;
 
             // Assert
             Assert.AreEqual(expectedName, actualName);
@@ -40,7 +39,7 @@ namespace ModernSlavery.Core.Tests.Classes.Downloadable
             var testableDownloadableFile = new DownloadableFile(fileName);
 
             // Act
-            string actualType = testableDownloadableFile.Type;
+            var actualType = testableDownloadableFile.Type;
 
             // Assert
             Assert.AreEqual(expectedType, actualType);
@@ -64,7 +63,7 @@ namespace ModernSlavery.Core.Tests.Classes.Downloadable
             var testableDownloadableFile = new DownloadableFile(fileName);
 
             // Act
-            string actualDescription = testableDownloadableFile.Description;
+            var actualDescription = testableDownloadableFile.Description;
 
             // Assert
             Assert.AreEqual(expectedDescription, actualDescription);
@@ -88,11 +87,10 @@ namespace ModernSlavery.Core.Tests.Classes.Downloadable
             var testableDownloadableFile = new DownloadableFile(fileName);
 
             // Act
-            string actualTitle = testableDownloadableFile.Title;
+            var actualTitle = testableDownloadableFile.Title;
 
             // Assert
             Assert.AreEqual(expectedTitle, actualTitle);
         }
-
     }
 }

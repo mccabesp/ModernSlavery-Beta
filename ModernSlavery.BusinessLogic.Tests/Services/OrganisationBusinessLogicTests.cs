@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Models.Compare;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
@@ -9,7 +8,6 @@ using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
-
 using NUnit.Framework;
 
 namespace ModernSlavery.BusinessLogic.Tests.Services
@@ -18,7 +16,6 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
     [SetCulture("en-GB")]
     public class OrganisationBusinessLogicTests : BaseBusinessLogicTests
     {
-
         private List<Return> GetFourOrgsWithVariousReturns()
         {
             var result = new List<Return>();
@@ -27,8 +24,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
 
             for (var i = 0; i < 2; i++)
             {
-                Organisation organisationInfoCorrect = OrganisationHelper.GetMockedOrganisation();
-                Return returnInfoCorrect = ReturnHelper.CreateTestReturn(organisationInfoCorrect);
+                var organisationInfoCorrect = OrganisationHelper.GetMockedOrganisation();
+                var returnInfoCorrect = ReturnHelper.CreateTestReturn(organisationInfoCorrect);
                 result.Add(returnInfoCorrect);
             }
 
@@ -89,20 +86,21 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         public async Task OrganisationBusinessLogic_GetCompareData_Leaves_Null_Values_At_The_Bottom_Of_The_ListAsync()
         {
             // Arrange
-            List<Return> listOfReturns = GetFourOrgsWithVariousReturns();
+            var listOfReturns = GetFourOrgsWithVariousReturns();
 
-            IEnumerable<Organisation> listOfOrgs = listOfReturns.Select(ret => ret.Organisation);
+            var listOfOrgs = listOfReturns.Select(ret => ret.Organisation);
 
-            Mock<IDataRepository> mockedDataRepository = MoqHelpers.CreateMockDataRepository();
+            var mockedDataRepository = MoqHelpers.CreateMockDataRepository();
 
             mockedDataRepository.SetupGetAll(listOfOrgs, listOfReturns);
 
-            IDataRepository dataRepository = mockedDataRepository.Object;
+            var dataRepository = mockedDataRepository.Object;
 
 
             var mockedCommonBusinessLogic = Get<ICommonBusinessLogic>();
 
-            var submissionBusinessLogic = new SubmissionBusinessLogic(mockedCommonBusinessLogic, dataRepository,Mock.Of<ILogRecordLogger>());
+            var submissionBusinessLogic =
+                new SubmissionBusinessLogic(mockedCommonBusinessLogic, dataRepository, Mock.Of<ILogRecordLogger>());
 
             var mockedScopeBusinessLogic = Get<IScopeBusinessLogic>();
             var mockedSecurityCodeBusinessLogic = Get<ISecurityCodeBusinessLogic>();
@@ -121,13 +119,13 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                 mockedDnBRepo,
                 mockedObfuscator);
 
-            IEnumerable<string> listEncOrgIds = listOfReturns.Select(x => mockedObfuscator.Obfuscate(x.OrganisationId.ToString()));
+            var listEncOrgIds = listOfReturns.Select(x => mockedObfuscator.Obfuscate(x.OrganisationId.ToString()));
             var year = 2017;
             var sortColumn = "DiffMedianBonusPercent";
             var sortAscending = true;
 
             // Act
-            IEnumerable<CompareReportModel> data = await organisationBusinessLogic.GetCompareDataAsync(
+            var data = await organisationBusinessLogic.GetCompareDataAsync(
                 listEncOrgIds,
                 year,
                 sortColumn,
@@ -135,6 +133,5 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
 
             // Assert
         }
-
     }
 }

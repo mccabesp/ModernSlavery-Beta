@@ -10,7 +10,6 @@ namespace ModernSlavery.Core.Tests.Classes
     [TestFixture]
     public class SicCodeSearchRepositoryTests
     {
-
         [Test]
         public void SicCodeSearchRepository_Can_Be_Created()
         {
@@ -20,13 +19,13 @@ namespace ModernSlavery.Core.Tests.Classes
                 new SearchCredentials(ConfigHelpers.SearchOptions.AzureApiAdminKey));
 
             // Act
-            var actualSicCodeSearchRepository = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
+            var actualSicCodeSearchRepository = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),
+                sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
 
             // Assert
             Assert.NotNull(
                 actualSicCodeSearchRepository,
                 "This test should have been able to create a SicCodeSearchRepository object but seems it was unable to do so");
         }
-
     }
 }

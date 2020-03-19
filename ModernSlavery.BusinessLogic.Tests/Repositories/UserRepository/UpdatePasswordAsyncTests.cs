@@ -5,35 +5,21 @@ using AutoMapper;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
 using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Tests.Common;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel.Options;
 using NUnit.Framework;
-using Module = Autofac.Module;
 
 namespace Repositories.UserRepository
 {
-
     [TestFixture]
     [SetCulture("en-GB")]
     public class UpdatePasswordAsyncTests : BaseTestFixture<UpdatePasswordAsyncTests.DependencyModule>
     {
-        public class DependencyModule : Module
-        {
-            protected override void Load(ContainerBuilder builder)
-            {
-                // Initialise AutoMapper
-                MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
-                });
-                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
-            }
-        }
-
         [SetUp]
         public void BeforeEach()
         {
@@ -44,7 +30,21 @@ namespace Repositories.UserRepository
 
             // service under test
             testUserRepo =
-                new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(), mockDataRepo.Object, mockUserLogRecord.Object, DependencyContainer.Resolve<IMapper>());
+                new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(),
+                    mockDataRepo.Object, mockUserLogRecord.Object, DependencyContainer.Resolve<IMapper>());
+        }
+
+        public class DependencyModule : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                // Initialise AutoMapper
+                var mapperConfig = new MapperConfiguration(config =>
+                {
+                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
+                });
+                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            }
         }
 
         private Mock<IDataRepository> mockDataRepo;
@@ -57,7 +57,8 @@ namespace Repositories.UserRepository
         {
             // Arrange
             var saveChangesCalled = false;
-            User testUserToUpdate = await testUserRepo.FindByEmailAsync("active1@ad5bda75-e514-491b-b74d-4672542cbd15.com");
+            var testUserToUpdate =
+                await testUserRepo.FindByEmailAsync("active1@ad5bda75-e514-491b-b74d-4672542cbd15.com");
             var testPassword = "__Password123__";
 
             mockDataRepo.Setup(x => x.SaveChangesAsync())
@@ -69,8 +70,10 @@ namespace Repositories.UserRepository
 
             // Assert
             Assert.IsTrue(saveChangesCalled, "Expected SaveChangesAsync to be called");
-            Assert.AreEqual(Crypto.GetPBKDF2(testPassword, Convert.FromBase64String(testUserToUpdate.Salt)), testUserToUpdate.PasswordHash, "Expected to change password");
-            Assert.AreEqual(HashingAlgorithm.PBKDF2, testUserToUpdate.HashingAlgorithm, "Expected hashing algorithm to change");
+            Assert.AreEqual(Crypto.GetPBKDF2(testPassword, Convert.FromBase64String(testUserToUpdate.Salt)),
+                testUserToUpdate.PasswordHash, "Expected to change password");
+            Assert.AreEqual(HashingAlgorithm.PBKDF2, testUserToUpdate.HashingAlgorithm,
+                "Expected hashing algorithm to change");
         }
 
 
@@ -81,9 +84,10 @@ namespace Repositories.UserRepository
         public async Task ThrowsErrorWhenUserStatusIsNotActive(string testCurrentEmail, UserStatuses testStatus)
         {
             // Arrange
-            User testUserToUpdate = await testUserRepo.FindByEmailAsync(testCurrentEmail);
-            DateTime testEmailVerifiedDate = VirtualDateTime.Now.Date.AddDays(-7);
-            string testExistingPasswordHash = Crypto.GetPBKDF2("ExistingPassword123", Convert.FromBase64String(testUserToUpdate.Salt));
+            var testUserToUpdate = await testUserRepo.FindByEmailAsync(testCurrentEmail);
+            var testEmailVerifiedDate = VirtualDateTime.Now.Date.AddDays(-7);
+            var testExistingPasswordHash =
+                Crypto.GetPBKDF2("ExistingPassword123", Convert.FromBase64String(testUserToUpdate.Salt));
             testUserToUpdate.PasswordHash = testExistingPasswordHash;
             testUserToUpdate.Status = testStatus;
 
@@ -96,11 +100,13 @@ namespace Repositories.UserRepository
                 "Can only update passwords for active users. UserId=23322",
                 actualException.Message,
                 "Expected exception message to match");
-            Assert.AreEqual(testExistingPasswordHash, testUserToUpdate.PasswordHash, "Expected password to still be the same");
+            Assert.AreEqual(testExistingPasswordHash, testUserToUpdate.PasswordHash,
+                "Expected password to still be the same");
             Assert.AreEqual(testStatus, testUserToUpdate.Status, "Expected status to still be the same");
         }
 
-        private static object[] ThrowsErrorWhenArgumentIsNullCases = {
+        private static object[] ThrowsErrorWhenArgumentIsNullCases =
+        {
             new object[] {null, "newpassword123", "Value cannot be null.\r\nParameter name: userToUpdate"},
             new object[] {new User(), null, "Value cannot be null.\r\nParameter name: newPassword"},
             new object[] {new User(), "", "Value cannot be null.\r\nParameter name: newPassword"},
@@ -117,7 +123,5 @@ namespace Repositories.UserRepository
             // Assert
             Assert.AreEqual(expectedErrorMessage, actualException.Message, "Expected exception message to match");
         }
-
     }
-
 }

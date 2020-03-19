@@ -12,14 +12,17 @@ namespace ModernSlavery.Tests.Common.Mocks
 {
     public class MockFileRepository : IFileRepository
     {
-
-        private readonly Dictionary<string, DateTime> fileAccesses = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, DateTime> fileAccesses =
+            new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 
         private readonly Dictionary<string, IDictionary<string, string>> fileMetaData =
             new Dictionary<string, IDictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
 
-        private readonly Dictionary<string, string> files = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, DateTime> fileWrites = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> files =
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        private readonly Dictionary<string, DateTime> fileWrites =
+            new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 
         public string RootDir => throw new NotImplementedException();
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -27,10 +30,7 @@ namespace ModernSlavery.Tests.Common.Mocks
         public async Task AppendAsync(string filePath, string text)
         {
             string file = null;
-            if (files.ContainsKey(filePath))
-            {
-                file = files[filePath];
-            }
+            if (files.ContainsKey(filePath)) file = files[filePath];
 
             file += text;
             files[filePath] = file;
@@ -38,24 +38,17 @@ namespace ModernSlavery.Tests.Common.Mocks
             fileWrites[filePath] = VirtualDateTime.Now;
         }
 
-        public async Task CreateDirectoryAsync(string directoryPath) { }
+        public async Task CreateDirectoryAsync(string directoryPath)
+        {
+        }
 
         public async Task DeleteFileAsync(string filePath)
         {
-            if (files.ContainsKey(filePath))
-            {
-                files.Remove(filePath);
-            }
+            if (files.ContainsKey(filePath)) files.Remove(filePath);
 
-            if (fileAccesses.ContainsKey(filePath))
-            {
-                fileAccesses.Remove(filePath);
-            }
+            if (fileAccesses.ContainsKey(filePath)) fileAccesses.Remove(filePath);
 
-            if (fileWrites.ContainsKey(filePath))
-            {
-                fileWrites.Remove(filePath);
-            }
+            if (fileWrites.ContainsKey(filePath)) fileWrites.Remove(filePath);
         }
 
         public async Task CopyFileAsync(string sourceFilePath, string destinationFilePath, bool overwrite)
@@ -73,25 +66,18 @@ namespace ModernSlavery.Tests.Common.Mocks
             return files.ContainsKey(filePath);
         }
 
-        public async Task<IEnumerable<string>> GetFilesAsync(string directoryPath, string searchPattern = null, bool recursive = false)
+        public async Task<IEnumerable<string>> GetFilesAsync(string directoryPath, string searchPattern = null,
+            bool recursive = false)
         {
             var results = new List<string>();
-            foreach (string key in files.Keys)
+            foreach (var key in files.Keys)
             {
-                if (!key.StartsWithI(directoryPath))
-                {
-                    continue;
-                }
+                if (!key.StartsWithI(directoryPath)) continue;
 
                 if (!recursive && key.Substring(directoryPath.Length).TrimStartI("/\\").ContainsAny('/', '\\'))
-                {
                     continue;
-                }
 
-                if (!string.IsNullOrWhiteSpace(searchPattern) && !Path.GetFileName(key).Like(searchPattern))
-                {
-                    continue;
-                }
+                if (!string.IsNullOrWhiteSpace(searchPattern) && !Path.GetFileName(key).Like(searchPattern)) continue;
 
                 results.Add(key);
             }
@@ -99,25 +85,18 @@ namespace ModernSlavery.Tests.Common.Mocks
             return results;
         }
 
-        public async Task<bool> GetAnyFileExistsAsync(string directoryPath, string searchPattern = null, bool recursive = false)
+        public async Task<bool> GetAnyFileExistsAsync(string directoryPath, string searchPattern = null,
+            bool recursive = false)
         {
             var results = new List<string>();
-            foreach (string key in files.Keys)
+            foreach (var key in files.Keys)
             {
-                if (!key.StartsWithI(directoryPath))
-                {
-                    continue;
-                }
+                if (!key.StartsWithI(directoryPath)) continue;
 
                 if (!recursive && key.Substring(directoryPath.Length).TrimStartI("/\\").ContainsAny('/', '\\'))
-                {
                     continue;
-                }
 
-                if (!string.IsNullOrWhiteSpace(searchPattern) && !Path.GetFileName(key).Like(searchPattern))
-                {
-                    continue;
-                }
+                if (!string.IsNullOrWhiteSpace(searchPattern) && !Path.GetFileName(key).Like(searchPattern)) continue;
 
                 return true;
             }
@@ -127,10 +106,7 @@ namespace ModernSlavery.Tests.Common.Mocks
 
         public async Task<long> GetFileSizeAsync(string filePath)
         {
-            if (!files.ContainsKey(filePath))
-            {
-                throw new FileNotFoundException();
-            }
+            if (!files.ContainsKey(filePath)) throw new FileNotFoundException();
 
             return files[filePath].Length;
         }
@@ -142,10 +118,7 @@ namespace ModernSlavery.Tests.Common.Mocks
 
         public async Task<DateTime> GetLastWriteTimeAsync(string filePath)
         {
-            if (!fileWrites.ContainsKey(filePath))
-            {
-                throw new FileNotFoundException();
-            }
+            if (!fileWrites.ContainsKey(filePath)) throw new FileNotFoundException();
 
             return fileWrites[filePath];
         }
@@ -164,54 +137,40 @@ namespace ModernSlavery.Tests.Common.Mocks
 
         public async Task<string> GetMetaDataAsync(string filePath, string key)
         {
-            IDictionary<string, string> metaData = await LoadMetaDataAsync(filePath);
+            var metaData = await LoadMetaDataAsync(filePath);
             return metaData.ContainsKey(key) ? metaData[key] : null;
         }
 
         public async Task SetMetaDataAsync(string filePath, string key, string value)
         {
-            IDictionary<string, string> metaData = await LoadMetaDataAsync(filePath);
+            var metaData = await LoadMetaDataAsync(filePath);
 
-            if (metaData.ContainsKey(key) && metaData[key] == value)
-            {
-                return;
-            }
+            if (metaData.ContainsKey(key) && metaData[key] == value) return;
 
             if (!string.IsNullOrWhiteSpace(value))
-            {
                 metaData[key] = value;
-            }
-            else if (metaData.ContainsKey(key))
-            {
-                metaData.Remove(key);
-            }
+            else if (metaData.ContainsKey(key)) metaData.Remove(key);
 
             await SaveMetaDataAsync(filePath, metaData);
         }
 
         public async Task<string> ReadAsync(string filePath)
         {
-            if (!files.ContainsKey(filePath))
-            {
-                throw new FileNotFoundException();
-            }
+            if (!files.ContainsKey(filePath)) throw new FileNotFoundException();
 
             return files[filePath];
         }
 
         public async Task<byte[]> ReadBytesAsync(string filePath)
         {
-            if (!files.ContainsKey(filePath))
-            {
-                throw new FileNotFoundException();
-            }
+            if (!files.ContainsKey(filePath)) throw new FileNotFoundException();
 
             return Encoding.UTF8.GetBytes(files[filePath]);
         }
 
         public async Task<DataTable> ReadDataTableAsync(string filePath)
         {
-            string fileContent = await ReadAsync(filePath);
+            var fileContent = await ReadAsync(filePath);
             return fileContent.ToDataTable();
         }
 
@@ -232,24 +191,15 @@ namespace ModernSlavery.Tests.Common.Mocks
 
         public async Task WriteAsync(string filePath, FileInfo uploadFile)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
             string content = null;
             if (uploadFile.Exists)
-            {
                 content = File.ReadAllText(uploadFile.FullName);
-            }
             else if (files.ContainsKey(uploadFile.FullName))
-            {
                 content = files[uploadFile.FullName];
-            }
             else
-            {
                 throw new FileNotFoundException(nameof(uploadFile));
-            }
 
             files[filePath] = content;
             fileAccesses[filePath] = VirtualDateTime.Now;
@@ -261,23 +211,15 @@ namespace ModernSlavery.Tests.Common.Mocks
             bool recursive = false)
         {
             var results = new List<string>();
-            foreach (string key in files.Keys)
+            foreach (var key in files.Keys)
             {
-                if (!key.StartsWithI(directoryPath))
-                {
-                    continue;
-                }
+                if (!key.StartsWithI(directoryPath)) continue;
 
                 if (!recursive && key.Substring(directoryPath.Length).TrimStartI("/\\").ContainsAny('/', '\\'))
-                {
                     continue;
-                }
 
-                string path = key.Substring(0, key.Length - Path.GetFileName(key).Length);
-                if (!string.IsNullOrWhiteSpace(searchPattern) && !path.Like(searchPattern))
-                {
-                    continue;
-                }
+                var path = key.Substring(0, key.Length - Path.GetFileName(key).Length);
+                if (!string.IsNullOrWhiteSpace(searchPattern) && !path.Like(searchPattern)) continue;
 
                 results.Add(key);
             }
@@ -289,8 +231,7 @@ namespace ModernSlavery.Tests.Common.Mocks
         {
             throw new NotImplementedException();
         }
-        
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     }
 }

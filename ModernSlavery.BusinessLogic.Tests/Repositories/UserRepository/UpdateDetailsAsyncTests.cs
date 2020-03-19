@@ -6,33 +6,20 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Database;
 using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Tests.Common;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel.Options;
 using NUnit.Framework;
 
 namespace Repositories.UserRepository
 {
-
     [TestFixture]
     [SetCulture("en-GB")]
-    public class UpdateDetailsAsyncTests: BaseTestFixture<UpdateDetailsAsyncTests.DependencyModule>
+    public class UpdateDetailsAsyncTests : BaseTestFixture<UpdateDetailsAsyncTests.DependencyModule>
     {
-        public class DependencyModule : Module
-        {
-            protected override void Load(ContainerBuilder builder)
-            {
-                // Initialise AutoMapper
-                MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
-                });
-                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
-            }
-        }
-
         [SetUp]
         public void BeforeEach()
         {
@@ -42,7 +29,22 @@ namespace Repositories.UserRepository
             mockLogRecordLogger = new Mock<IUserLogRecord>();
 
             // service under test
-            testUserRepo = new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(), mockDataRepo.Object, mockLogRecordLogger.Object, DependencyContainer.Resolve<IMapper>());
+            testUserRepo = new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(),
+                new GlobalOptions(), mockDataRepo.Object, mockLogRecordLogger.Object,
+                DependencyContainer.Resolve<IMapper>());
+        }
+
+        public class DependencyModule : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                // Initialise AutoMapper
+                var mapperConfig = new MapperConfiguration(config =>
+                {
+                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
+                });
+                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            }
         }
 
         private Mock<IDataRepository> mockDataRepo;
@@ -54,9 +56,11 @@ namespace Repositories.UserRepository
         {
             // Arrange
             var saveChangesCalled = false;
-            User testUserToUpdate = await testUserRepo.FindByEmailAsync("active1@ad5bda75-e514-491b-b74d-4672542cbd15.com");
+            var testUserToUpdate =
+                await testUserRepo.FindByEmailAsync("active1@ad5bda75-e514-491b-b74d-4672542cbd15.com");
 
-            var testUserDetails = new UpdateDetailsModel {
+            var testUserDetails = new UpdateDetailsModel
+            {
                 FirstName = "NewFirstName",
                 LastName = "NewLastName",
                 JobTitle = "NewJobTitle",
@@ -84,7 +88,7 @@ namespace Repositories.UserRepository
         public async Task ThrowsErrorWhenUserStatusIsNotActive(string testCurrentEmail, UserStatuses testStatus)
         {
             // Arrange
-            User testUserToUpdate = await testUserRepo.FindByEmailAsync(testCurrentEmail);
+            var testUserToUpdate = await testUserRepo.FindByEmailAsync(testCurrentEmail);
             testUserToUpdate.Status = testStatus;
 
             // Act
@@ -99,7 +103,8 @@ namespace Repositories.UserRepository
             Assert.AreEqual(testStatus, testUserToUpdate.Status, "Expected status to still be the same");
         }
 
-        private static object[] ThrowsErrorWhenArgumentIsNullCases = {
+        private static object[] ThrowsErrorWhenArgumentIsNullCases =
+        {
             new object[] {null, null, "Value cannot be null.\r\nParameter name: userToUpdate"},
             new object[] {new User(), null, "Value cannot be null.\r\nParameter name: changeDetails"}
         };
@@ -116,7 +121,5 @@ namespace Repositories.UserRepository
             // Assert
             Assert.AreEqual(expectedErrorMessage, actualException.Message, "Expected exception message to match");
         }
-
     }
-
 }

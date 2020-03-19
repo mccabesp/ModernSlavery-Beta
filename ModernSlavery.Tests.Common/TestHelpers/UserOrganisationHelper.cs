@@ -5,12 +5,10 @@ using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
 
-
 namespace ModernSlavery.WebUI.Tests.TestHelpers
 {
     public static class UserOrganisationHelper
     {
-
         //public static UserOrganisation LinkUserWithOrganisation(User user, Organisation organisation)
         //{
         //    var result = new UserOrganisation {
@@ -39,15 +37,17 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
 
         public static object[] CreateRegistrations()
         {
-            List<User> users = UserHelpers.CreateUsers();
+            var users = UserHelpers.CreateUsers();
 
-            var organisations = new List<Organisation> {
+            var organisations = new List<Organisation>
+            {
                 OrganisationHelper.GetMockedOrganisation(),
                 OrganisationHelper.GetMockedOrganisation(),
                 OrganisationHelper.GetMockedOrganisation()
             };
 
-            var registrations = new List<UserOrganisation> {
+            var registrations = new List<UserOrganisation>
+            {
                 LinkUserWithOrganisation(users.Where(u => u.UserId == 23322).FirstOrDefault(), organisations[0]),
                 LinkUserWithOrganisation(users.Where(u => u.UserId == 21555).FirstOrDefault(), organisations[0]),
                 LinkUserWithOrganisation(users.Where(u => u.UserId == 23322).FirstOrDefault(), organisations[1]),
@@ -59,15 +59,17 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
 
         public static object[] CreateRegistrationsInScope()
         {
-            List<User> users = UserHelpers.CreateUsers();
+            var users = UserHelpers.CreateUsers();
 
-            var organisations = new List<Organisation> {
+            var organisations = new List<Organisation>
+            {
                 OrganisationHelper.GetOrganisationInScope(),
                 OrganisationHelper.GetOrganisationInScope(),
                 OrganisationHelper.GetOrganisationInScope()
             };
 
-            var registrations = new List<UserOrganisation> {
+            var registrations = new List<UserOrganisation>
+            {
                 LinkUserWithOrganisation(users.Where(u => u.UserId == 23322).FirstOrDefault(), organisations[0]),
                 LinkUserWithOrganisation(users.Where(u => u.UserId == 21555).FirstOrDefault(), organisations[0]),
                 LinkUserWithOrganisation(users.Where(u => u.UserId == 23322).FirstOrDefault(), organisations[1]),
@@ -76,7 +78,5 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
 
             return new List<object> {users, organisations, registrations}.ToArray();
         }
-
     }
-
 }

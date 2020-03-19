@@ -1,26 +1,23 @@
 ﻿using System;
 using System.Linq;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
-using ModernSlavery.Tests.Common.Classes;
-using Moq;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
-
-using NUnit.Framework;
 using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.Core.Classes;
+using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
+using Moq;
+using NUnit.Framework;
 
 namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
 {
-
     [TestFixture]
     [SetCulture("en-GB")]
     public class FillMissingScopesTests : BaseBusinessLogicTests
     {
-
         [SetUp]
         public void BeforeEach()
         {
@@ -33,13 +30,14 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
             var mockedNotificationService = Get<INotificationService>();
             var mockedFileRepository = Get<IFileRepository>();
             var mockedDataRepository = Get<IDataRepository>();
-            mockCommonBusinessLogic = new CommonBusinessLogic(mockedSnapshotDateHelper, mockedSourceComparer, mockedSendEmailService, mockedNotificationService,mockedFileRepository,mockedDataRepository);
+            mockCommonBusinessLogic = new CommonBusinessLogic(mockedSnapshotDateHelper, mockedSourceComparer,
+                mockedSendEmailService, mockedNotificationService, mockedFileRepository, mockedDataRepository);
 
             // sut
             scopeBusinessLogic = new BusinessLogic.ScopeBusinessLogic(
                 mockCommonBusinessLogic,
                 mockDataRepository.Object,
-                null,null);
+                null, null);
         }
 
         private Mock<IDataRepository> mockDataRepository;
@@ -53,24 +51,24 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
         public void PresumesOutOfScopeForSnapshotYearsBeforeOrgCreatedDate(SectorTypes testSectorType)
         {
             // setup
-            Organisation testOrg = CreateOrgWithNoScopes(1, testSectorType, VirtualDateTime.Now);
+            var testOrg = CreateOrgWithNoScopes(1, testSectorType, VirtualDateTime.Now);
 
             // act
-            bool actualChanged = scopeBusinessLogic.FillMissingScopes(testOrg);
+            var actualChanged = scopeBusinessLogic.FillMissingScopes(testOrg);
 
             // assert
             Assert.IsTrue(actualChanged, "Expected change for missing scopes");
 
             // test the count of scopes set is correct
-            DateTime currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
-            int expectedScopeCount = (currentSnapshotDate.Year - ConfigHelpers.GlobalOptions.FirstReportingYear) + 1;
+            var currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
+            var expectedScopeCount = currentSnapshotDate.Year - ConfigHelpers.GlobalOptions.FirstReportingYear + 1;
             Assert.AreEqual(expectedScopeCount, testOrg.OrganisationScopes.Count);
 
             // check each scope before current snapshot year are set to presumed out of scope
-            OrganisationScope[] actualScopesArray = testOrg.OrganisationScopes.ToArray();
+            var actualScopesArray = testOrg.OrganisationScopes.ToArray();
             for (var i = 0; i < actualScopesArray.Length - 1; i++)
             {
-                OrganisationScope scope = actualScopesArray[i];
+                var scope = actualScopesArray[i];
                 Assert.AreEqual(ScopeStatuses.PresumedOutOfScope, scope.ScopeStatus);
             }
 
@@ -84,25 +82,25 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
         public void PresumesInScopeForSnapshotYearsDuringAndAfterOrgCreatedDate(SectorTypes testSectorType)
         {
             // setup
-            DateTime testCreatedDate = mockCommonBusinessLogic.GetAccountingStartDate(testSectorType).AddYears(-1);
-            Organisation testOrg = CreateOrgWithNoScopes(1, testSectorType, testCreatedDate);
+            var testCreatedDate = mockCommonBusinessLogic.GetAccountingStartDate(testSectorType).AddYears(-1);
+            var testOrg = CreateOrgWithNoScopes(1, testSectorType, testCreatedDate);
 
             // act
-            bool actualChanged = scopeBusinessLogic.FillMissingScopes(testOrg);
+            var actualChanged = scopeBusinessLogic.FillMissingScopes(testOrg);
 
             // assert
             Assert.IsTrue(actualChanged, "Expected change for missing scopes");
 
             // test the count of scopes set is correct
-            DateTime currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
-            int expectedScopeCount = (currentSnapshotDate.Year - ConfigHelpers.GlobalOptions.FirstReportingYear) + 1;
+            var currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
+            var expectedScopeCount = currentSnapshotDate.Year - ConfigHelpers.GlobalOptions.FirstReportingYear + 1;
             Assert.AreEqual(expectedScopeCount, testOrg.OrganisationScopes.Count);
 
             // check each scope after created date is set to presumed in of scope
-            OrganisationScope[] actualScopesArray = testOrg.OrganisationScopes.ToArray();
-            for (int i = actualScopesArray.Length - 2; i < actualScopesArray.Length; i++)
+            var actualScopesArray = testOrg.OrganisationScopes.ToArray();
+            for (var i = actualScopesArray.Length - 2; i < actualScopesArray.Length; i++)
             {
-                OrganisationScope scope = actualScopesArray[i];
+                var scope = actualScopesArray[i];
                 Assert.AreEqual(ScopeStatuses.PresumedInScope, scope.ScopeStatus);
             }
 
@@ -118,16 +116,19 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
             ScopeStatuses expectedPresumedScopeStatus)
         {
             // setup
-            DateTime testSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSectorType, ConfigHelpers.GlobalOptions.FirstReportingYear);
-            Organisation testOrg = CreateOrgWithScopeForAllYears(1, testSectorType, testDeclaredScopeStatus, testSnapshotDate);
+            var testSnapshotDate =
+                mockCommonBusinessLogic.GetAccountingStartDate(testSectorType,
+                    ConfigHelpers.GlobalOptions.FirstReportingYear);
+            var testOrg = CreateOrgWithScopeForAllYears(1, testSectorType, testDeclaredScopeStatus, testSnapshotDate);
 
             // act
-            bool actualChanged = scopeBusinessLogic.FillMissingScopes(testOrg);
+            var actualChanged = scopeBusinessLogic.FillMissingScopes(testOrg);
 
             // assert
             Assert.IsTrue(actualChanged, "Expected change to be true for missing scopes");
             Assert.NotNull(testOrg.LatestScope, "Expected latest scope to be set");
-            Assert.AreEqual(expectedPresumedScopeStatus, testOrg.LatestScope.ScopeStatus, "Expected latest scope to be PresumedOutOfScope");
+            Assert.AreEqual(expectedPresumedScopeStatus, testOrg.LatestScope.ScopeStatus,
+                "Expected latest scope to be PresumedOutOfScope");
         }
 
         [TestCase(SectorTypes.Private, ScopeStatuses.InScope, ScopeStatuses.PresumedInScope)]
@@ -139,34 +140,40 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
             ScopeStatuses expectedPresumedScopeStatus)
         {
             // setup
-            DateTime testCreatedDate = mockCommonBusinessLogic.GetAccountingStartDate(testSectorType, ConfigHelpers.GlobalOptions.FirstReportingYear);
-            Organisation testOrg = CreateOrgWithDeclaredAndPresumedScopes(
+            var testCreatedDate =
+                mockCommonBusinessLogic.GetAccountingStartDate(testSectorType,
+                    ConfigHelpers.GlobalOptions.FirstReportingYear);
+            var testOrg = CreateOrgWithDeclaredAndPresumedScopes(
                 testSectorType,
                 testDeclaredScopeStatus,
                 testCreatedDate,
                 testCreatedDate);
 
             // act
-            bool actualChanged = scopeBusinessLogic.FillMissingScopes(testOrg);
+            var actualChanged = scopeBusinessLogic.FillMissingScopes(testOrg);
 
             // assert
             Assert.IsTrue(actualChanged, "Expected change to be true for missing scopes");
 
-            OrganisationScope[] actualScopesArray = testOrg.OrganisationScopes.ToArray();
-            Assert.AreEqual(testDeclaredScopeStatus, actualScopesArray[0].ScopeStatus, "Expected first year scope status to match");
+            var actualScopesArray = testOrg.OrganisationScopes.ToArray();
+            Assert.AreEqual(testDeclaredScopeStatus, actualScopesArray[0].ScopeStatus,
+                "Expected first year scope status to match");
 
             // check that each year is presumed out of scope after first year
             for (var i = 1; i < actualScopesArray.Length; i++)
             {
-                OrganisationScope scope = actualScopesArray[i];
-                Assert.AreEqual(expectedPresumedScopeStatus, scope.ScopeStatus, "Expected presumed scope statuses to match");
+                var scope = actualScopesArray[i];
+                Assert.AreEqual(expectedPresumedScopeStatus, scope.ScopeStatus,
+                    "Expected presumed scope statuses to match");
             }
         }
 
         private Organisation CreateOrgWithNoScopes(int testOrgId, SectorTypes testSector, DateTime testCreated)
         {
-            return new Organisation {
-                OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active, Created = testCreated
+            return new Organisation
+            {
+                OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active,
+                Created = testCreated
             };
         }
 
@@ -176,10 +183,11 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
             DateTime testCreated,
             DateTime testSnapshotDate)
         {
-            Organisation testOrg = CreateOrgWithNoScopes(1, testSector, testCreated);
+            var testOrg = CreateOrgWithNoScopes(1, testSector, testCreated);
 
             testOrg.OrganisationScopes.Add(
-                new OrganisationScope {
+                new OrganisationScope
+                {
                     OrganisationScopeId = 1,
                     Status = ScopeRowStatuses.Active,
                     SnapshotDate = testSnapshotDate,
@@ -187,7 +195,8 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
                 });
 
             testOrg.OrganisationScopes.Add(
-                new OrganisationScope {
+                new OrganisationScope
+                {
                     OrganisationScopeId = 2,
                     Status = ScopeRowStatuses.Active,
                     SnapshotDate = testSnapshotDate.AddYears(1),
@@ -204,26 +213,23 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
             ScopeStatuses testScopeStatus,
             DateTime snapshotDate)
         {
-            int firstYear = SectorTypeHelper.SnapshotDateHelper.FirstReportingYear;
-            int lastYear = SectorTypeHelper.SnapshotDateHelper.CurrentSnapshotYear;
+            var firstYear = SectorTypeHelper.SnapshotDateHelper.FirstReportingYear;
+            var lastYear = SectorTypeHelper.SnapshotDateHelper.CurrentSnapshotYear;
 
-            Organisation testOrg = CreateOrgWithNoScopes(testOrgId, testSector, VirtualDateTime.Now);
+            var testOrg = CreateOrgWithNoScopes(testOrgId, testSector, VirtualDateTime.Now);
 
             // for all snapshot years check if scope exists
-            for (int year = firstYear; year < lastYear; year++)
-            {
+            for (var year = firstYear; year < lastYear; year++)
                 testOrg.OrganisationScopes.Add(
-                    new OrganisationScope {
+                    new OrganisationScope
+                    {
                         OrganisationScopeId = 1,
                         Status = ScopeRowStatuses.Active,
                         SnapshotDate = new DateTime(year, snapshotDate.Month, snapshotDate.Day),
                         ScopeStatus = testScopeStatus
                     });
-            }
 
             return testOrg;
         }
-
     }
-
 }

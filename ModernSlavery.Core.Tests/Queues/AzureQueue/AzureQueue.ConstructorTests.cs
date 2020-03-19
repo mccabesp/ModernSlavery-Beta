@@ -3,11 +3,9 @@ using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.AzureQueue
 {
-
     [TestFixture]
     public class ConstructorTests
     {
-
         [TestCase("")]
         [TestCase("  ")]
         [TestCase(null)]
@@ -15,7 +13,8 @@ namespace ModernSlavery.Core.Tests.AzureQueue
         {
             // Act
             var actualExpection =
-                Assert.Throws<ArgumentNullException>(() => new Infrastructure.Queue.AzureQueue(testConnString, "TestQueueName"));
+                Assert.Throws<ArgumentNullException>(() =>
+                    new Infrastructure.Queue.AzureQueue(testConnString, "TestQueueName"));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: connectionString", actualExpection.Message);
@@ -28,11 +27,11 @@ namespace ModernSlavery.Core.Tests.AzureQueue
         {
             // Act
             var actualExpection =
-                Assert.Throws<ArgumentNullException>(() => new Infrastructure.Queue.AzureQueue("TestConnectionString", testQueueName));
+                Assert.Throws<ArgumentNullException>(() =>
+                    new Infrastructure.Queue.AzureQueue("TestConnectionString", testQueueName));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: queueName", actualExpection.Message);
         }
-
     }
 }

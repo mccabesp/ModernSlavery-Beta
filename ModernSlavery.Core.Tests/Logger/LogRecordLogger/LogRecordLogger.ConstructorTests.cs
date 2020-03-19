@@ -1,23 +1,21 @@
 ﻿using System;
+using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
-
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.LogRecordLogger
 {
-
     [TestFixture]
     public class ConstrutorTests
     {
-
         [SetUp]
         public void BeforeEach()
         {
-            mockQueue = new Mock<Infrastructure.Queue.LogRecordQueue>("TestConnectionString", "TestQueueName") {CallBase = true};
+            mockQueue = new Mock<LogRecordQueue>("TestConnectionString", "TestQueueName") {CallBase = true};
         }
 
-        private Mock<Infrastructure.Queue.LogRecordQueue> mockQueue;
+        private Mock<LogRecordQueue> mockQueue;
 
         [TestCase("")]
         [TestCase("  ")]
@@ -26,7 +24,8 @@ namespace ModernSlavery.Core.Tests.LogRecordLogger
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Infrastructure.Logging.LogRecordLogger(ConfigHelpers.GlobalOptions,mockQueue.Object, testAppName, "TestFilename"));
+                () => new Infrastructure.Logging.LogRecordLogger(ConfigHelpers.GlobalOptions, mockQueue.Object,
+                    testAppName, "TestFilename"));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: applicationName", actualExpection.Message);
@@ -39,7 +38,8 @@ namespace ModernSlavery.Core.Tests.LogRecordLogger
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Infrastructure.Logging.LogRecordLogger(ConfigHelpers.GlobalOptions,mockQueue.Object, "TestAppName", testFilename));
+                () => new Infrastructure.Logging.LogRecordLogger(ConfigHelpers.GlobalOptions, mockQueue.Object,
+                    "TestAppName", testFilename));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: fileName", actualExpection.Message);
@@ -50,12 +50,12 @@ namespace ModernSlavery.Core.Tests.LogRecordLogger
         {
             // Act
             var actualExpection =
-                Assert.Throws<ArgumentNullException>(() => new Infrastructure.Logging.LogRecordLogger(ConfigHelpers.GlobalOptions,null, "TestAppName", "TestFilename"));
+                Assert.Throws<ArgumentNullException>(() =>
+                    new Infrastructure.Logging.LogRecordLogger(ConfigHelpers.GlobalOptions, null, "TestAppName",
+                        "TestFilename"));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: queue", actualExpection.Message);
         }
-
     }
-
 }

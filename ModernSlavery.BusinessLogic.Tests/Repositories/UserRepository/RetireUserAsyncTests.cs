@@ -5,34 +5,21 @@ using AutoMapper;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
 using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
+using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Tests.Common;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel.Options;
 using NUnit.Framework;
 
 namespace Repositories.UserRepository
 {
-
     [TestFixture]
     [SetCulture("en-GB")]
     public class RetireUserAsyncTests : BaseTestFixture<RetireUserAsyncTests.DependencyModule>
     {
-        public class DependencyModule : Module
-        {
-            protected override void Load(ContainerBuilder builder)
-            {
-                // Initialise AutoMapper
-                MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
-                });
-                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
-            }
-        }
-
         [SetUp]
         public void BeforeEach()
         {
@@ -43,7 +30,21 @@ namespace Repositories.UserRepository
 
             // service under test
             testUserRepo =
-                new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(), mockDataRepo.Object, mockUserLogRecord.Object, DependencyContainer.Resolve<IMapper>());
+                new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(),
+                    mockDataRepo.Object, mockUserLogRecord.Object, DependencyContainer.Resolve<IMapper>());
+        }
+
+        public class DependencyModule : Module
+        {
+            protected override void Load(ContainerBuilder builder)
+            {
+                // Initialise AutoMapper
+                var mapperConfig = new MapperConfiguration(config =>
+                {
+                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
+                });
+                builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            }
         }
 
         private Mock<IDataRepository> mockDataRepo;
@@ -56,7 +57,7 @@ namespace Repositories.UserRepository
         {
             // Arrange
             var saveChangesCalled = false;
-            User currentUser = await testUserRepo.FindByEmailAsync("active1@ad5bda75-e514-491b-b74d-4672542cbd15.com");
+            var currentUser = await testUserRepo.FindByEmailAsync("active1@ad5bda75-e514-491b-b74d-4672542cbd15.com");
 
             mockDataRepo.Setup(x => x.SaveChangesAsync())
                 .Callback(() => saveChangesCalled = true)
@@ -78,15 +79,17 @@ namespace Repositories.UserRepository
         public async Task ThrowsErrorWhenUserStatusIsNotActive(string testCurrentEmail, UserStatuses testStatus)
         {
             // Arrange
-            DateTime testEmailVerifiedDate = VirtualDateTime.Now.Date.AddDays(-7);
-            User currentUser = await testUserRepo.FindByEmailAsync(testCurrentEmail);
+            var testEmailVerifiedDate = VirtualDateTime.Now.Date.AddDays(-7);
+            var currentUser = await testUserRepo.FindByEmailAsync(testCurrentEmail);
             currentUser.Status = testStatus;
 
             // Act
-            var actualException = Assert.ThrowsAsync<ArgumentException>(async () => await testUserRepo.RetireUserAsync(currentUser));
+            var actualException =
+                Assert.ThrowsAsync<ArgumentException>(async () => await testUserRepo.RetireUserAsync(currentUser));
 
             // Assert
-            Assert.AreEqual("Can only retire active users. UserId=23322", actualException.Message, "Expected exception message to match");
+            Assert.AreEqual("Can only retire active users. UserId=23322", actualException.Message,
+                "Expected exception message to match");
             Assert.AreEqual(testStatus, currentUser.Status, "Expected status to still be the same");
         }
 
@@ -94,12 +97,11 @@ namespace Repositories.UserRepository
         public void ThrowsErrorWhenArgumentIsNull(User testUserArg, string expectedErrorMessage)
         {
             // Act
-            var actualException = Assert.ThrowsAsync<ArgumentNullException>(async () => await testUserRepo.RetireUserAsync(testUserArg));
+            var actualException =
+                Assert.ThrowsAsync<ArgumentNullException>(async () => await testUserRepo.RetireUserAsync(testUserArg));
 
             // Assert
             Assert.AreEqual(expectedErrorMessage, actualException.Message, "Expected exception message to match");
         }
-
     }
-
 }

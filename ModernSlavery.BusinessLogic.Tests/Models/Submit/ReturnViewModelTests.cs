@@ -8,7 +8,6 @@ namespace ModernSlavery.BusinessLogic.Tests.Models.Submit
     [TestFixture]
     public class ReturnViewModelTests
     {
-
         [Test]
         public void HasDraftWithContent_When_Draft_Is_Null_Returns_False()
         {
@@ -16,7 +15,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Models.Submit
             var testReturnViewModel = new ReturnViewModel {ReportInfo = new ReportInfoModel {Draft = null}};
 
             // Act
-            bool actualHasDraftWithContent = testReturnViewModel.HasDraftWithContent();
+            var actualHasDraftWithContent = testReturnViewModel.HasDraftWithContent();
 
             // Assert
             Assert.False(
@@ -31,7 +30,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Models.Submit
             var testReturnViewModel = new ReturnViewModel {ReportInfo = null};
 
             // Act
-            bool actualHasDraftWithContent = testReturnViewModel.HasDraftWithContent();
+            var actualHasDraftWithContent = testReturnViewModel.HasDraftWithContent();
 
             // Assert
             Assert.False(
@@ -44,14 +43,17 @@ namespace ModernSlavery.BusinessLogic.Tests.Models.Submit
         {
             // Arrange
             var returnViewModelContentUnderDraft = new ReturnViewModel();
-            var testReturnViewModel = new ReturnViewModel {
-                ReportInfo = new ReportInfoModel {
-                    Draft = new Draft(default, default,default) {ReturnViewModelContent = returnViewModelContentUnderDraft}
+            var testReturnViewModel = new ReturnViewModel
+            {
+                ReportInfo = new ReportInfoModel
+                {
+                    Draft = new Draft(default, default, default)
+                        {ReturnViewModelContent = returnViewModelContentUnderDraft}
                 }
             };
 
             // Act
-            bool actualHasDraftWithContent = testReturnViewModel.HasDraftWithContent();
+            var actualHasDraftWithContent = testReturnViewModel.HasDraftWithContent();
 
             // Assert
             Assert.True(
@@ -64,18 +66,19 @@ namespace ModernSlavery.BusinessLogic.Tests.Models.Submit
         public void HasDraftWithContent_When_ReturnViewModelContent_Is_Null_Returns_False()
         {
             // Arrange
-            var testReturnViewModel = new ReturnViewModel {
-                ReportInfo = new ReportInfoModel {Draft = new Draft(default, default,default) {ReturnViewModelContent = null}}
+            var testReturnViewModel = new ReturnViewModel
+            {
+                ReportInfo = new ReportInfoModel
+                    {Draft = new Draft(default, default, default) {ReturnViewModelContent = null}}
             };
 
             // Act
-            bool actualHasDraftWithContent = testReturnViewModel.HasDraftWithContent();
+            var actualHasDraftWithContent = testReturnViewModel.HasDraftWithContent();
 
             // Assert
             Assert.False(
                 actualHasDraftWithContent,
                 "This method checks for the existence of the return view model content, so if it's null, then it is of course expected to return false because it has indeed draft but the content wasn't loaded (i.e. when stashing/unStashing recursive objects are ignored)");
         }
-
     }
 }

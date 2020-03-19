@@ -1,28 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ModernSlavery.Core.Interfaces;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.Tests.Common.Classes;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
-using NUnit.Framework;
-using ModernSlavery.Infrastructure.Message;
-using ModernSlavery.Tests.Common.Classes;
 using Notify.Authentication;
+using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
 {
-
     [TestFixture]
     [SetCulture("en-GB")]
     public class SendEmailAsyncTests
     {
-
         [SetUp]
         public void BeforeEach()
         {
@@ -30,7 +26,7 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
             mockHttpMessageHandler = new Mock<HttpMessageHandler>();
 
             mockEmailTemplateRepo = new Mock<IEmailTemplateRepository>();
-            
+
             mockLogger = new Mock<ILogger<Infrastructure.Message.GovNotifyEmailProvider>>();
 
             mockHttpClientFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
@@ -86,18 +82,21 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
                 .As<HttpMessageInvoker>()
                 .Setup(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(
-                    (HttpRequestMessage request, CancellationToken token) => {
+                    (HttpRequestMessage request, CancellationToken token) =>
+                    {
                         sendAsyncCalled = true;
 
-                        string actualToken = request.Headers.Authorization.Parameter.Replace("Bearer ", "");
-                        IDictionary<string, object> decodedToken = Authenticator.DecodeToken(actualToken, apiKey);
-                        object actualServiceId = decodedToken["iss"];
+                        var actualToken = request.Headers.Authorization.Parameter.Replace("Bearer ", "");
+                        var decodedToken = Authenticator.DecodeToken(actualToken, apiKey);
+                        var actualServiceId = decodedToken["iss"];
                         Assert.AreEqual(expectedServiceId, actualServiceId);
 
-                        return new HttpResponseMessage {StatusCode = HttpStatusCode.OK, Content = new StringContent("{id: 123}")};
+                        return new HttpResponseMessage
+                            {StatusCode = HttpStatusCode.OK, Content = new StringContent("{id: 123}")};
                     });
 
-            SendEmailResult actual = await testNotifyEmailProvider.SendEmailAsync("test@test.com", "123", new {title = "TITLE"}, test);
+            var actual =
+                await testNotifyEmailProvider.SendEmailAsync("test@test.com", "123", new {title = "TITLE"}, test);
 
             Assert.IsTrue(sendAsyncCalled);
         }
@@ -121,19 +120,21 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
                 .As<HttpMessageInvoker>()
                 .Setup(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(
-                    (HttpRequestMessage request, CancellationToken token) => {
+                    (HttpRequestMessage request, CancellationToken token) =>
+                    {
                         if (request.Content != null)
                         {
                             sendAsyncCalled = true;
-                            string content = request.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                            var content = request.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                             dynamic parsed = JsonConvert.DeserializeObject(content);
                             Assert.AreEqual(expectedPersonalisation, parsed.personalisation.Environment.Value);
                         }
 
-                        return new HttpResponseMessage {StatusCode = HttpStatusCode.OK, Content = new StringContent("{id: 123}")};
+                        return new HttpResponseMessage
+                            {StatusCode = HttpStatusCode.OK, Content = new StringContent("{id: 123}")};
                     });
 
-            SendEmailResult actual = await testNotifyEmailProvider.SendEmailAsync("test@test.com", "123", new { }, true);
+            var actual = await testNotifyEmailProvider.SendEmailAsync("test@test.com", "123", new { }, true);
 
             Assert.IsTrue(sendAsyncCalled);
         }
@@ -152,11 +153,12 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
                 .As<HttpMessageInvoker>()
                 .Setup(x => x.SendAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(
-                    (HttpRequestMessage request, CancellationToken token) => {
+                    (HttpRequestMessage request, CancellationToken token) =>
+                    {
                         if (request.Content != null)
                         {
                             sendAsyncCalled = true;
-                            string content = request.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                            var content = request.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                             dynamic parsed = JsonConvert.DeserializeObject(content);
 
                             // assert email, template and reference
@@ -169,10 +171,11 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
                             Assert.AreEqual(expectedParameters.field2, parsed.personalisation.field2.Value);
                         }
 
-                        return new HttpResponseMessage {StatusCode = HttpStatusCode.OK, Content = new StringContent("{id: 123}")};
+                        return new HttpResponseMessage
+                            {StatusCode = HttpStatusCode.OK, Content = new StringContent("{id: 123}")};
                     });
 
-            SendEmailResult actual = await testNotifyEmailProvider.SendEmailAsync(
+            var actual = await testNotifyEmailProvider.SendEmailAsync(
                 expectedEmail,
                 expectedTemplateId,
                 expectedParameters,
@@ -180,7 +183,5 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
 
             Assert.IsTrue(sendAsyncCalled);
         }
-
     }
-
 }

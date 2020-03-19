@@ -1,24 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ModernSlavery.Entities;
 using ModernSlavery.Tests.Common.TestHelpers;
 using NUnit.Framework;
-using ModernSlavery.Entities;
 
 namespace ModernSlavery.Database.Tests
 {
     [TestFixture]
     public class OrganisationTests
     {
-
         [SetUp]
         public void BeforeEach()
         {
             _testOrganisation = OrganisationHelper.GetPublicOrganisation();
 
-            Return mocked2017Return = ReturnHelper.CreateTestReturn(_testOrganisation);
+            var mocked2017Return = ReturnHelper.CreateTestReturn(_testOrganisation);
             OrganisationHelper.LinkOrganisationAndReturn(_testOrganisation, mocked2017Return);
 
-            Return mocked2018Return = ReturnHelper.CreateTestReturn(_testOrganisation, 2018);
+            var mocked2018Return = ReturnHelper.CreateTestReturn(_testOrganisation, 2018);
             OrganisationHelper.LinkOrganisationAndReturn(_testOrganisation, mocked2018Return);
         }
 
@@ -29,8 +28,8 @@ namespace ModernSlavery.Database.Tests
         public void OrganisationDB_GetRecentReportingYears_Returns_The_Correct_Years(int countOfYears, int expected)
         {
             // Arrange - Act
-            IEnumerable<int> returnedDates = _testOrganisation.GetRecentReportingYears(countOfYears);
-            int actualCountOfReturnedDates = returnedDates.Count();
+            var returnedDates = _testOrganisation.GetRecentReportingYears(countOfYears);
+            var actualCountOfReturnedDates = returnedDates.Count();
 
             // Assert
             Assert.AreEqual(expected, actualCountOfReturnedDates);
@@ -41,8 +40,8 @@ namespace ModernSlavery.Database.Tests
         public void OrganisationDB_GetRecentReports_Returns_The_Correct_Years(int countOfYears, int expected)
         {
             // Arrange - Act
-            IEnumerable<Return> returnsAvailableInPreviousYears = _testOrganisation.GetRecentReports(countOfYears);
-            int actualCount = returnsAvailableInPreviousYears.Count();
+            var returnsAvailableInPreviousYears = _testOrganisation.GetRecentReports(countOfYears);
+            var actualCount = returnsAvailableInPreviousYears.Count();
 
             // Assert
             Assert.AreEqual(expected, actualCount);
@@ -57,16 +56,15 @@ namespace ModernSlavery.Database.Tests
             _testOrganisation.Returns = new List<Return>(); // remove returns
 
             // Act
-            IEnumerable<Return> returnsAvailableForTheLastTwoYears = _testOrganisation.GetRecentReports(2);
-            int actualCount = returnsAvailableForTheLastTwoYears.Count();
-            Return returnForCurrentYear = returnsAvailableForTheLastTwoYears.ElementAt(0);
-            Return returnForPreviousYear = returnsAvailableForTheLastTwoYears.ElementAt(1);
+            var returnsAvailableForTheLastTwoYears = _testOrganisation.GetRecentReports(2);
+            var actualCount = returnsAvailableForTheLastTwoYears.Count();
+            var returnForCurrentYear = returnsAvailableForTheLastTwoYears.ElementAt(0);
+            var returnForPreviousYear = returnsAvailableForTheLastTwoYears.ElementAt(1);
 
             // Assert
             Assert.AreEqual(2, actualCount);
             Assert.AreEqual(0, returnForCurrentYear.ReturnId);
             Assert.AreEqual(0, returnForPreviousYear.ReturnId);
         }
-
     }
 }
