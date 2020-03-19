@@ -6,7 +6,6 @@ namespace ModernSlavery.BusinessLogic.Models.FileModels
 {
     public class SubmissionsFileModel
     {
-
         public long ReturnId { get; set; }
         public long OrganisationId { get; set; }
         public string OrganisationName { get; set; }
@@ -37,6 +36,5 @@ namespace ModernSlavery.BusinessLogic.Models.FileModels
         public string OrganisationSize { get; set; }
         public string Modifications { get; set; }
         public bool EHRCResponse { get; set; }
-
     }
 }

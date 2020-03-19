@@ -4,10 +4,8 @@ namespace ModernSlavery.BusinessLogic.Models.Scope
 {
     public class OrganisationMissingScope
     {
-
-        public ModernSlavery.Entities.Organisation Organisation { get; set; }
+        public Entities.Organisation Organisation { get; set; }
 
         public List<int> MissingSnapshotYears { get; set; }
-
     }
 }

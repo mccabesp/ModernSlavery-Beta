@@ -7,7 +7,6 @@ namespace ModernSlavery.BusinessLogic
 {
     public interface ISecurityCodeBusinessLogic
     {
-
         CustomResult<Organisation> CreateSecurityCode(Organisation organisation,
             DateTime securityCodeExpiryDateTime);
 
@@ -15,23 +14,20 @@ namespace ModernSlavery.BusinessLogic
             DateTime securityCodeExpiryDateTime);
 
         CustomResult<Organisation> ExpireSecurityCode(Organisation organisation);
-
     }
 
     public class SecurityCodeBusinessLogic : ISecurityCodeBusinessLogic
     {
-
-        public CustomResult<Organisation> CreateSecurityCode(Organisation organisation, DateTime securityCodeExpiryDateTime)
+        public CustomResult<Organisation> CreateSecurityCode(Organisation organisation,
+            DateTime securityCodeExpiryDateTime)
         {
             if (!(organisation.IsActive() | organisation.IsPending()))
-            {
                 return new CustomResult<Organisation>(
                     InternalMessages.SecurityCodeCreateIsOnlyAllowedToNonRetiredOrgsErrorMessage(
                         organisation.OrganisationName,
                         organisation.EmployerReference,
                         organisation.Status.ToString()),
                     organisation);
-            }
 
             return SecurityCodeGenericMethod(
                 organisation,
@@ -41,7 +37,8 @@ namespace ModernSlavery.BusinessLogic
                 SetOrganisationSecurityCode);
         }
 
-        public CustomResult<Organisation> ExtendSecurityCode(Organisation organisation, DateTime securityCodeExpiryDateTime)
+        public CustomResult<Organisation> ExtendSecurityCode(Organisation organisation,
+            DateTime securityCodeExpiryDateTime)
         {
             return SecurityCodeGenericMethod(
                 organisation,
@@ -67,11 +64,9 @@ namespace ModernSlavery.BusinessLogic
             CustomResult<Organisation> futureValidationResult = null;
 
             if (securityCodeExpiryDateTime < VirtualDateTime.Now)
-            {
                 futureValidationResult = new CustomResult<Organisation>(
                     InternalMessages.SecurityCodeMustExpireInFutureErrorMessage(),
                     organisation);
-            }
 
             return futureValidationResult;
         }
@@ -80,12 +75,11 @@ namespace ModernSlavery.BusinessLogic
         {
             CustomResult<Organisation> securityCodeNotExpiredValidationResult = null;
 
-            if (organisation?.SecurityCodeExpiryDateTime != null && organisation.SecurityCodeExpiryDateTime < VirtualDateTime.Now)
-            {
+            if (organisation?.SecurityCodeExpiryDateTime != null &&
+                organisation.SecurityCodeExpiryDateTime < VirtualDateTime.Now)
                 securityCodeNotExpiredValidationResult = new CustomResult<Organisation>(
                     InternalMessages.SecurityCodeCannotModifyAnAlreadyExpiredSecurityCodeErrorMessage(),
                     organisation);
-            }
 
             return securityCodeNotExpiredValidationResult;
         }
@@ -96,7 +90,8 @@ namespace ModernSlavery.BusinessLogic
             return organisation;
         }
 
-        private Organisation SetOrganisationSecurityCodeExpiryDate(Organisation organisation, DateTime securityCodeExpiryDateTime)
+        private Organisation SetOrganisationSecurityCodeExpiryDate(Organisation organisation,
+            DateTime securityCodeExpiryDateTime)
         {
             organisation.SetSecurityCodeExpiryDate(securityCodeExpiryDateTime);
             return organisation;
@@ -112,20 +107,14 @@ namespace ModernSlavery.BusinessLogic
 
             try
             {
-                CustomResult<Organisation> securityCodeNotExpiredValidationResult = securityCodeNotExpiredValidator?.Invoke(organisation);
-                if (securityCodeNotExpiredValidationResult != null)
-                {
-                    return securityCodeNotExpiredValidationResult;
-                }
+                var securityCodeNotExpiredValidationResult = securityCodeNotExpiredValidator?.Invoke(organisation);
+                if (securityCodeNotExpiredValidationResult != null) return securityCodeNotExpiredValidationResult;
 
-                CustomResult<Organisation> securityValidationResult =
+                var securityValidationResult =
                     securityCodeDateTimeValidator?.Invoke(organisation, securityCodeExpiryDateTime);
-                if (securityValidationResult != null)
-                {
-                    return securityValidationResult;
-                }
+                if (securityValidationResult != null) return securityValidationResult;
 
-                Organisation org = getOrganisationAndWorkWithSecurityCode(organisation, securityCodeExpiryDateTime);
+                var org = getOrganisationAndWorkWithSecurityCode(organisation, securityCodeExpiryDateTime);
                 result = new CustomResult<Organisation>(org);
             }
             catch (Exception ex)
@@ -143,6 +132,5 @@ namespace ModernSlavery.BusinessLogic
 
         private delegate Organisation
             GetOrganisationAndWorkWithSecurityCode(Organisation organisation, DateTime securityCodeExpiryDateTime);
-
     }
 }

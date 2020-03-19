@@ -3,7 +3,8 @@
     public interface IDevOpsService
     {
     }
-    public class DevOpsService: IDevOpsService
+
+    public class DevOpsService : IDevOpsService
     {
     }
 }

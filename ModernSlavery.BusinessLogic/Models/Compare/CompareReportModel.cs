@@ -5,11 +5,9 @@ using ModernSlavery.Extensions;
 
 namespace ModernSlavery.BusinessLogic.Models.Compare
 {
-
     [Serializable]
     public sealed class CompareReportModel
     {
-
         public bool HasReported { get; set; }
 
         public string EncOrganisationId { get; set; }
@@ -42,13 +40,12 @@ namespace ModernSlavery.BusinessLogic.Models.Compare
 
         public bool? HasBonusesPaid { get; set; }
 
-        public bool RequiredToReport => ScopeStatus == ScopeStatuses.InScope || ScopeStatus == ScopeStatuses.PresumedInScope;
+        public bool RequiredToReport =>
+            ScopeStatus == ScopeStatuses.InScope || ScopeStatus == ScopeStatuses.PresumedInScope;
 
         public string OrganisationSizeName =>
             HasReported
                 ? OrganisationSize.GetAttribute<DisplayAttribute>().Name
                 : OrganisationSizes.NotProvided.GetAttribute<DisplayAttribute>().Name;
-
     }
-
 }

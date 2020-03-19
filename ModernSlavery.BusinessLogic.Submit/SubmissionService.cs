@@ -8,7 +8,7 @@
         IDraftFileBusinessLogic DraftFileBusinessLogic { get; }
     }
 
-    public class SubmissionService: ISubmissionService
+    public class SubmissionService : ISubmissionService
     {
         public SubmissionService(
             ICommonBusinessLogic commonBusinessLogic,

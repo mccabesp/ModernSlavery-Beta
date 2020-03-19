@@ -3,7 +3,8 @@
     public interface ISharedService
     {
     }
-    public class SharedService: ISharedService
+
+    public class SharedService : ISharedService
     {
     }
 }

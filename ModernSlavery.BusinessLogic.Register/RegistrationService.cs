@@ -21,14 +21,13 @@ namespace ModernSlavery.BusinessLogic.Register
         public IUserRepository UserRepository { get; }
         public IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
         public IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
-
     }
 
-    public class RegistrationService: IRegistrationService
+    public class RegistrationService : IRegistrationService
     {
         public RegistrationService(
-            [KeyFilter(Filenames.BadSicLog)]ILogRecordLogger badSicLog,
-            [KeyFilter(Filenames.RegistrationLog)]ILogRecordLogger registrationLog,
+            [KeyFilter(Filenames.BadSicLog)] ILogRecordLogger badSicLog,
+            [KeyFilter(Filenames.RegistrationLog)] ILogRecordLogger registrationLog,
             IRegistrationService registrationBusinessLogic,
             IScopeBusinessLogic scopeBL,
             IOrganisationBusinessLogic orgBL,
@@ -68,6 +67,5 @@ namespace ModernSlavery.BusinessLogic.Register
         public IUserRepository UserRepository { get; }
         public IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
         public IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
-
     }
 }

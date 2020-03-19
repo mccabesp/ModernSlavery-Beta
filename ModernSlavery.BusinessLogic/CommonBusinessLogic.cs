@@ -1,9 +1,8 @@
 ﻿using System;
-using Microsoft.Extensions.Configuration;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.BusinessLogic
@@ -18,21 +17,15 @@ namespace ModernSlavery.BusinessLogic
         INotificationService NotificationService { get; }
 
         DateTime GetAccountingStartDate(SectorTypes sector, int year = 0);
-
     }
 
     public class CommonBusinessLogic : ICommonBusinessLogic
     {
-        public GlobalOptions GlobalOptions { get; }
-
         private readonly ISnapshotDateHelper _snapshotDateHelper;
-        public IFileRepository FileRepository { get; }
-        public IDataRepository DataRepository { get; }
-        public ISourceComparer SourceComparer { get; }
-        public ISendEmailService SendEmailService { get; }
-        public INotificationService NotificationService { get; }
 
-        public CommonBusinessLogic(ISnapshotDateHelper snapshotDateHelper, ISourceComparer sourceComparer, ISendEmailService sendEmailService, INotificationService notificationService, IFileRepository fileRepository, IDataRepository dataRepository)
+        public CommonBusinessLogic(ISnapshotDateHelper snapshotDateHelper, ISourceComparer sourceComparer,
+            ISendEmailService sendEmailService, INotificationService notificationService,
+            IFileRepository fileRepository, IDataRepository dataRepository)
         {
             _snapshotDateHelper = snapshotDateHelper;
             SourceComparer = sourceComparer;
@@ -41,6 +34,13 @@ namespace ModernSlavery.BusinessLogic
             FileRepository = fileRepository;
             DataRepository = dataRepository;
         }
+
+        public GlobalOptions GlobalOptions { get; }
+        public IFileRepository FileRepository { get; }
+        public IDataRepository DataRepository { get; }
+        public ISourceComparer SourceComparer { get; }
+        public ISendEmailService SendEmailService { get; }
+        public INotificationService NotificationService { get; }
 
         /// <summary>
         ///     Returns the accounting start date for the specified sector and year
@@ -53,5 +53,4 @@ namespace ModernSlavery.BusinessLogic
             return _snapshotDateHelper.GetSnapshotDate(sectorType, year);
         }
     }
-
 }

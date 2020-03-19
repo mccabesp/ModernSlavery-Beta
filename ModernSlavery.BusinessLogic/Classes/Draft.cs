@@ -1,17 +1,26 @@
 ﻿using System;
 using System.IO;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core;
 
 namespace ModernSlavery.BusinessLogic.Classes
 {
     [Serializable]
     public class Draft
     {
+        #region Private methods
+
+        private string GetDraftFileName(long organisationId, int snapshotYear, string fileExtension)
+        {
+            return $"{organisationId}_{snapshotYear}.{fileExtension}";
+        }
+
+        #endregion
 
         #region Constructor
 
-        private Draft() { }
+        private Draft()
+        {
+        }
 
         public Draft(long organisationId, int snapshotYear, string rootPath)
         {
@@ -55,15 +64,5 @@ namespace ModernSlavery.BusinessLogic.Classes
         }
 
         #endregion
-
-        #region Private methods
-
-        private string GetDraftFileName(long organisationId, int snapshotYear, string fileExtension)
-        {
-            return $"{organisationId}_{snapshotYear}.{fileExtension}";
-        }
-
-        #endregion
-
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ModernSlavery.SharedKernel.Interfaces;
+﻿using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessLogic.View
 {
@@ -13,9 +10,9 @@ namespace ModernSlavery.BusinessLogic.View
         ISearchBusinessLogic SearchBusinessLogic { get; set; }
 
         IObfuscator Obfuscator { get; }
-
     }
-    public class ViewingService: IViewingService
+
+    public class ViewingService : IViewingService
     {
         public ViewingService(
             IOrganisationBusinessLogic organisationBusinessLogic,

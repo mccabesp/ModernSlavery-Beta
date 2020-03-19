@@ -1,12 +1,11 @@
-﻿using ModernSlavery.SharedKernel;
-using System;
+﻿using System;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.BusinessLogic.Models
 {
     [Serializable]
     public class LateSubmissionsFileModel
     {
-
         public long OrganisationId { get; internal set; }
         public string OrganisationName { get; internal set; }
         public SectorTypes OrganisationSectorType { get; internal set; }
@@ -18,6 +17,5 @@ namespace ModernSlavery.BusinessLogic.Models
         public string ReportModifiedFields { get; internal set; }
         public string ReportPersonResonsible { get; internal set; }
         public bool ReportEHRCResponse { get; internal set; }
-
     }
 }

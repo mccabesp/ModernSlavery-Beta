@@ -7,7 +7,6 @@ namespace ModernSlavery.BusinessLogic.Models.FileModels
     [Serializable]
     public class ScopesFileModel
     {
-
         public long OrganisationScopeId { get; set; }
 
         public long OrganisationId { get; set; }
@@ -30,6 +29,5 @@ namespace ModernSlavery.BusinessLogic.Models.FileModels
 
         public string Reason { get; set; }
         public string CampaignId { get; set; }
-
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
@@ -11,13 +10,12 @@ using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.BusinessLogic
 {
-
     public interface ISubmissionBusinessLogic
     {
         ILogRecordLogger SubmissionLog { get; }
@@ -29,19 +27,18 @@ namespace ModernSlavery.BusinessLogic
         IEnumerable<LateSubmissionsFileModel> GetLateSubmissions();
         ReturnViewModel ConvertSubmissionReportToReturnViewModel(Return reportToConvert);
         CustomResult<Return> GetSubmissionByOrganisationAndYear(Organisation organisation, int year);
-
     }
 
     public class SubmissionBusinessLogic : ISubmissionBusinessLogic
     {
+        private readonly ICommonBusinessLogic _commonBusinessLogic;
 
-        private ICommonBusinessLogic _commonBusinessLogic;
-
-        public SubmissionBusinessLogic(ICommonBusinessLogic commonBusinessLogic, IDataRepository dataRepo, [KeyFilter(Filenames.SubmissionLog)]ILogRecordLogger submissionLog)
+        public SubmissionBusinessLogic(ICommonBusinessLogic commonBusinessLogic, IDataRepository dataRepo,
+            [KeyFilter(Filenames.SubmissionLog)] ILogRecordLogger submissionLog)
         {
             _commonBusinessLogic = commonBusinessLogic;
-             DataRepository = dataRepo;
-             SubmissionLog = submissionLog;
+            DataRepository = dataRepo;
+            SubmissionLog = submissionLog;
         }
 
         private IDataRepository DataRepository { get; }
@@ -62,17 +59,19 @@ namespace ModernSlavery.BusinessLogic
         /// <returns></returns>
         public virtual async Task<Return> GetLatestSubmissionBySnapshotYearAsync(long organisationId, int snapshotYear)
         {
-            Return orgSubmission = await DataRepository.FirstOrDefaultAsync<Return>(
-                    s => s.AccountingDate.Year == snapshotYear
-                         && s.OrganisationId == organisationId
-                         && s.Status == ReturnStatuses.Submitted);
+            var orgSubmission = await DataRepository.FirstOrDefaultAsync<Return>(
+                s => s.AccountingDate.Year == snapshotYear
+                     && s.OrganisationId == organisationId
+                     && s.Status == ReturnStatuses.Submitted);
 
             return orgSubmission;
         }
 
-        public IEnumerable<Return> GetAllSubmissionsByOrganisationIdAndSnapshotYear(long organisationId, int snapshotYear)
+        public IEnumerable<Return> GetAllSubmissionsByOrganisationIdAndSnapshotYear(long organisationId,
+            int snapshotYear)
         {
-            return DataRepository.GetAll<Return>().Where(s => s.OrganisationId == organisationId && s.AccountingDate.Year == snapshotYear);
+            return DataRepository.GetAll<Return>().Where(s =>
+                s.OrganisationId == organisationId && s.AccountingDate.Year == snapshotYear);
         }
 
         /// <summary>
@@ -90,14 +89,11 @@ namespace ModernSlavery.BusinessLogic
                 .Where(r => r.AccountingDate.Year == year && r.Status == ReturnStatuses.Submitted).ToList();
 
 #if DEBUG
-            if (Debugger.IsAttached)
-            {
-                returns = returns.Take(100).ToList();
-            }
+            if (Debugger.IsAttached) returns = returns.Take(100).ToList();
 #endif
 
             // perform left join
-            IEnumerable<SubmissionsFileModel> records = returns.AsQueryable().GroupJoin(
+            var records = returns.AsQueryable().GroupJoin(
                     // join
                     scopes.AsQueryable(),
                     // on
@@ -109,7 +105,8 @@ namespace ModernSlavery.BusinessLogic
                     (r, os) => new {r, os = os.FirstOrDefault()})
                 .ToList()
                 .Select(
-                    j => new SubmissionsFileModel {
+                    j => new SubmissionsFileModel
+                    {
                         ReturnId = j.r.ReturnId,
                         OrganisationId = j.r.OrganisationId,
                         OrganisationName = j.r.Organisation.OrganisationName,
@@ -152,10 +149,10 @@ namespace ModernSlavery.BusinessLogic
         public virtual IEnumerable<LateSubmissionsFileModel> GetLateSubmissions()
         {
             // get the snapshot dates to filter submissions by
-            DateTime curPrivateSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Private);
-            DateTime curPublicSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Public);
-            DateTime prevPrivateSnapshotDate = curPrivateSnapshotDate.AddYears(-1);
-            DateTime prevPublicSnapshotDate = curPublicSnapshotDate.AddYears(-1);
+            var curPrivateSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Private);
+            var curPublicSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Public);
+            var prevPrivateSnapshotDate = curPrivateSnapshotDate.AddYears(-1);
+            var prevPublicSnapshotDate = curPublicSnapshotDate.AddYears(-1);
 
             // create return table query
             var lateSubmissions = DataRepository.GetAll<Return>()
@@ -174,7 +171,8 @@ namespace ModernSlavery.BusinessLogic
                          || r.Modifications.ToLower().Contains("personresponsible"))
                 .Where(r => r.Status == ReturnStatuses.Submitted)
                 .Select(
-                    r => new {
+                    r => new
+                    {
                         r.OrganisationId,
                         r.Organisation.OrganisationName,
                         r.Organisation.SectorType,
@@ -192,7 +190,8 @@ namespace ModernSlavery.BusinessLogic
 
             // create scope table query
             var activeScopes = DataRepository.GetAll<OrganisationScope>()
-                .Where(os => os.SnapshotDate.Year == prevPrivateSnapshotDate.Year && os.Status == ScopeRowStatuses.Active)
+                .Where(os =>
+                    os.SnapshotDate.Year == prevPrivateSnapshotDate.Year && os.Status == ScopeRowStatuses.Active)
                 .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SnapshotDate}).ToList();
 
             // perform a left join on lateSubmissions and activeScopes
@@ -209,12 +208,14 @@ namespace ModernSlavery.BusinessLogic
                 // ensure we only have in scope returns
                 .Where(
                     j => j.os == null
-                         || j.os.ScopeStatus != ScopeStatuses.OutOfScope && j.os.ScopeStatus != ScopeStatuses.PresumedOutOfScope);
+                         || j.os.ScopeStatus != ScopeStatuses.OutOfScope &&
+                         j.os.ScopeStatus != ScopeStatuses.PresumedOutOfScope);
 
             return records
                 .ToList()
                 .Select(
-                    j => new LateSubmissionsFileModel {
+                    j => new LateSubmissionsFileModel
+                    {
                         OrganisationId = j.r.OrganisationId,
                         OrganisationName = j.r.OrganisationName,
                         OrganisationSectorType = j.r.SectorType,
@@ -225,14 +226,17 @@ namespace ModernSlavery.BusinessLogic
                         ReportModifiedDate = j.r.Modified,
                         ReportModifiedFields = j.r.Modifications,
                         ReportPersonResonsible =
-                            j.r.SectorType == SectorTypes.Public ? "Not required" : $"{j.r.FirstName} {j.r.LastName} ({j.r.JobTitle})",
+                            j.r.SectorType == SectorTypes.Public
+                                ? "Not required"
+                                : $"{j.r.FirstName} {j.r.LastName} ({j.r.JobTitle})",
                         ReportEHRCResponse = j.r.EHRCResponse
                     });
         }
 
         public ReturnViewModel ConvertSubmissionReportToReturnViewModel(Return reportToConvert)
         {
-            var model = new ReturnViewModel {
+            var model = new ReturnViewModel
+            {
                 SectorType = reportToConvert.Organisation.SectorType,
                 ReturnId = reportToConvert.ReturnId,
                 OrganisationId = reportToConvert.OrganisationId,
@@ -263,10 +267,7 @@ namespace ModernSlavery.BusinessLogic
                 IsLateSubmission = reportToConvert.IsLateSubmission
             };
 
-            if (model.Address.EqualsI(model.LatestAddress))
-            {
-                model.LatestAddress = null;
-            }
+            if (model.Address.EqualsI(model.LatestAddress)) model.LatestAddress = null;
 
             model.OrganisationName = reportToConvert.Organisation.GetName(reportToConvert.StatusDate)?.Name
                                      ?? reportToConvert.Organisation.OrganisationName;
@@ -286,22 +287,20 @@ namespace ModernSlavery.BusinessLogic
 
         public CustomResult<Return> GetSubmissionByOrganisationAndYear(Organisation organisation, int year)
         {
-            IEnumerable<Return> reports = GetAllSubmissionsByOrganisationIdAndSnapshotYear(organisation.OrganisationId, year);
+            var reports = GetAllSubmissionsByOrganisationIdAndSnapshotYear(organisation.OrganisationId, year);
 
             if (!reports.Any())
-            {
                 return new CustomResult<Return>(
-                    InternalMessages.HttpNotFoundCausedByOrganisationReturnNotInDatabase(organisation.GetEncryptedId(), year));
-            }
+                    InternalMessages.HttpNotFoundCausedByOrganisationReturnNotInDatabase(organisation.GetEncryptedId(),
+                        year));
 
-            Return result = reports.OrderByDescending(r => r.Status == ReturnStatuses.Submitted)
+            var result = reports.OrderByDescending(r => r.Status == ReturnStatuses.Submitted)
                 .ThenByDescending(r => r.StatusDate)
                 .FirstOrDefault();
             if (!result.IsSubmitted())
-            {
                 return new CustomResult<Return>(
-                    InternalMessages.HttpGoneCausedByReportNotHavingBeenSubmitted(result.AccountingDate.Year, result.Status.ToString()));
-            }
+                    InternalMessages.HttpGoneCausedByReportNotHavingBeenSubmitted(result.AccountingDate.Year,
+                        result.Status.ToString()));
 
             return new CustomResult<Return>(result);
         }
@@ -309,9 +308,7 @@ namespace ModernSlavery.BusinessLogic
         #endregion
 
         #region Entities
-        
 
         #endregion
     }
-
 }

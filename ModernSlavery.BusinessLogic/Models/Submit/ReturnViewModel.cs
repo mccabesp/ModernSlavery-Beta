@@ -9,7 +9,6 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
     [Serializable]
     public class ReturnViewModel
     {
-
         public ReturnViewModel()
         {
             ReportInfo = new ReportInfoModel();
@@ -173,10 +172,7 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
 
         public bool HasDraftWithContent()
         {
-            if (ReportInfo == null)
-            {
-                return false;
-            }
+            if (ReportInfo == null) return false;
 
             return ReportInfo.HasDraftContent();
         }
@@ -188,29 +184,26 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
 
         public bool IsValidReturn()
         {
-            bool hasEnterCalculationsData = DiffMeanHourlyPayPercent.HasValue
-                                            && DiffMedianHourlyPercent.HasValue
-                                            && MaleMedianBonusPayPercent.HasValue
-                                            && FemaleMedianBonusPayPercent.HasValue
-                                            && MaleLowerPayBand.HasValue
-                                            && FemaleLowerPayBand.HasValue
-                                            && MaleMiddlePayBand.HasValue
-                                            && FemaleMiddlePayBand.HasValue
-                                            && MaleUpperPayBand.HasValue
-                                            && FemaleUpperPayBand.HasValue
-                                            && MaleUpperQuartilePayBand.HasValue
-                                            && FemaleUpperQuartilePayBand.HasValue
-                                            && FemaleMoneyFromMeanHourlyRate >= 0
-                                            && FemaleMoneyFromMedianHourlyRate >= 0;
+            var hasEnterCalculationsData = DiffMeanHourlyPayPercent.HasValue
+                                           && DiffMedianHourlyPercent.HasValue
+                                           && MaleMedianBonusPayPercent.HasValue
+                                           && FemaleMedianBonusPayPercent.HasValue
+                                           && MaleLowerPayBand.HasValue
+                                           && FemaleLowerPayBand.HasValue
+                                           && MaleMiddlePayBand.HasValue
+                                           && FemaleMiddlePayBand.HasValue
+                                           && MaleUpperPayBand.HasValue
+                                           && FemaleUpperPayBand.HasValue
+                                           && MaleUpperQuartilePayBand.HasValue
+                                           && FemaleUpperQuartilePayBand.HasValue
+                                           && FemaleMoneyFromMeanHourlyRate >= 0
+                                           && FemaleMoneyFromMedianHourlyRate >= 0;
 
-            if (SectorType == SectorTypes.Public)
-            {
-                return hasEnterCalculationsData;
-            }
+            if (SectorType == SectorTypes.Public) return hasEnterCalculationsData;
 
-            bool hasPersonResponsibleData = !string.IsNullOrWhiteSpace(JobTitle)
-                                            && !string.IsNullOrWhiteSpace(FirstName)
-                                            && !string.IsNullOrWhiteSpace(LastName);
+            var hasPersonResponsibleData = !string.IsNullOrWhiteSpace(JobTitle)
+                                           && !string.IsNullOrWhiteSpace(FirstName)
+                                           && !string.IsNullOrWhiteSpace(LastName);
 
             return hasEnterCalculationsData && hasPersonResponsibleData;
         }
@@ -242,16 +235,14 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
 
         #region Hourly Rate Helpers
 
-        public bool FemaleHasLowerMeanHourlyPercent => DiffMeanHourlyPayPercent == null || DiffMeanHourlyPayPercent >= 0;
+        public bool FemaleHasLowerMeanHourlyPercent =>
+            DiffMeanHourlyPayPercent == null || DiffMeanHourlyPayPercent >= 0;
 
         public decimal FemaleMoneyFromMeanHourlyRate
         {
             get
             {
-                if (DiffMeanHourlyPayPercent == null)
-                {
-                    return 0;
-                }
+                if (DiffMeanHourlyPayPercent == null) return 0;
 
                 return FemaleHasLowerMeanHourlyPercent
                     ? 100 - DiffMeanHourlyPayPercent.Value
@@ -259,16 +250,14 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
             }
         }
 
-        public bool FemaleHasLowerMedianHourlyPercent => DiffMedianHourlyPercent == null || DiffMedianHourlyPercent >= 0;
+        public bool FemaleHasLowerMedianHourlyPercent =>
+            DiffMedianHourlyPercent == null || DiffMedianHourlyPercent >= 0;
 
         public decimal FemaleMoneyFromMedianHourlyRate
         {
             get
             {
-                if (DiffMedianHourlyPercent == null)
-                {
-                    return 0;
-                }
+                if (DiffMedianHourlyPercent == null) return 0;
 
                 return FemaleHasLowerMedianHourlyPercent
                     ? 100 - DiffMedianHourlyPercent.Value
@@ -280,16 +269,10 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
         {
             get
             {
-                decimal roundedRate = Math.Round(FemaleMoneyFromMedianHourlyRate);
-                if (roundedRate < 100)
-                {
-                    return $"{roundedRate}p";
-                }
+                var roundedRate = Math.Round(FemaleMoneyFromMedianHourlyRate);
+                if (roundedRate < 100) return $"{roundedRate}p";
 
-                if (roundedRate == 100)
-                {
-                    return "£1";
-                }
+                if (roundedRate == 100) return "£1";
 
                 return $"£{string.Format("{0:#.00}", roundedRate / 100)}";
             }
@@ -305,12 +288,11 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
         {
             get
             {
-                if (DiffMedianBonusPercent == null)
-                {
-                    return 0;
-                }
+                if (DiffMedianBonusPercent == null) return 0;
 
-                return FemaleHasLowerMedianBonusPay ? 100 - DiffMedianBonusPercent.Value : 100 + Math.Abs(DiffMedianBonusPercent.Value);
+                return FemaleHasLowerMedianBonusPay
+                    ? 100 - DiffMedianBonusPercent.Value
+                    : 100 + Math.Abs(DiffMedianBonusPercent.Value);
             }
         }
 
@@ -318,16 +300,10 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
         {
             get
             {
-                decimal roundedRate = Math.Round(FemaleMoneyFromMedianBonusPay);
-                if (roundedRate < 100)
-                {
-                    return $"{roundedRate}p";
-                }
+                var roundedRate = Math.Round(FemaleMoneyFromMedianBonusPay);
+                if (roundedRate < 100) return $"{roundedRate}p";
 
-                if (roundedRate == 100)
-                {
-                    return "£1";
-                }
+                if (roundedRate == 100) return "£1";
 
                 return $"£{string.Format("{0:#.00}", roundedRate / 100)}";
             }
@@ -341,9 +317,9 @@ namespace ModernSlavery.BusinessLogic.Models.Submit
 
         public bool MenReceivedBonuses => MaleMedianBonusPayPercent.HasValue && MaleMedianBonusPayPercent.Value != 0;
 
-        public bool WomenReceivedBonuses => FemaleMedianBonusPayPercent.HasValue && FemaleMedianBonusPayPercent.Value != 0;
+        public bool WomenReceivedBonuses =>
+            FemaleMedianBonusPayPercent.HasValue && FemaleMedianBonusPayPercent.Value != 0;
 
         #endregion
-
     }
 }

@@ -9,14 +9,12 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace ModernSlavery.BusinessLogic
 {
     public interface IDraftFileBusinessLogic
     {
-
         Task<Draft> GetDraftIfAvailableAsync(long organisationId, int snapshotYear);
         Task<Draft> GetExistingOrNewAsync(long organisationId, int snapshotYear, long userIdRequestingAccess);
         Task<Draft> UpdateAsync(ReturnViewModel postedReturnViewModel, Draft draft, long userIdRequestingAccess);
@@ -25,15 +23,13 @@ namespace ModernSlavery.BusinessLogic
         Task<bool> RollbackDraftAsync(Draft draftToRevert);
         Task RestartDraftAsync(long organisationId, int snapshotYear, long userIdRequestingRollback);
         Task CommitDraftAsync(Draft draftToKeep);
-
     }
 
     public class DraftFileBusinessLogic : IDraftFileBusinessLogic
     {
-
         #region Constructor
 
-        public DraftFileBusinessLogic(GlobalOptions globalOptions,IFileRepository fileRepository)
+        public DraftFileBusinessLogic(GlobalOptions globalOptions, IFileRepository fileRepository)
         {
             GlobalOptions = globalOptions;
 
@@ -57,31 +53,27 @@ namespace ModernSlavery.BusinessLogic
 
         public async Task<Draft> GetDraftIfAvailableAsync(long organisationId, int snapshotYear)
         {
-            var result = new Draft(organisationId, snapshotYear,RootDraftPath);
+            var result = new Draft(organisationId, snapshotYear, RootDraftPath);
 
             // When_Not_Json_Return_Null() // 1
-            if (!await _fileRepository.GetFileExistsAsync(result.DraftPath))
-            {
-                return null;
-            }
+            if (!await _fileRepository.GetFileExistsAsync(result.DraftPath)) return null;
 
-            ReturnViewModel deserialisedJsonReturnViewModel = await DeserialiseDraftContentAsync(result.DraftPath);
+            var deserialisedJsonReturnViewModel = await DeserialiseDraftContentAsync(result.DraftPath);
 
             // When_Json_Has_Data_And_Not_Bak_File_Return_Draft() // 2
-            if (deserialisedJsonReturnViewModel != null && !await _fileRepository.GetFileExistsAsync(result.BackupDraftPath))
+            if (deserialisedJsonReturnViewModel != null &&
+                !await _fileRepository.GetFileExistsAsync(result.BackupDraftPath))
             {
                 result.ReturnViewModelContent = deserialisedJsonReturnViewModel;
                 return result;
             }
 
             // When_Json_Empty_And_Not_Bak_File_Return_Null() // 3
-            if (deserialisedJsonReturnViewModel == null && !await _fileRepository.GetFileExistsAsync(result.BackupDraftPath))
-            {
-                return null;
-            }
+            if (deserialisedJsonReturnViewModel == null &&
+                !await _fileRepository.GetFileExistsAsync(result.BackupDraftPath)) return null;
 
             // When_Json_Has_Data_And_Bak_File_Has_Data_Return_Bak_Draft_Info() // 4
-            ReturnViewModel deserialisedBakReturnViewModel = await DeserialiseDraftContentAsync(result.BackupDraftPath);
+            var deserialisedBakReturnViewModel = await DeserialiseDraftContentAsync(result.BackupDraftPath);
 
             if (deserialisedJsonReturnViewModel != null && deserialisedBakReturnViewModel != null)
             {
@@ -90,16 +82,10 @@ namespace ModernSlavery.BusinessLogic
             }
 
             // When_Json_Has_Data_And_Bak_File_Empty_Return_Null() // 5
-            if (deserialisedJsonReturnViewModel != null && deserialisedBakReturnViewModel == null)
-            {
-                return null;
-            }
+            if (deserialisedJsonReturnViewModel != null && deserialisedBakReturnViewModel == null) return null;
 
             // When_Json_Empty_And_Bak_File_Empty_Return_Null() // 6
-            if (deserialisedJsonReturnViewModel == null && deserialisedBakReturnViewModel == null)
-            {
-                return null;
-            }
+            if (deserialisedJsonReturnViewModel == null && deserialisedBakReturnViewModel == null) return null;
 
             throw new NotImplementedException();
         }
@@ -113,25 +99,24 @@ namespace ModernSlavery.BusinessLogic
         /// <param name="snapshotYear"></param>
         /// <param name="userIdRequestingAccess"></param>
         /// <returns></returns>
-        public async Task<Draft> GetExistingOrNewAsync(long organisationId, int snapshotYear, long userIdRequestingAccess)
+        public async Task<Draft> GetExistingOrNewAsync(long organisationId, int snapshotYear,
+            long userIdRequestingAccess)
         {
-            var resultingDraft = new Draft(organisationId, snapshotYear,RootDraftPath);
+            var resultingDraft = new Draft(organisationId, snapshotYear, RootDraftPath);
             return await GetDraftOrCreateAsync(resultingDraft, userIdRequestingAccess);
         }
 
-        public async Task<Draft> UpdateAsync(ReturnViewModel postedReturnViewModel, Draft draft, long userIdRequestingAccess)
+        public async Task<Draft> UpdateAsync(ReturnViewModel postedReturnViewModel, Draft draft,
+            long userIdRequestingAccess)
         {
-            Draft draftFile = await GetDraftOrCreateAsync(draft, userIdRequestingAccess);
+            var draftFile = await GetDraftOrCreateAsync(draft, userIdRequestingAccess);
 
-            if (!draftFile.IsUserAllowedAccess)
-            {
-                return draftFile;
-            }
+            if (!draftFile.IsUserAllowedAccess) return draftFile;
 
             draft.HasDraftBeenModifiedDuringThisSession = default; // front end flag, reset before saving.
 
             draftFile.ReturnViewModelContent = postedReturnViewModel;
-            byte[] objectConvertedToBytesSequence = SerialiseReturnViewModel(draftFile);
+            var objectConvertedToBytesSequence = SerialiseReturnViewModel(draftFile);
             await WriteAndTimestampAsync(draftFile, objectConvertedToBytesSequence, userIdRequestingAccess);
 
             return draftFile;
@@ -139,13 +124,10 @@ namespace ModernSlavery.BusinessLogic
 
         public async Task KeepDraftFileLockedToUserAsync(Draft draftExpectedToBeLocked, long userIdRequestingLock)
         {
-            (bool IsAllowedAccess, long UserId) result = await GetIsUserAllowedAccessAsync(userIdRequestingLock, draftExpectedToBeLocked);
+            var result = await GetIsUserAllowedAccessAsync(userIdRequestingLock, draftExpectedToBeLocked);
             draftExpectedToBeLocked.IsUserAllowedAccess = result.IsAllowedAccess;
 
-            if (!draftExpectedToBeLocked.IsUserAllowedAccess)
-            {
-                return;
-            }
+            if (!draftExpectedToBeLocked.IsUserAllowedAccess) return;
 
             await SetMetadataAsync(draftExpectedToBeLocked, userIdRequestingLock);
 
@@ -175,25 +157,17 @@ namespace ModernSlavery.BusinessLogic
         {
             var draftToRollback = new Draft(organisationId, snapshotYear, RootDraftPath);
             await GetDraftAccessInformationAsync(userIdRequestingRollback, draftToRollback);
-            if (!draftToRollback.IsUserAllowedAccess)
-            {
-                return;
-            }
+            if (!draftToRollback.IsUserAllowedAccess) return;
 
-            bool hasRollbackSucceeded = await RollbackDraftAsync(draftToRollback);
+            var hasRollbackSucceeded = await RollbackDraftAsync(draftToRollback);
 
             if (hasRollbackSucceeded)
-            {
                 await _fileRepository.CopyFileAsync(draftToRollback.DraftPath, draftToRollback.BackupDraftPath, true);
-            }
         }
 
         public async Task<bool> RollbackDraftAsync(Draft draftToDiscard)
         {
-            if (!await _fileRepository.GetFileExistsAsync(draftToDiscard.BackupDraftPath))
-            {
-                return false;
-            }
+            if (!await _fileRepository.GetFileExistsAsync(draftToDiscard.BackupDraftPath)) return false;
 
             await CheckBeforeDeleteAsync(draftToDiscard.DraftPath);
             await _fileRepository.CopyFileAsync(draftToDiscard.BackupDraftPath, draftToDiscard.DraftPath, true);
@@ -224,15 +198,10 @@ namespace ModernSlavery.BusinessLogic
 
             await GetDraftAccessInformationAsync(userIdRequestingAccess, resultingDraft);
 
-            if (!resultingDraft.IsUserAllowedAccess)
-            {
-                return resultingDraft;
-            }
+            if (!resultingDraft.IsUserAllowedAccess) return resultingDraft;
 
             if (!await _fileRepository.GetFileExistsAsync(resultingDraft.BackupDraftPath))
-            {
                 await _fileRepository.CopyFileAsync(resultingDraft.DraftPath, resultingDraft.BackupDraftPath, true);
-            }
 
             await SetMetadataAsync(resultingDraft, userIdRequestingAccess);
             resultingDraft.ReturnViewModelContent = await DeserialiseDraftContentAsync(resultingDraft.DraftPath);
@@ -243,9 +212,7 @@ namespace ModernSlavery.BusinessLogic
         private async Task CheckBeforeDeleteAsync(string draftFilePath)
         {
             if (await _fileRepository.GetFileExistsAsync(draftFilePath))
-            {
                 await _fileRepository.DeleteFileAsync(draftFilePath);
-            }
         }
 
         private async Task<string> CheckBeforeReadAsync(string draftFilePath)
@@ -259,7 +226,7 @@ namespace ModernSlavery.BusinessLogic
         {
             if (await _fileRepository.GetFileExistsAsync(draftFilePath))
             {
-                string metaData = await _fileRepository.GetMetaDataAsync(draftFilePath, metaDataLastWrittenTimeStamp);
+                var metaData = await _fileRepository.GetMetaDataAsync(draftFilePath, metaDataLastWrittenTimeStamp);
                 return metaData.ToDateTime();
             }
 
@@ -268,37 +235,38 @@ namespace ModernSlavery.BusinessLogic
 
         private async Task SetMetadataAsync(Draft draft, long userIdRequestingAccess)
         {
-            await _fileRepository.SetMetaDataAsync(draft.DraftPath, metaDataLastWrittenByUserId, userIdRequestingAccess.ToString());
-            await _fileRepository.SetMetaDataAsync(draft.DraftPath, metaDataLastWrittenTimeStamp, VirtualDateTime.Now.ToString());
+            await _fileRepository.SetMetaDataAsync(draft.DraftPath, metaDataLastWrittenByUserId,
+                userIdRequestingAccess.ToString());
+            await _fileRepository.SetMetaDataAsync(draft.DraftPath, metaDataLastWrittenTimeStamp,
+                VirtualDateTime.Now.ToString());
         }
 
         private async Task GetDraftAccessInformationAsync(long userRequestingAccessToDraft, Draft draft)
         {
             draft.LastWrittenDateTime = await CheckBeforeGetLastWriteTimeAsync(draft.DraftPath);
 
-            (bool IsAllowedAccess, long UserId) result = await GetIsUserAllowedAccessAsync(userRequestingAccessToDraft, draft);
+            var result = await GetIsUserAllowedAccessAsync(userRequestingAccessToDraft, draft);
             draft.IsUserAllowedAccess = result.IsAllowedAccess;
             draft.LastWrittenByUserId = result.UserId;
         }
 
-        private async Task<(bool IsAllowedAccess, long UserId)> GetIsUserAllowedAccessAsync(long userRequestingAccessToDraft, Draft draft)
+        private async Task<(bool IsAllowedAccess, long UserId)> GetIsUserAllowedAccessAsync(
+            long userRequestingAccessToDraft, Draft draft)
         {
-            if (!await _fileRepository.GetFileExistsAsync(draft.DraftPath))
-            {
-                return (true, 0);
-            }
+            if (!await _fileRepository.GetFileExistsAsync(draft.DraftPath)) return (true, 0);
 
-            (bool IsAllowedAccess, long UserId) result =
+            var result =
                 await GetIsUserTheLastPersonThatWroteOnTheFileAsync(draft.DraftPath, userRequestingAccessToDraft);
 
             return (result.IsAllowedAccess || !IsInUse(draft.LastWrittenDateTime), result.UserId);
         }
 
-        private async Task<(bool IsAllowedAccess, long UserId)> GetIsUserTheLastPersonThatWroteOnTheFileAsync(string draftFilePath,
+        private async Task<(bool IsAllowedAccess, long UserId)> GetIsUserTheLastPersonThatWroteOnTheFileAsync(
+            string draftFilePath,
             long userId)
         {
-            string metaData = await _fileRepository.GetMetaDataAsync(draftFilePath, metaDataLastWrittenByUserId);
-            int lastAccessedByUserId = metaData.ToInt32();
+            var metaData = await _fileRepository.GetMetaDataAsync(draftFilePath, metaDataLastWrittenByUserId);
+            var lastAccessedByUserId = metaData.ToInt32();
             return (lastAccessedByUserId == 0 || lastAccessedByUserId == userId, lastAccessedByUserId);
         }
 
@@ -310,22 +278,21 @@ namespace ModernSlavery.BusinessLogic
 
         private async Task<ReturnViewModel> DeserialiseDraftContentAsync(string draftFilePath)
         {
-            string jsonDraftFileContents = await CheckBeforeReadAsync(draftFilePath);
+            var jsonDraftFileContents = await CheckBeforeReadAsync(draftFilePath);
 
             #region json serialiser settings
 
             var exceptions = new ConcurrentBag<Exception>();
 
-            var jsonSerializerSettings = new JsonSerializerSettings {
-                Error = delegate(object sender, ErrorEventArgs args) {
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                Error = delegate(object sender, ErrorEventArgs args)
+                {
                     exceptions.Add(new Exception(args.ErrorContext.Error.Message));
                     args.ErrorContext.Handled = true;
                 }
             };
-            if (exceptions.Count > 0)
-            {
-                throw new AggregateException($"Error De-serializing {draftFilePath}", exceptions);
-            }
+            if (exceptions.Count > 0) throw new AggregateException($"Error De-serializing {draftFilePath}", exceptions);
 
             #endregion
 
@@ -338,24 +305,23 @@ namespace ModernSlavery.BusinessLogic
 
             var exceptions = new ConcurrentBag<Exception>();
 
-            var jsonSerializerSettings = new JsonSerializerSettings {
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
                 NullValueHandling = NullValueHandling.Ignore,
                 DefaultValueHandling = DefaultValueHandling.Ignore,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                Error = delegate(object sender, ErrorEventArgs args) {
+                Error = delegate(object sender, ErrorEventArgs args)
+                {
                     exceptions.Add(new Exception(args.ErrorContext.Error.Message));
                     args.ErrorContext.Handled = true;
                 }
             };
-            if (exceptions.Count > 0)
-            {
-                throw new AggregateException($"Error serializing {draft.DraftPath}", exceptions);
-            }
+            if (exceptions.Count > 0) throw new AggregateException($"Error serializing {draft.DraftPath}", exceptions);
 
             #endregion
 
 
-            string serializedObject = JsonConvert.SerializeObject(
+            var serializedObject = JsonConvert.SerializeObject(
                 draft.ReturnViewModelContent,
                 Formatting.Indented,
                 jsonSerializerSettings);
@@ -363,13 +329,13 @@ namespace ModernSlavery.BusinessLogic
             return Encoding.UTF8.GetBytes(serializedObject);
         }
 
-        private async Task WriteAndTimestampAsync(Draft resultingDraft, byte[] contentToWrite, long userIdRequestingAccess)
+        private async Task WriteAndTimestampAsync(Draft resultingDraft, byte[] contentToWrite,
+            long userIdRequestingAccess)
         {
             await _fileRepository.WriteAsync(resultingDraft.DraftPath, contentToWrite);
             await SetMetadataAsync(resultingDraft, userIdRequestingAccess);
         }
 
         #endregion
-
     }
 }

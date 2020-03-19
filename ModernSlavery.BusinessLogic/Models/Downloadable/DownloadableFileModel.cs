@@ -8,7 +8,6 @@ namespace ModernSlavery.BusinessLogic.Models.Downloadable
 {
     public class DownloadableFileModel
     {
-
         public DownloadableFileModel(string filePath)
         {
             Filepath = filePath;
@@ -22,15 +21,9 @@ namespace ModernSlavery.BusinessLogic.Models.Downloadable
         {
             get
             {
-                if (Filepath.EndsWithI(".csv"))
-                {
-                    return "text/csv";
-                }
+                if (Filepath.EndsWithI(".csv")) return "text/csv";
 
-                if (Filepath.EndsWithI(".txt", ".log"))
-                {
-                    return "text/plain";
-                }
+                if (Filepath.EndsWithI(".txt", ".log")) return "text/plain";
 
                 return FileSystem.GetMimeMapping(Filename);
             }
@@ -42,6 +35,5 @@ namespace ModernSlavery.BusinessLogic.Models.Downloadable
 
         public DataTable DataTable { get; set; }
         public string Name { get; set; }
-
     }
 }

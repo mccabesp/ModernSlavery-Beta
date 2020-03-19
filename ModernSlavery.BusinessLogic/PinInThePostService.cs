@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
@@ -12,38 +10,39 @@ namespace ModernSlavery.BusinessLogic
 {
     public class PinInThePostService : IPinInThePostService
     {
-
         private const int NotifyAddressLineLength = 35;
+        private readonly ICustomLogger CustomLogger;
 
         private readonly GlobalOptions GlobalOptions;
         private readonly IGovNotifyAPI govNotifyApi;
-        private readonly ICustomLogger CustomLogger;
 
         public PinInThePostService(GlobalOptions globalOptions, ICustomLogger customLogger, IGovNotifyAPI govNotifyApi)
         {
             GlobalOptions = globalOptions;
-            this.CustomLogger = customLogger;
+            CustomLogger = customLogger;
             this.govNotifyApi = govNotifyApi;
         }
 
-        public bool SendPinInThePost(UserOrganisation userOrganisation, string pin, string returnUrl, out string letterId)
+        public bool SendPinInThePost(UserOrganisation userOrganisation, string pin, string returnUrl,
+            out string letterId)
         {
-            string userFullNameAndJobTitle = $"{userOrganisation.User.Fullname} ({userOrganisation.User.JobTitle})";
+            var userFullNameAndJobTitle = $"{userOrganisation.User.Fullname} ({userOrganisation.User.JobTitle})";
 
-            string companyName = userOrganisation.Organisation.OrganisationName;
+            var companyName = userOrganisation.Organisation.OrganisationName;
 
-            List<string> address = GetAddressInFourLineFormat(userOrganisation.Organisation);
+            var address = GetAddressInFourLineFormat(userOrganisation.Organisation);
 
-            string postCode = userOrganisation.Organisation.OrganisationAddresses.OrderByDescending(a => a.Modified)
+            var postCode = userOrganisation.Organisation.OrganisationAddresses.OrderByDescending(a => a.Modified)
                 .FirstOrDefault()
                 .PostCode;
 
             //string returnUrl = controller.Url.Action(nameof(OrganisationController.ManageOrganisations), "Organisation", null, "https");
-            DateTime pinExpiryDate = VirtualDateTime.Now.AddDays(GlobalOptions.PinInPostExpiryDays);
+            var pinExpiryDate = VirtualDateTime.Now.AddDays(GlobalOptions.PinInPostExpiryDays);
 
-            string templateId = GlobalOptions.GovUkNotifyPinInThePostTemplateId;
+            var templateId = GlobalOptions.GovUkNotifyPinInThePostTemplateId;
 
-            var personalisation = new Dictionary<string, dynamic> {
+            var personalisation = new Dictionary<string, dynamic>
+            {
                 {"address_line_1", userFullNameAndJobTitle},
                 {"address_line_2", companyName},
                 {"address_line_3", address.Count > 0 ? address[0] : ""},
@@ -70,7 +69,7 @@ namespace ModernSlavery.BusinessLogic
 
         public List<string> GetAddressInFourLineFormat(Organisation organisation)
         {
-            List<string> address = GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(organisation);
+            var address = GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(organisation);
 
             ReduceAddressToAtMostFourLines(address);
 
@@ -81,52 +80,32 @@ namespace ModernSlavery.BusinessLogic
         {
             var address = new List<string>();
 
-            OrganisationAddress latestAddress = organisation.OrganisationAddresses.OrderByDescending(a => a.Modified).FirstOrDefault();
+            var latestAddress = organisation.OrganisationAddresses.OrderByDescending(a => a.Modified).FirstOrDefault();
 
             if (!string.IsNullOrWhiteSpace(latestAddress.PoBox))
             {
-                string poBox = latestAddress.PoBox;
-                if (!poBox.Contains("PO Box", StringComparison.OrdinalIgnoreCase))
-                {
-                    poBox = $"PO Box {poBox}";
-                }
+                var poBox = latestAddress.PoBox;
+                if (!poBox.Contains("PO Box", StringComparison.OrdinalIgnoreCase)) poBox = $"PO Box {poBox}";
 
                 address.Add("PO Box " + poBox);
             }
 
-            if (!string.IsNullOrWhiteSpace(latestAddress.Address1))
-            {
-                address.Add(latestAddress.Address1);
-            }
+            if (!string.IsNullOrWhiteSpace(latestAddress.Address1)) address.Add(latestAddress.Address1);
 
-            if (!string.IsNullOrWhiteSpace(latestAddress.Address2))
-            {
-                address.Add(latestAddress.Address2);
-            }
+            if (!string.IsNullOrWhiteSpace(latestAddress.Address2)) address.Add(latestAddress.Address2);
 
-            if (!string.IsNullOrWhiteSpace(latestAddress.Address3))
-            {
-                address.Add(latestAddress.Address3);
-            }
+            if (!string.IsNullOrWhiteSpace(latestAddress.Address3)) address.Add(latestAddress.Address3);
 
-            if (!string.IsNullOrWhiteSpace(latestAddress.TownCity))
-            {
-                address.Add(latestAddress.TownCity);
-            }
+            if (!string.IsNullOrWhiteSpace(latestAddress.TownCity)) address.Add(latestAddress.TownCity);
 
-            if (!string.IsNullOrWhiteSpace(latestAddress.County))
-            {
-                address.Add(latestAddress.County);
-            }
+            if (!string.IsNullOrWhiteSpace(latestAddress.County)) address.Add(latestAddress.County);
 
             // Gov.UK Notify can only send post to the UK, so there's no need
             // to have 'UK' or 'United Kingdom' as part of the address
             if (!string.IsNullOrWhiteSpace(latestAddress.Country)
                 && latestAddress.Country.ToUpper() != "UNITED KINGDOM"
                 && latestAddress.Country.ToUpper() != "UK")
-            {
                 address.Add(latestAddress.Country);
-            }
 
             return address;
         }
@@ -136,17 +115,13 @@ namespace ModernSlavery.BusinessLogic
             // The address might be up to 7 lines, to start with,
             // so we might need to remove up to 3 lines
             for (var i = 0; i < 3; i++)
-            {
                 if (address.Count > 4)
-                {
                     ReduceByOneLine(address);
-                }
-            }
 
             if (address.Count > 4)
             {
                 // If the address is still more than 4 lines long, log an Error and chop off the end
-                List<string> originalAddress = address.ToList(); // Take a copy of the list for the log message
+                var originalAddress = address.ToList(); // Take a copy of the list for the log message
                 address.RemoveRange(4, address.Count - 1);
 
                 CustomLogger.Error(
@@ -158,14 +133,14 @@ namespace ModernSlavery.BusinessLogic
         private static void ReduceByOneLine(List<string> address)
         {
             // Loop through all pairs of lines, starting at the end of the address
-            for (int currentLineNumber = address.Count - 2; currentLineNumber > 0; currentLineNumber--)
+            for (var currentLineNumber = address.Count - 2; currentLineNumber > 0; currentLineNumber--)
             {
-                string currentLine = address[currentLineNumber];
-                string nextLine = address[currentLineNumber + 1];
+                var currentLine = address[currentLineNumber];
+                var nextLine = address[currentLineNumber + 1];
 
                 if (currentLine.Length + nextLine.Length < NotifyAddressLineLength)
                 {
-                    string concatenatedLines = currentLine + ", " + nextLine;
+                    var concatenatedLines = currentLine + ", " + nextLine;
                     address.RemoveRange(currentLineNumber, 2);
                     address.Insert(currentLineNumber, concatenatedLines);
 
@@ -174,6 +149,5 @@ namespace ModernSlavery.BusinessLogic
                 }
             }
         }
-
     }
 }

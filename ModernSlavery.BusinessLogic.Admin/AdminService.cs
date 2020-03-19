@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Autofac.Features.AttributeFilters;
+﻿using Autofac.Features.AttributeFilters;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.SharedKernel;
@@ -27,12 +24,12 @@ namespace ModernSlavery.BusinessLogic.Admin
         ICommonBusinessLogic CommonBusinessLogic { get; }
     }
 
-    public class AdminService: IAdminService
+    public class AdminService : IAdminService
     {
         public AdminService(
-            [KeyFilter(Filenames.ManualChangeLog)]ILogRecordLogger manualChangeLog,
-            [KeyFilter(Filenames.BadSicLog)]ILogRecordLogger badSicLog,
-            [KeyFilter(Filenames.RegistrationLog)]ILogRecordLogger registrationLog,
+            [KeyFilter(Filenames.ManualChangeLog)] ILogRecordLogger manualChangeLog,
+            [KeyFilter(Filenames.BadSicLog)] ILogRecordLogger badSicLog,
+            [KeyFilter(Filenames.RegistrationLog)] ILogRecordLogger registrationLog,
             IShortCodesRepository shortCodesRepository,
             IOrganisationBusinessLogic organisationBusinessLogic,
             ISearchBusinessLogic searchBusinessLogic,
