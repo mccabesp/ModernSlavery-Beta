@@ -1,9 +1,8 @@
-@using ModernSlavery.Core
-@using ModernSlavery.Entities
 @using GovUkDesignSystem
-@using GovUkDesignSystem.GovUkDesignSystemComponents
+@using ModernSlavery.BusinessLogic
+@using ModernSlavery.SharedKernel.Options
 @model List<ModernSlavery.Entities.UserOrganisation>
-
+@inject GlobalOptions globalOptions;
 @{
     ViewBag.Title = "Unconfirmed PINs in the Post - Administration - Modern Slavery Reporting service";
     Layout = "~/Views/GovUkFrontend/GovUkFrontendLayout.cshtml";
@@ -73,7 +72,7 @@
                     </span>
                     <br/>
                     <span class="govuk-!-font-size-16">
-                        @(userOrganisation.PINSentDate.Value.AddDays(Global.PinInPostExpiryDays).ToString("ddd d MMM yyyy"))
+                        @(userOrganisation.PINSentDate.Value.AddDays(globalOptions.PinInPostExpiryDays).ToString("ddd d MMM yyyy"))
                     </span>
                 </td>
                 <td class="govuk-table__cell">

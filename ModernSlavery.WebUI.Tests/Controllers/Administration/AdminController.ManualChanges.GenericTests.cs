@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.TestHelpers;
@@ -17,6 +16,7 @@ using NUnit.Framework;
 using ModernSlavery.WebUI.Tests;
 using ModernSlavery.WebUI.Admin.Controllers;
 using ModernSlavery.WebUI.Admin.Models;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 {

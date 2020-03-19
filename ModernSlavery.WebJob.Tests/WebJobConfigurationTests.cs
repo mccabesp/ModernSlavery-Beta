@@ -1,6 +1,6 @@
 ﻿using System;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Tests.Common.Classes;
 using NUnit.Framework;
 
 namespace ModernSlavery.WebJob.Tests
@@ -12,7 +12,7 @@ namespace ModernSlavery.WebJob.Tests
         [SetUp]
         public void Setup()
         {
-            VirtualDateTime.Initialise(Config.OffsetCurrentDateTimeForSite());
+            VirtualDateTime.Initialise(ConfigHelpers.GlobalOptions.DateTimeOffset);
         }
 
         [Test]

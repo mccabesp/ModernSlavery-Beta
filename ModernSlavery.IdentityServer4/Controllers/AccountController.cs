@@ -10,9 +10,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
-using ModernSlavery.Core;
 using ModernSlavery.Extensions;
-using ModernSlavery.IdentityServer4.Classes;
 using ModernSlavery.IdentityServer4.Models.Account;
 using IdentityModel;
 using IdentityServer4;
@@ -24,12 +22,15 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Models.Account;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models.AccountModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.IdentityServer4.Classes;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.IdentityServer4.Controllers
 {
@@ -46,21 +47,23 @@ namespace ModernSlavery.IdentityServer4.Controllers
         private readonly IClientStore _clientStore;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
+        private readonly IEventService _events;
+
         private readonly IUserRepository _userRepository;
 
         public AccountController(
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
-            IUserRepository userRepository,
             IEventService events,
-            IDistributedCache cache,
-            ILogger<AccountController> logger) : base(events, cache, logger)
+            IUserRepository userRepository,
+            ILogger<AccountController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             _userRepository = userRepository;
             _interaction = interaction;
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
+            _events = events;
         }
 
 
@@ -79,7 +82,7 @@ namespace ModernSlavery.IdentityServer4.Controllers
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
             {
-                return Redirect(Startup.SiteAuthority + "manage-organisations");
+                return Redirect(CommonBusinessLogic.GlobalOptions.SiteAuthority + "manage-organisations");
             }
 
             // build a model so we know what to show on the login page
@@ -215,14 +218,14 @@ namespace ModernSlavery.IdentityServer4.Controllers
                 {
                     //Prompt unknown users same as with known users to prevent guessing of valid usernames
                     //Note: Its OK here to use the local web cache since sticky sessions are used by Azure
-                    string login = await _cache.GetStringAsync($"{model.Username}:login");
+                    string login = await WebService.Cache.GetAsync<string>($"{model.Username}:login");
 
                     DateTime loginDate = string.IsNullOrWhiteSpace(login) ? DateTime.MinValue : login.BeforeFirst("|").ToDateTime();
                     int loginAttempts = string.IsNullOrWhiteSpace(login) ? 0 : login.AfterFirst("|").ToInt32();
                     TimeSpan lockRemaining = loginDate == DateTime.MinValue
                         ? TimeSpan.Zero
-                        : loginDate.AddMinutes(Global.LockoutMinutes) - VirtualDateTime.Now;
-                    if (loginAttempts >= Global.MaxLoginAttempts && lockRemaining > TimeSpan.Zero)
+                        : loginDate.AddMinutes(CommonBusinessLogic.GlobalOptions.LockoutMinutes) - VirtualDateTime.Now;
+                    if (loginAttempts >= CommonBusinessLogic.GlobalOptions.MaxLoginAttempts && lockRemaining > TimeSpan.Zero)
                     {
                         await _events.RaiseAsync(
                             new UserLoginFailureEvent(model.Username, AccountOptions.TooManySigninAttemptsErrorMessage));
@@ -235,10 +238,7 @@ namespace ModernSlavery.IdentityServer4.Controllers
                         await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "Invalid user"));
                         ModelState.AddModelError("", AccountOptions.InvalidCredentialsErrorMessage);
                         loginAttempts++;
-                        var cacheOptions = new DistributedCacheEntryOptions {
-                            AbsoluteExpiration = VirtualDateTime.Now.AddMinutes(Global.LockoutMinutes)
-                        };
-                        await _cache.SetStringAsync($"{model.Username}:login", $"{VirtualDateTime.Now}|{loginAttempts}", cacheOptions);
+                        await WebService.Cache.AddAsync($"{model.Username}:login", $"{VirtualDateTime.Now}|{loginAttempts}",absoluteExpiration: VirtualDateTime.Now.AddMinutes(CommonBusinessLogic.GlobalOptions.LockoutMinutes));
                     }
                 }
             }
@@ -258,7 +258,7 @@ namespace ModernSlavery.IdentityServer4.Controllers
             //If there is no logoutid then sign-out via webui
             if (string.IsNullOrWhiteSpace(logoutId))
             {
-                return Redirect(Startup.SiteAuthority + "sign-out");
+                return Redirect(CommonBusinessLogic.GlobalOptions.SiteAuthority + "sign-out");
             }
 
             // build a model so the logout page knows what to display
@@ -374,6 +374,7 @@ namespace ModernSlavery.IdentityServer4.Controllers
             return vm;
         }
 
+
         private async Task<LogoutViewModel> BuildLogoutViewModelAsync(string logoutId)
         {
             // get context information (client name, post logout redirect URI and iframe for federated signout)
@@ -383,20 +384,22 @@ namespace ModernSlavery.IdentityServer4.Controllers
                 ShowLogoutPrompt = AccountOptions.ShowLogoutPrompt,
                 AutomaticRedirectAfterSignOut = AccountOptions.AutomaticRedirectAfterSignOut,
                 PostLogoutRedirectUri = logout?.PostLogoutRedirectUri,
+                ClientId = logout.ClientId,
                 ClientName = string.IsNullOrEmpty(logout?.ClientName) ? logout?.ClientId : logout?.ClientName,
                 LogoutId = logoutId
             };
 
             //Get the logout properties per client 
-            if (vm.Client.Properties.ContainsKey("AutomaticRedirectAfterSignOut"))
+            var client = await _clientStore.FindClientByIdAsync(vm.ClientId);
+            if (client.Properties.ContainsKey("AutomaticRedirectAfterSignOut"))
             {
-                vm.AutomaticRedirectAfterSignOut = vm.Client.Properties["AutomaticRedirectAfterSignOut"]
+                vm.AutomaticRedirectAfterSignOut = client.Properties["AutomaticRedirectAfterSignOut"]
                     .ToBoolean(AccountOptions.AutomaticRedirectAfterSignOut);
             }
 
-            if (vm.Client.Properties.ContainsKey("ShowLogoutPrompt"))
+            if (client.Properties.ContainsKey("ShowLogoutPrompt"))
             {
-                vm.ShowLogoutPrompt = vm.Client.Properties["ShowLogoutPrompt"].ToBoolean(AccountOptions.ShowLogoutPrompt);
+                vm.ShowLogoutPrompt = client.Properties["ShowLogoutPrompt"].ToBoolean(AccountOptions.ShowLogoutPrompt);
             }
 
             if (User?.Identity.IsAuthenticated != true)
@@ -426,15 +429,18 @@ namespace ModernSlavery.IdentityServer4.Controllers
             var vm = new LoggedOutViewModel {
                 AutomaticRedirectAfterSignOut = AccountOptions.AutomaticRedirectAfterSignOut,
                 PostLogoutRedirectUri = logout?.PostLogoutRedirectUri,
+                ClientId = logout.ClientId,
                 ClientName = string.IsNullOrEmpty(logout?.ClientName) ? logout?.ClientId : logout?.ClientName,
                 SignOutIframeUrl = logout?.SignOutIFrameUrl,
                 LogoutId = logoutId
             };
 
             //Get the logout properties per client 
-            if (vm.Client.Properties.ContainsKey("AutomaticRedirectAfterSignOut"))
+            var client = await _clientStore.FindClientByIdAsync(vm.ClientId);
+
+            if (client.Properties.ContainsKey("AutomaticRedirectAfterSignOut"))
             {
-                vm.AutomaticRedirectAfterSignOut = vm.Client.Properties["AutomaticRedirectAfterSignOut"]
+                vm.AutomaticRedirectAfterSignOut = client.Properties["AutomaticRedirectAfterSignOut"]
                     .ToBoolean(AccountOptions.AutomaticRedirectAfterSignOut);
             }
 

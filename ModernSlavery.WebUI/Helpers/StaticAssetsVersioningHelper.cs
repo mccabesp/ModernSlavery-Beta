@@ -4,12 +4,25 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Helpers
 {
-    public static class StaticAssetsVersioningHelper
+    public interface IStaticAssetsVersioningHelper
     {
+        string GetAppCssFilename();
+        string GetAppIe8CssFilename();
+        string GetAppJsFilename();
+    }
+
+    public class StaticAssetsVersioningHelper : IStaticAssetsVersioningHelper
+    {
+        public StaticAssetsVersioningHelper(GlobalOptions globalOptions)
+        {
+            _globalOptions = globalOptions;
+        }
+
+        private readonly GlobalOptions _globalOptions;
         private const string PathFromExecutableToWwwRoot = "wwwroot";
         private const string CompiledDirectory = "compiled";
 
@@ -17,15 +30,15 @@ namespace ModernSlavery.WebUI.Helpers
         private const string AppIe8CssRegex = "app-ie8-[^-]*.css";
         private const string AppJsRegex = "app-.*.js";
 
-        private static Dictionary<string, string> cachedFilenames = new Dictionary<string, string>();
+        private Dictionary<string, string> cachedFilenames = new Dictionary<string, string>();
 
-        public static string GetAppCssFilename() => GetStaticFile(CompiledDirectory, AppCssRegex);
-        public static string GetAppIe8CssFilename() => GetStaticFile(CompiledDirectory, AppIe8CssRegex);
-        public static string GetAppJsFilename() => GetStaticFile(CompiledDirectory, AppJsRegex);
+        public string GetAppCssFilename() => GetStaticFile(CompiledDirectory, AppCssRegex);
+        public string GetAppIe8CssFilename() => GetStaticFile(CompiledDirectory, AppIe8CssRegex);
+        public string GetAppJsFilename() => GetStaticFile(CompiledDirectory, AppJsRegex);
 
-        private static string GetStaticFile(string directory, string fileRegex)
+        private string GetStaticFile(string directory, string fileRegex)
         {
-            if (Config.IsLocal())
+            if (_globalOptions.IsLocal())
             {
                 // When developing locally, skip the cache
                 return FindMatchingFile(directory, fileRegex);
@@ -45,7 +58,7 @@ namespace ModernSlavery.WebUI.Helpers
             }
         }
 
-        private static string FindMatchingFile(string directory, string fileRegex)
+        private string FindMatchingFile(string directory, string fileRegex)
         {
             string executablePath = Assembly.GetEntryAssembly().Location;
             string executableDirectory = Path.GetDirectoryName(executablePath);

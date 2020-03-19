@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -52,7 +51,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
             if (!stashedReturnViewModel.ReportInfo.Draft.IsUserAllowedAccess)
             {
                 this.CleanModelErrors<ReturnViewModel>();
-                return View("CustomError", new ErrorViewModel(3040));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(3040));
             }
 
             stashedReturnViewModel.ReturnUrl = returnUrl;
@@ -104,7 +103,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
             if (!stashedReturnViewModel.ReportInfo.Draft.IsUserAllowedAccess)
             {
                 this.CleanModelErrors<ReturnViewModel>();
-                return View("CustomError", new ErrorViewModel(3040));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(3040));
             }
 
             #endregion

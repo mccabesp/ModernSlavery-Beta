@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
@@ -27,10 +26,10 @@ namespace ModernSlavery.WebJob
 
             try
             {
-                string filePath = Path.Combine(Global.DownloadsPath, Filenames.OrphanOrganisations);
+                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.OrphanOrganisations);
 
                 //Dont execute on startup if file already exists
-                if (!StartedJobs.Contains(funcName) && await FileRepository.GetFileExistsAsync(filePath))
+                if (!StartedJobs.Contains(funcName) && await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     log.LogDebug($"Skipped {funcName} at start up.");
                     return;
@@ -83,8 +82,8 @@ namespace ModernSlavery.WebJob
                         foreach (UnregisteredOrganisationsFileModel model in unregisteredOrganisations)
                         {
                             // get organisation scope and submission per year
-                            Return returnByYear = await _SubmissionBL.GetLatestSubmissionBySnapshotYearAsync(model.OrganisationId, year);
-                            OrganisationScope scopeByYear = await _ScopeBL.GetLatestScopeBySnapshotYearAsync(model.OrganisationId, year);
+                            Return returnByYear = await _SubmissionBusinessLogic.GetLatestSubmissionBySnapshotYearAsync(model.OrganisationId, year);
+                            OrganisationScope scopeByYear = await _ScopeBusinessLogic.GetLatestScopeBySnapshotYearAsync(model.OrganisationId, year);
 
                             // update file model with year data
                             model.HasSubmitted = returnByYear == null ? "False" : "True";
@@ -103,8 +102,8 @@ namespace ModernSlavery.WebJob
         private async Task<List<UnregisteredOrganisationsFileModel>> GetOrphanOrganisationsAsync()
         {
             // Get all the latest organisations with no registrations
-            DateTime pinExpiresDate = Global.PinExpiresDate;
-            List<Organisation> unregisteredOrgs = await DataRepository.GetAll<Organisation>()
+            DateTime pinExpiresDate = _CommonBusinessLogic.GlobalOptions.PinExpiresDate;
+            List<Organisation> unregisteredOrgs = await _CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                 .Where(
                     o => o.Status == OrganisationStatuses.Active
                          && (o.LatestScope.ScopeStatus == ScopeStatuses.InScope

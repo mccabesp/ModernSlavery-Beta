@@ -1,11 +1,10 @@
-﻿using ModernSlavery.Core;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models.HttpResultModels;
-using ModernSlavery.Extensions;
+﻿using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessLogic;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -18,9 +17,7 @@ namespace ModernSlavery.WebUI.Controllers
         #region Constructors
 
         public ActionHubController(
-            ILogger<ActionHubController> logger,
-            IWebService webService,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<ActionHubController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
         }
 
@@ -28,7 +25,7 @@ namespace ModernSlavery.WebUI.Controllers
 
         private bool UseNewActionHub()
         {
-            return VirtualDateTime.Now >= Global.ActionHubSwitchOverDate;
+            return VirtualDateTime.Now >= CommonBusinessLogic.GlobalOptions.ActionHubSwitchOverDate;
         }
 
         // GET: ActionHub

@@ -9,6 +9,7 @@ using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Options;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.Infrastructure.Logging
@@ -16,15 +17,17 @@ namespace ModernSlavery.Infrastructure.Logging
     public class UserLogRecord : LogRecordLogger, IUserLogRecord
     {
 
-        public UserLogRecord(LogRecordQueue queue)
-            : base(queue, AppDomain.CurrentDomain.FriendlyName, Filenames.UserLog) { }
+        public UserLogRecord(
+            GlobalOptions globalOptions,
+            LogRecordQueue queue)
+            : base(globalOptions,queue, AppDomain.CurrentDomain.FriendlyName, Filenames.UserLog) { }
 
         public async Task LogEmailChangedAsync(string oldEmailAddress,
             string newEmailAddress,
             User userToUpdate,
             string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix))
             {
                 return;
             }
@@ -42,7 +45,7 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task LogPasswordChangedAsync(User userToUpdate, string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix))
             {
                 return;
             }
@@ -63,7 +66,7 @@ namespace ModernSlavery.Infrastructure.Logging
             User userToUpdate,
             string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix))
             {
                 return;
             }
@@ -81,7 +84,7 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task LogUserRetiredAsync(User retiredUser, string actionByEmailAddress)
         {
-            if (retiredUser.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (retiredUser.EmailAddress.StartsWithI(GlobalOptions.TestPrefix))
             {
                 return;
             }

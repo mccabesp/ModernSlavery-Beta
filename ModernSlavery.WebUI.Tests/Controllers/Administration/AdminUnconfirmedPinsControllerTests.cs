@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;

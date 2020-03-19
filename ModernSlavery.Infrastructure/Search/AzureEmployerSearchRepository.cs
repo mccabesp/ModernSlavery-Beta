@@ -15,12 +15,14 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Options;
 using Index = Microsoft.Azure.Search.Models.Index;
 
 namespace ModernSlavery.Infrastructure.Search
 {
     public class AzureEmployerSearchRepository : ISearchRepository<EmployerSearchModel>
     {
+        private readonly GlobalOptions GlobalOptions;
         public readonly ILogRecordLogger SearchLog;
         private const string suggestorName = "sgOrgName";
         private const string synonymMapName = "desc-synonymmap";
@@ -34,6 +36,7 @@ namespace ModernSlavery.Infrastructure.Search
         public string IndexName { get; }
 
         public AzureEmployerSearchRepository(
+            GlobalOptions globalOptions,
             [KeyFilter(Filenames.SearchLog)]ILogRecordLogger searchLog,
             string serviceName,
             string indexName,
@@ -42,6 +45,7 @@ namespace ModernSlavery.Infrastructure.Search
             TelemetryClient telemetryClient = null, 
             bool disabled=false)
         {
+            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
             Disabled = disabled;
             if (disabled)
             {
@@ -136,9 +140,9 @@ namespace ModernSlavery.Infrastructure.Search
             }
 
             //Remove all test organisations
-            if (!string.IsNullOrWhiteSpace(Global.TestPrefix))
+            if (!string.IsNullOrWhiteSpace(GlobalOptions.TestPrefix))
             {
-                newRecords = newRecords.Where(e => !e.Name.StartsWithI(Global.TestPrefix));
+                newRecords = newRecords.Where(e => !e.Name.StartsWithI(GlobalOptions.TestPrefix));
             }
 
             //Ensure the records are ordered by name

@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Filters;
-using ModernSlavery.Core.Models.HttpResultModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -11,13 +8,17 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 using Moq;
 
 using NUnit.Framework;
 
 namespace ModernSlavery.API.Tests.Filters
 {
-    public class AllowOnlyTrustedIpsAttributeTests
+    public class AllowOnlyTrustedDomainsAttributeTests
     {
 
         private string _rememberGlobalTrustedIpDomainsValueBeforeEachTest;
@@ -25,17 +26,17 @@ namespace ModernSlavery.API.Tests.Filters
         [SetUp]
         public void SetUp()
         {
-            _rememberGlobalTrustedIpDomainsValueBeforeEachTest = Global.TrustedIPDomains;
+            _rememberGlobalTrustedIpDomainsValueBeforeEachTest = ConfigHelpers.GlobalOptions.TrustedIPDomains;
         }
 
         [TearDown]
         public void TearDown()
         {
-            Global.TrustedIPDomains = _rememberGlobalTrustedIpDomainsValueBeforeEachTest;
+            ConfigHelpers.GlobalOptions.TrustedIPDomains = _rememberGlobalTrustedIpDomainsValueBeforeEachTest;
         }
 
         [Test]
-        public void AllowOnlyTrustedIpsAttribute_Succeeds_When_HttpContext_Is_Not_Null()
+        public void AllowOnlyTrustedDomainsAttribute_Succeeds_When_HttpContext_Is_Not_Null()
         {
             // Arrange
             var ipToTest = "26.0.45.1";
@@ -55,19 +56,19 @@ namespace ModernSlavery.API.Tests.Filters
 
             var context = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), null);
 
-            Global.TrustedIPDomains = ipToTest + ",68.91.0.0.1,47.217.217.217";
+            ConfigHelpers.GlobalOptions.TrustedIPDomains = ipToTest + ",68.91.0.0.1,47.217.217.217";
 
-            var allowOnlyTrustedIpsAttribute = new AllowOnlyTrustedIps();
+            var AllowOnlyTrustedDomainsAttribute = new AllowOnlyTrustedDomainsAttribute();
 
             // Act
-            allowOnlyTrustedIpsAttribute.OnActionExecuting(context);
+            AllowOnlyTrustedDomainsAttribute.OnActionExecuting(context);
 
             // Assert
             Assert.Null(context.Result);
         }
 
         [Test]
-        public void AllowOnlyTrustedIpsAttribute_Forbids_When_Unable_To_Read_Host_Address_Info()
+        public void AllowOnlyTrustedDomainsAttribute_Forbids_When_Unable_To_Read_Host_Address_Info()
         {
             // Arrange
             var httpConnectionFeature = new Mock<IHttpConnectionFeature>();
@@ -76,7 +77,7 @@ namespace ModernSlavery.API.Tests.Filters
                 .Returns(IPAddress.Parse("34.33.33.1"));
 
             string actualLoggedMessage = string.Empty;
-            var configurableLogger = new Mock<ILogger<AllowOnlyTrustedIps>>();
+            var configurableLogger = new Mock<ILogger<AllowOnlyTrustedDomainsAttribute>>();
 
             configurableLogger
                 .Setup(
@@ -115,12 +116,12 @@ namespace ModernSlavery.API.Tests.Filters
 
             var context = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), null);
 
-            Global.TrustedIPDomains = "15.0.64.1";
+            ConfigHelpers.GlobalOptions.TrustedIPDomains = "15.0.64.1";
 
-            var allowOnlyTrustedIpsAttribute = new AllowOnlyTrustedIps(AllowOnlyTrustedIps.IpRangeTypes.TrustedIPDomains);
+            var AllowOnlyTrustedDomainsAttribute = new AllowOnlyTrustedDomainsAttribute();
 
             // Act
-            allowOnlyTrustedIpsAttribute.OnActionExecuting(context);
+            AllowOnlyTrustedDomainsAttribute.OnActionExecuting(context);
             var expectedHttpStatusCodeResult403 = context.Result as HttpForbiddenResult;
 
             // Assert
@@ -134,7 +135,7 @@ namespace ModernSlavery.API.Tests.Filters
         }
 
         [Test]
-        public void AllowOnlyTrustedIpsAttribute_Forbids_When_Address_Is_Not_On_Trusted_List()
+        public void AllowOnlyTrustedDomainsAttribute_Forbids_When_Address_Is_Not_On_Trusted_List()
         {
             // Arrange
             var httpConnectionFeature = new Mock<IHttpConnectionFeature>();
@@ -143,7 +144,7 @@ namespace ModernSlavery.API.Tests.Filters
                 .Returns(IPAddress.Parse("45.33.33.1")); // address NOT on trusted list
 
             string actualLoggedMessage = string.Empty;
-            var configurableLogger = new Mock<ILogger<AllowOnlyTrustedIps>>();
+            var configurableLogger = new Mock<ILogger<AllowOnlyTrustedDomainsAttribute>>();
 
             configurableLogger
                 .Setup(
@@ -182,12 +183,12 @@ namespace ModernSlavery.API.Tests.Filters
 
             var context = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), null);
 
-            Global.TrustedIPDomains = "25.0.64.1,101.102.103.104";
+            ConfigHelpers.GlobalOptions.TrustedIPDomains = "25.0.64.1,101.102.103.104";
 
-            var allowOnlyTrustedIpsAttribute = new AllowOnlyTrustedIps(AllowOnlyTrustedIps.IpRangeTypes.TrustedIPDomains);
+            var AllowOnlyTrustedDomainsAttribute = new AllowOnlyTrustedDomainsAttribute();
 
             // Act
-            allowOnlyTrustedIpsAttribute.OnActionExecuting(context);
+            AllowOnlyTrustedDomainsAttribute.OnActionExecuting(context);
             var expectedHttpStatusCodeResult403 = context.Result as HttpForbiddenResult;
 
             // Assert
@@ -201,7 +202,7 @@ namespace ModernSlavery.API.Tests.Filters
         }
 
         [Test]
-        public void AllowOnlyTrustedIpsAttribute_Logs_Controller_Name_If_Known()
+        public void AllowOnlyTrustedDomainsAttribute_Logs_Controller_Name_If_Known()
         {
             // Arrange
             var httpConnectionFeature = new Mock<IHttpConnectionFeature>();
@@ -210,7 +211,7 @@ namespace ModernSlavery.API.Tests.Filters
                 .Returns(IPAddress.Parse("96.97.98.99")); // address NOT on trusted list
 
             string actualLoggedMessage = string.Empty;
-            var configurableLogger = new Mock<ILogger<AllowOnlyTrustedIps>>();
+            var configurableLogger = new Mock<ILogger<AllowOnlyTrustedDomainsAttribute>>();
 
             configurableLogger
                 .Setup(
@@ -253,12 +254,12 @@ namespace ModernSlavery.API.Tests.Filters
                 new Dictionary<string, object>(),
                 new OnlyForTestingPleaseIgnoreThisController());
 
-            Global.TrustedIPDomains = "25.26.27.28,31.32.33.34";
+            ConfigHelpers.GlobalOptions.TrustedIPDomains = "25.26.27.28,31.32.33.34";
 
-            var allowOnlyTrustedIpsAttribute = new AllowOnlyTrustedIps(AllowOnlyTrustedIps.IpRangeTypes.TrustedIPDomains);
+            var AllowOnlyTrustedDomainsAttribute = new AllowOnlyTrustedDomainsAttribute();
 
             // Act
-            allowOnlyTrustedIpsAttribute.OnActionExecuting(context);
+            AllowOnlyTrustedDomainsAttribute.OnActionExecuting(context);
             var expectedHttpStatusCodeResult403 = context.Result as HttpForbiddenResult;
 
             // Assert
@@ -267,7 +268,7 @@ namespace ModernSlavery.API.Tests.Filters
             Assert.IsNull(expectedHttpStatusCodeResult403.ContentType);
 
             var expectedLoggedMessage =
-                "Access to controller ModernSlavery.API.Tests.Filters.AllowOnlyTrustedIpsAttributeTests+OnlyForTestingPleaseIgnoreThisController was forbidden for address 96.97.98.99 as it is not part of the configured ips TrustedIPDomains";
+                "Access to controller ModernSlavery.API.Tests.Filters.AllowOnlyTrustedDomainsAttributeTests+OnlyForTestingPleaseIgnoreThisController was forbidden for address 96.97.98.99 as it is not part of the configured ips TrustedIPDomains";
             Assert.AreEqual(expectedLoggedMessage, actualLoggedMessage);
         }
 

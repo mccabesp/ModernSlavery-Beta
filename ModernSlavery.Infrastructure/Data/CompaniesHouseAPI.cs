@@ -9,9 +9,11 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.CompaniesHouse;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.Hosts.WebHost;
 using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using Newtonsoft.Json;
 using Polly;
 using Polly.Extensions.Http;
@@ -21,16 +23,17 @@ namespace ModernSlavery.Infrastructure
     public class CompaniesHouseAPI : ICompaniesHouseAPI
     {
 
-        public CompaniesHouseAPI(IOptions<CompaniesHouseOptions> options)
+        public CompaniesHouseAPI(CompaniesHouseOptions options, GlobalOptions globalOptions)
         {
-            Options = options?.Value ?? throw new ArgumentNullException("You must provide the companies house options", nameof(CompaniesHouseOptions));
-
+            Options = options ?? throw new ArgumentNullException("You must provide the companies house options", nameof(CompaniesHouseOptions));
+            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
             BaseUri = new Uri(Options.ApiServer);
             _apiKey = Options.ApiKey;
             MaxRecords = Options.MaxRecords;
         }
 
         private readonly CompaniesHouseOptions Options;
+        private readonly GlobalOptions GlobalOptions;
         private readonly Uri BaseUri;
         private readonly string _apiKey;
         public int MaxRecords { get; }
@@ -60,7 +63,7 @@ namespace ModernSlavery.Infrastructure
 
                 int id = Numeric.Rand(100000, int.MaxValue - 1);
                 var employer = new EmployerRecord {
-                    OrganisationName = Config.GetAppSetting("TestPrefix") + "_Ltd_" + id,
+                    OrganisationName = GlobalOptions.TestPrefix + "_Ltd_" + id,
                     CompanyNumber = ("_" + id).Left(10),
                     Address1 = "Test Address 1",
                     Address2 = "Test Address 2",

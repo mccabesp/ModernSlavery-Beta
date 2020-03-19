@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Models.Register;
 using Microsoft.AspNetCore.Authorization;
@@ -61,7 +59,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await DataRepository.GetAll<UserOrganisation>()
+            UserOrganisation userOrg = await CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             if (userOrg == null)
@@ -72,15 +70,15 @@ namespace ModernSlavery.WebUI.Controllers
             //Ensure they havent entered wrong pin too many times
             TimeSpan remaining = userOrg.ConfirmAttemptDate == null
                 ? TimeSpan.Zero
-                : userOrg.ConfirmAttemptDate.Value.AddMinutes(Global.LockoutMinutes) - VirtualDateTime.Now;
-            if (userOrg.ConfirmAttempts >= Global.MaxPinAttempts && remaining > TimeSpan.Zero)
+                : userOrg.ConfirmAttemptDate.Value.AddMinutes(CommonBusinessLogic.GlobalOptions.LockoutMinutes) - VirtualDateTime.Now;
+            if (userOrg.ConfirmAttempts >= CommonBusinessLogic.GlobalOptions.MaxPinAttempts && remaining > TimeSpan.Zero)
             {
-                return View("CustomError", new ErrorViewModel(1113, new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1113, new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
             }
 
             remaining = userOrg.PINSentDate == null
                 ? TimeSpan.Zero
-                : userOrg.PINSentDate.Value.AddDays(Global.PinInPostMinRepostDays) - VirtualDateTime.Now;
+                : userOrg.PINSentDate.Value.AddDays(CommonBusinessLogic.GlobalOptions.PinInPostMinRepostDays) - VirtualDateTime.Now;
             var model = new CompleteViewModel();
 
             model.PIN = null;
@@ -88,7 +86,7 @@ namespace ModernSlavery.WebUI.Controllers
             model.Remaining = remaining.ToFriendly(maxParts: 2);
 
             //If the email address is a test email then simulate sending
-            if (userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (userOrg.User.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
             {
                 model.PIN = "ABCDEF";
             }
@@ -119,17 +117,17 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await DataRepository.GetAll<UserOrganisation>()
+            UserOrganisation userOrg = await CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             ActionResult result1;
 
             TimeSpan remaining = userOrg.ConfirmAttemptDate == null
                 ? TimeSpan.Zero
-                : userOrg.ConfirmAttemptDate.Value.AddMinutes(Global.LockoutMinutes) - VirtualDateTime.Now;
-            if (userOrg.ConfirmAttempts >= Global.MaxPinAttempts && remaining > TimeSpan.Zero)
+                : userOrg.ConfirmAttemptDate.Value.AddMinutes(CommonBusinessLogic.GlobalOptions.LockoutMinutes) - VirtualDateTime.Now;
+            if (userOrg.ConfirmAttempts >= CommonBusinessLogic.GlobalOptions.MaxPinAttempts && remaining > TimeSpan.Zero)
             {
-                return View("CustomError", new ErrorViewModel(1113, new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1113, new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
             }
 
             var updateSearchIndex = false;
@@ -154,7 +152,7 @@ namespace ModernSlavery.WebUI.Controllers
                     Logger.LogWarning(
                         $"Attempt to PIN activate a {userOrg.Organisation.Status} organisation",
                         $"Organisation: '{userOrg.Organisation.OrganisationName}' Reference: '{userOrg.Organisation.EmployerReference}' User: '{currentUser.EmailAddress}'");
-                    return View("CustomError", new ErrorViewModel(1149));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1149));
                 }
 
                 //Set the latest registration
@@ -197,10 +195,10 @@ namespace ModernSlavery.WebUI.Controllers
             userOrg.ConfirmAttemptDate = VirtualDateTime.Now;
 
             //Save the changes
-            await DataRepository.SaveChangesAsync();
+            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Log the registration
-            if (!userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (!userOrg.User.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
             {
                 await RegistrationService.RegistrationLog.WriteAsync(
                     new RegisterLogModel {

@@ -37,16 +37,15 @@ namespace ModernSlavery.Infrastructure.Queue
 
         public static void RegisterLogRecord(this ContainerBuilder builder, string fileName)
         {
-            if (string.IsNullOrWhiteSpace(fileName))
-            {
-                throw new ArgumentNullException(nameof(fileName));
-            }
+            if (string.IsNullOrWhiteSpace(fileName))throw new ArgumentNullException(nameof(fileName));
 
             string applicationName = AppDomain.CurrentDomain.FriendlyName;
 
-            builder.Register(ctx => new LogRecordLogger(ctx.Resolve<LogRecordQueue>(), applicationName, fileName))
+            builder.RegisterType<LogRecordLogger>()
                 .Keyed<ILogRecordLogger>(fileName)
-                .SingleInstance();
+                .SingleInstance()
+                .WithParameter("applicationName", AppDomain.CurrentDomain.FriendlyName)
+                .WithParameter("fileName",fileName);
         }
 
         /// <summary>
@@ -56,7 +55,7 @@ namespace ModernSlavery.Infrastructure.Queue
         public static ILoggerFactory UseLogEventQueueLogger(this ILoggerFactory factory, IServiceProvider serviceProvider)
         {
             // Resolve filter options
-            var filterOptions = serviceProvider.GetService<IOptions<LoggerFilterOptions>>();
+            var filterOptions = serviceProvider.GetService<LoggerFilterOptions>();
 
             // Resolve the keyed queue from autofac
             var lifetimeScope = serviceProvider.GetService<ILifetimeScope>();
@@ -78,7 +77,7 @@ namespace ModernSlavery.Infrastructure.Queue
             ServiceProvider serviceProvider = builder.Services.BuildServiceProvider();
 
             // Resolve filter options
-            var filterOptions = serviceProvider.GetService<IOptions<LoggerFilterOptions>>();
+            var filterOptions = serviceProvider.GetService<LoggerFilterOptions>();
 
             // Resolve the keyed queue from autofac
             var lifetimeScope = serviceProvider.GetService<IContainer>();

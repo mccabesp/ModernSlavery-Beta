@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
@@ -44,7 +43,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
         [SetUp]
         public void InitialiseDbObjectsBeforeEachTest()
         {
-            Organisation org = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, Global.FirstReportingYear);
+            Organisation org = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.GlobalOptions.FirstReportingYear);
             org.SetSecurityCode(VirtualDateTime.Now.AddDays(90));
             _databaseAdminUser = UserHelper.GetDatabaseAdmin();
             _dbObjects = new object[] {org, _databaseAdminUser};
@@ -111,7 +110,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
         public async Task AdminController_ManualChanges_POST_Extend_SecurityCode_Fails_When_Applied_To_Expired_Security_CodeAsync()
         {
             // Arrange
-            Organisation thisTestOrg = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, Global.FirstReportingYear);
+            Organisation thisTestOrg = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.GlobalOptions.FirstReportingYear);
             thisTestOrg.SetSecurityCode(VirtualDateTime.Now.AddDays(90));
             thisTestOrg.SetSecurityCodeExpiryDate(VirtualDateTime.Now.AddDays(-5));
 
@@ -215,7 +214,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
         public async Task AdminController_ManualChanges_POST_Expire_SecurityCode_Fails_When_Applied_To_Expired_Security_CodeAsync()
         {
             // Arrange
-            Organisation thisTestOrg = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, Global.FirstReportingYear);
+            Organisation thisTestOrg = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.GlobalOptions.FirstReportingYear);
             thisTestOrg.SetSecurityCode(VirtualDateTime.Now.AddDays(90));
             thisTestOrg.SetSecurityCodeExpiryDate(VirtualDateTime.Now.AddDays(-5));
 
@@ -523,7 +522,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
         {
             // Arrange (data for this test is slightly different than others in this class)
             Organisation organisationWithoutSecurityCode =
-                OrganisationHelper.GetOrganisationInScope(TestEmployerReference, Global.FirstReportingYear);
+                OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.GlobalOptions.FirstReportingYear);
             _dbObjects = new object[] {organisationWithoutSecurityCode, _databaseAdminUser};
 
             AdminController adminControllerToExtendSecurityCodeTests = GetControllerForOutOfScopeTests();

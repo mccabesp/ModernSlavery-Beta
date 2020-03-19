@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using ModernSlavery.BusinessLogic.Models.Downloadable;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.Downloadable;
 
 namespace ModernSlavery.BusinessLogic
 {

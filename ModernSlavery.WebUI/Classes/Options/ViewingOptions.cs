@@ -1,7 +1,10 @@
-﻿namespace ModernSlavery.WebUI.Options
+﻿using ModernSlavery.SharedKernel.Options;
+
+namespace ModernSlavery.WebUI.Options
 {
 
-    public class ViewingOptions
+    [Options("Web:Viewing")]
+    public class ViewingOptions: IOptions
     {
 
         /// <summary>

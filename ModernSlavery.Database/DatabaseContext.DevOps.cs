@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using ModernSlavery.Core;
-using ModernSlavery.Extensions.AspNetCore;
 
 namespace ModernSlavery.Database
 {
@@ -11,10 +9,7 @@ namespace ModernSlavery.Database
 
         public void DeleteAllTestRecords(DateTime? deadline = null)
         {
-            if (Config.IsProduction())
-            {
-                throw new Exception("Attempt to delete all test data from production environment");
-            }
+            if (GlobalOptions.IsProduction())throw new Exception("Attempt to delete all test data from production environment");
 
             if (string.IsNullOrWhiteSpace(GlobalOptions.TestPrefix))
             {
@@ -48,9 +43,9 @@ namespace ModernSlavery.Database
         }
 
 
-        private static void ExecuteSqlCommand(string query, int timeOut = 120)
+        private void ExecuteSqlCommand(string query, int timeOut = 120)
         {
-            using (var sqlConnection1 = new SqlConnection(Config.GetConnectionString("ModernSlaveryDatabase")))
+            using (var sqlConnection1 = new SqlConnection(DatabaseOptions.ConnectionString))
             {
                 using (var cmd = new SqlCommand(query, sqlConnection1))
                 {

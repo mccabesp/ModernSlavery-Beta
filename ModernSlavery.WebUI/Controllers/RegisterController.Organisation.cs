@@ -2,15 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Register;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -20,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -72,7 +70,7 @@ namespace ModernSlavery.WebUI.Controllers
             var m = this.UnstashModel<OrganisationViewModel>();
             if (m == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             model.Employers = m.Employers;
@@ -114,7 +112,7 @@ namespace ModernSlavery.WebUI.Controllers
             var model = this.UnstashModel<OrganisationViewModel>();
             if (model == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             model.ManualRegistration = true;
@@ -161,7 +159,7 @@ namespace ModernSlavery.WebUI.Controllers
             var m = this.UnstashModel<OrganisationViewModel>();
             if (m == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             model.Employers = m.Employers;
@@ -187,8 +185,8 @@ namespace ModernSlavery.WebUI.Controllers
                         model.Employers = await RegistrationService.PrivateSectorRepository.SearchAsync(
                             model.SearchText,
                             1,
-                            Global.EmployerPageSize,
-                            currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
+                            CommonBusinessLogic.GlobalOptions.EmployerPageSize,
+                            currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix));
                     }
                     catch (Exception ex)
                     {
@@ -206,8 +204,8 @@ namespace ModernSlavery.WebUI.Controllers
                         await RegistrationService.CommonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                             "GPG - COMPANIES HOUSE ERROR",
                             $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
-                            currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
-                        return View("CustomError", new ErrorViewModel(1140));
+                            currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix));
+                        return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                     }
 
                     break;
@@ -215,8 +213,8 @@ namespace ModernSlavery.WebUI.Controllers
                     model.Employers = await RegistrationService.PublicSectorRepository.SearchAsync(
                         model.SearchText,
                         1,
-                        Global.EmployerPageSize,
-                        currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
+                        CommonBusinessLogic.GlobalOptions.EmployerPageSize,
+                        currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix));
 
                     break;
 
@@ -231,7 +229,7 @@ namespace ModernSlavery.WebUI.Controllers
                 CompaniesHouseFailures++;
                 if (CompaniesHouseFailures >= 3)
                 {
-                    return View("CustomError", new ErrorViewModel(1140));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                 }
             }
             else
@@ -279,7 +277,7 @@ namespace ModernSlavery.WebUI.Controllers
             var model = this.UnstashModel<OrganisationViewModel>();
             if (model == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             model.NoReference = false;
@@ -334,7 +332,7 @@ namespace ModernSlavery.WebUI.Controllers
             var m = this.UnstashModel<OrganisationViewModel>();
             if (m == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             model.Employers = m.Employers;
@@ -413,8 +411,8 @@ namespace ModernSlavery.WebUI.Controllers
                             model.Employers = await RegistrationService.PrivateSectorRepository.SearchAsync(
                                 model.SearchText,
                                 nextPage,
-                                Global.EmployerPageSize,
-                                currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
+                                CommonBusinessLogic.GlobalOptions.EmployerPageSize,
+                                currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix));
                         }
                         catch (Exception ex)
                         {
@@ -432,8 +430,8 @@ namespace ModernSlavery.WebUI.Controllers
                             await RegistrationService.CommonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                                 "GPG - COMPANIES HOUSE ERROR",
                                 $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
-                                currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
-                            return View("CustomError", new ErrorViewModel(1140));
+                                currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix));
+                            return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                         }
 
                         model.LastPrivateSearchRemoteTotal = LastPrivateSearchRemoteTotal;
@@ -442,7 +440,7 @@ namespace ModernSlavery.WebUI.Controllers
                             CompaniesHouseFailures++;
                             if (CompaniesHouseFailures >= 3)
                             {
-                                return View("CustomError", new ErrorViewModel(1140));
+                                return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                             }
                         }
                         else
@@ -456,8 +454,8 @@ namespace ModernSlavery.WebUI.Controllers
                         model.Employers = await RegistrationService.PublicSectorRepository.SearchAsync(
                             model.SearchText,
                             nextPage,
-                            Global.EmployerPageSize,
-                            currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
+                            CommonBusinessLogic.GlobalOptions.EmployerPageSize,
+                            currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix));
                         break;
 
                     default:
@@ -499,16 +497,16 @@ namespace ModernSlavery.WebUI.Controllers
                 }
 
                 //Get the organisation from the database
-                Organisation org = employer.OrganisationId > 0 ? DataRepository.Get<Organisation>(employer.OrganisationId) : null;
+                Organisation org = employer.OrganisationId > 0 ? CommonBusinessLogic.DataRepository.Get<Organisation>(employer.OrganisationId) : null;
                 if (org == null && !string.IsNullOrWhiteSpace(employer.CompanyNumber))
                 {
-                    org = DataRepository.GetAll<Organisation>()
+                    org = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                         .FirstOrDefault(o => o.CompanyNumber != null && o.CompanyNumber == employer.CompanyNumber);
                 }
 
                 if (org == null && !string.IsNullOrWhiteSpace(employer.EmployerReference))
                 {
-                    org = DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
+                    org = CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
                 }
 
                 if (org != null)
@@ -519,17 +517,17 @@ namespace ModernSlavery.WebUI.Controllers
                         Logger.LogWarning(
                             $"Attempt to register a {org.Status} organisation",
                             $"Organisation: '{org.OrganisationName}' Reference: '{org.EmployerReference}' User: '{currentUser.EmailAddress}'");
-                        return View("CustomError", new ErrorViewModel(1149));
+                        return View("CustomError", WebService.ErrorViewModelFactory.Create(1149));
                     }
 
                     //Make sure the found organisation is of the correct sector type
                     if (org.SectorType != model.SectorType)
                     {
-                        return View("CustomError", new ErrorViewModel(model.SectorType == SectorTypes.Private ? 1146 : 1147));
+                        return View("CustomError", WebService.ErrorViewModelFactory.Create(model.SectorType == SectorTypes.Private ? 1146 : 1147));
                     }
 
                     //Ensure user is not already registered for this organisation
-                    UserOrganisation userOrg = DataRepository.GetAll<UserOrganisation>()
+                    UserOrganisation userOrg = CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                         .FirstOrDefault(uo => uo.OrganisationId == org.OrganisationId && uo.UserId == currentUser.UserId);
                     if (userOrg != null)
                     {
@@ -539,11 +537,11 @@ namespace ModernSlavery.WebUI.Controllers
                     }
 
                     //Ensure there isnt another pending registeration for this organisation
-                    //userOrg = DataRepository.GetAll<UserOrganisation>().FirstOrDefault(uo => uo.OrganisationId == org.OrganisationId && uo.UserId != currentUser.UserId && uo.PINSentDate!=null && uo.PINConfirmedDate==null);
+                    //userOrg = CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().FirstOrDefault(uo => uo.OrganisationId == org.OrganisationId && uo.UserId != currentUser.UserId && uo.PINSentDate!=null && uo.PINConfirmedDate==null);
                     //if (userOrg != null)
                     //{
-                    //    var remainingTime = userOrg.PINSentDate.Value.AddDays(Global.PinInPostExpiryDays) - VirtualDateTime.Now;
-                    //    return View("CustomError", new ErrorViewModel(1148, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+                    //    var remainingTime = userOrg.PINSentDate.Value.AddDays(CommonBusinessLogic.GlobalOptions.PinInPostExpiryDays) - VirtualDateTime.Now;
+                    //    return View("CustomError", WebService.ErrorViewModelFactory.Create(1148, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
                     //}
 
                     employer.OrganisationId = org.OrganisationId;
@@ -624,7 +622,7 @@ namespace ModernSlavery.WebUI.Controllers
             var model = this.UnstashModel<OrganisationViewModel>();
             if (model == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             //Prepopulate name if it empty
@@ -661,7 +659,7 @@ namespace ModernSlavery.WebUI.Controllers
             var m = this.UnstashModel<OrganisationViewModel>();
             if (m == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             model.Employers = m.Employers;
@@ -779,7 +777,7 @@ namespace ModernSlavery.WebUI.Controllers
             {
                 if (!string.IsNullOrWhiteSpace(model.CompanyNumber))
                 {
-                    results = DataRepository.GetAll<Organisation>()
+                    results = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                         .Where(o => o.CompanyNumber == model.CompanyNumber)
                         .Select(o => o.OrganisationId);
                     if (results.Any())
@@ -791,7 +789,7 @@ namespace ModernSlavery.WebUI.Controllers
 
                 if (!string.IsNullOrWhiteSpace(model.CharityNumber))
                 {
-                    results = DataRepository.GetAll<OrganisationReference>()
+                    results = CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>()
                         .Where(
                             r => r.ReferenceName.ToLower() == nameof(OrganisationViewModel.CharityNumber).ToLower()
                                  && r.ReferenceValue.ToLower() == model.CharityNumber.ToLower())
@@ -805,7 +803,7 @@ namespace ModernSlavery.WebUI.Controllers
 
                 if (!string.IsNullOrWhiteSpace(model.MutualNumber))
                 {
-                    results = DataRepository.GetAll<OrganisationReference>()
+                    results = CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>()
                         .Where(
                             r => r.ReferenceName.ToLower() == nameof(OrganisationViewModel.MutualNumber).ToLower()
                                  && r.ReferenceValue.ToLower() == model.MutualNumber.ToLower())
@@ -821,7 +819,7 @@ namespace ModernSlavery.WebUI.Controllers
                 {
                     if (model.IsDUNS)
                     {
-                        results = DataRepository.GetAll<Organisation>()
+                        results = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                             .Where(r => r.DUNSNumber.ToLower() == model.OtherValue.ToLower())
                             .Select(r => r.OrganisationId);
                         if (results.Any())
@@ -831,7 +829,7 @@ namespace ModernSlavery.WebUI.Controllers
                         }
                     }
 
-                    results = DataRepository.GetAll<OrganisationReference>()
+                    results = CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>()
                         .Where(
                             r => r.ReferenceName.ToLower() == model.OtherName.ToLower()
                                  && r.ReferenceValue.ToLower() == model.OtherValue.ToLower())
@@ -850,7 +848,7 @@ namespace ModernSlavery.WebUI.Controllers
             if (model.MatchedReferenceCount == 0)
             {
                 string orgName = model.OrganisationName.ToLower().ReplaceI("limited", "").ReplaceI("ltd", "");
-                results = DataRepository.GetAll<Organisation>()
+                results = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                     .Where(o => o.OrganisationName.Contains(orgName))
                     .Select(o => o.OrganisationId);
                 if (results.Any())
@@ -858,7 +856,7 @@ namespace ModernSlavery.WebUI.Controllers
                     orgIds.AddRange(results);
                 }
 
-                results = Organisation.Search(DataRepository.GetAll<Organisation>(), model.OrganisationName, 49, Global.LevenshteinDistance)
+                results = Organisation.Search(CommonBusinessLogic.DataRepository.GetAll<Organisation>(), model.OrganisationName, 49, CommonBusinessLogic.GlobalOptions.LevenshteinDistance)
                     .Select(o => o.OrganisationId);
                 if (results.Any())
                 {
@@ -877,7 +875,7 @@ namespace ModernSlavery.WebUI.Controllers
                 return RedirectToAction("AddAddress", "Register");
             }
 
-            List<Organisation> employers = await DataRepository.GetAll<Organisation>()
+            List<Organisation> employers = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                 .Where(o => orgIds.Contains(o.OrganisationId))
                 .OrderBy(o => o.OrganisationName)
                 .ToListAsync();
@@ -925,7 +923,7 @@ namespace ModernSlavery.WebUI.Controllers
             var model = this.UnstashModel<OrganisationViewModel>();
             if (model == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             model.ManualAuthorised = false;
@@ -953,7 +951,7 @@ namespace ModernSlavery.WebUI.Controllers
             var model = this.UnstashModel<OrganisationViewModel>();
             if (model == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             if (command.EqualsI("Continue"))
@@ -991,7 +989,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             EmployerRecord employer = model.GetManualEmployer();
 
-            Organisation org = DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationId == employer.OrganisationId);
+            Organisation org = CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationId == employer.OrganisationId);
 
             //Make sure the found organisation is active or pending
             if (org.Status != OrganisationStatuses.Active && org.Status != OrganisationStatuses.Pending)
@@ -999,7 +997,7 @@ namespace ModernSlavery.WebUI.Controllers
                 Logger.LogWarning(
                     $"Attempt to register a {org.Status} organisation",
                     $"Organisation: '{org.OrganisationName}' Reference: '{org.EmployerReference}' User: '{currentUser.EmailAddress}'");
-                return View("CustomError", new ErrorViewModel(1149));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1149));
             }
 
             if (org.SectorType == SectorTypes.Private)
@@ -1014,7 +1012,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
 
-            UserOrganisation userOrg = await DataRepository.GetAll<UserOrganisation>()
+            UserOrganisation userOrg = await CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.OrganisationId == org.OrganisationId && uo.UserId == currentUser.UserId);
             if (userOrg != null)
             {
@@ -1104,7 +1102,7 @@ namespace ModernSlavery.WebUI.Controllers
             var model = this.UnstashModel<OrganisationViewModel>();
             if (model == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             //Get the sic codes from companies house
@@ -1121,9 +1119,9 @@ namespace ModernSlavery.WebUI.Controllers
                 if (!model.ManualRegistration && string.IsNullOrWhiteSpace(employer.SicCodeIds))
                 {
                     employer.SicSource = "CoHo";
-                    if (currentUser.EmailAddress.StartsWithI(Global.TestPrefix))
+                    if (currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
                     {
-                        SicCode sic = await DataRepository.GetAll<SicCode>().FirstOrDefaultAsync(s => s.SicSectionId != "X");
+                        SicCode sic = await CommonBusinessLogic.DataRepository.GetAll<SicCode>().FirstOrDefaultAsync(s => s.SicSectionId != "X");
                         employer.SicCodeIds = sic?.SicCodeId.ToString();
                     }
                     else
@@ -1154,8 +1152,8 @@ namespace ModernSlavery.WebUI.Controllers
                             await RegistrationService.CommonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                                 "GPG - COMPANIES HOUSE ERROR",
                                 $"Cant get SIC Codes from Companies House API for company {employer.OrganisationName} No:{employer.CompanyNumber} due to following error:\n\n{ex.Message}",
-                                currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
-                            return View("CustomError", new ErrorViewModel(1140));
+                                currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix));
+                            return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                         }
 
                         CompaniesHouseFailures = 0;
@@ -1281,7 +1279,7 @@ namespace ModernSlavery.WebUI.Controllers
             var m = this.UnstashModel<OrganisationViewModel>();
             if (m == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             model.Employers = m.Employers;
@@ -1362,7 +1360,7 @@ namespace ModernSlavery.WebUI.Controllers
                 string reviewCode = Encryption.EncryptQuerystring(
                     userOrg.UserId + ":" + userOrg.OrganisationId + ":" + VirtualDateTime.Now.ToSmallDateTime());
 
-                if (currentUser.EmailAddress.StartsWithI(Global.TestPrefix))
+                if (currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
                 {
                     TempData["TestUrl"] = Url.Action("ReviewRequest", "Admin", new { area = "Admin", code = reviewCode });
                 }
@@ -1374,7 +1372,7 @@ namespace ModernSlavery.WebUI.Controllers
             if (sector == SectorTypes.Public || model.IsFastTrackAuthorised)
             {
                 //Log the registration
-                if (!userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))
+                if (!userOrg.User.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
                 {
                     await RegistrationService.RegistrationLog.WriteAsync(
                         new RegisterLogModel
@@ -1463,7 +1461,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             Organisation org = employer == null || employer.OrganisationId == 0
                 ? null
-                : DataRepository.Get<Organisation>(employer.OrganisationId);
+                : CommonBusinessLogic.DataRepository.Get<Organisation>(employer.OrganisationId);
 
             #region Create a new organisation
 
@@ -1488,7 +1486,7 @@ namespace ModernSlavery.WebUI.Controllers
                     StatusDetails = "Generated by the system",
                     SnapshotDate = RegistrationService.CommonBusinessLogic.GetAccountingStartDate(org.SectorType)
                 };
-                DataRepository.Insert(newScope);
+                CommonBusinessLogic.DataRepository.Insert(newScope);
                 org.OrganisationScopes.Add(newScope);
 
                 //Create a presumed out-of-scope for previous year
@@ -1501,7 +1499,7 @@ namespace ModernSlavery.WebUI.Controllers
                     StatusDetails = "Generated by the system",
                     SnapshotDate = newScope.SnapshotDate.AddYears(-1)
                 };
-                DataRepository.Insert(oldScope);
+                CommonBusinessLogic.DataRepository.Insert(oldScope);
                 org.OrganisationScopes.Add(oldScope);
 
                 if (employer == null)
@@ -1516,7 +1514,7 @@ namespace ModernSlavery.WebUI.Controllers
                             ReferenceValue = model.CharityNumber,
                             Organisation = org
                         };
-                        DataRepository.Insert(reference);
+                        CommonBusinessLogic.DataRepository.Insert(reference);
                         org.OrganisationReferences.Add(reference);
                     }
 
@@ -1529,7 +1527,7 @@ namespace ModernSlavery.WebUI.Controllers
                             ReferenceValue = model.MutualNumber,
                             Organisation = org
                         };
-                        DataRepository.Insert(reference);
+                        CommonBusinessLogic.DataRepository.Insert(reference);
                         org.OrganisationReferences.Add(reference);
                     }
 
@@ -1542,7 +1540,7 @@ namespace ModernSlavery.WebUI.Controllers
                             ReferenceValue = model.OtherValue,
                             Organisation = org
                         };
-                        DataRepository.Insert(reference);
+                        CommonBusinessLogic.DataRepository.Insert(reference);
                         org.OrganisationReferences.Add(reference);
                     }
                 }
@@ -1550,7 +1548,7 @@ namespace ModernSlavery.WebUI.Controllers
                 org.SetStatus(
                     authorised && !model.ManualRegistration ? OrganisationStatuses.Active : OrganisationStatuses.Pending,
                     OriginalUser == null ? currentUser.UserId : OriginalUser.UserId);
-                DataRepository.Insert(org);
+                CommonBusinessLogic.DataRepository.Insert(org);
             }
 
             #endregion
@@ -1590,7 +1588,7 @@ namespace ModernSlavery.WebUI.Controllers
                     org.OrganisationName = newName;
 
                     var orgName = new OrganisationName { Name = newName, Source = newNameSource };
-                    DataRepository.Insert(orgName);
+                    CommonBusinessLogic.DataRepository.Insert(orgName);
                     org.OrganisationNames.Add(orgName);
                 }
             }
@@ -1622,7 +1620,7 @@ namespace ModernSlavery.WebUI.Controllers
             if (newSicCodeIds.Any())
             {
                 //TODO we should cache these SIC codes
-                SortedSet<int> allSicCodes = DataRepository.GetAll<SicCode>().Select(s => s.SicCodeId).ToSortedSet();
+                SortedSet<int> allSicCodes = CommonBusinessLogic.DataRepository.GetAll<SicCode>().Select(s => s.SicCodeId).ToSortedSet();
                 badSicCodes = newSicCodeIds.Except(allSicCodes).ToSortedSet();
                 newSicCodeIds = newSicCodeIds.Except(badSicCodes).ToSortedSet();
 
@@ -1647,7 +1645,7 @@ namespace ModernSlavery.WebUI.Controllers
                         foreach (int newSicCodeId in newSicCodeIds)
                         {
                             var sicCode = new OrganisationSicCode { Organisation = org, SicCodeId = newSicCodeId, Source = newSicSource };
-                            DataRepository.Insert(sicCode);
+                            CommonBusinessLogic.DataRepository.Insert(sicCode);
                             org.OrganisationSicCodes.Add(sicCode);
                         }
                     }
@@ -1718,7 +1716,7 @@ namespace ModernSlavery.WebUI.Controllers
                 address.IsUkAddress = newAddressModel.IsUkAddress;
                 address.Source = newAddressSource;
                 address.SetStatus(AddressStatuses.Pending, OriginalUser == null ? currentUser.UserId : OriginalUser.UserId);
-                DataRepository.Insert(address);
+                CommonBusinessLogic.DataRepository.Insert(address);
             }
 
             //This line is to help diagnose object reference not found exception raised at this point 
@@ -1733,13 +1731,13 @@ namespace ModernSlavery.WebUI.Controllers
 
             userOrg = org.OrganisationId == 0
                 ? null
-                : await DataRepository.GetAll<UserOrganisation>()
+                : await CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                     .FirstOrDefaultAsync(uo => uo.OrganisationId == org.OrganisationId && uo.UserId == currentUser.UserId);
 
             if (userOrg == null)
             {
                 userOrg = new UserOrganisation { User = currentUser, Organisation = org, Created = now };
-                DataRepository.Insert(userOrg);
+                CommonBusinessLogic.DataRepository.Insert(userOrg);
             }
 
             //This line is to help diagnose object reference not found exception raised at this point 
@@ -1813,12 +1811,12 @@ namespace ModernSlavery.WebUI.Controllers
 
             var saved = false;
             UserOrganisation tempUserOrg = userOrg; // Need to use a temporary UserOrg inside a lambda expression for out parameters
-            await DataRepository.BeginTransactionAsync(
+            await CommonBusinessLogic.DataRepository.BeginTransactionAsync(
                 async () =>
                 {
                     try
                     {
-                        await DataRepository.SaveChangesAsync();
+                        await CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
                         RegistrationService.ScopeBusinessLogic.FillMissingScopes(tempUserOrg.Organisation);
 
@@ -1827,14 +1825,14 @@ namespace ModernSlavery.WebUI.Controllers
                             tempUserOrg.Organisation.LatestRegistration = tempUserOrg;
                         }
 
-                        await DataRepository.SaveChangesAsync();
+                        await CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
                         if (tempUserOrg.Address.Status == AddressStatuses.Active)
                         {
                             tempUserOrg.Organisation.LatestAddress = tempUserOrg.Address;
                         }
 
-                        await DataRepository.SaveChangesAsync();
+                        await CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
                         //Ensure the organisation has an employer reference
                         if (string.IsNullOrWhiteSpace(tempUserOrg.Organisation.EmployerReference))
@@ -1842,12 +1840,12 @@ namespace ModernSlavery.WebUI.Controllers
                             await RegistrationService.OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(tempUserOrg.Organisation);
                         }
 
-                        DataRepository.CommitTransaction();
+                        CommonBusinessLogic.DataRepository.CommitTransaction();
                         saved = true;
                     }
                     catch (Exception ex)
                     {
-                        DataRepository.RollbackTransaction();
+                        CommonBusinessLogic.DataRepository.RollbackTransaction();
                         sendRequest = false;
                         Logger.LogWarning(ex, Extensions.Json.SerializeObjectDisposed(model));
                         throw;
@@ -1895,7 +1893,7 @@ namespace ModernSlavery.WebUI.Controllers
                         $"{model.ContactFirstName} {currentUser.ContactLastName} ({currentUser.JobTitle})",
                         org.OrganisationName,
                         address.GetAddressString(),
-                        currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
+                        currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix));
                 }
                 else
                 {
@@ -1904,7 +1902,7 @@ namespace ModernSlavery.WebUI.Controllers
                         $"{currentUser.Fullname} ({currentUser.JobTitle})",
                         org.OrganisationName,
                         address.GetAddressString(),
-                        currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
+                        currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix));
                 }
             }
 
@@ -1923,7 +1921,7 @@ namespace ModernSlavery.WebUI.Controllers
             string reviewUrl = Url.Action("ReviewRequest", "Admin", new { area = "Admin", code = reviewCode }, "https");
 
             //If the email address is a test email then simulate sending
-            if (userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (userOrg.User.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
             {
                 return;
             }
@@ -1947,7 +1945,7 @@ namespace ModernSlavery.WebUI.Controllers
             //Clear the stash
             this.ClearStash();
 
-            if (currentUser.EmailAddress.StartsWithI(Global.TestPrefix) && TempData.ContainsKey("TestUrl"))
+            if (currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix) && TempData.ContainsKey("TestUrl"))
             {
                 ViewBag.TestUrl = TempData["TestUrl"];
             }

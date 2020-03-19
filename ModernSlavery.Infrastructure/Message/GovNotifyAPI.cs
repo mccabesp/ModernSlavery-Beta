@@ -1,7 +1,7 @@
+using System;
 using System.Collections.Generic;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Infrastructure.Logging;
 using Newtonsoft.Json;
 using Notify.Client;
@@ -12,14 +12,16 @@ namespace ModernSlavery.Infrastructure.Message
 {
     public class GovNotifyAPI : IGovNotifyAPI
     {
-        public GovNotifyAPI(ICustomLogger customLogger)
+        public GovNotifyAPI(GovNotifyOptions options,  ICustomLogger customLogger)
         {
-            CustomLogger = customLogger;
+            Options = options ?? throw new ArgumentNullException(nameof(options));
+            CustomLogger = customLogger ?? throw new ArgumentNullException(nameof(customLogger));
+            _client = new NotificationClient(Options.ApiKey);
         }
 
+        private readonly GovNotifyOptions Options;
         private readonly ICustomLogger CustomLogger;
-        private readonly NotificationClient _client = new NotificationClient(_apiKey);
-        private static string _apiKey => Config.GetAppSetting("Email:Providers:GovNotify:ApiKey");
+        private readonly NotificationClient _client;
 
         public SendEmailResponse SendEmail(SendEmailRequest sendEmailRequest)
         {

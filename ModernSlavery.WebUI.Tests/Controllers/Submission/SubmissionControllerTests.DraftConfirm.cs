@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Controllers.Submission;
@@ -15,6 +14,8 @@ using Autofac;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Submit;
 using ModernSlavery.Infrastructure.File;
+using ModernSlavery.Infrastructure.Options;
+using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Presenters;
 using Moq;
 
@@ -69,9 +70,9 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.Bind(returnViewModel);
 
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testDraftFileBL = new DraftFileBusinessLogic(null,new SystemFileRepository());
+            var testDraftFileBL = new DraftFileBusinessLogic(null,new SystemFileRepository(new StorageOptions()));
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(

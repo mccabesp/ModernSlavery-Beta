@@ -7,19 +7,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
+using ModernSlavery.Infrastructure.Options;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.Infrastructure.File
 {
     public class SystemFileRepository : IFileRepository
     {
-
+        private readonly StorageOptions _storageOptions;
         private readonly DirectoryInfo _rootDir;
 
-        public SystemFileRepository(string rootPath = null)
+        public SystemFileRepository(StorageOptions storageOptions)
         {
-            rootPath = string.IsNullOrWhiteSpace(rootPath) ? AppDomain.CurrentDomain.BaseDirectory : FileSystem.ExpandLocalPath(rootPath);
-            _rootDir = new DirectoryInfo(rootPath);
+            _storageOptions = storageOptions ?? throw new ArgumentNullException(nameof(storageOptions));
+            if (string.IsNullOrWhiteSpace(storageOptions.LocalStorageRoot)) throw new ArgumentNullException(nameof(storageOptions.LocalStorageRoot));
+
+            var rootPath = string.IsNullOrWhiteSpace(storageOptions.LocalStorageRoot) ? AppDomain.CurrentDomain.BaseDirectory : FileSystem.ExpandLocalPath(storageOptions.LocalStorageRoot);
+            _rootDir = new DirectoryInfo(storageOptions.LocalStorageRoot);
         }
 
         public string RootDir => _rootDir.FullName;

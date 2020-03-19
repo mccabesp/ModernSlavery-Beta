@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using ModernSlavery.BusinessLogic.Repositories;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Infrastructure.Data;
 
 namespace ModernSlavery.IdentityServer4.Classes
 {

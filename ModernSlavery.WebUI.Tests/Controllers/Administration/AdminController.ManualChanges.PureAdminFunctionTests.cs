@@ -15,7 +15,6 @@ using ModernSlavery.Entities.Enums;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Tests;
 using ModernSlavery.WebUI.Admin.Controllers;
-using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 
 namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests

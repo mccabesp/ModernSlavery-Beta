@@ -1,18 +1,16 @@
 ﻿using System.Collections.Specialized;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Infrastructure.Options;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Search;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Presenters
 {
 
     public interface ISearchPresenter
     {
-
-        bool CacheSearchResults { get; }
-
         SearchViewModel LastSearchResults { get; set; }
 
         string LastSearchParameters { get; }
@@ -24,12 +22,14 @@ namespace ModernSlavery.WebUI.Presenters
     public class SearchPresenter : ISearchPresenter
     {
 
-        public SearchPresenter(IHttpSession session, IUrlHelper urlHelper)
+        public SearchPresenter(IHttpSession session, IUrlHelper urlHelper, SearchOptions searchOptions)
         {
-            CacheSearchResults = Config.GetAppSetting("SearchService:CacheResults").ToBoolean();
             Session = session;
             UrlHelper = urlHelper;
+            _searchOptions = searchOptions;
         }
+
+        private readonly SearchOptions _searchOptions;
 
         /// <summary>
         ///     Returns the relative Url of the last search including querystring

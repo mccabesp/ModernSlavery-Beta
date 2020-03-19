@@ -1,16 +1,18 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {
     public class WebService : IWebService
     {
-        public WebService(IMapper autoMapper, IHttpCache cache, IHttpSession session, IWebHostEnvironment hostingEnvironment, IShortCodesRepository shortCodesRepository, IWebTracker webTracker)
+        public WebService(IErrorViewModelFactory errorViewModelFactory, FeatureSwitchOptions featureSwitchOptions, IMapper autoMapper, IHttpCache cache, IHttpSession session, IWebHostEnvironment hostingEnvironment, IShortCodesRepository shortCodesRepository, IWebTracker webTracker)
         {
+            ErrorViewModelFactory = errorViewModelFactory;
+            FeatureSwitchOptions = featureSwitchOptions;
             AutoMapper = autoMapper;
             Cache = cache;
             Session = session;
@@ -19,6 +21,8 @@ namespace ModernSlavery.WebUI.Shared.Classes
             WebTracker = webTracker;
         }
 
+        public IErrorViewModelFactory ErrorViewModelFactory { get; }
+        public FeatureSwitchOptions FeatureSwitchOptions { get; }
         public IMapper AutoMapper { get; }
         public IHttpCache Cache { get; }
         public IHttpSession Session { get; }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 
 namespace ModernSlavery.WebJob
@@ -32,11 +30,11 @@ namespace ModernSlavery.WebJob
 
         private void UpdateFromCompaniesHouse(string runId)
         {
-            int maxNumCallCompaniesHouseApi = Config.GetAppSetting("MaxNumCallsCompaniesHouseApiPerFiveMins").ToInt32(500);
+            int maxNumCallCompaniesHouseApi = _CommonBusinessLogic.GlobalOptions.MaxNumCallsCompaniesHouseApiPerFiveMins;
 
             for (var i = 0; i < maxNumCallCompaniesHouseApi; i++)
             {
-                long organisationId = DataRepository.GetAll<Organisation>()
+                long organisationId = _CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                     .Where(org => !org.OptedOutFromCompaniesHouseUpdate && org.CompanyNumber != null && org.CompanyNumber != "")
                     .OrderByDescending(org => org.LastCheckedAgainstCompaniesHouse == null)
                     .ThenBy(org => org.LastCheckedAgainstCompaniesHouse)

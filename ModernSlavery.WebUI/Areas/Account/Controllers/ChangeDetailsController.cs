@@ -6,10 +6,11 @@ using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessLogic;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Areas.Account.Controllers
 {
@@ -21,9 +22,7 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
 
         public ChangeDetailsController(
             IChangeDetailsViewService changeDetailsService,
-            ILogger<ChangeDetailsController> logger,
-            IWebService webService,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<ChangeDetailsController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             ChangeDetailsService = changeDetailsService;
         }

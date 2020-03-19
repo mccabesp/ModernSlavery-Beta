@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 
 using NUnit.Framework;
@@ -38,7 +37,7 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Infrastructure.Logging.LogEventLoggerProvider(null, "TestApplicationName", Options.Create(new LoggerFilterOptions())));
+                () => new Infrastructure.Logging.LogEventLoggerProvider(null, "TestApplicationName", new LoggerFilterOptions()));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: queue", actualExpection.Message);

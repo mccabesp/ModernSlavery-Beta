@@ -12,28 +12,29 @@ using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Message
 {
 
-    public class SmtpEmailProvider : AEmailProvider
+    public class SmtpEmailProvider : BaseEmailProvider
     {
 
         public SmtpEmailProvider(IEmailTemplateRepository emailTemplateRepo,
-            IOptions<SmtpEmailOptions> smtpEmailOptions,
+            SmtpEmailOptions smtpEmailOptions,
+            GlobalOptions globalOptions,
             ILogger<SmtpEmailProvider> logger,
             [KeyFilter(Filenames.EmailSendLog)]ILogRecordLogger emailSendLog)
-            : base(emailTemplateRepo, logger, emailSendLog)
+            : base(globalOptions,emailTemplateRepo, logger, emailSendLog)
         {
             Options = smtpEmailOptions ?? throw new ArgumentNullException(nameof(smtpEmailOptions));
             //TODO ensure smtp config is present (when enabled)
         }
 
-        public IOptions<SmtpEmailOptions> Options { get; }
+        public SmtpEmailOptions Options { get; }
 
-        public override bool Enabled => Options.Value.Enabled != false;
+        public override bool Enabled => Options.Enabled != false;
 
         public override async Task<SendEmailResult> SendEmailAsync<TModel>(string emailAddress, string templateId, TModel model, bool test)
         {
@@ -41,7 +42,7 @@ namespace ModernSlavery.Infrastructure.Message
             Dictionary<string, object> mergeParameters = model.GetPropertiesDictionary();
 
             // prefix subject with environment name
-            mergeParameters["Environment"] = Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] ";
+            mergeParameters["Environment"] = GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] ";
 
             // get template
             EmailTemplateInfo emailTemplateInfo = EmailTemplateRepo.GetByTemplateId(templateId);
@@ -71,16 +72,16 @@ namespace ModernSlavery.Infrastructure.Message
                 messageHtml = messageHtml.Replace($"(({name}))", value.ToString());
             }
 
-            string smtpServer = string.IsNullOrWhiteSpace(Options.Value.Server) ? Options.Value.Server2 : Options.Value.Server;
-            int smtpServerPort = (string.IsNullOrWhiteSpace(Options.Value.Port) ? Options.Value.Port2: Options.Value.Port).ToInt32(25);
-            string smtpUsername = string.IsNullOrWhiteSpace(Options.Value.Username) ? Options.Value.Username2 : Options.Value.Username;
-            string smtpPassword = string.IsNullOrWhiteSpace(Options.Value.Password) ? Options.Value.Password2 : Options.Value.Password;
+            string smtpServer = string.IsNullOrWhiteSpace(Options.Server) ? Options.Server2 : Options.Server;
+            int smtpServerPort = Options.Port<=0 ? Options.Port2: Options.Port;
+            string smtpUsername = string.IsNullOrWhiteSpace(Options.Username) ? Options.Username2 : Options.Username;
+            string smtpPassword = string.IsNullOrWhiteSpace(Options.Password) ? Options.Password2 : Options.Password;
 
             await Email.QuickSendAsync(
                 messageSubject,
-                Options.Value.SenderEmail,
-                Options.Value.SenderName,
-                Options.Value.ReplyEmail,
+                Options.SenderEmail,
+                Options.SenderName,
+                Options.ReplyEmail,
                 emailAddress,
                 messageHtml,
                 smtpServer,

@@ -20,7 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
     <ProjectReference Include="..\ModernSlavery.Database\ModernSlavery.Database.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Extensions.AspNetCore\ModernSlavery.Extensions.AspNetCore.csproj" />
     <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure\ModernSlavery.Infrastructure.csproj" />
   </ItemGroup>

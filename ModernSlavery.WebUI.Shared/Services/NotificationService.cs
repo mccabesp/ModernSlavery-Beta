@@ -8,21 +8,22 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.SharedKernel;
-using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Shared.Services
 {
     public class NotificationService: INotificationService
     {
-        public NotificationService(ILogger<NotificationService> logger, ICustomLogger customLogger, [KeyFilter(QueueNames.SendNotifyEmail)]IQueue sendNotifyEmailQueue)
+        public NotificationService(GlobalOptions globalOptions, ILogger<NotificationService> logger, ICustomLogger customLogger, [KeyFilter(QueueNames.SendNotifyEmail)]IQueue sendNotifyEmailQueue)
         {
-            Logger = logger;
-            CustomLogger = customLogger;
-            SendNotifyEmailQueue = sendNotifyEmailQueue;
+            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            CustomLogger = customLogger ?? throw new ArgumentNullException(nameof(customLogger));
+            SendNotifyEmailQueue = sendNotifyEmailQueue ?? throw new ArgumentNullException(nameof(sendNotifyEmailQueue));
         }
 
+        private readonly GlobalOptions GlobalOptions;
         private ILogger Logger { get; }
         private ICustomLogger CustomLogger { get; }
         public IQueue SendNotifyEmailQueue { get; }
@@ -38,7 +39,7 @@ namespace ModernSlavery.WebUI.Shared.Services
                 {"SubmittedOrUpdated", submittedOrUpdated},
                 {"ReportingPeriod", reportingPeriod},
                 {"ReportLink", reportLink},
-                {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
+                {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
@@ -54,7 +55,7 @@ namespace ModernSlavery.WebUI.Shared.Services
             var personalisation = new Dictionary<string, dynamic> {
                 {"PIN", pin},
                 {"OrganisationName", organisationName},
-                {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
+                {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
@@ -70,7 +71,7 @@ namespace ModernSlavery.WebUI.Shared.Services
             var personalisation = new Dictionary<string, dynamic> {
                 {"OrganisationName", organisationName},
                 {"Username", username},
-                {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
+                {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
@@ -86,7 +87,7 @@ namespace ModernSlavery.WebUI.Shared.Services
             var personalisation = new Dictionary<string, dynamic> {
                 {"OrganisationName", organisationName},
                 {"RemovedUser", removedUserName},
-                {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
+                {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
@@ -100,7 +101,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         public async void SendScopeChangeInEmail(string emailAddress, string organisationName)
         {
             var personalisation = new Dictionary<string, dynamic> {
-                {"OrganisationName", organisationName}, {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
+                {"OrganisationName", organisationName}, {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
@@ -114,7 +115,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         public async void SendScopeChangeOutEmail(string emailAddress, string organisationName)
         {
             var personalisation = new Dictionary<string, dynamic> {
-                {"OrganisationName", organisationName}, {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
+                {"OrganisationName", organisationName}, {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest

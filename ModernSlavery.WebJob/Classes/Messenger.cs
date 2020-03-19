@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Models.LogModels;
@@ -27,32 +25,14 @@ namespace ModernSlavery.WebJob
     {
 
         private readonly ILogger<Messenger> log;
-
-        public Messenger(ILogger<Messenger> logger, GpgEmailProvider gpgEmailProvider)
+        private readonly EmailProvider GpgEmailProvider;
+        private readonly SmtpEmailOptions SmtpOptions;
+        public Messenger(ILogger<Messenger> logger, SmtpEmailOptions smtpOptions,  EmailProvider gpgEmailProvider)
         {
-            log = logger;
-            GpgEmailProvider = gpgEmailProvider;
+            log = logger ?? throw new ArgumentNullException(nameof(logger));
+            SmtpOptions = smtpOptions ?? throw new ArgumentNullException(nameof(smtpOptions));
+            GpgEmailProvider = gpgEmailProvider ?? throw new ArgumentNullException(nameof(gpgEmailProvider));
         }
-
-        private string GEODistributionList => Config.GetAppSetting("GEODistributionList");
-
-        private string SmtpSenderName => Config.GetAppSetting("Email:Providers:Smtp:SenderName");
-        private string SmtpSenderEmail => Config.GetAppSetting("Email:Providers:Smtp:SenderEmail");
-        private string SmtpReplyEmail => Config.GetAppSetting("Email:Providers:Smtp:ReplyEmail");
-
-        private string SmtpServer2 =>
-            Config.GetAppSetting("Email:Providers:Smtp:Server2") ?? Config.GetAppSetting("Email:Providers:Smtp:Server");
-
-        private int SmtpPort2 =>
-            (Config.GetAppSetting("Email:Providers:Smtp:Port2") ?? Config.GetAppSetting("Email:Providers:Smtp:Port")).ToInt32(25);
-
-        private string SmtpUsername2 =>
-            Config.GetAppSetting("Email:Providers:Smtp:Username2") ?? Config.GetAppSetting("Email:Providers:Smtp:Username");
-
-        private string SmtpPassword2 =>
-            Config.GetAppSetting("Email:Providers:Smtp:Password2") ?? Config.GetAppSetting("Email:Providers:Smtp:Password");
-
-        public GpgEmailProvider GpgEmailProvider { get; }
 
         #region Emails
 
@@ -63,16 +43,16 @@ namespace ModernSlavery.WebJob
         /// <param name="message"></param>
         public async Task<bool> SendGeoMessageAsync(string subject, string message, bool test = false)
         {
-            List<string> emailAddresses = GEODistributionList.SplitI(";").ToList();
+            List<string> emailAddresses = GpgEmailProvider.EmailOptions.GEODistributionList.SplitI(";").ToList();
             emailAddresses = emailAddresses.RemoveI("sender", "recipient");
             if (emailAddresses.Count == 0)
             {
-                throw new ArgumentNullException(nameof(GEODistributionList));
+                throw new ArgumentNullException(nameof(GpgEmailProvider.EmailOptions.GEODistributionList));
             }
 
             if (!emailAddresses.ContainsAllEmails())
             {
-                throw new ArgumentException($"{GEODistributionList} contains an invalid email address", nameof(GEODistributionList));
+                throw new ArgumentException($"{GpgEmailProvider.EmailOptions.GEODistributionList} contains an invalid email address", nameof(GpgEmailProvider.EmailOptions.GEODistributionList));
             }
 
             var successCount = 0;
@@ -82,23 +62,23 @@ namespace ModernSlavery.WebJob
                 {
                     await Email.QuickSendAsync(
                         subject,
-                        SmtpSenderEmail,
-                        SmtpSenderName,
-                        SmtpReplyEmail,
+                        SmtpOptions.SenderEmail,
+                        SmtpOptions.SenderName,
+                        SmtpOptions.ReplyEmail,
                         emailAddress,
                         message,
-                        SmtpServer2,
-                        SmtpUsername2,
-                        SmtpPassword2,
-                        SmtpPort2,
+                        SmtpOptions.Server2,
+                        SmtpOptions.Username2,
+                        SmtpOptions.Password2,
+                        SmtpOptions.Port2,
                         test: test);
                     await GpgEmailProvider.EmailSendLog.WriteAsync(
                         new EmailSendLogModel {
                             Message = "Email successfully sent via SMTP",
                             Subject = subject,
                             Recipients = emailAddress,
-                            Server = $"{SmtpServer2}:{SmtpPort2}",
-                            Username = SmtpUsername2,
+                            Server = $"{SmtpOptions.Server2}:{SmtpOptions.Port2}",
+                            Username = SmtpOptions.Username2,
                             Details = message
                         });
                     successCount++;
@@ -133,23 +113,23 @@ namespace ModernSlavery.WebJob
                 {
                     await Email.QuickSendAsync(
                         subject,
-                        SmtpSenderEmail,
-                        SmtpSenderName,
-                        SmtpReplyEmail,
+                        SmtpOptions.SenderEmail,
+                        SmtpOptions.SenderName,
+                        SmtpOptions.ReplyEmail,
                         emailAddress,
                         message,
-                        SmtpServer2,
-                        SmtpUsername2,
-                        SmtpPassword2,
-                        SmtpPort2,
+                        SmtpOptions.Server2,
+                        SmtpOptions.Username2,
+                        SmtpOptions.Password2,
+                        SmtpOptions.Port2,
                         test: test);
                     await GpgEmailProvider.EmailSendLog.WriteAsync(
                         new EmailSendLogModel {
                             Message = "Email successfully sent via SMTP",
                             Subject = subject,
                             Recipients = emailAddress,
-                            Server = $"{SmtpServer2}:{SmtpPort2}",
-                            Username = SmtpUsername2,
+                            Server = $"{SmtpOptions.Server2}:{SmtpOptions.Port2}",
+                            Username = SmtpOptions.Username2,
                             Details = message
                         });
                     successCount++;

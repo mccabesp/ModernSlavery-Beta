@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Infrastructure.Message;
-using Notify.Models.Responses;
 
 public class MockGovNotify : IGovNotifyAPI
 {

@@ -11,6 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="LogRecords\**" />
+    <EmbeddedResource Remove="LogRecords\**" />
+    <None Remove="LogRecords\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac" Version="5.0.0" />
     <PackageReference Include="Lindhart.Analyser.MissingAwaitWarning" Version="1.2.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
@@ -28,11 +34,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.10.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="LogRecords\" />
-    <Folder Include="Models\Account\" />
   </ItemGroup>
 
   <ItemGroup>

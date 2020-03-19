@@ -1,40 +1,30 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Globalization;
-using System.Threading;
+using System.Threading.Tasks;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using ModernSlavery.Infrastructure.Hosts.WebHost;
 
 namespace ModernSlavery.WebUI
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             Console.Title = "ModernSlavery.WebUI";
 
             //Add a handler for unhandled exceptions
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            //Culture is required so UK dates can be parsed correctly
-            Thread.CurrentThread.CurrentCulture = new CultureInfo(Config.GetAppSetting("Culture").ToStringOr("en-GB"));
-            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
-            CultureInfo.DefaultThreadCurrentCulture = Thread.CurrentThread.CurrentCulture;
-            CultureInfo.DefaultThreadCurrentUICulture = Thread.CurrentThread.CurrentCulture;
-
             //Create the web host
-            IWebHost host = BuildWebHost(args);
-
-            //Set the minumum threads 
-            Console.WriteLine(Extensions.AspNetCore.Extensions.SetThreadCount());
+            var hostBuilder = Host.CreateDefaultBuilder(args).ConfigureWebHostBuilder<Startup>();
+            var host=hostBuilder.Build();
 
             //Show thread availability
-            Console.WriteLine(Extensions.AspNetCore.Extensions.GetThreadCount());
+            Console.WriteLine(Infrastructure.Hosts.Extensions.GetThreadCount());
 
-            //Run the webhost
-            host.Run();
+            //Run the host
+            await host.RunAsync();
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -45,17 +35,9 @@ namespace ModernSlavery.WebUI
             Debug.WriteLine($"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
 
             //Show thread availability
-            Console.WriteLine(Extensions.AspNetCore.Extensions.GetThreadCount());
+            Console.WriteLine(Infrastructure.Hosts.Extensions.GetThreadCount());
 
             throw ex;
-        }
-
-        public static IWebHost BuildWebHost(string[] args)
-        {
-            IWebHostBuilder webHostBuilder = WebHost.CreateDefaultBuilder(args)
-                .UseGpgConfiguration(typeof(Startup));
-
-            return webHostBuilder.Build();
         }
 
     }

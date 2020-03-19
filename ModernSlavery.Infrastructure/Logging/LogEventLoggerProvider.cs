@@ -21,7 +21,7 @@ namespace ModernSlavery.Infrastructure.Logging
         private readonly IQueue queue;
         public string Alias = typeof(LogEventLoggerProvider).GetAttributeValue((ProviderAliasAttribute attrib) => attrib.Alias);
 
-        public LogEventLoggerProvider(IQueue queue, string applicationName, IOptions<LoggerFilterOptions> filterOptions)
+        public LogEventLoggerProvider(IQueue queue, string applicationName, LoggerFilterOptions filterOptions)
         {
             if (string.IsNullOrWhiteSpace(applicationName))
             {
@@ -33,11 +33,11 @@ namespace ModernSlavery.Infrastructure.Logging
 
             if (filterOptions != null)
             {
-                MinLevel = filterOptions.Value.MinLevel;
-                FilterRules = filterOptions.Value.Rules.Where(r => r.ProviderName.EqualsI(Alias)).ToList();
+                MinLevel = filterOptions.MinLevel;
+                FilterRules = filterOptions.Rules.Where(r => r.ProviderName.EqualsI(Alias)).ToList();
                 if (FilterRules == null || FilterRules.Count == 0)
                 {
-                    FilterRules = filterOptions.Value.Rules
+                    FilterRules = filterOptions.Rules
                         .Where(r => string.IsNullOrWhiteSpace(r.ProviderName) || r.ProviderName.EqualsI("default"))
                         .ToList();
                 }

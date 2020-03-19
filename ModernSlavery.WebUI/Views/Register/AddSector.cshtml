@@ -1,12 +1,11 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using ModernSlavery.BusinessLogic
+@inject CommonBusinessLogic commonBusinessLogic
+@model ModernSlavery.WebUI.Shared.Models.OrganisationViewModel
+@{
     ViewBag.Title = "Add your organisation's sectors - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as RegisterController;
 }
-
-@using ModernSlavery.Core
-@using ModernSlavery.Database
-@model ModernSlavery.WebUI.Shared.Models.OrganisationViewModel
-
 <div class="grid-row">
     <div class="column-two-thirds">
         <a href="@Url.Action("AddContact")" class="link-back">Back</a>
@@ -75,27 +74,27 @@
                         }
                         <p>@Html.ValueFor(model => model.OrganisationName)</p>
                         <div class="form-group @Html.SetErrorClass(model => model.SicCodeIds, " error")">
-                            @Html.LabelFor(model => model.SicCodeIds, "SIC Codes", new {@class = "form-label col-md-2"})
+                            @Html.LabelFor(model => model.SicCodeIds, "SIC Codes", new { @class = "form-label col-md-2" })
                             @if (Model.SectorType != SectorTypes.Private)
                             {
                                 <span class="optional">(Optional)</span>
                             }
-                            @Html.ValidationMessageFor(model => model.SicCodeIds, "", new {@class = "error-danger"})
+                            @Html.ValidationMessageFor(model => model.SicCodeIds, "", new { @class = "error-danger" })
                             <div class="col-md-10">
-                                @Html.TextAreaFor(model => model.SicCodeIds, new {@class = "form-control", style = "height:100px;width:100%;resize: none;"})
+                                @Html.TextAreaFor(model => model.SicCodeIds, new { @class = "form-control", style = "height:100px;width:100%;resize: none;" })
                                 <span style="font-size:small;">Enter SIC codes separated by commas, semicolons or new lines.</span>
                             </div>
                         </div>
 
                         <p>
-                            <input class="button" type="submit" role="button" name="command" value="Continue" aria-label="Continue"/>
+                            <input class="button" type="submit" role="button" name="command" value="Continue" aria-label="Continue" />
                         </p>
 
                         <details role="group">
                             <summary role="button" aria-controls="details-content-0" aria-expanded="true">View SIC codes</summary>
                             <div class="panel panel-border-narrow" id="details-content-0" aria-hidden="false">
                                 <div style="overflow:auto;height:200px;border:inset;">
-                                    @await Html.PartialAsync("_SicCodeList", controller.DataRepository
+                                    @await Html.PartialAsync("_SicCodeList", commonBusinessLogic.DataRepository
                                         .GetAll<SicCode>()
                                         .Select(x => x.SicCodeId)
                                         .ToList())

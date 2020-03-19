@@ -8,9 +8,8 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.Core.Interfaces;
 using Moq;
 using ModernSlavery.Entities.Enums;
-
+using ModernSlavery.Tests.Common.Classes;
 using NUnit.Framework;
-using ModernSlavery.WebUI.Shared.Classes;
 
 namespace Account.ViewServices
 {
@@ -33,7 +32,7 @@ namespace Account.ViewServices
             mockSendEmailService = new Mock<ISendEmailService>();
 
             // service under test
-            testChangeEmailService = new ChangeEmailViewService(mockUserRepo.Object, mockUrlHelper.Object, mockSendEmailService.Object);
+            testChangeEmailService = new ChangeEmailViewService(ConfigHelpers.GlobalOptions,mockUserRepo.Object, mockUrlHelper.Object, mockSendEmailService.Object);
         }
 
         [Test]

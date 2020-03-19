@@ -1,4 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
+using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {
@@ -36,6 +40,17 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
             return string.Format(error, displayName, par1, par2);
         }
+
+        public static HttpStatusViewResult ToHttpStatusViewResult(this CustomError customError)
+        {
+            HttpStatusCode codeConvertedToStatus = Enum.IsDefined(typeof(HttpStatusCode), customError.Code)
+                ? (HttpStatusCode)customError.Code
+                : HttpStatusCode.NotFound;
+
+            return new HttpStatusViewResult((int)codeConvertedToStatus, customError.Description);
+        }
+
+
 
     }
 }

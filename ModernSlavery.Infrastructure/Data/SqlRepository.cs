@@ -36,6 +36,10 @@ namespace ModernSlavery.Infrastructure.Data
         {
             return await DbContext.Set<TEntity>().AnyAsync(predicate);
         }
+        public async Task<int> CountAsync<TEntity>(Expression<Func<TEntity, bool>> predicate = null) where TEntity : class
+        {
+            return await DbContext.Set<TEntity>().CountAsync(predicate);
+        }
 
         public async Task<TEntity> FirstOrDefaultAsync<TEntity>(Expression<Func<TEntity, bool>> predicate=null) where TEntity : class
         {

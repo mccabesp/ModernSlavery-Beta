@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -18,7 +17,6 @@ using ModernSlavery.WebUI.Tests.TestHelpers;
 using MockQueryable.Moq;
 using Moq;
 using ModernSlavery.Entities.Enums;
-using ModernSlavery.Infrastructure;
 using ModernSlavery.SharedKernel;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Shared.Models;
@@ -290,7 +288,7 @@ namespace ModernSlavery.Tests
             var testSecurityTok = "11113333";
             var testModel = new EnterCodesViewModel {EmployerReference = testEmployerRef, SecurityToken = testSecurityTok};
 
-            DateTime testExpiredDate = VirtualDateTime.Now.AddDays(-(Global.SecurityCodeExpiryDays + 1));
+            DateTime testExpiredDate = VirtualDateTime.Now.AddDays(-(ConfigHelpers.GlobalOptions.SecurityCodeExpiryDays + 1));
 
             //Always returns an organisation and scope
             mockDataRepo.SetupGetAll(new Organisation(), new OrganisationScope());
@@ -314,7 +312,7 @@ namespace ModernSlavery.Tests
             var testSecurityTok = "11113333";
             var testModel = new EnterCodesViewModel {EmployerReference = testEmployerRef, SecurityToken = testSecurityTok};
 
-            DateTime testExpiredDate = VirtualDateTime.Now.AddDays(-(Global.SecurityCodeExpiryDays - 1));
+            DateTime testExpiredDate = VirtualDateTime.Now.AddDays(-(ConfigHelpers.GlobalOptions.SecurityCodeExpiryDays - 1));
 
             //Always returns an organisation and scope
             mockDataRepo.SetupGetAll(new Organisation(), new OrganisationScope());

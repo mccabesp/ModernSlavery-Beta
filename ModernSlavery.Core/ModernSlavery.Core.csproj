@@ -29,33 +29,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.Entities\ModernSlavery.Entities.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Extensions.AspNetCore\ModernSlavery.Extensions.AspNetCore.csproj" />
     <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
+    <ProjectReference Include="..\ModernSlavery.SharedKernel\ModernSlavery.SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.10.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="CsvHelper">
-      <HintPath>..\packages\CsvHelper.2.16.3.0\lib\net45\CsvHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
 
   <ItemGroup>

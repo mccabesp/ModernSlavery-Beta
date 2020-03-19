@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
@@ -19,7 +17,10 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Models;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Shared.Services;
 
@@ -112,7 +113,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             //Test the google analytics tracker was executed once on the controller
             controller.WebTracker.GetMockFromObject()
-                .Verify(mock => mock.TrackPageViewAsync(It.IsAny<Controller>(), null, null), Times.Once());
+                .Verify(mock => mock.SendPageViewTrackingAsync(null, null), Times.Once());
 
             Assert.NotNull(result, "RedirectToActionResult should not be null");
             Assert.AreEqual("ManageOrganisations", result.ActionName, "Expected the Action to be 'ManageOrganisations'");
@@ -136,7 +137,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             // Assert
             //Test the google analytics tracker was executed once on the controller
             controller.WebTracker.GetMockFromObject()
-                .Verify(mock => mock.TrackPageViewAsync(It.IsAny<Controller>(), null, null), Times.Once());
+                .Verify(mock => mock.SendPageViewTrackingAsync(null, null), Times.Once());
 
             Assert.NotNull(result, "RedirectToActionResult should not be null");
             Assert.AreEqual("ManageOrganisations", result.ActionName, "Expected the Action to be 'ManageOrganisations'");
@@ -563,7 +564,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
         [Description("ScopeController OutOfScope GET: When HasSpamLock Then Return CustomError View")]
         public async Task ScopeController_OutOfScope_GET_When_HasSpamLock_Then_Return_CustomError_ViewAsync()
         {
-            bool settingValueBeforeTheTest = Global.SkipSpamProtection; // Remember the original value of this setting
+            bool settingValueBeforeTheTest = ConfigHelpers.GlobalOptions.SkipSpamProtection; // Remember the original value of this setting
 
             try
             {
@@ -572,7 +573,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 var controller = UiTestHelper.GetController<ScopeController>();
                 await controller.Cache.SetAsync("127.0.0.1:lastScopeCode", dateTimeNow);
 
-                Global.SkipSpamProtection = false;
+                ConfigHelpers.GlobalOptions.SkipSpamProtection = false;
 
                 // Act
                 var result = await controller.OutOfScope() as ViewResult;
@@ -592,7 +593,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             }
             finally
             {
-                Global.SkipSpamProtection = settingValueBeforeTheTest; // Reinstate the value as it was before this test.
+                ConfigHelpers.GlobalOptions.SkipSpamProtection = settingValueBeforeTheTest; // Reinstate the value as it was before this test.
             }
         }
 
@@ -621,7 +622,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
         [Description("ScopeController OutOfScope POST: When HasSpamLock Then Return CustomError View")]
         public async Task ScopeController_OutOfScope_POST_When_HasSpamLock_Then_Return_CustomError_ViewAsync()
         {
-            bool settingValueBeforeTheTest = Global.SkipSpamProtection; // Remember the original value of this setting
+            bool settingValueBeforeTheTest = ConfigHelpers.GlobalOptions.SkipSpamProtection; // Remember the original value of this setting
 
             try
             {
@@ -630,7 +631,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 var controller = UiTestHelper.GetController<ScopeController>();
                 await controller.Cache.SetAsync("127.0.0.1:lastScopeCode", dateTimeNow);
 
-                Global.SkipSpamProtection = false;
+                ConfigHelpers.GlobalOptions.SkipSpamProtection = false;
 
                 // Act
                 var result = await controller.OutOfScope(new EnterCodesViewModel()) as ViewResult;
@@ -650,7 +651,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             }
             finally
             {
-                Global.SkipSpamProtection = settingValueBeforeTheTest; // Reinstate the value as it was before this test.
+                ConfigHelpers.GlobalOptions.SkipSpamProtection = settingValueBeforeTheTest; // Reinstate the value as it was before this test.
             }
         }
 

@@ -2,17 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebUI.Models.Search;
 using Microsoft.Azure.Search;
-using Microsoft.Azure.Search.Models;
 using ModernSlavery.Infrastructure.Data;
 using ModernSlavery.Infrastructure.Search;
 using Moq;
@@ -34,10 +30,8 @@ namespace ModernSlavery.Integration.Tests
         {
             SetupHelpers.SetupMockLogRecordGlobals();
 
-            string azureSearchServiceName = Config.GetAppSetting("SearchService:ServiceName");
-            string azureSearchAdminApiKey = Config.GetAppSetting("SearchService:AdminApiKey");
-            //_azureSearchRepo = new AzureSearchRepository(azureSearchServiceName, azureSearchAdminApiKey, null, Global.AppInsightsClient);
-            _azureSearchRepo = new AzureEmployerSearchRepository(Mock.Of<ILogRecordLogger>(),azureSearchServiceName, azureSearchAdminApiKey);
+            //_azureSearchRepo = new AzureSearchRepository(azureSearchServiceName, azureSearchAdminApiKey, null, GlobalOptions.AppInsightsClient);
+            _azureSearchRepo = new AzureEmployerSearchRepository(ConfigHelpers.GlobalOptions,Mock.Of<ILogRecordLogger>(), ConfigHelpers.SearchOptions.AzureServiceName, ConfigHelpers.SearchOptions.EmployerIndexName,ConfigHelpers.SearchOptions.AzureApiAdminKey);
         }
 
         /* Tests that fail if PartialNameForSuffixSearches is missing */
@@ -117,7 +111,7 @@ namespace ModernSlavery.Integration.Tests
 
             var mockViewingService = new Mock<IViewingService>();
             mockViewingService.Setup(m => m.SearchBusinessLogic.EmployerSearchRepository).Returns(_azureSearchRepo);
-            var testPresenter = new ViewingPresenter(Mock.Of<IDataRepository>(), mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
 
             var mockedSearchParameters =
                 Mock.Of<EmployerSearchParameters>(
@@ -162,7 +156,7 @@ namespace ModernSlavery.Integration.Tests
             const SearchTypes searchBy = SearchTypes.ByEmployerName;
             var mockViewingService = new Mock<IViewingService>();
             mockViewingService.Setup(m => m.SearchBusinessLogic.EmployerSearchRepository).Returns(_azureSearchRepo);
-            var testPresenter = new ViewingPresenter(Mock.Of<IDataRepository>(), mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
 
             var mockedSearchParameters =
                 Mock.Of<EmployerSearchParameters>(
@@ -190,7 +184,7 @@ namespace ModernSlavery.Integration.Tests
             const SearchTypes searchType = SearchTypes.BySectorType;
             var mockViewingService = new Mock<IViewingService>();
             mockViewingService.Setup(m => m.SearchBusinessLogic.EmployerSearchRepository).Returns(_azureSearchRepo);
-            var testPresenter = new ViewingPresenter(Mock.Of<IDataRepository>(), mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
 
             var mockedSearchParameters =
                 Mock.Of<EmployerSearchParameters>(
@@ -217,7 +211,7 @@ namespace ModernSlavery.Integration.Tests
 
             var mockViewingService = new Mock<IViewingService>();
             mockViewingService.Setup(m => m.SearchBusinessLogic.EmployerSearchRepository).Returns(_azureSearchRepo);
-            var testPresenter = new ViewingPresenter(Mock.Of<IDataRepository>(), mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
 
             var mockedSearchParameters =
                 Mock.Of<EmployerSearchParameters>(
@@ -244,20 +238,16 @@ namespace ModernSlavery.Integration.Tests
         public async Task ViewingService_GetListOfSicCodeSuggestions(string searchKeyWords, int expectedNumberOfSuggestions)
         {
             // Arrange
-            string sicCodeSearchServiceName = Config.GetAppSetting("SearchService:ServiceName");
-            string sicCodeSearchIndexName = Config.GetAppSetting("SearchService:SicCodeIndexName");
-            string sicCodeSearchAdminApiKey = Config.GetAppSetting("SearchService:AdminApiKey");
-
             var sicCodeSearchServiceClient = new SearchServiceClient(
-                sicCodeSearchServiceName,
-                new SearchCredentials(sicCodeSearchAdminApiKey));
+                ConfigHelpers.SearchOptions.AzureServiceName,
+                new SearchCredentials(ConfigHelpers.SearchOptions.AzureApiAdminKey));
 
-            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),sicCodeSearchServiceClient,sicCodeSearchIndexName);
+            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
 
             var mockViewingService = new Mock<IViewingService>();
             mockViewingService.Setup(m => m.SearchBusinessLogic.EmployerSearchRepository).Returns(_azureSearchRepo);
             mockViewingService.Setup(m => m.SearchBusinessLogic.SicCodeSearchRepository).Returns(sicCodeSearchIndexClient);
-            var testPresenter = new ViewingPresenter(Mock.Of<IDataRepository>(), mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
 
             // Act
             List<SicCodeSearchResult> result = await testPresenter.GetListOfSicCodeSuggestionsAsync(searchKeyWords);
@@ -285,22 +275,18 @@ namespace ModernSlavery.Integration.Tests
             string csvListOfSicSectionsExpectedToBeSelected)
         {
             // Arrange
-            string sicCodeSearchServiceName = Config.GetAppSetting("SearchService:ServiceName");
-            string sicCodeSearchIndexName = Config.GetAppSetting("SearchService:SicCodeIndexName");
-            string sicCodeSearchAdminApiKey = Config.GetAppSetting("SearchService:AdminApiKey");
-
             var sicCodeSearchServiceClient = new SearchServiceClient(
-                sicCodeSearchServiceName,
-                new SearchCredentials(sicCodeSearchAdminApiKey));
+                ConfigHelpers.SearchOptions.AzureServiceName,
+                new SearchCredentials(ConfigHelpers.SearchOptions.AzureApiAdminKey));
 
-            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),sicCodeSearchServiceClient, sicCodeSearchIndexName);
+            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
 
             Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockDataRepository();
 
             var mockViewingService = new Mock<IViewingService>();
             mockViewingService.Setup(m => m.SearchBusinessLogic.EmployerSearchRepository).Returns(_azureSearchRepo);
             mockViewingService.Setup(m => m.SearchBusinessLogic.SicCodeSearchRepository).Returns(sicCodeSearchIndexClient);
-            var testPresenter = new ViewingPresenter(Mock.Of<IDataRepository>(), mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
 
             #region Calculate the expected number of records
 

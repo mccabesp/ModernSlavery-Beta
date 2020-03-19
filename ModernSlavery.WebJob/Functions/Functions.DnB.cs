@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
@@ -40,19 +38,19 @@ namespace ModernSlavery.WebJob
                 #region Load and Prechecks
 
                 //Load the D&B records
-                IEnumerable<string> dnbOrgsPaths = await FileRepository.GetFilesAsync(Global.DataPath, Filenames.DnBOrganisations());
+                IEnumerable<string> dnbOrgsPaths = await _CommonBusinessLogic.FileRepository.GetFilesAsync(_CommonBusinessLogic.GlobalOptions.DataPath, Filenames.DnBOrganisations());
                 string dnbOrgsPath = dnbOrgsPaths.OrderByDescending(f => f).FirstOrDefault();
                 if (string.IsNullOrEmpty(dnbOrgsPath))
                 {
                     return;
                 }
 
-                if (!await FileRepository.GetFileExistsAsync(dnbOrgsPath))
+                if (!await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(dnbOrgsPath))
                 {
                     throw new Exception("Could not find " + dnbOrgsPath);
                 }
 
-                List<DnBOrgsModel> AllDnBOrgs = await FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
+                List<DnBOrgsModel> AllDnBOrgs = await _CommonBusinessLogic.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
 
                 if (!AllDnBOrgs.Any())
                 {
@@ -125,7 +123,7 @@ namespace ModernSlavery.WebJob
                 }
 
                 //Get the current users email address
-                User user = await DataRepository.GetAll<User>().FirstOrDefaultAsync(u => u.UserId == currentUserId);
+                User user = await _CommonBusinessLogic.DataRepository.GetAll<User>().FirstOrDefaultAsync(u => u.UserId == currentUserId);
                 userEmail = user?.EmailAddress;
 
                 //Count records requiring import
@@ -137,7 +135,7 @@ namespace ModernSlavery.WebJob
                     return;
                 }
 
-                List<Organisation> dbOrgs = DataRepository.GetAll<Organisation>().ToList();
+                List<Organisation> dbOrgs = _CommonBusinessLogic.DataRepository.GetAll<Organisation>().ToList();
 
                 #endregion
 
@@ -155,7 +153,7 @@ namespace ModernSlavery.WebJob
                         Organisation org = dbOrgs.FirstOrDefault(o => o.OrganisationId == dnbOrg.OrganisationId);
                         if (org == null)
                         {
-                            if (!Config.IsProduction())
+                            if (!_CommonBusinessLogic.GlobalOptions.IsProduction())
                             {
                                 continue;
                             }
@@ -172,17 +170,17 @@ namespace ModernSlavery.WebJob
                         dnbOrg.OrganisationId = null;
                     }
 
-                    await DataRepository.SaveChangesAsync();
-                    dbOrgs = await DataRepository.GetAll<Organisation>().ToListAsync();
+                    await _CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                    dbOrgs = await _CommonBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync();
 
-                    await FileRepository.SaveCSVAsync(AllDnBOrgs, dnbOrgsPath);
-                    AllDnBOrgs = await FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
+                    await _CommonBusinessLogic.FileRepository.SaveCSVAsync(AllDnBOrgs, dnbOrgsPath);
+                    AllDnBOrgs = await _CommonBusinessLogic.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
                     AllDnBOrgs = AllDnBOrgs.OrderBy(o => o.OrganisationName).ToList();
                 }
 
                 #endregion
 
-                List<SicCode> allSicCodes = await DataRepository.GetAll<SicCode>().ToListAsync();
+                List<SicCode> allSicCodes = await _CommonBusinessLogic.DataRepository.GetAll<SicCode>().ToListAsync();
 
                 dnbOrgs = AllDnBOrgs.Where(o => o.ImportedDate == null || o.ImportedDate < o.StatusCheckedDate).ToList();
                 while (dnbOrgs.Count > 0)
@@ -236,7 +234,7 @@ namespace ModernSlavery.WebJob
                                     Status = ScopeRowStatuses.Active,
                                     SnapshotDate = _snapshotDateHelper.GetSnapshotDate(dbOrg.SectorType)
                                 };
-                                DataRepository.Insert(newScope);
+                                _CommonBusinessLogic.DataRepository.Insert(newScope);
                                 dbOrg.OrganisationScopes.Add(newScope);
 
                                 //Create a presumed out-of-scope for previous year
@@ -247,7 +245,7 @@ namespace ModernSlavery.WebJob
                                     Status = ScopeRowStatuses.Active,
                                     SnapshotDate = newScope.SnapshotDate.AddYears(-1)
                                 };
-                                DataRepository.Insert(oldScope);
+                                _CommonBusinessLogic.DataRepository.Insert(oldScope);
                                 dbOrg.OrganisationScopes.Add(oldScope);
 
                                 dbOrg.SetStatus(OrganisationStatuses.Active, currentUserId, "Imported from D&B");
@@ -263,7 +261,7 @@ namespace ModernSlavery.WebJob
                         else if (dbOrg.OrganisationName != orgName.Name)
                         {
                             OrganisationName oldOrgName = dbOrg.GetName();
-                            if (oldOrgName == null || _CommonBL.SourceComparer.CanReplace(orgName.Source, oldOrgName.Source))
+                            if (oldOrgName == null || _CommonBusinessLogic.SourceComparer.CanReplace(orgName.Source, oldOrgName.Source))
                             {
                                 dbOrg.OrganisationName = orgName.Name;
                                 dbOrg.OrganisationNames.Add(orgName);
@@ -291,7 +289,7 @@ namespace ModernSlavery.WebJob
                             string employerReference;
                             do
                             {
-                                employerReference = _OrganisationBL.GenerateEmployerReference();
+                                employerReference = _OrganisationBusinessLogic.GenerateEmployerReference();
                             } while (employerReferences.Contains(employerReference));
 
                             dbOrg.EmployerReference = employerReference;
@@ -313,7 +311,7 @@ namespace ModernSlavery.WebJob
                         dataSource = string.IsNullOrWhiteSpace(dnbOrg.AddressSource) ? "D&B" : dnbOrg.AddressSource;
                         if (newAddress == null
                             || !newAddress.GetAddressString().EqualsI(fullAddress)
-                            && _CommonBL.SourceComparer.CanReplace(dataSource, newAddress.Source))
+                            && _CommonBusinessLogic.SourceComparer.CanReplace(dataSource, newAddress.Source))
                         {
                             DateTime statusDate = VirtualDateTime.Now;
 
@@ -372,14 +370,14 @@ namespace ModernSlavery.WebJob
                             newCodeIds.Add(1);
                         }
 
-                        if (!Config.IsProduction())
+                        if (!_CommonBusinessLogic.GlobalOptions.IsProduction())
                         {
                             Debug.WriteLine(
                                 $"OLD:{oldCodes.Select(s => s.SicCodeId).ToDelimitedString()} NEW:{newCodeIds.ToDelimitedString()}");
                         }
 
                         dataSource = string.IsNullOrWhiteSpace(dnbOrg.SicSource) ? "D&B" : dnbOrg.SicSource;
-                        if (!newCodeIds.SetEquals(oldCodeIds) && _CommonBL.SourceComparer.CanReplace(dataSource, oldSicSource))
+                        if (!newCodeIds.SetEquals(oldCodeIds) && _CommonBusinessLogic.SourceComparer.CanReplace(dataSource, oldSicSource))
                         {
                             foreach (int code in newCodeIds)
                             {
@@ -417,14 +415,14 @@ namespace ModernSlavery.WebJob
                             }
                         }
 
-                        await DataRepository.BeginTransactionAsync(
+                        await _CommonBusinessLogic.DataRepository.BeginTransactionAsync(
                             async () => {
                                 try
                                 {
                                     //Save the name, Sic, EmployerReference, DateOfCessasion changes
                                     if (dbChanged)
                                     {
-                                        await DataRepository.SaveChangesAsync();
+                                        await _CommonBusinessLogic.DataRepository.SaveChangesAsync();
                                     }
 
                                     //Save the changes
@@ -433,8 +431,8 @@ namespace ModernSlavery.WebJob
                                     var insert = false;
                                     if (dbOrg.OrganisationId == 0)
                                     {
-                                        DataRepository.Insert(dbOrg);
-                                        await DataRepository.SaveChangesAsync();
+                                        _CommonBusinessLogic.DataRepository.Insert(dbOrg);
+                                        await _CommonBusinessLogic.DataRepository.SaveChangesAsync();
                                         dbChanged = true;
                                         insert = true;
                                     }
@@ -443,14 +441,14 @@ namespace ModernSlavery.WebJob
                                     {
                                         dbOrg.OrganisationAddresses.Add(newAddress);
                                         dbOrg.LatestAddress = newAddress;
-                                        await DataRepository.SaveChangesAsync();
+                                        await _CommonBusinessLogic.DataRepository.SaveChangesAsync();
                                         dbChanged = true;
                                     }
 
                                     if (dbChanged)
                                     {
                                         dbChanges++;
-                                        DataRepository.CommitTransaction();
+                                        _CommonBusinessLogic.DataRepository.CommitTransaction();
                                         totalChanges++;
                                         if (insert)
                                         {
@@ -463,7 +461,7 @@ namespace ModernSlavery.WebJob
                                 }
                                 catch
                                 {
-                                    DataRepository.RollbackTransaction();
+                                    _CommonBusinessLogic.DataRepository.RollbackTransaction();
                                 }
                             });
                         c++;
@@ -472,14 +470,14 @@ namespace ModernSlavery.WebJob
                     //Reload all the changes
                     if (dbChanges > 0)
                     {
-                        dbOrgs = await DataRepository.GetAll<Organisation>().ToListAsync();
+                        dbOrgs = await _CommonBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync();
                     }
 
                     //Save the D&B records
                     if (dnbChanges > 0)
                     {
-                        await FileRepository.SaveCSVAsync(AllDnBOrgs, dnbOrgsPath);
-                        AllDnBOrgs = await FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
+                        await _CommonBusinessLogic.FileRepository.SaveCSVAsync(AllDnBOrgs, dnbOrgsPath);
+                        AllDnBOrgs = await _CommonBusinessLogic.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
                         AllDnBOrgs = AllDnBOrgs.OrderBy(o => o.OrganisationName).ToList();
                         dnbOrgs = AllDnBOrgs.Where(o => o.ImportedDate == null || o.ImportedDate < o.StatusCheckedDate).ToList();
                     }

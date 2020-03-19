@@ -18,14 +18,17 @@ namespace ModernSlavery.BusinessLogic.Classes
 {
     public class DnBOrgsRepository: IDnBOrgsRepository
     {
-        public DnBOrgsRepository([KeyFilter(QueueNames.ExecuteWebJob)]IQueue executeWebjobQueue, IFileRepository fileRepository)
+        public DnBOrgsRepository([KeyFilter(QueueNames.ExecuteWebJob)]IQueue executeWebjobQueue, IFileRepository fileRepository,string dataPath)
         {
             ExecuteWebjobQueue = executeWebjobQueue;
             FileRepository = fileRepository;
+            DataPath = dataPath;
         }
 
-        readonly IQueue ExecuteWebjobQueue;
+        private readonly IQueue ExecuteWebjobQueue;
         private readonly IFileRepository FileRepository;
+        private readonly string DataPath;
+
 
         #region Properties
         private DateTime _DnBOrgsLoaded;
@@ -244,13 +247,13 @@ namespace ModernSlavery.BusinessLogic.Classes
 
         public async Task<List<DnBOrgsModel>> LoadIfNewerAsync()
         {
-            string dnbOrgsPath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations());
+            string dnbOrgsPath = Path.Combine(DataPath, Filenames.DnBOrganisations());
             bool fileExists = await FileRepository.GetFileExistsAsync(dnbOrgsPath);
 
             //Copy the previous years if no current year
             if (!fileExists)
             {
-                string dnbOrgsPathPrevious = Path.Combine(Global.DataPath, Filenames.PreviousDnBOrganisations());
+                string dnbOrgsPathPrevious = Path.Combine(DataPath, Filenames.PreviousDnBOrganisations());
                 if (await FileRepository.GetFileExistsAsync(dnbOrgsPathPrevious))
                 {
                     await FileRepository.WriteAsync(dnbOrgsPath, await FileRepository.ReadBytesAsync(dnbOrgsPathPrevious));

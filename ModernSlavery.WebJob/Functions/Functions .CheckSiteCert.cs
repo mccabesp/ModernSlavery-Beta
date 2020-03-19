@@ -2,9 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 
@@ -17,14 +15,11 @@ namespace ModernSlavery.WebJob
         {
             try
             {
-                if (Global.CertExpiresWarningDays > 0)
+                if (_CommonBusinessLogic.GlobalOptions.CertExpiresWarningDays > 0)
                 {
                     //Get the cert thumbprint
-                    string certThumprint = Config.Configuration["WEBSITE_LOAD_CERTIFICATES"].SplitI(";").FirstOrDefault();
-                    if (string.IsNullOrWhiteSpace(certThumprint))
-                    {
-                        certThumprint = Config.Configuration["CertThumprint"].SplitI(";").FirstOrDefault();
-                    }
+                    string certThumprint = _CommonBusinessLogic.GlobalOptions.WEBSITE_LOAD_CERTIFICATES.SplitI(";").FirstOrDefault();
+                    if (string.IsNullOrWhiteSpace(certThumprint))certThumprint = _CommonBusinessLogic.GlobalOptions.CertThumprint.SplitI(";").FirstOrDefault();
 
                     if (!string.IsNullOrWhiteSpace(certThumprint))
                     {
@@ -36,17 +31,17 @@ namespace ModernSlavery.WebJob
                         {
                             await _Messenger.SendGeoMessageAsync(
                                 "GPG - WEBSITE CERTIFICATE EXPIRED",
-                                $"The website certificate for '{Global.ExternalHost}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
+                                $"The website certificate for '{_CommonBusinessLogic.GlobalOptions.EXTERNAL_HOST}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
                         }
                         else
                         {
                             TimeSpan remainingTime = expires - VirtualDateTime.Now;
 
-                            if (expires < VirtualDateTime.UtcNow.AddDays(Global.CertExpiresWarningDays))
+                            if (expires < VirtualDateTime.UtcNow.AddDays(_CommonBusinessLogic.GlobalOptions.CertExpiresWarningDays))
                             {
                                 await _Messenger.SendGeoMessageAsync(
                                     "GPG - WEBSITE CERTIFICATE EXPIRING",
-                                    $"The website certificate for '{Global.ExternalHost}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
+                                    $"The website certificate for '{_CommonBusinessLogic.GlobalOptions.EXTERNAL_HOST}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
                             }
                         }
                     }

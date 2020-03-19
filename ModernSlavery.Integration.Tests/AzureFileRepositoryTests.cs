@@ -6,6 +6,7 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.Search.Models;
 using ModernSlavery.Infrastructure.File;
+using ModernSlavery.Infrastructure.Options;
 using NUnit.Framework;
 using ModernSlavery.SharedKernel;
 
@@ -19,7 +20,7 @@ namespace ModernSlavery.Integration.Tests
         public async Task AzureFileRepository_Append_Csv_Records_Async()
         {
             // Arrange
-            var systemFileRepository = new SystemFileRepository();
+            var systemFileRepository = new SystemFileRepository(new StorageOptions());
 
             string searchLogFilename = "testSearchLog" + VirtualDateTime.Now.ToString("yyyyMMdd_HHmmssfff") + "_deleteme.csv";
 

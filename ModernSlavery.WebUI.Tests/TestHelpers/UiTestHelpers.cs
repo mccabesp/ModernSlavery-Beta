@@ -9,15 +9,11 @@ using Autofac;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Repositories;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.Cookies;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.Mocks;
@@ -37,7 +33,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using Moq;
 using ModernSlavery.SharedKernel;
 
@@ -45,18 +40,18 @@ using Newtonsoft.Json;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Infrastructure;
 using ModernSlavery.BusinessLogic.Admin;
-using ModernSlavery.Infrastructure;
+using ModernSlavery.Infrastructure.Data;
 using ModernSlavery.Infrastructure.File;
-using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.Infrastructure.Options;
 using ModernSlavery.Infrastructure.Queue;
-using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Admin.Controllers;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Classes.Cookies;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using HttpContext = Microsoft.AspNetCore.Http.HttpContext;
 
 namespace ModernSlavery.WebUI.Tests.TestHelpers
 {
@@ -72,7 +67,7 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
         {
             //Create Inversion of Control container
             DIContainer = BuildContainerIoC(dbObjects);
-
+            
             //Mock UserId as claim
             var claims = new List<Claim>();
             if (userId < 0)
@@ -203,9 +198,6 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
             Mock<IHttpContextAccessor> mockHttpContextAccessor = DIContainer.Resolve<IHttpContextAccessor>().GetMockFromObject();
             mockHttpContextAccessor.SetupGet(a => a.HttpContext).Returns(httpContextMock.Object);
 
-            //Configure the global HttpContext using the mock accessor
-            System.Web.HttpContext.Configure(mockHttpContextAccessor.Object);
-
             //Create and return the controller
             var controller = DIContainer.Resolve<T>();
 
@@ -253,14 +245,14 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
 
             //Create the mock repositories
             // BL Repository
-            builder.Register(c => new SystemFileRepository()).As<IFileRepository>().SingleInstance();
+            builder.Register(c => new SystemFileRepository(new StorageOptions())).As<IFileRepository>().SingleInstance();
             builder.Register(c => new MockSearchRepository()).As<ISearchRepository<EmployerSearchModel>>().SingleInstance();
             builder.Register(c => Mock.Of<ISearchRepository<SicCodeSearchModel>>()).As<ISearchRepository<SicCodeSearchModel>>();
             builder.RegisterType<UserRepository>().As<IUserRepository>().SingleInstance();
             builder.RegisterType<RegistrationRepository>().As<IRegistrationRepository>().SingleInstance();
 
             // BL Services
-            builder.RegisterInstance(Config.Configuration);
+            builder.RegisterInstance(ConfigHelpers.Config);
             builder.RegisterType<CommonBusinessLogic>().As<ICommonBusinessLogic>().InstancePerLifetimeScope();
             builder.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().InstancePerLifetimeScope();
             builder.RegisterType<UpdateFromCompaniesHouseService>().As<UpdateFromCompaniesHouseService>().InstancePerLifetimeScope();

@@ -5,12 +5,12 @@ using Autofac;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using ModernSlavery.Core.Models;
 using Newtonsoft.Json;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.WebJob
 {
@@ -23,14 +23,13 @@ namespace ModernSlavery.WebJob
             DateTime start = VirtualDateTime.Now;
             _CustomLogger.Information("SendReminderEmails Function started", start);
             
-            List<int> reminderDays = GetReminderEmailDays();
-            if (reminderDays.Count == 0)
+            if (_CommonBusinessLogic.GlobalOptions.ReminderEmailDays==null || _CommonBusinessLogic.GlobalOptions.ReminderEmailDays.Length == 0)
             {
                 _CustomLogger.Information("SendReminderEmails Function finished. No ReminderEmailDays set.");
                 return;
             }
 
-            IEnumerable<User> users = DataRepository.GetAll<User>();
+            IEnumerable<User> users = _CommonBusinessLogic.DataRepository.GetAll<User>();
 
             foreach (User user in users)
             {
@@ -109,7 +108,7 @@ namespace ModernSlavery.WebJob
                 {"OrganisationIsSingular", organisations.Count == 1},
                 {"OrganisationIsPlural", organisations.Count > 1},
                 {"SectorType", sectorType.ToString().ToLower()},
-                {"Environment", Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] "}
+                {"Environment", _CommonBusinessLogic.GlobalOptions.IsProduction() ? "" : $"[{_CommonBusinessLogic.GlobalOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
@@ -151,7 +150,7 @@ namespace ModernSlavery.WebJob
 
         private bool ReminderEmailWasNotSentAfterLatestReminderDate(User user, SectorTypes sectorType)
         {
-            ReminderEmail latestReminderEmail = DataRepository.GetAll<ReminderEmail>()
+            ReminderEmail latestReminderEmail = _CommonBusinessLogic.DataRepository.GetAll<ReminderEmail>()
                 .Where(re => re.UserId == user.UserId)
                 .Where(re => re.SectorType == sectorType)
                 .OrderByDescending(re => re.DateSent)
@@ -168,8 +167,7 @@ namespace ModernSlavery.WebJob
 
         private DateTime GetEarliestReminderDate(SectorTypes sectorType)
         {
-            List<int> reminderEmailDays = GetReminderEmailDays();
-            int earliestReminderDay = reminderEmailDays[reminderEmailDays.Count - 1];
+            int earliestReminderDay = _CommonBusinessLogic.GlobalOptions.ReminderEmailDays[_CommonBusinessLogic.GlobalOptions.ReminderEmailDays.Length - 1];
 
             DateTime deadlineDate = GetDeadlineDate(sectorType);
             return deadlineDate.AddDays(-earliestReminderDay);
@@ -185,22 +183,14 @@ namespace ModernSlavery.WebJob
 
         private List<DateTime> GetReminderDates(SectorTypes sectorType)
         {
-            List<int> reminderDays = GetReminderEmailDays();
-            DateTime deadlineDate = GetDeadlineDate(sectorType);
+            var deadlineDate = GetDeadlineDate(sectorType);
 
-            return reminderDays.Select(reminderDay => deadlineDate.AddDays(-reminderDay)).ToList();
+            return _CommonBusinessLogic.GlobalOptions.ReminderEmailDays.Select(reminderDay => deadlineDate.AddDays(-reminderDay)).ToList();
         }
 
         private DateTime GetDeadlineDate(SectorTypes sectorType)
         {
             return _snapshotDateHelper.GetSnapshotDate(sectorType).AddYears(1);
-        }
-
-        private static List<int> GetReminderEmailDays()
-        {
-            var reminderEmailDays = JsonConvert.DeserializeObject<List<int>>(Config.GetAppSetting("ReminderEmailDays"));
-            reminderEmailDays.Sort();
-            return reminderEmailDays;
         }
 
     }

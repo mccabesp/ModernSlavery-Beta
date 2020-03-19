@@ -7,14 +7,16 @@ using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Logging
 {
     public class RegistrationLogRecord : LogRecordLogger, IRegistrationLogRecord
     {
 
-        public RegistrationLogRecord(LogRecordQueue queue)
-            : base(queue, AppDomain.CurrentDomain.FriendlyName, Filenames.RegistrationLog) { }
+        public RegistrationLogRecord(GlobalOptions globalOptions,
+            LogRecordQueue queue)
+            : base(globalOptions, queue, AppDomain.CurrentDomain.FriendlyName, Filenames.RegistrationLog) { }
 
         public async Task LogUnregisteredAsync(UserOrganisation unregisteredUserOrg, string actionByEmailAddress)
         {
@@ -37,7 +39,7 @@ namespace ModernSlavery.Infrastructure.Logging
             User logUser = logUserOrg.User;
             OrganisationAddress logAddress = logUserOrg.Address;
 
-            if (logUser.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (logUser.EmailAddress.StartsWithI(GlobalOptions.TestPrefix))
             {
                 return;
             }

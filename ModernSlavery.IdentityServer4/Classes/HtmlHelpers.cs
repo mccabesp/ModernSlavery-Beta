@@ -1,12 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.IdentityServer4.Classes
 {
@@ -15,8 +14,9 @@ namespace ModernSlavery.IdentityServer4.Classes
 
         public static HtmlString PageIdentifier(this IHtmlHelper htmlHelper)
         {
+            var globalOptions=htmlHelper.GetGlobalOptions();
             return new HtmlString(
-                $"Date:{VirtualDateTime.Now}, Version:{Global.Version}, File Date:{Global.AssemblyDate.ToLocalTime()}, Environment:{Config.EnvironmentName}, Machine:{Environment.MachineName}, Instance:{Global.AzureInstanceId}, {Global.AssemblyCopyright}");
+                $"Date:{VirtualDateTime.Now}, Version:{globalOptions.Version}, File Date:{globalOptions.AssemblyDate.ToLocalTime()}, Environment:{globalOptions.Environment}, Machine:{Environment.MachineName}, Instance:{globalOptions.WEBSITE_INSTANCE_ID}, {globalOptions.AssemblyCopyright}");
         }
 
         public static string CurrentView(this IHtmlHelper html)

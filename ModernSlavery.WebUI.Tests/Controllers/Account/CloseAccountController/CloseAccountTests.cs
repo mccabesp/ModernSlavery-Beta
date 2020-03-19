@@ -2,12 +2,9 @@
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +12,7 @@ using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Core.EmailTemplates;
 using Moq;
 using ModernSlavery.Entities.Enums;
-
+using ModernSlavery.Tests.Common.Classes;
 using NUnit.Framework;
 
 namespace Account.Controllers.CloseAccountController
@@ -205,11 +202,11 @@ namespace Account.Controllers.CloseAccountController
                                 && inst.Type == typeof(CloseAccountCompletedTemplate).FullName)),
                 Times.Once(),
                 $"Expected the users email address using {nameof(CloseAccountCompletedTemplate)} to be in the email send queue");
-            string geoDistributionList = Config.GetAppSetting("GEODistributionList");
+
             mockEmailQueue.Verify(
                 x => x.AddMessageAsync(
                     It.Is<QueueWrapper>(
-                        inst => inst.Message.Contains(geoDistributionList) && inst.Type == typeof(OrphanOrganisationTemplate).FullName)),
+                        inst => inst.Message.Contains(ConfigHelpers.EmailOptions.GEODistributionList) && inst.Type == typeof(OrphanOrganisationTemplate).FullName)),
                 Times.Never,
                 $"Didnt expect the GEO Email addresses using {nameof(OrphanOrganisationTemplate)} to be in the email send queue");
         }
@@ -225,7 +222,7 @@ namespace Account.Controllers.CloseAccountController
                     23322,
                     mockRouteData,
                     registrations);
-            var verifiedUser = controller.DataRepository.Get<User>((long) 23322);
+            var verifiedUser = controller.CommonBusinessLogic.DataRepository.Get<User>((long) 23322);
 
             var mockEmailQueue = new Mock<IQueue>();
 
@@ -243,11 +240,11 @@ namespace Account.Controllers.CloseAccountController
                                 && inst.Type == typeof(CloseAccountCompletedTemplate).FullName)),
                 Times.Once(),
                 $"Expected the users email address using {nameof(CloseAccountCompletedTemplate)} to be in the email send queue");
-            string geoDistributionList = Config.GetAppSetting("GEODistributionList");
+
             mockEmailQueue.Verify(
                 x => x.AddMessageAsync(
                     It.Is<QueueWrapper>(
-                        inst => inst.Message.Contains(geoDistributionList) && inst.Type == typeof(OrphanOrganisationTemplate).FullName)),
+                        inst => inst.Message.Contains(ConfigHelpers.EmailOptions.GEODistributionList) && inst.Type == typeof(OrphanOrganisationTemplate).FullName)),
                 Times.Once(),
                 $"Expected the GEO Email addresses using {nameof(OrphanOrganisationTemplate)} to be in the email send queue");
         }

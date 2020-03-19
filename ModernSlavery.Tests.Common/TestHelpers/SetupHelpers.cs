@@ -1,6 +1,4 @@
 ﻿using Autofac;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.SharedKernel;
 using Moq;

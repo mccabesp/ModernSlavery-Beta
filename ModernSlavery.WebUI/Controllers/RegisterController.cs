@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Web;
-using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Register;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +10,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessLogic.Register;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
-using ModernSlavery.Infrastructure;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -34,11 +27,9 @@ namespace ModernSlavery.WebUI.Controllers
         #region Constructors
 
         public RegisterController(
-            ILogger<RegisterController> logger,
-            IWebService webService,
             IRegistrationService registrationService,
             IScopePresenter scopePresentation,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<RegisterController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             RegistrationService = registrationService;
             ScopePresentation = scopePresentation;
@@ -76,7 +67,7 @@ namespace ModernSlavery.WebUI.Controllers
             await Cache.RemoveAsync($"{UserHostAddress}:LastPasswordResetDate");
             if (value > DateTime.MinValue)
             {
-                await Cache.AddAsync($"{UserHostAddress}:LastPasswordResetDate", value, value.AddMinutes(Global.MinPasswordResetMinutes));
+                await Cache.AddAsync($"{UserHostAddress}:LastPasswordResetDate", value, value.AddMinutes(CommonBusinessLogic.GlobalOptions.MinPasswordResetMinutes));
             }
         }
 
@@ -111,21 +102,21 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await DataRepository.GetAll<UserOrganisation>()
+            UserOrganisation userOrg = await CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             //If a pin has never been sent or resend button submitted then send one immediately
             if (string.IsNullOrWhiteSpace(userOrg.PIN) && string.IsNullOrWhiteSpace(userOrg.PINHash)
                 || userOrg.PINSentDate.EqualsI(null, DateTime.MinValue)
-                || userOrg.PINSentDate.Value.AddDays(Global.PinInPostExpiryDays) < VirtualDateTime.Now)
+                || userOrg.PINSentDate.Value.AddDays(CommonBusinessLogic.GlobalOptions.PinInPostExpiryDays) < VirtualDateTime.Now)
             {
                 try
                 {
                     DateTime now = VirtualDateTime.Now;
 
                     // Check if we are a test user (for load testing)
-                    bool thisIsATestUser = userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix);
-                    bool pinInPostTestMode = Config.GetAppSetting<bool>("PinInPostTestMode");
+                    bool thisIsATestUser = userOrg.User.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix);
+                    bool pinInPostTestMode = CommonBusinessLogic.GlobalOptions.PinInPostTestMode;
 
                     // Generate a new pin
                     string pin = RegistrationService.OrganisationBusinessLogic.GeneratePINCode(thisIsATestUser);
@@ -135,7 +126,7 @@ namespace ModernSlavery.WebUI.Controllers
                     userOrg.PINHash = null;
                     userOrg.PINSentDate = now;
                     userOrg.Method = RegistrationMethods.PinInPost;
-                    await DataRepository.SaveChangesAsync();
+                    await CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
                     if (thisIsATestUser || pinInPostTestMode)
                     {
@@ -148,7 +139,7 @@ namespace ModernSlavery.WebUI.Controllers
                         if (RegistrationService.PinInThePostService.SendPinInThePost(userOrg, pin,returnUrl, out string letterId))
                         {
                             userOrg.PITPNotifyLetterId = letterId;
-                            await DataRepository.SaveChangesAsync();
+                            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
                         }
                         else
                         {
@@ -167,7 +158,7 @@ namespace ModernSlavery.WebUI.Controllers
                 {
                     Logger.LogError(ex, ex.Message);
                     // TODO: maybe change this?
-                    return View("CustomError", new ErrorViewModel(3014));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(3014));
                 }
             }
 
@@ -206,7 +197,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await DataRepository.GetAll<UserOrganisation>()
+            UserOrganisation userOrg = await CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             //Prepare view parameters
@@ -233,14 +224,14 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await DataRepository.GetAll<UserOrganisation>()
+            UserOrganisation userOrg = await CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             //Mark the user org as ready to send a pin
             userOrg.PIN = null;
             userOrg.PINHash = null;
             userOrg.PINSentDate = null;
-            await DataRepository.SaveChangesAsync();
+            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
             return RedirectToAction("PINSent");
         }
@@ -256,10 +247,10 @@ namespace ModernSlavery.WebUI.Controllers
             DateTime lastPasswordResetDate = await GetLastPasswordResetDateAsync();
             TimeSpan remainingTime = lastPasswordResetDate == DateTime.MinValue
                 ? TimeSpan.Zero
-                : lastPasswordResetDate.AddMinutes(Global.MinPasswordResetMinutes) - VirtualDateTime.Now;
-            if (!Global.SkipSpamProtection && remainingTime > TimeSpan.Zero)
+                : lastPasswordResetDate.AddMinutes(CommonBusinessLogic.GlobalOptions.MinPasswordResetMinutes) - VirtualDateTime.Now;
+            if (!CommonBusinessLogic.GlobalOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
             {
-                return View("CustomError", new ErrorViewModel(1133, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1133, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
             }
 
             User currentUser;
@@ -290,8 +281,8 @@ namespace ModernSlavery.WebUI.Controllers
             DateTime lastPasswordResetDate = await GetLastPasswordResetDateAsync();
             TimeSpan remainingTime = lastPasswordResetDate == DateTime.MinValue
                 ? TimeSpan.Zero
-                : lastPasswordResetDate.AddMinutes(Global.MinPasswordResetMinutes) - VirtualDateTime.Now;
-            if (!Global.SkipSpamProtection && remainingTime > TimeSpan.Zero)
+                : lastPasswordResetDate.AddMinutes(CommonBusinessLogic.GlobalOptions.MinPasswordResetMinutes) - VirtualDateTime.Now;
+            if (!CommonBusinessLogic.GlobalOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
             {
                 ModelState.AddModelError(3026, null, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)});
             }
@@ -322,7 +313,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             //Ensure signup is restricted to every 10 mins
             await SetLastPasswordResetDateAsync(
-                model.EmailAddress.StartsWithI(Global.TestPrefix) ? DateTime.MinValue : VirtualDateTime.Now);
+                model.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix) ? DateTime.MinValue : VirtualDateTime.Now);
 
             // find the latest active user by email
             currentUser = await RegistrationService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.Active);
@@ -343,11 +334,11 @@ namespace ModernSlavery.WebUI.Controllers
 
             currentUser.ResetAttempts = 0;
             currentUser.ResetSendDate = VirtualDateTime.Now;
-            await DataRepository.SaveChangesAsync();
+            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
             //show confirmation
             ViewBag.EmailAddress = currentUser.EmailAddress;
-            if (currentUser.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
             {
                 ViewBag.TestUrl = Url.Action(
                     "NewPassword",
@@ -439,20 +430,20 @@ namespace ModernSlavery.WebUI.Controllers
             }
             catch
             {
-                return View("CustomError", new ErrorViewModel(1123));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1123));
             }
 
             //Get the user oganisation
-            user = DataRepository.Get<User>(userId);
+            user = CommonBusinessLogic.DataRepository.Get<User>(userId);
 
             if (user == null)
             {
-                return View("CustomError", new ErrorViewModel(1124));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1124));
             }
 
             if (resetDate.AddDays(1) < VirtualDateTime.Now)
             {
-                return View("CustomError", new ErrorViewModel(1126));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1126));
             }
 
             return null;
@@ -484,7 +475,7 @@ namespace ModernSlavery.WebUI.Controllers
             var m = this.UnstashModel<ResetViewModel>();
             if (m == null || string.IsNullOrWhiteSpace(m.Resetcode))
             {
-                return View("CustomError", new ErrorViewModel(0));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(0));
             }
 
             result = UnwrapPasswordReset(m.Resetcode, out currentUser);
@@ -500,13 +491,13 @@ namespace ModernSlavery.WebUI.Controllers
 
             currentUser.ResetAttempts = 0;
             currentUser.ResetSendDate = null;
-            await DataRepository.SaveChangesAsync();
+            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Send completed notification email
             await RegistrationService.CommonBusinessLogic.SendEmailService.SendResetPasswordCompletedAsync(currentUser.EmailAddress);
 
             //Send the verification code and showconfirmation
-            return View("CustomError", new ErrorViewModel(1127));
+            return View("CustomError", WebService.ErrorViewModelFactory.Create(1127));
         }
 
         #endregion

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {

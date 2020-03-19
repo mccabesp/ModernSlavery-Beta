@@ -4,14 +4,14 @@
 
 using System.Threading.Tasks;
 using ModernSlavery.Extensions;
-using ModernSlavery.IdentityServer4.Classes;
-using ModernSlavery.IdentityServer4.Models.Home;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.IdentityServer4.Controllers
 {
@@ -19,15 +19,16 @@ namespace ModernSlavery.IdentityServer4.Controllers
     public class HomeController : BaseController
     {
 
+        private readonly IEventService _events;
         private readonly IIdentityServerInteractionService _interaction;
 
         public HomeController(
             IIdentityServerInteractionService interaction,
             IEventService events,
-            IDistributedCache cache,
-            ILogger<HomeController> logger) : base(events, cache, logger)
+            ILogger<HomeController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             _interaction = interaction;
+            _events = events;
         }
 
         [Route("~/ping")]
@@ -44,7 +45,7 @@ namespace ModernSlavery.IdentityServer4.Controllers
         [Route("~/login/login")]
         public IActionResult RedirectOldLogin()
         {
-            return Redirect(Startup.SiteAuthority);
+            return Redirect(CommonBusinessLogic.GlobalOptions.SiteAuthority);
         }
 
         /// <summary>
@@ -67,15 +68,12 @@ namespace ModernSlavery.IdentityServer4.Controllers
                 }
             }
 
-            var model = new ErrorViewModel();
 
             // retrieve error details from identityserver
             ErrorMessage message = await _interaction.GetErrorContextAsync(errorId);
             if (message != null)
             {
-                model.Title = message.Error;
-                model.Description = message.ErrorDescription;
-                _Logger.LogError($"{message.Error}: {message.ErrorDescription}");
+                Logger.LogError($"{message.Error}: {message.ErrorDescription}");
             }
             else
             {
@@ -87,16 +85,17 @@ namespace ModernSlavery.IdentityServer4.Controllers
                     var statusCodeData = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
                     if (statusCodeData != null)
                     {
-                        _Logger.LogError($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
+                        Logger.LogError($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
                     }
                     else
                     {
-                        _Logger.LogError($"HttpStatusCode {errorCode}, Path: Unknown");
+                        Logger.LogError($"HttpStatusCode {errorCode}, Path: Unknown");
                     }
                 }
             }
 
             Response.StatusCode = errorCode;
+            var model = WebService.ErrorViewModelFactory.Create(message.Error, message.ErrorDescription);
             return View("Error", model);
         }
 

@@ -7,10 +7,11 @@ using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessLogic;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Areas.Account.Controllers
 {
@@ -22,9 +23,7 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
 
         public ChangePasswordController(
             IChangePasswordViewService changePasswordService,
-            ILogger<ChangePasswordController> logger,
-            IWebService webService,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<ChangePasswordController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             ChangePasswordService = changePasswordService;
         }

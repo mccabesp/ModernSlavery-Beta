@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
@@ -117,13 +116,13 @@ namespace ModernSlavery.WebJob
 
         private async Task AddDataToIndexAsync(ILogger log)
         {
-            IQueryable<Organisation> allOrgs = DataRepository.GetAll<Organisation>();
+            IQueryable<Organisation> allOrgs = _CommonBusinessLogic.DataRepository.GetAll<Organisation>();
             List<Organisation> allOrgsList = await allOrgs.ToListAsync();
 
             //Remove the test organisations
-            if (!string.IsNullOrWhiteSpace(Global.TestPrefix))
+            if (!string.IsNullOrWhiteSpace(_CommonBusinessLogic.GlobalOptions.TestPrefix))
             {
-                allOrgsList.RemoveAll(o => o.OrganisationName.StartsWithI(Global.TestPrefix));
+                allOrgsList.RemoveAll(o => o.OrganisationName.StartsWithI(_CommonBusinessLogic.GlobalOptions.TestPrefix));
             }
 
             IEnumerable<Organisation> lookupResult = SearchBusinessLogic.LookupSearchableOrganisations(allOrgsList);
@@ -144,14 +143,14 @@ namespace ModernSlavery.WebJob
 
             try
             {
-                IEnumerable<string> files = await FileRepository.GetFilesAsync(Global.DataPath, Filenames.SicSectorSynonyms);
+                IEnumerable<string> files = await _CommonBusinessLogic.FileRepository.GetFilesAsync(_CommonBusinessLogic.GlobalOptions.DataPath, Filenames.SicSectorSynonyms);
                 string sicSectorSynonymsFilePath = files.OrderByDescending(f => f).FirstOrDefault();
 
                 #region Pattern
 
-                string rootDirMightIndicateCurrentLocation = string.IsNullOrEmpty(FileRepository.RootDir)
+                string rootDirMightIndicateCurrentLocation = string.IsNullOrEmpty(_CommonBusinessLogic.FileRepository.RootDir)
                     ? "root"
-                    : $"path {FileRepository.RootDir}";
+                    : $"path {_CommonBusinessLogic.FileRepository.RootDir}";
                 string fileInPathMessage = $"pattern {Filenames.SicSectorSynonyms} in {rootDirMightIndicateCurrentLocation}.";
                 if (string.IsNullOrEmpty(sicSectorSynonymsFilePath))
                 {
@@ -166,7 +165,7 @@ namespace ModernSlavery.WebJob
 
                 #region File exist
 
-                bool fileExists = await FileRepository.GetFileExistsAsync(sicSectorSynonymsFilePath);
+                bool fileExists = await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(sicSectorSynonymsFilePath);
                 if (!fileExists)
                 {
                     string fileDoesNotExistMessage = $"File does not exist {sicSectorSynonymsFilePath}.";
@@ -178,7 +177,7 @@ namespace ModernSlavery.WebJob
 
                 #endregion
 
-                List<SicCodeSearchModel> csv = await FileRepository.ReadCSVAsync<SicCodeSearchModel>(sicSectorSynonymsFilePath);
+                List<SicCodeSearchModel> csv = await _CommonBusinessLogic.FileRepository.ReadCSVAsync<SicCodeSearchModel>(sicSectorSynonymsFilePath);
 
                 listOfSicCodeRecords = csv.OrderBy(o => o.SicCodeId).ToList();
 

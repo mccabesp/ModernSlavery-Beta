@@ -11,16 +11,12 @@ using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.BusinessLogic.Models.Organisation;
 using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.BusinessLogic.Submit;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Models.Submit;
 using ModernSlavery.WebUI.Options;
-using ModernSlavery.WebUI.Shared.Abstractions;
-using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.WebUI.Presenters
 {
@@ -72,15 +68,18 @@ namespace ModernSlavery.WebUI.Presenters
     {
         public SubmissionPresenter(
             ISubmissionService submissionService,
-            IOptionsSnapshot<SubmissionOptions> submissionOptions)
+            SubmissionOptions submissionOptions,
+            ICommonBusinessLogic commonBusinessLogic)
         
         {
             SubmissionService=submissionService;
             SubmissionOptions = submissionOptions;
+            _commonBusinessLogic = commonBusinessLogic;
         }
         public ISubmissionService SubmissionService { get; }
-        public IOptionsSnapshot<SubmissionOptions> SubmissionOptions { get; }
-        
+        public SubmissionOptions SubmissionOptions { get; }
+        private ICommonBusinessLogic _commonBusinessLogic;
+
         public bool IsCurrentSnapshotYear(SectorTypes sector, int snapshotYear)
         {
             // Get the current reporting year
@@ -101,7 +100,7 @@ namespace ModernSlavery.WebUI.Presenters
 
         public virtual bool IsValidSnapshotYear(int snapshotYear)
         {
-            return snapshotYear >= Global.FirstReportingYear;
+            return snapshotYear >= _commonBusinessLogic.GlobalOptions.FirstReportingYear;
         }
 
         public Return CreateDraftSubmissionFromViewModel(ReturnViewModel stashedReturnViewModel)
@@ -528,10 +527,10 @@ namespace ModernSlavery.WebUI.Presenters
         public async Task<List<ReportInfoModel>> GetAllEditableReportsAsync(UserOrganisation userOrg, DateTime currentSnapshotDate)
         {
             int currentYear = currentSnapshotDate.Year;
-            int startYear = currentYear - (SubmissionOptions.Value.EditableReportCount - 1);
-            if (startYear < Global.FirstReportingYear)
+            int startYear = currentYear - (SubmissionOptions.EditableReportCount - 1);
+            if (startYear < _commonBusinessLogic.GlobalOptions.FirstReportingYear)
             {
-                startYear = Global.FirstReportingYear;
+                startYear = _commonBusinessLogic.GlobalOptions.FirstReportingYear;
             }
 
             var reportInfos = new List<ReportInfoModel>();

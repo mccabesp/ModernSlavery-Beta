@@ -4,11 +4,8 @@ using System.Threading.Tasks;
 using Autofac;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
@@ -24,7 +21,10 @@ using ModernSlavery.SharedKernel;
 
 using NUnit.Framework;
 using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {
@@ -550,7 +550,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 ReturnId = 101,
                 OrganisationId = org.OrganisationId,
                 Status = ReturnStatuses.Submitted,
-                AccountingDate = org.SectorType.GetAccountingStartDate(Numeric.Rand(Global.FirstReportingYear, VirtualDateTime.Now.Year))
+                AccountingDate = org.SectorType.GetAccountingStartDate(Numeric.Rand(ConfigHelpers.GlobalOptions.FirstReportingYear, VirtualDateTime.Now.Year))
             };
 
             var controller = UiTestHelper.GetController<ViewingController>(0, routeData, org, report);
@@ -582,13 +582,13 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 ReturnId = 101,
                 OrganisationId = org.OrganisationId,
                 Status = ReturnStatuses.Submitted,
-                AccountingDate = org.SectorType.GetAccountingStartDate(Numeric.Rand(Global.FirstReportingYear, VirtualDateTime.Now.Year))
+                AccountingDate = org.SectorType.GetAccountingStartDate(Numeric.Rand(ConfigHelpers.GlobalOptions.FirstReportingYear, VirtualDateTime.Now.Year))
             };
 
             var controller = UiTestHelper.GetController<ViewingController>(0, routeData, org, report);
 
             // Act
-            var result = controller.ReportDeprecated(org.GetEncryptedId(), Global.FirstReportingYear - 1) as HttpStatusViewResult;
+            var result = controller.ReportDeprecated(org.GetEncryptedId(),ConfigHelpers.GlobalOptions.FirstReportingYear - 1) as HttpStatusViewResult;
 
             // Assert
             Assert.NotNull(result, "Expected HttpStatusViewResult");
@@ -614,7 +614,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 ReturnId = 101,
                 OrganisationId = org.OrganisationId,
                 Status = ReturnStatuses.Submitted,
-                AccountingDate = org.SectorType.GetAccountingStartDate(Numeric.Rand(Global.FirstReportingYear, VirtualDateTime.Now.Year))
+                AccountingDate = org.SectorType.GetAccountingStartDate(Numeric.Rand(ConfigHelpers.GlobalOptions.FirstReportingYear, VirtualDateTime.Now.Year))
             };
 
             var controller = UiTestHelper.GetController<ViewingController>(0, routeData, org, report);
@@ -645,7 +645,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 ReturnId = 101,
                 OrganisationId = org.OrganisationId,
                 Status = ReturnStatuses.Submitted,
-                AccountingDate = org.SectorType.GetAccountingStartDate(Numeric.Rand(Global.FirstReportingYear, VirtualDateTime.Now.Year))
+                AccountingDate = org.SectorType.GetAccountingStartDate(Numeric.Rand(ConfigHelpers.GlobalOptions.FirstReportingYear, VirtualDateTime.Now.Year))
             };
 
             var controller = UiTestHelper.GetController<ViewingController>(0, routeData, org, report);
@@ -672,7 +672,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 .EncryptAndEncode(organisationId);
 
             // Act
-            var result = controller.ReportDeprecated(encryptedOrganisationId, Global.FirstReportingYear) as RedirectToActionResult;
+            var result = controller.ReportDeprecated(encryptedOrganisationId,ConfigHelpers.GlobalOptions.FirstReportingYear) as RedirectToActionResult;
 
             // Assert
             Assert.NotNull(result);
@@ -683,7 +683,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
         public static string ConfigureObfuscator(long valueToObfuscate)
         {
-            string result = new InternalObfuscator().Obfuscate(valueToObfuscate.ToString());
+            string result = new InternalObfuscator(ConfigHelpers.GlobalOptions.ObfuscationSeed).Obfuscate(valueToObfuscate.ToString());
 
             Mock<IObfuscator> mockedObfuscatorToSetup = AutoFacExtensions.ResolveAsMock<IObfuscator>();
 
@@ -726,7 +726,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
         {
             // Arrange
             var controller = UiTestHelper.GetController<ViewingController>();
-            int year = Global.FirstReportingYear - 1;
+            int year =ConfigHelpers.GlobalOptions.FirstReportingYear - 1;
 
             // Act
             var result = controller.Report("_", year) as HttpStatusViewResult;
@@ -764,7 +764,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 .Throws(new Exception("Kaboom"));
 
             // Act
-            var result = controller.Report("dxDN£34MdgC", Global.FirstReportingYear) as ViewResult;
+            var result = controller.Report("dxDN£34MdgC",ConfigHelpers.GlobalOptions.FirstReportingYear) as ViewResult;
             Assert.NotNull(result);
             var model = result.Model as ErrorViewModel;
             Assert.NotNull(model);
@@ -782,10 +782,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
         {
             // Arrange
             var controller = UiTestHelper.GetController<ViewingController>();
-            string obfuscatedZeroOrganisationId = new InternalObfuscator().Obfuscate(0);
+            string obfuscatedZeroOrganisationId = new InternalObfuscator(ConfigHelpers.GlobalOptions.ObfuscationSeed).Obfuscate(0);
 
             // Act
-            var result = controller.Report(obfuscatedZeroOrganisationId, Global.FirstReportingYear) as HttpStatusViewResult;
+            var result = controller.Report(obfuscatedZeroOrganisationId,ConfigHelpers.GlobalOptions.FirstReportingYear) as HttpStatusViewResult;
 
             // Assert
             Assert.NotNull(result);
@@ -803,7 +803,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             string obfuscatedEmployerId = ConfigureObfuscator(1548);
 
             // Act
-            var result = controller.Report(obfuscatedEmployerId, Global.FirstReportingYear) as HttpStatusViewResult;
+            var result = controller.Report(obfuscatedEmployerId,ConfigHelpers.GlobalOptions.FirstReportingYear) as HttpStatusViewResult;
 
             // Assert
             Assert.NotNull(result);
@@ -826,7 +826,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 .Returns(org.OrganisationId.ToInt32());
 
             // Act
-            var result = controller.Report(org.GetEncryptedId(), Global.FirstReportingYear) as HttpStatusViewResult;
+            var result = controller.Report(org.GetEncryptedId(),ConfigHelpers.GlobalOptions.FirstReportingYear) as HttpStatusViewResult;
 
             // Assert
             Assert.NotNull(result);
@@ -848,7 +848,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 .Returns(org.OrganisationId.ToInt32());
 
             // Act
-            var result = controller.Report(org.GetEncryptedId(), Global.FirstReportingYear) as HttpStatusViewResult;
+            var result = controller.Report(org.GetEncryptedId(),ConfigHelpers.GlobalOptions.FirstReportingYear) as HttpStatusViewResult;
 
             // Assert
             Assert.NotNull(result);
@@ -868,14 +868,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 OrganisationId = org.OrganisationId,
                 Status = returnStatus == ReturnStatuses.Retired ? ReturnStatuses.Deleted : ReturnStatuses.Retired,
                 StatusDate = VirtualDateTime.Now,
-                AccountingDate = org.SectorType.GetAccountingStartDate(Global.FirstReportingYear)
+                AccountingDate = org.SectorType.GetAccountingStartDate(ConfigHelpers.GlobalOptions.FirstReportingYear)
             };
             var report2 = new Return {
                 ReturnId = 102,
                 OrganisationId = org.OrganisationId,
                 Status = returnStatus,
                 StatusDate = report1.StatusDate.AddSeconds(1),
-                AccountingDate = org.SectorType.GetAccountingStartDate(Global.FirstReportingYear)
+                AccountingDate = org.SectorType.GetAccountingStartDate(ConfigHelpers.GlobalOptions.FirstReportingYear)
             };
 
             var controller = UiTestHelper.GetController<ViewingController>(org.OrganisationId, null, org, report1, report2);
@@ -908,7 +908,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 ReturnId = 98754,
                 OrganisationId = org.OrganisationId,
                 Status = ReturnStatuses.Retired,
-                AccountingDate = org.SectorType.GetAccountingStartDate(Global.FirstReportingYear)
+                AccountingDate = org.SectorType.GetAccountingStartDate(ConfigHelpers.GlobalOptions.FirstReportingYear)
             };
 
             var controller = UiTestHelper.GetController<ViewingController>(default, null, org, report);
@@ -919,7 +919,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 .Returns(org.OrganisationId.ToInt32());
 
             // Act
-            var result = controller.Report(obfuscatedOrganisationId, Global.FirstReportingYear + 1) as HttpStatusViewResult;
+            var result = controller.Report(obfuscatedOrganisationId,ConfigHelpers.GlobalOptions.FirstReportingYear + 1) as HttpStatusViewResult;
 
             // Assert
             Assert.NotNull(result);
@@ -955,7 +955,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.ViewingService.SubmissionBusinessLogic = mockedSubmissionBusinessLogicToSetup.Object;
 
             // Act
-            var result = controller.Report(obfuscatedOrganisationId, Global.FirstReportingYear + 1) as ViewResult;
+            var result = controller.Report(obfuscatedOrganisationId,ConfigHelpers.GlobalOptions.FirstReportingYear + 1) as ViewResult;
             Assert.NotNull(result);
             var model = result.Model as ErrorViewModel;
             Assert.NotNull(model);
@@ -978,7 +978,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 SectorType = Numeric.Rand(0, 1) == 0 ? SectorTypes.Private : SectorTypes.Public
             };
 
-            DateTime testAccountingDate = org.SectorType.GetAccountingStartDate(Global.FirstReportingYear);
+            DateTime testAccountingDate = org.SectorType.GetAccountingStartDate(ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             org.OrganisationScopes = new[] {
                 new OrganisationScope {
@@ -1076,7 +1076,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 .Returns(org.OrganisationId.ToInt32());
 
             // Act
-            var result = controller.Report(obfuscatedOrganisationId, Global.FirstReportingYear) as ViewResult;
+            var result = controller.Report(obfuscatedOrganisationId,ConfigHelpers.GlobalOptions.FirstReportingYear) as ViewResult;
             Assert.NotNull(result);
             var model = result.Model as ReturnViewModel;
             Assert.NotNull(model);

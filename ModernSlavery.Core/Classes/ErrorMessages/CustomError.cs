@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Core.Classes.ErrorMessages
@@ -24,15 +23,6 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         public override string ToString()
         {
             return Description;
-        }
-
-        public HttpStatusViewResult ToHttpStatusViewResult()
-        {
-            HttpStatusCode codeConvertedToStatus = Enum.IsDefined(typeof(HttpStatusCode), Code)
-                ? (HttpStatusCode) Code
-                : HttpStatusCode.NotFound;
-
-            return new HttpStatusViewResult((int) codeConvertedToStatus, Description);
         }
 
         public HttpException ToHttpException()

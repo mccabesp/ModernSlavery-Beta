@@ -2,7 +2,7 @@
 using System.Linq;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.WebUI.Shared.Interfaces;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.Core.Classes

@@ -1,7 +1,9 @@
-﻿namespace ModernSlavery.WebUI.Options
-{
+﻿using ModernSlavery.SharedKernel.Options;
 
-    public class SubmissionOptions
+namespace ModernSlavery.WebUI.Options
+{
+    [Options("Web:Submission")]
+    public class SubmissionOptions:IOptions
     {
 
         /// <summary>

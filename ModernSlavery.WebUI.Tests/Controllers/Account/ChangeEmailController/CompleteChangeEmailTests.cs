@@ -1,16 +1,14 @@
 ﻿using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using ModernSlavery.BusinessLogic.Models.Account;
 using ModernSlavery.Core.EmailTemplates;
-using ModernSlavery.Core.Models.AccountModels;
 using Moq;
 
 using NUnit.Framework;

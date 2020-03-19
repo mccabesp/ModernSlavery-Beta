@@ -2,22 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.Cookies;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Views.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Presenters;
-using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.WebUI.Shared.Classes.Cookies;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -28,11 +25,9 @@ namespace ModernSlavery.WebUI.Controllers
 
         public HomeController(
             ICustomLogger customLogger,
-            ILogger<HomeController> logger,
-            IWebService webService,
             IScopePresenter scopeUIService,
             IShortCodesRepository shortCodesRepository,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<HomeController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             CustomLogger = customLogger;
             ScopePresentation = scopeUIService;
@@ -69,17 +64,17 @@ namespace ModernSlavery.WebUI.Controllers
                     {
                         return View(
                             "CustomError",
-                            new ErrorViewModel(1135, new {expiryDate = code.ExpiryDate.Value.ToString("d MMMM yyyy")}));
+                            WebService.ErrorViewModelFactory.Create(1135, new {expiryDate = code.ExpiryDate.Value.ToString("d MMMM yyyy")}));
                     }
 
-                    await WebTracker.TrackPageViewAsync(this);
+                    await TrackPageViewAsync();
 
                     string url = $"{code.Path.TrimI(@" .~\")}{RequestUrl.Query}";
                     return new RedirectResult(url);
                 }
             }
 
-            return View("CustomError", new ErrorViewModel(1136));
+            return View("CustomError", WebService.ErrorViewModelFactory.Create(1136));
         }
 
         [HttpGet("~/sign-out")]
@@ -125,7 +120,7 @@ namespace ModernSlavery.WebUI.Controllers
         [HttpGet("Init")]
         public IActionResult Init()
         {
-            if (!Config.IsProduction())
+            if (!CommonBusinessLogic.GlobalOptions.IsProduction())
             {
                 Logger.LogInformation("Home Controller Initialised");
             }
@@ -231,10 +226,10 @@ namespace ModernSlavery.WebUI.Controllers
             {
                 // check if the user has accepted the privacy statement
                 DateTime? hasReadPrivacy = currentUser.AcceptedPrivacyStatement;
-                if (hasReadPrivacy == null || hasReadPrivacy.ToDateTime() < Global.PrivacyChangedDate)
+                if (hasReadPrivacy == null || hasReadPrivacy.ToDateTime() < CommonBusinessLogic.GlobalOptions.PrivacyChangedDate)
                 {
                     currentUser.AcceptedPrivacyStatement = VirtualDateTime.Now;
-                    await DataRepository.SaveChangesAsync();
+                    await CommonBusinessLogic.DataRepository.SaveChangesAsync();
                 }
             }
 

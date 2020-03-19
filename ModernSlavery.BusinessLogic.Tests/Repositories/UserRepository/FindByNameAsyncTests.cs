@@ -10,6 +10,8 @@ using NUnit.Framework;
 using ModernSlavery.Tests.Common;
 using Autofac;
 using AutoMapper;
+using ModernSlavery.Database;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
 {
@@ -22,7 +24,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
             {
                 // Initialise AutoMapper
                 MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                    config.AddMaps(typeof(BusinessLogic.Repositories.UserRepository));
+                    config.AddMaps(typeof(Infrastructure.Data.UserRepository));
                 });
                 builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
             }
@@ -126,7 +128,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
                         .BuildMock()
                         .Object);
 
-            _configuredIUserRepository = new BusinessLogic.Repositories.UserRepository(
+            _configuredIUserRepository = new Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(),
                 configurableDataRepository.Object,
                 Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
         }

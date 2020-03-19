@@ -34,7 +34,7 @@ namespace ModernSlavery.WebUI.Controllers
             var model = this.UnstashModel<OrganisationViewModel>();
             if (model == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             //Pre-populate address from selected employer
@@ -73,7 +73,7 @@ namespace ModernSlavery.WebUI.Controllers
             var m = this.UnstashModel<OrganisationViewModel>();
             if (m == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             model.Employers = m.Employers;
@@ -181,7 +181,7 @@ namespace ModernSlavery.WebUI.Controllers
             var model = this.UnstashModel<OrganisationViewModel>();
             if (model == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             //Pre-load contact details
@@ -239,7 +239,7 @@ namespace ModernSlavery.WebUI.Controllers
             var m = this.UnstashModel<OrganisationViewModel>();
             if (m == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             model.Employers = m.Employers;
@@ -319,7 +319,7 @@ namespace ModernSlavery.WebUI.Controllers
             var model = this.UnstashModel<OrganisationViewModel>();
             if (model == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             return View("AddSector", model);
@@ -343,7 +343,7 @@ namespace ModernSlavery.WebUI.Controllers
             var m = this.UnstashModel<OrganisationViewModel>();
             if (m == null)
             {
-                return View("CustomError", new ErrorViewModel(1112));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
             }
 
             model.Employers = m.Employers;
@@ -415,7 +415,7 @@ namespace ModernSlavery.WebUI.Controllers
                             break;
                         }
 
-                        var sic = DataRepository.Get<SicCode>(code);
+                        var sic = CommonBusinessLogic.DataRepository.Get<SicCode>(code);
                         if (sic == null || code == 1)
                         {
                             ModelState.AddModelError("", code + " is not a recognised SIC code");

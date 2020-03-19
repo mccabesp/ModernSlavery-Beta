@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Entities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
@@ -21,11 +20,11 @@ namespace ModernSlavery.WebJob
         {
             try
             {
-                string filePath = Path.Combine(Global.DownloadsPath, Filenames.UnverifiedRegistrations);
+                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.UnverifiedRegistrations);
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateUnverifiedRegistrations))
-                    && await FileRepository.GetFileExistsAsync(filePath))
+                    && await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -64,7 +63,7 @@ namespace ModernSlavery.WebJob
             RunningJobs.Add(nameof(UpdateUnverifiedRegistrations));
             try
             {
-                List<UserOrganisation> userOrgs = DataRepository.GetAll<UserOrganisation>()
+                List<UserOrganisation> userOrgs = _CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                     .Where(uo => uo.PINConfirmedDate == null)
                     .OrderBy(uo => uo.Organisation.OrganisationName)
                     .Include(uo => uo.Organisation.LatestScope)
@@ -97,7 +96,7 @@ namespace ModernSlavery.WebJob
                             Address = uo.Address?.GetAddressString()
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(_CommonBusinessLogic.FileRepository, records, filePath);
             }
             finally
             {

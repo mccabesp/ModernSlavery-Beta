@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.StaticFiles;
-using System;
+﻿using System;
 using System.IO;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace ModernSlavery.Extensions
 {

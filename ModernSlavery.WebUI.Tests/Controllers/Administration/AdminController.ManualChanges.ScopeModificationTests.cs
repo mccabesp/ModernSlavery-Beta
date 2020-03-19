@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Autofac;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
@@ -23,7 +20,6 @@ using NUnit.Framework;
 using ModernSlavery.WebUI.Tests;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.Admin.Controllers;
-using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
 {
@@ -47,7 +43,7 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
         [SetUp]
         public void InitialiseDbObjectsBeforeEachTest()
         {
-            int callRequiredToInitialiseVirtualDateTime = Global.FirstReportingYear;
+            int callRequiredToInitialiseVirtualDateTime = ConfigHelpers.GlobalOptions.FirstReportingYear;
             OrganisationScope orgStatusToProveItDoesNotGetRetired =
                 OrganisationScopeHelper.GetOrganisationScope_InScope(2001, SectorTypes.Private);
             Organisation org = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, TestSnapshotYear);

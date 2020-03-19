@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -29,7 +28,7 @@ namespace ModernSlavery.WebJob
 
                 #region WebServer Logs
 
-                string webServerlogPath = Path.Combine(Global.LogPath, "ModernSlavery.WebUI");
+                string webServerlogPath = Path.Combine(_CommonBusinessLogic.GlobalOptions.LogPath, "ModernSlavery.WebUI");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "WarningLog"));
@@ -44,7 +43,7 @@ namespace ModernSlavery.WebJob
 
                 #region IdentityServer Logs
 
-                string identityServerlogPath = Path.Combine(Global.LogPath, "ModernSlavery.IdentityServer4");
+                string identityServerlogPath = Path.Combine(_CommonBusinessLogic.GlobalOptions.LogPath, "ModernSlavery.IdentityServer4");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "WarningLog"));
@@ -54,7 +53,7 @@ namespace ModernSlavery.WebJob
 
                 #region Webjob Logs
 
-                string webJoblogPath = Path.Combine(Global.LogPath, "ModernSlavery.WebJob");
+                string webJoblogPath = Path.Combine(_CommonBusinessLogic.GlobalOptions.LogPath, "ModernSlavery.WebJob");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "WarningLog"));
@@ -83,7 +82,7 @@ namespace ModernSlavery.WebJob
         private async Task MergeCsvLogsAsync<T>(ILogger log, string logPath, string prefix, string extension = ".csv")
         {
             //Get all the daily log files
-            IEnumerable<string> files = await FileRepository.GetFilesAsync(logPath, $"{prefix}_*{extension}");
+            IEnumerable<string> files = await _CommonBusinessLogic.FileRepository.GetFilesAsync(logPath, $"{prefix}_*{extension}");
             List<string> fileList = files.OrderBy(o => o).ToList();
 
             //Get all files before today
@@ -118,13 +117,13 @@ namespace ModernSlavery.WebJob
                     string monthLog = Path.Combine(logPath, $"{prefix}_{date:yyMM}{extension}");
 
                     //Read all the records from this daily log file
-                    List<T> records = await FileRepository.ReadCSVAsync<T>(file);
+                    List<T> records = await _CommonBusinessLogic.FileRepository.ReadCSVAsync<T>(file);
 
                     //Add the records to its monthly log file
-                    await FileRepository.AppendCsvRecordsAsync(monthLog, records);
+                    await _CommonBusinessLogic.FileRepository.AppendCsvRecordsAsync(monthLog, records);
 
                     //Delete this daily log file
-                    await FileRepository.DeleteFileAsync(file);
+                    await _CommonBusinessLogic.FileRepository.DeleteFileAsync(file);
                 }
                 catch (Exception ex)
                 {
@@ -165,9 +164,9 @@ namespace ModernSlavery.WebJob
                     }
 
                     string archivePath = Path.Combine(logPath, year.ToString());
-                    if (!await FileRepository.GetDirectoryExistsAsync(archivePath))
+                    if (!await _CommonBusinessLogic.FileRepository.GetDirectoryExistsAsync(archivePath))
                     {
-                        await FileRepository.CreateDirectoryAsync(archivePath);
+                        await _CommonBusinessLogic.FileRepository.CreateDirectoryAsync(archivePath);
                     }
 
                     //Ensure we have a unique filename
@@ -175,19 +174,19 @@ namespace ModernSlavery.WebJob
                     string archiveFilePath = Path.Combine(archivePath, fileName) + ext;
 
                     var c = 0;
-                    while (await FileRepository.GetFileExistsAsync(archiveFilePath))
+                    while (await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(archiveFilePath))
                     {
                         c++;
                         archiveFilePath = Path.Combine(archivePath, fileName) + $" ({c}){ext}";
                     }
 
                     //Copy to the archive folder
-                    await FileRepository.CopyFileAsync(file, archiveFilePath, false);
+                    await _CommonBusinessLogic.FileRepository.CopyFileAsync(file, archiveFilePath, false);
 
                     //Delete the old file
-                    if (await FileRepository.GetFileExistsAsync(archiveFilePath))
+                    if (await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(archiveFilePath))
                     {
-                        await FileRepository.DeleteFileAsync(file);
+                        await _CommonBusinessLogic.FileRepository.DeleteFileAsync(file);
                     }
                 }
                 catch (Exception ex)

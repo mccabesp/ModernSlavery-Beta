@@ -3,14 +3,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using System.Web;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Database;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.IdentityServer4.Classes;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
@@ -23,61 +20,58 @@ using Microsoft.IdentityModel.Logging;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
+using ModernSlavery.Infrastructure.Configuration;
 using ModernSlavery.Infrastructure.Data;
 using ModernSlavery.Infrastructure.File;
+using ModernSlavery.Infrastructure.Hosts.WebHost;
 using ModernSlavery.Infrastructure.Logging;
+using ModernSlavery.Infrastructure.Options;
 using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Classes.Middleware;
+using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.IdentityServer4
 {
-    public class Startup
+    public class Startup:IStartup
     {
 
         public static Action<IServiceCollection> ConfigureTestServices;
         public static Action<ContainerBuilder> ConfigureTestContainer;
 
         private readonly IConfiguration _Config;
-        private readonly IWebHostEnvironment _Env;
         private readonly ILogger _Logger;
+        private IServiceProvider _ServiceProvider;
+        private OptionsBinder OptionsBinder;
 
-        public Startup(IWebHostEnvironment env, IConfiguration config, ILogger<Startup> logger)
+        public Startup(IConfiguration config)
         {
-            this._Env = env;
-            this._Config = config;
-            this._Logger = logger;
-        }
-
-
-        private static string _SiteAuthority;
-        public static string SiteAuthority
-        {
-            get
-            {
-                if (_SiteAuthority == null)
-                {
-                    _SiteAuthority = Config.SiteAuthority;
-                }
-
-                return _SiteAuthority;
-            }
-            set => _SiteAuthority = value;
+            _Config = config;
+            _Logger = Activator.CreateInstance<Logger<Startup>>();
         }
 
         // ConfigureServices is where you register dependencies. This gets
         // called by the runtime before the ConfigureContainer method, below.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            // Add services to the collection. Don't build or return 
-            // any IServiceProvider or the ConfigureContainer method
-            // won't get called.
-            services.ConfigureOptions<GlobalOptions>(_Config);
+            #region Bind the options classes and register as services
+            OptionsBinder = new OptionsBinder(services, _Config);
+            OptionsBinder.BindAssemblies("ModernSlavery");
+            var globalOptions = OptionsBinder.Get<GlobalOptions>();
+            #endregion
+
+            //Initialise the virtual date and time
+            VirtualDateTime.Initialise(globalOptions.DateTimeOffset);
 
             #region Configure identity server
 
             services.AddSingleton<IEventSink, AuditEventSink>();
 
-            IIdentityServerBuilder builder = services.AddIdentityServer(
+            var clients=new Clients(globalOptions);
+            var resources=new Resources(globalOptions);
+
+            var identityServer=services.AddIdentityServer(
                     options => {
                         options.Events.RaiseSuccessEvents = true;
                         options.Events.RaiseFailureEvents = true;
@@ -86,19 +80,15 @@ namespace ModernSlavery.IdentityServer4
                         options.UserInteraction.LogoutUrl = "/sign-out";
                         options.UserInteraction.ErrorUrl = "/error";
                     })
-                .AddInMemoryClients(Clients.Get())
-                .AddInMemoryIdentityResources(Resources.GetIdentityResources())
+                .AddInMemoryClients(clients.Get())
+                .AddInMemoryIdentityResources(resources.GetIdentityResources())
                 //.AddInMemoryApiResources(Resources.GetApiResources())
                 .AddCustomUserStore();
 
-            if (Debugger.IsAttached || Config.IsDevelopment() || Config.IsLocal())
-            {
-                builder.AddDeveloperSigningCredential();
-            }
+            if (Debugger.IsAttached || _Config["Environment"].EqualsI("Development","Local"))
+                identityServer.AddDeveloperSigningCredential();
             else
-            {
-                builder.AddSigningCredential(LoadCertificate());
-            }
+                identityServer.AddSigningCredential(LoadCertificate(globalOptions));
 
             #endregion
 
@@ -114,11 +104,13 @@ namespace ModernSlavery.IdentityServer4
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
-            if (Config.IsDevelopment() || Config.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
+            if (_Config["Environment"].EqualsI("Development", "Local")) mvcBuilder.AddRazorRuntimeCompilation();
 
 
             //Add the distributed cache and data protection
             services.AddDistributedCache(_Config).AddDataProtection(_Config);
+
+            services.AddApplicationInsightsTelemetry(_Config.GetValue("ApplicationInsights:InstrumentationKey",_Config["APPINSIGHTS-INSTRUMENTATIONKEY"]));
 
             //This may now be required 
             services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
@@ -126,21 +118,7 @@ namespace ModernSlavery.IdentityServer4
             //Override any test services
             ConfigureTestServices?.Invoke(services);
 
-            //Create Inversion of Control container
-            Program.ContainerIoC = BuildContainerIoC(services);
-
-            // Create the IServiceProvider based on the container.
-            return Program.ContainerIoC.Resolve<IServiceProvider>();
-        }
-
-        // ConfigureContainer is where you can register things directly
-        // with Autofac. This runs after ConfigureServices so the things
-        // here will override registrations made in ConfigureServices.
-        // Don't build the container; that gets done for you. If you
-        // need a reference to the container, you need to use the
-        // "Without ConfigureContainer" mechanism shown later.
-        public IContainer BuildContainerIoC(IServiceCollection services)
-        {
+            //Create the Autofac inversion of control container
             var builder = new ContainerBuilder();
 
             // Note that Populate is basically a foreach to add things
@@ -151,38 +129,59 @@ namespace ModernSlavery.IdentityServer4
             // in the ServiceCollection. Mix and match as needed.
             builder.Populate(services);
 
-            //Set the default encrytpion key
-            Encryption.SetDefaultEncryptionKey(Config.GetAppSetting("DefaultEncryptionKey"));
+            //Configure the container
+            var container=BuildContainer(builder);
+
+            //Register Autofac as the service provider
+            _ServiceProvider = new AutofacServiceProvider(container);
+            services.AddSingleton(_ServiceProvider);
+
+            //Register the webJobs IJobActivator
+            services.AddSingleton(container);
+
+            return container.Resolve<IServiceProvider>();
+        }
+
+        // ConfigureContainer is where you can register things directly
+        // with Autofac. This runs after ConfigureServices so the things
+        // here will override registrations made in ConfigureServices.
+        // Don't build the container; that gets done for you. If you
+        // need a reference to the container, you need to use the
+        // "Without ConfigureContainer" mechanism shown later.
+        private IContainer BuildContainer(ContainerBuilder builder)
+        {
+            var globalOptions = OptionsBinder.Get<GlobalOptions>();
+            var databaseOptions = OptionsBinder.Get<DatabaseOptions>();
+            var storageOptions = OptionsBinder.Get<StorageOptions>();
 
             //Register the configuration
             builder.RegisterInstance(_Config).SingleInstance();
 
-            builder.Register(c => new SqlRepository(new DatabaseContext(null,Global.DatabaseConnectionString)))
+            builder.Register(c => new SqlRepository(new DatabaseContext(globalOptions, databaseOptions)))
                 .As<IDataRepository>()
                 .InstancePerLifetimeScope();
 
             // Register storage
-            string azureStorageShareName = Config.GetAppSetting("AzureStorageShareName");
-            string localStorageRoot = Config.GetAppSetting("LocalStorageRoot");
+            string azureStorageShareName = _Config["AzureStorageShareName"];
+            string localStorageRoot = _Config["LocalStorageRoot"];
             if (string.IsNullOrWhiteSpace(localStorageRoot))
             {
                 //Exponential retry policy is recommended for background tasks - see https://docs.microsoft.com/en-us/azure/architecture/best-practices/retry-service-specific#azure-storage
                 builder.Register(
                         c => new AzureFileRepository(
-                            Global.AzureStorageConnectionString,
-                            azureStorageShareName,
+                            storageOptions,
                             new ExponentialRetry(TimeSpan.FromSeconds(3), 10)))
                     .As<IFileRepository>()
                     .SingleInstance();
             }
             else
             {
-                builder.Register(c => new SystemFileRepository(localStorageRoot)).As<IFileRepository>().SingleInstance();
+                builder.Register(c => new SystemFileRepository(storageOptions)).As<IFileRepository>().SingleInstance();
             }
 
             // Register queues (without key filtering)
-            builder.Register(c => new LogEventQueue(Global.AzureStorageConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
-            builder.Register(c => new LogRecordQueue(Global.AzureStorageConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
+            builder.Register(c => new LogEventQueue(storageOptions.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
+            builder.Register(c => new LogRecordQueue(storageOptions.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
 
             // Register log records (without key filtering)
             builder.RegisterType<UserLogRecord>().As<IUserLogRecord>().SingleInstance();
@@ -206,15 +205,24 @@ namespace ModernSlavery.IdentityServer4
 
             builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
 
+            //Build the container
             return builder.Build();
         }
 
-        public void Configure(IApplicationBuilder app, IApplicationLifetime lifetime, ILoggerFactory loggerFactory, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app)
         {
+            //Set the default encryption key
+            Encryption.SetDefaultEncryptionKey(_Config["DefaultEncryptionKey"]);
+
+            var lifetime = app.ApplicationServices.GetService<IApplicationLifetime>();
+            var loggerFactory = app.ApplicationServices.GetService<ILoggerFactory>();
+            var globalOptions = app.ApplicationServices.GetService<GlobalOptions>();
+            var responseCachingOptions = OptionsBinder.Get<ResponseCachingOptions>();
+
             loggerFactory.UseLogEventQueueLogger(app.ApplicationServices);
 
             app.UseMiddleware<ExceptionMiddleware>();
-            if (Debugger.IsAttached || Config.IsDevelopment() || Config.IsLocal())
+            if (Debugger.IsAttached || _Config["Environment"].EqualsI("Development","Local"))
             {
                 IdentityModelEventSource.ShowPII = true;
 
@@ -232,15 +240,12 @@ namespace ModernSlavery.IdentityServer4
                 new StaticFileOptions {
                     OnPrepareResponse = ctx => {
                         //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
-                        if (Global.StaticCacheSeconds > 0)
-                        {
-                            ctx.Context.SetResponseCache(Global.StaticCacheSeconds);
-                        }
+                        if (responseCachingOptions.StaticCacheSeconds > 0)ctx.Context.SetResponseCache(responseCachingOptions.StaticCacheSeconds);
                     }
                 }); //For the wwwroot folder
 
             // Include un-bundled js + css folders to serve the source files in dev environment
-            if (Config.IsLocal())
+            if (_Config["Environment"].EqualsI("Local"))
             {
                 app.UseStaticFiles(
                     new StaticFileOptions {
@@ -248,19 +253,16 @@ namespace ModernSlavery.IdentityServer4
                         RequestPath = "",
                         OnPrepareResponse = ctx => {
                             //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
-                            if (Global.StaticCacheSeconds > 0)
-                            {
-                                ctx.Context.SetResponseCache(Global.StaticCacheSeconds);
-                            }
+                            if (responseCachingOptions.StaticCacheSeconds > 0)ctx.Context.SetResponseCache(responseCachingOptions.StaticCacheSeconds);
                         }
                     });
             }
 
             app.UseRouting();
-            app.UseStaticHttpContext(); //Temporary fix for old static HttpContext 
-            app.UseMaintenancePageMiddleware(Global.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
-            app.UseStickySessionMiddleware(Global.StickySessions); //Enable/Disable sticky sessions based on  
+            app.UseMaintenancePageMiddleware(globalOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
+            app.UseStickySessionMiddleware(globalOptions.StickySessions); //Enable/Disable sticky sessions based on  
             app.UseSecurityHeaderMiddleware(); //Add/remove security headers from all responses
+
             //app.UseMvcWithDefaultRoute();
             app.UseEndpoints(endpoints =>
             {
@@ -272,18 +274,18 @@ namespace ModernSlavery.IdentityServer4
                     // Summary:
                     //     Triggered when the application host has fully started and is about to wait for
                     //     a graceful shutdown.
-                    logger.LogInformation("Application Started");
+                    _Logger.LogInformation("Application Started");
                 });
             lifetime.ApplicationStopping.Register(
                 () => {
                     // Summary:
                     //     Triggered when the application host is performing a graceful shutdown. Requests
                     //     may still be in flight. Shutdown will block until this event completes.
-                    logger.LogInformation("Application Stopping");
+                    _Logger.LogInformation("Application Stopping");
                 });
         }
 
-        private X509Certificate2 LoadCertificate()
+        private X509Certificate2 LoadCertificate(GlobalOptions globalOptions)
         {
             //Load the site certificate
             string certThumprint = _Config["WEBSITE_LOAD_CERTIFICATES"].SplitI(";").FirstOrDefault();
@@ -307,22 +309,22 @@ namespace ModernSlavery.IdentityServer4
                     $"Successfully loaded certificate '{cert.FriendlyName}' expiring '{cert.GetExpirationDateString()}' from file '{certPath}'");
             }
 
-            if (Global.CertExpiresWarningDays > 0)
+            if (globalOptions.CertExpiresWarningDays > 0)
             {
                 DateTime expires = cert.GetExpirationDateString().ToDateTime();
                 if (expires < VirtualDateTime.UtcNow)
                 {
                     _Logger.LogError(
-                        $"The website certificate for '{Global.ExternalHost}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
+                        $"The website certificate for '{globalOptions.EXTERNAL_HOST}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
                 }
                 else
                 {
                     TimeSpan remainingTime = expires - VirtualDateTime.Now;
 
-                    if (expires < VirtualDateTime.UtcNow.AddDays(Global.CertExpiresWarningDays))
+                    if (expires < VirtualDateTime.UtcNow.AddDays(globalOptions.CertExpiresWarningDays))
                     {
                         _Logger.LogWarning(
-                            $"The website certificate for '{SiteAuthority}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
+                            $"The website certificate for '{globalOptions.SiteAuthority}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
                     }
                 }
             }

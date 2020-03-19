@@ -1,13 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Shared.Options;
 
-namespace ModernSlavery.WebUI.Shared.Abstractions
+namespace ModernSlavery.WebUI.Shared.Interfaces
 {
     public interface IWebService
     {
+        IErrorViewModelFactory ErrorViewModelFactory { get; }
+        FeatureSwitchOptions FeatureSwitchOptions { get; }
+
         IMapper AutoMapper { get; }
         IHttpCache Cache { get; }
         IHttpSession Session { get; }

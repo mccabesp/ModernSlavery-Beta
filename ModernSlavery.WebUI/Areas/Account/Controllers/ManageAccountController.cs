@@ -4,9 +4,10 @@ using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessLogic;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.Entities;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Areas.Account.Controllers
 {
@@ -16,10 +17,8 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
     public class ManageAccountController : BaseController
     {
 
-        public ManageAccountController(ILogger<ManageAccountController> logger,
-            IWebService webService,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository,
-            fileRepository)
+        public ManageAccountController(
+            ILogger<ManageAccountController> logger,IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
         }
 

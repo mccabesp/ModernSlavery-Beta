@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Entities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
@@ -21,10 +20,10 @@ namespace ModernSlavery.WebJob
         {
             try
             {
-                string filePath = Path.Combine(Global.DownloadsPath, Filenames.Users);
+                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.Users);
 
                 //Dont execute on startup if file already exists
-                if (!StartedJobs.Contains(nameof(UpdateUsers)) && await FileRepository.GetFileExistsAsync(filePath))
+                if (!StartedJobs.Contains(nameof(UpdateUsers)) && await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -57,7 +56,7 @@ namespace ModernSlavery.WebJob
             RunningJobs.Add(nameof(UpdateUsers));
             try
             {
-                List<User> users = await DataRepository.GetAll<User>().ToListAsync();
+                List<User> users = await _CommonBusinessLogic.DataRepository.GetAll<User>().ToListAsync();
                 var records = users.Where(u => !u.IsAdministrator())
                     .OrderBy(u => u.Lastname)
                     .Select(
@@ -82,7 +81,7 @@ namespace ModernSlavery.WebJob
                             u.Created
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(_CommonBusinessLogic.FileRepository, records, filePath);
             }
             finally
             {

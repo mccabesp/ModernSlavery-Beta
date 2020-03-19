@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Models.Cookies;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Options;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Classes.Cookies;
+using ModernSlavery.WebUI.Shared.Interfaces;
 using HttpContext = Microsoft.AspNetCore.Http.HttpContext;
 
 namespace ModernSlavery.WebUI.Presenters

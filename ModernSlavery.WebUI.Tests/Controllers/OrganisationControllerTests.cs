@@ -6,10 +6,8 @@ using ModernSlavery.BusinessLogic;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Organisation;
 using ModernSlavery.WebUI.Tests.TestHelpers;
@@ -18,11 +16,11 @@ using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Core.EmailTemplates;
 using Moq;
 using ModernSlavery.Entities.Enums;
-using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.SharedKernel;
-
+using ModernSlavery.Tests.Common.Classes;
 using NUnit.Framework;
 using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Services;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
@@ -464,7 +462,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Expect(actionResult.ViewName.EqualsI("ScopeDeclared"), "Expected ScopeDeclared view");
             Expect(actionResult.ViewData.ModelState.IsValid, "Expected Valid viewstate");
             IQueryable<OrganisationScope> orgScopes =
-                controller.DataRepository.GetAll<OrganisationScope>().Where(os => os.OrganisationId == testOrgId);
+                controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationScope>().Where(os => os.OrganisationId == testOrgId);
 
             Expect(orgScopes.Count() == 3, "Expected three organisation scopes");
 
@@ -725,11 +723,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 Times.Exactly(1),
                 $"Expected the correct templateId to be in the email send queue, expected {EmailTemplates.RemovedUserFromOrganisationEmail}");
 
-            string geoDistributionList = Config.GetAppSetting("GEODistributionList");
             mockEmailQueue.Verify(
                 x => x.AddMessageAsync(
                     It.Is<QueueWrapper>(
-                        inst => inst.Message.Contains(geoDistributionList)
+                        inst => inst.Message.Contains(ConfigHelpers.EmailOptions.GEODistributionList)
                                 && inst.Type == typeof(OrphanOrganisationTemplate).FullName)),
                 Times.Once(),
                 $"Expected the GEO Email addresses using {nameof(OrphanOrganisationTemplate)} to be in the email send queue");
@@ -796,11 +793,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers
                 Times.Once(),
                 "Expected the other user of the same organisation's email address to be in the email send queue");
 
-            string geoDistributionList = Config.GetAppSetting("GEODistributionList");
             mockEmailQueue.Verify(
                 x => x.AddMessageAsync(
                     It.Is<QueueWrapper>(
-                        inst => inst.Message.Contains(geoDistributionList)
+                        inst => inst.Message.Contains(ConfigHelpers.EmailOptions.GEODistributionList)
                                 && inst.Type == typeof(OrphanOrganisationTemplate).FullName)),
                 Times.Never,
                 $"Didnt expect the GEO Email addresses using {nameof(OrphanOrganisationTemplate)} to be in the email send queue");

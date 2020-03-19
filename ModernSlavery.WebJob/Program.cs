@@ -1,23 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Threading;
 using Autofac;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using ModernSlavery.Core.EmailTemplates;
-using ModernSlavery.Infrastructure.Message;
-using ModernSlavery.Infrastructure.Queue;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Infrastructure.WebjobHost;
 
 namespace ModernSlavery.WebJob
 {
@@ -27,61 +15,25 @@ namespace ModernSlavery.WebJob
 
         public static IContainer ContainerIOC;
 
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             Console.Title = "ModernSlavery.WebJobs";
 
             //Add a handler for unhandled exceptions
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            //Culture is required so UK dates can be parsed correctly
-            Thread.CurrentThread.CurrentCulture = new CultureInfo(Config.GetAppSetting("Culture").ToStringOr("en-GB"));
-            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
-            CultureInfo.DefaultThreadCurrentCulture = Thread.CurrentThread.CurrentCulture;
-            CultureInfo.DefaultThreadCurrentUICulture = Thread.CurrentThread.CurrentCulture;
+            //Create the web host
+            var hostBuilder = Host.CreateDefaultBuilder(args).ConfigureWebjobHostBuilder<Startup>();
+            var host = hostBuilder.Build();
 
-            if (!Config.IsProduction() && Config.GetAppSetting("DUMP_APPSETTINGS") == "1")
-            {
-                foreach (string key in Config.GetAppSettingKeys())
-                {
-                    Console.WriteLine($@"APPSETTING[""{key}""]={Config.GetAppSetting(key)}");
-                }
-            }
-
-            //Build the webjob host and services
-            IHost host = BuildJobHost(args);
-
-            // Register email templates
-            var emailTemplatesConfigPath = "Email:Templates";
-            // Gpg templates
-            host.RegisterEmailTemplate<ChangeEmailPendingVerificationTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<ChangeEmailCompletedVerificationTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<ChangeEmailCompletedNotificationTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<ChangePasswordCompletedTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<ResetPasswordVerificationTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<ResetPasswordCompletedTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<CloseAccountCompletedTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<OrphanOrganisationTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<CreateAccountPendingVerificationTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<OrganisationRegistrationApprovedTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<OrganisationRegistrationDeclinedTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<OrganisationRegistrationRemovedTemplate>(emailTemplatesConfigPath);
-            host.RegisterEmailTemplate<GeoOrganisationRegistrationRequestTemplate>(emailTemplatesConfigPath);
-
-            // system templates
-            host.RegisterEmailTemplate<SendEmailTemplate>(emailTemplatesConfigPath);
-
-            //Ensure SicSectorSynonyms exist on remote 
-            var _FileRepository = ContainerIOC.Resolve<IFileRepository>();
-            Task.WaitAll(Core.Classes.Extensions.PushRemoteFileAsync(_FileRepository, Filenames.SicSectorSynonyms, Global.DataPath));
+            //Show thread availability
+            Console.WriteLine(Infrastructure.Hosts.Extensions.GetThreadCount());
 
             //Leave this check here to ensure function dependencies resolve on startup rather than when each function method is invoked
             var functions = ContainerIOC.Resolve<Functions>();
-            
-            //Show thread availability
-            Console.WriteLine(Extensions.AspNetCore.Extensions.GetThreadCount());
 
-            host.Run();
+            //Run the host
+            await host.RunAsync();
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -92,60 +44,10 @@ namespace ModernSlavery.WebJob
             Debug.WriteLine($"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
 
             //Show thread availability
-            Console.WriteLine(Extensions.AspNetCore.Extensions.GetThreadCount());
+            Console.WriteLine(Infrastructure.Hosts.Extensions.GetThreadCount());
 
             throw ex;
         }
-
-        public static IHost BuildJobHost(string[] args)
-        {
-            IHostBuilder jobHostBuilder = new HostBuilder()
-                .UseEnvironment(Config.EnvironmentName)
-                .ConfigureServices(Startup.ConfigureServices);
-
-            jobHostBuilder.ConfigureLogging(
-                (context, builder) => {
-                    builder.ClearProviders();
-                    builder.AddConfiguration(Config.Configuration.GetSection("Logging"));
-                    // If this key exists in any config, use it to enable App Insights
-                    if (!string.IsNullOrEmpty(Global.APPINSIGHTS_INSTRUMENTATIONKEY))
-                    {
-                        builder.AddApplicationInsights(o => o.InstrumentationKey = Global.APPINSIGHTS_INSTRUMENTATIONKEY);
-                    }
-
-                    builder.AddDebug();
-                    builder.AddConsole();
-                    builder.AddEventSourceLogger(); //Log to windows event log
-                    builder.AddAzureQueueLogger();
-                });
-
-            Extensions.AspNetCore.Extensions.SetupSerilogLogger();
-
-            var settings = new Dictionary<string, string>();
-            settings["ConnectionStrings:AzureWebJobsStorage"] = Global.AzureStorageConnectionString;
-
-            jobHostBuilder.ConfigureAppConfiguration(b => { b.AddInMemoryCollection(settings); });
-
-            jobHostBuilder.ConfigureWebJobs(
-                builder => {
-                    builder.AddAzureStorageCoreServices();
-                    builder.AddAzureStorage(
-                        queueConfig => {
-                            queueConfig.BatchSize = 1; //Process queue messages 1 item per time per job function
-                        },
-                        blobConfig => {
-                            //Configure blobs here
-                        });
-                    builder.AddServiceBus();
-                    builder.AddEventHubs();
-                    builder.AddTimers();
-                });
-
-            return jobHostBuilder
-                .UseConsoleLifetime()
-                .Build();
-        }
-
     }
 
     public class AutofacJobActivator : IJobActivator

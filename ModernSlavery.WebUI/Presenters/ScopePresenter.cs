@@ -146,7 +146,7 @@ namespace ModernSlavery.WebUI.Presenters
             //Get the organisation with this employer reference
             Organisation org = model.OrganisationId == 0
                 ? null
-                : await DataRepository.GetAll<Organisation>().FirstOrDefaultAsync(o => o.OrganisationId == model.OrganisationId);
+                : await _commonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefaultAsync(o => o.OrganisationId == model.OrganisationId);
             if (org == null)
             {
                 throw new ArgumentOutOfRangeException(
@@ -231,7 +231,7 @@ namespace ModernSlavery.WebUI.Presenters
 
         public async Task<Organisation> GetOrgByEmployerReferenceAsync(string employerReference)
         {
-            Organisation org = await DataRepository.GetAll<Organisation>()
+            Organisation org = await _commonBusinessLogic.DataRepository.GetAll<Organisation>()
                 .FirstOrDefaultAsync(o => o.EmployerReference == employerReference);
             return org;
         }

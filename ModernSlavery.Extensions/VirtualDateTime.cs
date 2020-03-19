@@ -4,17 +4,19 @@ namespace ModernSlavery.Extensions
 {
     public static class VirtualDateTime
     {
+        public static TimeSpan Offset { get; private set; } =TimeSpan.Zero;
 
-        private static TimeSpan offsetCurrentDateTimeForSite = TimeSpan.Zero;
+        public static DateTime Now => DateTime.Now.Add(Offset);
 
-        public static DateTime Now => DateTime.Now.Add(offsetCurrentDateTimeForSite);
+        public static DateTime UtcNow => DateTime.UtcNow.Add(Offset);
 
-        public static DateTime UtcNow => DateTime.UtcNow.Add(offsetCurrentDateTimeForSite);
-
-        public static void Initialise(TimeSpan initialisationTimeSpan)
+        public static void Initialise(TimeSpan initialisationTimeSpan=default)
         {
-            offsetCurrentDateTimeForSite = initialisationTimeSpan;
+            Offset = initialisationTimeSpan;
         }
-
+        public static void Initialise(string dateTimeOffset)
+        {
+            Offset = string.IsNullOrWhiteSpace(dateTimeOffset) ? TimeSpan.Zero : TimeSpan.Parse(dateTimeOffset);
+        }
     }
 }

@@ -3,12 +3,10 @@ using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
@@ -21,7 +19,8 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
-
+using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.WebUI.Shared.Classes;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Shared.Models;
 
@@ -329,7 +328,7 @@ namespace ModernSlavery.Tests
                 UserId = 1,
                 Organisation = org,
                 OrganisationId = 1,
-                PINSentDate = VirtualDateTime.Now.AddDays(0 - Global.PinInPostExpiryDays - 1)
+                PINSentDate = VirtualDateTime.Now.AddDays(0 - ConfigHelpers.GlobalOptions.PinInPostExpiryDays - 1)
             };
 
             var routeData = new RouteData();
@@ -1023,7 +1022,7 @@ namespace ModernSlavery.Tests
             Mock<IScopeBusinessLogic> mockScopeBL = AutoFacExtensions.ResolveAsMock<IScopeBusinessLogic>(true);
             //ACT:
             var result = controller.OrganisationType() as RedirectToActionResult;
-            UserOrganisation userOrg = controller.DataRepository.GetAll<UserOrganisation>()
+            UserOrganisation userOrg = controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefault(uo => uo.UserId == user.UserId && uo.OrganisationId == orgScope.OrganisationId);
 
             //ASSERT:
@@ -1292,7 +1291,7 @@ namespace ModernSlavery.Tests
             var actualModel = controller.UnstashModel<OrganisationViewModel>();
 
             //check that the search returned a match in the db
-            //var sResult     = controller.DataRepository.GetAll<OrganisationViewModel>().Where(o => o.CompanyNumber == resultModel.CompanyNumber);
+            //var sResult     = controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationViewModel>().Where(o => o.CompanyNumber == resultModel.CompanyNumber);
             //var pagedResult =  controller.PrivateSectorRepository.Search(model.SearchText, 1, Settings.Default.EmployerPageSize);
 
             //ASSERT:

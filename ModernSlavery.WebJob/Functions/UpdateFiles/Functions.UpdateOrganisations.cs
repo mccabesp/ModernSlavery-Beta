@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.SharedKernel;
@@ -19,13 +18,13 @@ namespace ModernSlavery.WebJob
         {
             try
             {
-                string filePath = Path.Combine(Global.DownloadsPath, Filenames.Organisations);
+                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.Organisations);
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateOrganisationsAsync)))
                 {
-                    IEnumerable<string> files = await FileRepository.GetFilesAsync(
-                        Global.DownloadsPath,
+                    IEnumerable<string> files = await _CommonBusinessLogic.FileRepository.GetFilesAsync(
+                        _CommonBusinessLogic.GlobalOptions.DownloadsPath,
                         $"{Path.GetFileNameWithoutExtension(Filenames.Organisations)}*{Path.GetExtension(Filenames.Organisations)}");
                     if (files.Any())
                     {
@@ -64,7 +63,7 @@ namespace ModernSlavery.WebJob
             {
                 await WriteRecordsPerYearAsync(
                     filePath,
-                    _OrganisationBL.GetOrganisationsFileModelByYearAsync);
+                    _OrganisationBusinessLogic.GetOrganisationsFileModelByYearAsync);
             }
             finally
             {

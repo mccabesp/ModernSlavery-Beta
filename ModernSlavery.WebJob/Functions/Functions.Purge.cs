@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -29,11 +27,11 @@ namespace ModernSlavery.WebJob
         {
             try
             {
-                DateTime deadline = VirtualDateTime.Now.AddDays(0 - Global.PurgeUnverifiedUserDays);
-                List<User> users = await DataRepository.GetAll<User>()
+                DateTime deadline = VirtualDateTime.Now.AddDays(0 - _CommonBusinessLogic.GlobalOptions.PurgeUnverifiedUserDays);
+                List<User> users = await _CommonBusinessLogic.DataRepository.GetAll<User>()
                     .Where(u => u.EmailVerifiedDate == null && (u.EmailVerifySendDate == null || u.EmailVerifySendDate.Value < deadline))
                     .ToListAsync();
-                DateTime pinExpireyDate = VirtualDateTime.Now.AddDays(0 - Global.PinInPostExpiryDays);
+                DateTime pinExpireyDate = VirtualDateTime.Now.AddDays(0 - _CommonBusinessLogic.GlobalOptions.PinInPostExpiryDays);
                 foreach (User user in users)
                 {
                     //Ignore if they have verified PIN
@@ -52,8 +50,8 @@ namespace ModernSlavery.WebJob
                         null,
                         JsonConvert.SerializeObject(new {user.UserId, user.EmailAddress, user.JobTitle, user.Fullname}),
                         null);
-                    DataRepository.Delete(user);
-                    await DataRepository.SaveChangesAsync();
+                    _CommonBusinessLogic.DataRepository.Delete(user);
+                    await _CommonBusinessLogic.DataRepository.SaveChangesAsync();
                     await _ManualChangeLog.WriteAsync(logItem);
                 }
 
@@ -75,8 +73,8 @@ namespace ModernSlavery.WebJob
         {
             try
             {
-                DateTime deadline = VirtualDateTime.Now.AddDays(0 - Global.PurgeUnconfirmedPinDays);
-                List<UserOrganisation> registrations = await DataRepository.GetAll<UserOrganisation>()
+                DateTime deadline = VirtualDateTime.Now.AddDays(0 - _CommonBusinessLogic.GlobalOptions.PurgeUnconfirmedPinDays);
+                List<UserOrganisation> registrations = await _CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                     .Where(u => u.PINConfirmedDate == null && u.PINSentDate != null && u.PINSentDate.Value < deadline)
                     .ToListAsync();
                 foreach (UserOrganisation registration in registrations)
@@ -100,8 +98,8 @@ namespace ModernSlavery.WebJob
                                 registration.PINConfirmedDate
                             }),
                         null);
-                    DataRepository.Delete(registration);
-                    await DataRepository.SaveChangesAsync();
+                    _CommonBusinessLogic.DataRepository.Delete(registration);
+                    await _CommonBusinessLogic.DataRepository.SaveChangesAsync();
                     await _ManualChangeLog.WriteAsync(logItem);
                 }
 
@@ -125,8 +123,8 @@ namespace ModernSlavery.WebJob
         {
             try
             {
-                DateTime deadline = VirtualDateTime.Now.AddDays(0 - Global.PurgeUnusedOrganisationDays);
-                List<Organisation> orgs = await DataRepository.GetAll<Organisation>()
+                DateTime deadline = VirtualDateTime.Now.AddDays(0 - _CommonBusinessLogic.GlobalOptions.PurgeUnusedOrganisationDays);
+                List<Organisation> orgs = await _CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                     .Where(
                         o => o.Created < deadline
                              && !o.Returns.Any()
@@ -140,11 +138,11 @@ namespace ModernSlavery.WebJob
                 if (orgs.Any())
                 {
                     //Remove D&B orgs
-                    string filePath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations());
-                    bool exists = await FileRepository.GetFileExistsAsync(filePath);
+                    string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DataPath, Filenames.DnBOrganisations());
+                    bool exists = await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath);
                     if (exists)
                     {
-                        List<DnBOrgsModel> allDnBOrgs = await FileRepository.ReadCSVAsync<DnBOrgsModel>(filePath);
+                        List<DnBOrgsModel> allDnBOrgs = await _CommonBusinessLogic.FileRepository.ReadCSVAsync<DnBOrgsModel>(filePath);
                         allDnBOrgs = allDnBOrgs.OrderBy(o => o.OrganisationId).ToList();
                         orgs.RemoveAll(
                             o => allDnBOrgs.Any(
@@ -180,7 +178,7 @@ namespace ModernSlavery.WebJob
                             null);
                         EmployerSearchModel searchRecord = EmployerSearchModel.Create(org,true);
 
-                        await DataRepository.BeginTransactionAsync(
+                        await _CommonBusinessLogic.DataRepository.BeginTransactionAsync(
                             async () => {
                                 try
                                 {
@@ -188,17 +186,17 @@ namespace ModernSlavery.WebJob
                                     org.LatestRegistration = null;
                                     org.LatestReturn = null;
                                     org.LatestScope = null;
-                                    org.UserOrganisations.ForEach(uo => DataRepository.Delete(uo));
-                                    await DataRepository.SaveChangesAsync();
+                                    org.UserOrganisations.ForEach(uo => _CommonBusinessLogic.DataRepository.Delete(uo));
+                                    await _CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
-                                    DataRepository.Delete(org);
-                                    await DataRepository.SaveChangesAsync();
+                                    _CommonBusinessLogic.DataRepository.Delete(org);
+                                    await _CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
-                                    DataRepository.CommitTransaction();
+                                    _CommonBusinessLogic.DataRepository.CommitTransaction();
                                 }
                                 catch (Exception ex)
                                 {
-                                    DataRepository.RollbackTransaction();
+                                    _CommonBusinessLogic.DataRepository.RollbackTransaction();
                                     log.LogError(
                                         ex,
                                         $"{nameof(PurgeOrganisations)}: Failed to purge organisation {org.OrganisationId} '{org.OrganisationName}' ERROR: {ex.Message}:{ex.GetDetailsText()}");
@@ -230,8 +228,8 @@ namespace ModernSlavery.WebJob
         {
             try
             {
-                DateTime deadline = VirtualDateTime.Now.AddDays(0 - Global.PurgeRetiredReturnDays);
-                List<Return> returns = await DataRepository.GetAll<Return>()
+                DateTime deadline = VirtualDateTime.Now.AddDays(0 - _CommonBusinessLogic.GlobalOptions.PurgeRetiredReturnDays);
+                List<Return> returns = await _CommonBusinessLogic.DataRepository.GetAll<Return>()
                     .Where(r => r.StatusDate < deadline && (r.Status == ReturnStatuses.Retired || r.Status == ReturnStatuses.Deleted))
                     .ToListAsync();
 
@@ -246,8 +244,8 @@ namespace ModernSlavery.WebJob
                         null,
                         JsonConvert.SerializeObject(DownloadResult.Create(@return)),
                         null);
-                    DataRepository.Delete(@return);
-                    await DataRepository.SaveChangesAsync();
+                    _CommonBusinessLogic.DataRepository.Delete(@return);
+                    await _CommonBusinessLogic.DataRepository.SaveChangesAsync();
                     await _ManualChangeLog.WriteAsync(logItem);
                 }
 
@@ -270,7 +268,7 @@ namespace ModernSlavery.WebJob
             TimerInfo timer,
             ILogger log)
         {
-            if (Config.IsProduction())
+            if (_CommonBusinessLogic.GlobalOptions.IsProduction())
             {
                 return;
             }

@@ -76,7 +76,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
 
             // Mocks
             var testSubmissionService = new SubmissionService(mockCommonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Assert
             bool actual = testPresenter.IsCurrentSnapshotYear(testSector, testYear);

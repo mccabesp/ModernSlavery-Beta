@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.TestHelpers;
@@ -16,7 +13,9 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Classes;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Shared.Models;
 
@@ -107,7 +106,7 @@ namespace ModernSlavery.Tests
             Assert.AreEqual(result.ControllerName, "Register", "Expected the Controller to be 'Register'");
 
             // Assert User Setting
-            UserSetting userSetting = controller.DataRepository.GetAll<User>()
+            UserSetting userSetting = controller.CommonBusinessLogic.DataRepository.GetAll<User>()
                 .FirstOrDefault()
                 .UserSettings.FirstOrDefault(x => x.Key == UserSettingKeys.PendingFasttrackCodes);
             Assert.AreEqual(
@@ -216,7 +215,7 @@ namespace ModernSlavery.Tests
             mockRouteData.Values.Add("Action", "ServiceActivated");
             mockRouteData.Values.Add("Controller", "Register");
 
-            Return mockReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockUserOrg, Global.FirstReportingYear);
+            Return mockReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockUserOrg,ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockOrg, mockReturn);
 
@@ -247,7 +246,7 @@ namespace ModernSlavery.Tests
             Organisation mockOrg = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockUserOrg = UserOrganisationHelper.LinkUserWithOrganisation(mockUser, mockOrg);
 
-            Return mockReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockUserOrg, Global.FirstReportingYear);
+            Return mockReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockUserOrg,ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockOrg, mockReturn);
 

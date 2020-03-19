@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Filters;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Interfaces.Downloadable;
-using ModernSlavery.Core.Models.Downloadable;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Models.Downloadable;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
@@ -25,10 +24,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #region Constructors
 
         public DownloadableFileController(
-            ILogger<DownloadableFileController> logger,
-            IWebService webService,
             IDownloadableFileBusinessLogic downloadableFileBusinessLogic,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<DownloadableFileController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             _downloadableFileBusinessLogic = downloadableFileBusinessLogic;
         }
@@ -38,7 +35,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #region File Download Action
 
         [Route("download")]
-        [AllowOnlyTrustedIps(AllowOnlyTrustedIps.IpRangeTypes.EhrcIPRange)]
+        [AllowOnlyTrustedDomains]
         [ResponseCache(CacheProfileName = "Download")]
         public async Task<IActionResult> DownloadFile(string p)
         {
@@ -96,12 +93,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private async Task<IEnumerable<IDownloadableItem>> FetchDownloadablesFromSubfolderAsync(string fp, string subfolderName)
         {
             //var logsPathToProcess = string.IsNullOrEmpty(fp)
-            //    ? Path.Combine(Global.LogPath, subfolderName)
+            //    ? Path.Combine(CommonBusinessLogic.GlobalOptions.LogPath, subfolderName)
             //    : fp;
 
             // Storage explorer, we DO want to change
             string logsPathToProcess = string.IsNullOrWhiteSpace(fp)
-                ? Path.Combine(Global.LogPath, subfolderName).Replace("\\", "/")
+                ? Path.Combine(CommonBusinessLogic.GlobalOptions.LogPath, subfolderName).Replace("\\", "/")
                 : fp;
 
             IEnumerable<IDownloadableItem> listOfDownloadableItems =

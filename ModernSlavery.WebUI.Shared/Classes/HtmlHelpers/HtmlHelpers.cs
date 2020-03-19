@@ -11,7 +11,6 @@ using System.Web.Mvc;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
@@ -25,10 +24,14 @@ namespace ModernSlavery.WebUI.Shared.Classes
 {
     public static class HtmlHelpers
     {
-        private static GlobalOptions GlobalOptions = Activator.CreateInstance<GlobalOptions>();
+        public static GlobalOptions GetGlobalOptions(this IHtmlHelper htmlHelper)
+        {
+            return (GlobalOptions)htmlHelper.ViewContext.HttpContext.RequestServices.GetService(typeof(GlobalOptions));
 
+        }
         public static async Task<IHtmlContent> PartialModelAsync<T>(this IHtmlHelper htmlHelper, T viewModel)
         {
+
             // extract the parial path from the model class attr
             string partialPath = viewModel.GetAttribute<PartialAttribute>().PartialPath;
             return await htmlHelper.PartialAsync(partialPath, viewModel);
@@ -36,8 +39,9 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
         public static HtmlString PageIdentifier(this IHtmlHelper htmlHelper)
         {
+            var globalOptions = htmlHelper.GetGlobalOptions();
             return new HtmlString(
-                $"Date:{VirtualDateTime.Now}, Version:{GlobalOptions.Version}, File Date:{GlobalOptions.AssemblyDate.ToLocalTime()}, Environment:{Config.EnvironmentName}, Machine:{Environment.MachineName}, Instance:{GlobalOptions.WEBSITE_INSTANCE_ID}, {GlobalOptions.AssemblyCopyright}");
+                $"Date:{VirtualDateTime.Now}, Version:{globalOptions.Version}, File Date:{globalOptions.AssemblyDate.ToLocalTime()}, Environment:{globalOptions.Environment}, Machine:{Environment.MachineName}, Instance:{globalOptions.WEBSITE_INSTANCE_ID}, {globalOptions.AssemblyCopyright}");
         }
 
         public static HtmlString ToHtml(this IHtmlHelper htmlHelper, string text)
@@ -45,11 +49,6 @@ namespace ModernSlavery.WebUI.Shared.Classes
             text = htmlHelper.Encode(text);
             text = text.Replace(Environment.NewLine, "<br/>");
             return new HtmlString(text);
-        }
-
-        public static HtmlString AppSetting(this IHtmlHelper htmlHelper, string appSettingKey)
-        {
-            return new HtmlString(Config.GetAppSetting(appSettingKey));
         }
 
         public static HtmlString SetErrorClass<TModel, TProperty>(

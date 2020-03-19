@@ -1,6 +1,5 @@
 ﻿using Cryptography.Obfuscation;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Core.Classes
@@ -8,12 +7,11 @@ namespace ModernSlavery.Core.Classes
     public class InternalObfuscator : IObfuscator
     {
 
-        private static readonly int Seed = Config.GetAppSetting("ObfuscationSeed").ToInt32(127);
         private readonly Obfuscator _obfuscator;
 
-        public InternalObfuscator()
+        public InternalObfuscator(int seed)
         {
-            _obfuscator = new Obfuscator {Seed = Seed};
+            _obfuscator = new Obfuscator {Seed = seed};
         }
 
         public string Obfuscate(string value)

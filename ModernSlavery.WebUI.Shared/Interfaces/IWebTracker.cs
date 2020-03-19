@@ -1,12 +1,12 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace ModernSlavery.WebUI.Shared.Interfaces
 {
     public interface IWebTracker
     {
 
-        Task TrackPageViewAsync(Controller controller, string pageTitle = null, string pageUrl = null);
+        Task<HttpResponseMessage> SendPageViewTrackingAsync(string title, string url);
 
     }
 }

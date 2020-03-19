@@ -4,6 +4,9 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using Autofac;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Extensions;
 using Microsoft.Extensions.Logging;
 
@@ -11,6 +14,10 @@ namespace ModernSlavery.Database.Classes
 {
     public static class Extensions
     {
+        public static void AddDataAccessServices(this ContainerBuilder builder)
+        {
+            builder.RegisterType<DatabaseContext>().As<IDbContext>().InstancePerLifetimeScope();
+        }
 
         internal static List<T> SqlQuery<T>(this IDbConnection connection, string query, ILogger logger = null)
         {

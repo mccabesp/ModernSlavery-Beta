@@ -2,18 +2,16 @@
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Submit;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Controllers.Submission
 {
@@ -28,11 +26,9 @@ namespace ModernSlavery.WebUI.Controllers.Submission
         private readonly ISubmissionService _SubmissionService;
 
         public SubmitController(
-            ILogger<SubmitController> logger,
-            IWebService webService,
             ISubmissionService submissionService,
             ISubmissionPresenter submissionPresenter,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<SubmitController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             _SubmissionService = submissionService;
             _SubmissionPresenter = submissionPresenter;
@@ -41,7 +37,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
         [Route("Init")]
         public IActionResult Init()
         {
-            if (!Config.IsProduction())
+            if (!CommonBusinessLogic.GlobalOptions.IsProduction())
             {
                 Logger.LogInformation("Submit Controller Initialised");
             }
@@ -52,7 +48,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
         [HttpGet("submit/")]
         public async Task<IActionResult> Redirect()
         {
-            await WebTracker.TrackPageViewAsync(this);
+            await TrackPageViewAsync();
 
             return RedirectToAction("EnterCalculations");
         }

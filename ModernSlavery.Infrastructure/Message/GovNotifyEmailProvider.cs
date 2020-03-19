@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.SharedKernel.Options;
 using Notify.Client;
 using Notify.Interfaces;
 using Notify.Models;
@@ -17,16 +17,17 @@ using Notify.Models.Responses;
 namespace ModernSlavery.Infrastructure.Message
 {
 
-    public class GovNotifyEmailProvider : AEmailProvider
+    public class GovNotifyEmailProvider : BaseEmailProvider
     {
 
         public GovNotifyEmailProvider(
             IHttpClientFactory httpClientFactory,
             IEmailTemplateRepository emailTemplateRepo,
-            IOptions<GovNotifyOptions> govNotifyOptions,
+            GovNotifyOptions govNotifyOptions,
+            GlobalOptions globalOptions,
             ILogger<GovNotifyEmailProvider> logger,
             [KeyFilter(Filenames.EmailSendLog)]ILogRecordLogger emailSendLog)
-            : base(emailTemplateRepo, logger,emailSendLog)
+            : base(globalOptions,emailTemplateRepo, logger,emailSendLog)
         {
             Options = govNotifyOptions
                       ?? throw new ArgumentNullException("You must provide the gov notify email options", nameof(govNotifyOptions));
@@ -34,25 +35,25 @@ namespace ModernSlavery.Infrastructure.Message
             if (Enabled)
             {
                 // ensure we have api keys
-                if (string.IsNullOrWhiteSpace(Options.Value.ApiKey))
+                if (string.IsNullOrWhiteSpace(Options.ApiKey))
                 {
-                    throw new NullReferenceException($"{nameof(Options.Value.ApiKey)}: You must supply a production api key for GovNotify");
+                    throw new NullReferenceException($"{nameof(Options.ApiKey)}: You must supply a production api key for GovNotify");
                 }
 
-                if (string.IsNullOrWhiteSpace(Options.Value.ApiTestKey))
+                if (string.IsNullOrWhiteSpace(Options.ApiTestKey))
                 {
-                    throw new NullReferenceException($"{nameof(Options.Value.ApiTestKey)}: You must supply a test api key for GovNotify");
+                    throw new NullReferenceException($"{nameof(Options.ApiTestKey)}: You must supply a test api key for GovNotify");
                 }
             }
 
             // create the clients
             HttpClient httpClient = httpClientFactory.CreateClient(nameof(GovNotifyEmailProvider));
             var notifyHttpWrapper = new HttpClientWrapper(httpClient);
-            ProductionClient = new NotificationClient(notifyHttpWrapper, Options.Value.ApiKey);
-            TestClient = new NotificationClient(notifyHttpWrapper, Options.Value.ApiTestKey);
+            ProductionClient = new NotificationClient(notifyHttpWrapper, Options.ApiKey);
+            TestClient = new NotificationClient(notifyHttpWrapper, Options.ApiTestKey);
         }
 
-        public override bool Enabled => Options.Value.Enabled != false;
+        public override bool Enabled => Options.Enabled != false;
 
         public override async Task<SendEmailResult> SendEmailAsync<TTemplate>(string emailAddress,
             string templateId,
@@ -63,7 +64,7 @@ namespace ModernSlavery.Infrastructure.Message
             Dictionary<string, object> mergeParameters = parameters.GetPropertiesDictionary();
 
             // prefix subject with environment name
-            mergeParameters["Environment"] = Config.IsProduction() ? "" : $"[{Config.EnvironmentName}] ";
+            mergeParameters["Environment"] = GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] ";
 
             // determine which client to use
             IAsyncNotificationClient client = test ? TestClient : ProductionClient;
@@ -73,7 +74,7 @@ namespace ModernSlavery.Infrastructure.Message
                 emailAddress,
                 templateId,
                 mergeParameters,
-                Options.Value.ClientReference);
+                Options.ClientReference);
 
             // get result
             Notification notification = await client.GetNotificationByIdAsync(response.id);
@@ -81,7 +82,7 @@ namespace ModernSlavery.Infrastructure.Message
             return new SendEmailResult {
                 Status = notification.status,
                 Server = "Gov Notify",
-                ServerUsername = Options.Value.ClientReference,
+                ServerUsername = Options.ClientReference,
                 EmailAddress = emailAddress,
                 EmailSubject = notification.subject
             };
@@ -93,7 +94,7 @@ namespace ModernSlavery.Infrastructure.Message
 
         public IAsyncNotificationClient TestClient { get; }
 
-        public IOptions<GovNotifyOptions> Options { get; }
+        public GovNotifyOptions Options { get; }
 
         #endregion
 

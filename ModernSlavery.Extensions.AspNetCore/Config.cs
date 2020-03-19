@@ -4,10 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
+using ModernSlavery.Extensions;
 
-namespace ModernSlavery.Extensions.AspNetCore
+namespace ModernSlavery.Infrastucture.Extensions
 {
-    public static class Config
+    public static class ConfigOld
     {
 
         private static string _EnvironmentName;

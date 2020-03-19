@@ -42,7 +42,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
     <ProjectReference Include="..\ModernSlavery.Entities\ModernSlavery.Entities.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Extensions.AspNetCore\ModernSlavery.Extensions.AspNetCore.csproj" />
     <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
     <ProjectReference Include="..\ModernSlavery.Tests.Common\ModernSlavery.Tests.Common.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI\ModernSlavery.WebUI.csproj" />

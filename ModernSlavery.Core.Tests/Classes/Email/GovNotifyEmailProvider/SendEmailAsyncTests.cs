@@ -4,9 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -14,6 +12,7 @@ using Moq.Protected;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.Tests.Common.Classes;
 using Notify.Authentication;
 
 namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
@@ -31,33 +30,33 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
             mockHttpMessageHandler = new Mock<HttpMessageHandler>();
 
             mockEmailTemplateRepo = new Mock<IEmailTemplateRepository>();
-            mockGovNotifyOptions = new Mock<IOptions<GovNotifyOptions>>();
+            
             mockLogger = new Mock<ILogger<Infrastructure.Message.GovNotifyEmailProvider>>();
 
             mockHttpClientFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
                 .Returns(new HttpClient(mockHttpMessageHandler.Object));
 
-            mockGovNotifyOptions.Setup(x => x.Value)
-                .Returns(
-                    new GovNotifyOptions {
-                        ApiKey = $"prod-{ProductionServiceId}-{ProductionApiKey}",
-                        ApiTestKey = $"test-{TestServiceId}-{TestApiKey}",
-                        ClientReference = "GovNotifyClientReference",
-                        Enabled = true
-                    });
+            ConfigHelpers.GovNotifyOptions = new GovNotifyOptions
+            {
+                ApiKey = $"prod-{ProductionServiceId}-{ProductionApiKey}",
+                ApiTestKey = $"test-{TestServiceId}-{TestApiKey}",
+                ClientReference = "GovNotifyClientReference",
+                Enabled = true
+            };
 
             // service under test
             testNotifyEmailProvider = new Infrastructure.Message.GovNotifyEmailProvider(
                 mockHttpClientFactory.Object,
                 mockEmailTemplateRepo.Object,
                 mockGovNotifyOptions.Object,
+                ConfigHelpers.GlobalOptions,
                 mockLogger.Object, Mock.Of<ILogRecordLogger>());
         }
 
         [TearDown]
         public void AfterEach()
         {
-            Config.EnvironmentName = "Local";
+            ConfigHelpers.GlobalOptions.Environment = "Local";
         }
 
         // notify keys broken down for testing
@@ -68,7 +67,7 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
         private const string TestApiKey = "44444444-4444-4444-4444-444444444444";
 
         private Mock<IEmailTemplateRepository> mockEmailTemplateRepo;
-        private Mock<IOptions<GovNotifyOptions>> mockGovNotifyOptions;
+        private Mock<GovNotifyOptions> mockGovNotifyOptions;
         private Mock<ILogger<Infrastructure.Message.GovNotifyEmailProvider>> mockLogger;
 
         private Mock<IHttpClientFactory> mockHttpClientFactory;
@@ -115,7 +114,7 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
             Environment.SetEnvironmentVariable("Vault", " ");
 
             // set the environment to test
-            Config.EnvironmentName = testEnvironment;
+            ConfigHelpers.GlobalOptions.Environment = testEnvironment;
 
             mockHttpMessageHandler
                 .Protected()
@@ -163,7 +162,7 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
                             // assert email, template and reference
                             Assert.AreEqual(expectedEmail, parsed.email_address.Value);
                             Assert.AreEqual(expectedTemplateId, parsed.template_id.Value);
-                            Assert.AreEqual(testNotifyEmailProvider.Options.Value.ClientReference, parsed.reference.Value);
+                            Assert.AreEqual(testNotifyEmailProvider.Options.ClientReference, parsed.reference.Value);
 
                             // assert parameters
                             Assert.AreEqual(expectedParameters.field1, parsed.personalisation.field1.Value);

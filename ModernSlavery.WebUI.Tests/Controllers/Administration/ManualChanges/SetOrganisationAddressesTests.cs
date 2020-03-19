@@ -500,14 +500,14 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.ManualChanges.Tests
             string[] actualResults = actualManualChangesViewModel.Results.Split(new[] {"\r\n", "\n"}, StringSplitOptions.None);
             Assert.AreEqual(3, actualResults.Length);
 
-            Organisation org1 = thisTestAdminController.DataRepository.GetAll<Organisation>()
+            Organisation org1 = thisTestAdminController.CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                 .SingleOrDefault(x => x.EmployerReference == "6B2LF57C");
             Assert.AreEqual("Some House, 1 Some Street, Some Town, PC1 11RT", org1.LatestAddress.GetAddressString());
             Assert.AreEqual(
                 "1: 6B2LF57C: Address=No previous address has been set to Some House,1 Some Street,,Some Town,,,PC1 11RT",
                 actualResults[0]);
 
-            Organisation org2 = thisTestAdminController.DataRepository.GetAll<Organisation>()
+            Organisation org2 = thisTestAdminController.CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                 .SingleOrDefault(x => x.EmployerReference == "D43TYU76");
             Assert.AreEqual("PO BOX 12, Another Town, PC2 55RT", org2.LatestAddress.GetAddressString());
             Assert.AreEqual(

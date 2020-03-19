@@ -1,6 +1,4 @@
 ﻿using ModernSlavery.Core.Models;
-using ModernSlavery.Infrastructure;
-using ModernSlavery.Infrastructure.Search;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Models

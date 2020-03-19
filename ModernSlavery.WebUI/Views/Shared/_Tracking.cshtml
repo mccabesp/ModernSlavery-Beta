@@ -1,7 +1,7 @@
-﻿@using ModernSlavery.Core
-@using ModernSlavery.Core.Models.Cookies
-@using Microsoft.ApplicationInsights.AspNetCore
+﻿@using Microsoft.ApplicationInsights.AspNetCore
+@using ModernSlavery.WebUI.Shared.Classes.Cookies
 @inject JavaScriptSnippet snippet
+@inject GlobalOptions globalOptions
 @{
     CookieSettings cookieSettings = CookieHelper.GetCookieSettingsCookie(Context.Request);
 }
@@ -26,21 +26,21 @@
     }
 
     function sendGpgPageView() {
-        // Setup tracking to the GPG Google Analytics account 
-        ga('create', '@(Html.AppSetting("GoogleAnalyticsAccountId"))', 'auto');
+        // Setup tracking to the GPG Google Analytics account
+        ga('create', '@(globalOptions.GoogleAnalyticsAccountId)', 'auto');
 
         // Track the current page view using the GPG Google Analytics account
         ga('send', 'pageview');
     }
 
     function sendGovUkPageView() {
-        // Setup tracking to the GDS Google Analytics shared tracking account 
+        // Setup tracking to the GDS Google Analytics shared tracking account
         ga('create', 'UA-145652997-1', 'auto', 'govuk_shared', { 'allowLinker': true });
         ga('govuk_shared.require', 'linker');
         ga('govuk_shared.linker.set', 'anonymizeIp', true);
         ga('govuk_shared.linker:autoLink', ['www.gov.uk']);
 
-        // Track the current page view using the GDS Google Analytics shared tracking account 
+        // Track the current page view using the GDS Google Analytics shared tracking account
         ga('govuk_shared.send', 'pageview');
     }
 
@@ -66,15 +66,15 @@
     {
         @:sendGpgPageView();
     }
-    @if (cookieSettings.GoogleAnalyticsGovUk && Global.SendGoogleAnalyticsDataToGovUk)
+    @if (cookieSettings.GoogleAnalyticsGovUk && globalOptions.SendGoogleAnalyticsDataToGovUk)
     {
         @:sendGovUkPageView();
     }
 </script>
 
 @if (cookieSettings.ApplicationInsights &&
-     snippet != null &&
-     !string.IsNullOrWhiteSpace(Global.APPINSIGHTS_INSTRUMENTATIONKEY))
+    snippet != null &&
+    !string.IsNullOrWhiteSpace(globalOptions.APPINSIGHTS_INSTRUMENTATIONKEY))
 {
     @Html.Raw(snippet.FullScript)
 }

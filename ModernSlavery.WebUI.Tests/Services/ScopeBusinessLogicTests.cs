@@ -13,7 +13,6 @@ using ModernSlavery.Tests.Common.Mocks;
 using MockQueryable.Moq;
 using Moq;
 using ModernSlavery.Entities.Enums;
-using ModernSlavery.Infrastructure;
 using NUnit.Framework;
 
 namespace ModernSlavery.Tests

@@ -5,6 +5,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Infrastructure.Options;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.SharedKernel.Interfaces;
 
@@ -14,55 +15,50 @@ namespace ModernSlavery.WebJob
     {
 
         public Functions(
+            StorageOptions storageOptions,
             ICustomLogger customLogger,
             [KeyFilter(Filenames.BadSicLog)]ILogRecordLogger badSicLog,
             [KeyFilter(Filenames.ManualChangeLog)]ILogRecordLogger manualChangeLog,
             IMessenger messenger,
-            IFileRepository fileRepository,
-            IDataRepository dataRepository,
+            ICommonBusinessLogic commonBusinessLogic,
             ISearchRepository<EmployerSearchModel> employerSearchRepository,
             ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
-            ICommonBusinessLogic commonBL,
-            IScopeBusinessLogic scopeBL,
-            ISubmissionBusinessLogic submissionBL,
-            IOrganisationBusinessLogic orgBL,
+            ISubmissionBusinessLogic submissionBusinessLogic,
+            IOrganisationBusinessLogic organisationBusinessLogic,
             ISearchBusinessLogic searchBusinessLogic,
             IGovNotifyAPI govNotifyApi,
-            UpdateFromCompaniesHouseService updateFromCompaniesHouseService,
-            ISnapshotDateHelper snapshotDateHelper)
+            UpdateFromCompaniesHouseService updateFromCompaniesHouseService)
         {
+            _StorageOptions = storageOptions;
             _CustomLogger = customLogger;
             _BadSicLog = badSicLog;
             _ManualChangeLog = manualChangeLog;
             _Messenger = messenger;
-            DataRepository = dataRepository;
-            FileRepository = fileRepository;
+            CommonBusinessLogic = commonBusinessLogic;
             _EmployerSearchRepository = employerSearchRepository;
             _SicCodeSearchRepository = sicCodeSearchRepository;
-            _CommonBL = commonBL;
-            _ScopeBL = scopeBL;
-            _SubmissionBL = submissionBL;
-            _OrganisationBL = orgBL;
+            _SubmissionBusinessLogic = submissionBusinessLogic;
+            _OrganisationBusinessLogic = organisationBusinessLogic;
             SearchBusinessLogic = searchBusinessLogic;
             _updateFromCompaniesHouseService = updateFromCompaniesHouseService;
-            _snapshotDateHelper = snapshotDateHelper;
             this.govNotifyApi = govNotifyApi;
         }
 
         #region Properties
 
+        private readonly StorageOptions _StorageOptions;
+
         private readonly ICustomLogger _CustomLogger;
         private readonly ILogRecordLogger _BadSicLog;
         private readonly ILogRecordLogger _ManualChangeLog;
         private readonly IMessenger _Messenger;
-        public readonly IFileRepository FileRepository;
-        public readonly IDataRepository DataRepository;
+        public readonly ICommonBusinessLogic CommonBusinessLogic;
         private readonly ISearchRepository<EmployerSearchModel> _EmployerSearchRepository;
         private readonly ISearchRepository<SicCodeSearchModel> _SicCodeSearchRepository;
-        private readonly IScopeBusinessLogic _ScopeBL;
-        private readonly ICommonBusinessLogic _CommonBL;
-        private readonly ISubmissionBusinessLogic _SubmissionBL;
-        private readonly IOrganisationBusinessLogic _OrganisationBL;
+        private readonly IScopeBusinessLogic _ScopeBusinessLogic;
+        private readonly ICommonBusinessLogic _CommonBusinessLogic;
+        private readonly ISubmissionBusinessLogic _SubmissionBusinessLogic;
+        private readonly IOrganisationBusinessLogic _OrganisationBusinessLogic;
         public readonly ISearchBusinessLogic SearchBusinessLogic;
         private readonly IGovNotifyAPI govNotifyApi;
         private readonly UpdateFromCompaniesHouseService _updateFromCompaniesHouseService;

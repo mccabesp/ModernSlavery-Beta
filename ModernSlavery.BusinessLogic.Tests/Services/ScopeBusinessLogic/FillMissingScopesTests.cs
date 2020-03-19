@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Linq;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
 using ModernSlavery.Entities.Enums;
@@ -12,8 +10,6 @@ using ModernSlavery.SharedKernel;
 
 using NUnit.Framework;
 using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 
@@ -67,7 +63,7 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
 
             // test the count of scopes set is correct
             DateTime currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
-            int expectedScopeCount = (currentSnapshotDate.Year - Global.FirstReportingYear) + 1;
+            int expectedScopeCount = (currentSnapshotDate.Year - ConfigHelpers.GlobalOptions.FirstReportingYear) + 1;
             Assert.AreEqual(expectedScopeCount, testOrg.OrganisationScopes.Count);
 
             // check each scope before current snapshot year are set to presumed out of scope
@@ -99,7 +95,7 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
 
             // test the count of scopes set is correct
             DateTime currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
-            int expectedScopeCount = (currentSnapshotDate.Year - Global.FirstReportingYear) + 1;
+            int expectedScopeCount = (currentSnapshotDate.Year - ConfigHelpers.GlobalOptions.FirstReportingYear) + 1;
             Assert.AreEqual(expectedScopeCount, testOrg.OrganisationScopes.Count);
 
             // check each scope after created date is set to presumed in of scope
@@ -122,7 +118,7 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
             ScopeStatuses expectedPresumedScopeStatus)
         {
             // setup
-            DateTime testSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSectorType, Global.FirstReportingYear);
+            DateTime testSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSectorType, ConfigHelpers.GlobalOptions.FirstReportingYear);
             Organisation testOrg = CreateOrgWithScopeForAllYears(1, testSectorType, testDeclaredScopeStatus, testSnapshotDate);
 
             // act
@@ -143,7 +139,7 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
             ScopeStatuses expectedPresumedScopeStatus)
         {
             // setup
-            DateTime testCreatedDate = mockCommonBusinessLogic.GetAccountingStartDate(testSectorType, Global.FirstReportingYear);
+            DateTime testCreatedDate = mockCommonBusinessLogic.GetAccountingStartDate(testSectorType, ConfigHelpers.GlobalOptions.FirstReportingYear);
             Organisation testOrg = CreateOrgWithDeclaredAndPresumedScopes(
                 testSectorType,
                 testDeclaredScopeStatus,

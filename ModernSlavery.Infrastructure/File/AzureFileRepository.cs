@@ -12,35 +12,31 @@ using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
+using ModernSlavery.Infrastructure.Options;
 
 namespace ModernSlavery.Infrastructure.File
 {
     public class AzureFileRepository : IFileRepository
     {
 
+        private readonly StorageOptions _storageOptions;
         private readonly CloudFileDirectory _rootDir;
 
-        public AzureFileRepository(string connectionString, string shareName, IRetryPolicy retryPolicy = null)
+        public AzureFileRepository(StorageOptions storageOptions, IRetryPolicy retryPolicy = null)
         {
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                throw new ArgumentNullException(nameof(connectionString));
-            }
-
-            if (string.IsNullOrWhiteSpace(shareName))
-            {
-                throw new ArgumentNullException(nameof(shareName));
-            }
+            _storageOptions = storageOptions ?? throw new ArgumentNullException(nameof(storageOptions));
+            if (string.IsNullOrWhiteSpace(storageOptions.AzureConnectionString))throw new ArgumentNullException(nameof(storageOptions.AzureConnectionString));
+            if (string.IsNullOrWhiteSpace(storageOptions.AzureShareName))throw new ArgumentNullException(nameof(storageOptions.AzureShareName));
 
             // Parse the connection string and return a reference to the storage account.
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageOptions.AzureConnectionString);
 
             // Create a CloudFileClient object for credentialed access to File storage.
             CloudFileClient fileClient = storageAccount.CreateCloudFileClient();
             fileClient.DefaultRequestOptions.RetryPolicy =
                 retryPolicy ?? new LinearRetry(TimeSpan.FromMilliseconds(500), 10); //Maximum of 5 second wait 
 
-            CloudFileShare share = fileClient.GetShareReference(shareName);
+            CloudFileShare share = fileClient.GetShareReference(storageOptions.AzureShareName);
 
             _rootDir = share.GetRootDirectoryReference();
         }

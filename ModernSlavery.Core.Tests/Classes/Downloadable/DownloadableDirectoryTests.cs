@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Infrastructure.File;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Classes.Downloadable

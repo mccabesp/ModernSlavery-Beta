@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
@@ -57,7 +56,7 @@ namespace ModernSlavery.WebJob.Tests.Functions
         {
             //ARRANGE
             //Ensure all orgs are in scope for current year
-            IEnumerable<Organisation> orgs = _functions.DataRepository.GetAll<Organisation>();
+            IEnumerable<Organisation> orgs = _functions.CommonBusinessLogic.DataRepository.GetAll<Organisation>();
 
             //Add a random number of in scope orgs
             int inScope = Numeric.Rand(1, orgs.Count());

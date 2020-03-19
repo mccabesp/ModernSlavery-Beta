@@ -1,9 +1,7 @@
 ﻿using Autofac;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.Mocks;
 using ModernSlavery.Tests.Common.TestHelpers;
@@ -11,10 +9,7 @@ using Microsoft.Azure.Search;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Infrastructure;
 using ModernSlavery.Infrastructure.Data;
-using ModernSlavery.Infrastructure.Message;
-using ModernSlavery.Infrastructure.Search;
 using Moq;
 
 using ModernSlavery.SharedKernel.Interfaces;
@@ -50,7 +45,7 @@ namespace ModernSlavery.WebJob.Tests.TestHelpers
             builder.RegisterType(typeof(AzureSicCodeSearchRepository)).As<ISearchRepository<SicCodeSearchModel>>().SingleInstance();
 
             // BL Services
-            builder.RegisterInstance(Config.Configuration).SingleInstance();
+            builder.RegisterInstance(ConfigHelpers.Config).SingleInstance();
             builder.RegisterType<CommonBusinessLogic>().As<ICommonBusinessLogic>().InstancePerLifetimeScope();
             builder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>().InstancePerLifetimeScope();
             builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerLifetimeScope();
@@ -60,7 +55,7 @@ namespace ModernSlavery.WebJob.Tests.TestHelpers
             builder.RegisterType<UpdateFromCompaniesHouseService>().As<UpdateFromCompaniesHouseService>().InstancePerLifetimeScope();
 
             //Register some singletons
-            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance();
+            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance().WithParameter("seed", ConfigHelpers.GlobalOptions.ObfuscationSeed);
             builder.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
 
             builder.Register(c => Mock.Of<IMessenger>()).As<IMessenger>().SingleInstance();

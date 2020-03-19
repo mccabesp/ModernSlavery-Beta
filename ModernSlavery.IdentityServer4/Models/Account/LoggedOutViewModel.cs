@@ -12,6 +12,7 @@ namespace ModernSlavery.IdentityServer4.Models.Account
     {
 
         public string PostLogoutRedirectUri { get; set; }
+        public string ClientId { get; set; }
         public string ClientName { get; set; }
         public string SignOutIframeUrl { get; set; }
 
@@ -20,11 +21,5 @@ namespace ModernSlavery.IdentityServer4.Models.Account
         public string LogoutId { get; set; }
         public bool TriggerExternalSignout => ExternalAuthenticationScheme != null;
         public string ExternalAuthenticationScheme { get; set; }
-
-        public Client Client
-        {
-            get { return Clients.Get().FirstOrDefault(c => c.ClientName == ClientName); }
-        }
-
     }
 }

@@ -7,9 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using ModernSlavery.Core;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static ModernSlavery.Extensions.Web;
@@ -25,7 +23,7 @@ namespace ModernSlavery.WebJob
         {
             try
             {
-                string azureStorageConnectionString = Config.GetConnectionString("AzureStorage");
+                string azureStorageConnectionString = _StorageOptions.AzureConnectionString;
                 if (azureStorageConnectionString.Equals("UseDevelopmentStorage=true"))
                 {
                     return;
@@ -35,7 +33,7 @@ namespace ModernSlavery.WebJob
 
                 string azureStorageAccount = connectionString["AccountName"];
                 string azureStorageKey = connectionString["AccountKey"];
-                string azureStorageShareName = Config.GetAppSetting("AzureStorageShareName");
+                string azureStorageShareName = _StorageOptions.AzureShareName;
 
                 //Take the snapshot
                 await TakeSnapshotAsync(azureStorageAccount, azureStorageKey, azureStorageShareName);
@@ -49,7 +47,7 @@ namespace ModernSlavery.WebJob
                     List<string> snapshots =
                         xml.Descendants().Where(e => e.Name.LocalName.EqualsI("Snapshot")).Select(e => e.Value).ToList();
                     //var snapshots = snapshots.Where(e => e.EqualsI("Snapshot")).Select(e=>e.Value).ToList();
-                    DateTime deadline = VirtualDateTime.Now.AddDays(0 - Config.GetAppSetting("MaxSnapshotDays").ToInt32(35));
+                    DateTime deadline = VirtualDateTime.Now.AddDays(0 - _CommonBusinessLogic.GlobalOptions.MaxSnapshotDays);
                     foreach (string snapshot in snapshots)
                     {
                         DateTime date = DateTime.Parse(snapshot);
@@ -80,17 +78,14 @@ namespace ModernSlavery.WebJob
         {
             try
             {
-                string azureStorageConnectionString = Config.GetConnectionString("AzureStorage");
-                if (azureStorageConnectionString.Equals("UseDevelopmentStorage=true"))
-                {
-                    return;
-                }
+                string azureStorageConnectionString = _StorageOptions.AzureConnectionString;
+                if (azureStorageConnectionString.Equals("UseDevelopmentStorage=true"))return;
 
                 Dictionary<string, string> connectionString = azureStorageConnectionString.ConnectionStringToDictionary();
 
                 string azureStorageAccount = connectionString["AccountName"];
                 string azureStorageKey = connectionString["AccountKey"];
-                string azureStorageShareName = Config.GetAppSetting("AzureStorageShareName");
+                string azureStorageShareName = _StorageOptions.AzureShareName;
 
                 //Take the snapshot
                 await TakeSnapshotAsync(azureStorageAccount, azureStorageKey, azureStorageShareName);
@@ -237,35 +232,35 @@ namespace ModernSlavery.WebJob
             const string logZipDir = @"\Archive\";
 
             //Ensure the archive directory exists
-            if (!await FileRepository.GetDirectoryExistsAsync(logZipDir))
+            if (!await _CommonBusinessLogic.FileRepository.GetDirectoryExistsAsync(logZipDir))
             {
-                await FileRepository.CreateDirectoryAsync(logZipDir);
+                await _CommonBusinessLogic.FileRepository.CreateDirectoryAsync(logZipDir);
             }
 
             //Create the zip file path using todays date
             string logZipFilePath = Path.Combine(logZipDir, $"{VirtualDateTime.Now.ToString("yyyyMMdd")}.zip");
 
             //Dont zip if we have one for today
-            if (await FileRepository.GetFileExistsAsync(logZipFilePath))
+            if (await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(logZipFilePath))
             {
                 return;
             }
 
-            string zipDir = Url.UrlToDirSeparator(Path.Combine(FileRepository.RootDir, logZipDir));
+            string zipDir = Url.UrlToDirSeparator(Path.Combine(_CommonBusinessLogic.FileRepository.RootDir, logZipDir));
 
             using (var fileStream = new MemoryStream())
             {
                 var files = 0;
                 using (var zipStream = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
                 {
-                    foreach (string dir in await FileRepository.GetDirectoriesAsync("\\", null, true))
+                    foreach (string dir in await _CommonBusinessLogic.FileRepository.GetDirectoriesAsync("\\", null, true))
                     {
                         if (Url.UrlToDirSeparator($"{dir}\\").StartsWithI(zipDir))
                         {
                             continue;
                         }
 
-                        foreach (string file in await FileRepository.GetFilesAsync(dir, "*.*"))
+                        foreach (string file in await _CommonBusinessLogic.FileRepository.GetFilesAsync(dir, "*.*"))
                         {
                             string dirFile = Url.UrlToDirSeparator(file);
 
@@ -278,7 +273,7 @@ namespace ModernSlavery.WebJob
                             ZipArchiveEntry entry = zipStream.CreateEntry(dirFile);
                             using (Stream entryStream = entry.Open())
                             {
-                                await FileRepository.ReadAsync(dirFile, entryStream);
+                                await _CommonBusinessLogic.FileRepository.ReadAsync(dirFile, entryStream);
                                 files++;
                             }
                         }
@@ -291,7 +286,7 @@ namespace ModernSlavery.WebJob
                 }
 
                 fileStream.Position = 0;
-                await FileRepository.WriteAsync(logZipFilePath, fileStream);
+                await _CommonBusinessLogic.FileRepository.WriteAsync(logZipFilePath, fileStream);
             }
         }
 

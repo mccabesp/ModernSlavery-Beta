@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Organisation;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Organisation;
@@ -13,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -102,7 +101,7 @@ namespace ModernSlavery.WebUI.Controllers
             if (!IsImpersonatingUser && !base.CurrentUser.IsAdministrator())
             {
                 DateTime? hasReadPrivacy = currentUser.AcceptedPrivacyStatement;
-                if (hasReadPrivacy == null || hasReadPrivacy.Value < Global.PrivacyChangedDate)
+                if (hasReadPrivacy == null || hasReadPrivacy.Value < CommonBusinessLogic.GlobalOptions.PrivacyChangedDate)
                 {
                     return RedirectToAction(nameof(HomeController.PrivacyPolicy), "Home");
                 }

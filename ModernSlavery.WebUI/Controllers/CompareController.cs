@@ -6,23 +6,19 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Models.Compare;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -31,12 +27,10 @@ namespace ModernSlavery.WebUI.Controllers
     {
 
         public CompareController(
-            ILogger<CompareController> logger,
-            IWebService webService,
             ISearchPresenter searchViewService,
             IComparePresenter compareViewService,
             IOrganisationBusinessLogic organisationBusinessLogic,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<CompareController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             OrganisationBusinessLogic = organisationBusinessLogic;
             SearchViewService = searchViewService;
@@ -221,8 +215,7 @@ namespace ModernSlavery.WebUI.Controllers
             //Track the download 
             if (CompareViewService.SortColumn != column || CompareViewService.SortAscending != sort)
             {
-                await WebTracker.TrackPageViewAsync(
-                    this,
+                await TrackPageViewAsync(
                     $"sort-employers: {column} {(CompareViewService.SortAscending ? "Ascending" : "Descending")}",
                     $"/compare-employers/sort-employers?{column}={(CompareViewService.SortAscending ? "Ascending" : "Descending")}");
 
@@ -243,7 +236,7 @@ namespace ModernSlavery.WebUI.Controllers
             {
                 CompareViewService.SortColumn = null;
                 CompareViewService.SortAscending = true;
-                year = Global.FirstReportingYear;
+                year = CommonBusinessLogic.GlobalOptions.FirstReportingYear;
             }
 
             //Load employers from querystring (via shared email)
@@ -284,14 +277,12 @@ namespace ModernSlavery.WebUI.Controllers
             if (CompareViewService.LastComparedEmployerList != lastComparedEmployerList && IsAction("CompareEmployers"))
             {
                 SortedSet<string> employerIds = compareReports.Select(r => r.EncOrganisationId).ToSortedSet();
-                await WebTracker.TrackPageViewAsync(
-                    this,
+                await TrackPageViewAsync(
                     $"compare-employers: {employerIds.ToDelimitedString()}",
                     $"{ViewBag.ReturnUrl}?{employerIds.ToEncapsulatedString("e=", null, "&", "&", false)}");
                 foreach (CompareReportModel employer in compareReports)
                 {
-                    await WebTracker.TrackPageViewAsync(
-                        this,
+                    await TrackPageViewAsync(
                         $"{employer.EncOrganisationId}: {employer.OrganisationName}",
                         $"{ViewBag.ReturnUrl}?{employer.EncOrganisationId}={employer.OrganisationName}");
                 }
@@ -329,7 +320,7 @@ namespace ModernSlavery.WebUI.Controllers
         {
             if (year == 0)
             {
-                year = Global.FirstReportingYear;
+                year = CommonBusinessLogic.GlobalOptions.FirstReportingYear;
             }
 
             string args = command.AfterFirst(":");
@@ -357,7 +348,7 @@ namespace ModernSlavery.WebUI.Controllers
         {
             if (year == 0)
             {
-                year = Global.FirstReportingYear;
+                year = CommonBusinessLogic.GlobalOptions.FirstReportingYear;
             }
 
             var result = await CompareEmployers(year) as ViewResult;
@@ -382,7 +373,7 @@ namespace ModernSlavery.WebUI.Controllers
             Response.BufferOutput = true;
             */
             //Track the download 
-            await WebTracker.TrackPageViewAsync(this, contentDisposition.FileName);
+            await TrackPageViewAsync(contentDisposition.FileName);
 
             //Return the data
             return Content(model.ToCSV(), "text/csv");

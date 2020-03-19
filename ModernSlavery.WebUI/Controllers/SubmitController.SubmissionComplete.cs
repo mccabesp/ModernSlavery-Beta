@@ -1,7 +1,5 @@
 ﻿using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core;
-using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
@@ -47,7 +45,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
         [PreventDuplicatePost]
         public IActionResult SubmissionCompletePost(string command)
         {
-            string doneUrl = Global.DoneUrl ?? Url.Action("Index", "Viewing", null, "https");
+            string doneUrl = CommonBusinessLogic.GlobalOptions.DoneUrl ?? Url.Action("Index", "Viewing", null, "https");
 
             return LogoutUser(doneUrl);
         }

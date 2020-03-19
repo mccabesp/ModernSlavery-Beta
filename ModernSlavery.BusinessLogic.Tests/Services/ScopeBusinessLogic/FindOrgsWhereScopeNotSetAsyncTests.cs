@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Scope;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
 using ModernSlavery.Entities.Enums;
@@ -15,8 +13,6 @@ using ModernSlavery.SharedKernel;
 using NUnit.Framework;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.WebUI.Shared.Abstractions;
 
 namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
 {
@@ -136,7 +132,7 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
         {
             var mockOrg = new Organisation {OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active};
 
-            for (int year = Global.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
+            for (int year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
             {
                 mockOrg.OrganisationScopes.Add(
                     new OrganisationScope {
@@ -160,7 +156,7 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
         {
             var mockOrg = new Organisation {OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active};
 
-            for (int year = Global.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
+            for (int year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
             {
                 mockOrg.OrganisationScopes.Add(
                     new OrganisationScope {
@@ -179,7 +175,7 @@ namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
         {
             int currentYear = currentSnapshotDate.Year;
             var results = new List<int>();
-            for (int year = Global.FirstReportingYear; year <= currentYear; year++)
+            for (int year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= currentYear; year++)
             {
                 results.Add(year);
             }

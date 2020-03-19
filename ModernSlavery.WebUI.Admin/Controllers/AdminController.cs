@@ -7,17 +7,12 @@ using System.Net.Mime;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using Autofac.Features.AttributeFilters;
 using CsvHelper;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Admin.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -28,13 +23,13 @@ using CsvHelper.Configuration;
 using System.Globalization;
 using ModernSlavery.BusinessLogic.Admin;
 using ModernSlavery.Core.Models.LogModels;
-using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
-using ModernSlavery.WebUI.Shared.Abstractions;
-using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
@@ -47,10 +42,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #region Constructors
 
         public AdminController(
-            ILogger<AdminController> logger,
-            IWebService webService,
             IAdminService adminService,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<AdminController> logger,IWebService webService,ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             AdminService = adminService;
         }
@@ -72,7 +65,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("Init")]
         public IActionResult Init()
         {
-            if (!Config.IsProduction())
+            if (!CommonBusinessLogic.GlobalOptions.IsProduction())
             {
                 Logger.LogInformation("Admin Controller Initialised");
             }
@@ -92,8 +85,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 IsDatabaseAdministrator = CurrentUser.IsDatabaseAdministrator(),
                 IsDowngradedDueToIpRestrictions =
                     !IsTrustedIP && (CurrentUser.IsDatabaseAdministrator() || CurrentUser.IsSuperAdministrator()),
-                FeedbackCount = DataRepository.GetAll<Feedback>().Count(),
-                LatestFeedbackDate = DataRepository.GetAll<Feedback>()
+                FeedbackCount = CommonBusinessLogic.DataRepository.GetAll<Feedback>().Count(),
+                LatestFeedbackDate = CommonBusinessLogic.DataRepository.GetAll<Feedback>()
                     .OrderByDescending(feedback => feedback.CreatedDate)
                     .FirstOrDefault()
                     ?.CreatedDate
@@ -115,22 +108,22 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Create Registration History
 
-            IEnumerable<string> files = await FileRepository.GetFilesAsync(Global.LogPath, "RegistrationLog*.csv", true);
+            IEnumerable<string> files = await CommonBusinessLogic.FileRepository.GetFilesAsync(CommonBusinessLogic.GlobalOptions.LogPath, "RegistrationLog*.csv", true);
             if (!files.Any())
             {
                 //Create the first log file
                 var logRecords = new List<RegisterLogModel>();
-                foreach (UserOrganisation userOrg in DataRepository.GetAll<UserOrganisation>()
+                foreach (UserOrganisation userOrg in CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                     .Where(uo => uo.PINConfirmedDate != null)
                     .OrderBy(uo => uo.PINConfirmedDate))
                 {
                     //Dont log test registrations
-                    if (userOrg.User.EmailAddress.StartsWithI(Global.TestPrefix))
+                    if (userOrg.User.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
                     {
                         continue;
                     }
 
-                    OrganisationStatus status = await DataRepository.GetAll<OrganisationStatus>()
+                    OrganisationStatus status = await CommonBusinessLogic.DataRepository.GetAll<OrganisationStatus>()
                         .FirstOrDefaultAsync(
                             os => os.OrganisationId == userOrg.OrganisationId
                                   && os.Status == userOrg.Organisation.Status
@@ -172,7 +165,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 //Get the files again
-                files = await FileRepository.GetFilesAsync(Global.LogPath, "RegistrationLog*.csv", true);
+                files = await CommonBusinessLogic.FileRepository.GetFilesAsync(CommonBusinessLogic.GlobalOptions.LogPath, "RegistrationLog*.csv", true);
             }
 
             foreach (string filePath in files)
@@ -183,9 +176,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     Title = "Registration History",
                     Description = "Audit history of approved and rejected registrations."
                 };
-                if (await FileRepository.GetFileExistsAsync(download.Filepath))
+                if (await CommonBusinessLogic.FileRepository.GetFileExistsAsync(download.Filepath))
                 {
-                    download.Modified = await FileRepository.GetLastWriteTimeAsync(download.Filepath);
+                    download.Modified = await CommonBusinessLogic.FileRepository.GetLastWriteTimeAsync(download.Filepath);
                 }
 
                 downloads.Add(download);
@@ -200,21 +193,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             downloads = new List<DownloadViewModel.Download>();
 
-            files = await FileRepository.GetFilesAsync(Global.LogPath, "SubmissionLog*.csv", true);
+            files = await CommonBusinessLogic.FileRepository.GetFilesAsync(CommonBusinessLogic.GlobalOptions.LogPath, "SubmissionLog*.csv", true);
             if (!files.Any())
             {
                 var logRecords = new List<SubmissionLogModel>();
 
                 //Create the first log file
-                foreach (Return @return in DataRepository.GetAll<Return>().OrderBy(r => r.StatusDate))
+                foreach (Return @return in CommonBusinessLogic.DataRepository.GetAll<Return>().OrderBy(r => r.StatusDate))
                 {
                     //Dont log return for test organisations
-                    if (@return.Organisation.OrganisationName.StartsWithI(Global.TestPrefix))
+                    if (@return.Organisation.OrganisationName.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
                     {
                         continue;
                     }
 
-                    ReturnStatus status = await DataRepository.GetAll<ReturnStatus>()
+                    ReturnStatus status = await CommonBusinessLogic.DataRepository.GetAll<ReturnStatus>()
                         .FirstOrDefaultAsync(
                             rs => rs.ReturnId == @return.ReturnId && rs.Status == @return.Status && rs.StatusDate == @return.StatusDate);
 
@@ -274,7 +267,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 //Get the files again
-                files = await FileRepository.GetFilesAsync(Global.LogPath, "SubmissionLog*.csv", true);
+                files = await CommonBusinessLogic.FileRepository.GetFilesAsync(CommonBusinessLogic.GlobalOptions.LogPath, "SubmissionLog*.csv", true);
             }
 
             foreach (string filePath in files)
@@ -285,9 +278,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     Title = "Submission History",
                     Description = "Audit history of approved and rejected registrations."
                 };
-                if (await FileRepository.GetFileExistsAsync(download.Filepath))
+                if (await CommonBusinessLogic.FileRepository.GetFileExistsAsync(download.Filepath))
                 {
-                    download.Modified = await FileRepository.GetLastWriteTimeAsync(download.Filepath);
+                    download.Modified = await CommonBusinessLogic.FileRepository.GetLastWriteTimeAsync(download.Filepath);
                 }
 
                 downloads.Add(download);
@@ -319,7 +312,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 return new RedirectResult(filePath);
             }
 
-            if (!await FileRepository.GetFileExistsAsync(filePath))
+            if (!await CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
             {
                 return new HttpNotFoundResult($"File '{filePath}' does not exist");
             }
@@ -336,7 +329,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             Response.BufferOutput = true;
             */
 
-            return Content(await FileRepository.ReadAsync(filePath), model.ContentType);
+            return Content(await CommonBusinessLogic.FileRepository.ReadAsync(filePath), model.ContentType);
         }
 
         #endregion
@@ -347,14 +340,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public async Task<IActionResult> Read(string filePath)
         {
             //Ensure the file exists
-            if (string.IsNullOrWhiteSpace(filePath) || !await FileRepository.GetFileExistsAsync(filePath))
+            if (string.IsNullOrWhiteSpace(filePath) || !await CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
             {
                 return new NotFoundResult();
             }
 
             var model = new DownloadViewModel.Download();
             model.Filepath = filePath;
-            string content = await FileRepository.ReadAsync(filePath);
+            string content = await CommonBusinessLogic.FileRepository.ReadAsync(filePath);
 
             if (model.ContentType.EqualsI("text/csv"))
             {
@@ -376,7 +369,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public async Task<IActionResult> PendingRegistrations()
         {
             List<UserOrganisation> nonUkAddressUserOrganisations =
-                DataRepository
+                CommonBusinessLogic.DataRepository
                     .GetAll<UserOrganisation>()
                     .Where(uo => uo.User.Status == UserStatuses.Active)
                     .Where(
@@ -388,7 +381,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     .ToList();
 
             List<UserOrganisation> publicSectorUserOrganisations =
-                DataRepository
+                CommonBusinessLogic.DataRepository
                     .GetAll<UserOrganisation>()
                     .Where(uo => uo.User.Status == UserStatuses.Active)
                     .Where(
@@ -399,7 +392,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     .ToList();
 
             List<UserOrganisation> allManuallyRegisteredUserOrganisations =
-                DataRepository
+                CommonBusinessLogic.DataRepository
                     .GetAll<UserOrganisation>()
                     .Where(uo => uo.User.Status == UserStatuses.Active)
                     .Where(uo => uo.PINConfirmedDate == null && uo.Method == RegistrationMethods.Manual)
@@ -428,15 +421,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("downloads")]
         public async Task<IActionResult> Downloads()
         {
-            await FileRepository.CreateDirectoryAsync(Global.DownloadsPath);
+            await CommonBusinessLogic.FileRepository.CreateDirectoryAsync(CommonBusinessLogic.GlobalOptions.DownloadsPath);
 
             var model = new DownloadViewModel();
 
             #region Organisation Downloads
 
             DownloadViewModel.Download download;
-            IEnumerable<string> files = await FileRepository.GetFilesAsync(
-                Global.DownloadsPath,
+            IEnumerable<string> files = await CommonBusinessLogic.FileRepository.GetFilesAsync(
+                CommonBusinessLogic.GlobalOptions.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.Organisations)}*{Path.GetExtension(Filenames.Organisations)}");
             foreach (string file in files.OrderByDescending(file => file))
             {
@@ -455,8 +448,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Orphaned organisations Addresses
 
-            files = await FileRepository.GetFilesAsync(
-                Global.DownloadsPath,
+            files = await CommonBusinessLogic.FileRepository.GetFilesAsync(
+                CommonBusinessLogic.GlobalOptions.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.OrphanOrganisations)}*{Path.GetExtension(Filenames.OrphanOrganisations)}");
             foreach (string file in files.OrderByDescending(file => file))
             {
@@ -475,8 +468,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Registration Addresses
 
-            files = await FileRepository.GetFilesAsync(
-                Global.DownloadsPath,
+            files = await CommonBusinessLogic.FileRepository.GetFilesAsync(
+                CommonBusinessLogic.GlobalOptions.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.RegistrationAddresses)}*{Path.GetExtension(Filenames.RegistrationAddresses)}");
             foreach (string file in files.OrderByDescending(file => file))
             {
@@ -496,8 +489,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Scopes
 
-            files = await FileRepository.GetFilesAsync(
-                Global.DownloadsPath,
+            files = await CommonBusinessLogic.FileRepository.GetFilesAsync(
+                CommonBusinessLogic.GlobalOptions.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.OrganisationScopes)}*{Path.GetExtension(Filenames.OrganisationScopes)}");
             foreach (string file in files.OrderByDescending(file => file))
             {
@@ -518,8 +511,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Submissions
 
-            files = await FileRepository.GetFilesAsync(
-                Global.DownloadsPath,
+            files = await CommonBusinessLogic.FileRepository.GetFilesAsync(
+                CommonBusinessLogic.GlobalOptions.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.OrganisationSubmissions)}*{Path.GetExtension(Filenames.OrganisationSubmissions)}");
             foreach (string file in files.OrderByDescending(file => file))
             {
@@ -538,7 +531,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             download = new DownloadViewModel.Download {
                 Type = "Late Submissions",
-                Filepath = Path.Combine(Global.DownloadsPath, Filenames.OrganisationLateSubmissions),
+                Filepath = Path.Combine(CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.OrganisationLateSubmissions),
                 Title = "Organisation Late Submissions",
                 Description = "Organisations who reported or changed their submission late the previous snapshot date."
             };
@@ -551,7 +544,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             download = new DownloadViewModel.Download {
                 Type = "Users",
-                Filepath = Path.Combine(Global.DownloadsPath, Filenames.Users),
+                Filepath = Path.Combine(CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.Users),
                 Title = "All Users Accounts",
                 Description = "A list of all user accounts and their statuses."
             };
@@ -564,7 +557,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             download = new DownloadViewModel.Download {
                 Type = "Users",
-                Filepath = Path.Combine(Global.DownloadsPath, Filenames.Registrations),
+                Filepath = Path.Combine(CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.Registrations),
                 Title = "User Organisation Registrations",
                 Description =
                     "A list of all organisations that have been registered by a user. This includes all users for each organisation."
@@ -574,7 +567,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             download = new DownloadViewModel.Download {
                 Type = "Users",
-                Filepath = Path.Combine(Global.DownloadsPath, Filenames.UnverifiedRegistrations),
+                Filepath = Path.Combine(CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.UnverifiedRegistrations),
                 Title = "Unverified User Organisation Registrations",
                 Description = "A list of all unverified organisations pending verification from a user."
             };
@@ -583,7 +576,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             download = new DownloadViewModel.Download {
                 Type = "Users",
-                Filepath = Path.Combine(Global.DownloadsPath, Filenames.UnverifiedRegistrations),
+                Filepath = Path.Combine(CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.UnverifiedRegistrations),
                 Title = "Unverified User Organisation Registrations",
                 Description = "A list of all unverified organisations pending verification from a user."
             };
@@ -596,7 +589,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             download = new DownloadViewModel.Download {
                 Type = "User Consent",
-                Filepath = Path.Combine(Global.DownloadsPath, Filenames.SendInfo),
+                Filepath = Path.Combine(CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.SendInfo),
                 Title = "Users to send updates and info",
                 Description = "Users who answered \"Yes\" to \"I would like to receive information about webinars, events and new guidance\""
             };
@@ -605,7 +598,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             download = new DownloadViewModel.Download {
                 Type = "User Consent",
-                Filepath = Path.Combine(Global.DownloadsPath, Filenames.AllowFeedback),
+                Filepath = Path.Combine(CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.AllowFeedback),
                 Title = "Users to contact for feedback",
                 Description = "Users who answered \"Yes\" to \"I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys\""
             };
@@ -621,10 +614,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             bool isSuperAdministrator = IsSuperAdministrator;
             await model.Downloads.WaitForAllAsync(
                 async d => {
-                    if (await FileRepository.GetFileExistsAsync(d.Filepath))
+                    if (await CommonBusinessLogic.FileRepository.GetFileExistsAsync(d.Filepath))
                     {
-                        d.Modified = await FileRepository.GetLastWriteTimeAsync(d.Filepath);
-                        IDictionary<string, string> metaData = await FileRepository.LoadMetaDataAsync(d.Filepath);
+                        d.Modified = await CommonBusinessLogic.FileRepository.GetLastWriteTimeAsync(d.Filepath);
+                        IDictionary<string, string> metaData = await CommonBusinessLogic.FileRepository.LoadMetaDataAsync(d.Filepath);
 
                         d.Count = metaData != null && metaData.ContainsKey("RecordCount")
                             ? metaData["RecordCount"].ToInt32().ToString()
@@ -657,7 +650,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var model = this.UnstashModel<DownloadViewModel>();
             if (model == null)
             {
-                return View("CustomError", new ErrorViewModel(1138));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1138));
             }
 
             string filepath = command.AfterFirst(":");
@@ -677,7 +670,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 return View("Downloads", model);
             }
 
-            return View("CustomError", new ErrorViewModel(1139));
+            return View("CustomError", WebService.ErrorViewModelFactory.Create(1139));
         }
 
         #endregion
@@ -689,29 +682,29 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             var model = new UploadViewModel();
 
-            int sicSectionsCount = await DataRepository.GetAll<SicSection>().CountAsync();
+            int sicSectionsCount = await CommonBusinessLogic.DataRepository.GetAll<SicSection>().CountAsync();
             var upload = new UploadViewModel.Upload {
                 Type = "SicSection",
-                Filepath = Path.Combine(Global.DataPath, Filenames.SicSections),
+                Filepath = Path.Combine(CommonBusinessLogic.GlobalOptions.DataPath, Filenames.SicSections),
                 Title = "SIC Sections",
                 Description = "Standard Industrial Classification (SIC) sector titles.",
                 Count = sicSectionsCount.ToString()
             };
-            upload.Modified = await FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await FileRepository.GetLastWriteTimeAsync(upload.Filepath)
+            upload.Modified = await CommonBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
+                ? await CommonBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
                 : DateTime.MinValue;
             model.Uploads.Add(upload);
 
-            int sicCodesCount = await DataRepository.GetAll<SicCode>().CountAsync();
+            int sicCodesCount = await CommonBusinessLogic.DataRepository.GetAll<SicCode>().CountAsync();
             upload = new UploadViewModel.Upload {
                 Type = "SicCode",
-                Filepath = Path.Combine(Global.DataPath, Filenames.SicCodes),
+                Filepath = Path.Combine(CommonBusinessLogic.GlobalOptions.DataPath, Filenames.SicCodes),
                 Title = "SIC Codes",
                 Description = "Standard Industrial Classification (SIC) codes and titles.",
                 Count = sicCodesCount.ToString()
             };
-            upload.Modified = await FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await FileRepository.GetLastWriteTimeAsync(upload.Filepath)
+            upload.Modified = await CommonBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
+                ? await CommonBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
                 : DateTime.MinValue;
             model.Uploads.Add(upload);
 
@@ -720,28 +713,28 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             List<DnBOrgsModel> allDnBOrgs = await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
             upload = new UploadViewModel.Upload {
                 Type = "DnBOrgs",
-                Filepath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations()),
+                Filepath = Path.Combine(CommonBusinessLogic.GlobalOptions.DataPath, Filenames.DnBOrganisations()),
                 Title = "Dun & Bradstreet Organisations",
                 Description = "Latest list of public and private sector organisations from Dun & Bradstreet database.",
                 Count = allDnBOrgs == null
                     ? "0"
                     : $"{allDnBOrgs.Count(o => o.ImportedDate != null && (o.StatusCheckedDate == null || o.ImportedDate >= o.StatusCheckedDate))}/{allDnBOrgs.Count.ToString()}"
             };
-            upload.Modified = await FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await FileRepository.GetLastWriteTimeAsync(upload.Filepath)
+            upload.Modified = await CommonBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
+                ? await CommonBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
                 : DateTime.MinValue;
             model.Uploads.Add(upload);
 
             List<ShortCodeModel> allShortCodes = await AdminService.ShortCodesRepository.GetAllShortCodesAsync();
             upload = new UploadViewModel.Upload {
                 Type = "ShortCodes",
-                Filepath = Path.Combine(Global.DataPath, Filenames.ShortCodes),
+                Filepath = Path.Combine(CommonBusinessLogic.GlobalOptions.DataPath, Filenames.ShortCodes),
                 Title = "Short Codes",
                 Description = "Short codes for tracking and routing users to specific web pages.",
                 Count = allShortCodes == null ? "0" : allShortCodes.Count.ToString()
             };
-            upload.Modified = await FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await FileRepository.GetLastWriteTimeAsync(upload.Filepath)
+            upload.Modified = await CommonBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
+                ? await CommonBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
                 : DateTime.MinValue;
             model.Uploads.Add(upload);
 
@@ -764,7 +757,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var model = this.UnstashModel<UploadViewModel>();
             if (model == null)
             {
-                return View("CustomError", new ErrorViewModel(1138));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1138));
             }
 
             string filepath = command.AfterFirst(":");
@@ -790,7 +783,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             {
                 try
                 {
-                    await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.ImportAsync(DataRepository, CurrentUser);
+                    await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.ImportAsync(CommonBusinessLogic.DataRepository, CurrentUser);
                 }
                 catch (Exception ex)
                 {
@@ -863,7 +856,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         }
 
                         //Core.Classes.Extensions
-                        await FileRepository.SaveCSVAsync(records, upload.Filepath);
+                        await CommonBusinessLogic.FileRepository.SaveCSVAsync(records, upload.Filepath);
                         DateTime updateTime = VirtualDateTime.Now.AddMinutes(-2);
                         switch (upload.Type)
                         {
@@ -872,16 +865,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 break;
                             case "SicSection":
                                 await DataMigrations.Update_SICSectionsAsync(
-                                    DataRepository,
-                                    FileRepository,
-                                    Global.DataPath,
+                                    CommonBusinessLogic.DataRepository,
+                                    CommonBusinessLogic.FileRepository,
+                                    CommonBusinessLogic.GlobalOptions.DataPath,
                                     true);
                                 break;
                             case "SicCode":
                                 await DataMigrations.Update_SICCodesAsync(
-                                    DataRepository,
-                                    FileRepository,
-                                    Global.DataPath,
+                                    CommonBusinessLogic.DataRepository,
+                                    CommonBusinessLogic.FileRepository,
+                                    CommonBusinessLogic.GlobalOptions.DataPath,
                                     true);
                                 //TODO Recheck remaining companies with no Sic against new SicCodes and then CoHo
                                 await UpdateCompanySicCodesAsync(updateTime);
@@ -910,17 +903,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private async Task UpdateCompanySicCodesAsync(DateTime updateTime)
         {
             //Get all the bad sic records
-            IEnumerable<string> files = await FileRepository.GetFilesAsync(Global.LogPath, "BadSicLog*.csv", true);
+            IEnumerable<string> files = await CommonBusinessLogic.FileRepository.GetFilesAsync(CommonBusinessLogic.GlobalOptions.LogPath, "BadSicLog*.csv", true);
             var fileRecords = new Dictionary<string, List<BadSicLogModel>>();
             var changedFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (string file in files)
             {
-                List<BadSicLogModel> records = await FileRepository.ReadCSVAsync<BadSicLogModel>(file);
+                List<BadSicLogModel> records = await CommonBusinessLogic.FileRepository.ReadCSVAsync<BadSicLogModel>(file);
                 fileRecords[file] = records;
             }
 
             //Get all the new Sic Codes
-            IQueryable<int> newSicCodes = DataRepository.GetAll<SicCode>().Where(s => s.Created >= updateTime).Select(s => s.SicCodeId);
+            IQueryable<int> newSicCodes = CommonBusinessLogic.DataRepository.GetAll<SicCode>().Where(s => s.Created >= updateTime).Select(s => s.SicCodeId);
 
             foreach (int newSicCode in newSicCodes)
             {
@@ -930,7 +923,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     IEnumerable<BadSicLogModel> records = file.Where(r => r.SicCode == newSicCode);
                     foreach (BadSicLogModel record in records)
                     {
-                        IQueryable<OrganisationSicCode> orgSics = DataRepository.GetAll<OrganisationSicCode>()
+                        IQueryable<OrganisationSicCode> orgSics = CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>()
                             .Where(o => o.OrganisationId == record.OrganisationId);
                         if (await orgSics.AnyAsync())
                         {
@@ -939,7 +932,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 continue;
                             }
 
-                            DataRepository.Insert(new OrganisationSicCode {OrganisationId = record.OrganisationId, SicCodeId = newSicCode});
+                            CommonBusinessLogic.DataRepository.Insert(new OrganisationSicCode {OrganisationId = record.OrganisationId, SicCodeId = newSicCode});
                         }
 
                         file.Remove(record);
@@ -948,7 +941,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
             }
 
-            await DataRepository.SaveChangesAsync();
+            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Update or delete the changed log files
             foreach (string changedFile in changedFiles)
@@ -956,11 +949,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 List<BadSicLogModel> records = fileRecords[changedFile];
                 if (records.Any())
                 {
-                    await FileRepository.SaveCSVAsync(fileRecords[changedFile], changedFile);
+                    await CommonBusinessLogic.FileRepository.SaveCSVAsync(fileRecords[changedFile], changedFile);
                 }
                 else
                 {
-                    await FileRepository.DeleteFileAsync(changedFile);
+                    await CommonBusinessLogic.FileRepository.DeleteFileAsync(changedFile);
                 }
             }
         }
@@ -968,21 +961,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private async Task RecheckCompaniesAsync()
         {
             //Get all the bad sic records
-            IEnumerable<string> files = await FileRepository.GetFilesAsync(Global.LogPath, "BadSicLog*.csv", true);
+            IEnumerable<string> files = await CommonBusinessLogic.FileRepository.GetFilesAsync(CommonBusinessLogic.GlobalOptions.LogPath, "BadSicLog*.csv", true);
             var badSicCodes = new HashSet<string>();
             foreach (string file in files)
             {
-                List<BadSicLogModel> records = await FileRepository.ReadCSVAsync<BadSicLogModel>(file);
+                List<BadSicLogModel> records = await CommonBusinessLogic.FileRepository.ReadCSVAsync<BadSicLogModel>(file);
                 badSicCodes.AddRange(records.ToList().Select(s => $"{s.OrganisationId}:{s.SicCode}").Distinct());
             }
 
             //Get all the private organisations with no sic codes
-            IQueryable<Organisation> orgs = DataRepository.GetAll<Organisation>()
+            IQueryable<Organisation> orgs = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                 .Where(
                     o => o.SectorType == SectorTypes.Private
                          && o.CompanyNumber != null
                          && !o.OrganisationSicCodes.Where(s => s.Retired == null).Any());
-            List<SicCode> allSicCodes = await DataRepository.GetAll<SicCode>().ToListAsync();
+            List<SicCode> allSicCodes = await CommonBusinessLogic.DataRepository.GetAll<SicCode>().ToListAsync();
             foreach (Organisation org in orgs)
             {
                 try
@@ -1029,7 +1022,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
             }
 
-            await DataRepository.SaveChangesAsync();
+            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
         }
 
         #endregion
@@ -1056,7 +1049,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             emailAddress = emailAddress?.ToLower();
 
             //Throw error if the user is not a super administrator of a test admin
-            if (!IsSuperAdministrator && (!IsAdministrator || !IsTestUser || !emailAddress.StartsWithI(Global.TestPrefix)))
+            if (!IsSuperAdministrator && (!IsAdministrator || !IsTestUser || !emailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix)))
             {
                 return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a super administrator");
             }
@@ -1068,13 +1061,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             //Ensure we get a valid user from the database
-            User currentUser = DataRepository.FindUser(User);
+            User currentUser = CommonBusinessLogic.DataRepository.FindUser(User);
             if (currentUser == null || !currentUser.IsAdministrator())
             {
                 throw new IdentityNotMappedException();
             }
 
-            if (currentUser.EmailAddress.StartsWithI(Global.TestPrefix) && !emailAddress.StartsWithI(Global.TestPrefix))
+            if (currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix) && !emailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
             {
                 ModelState.AddModelError(
                     "",

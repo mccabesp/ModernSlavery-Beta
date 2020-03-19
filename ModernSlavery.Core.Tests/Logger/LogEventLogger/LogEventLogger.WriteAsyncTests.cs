@@ -1,10 +1,7 @@
 ﻿using System.Threading.Tasks;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Tests.Common.Classes;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Models.LogModels;
-using ModernSlavery.SharedKernel;
 using Moq;
 
 using Newtonsoft.Json;
@@ -25,7 +22,7 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
             mockLogEventLoggerProvider = new Mock<Infrastructure.Logging.LogEventLoggerProvider>(
                 mockQueue.Object,
                 testApplicationName,
-                Options.Create(new LoggerFilterOptions())) {CallBase = true};
+                new LoggerFilterOptions()) {CallBase = true};
         }
 
         private Mock<Infrastructure.Queue.AzureQueue> mockQueue;

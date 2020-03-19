@@ -8,20 +8,20 @@ using ModernSlavery.Entities;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
+using ModernSlavery.BusinessLogic;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
-using Newtonsoft.Json;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using Newtonsoft.Json;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Shared.Controllers
 {
@@ -33,8 +33,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         public BaseController(
             ILogger logger,
             IWebService webService,
-            IDataRepository dataRepository,
-            IFileRepository fileRepository) : base()
+            ICommonBusinessLogic commonBusinessLogic) : base()
         {
             Logger = logger;
             AutoMapper = webService.AutoMapper;
@@ -42,15 +41,14 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             Session = webService.Session;
             WebTracker = webService.WebTracker;
 
-            DataRepository = dataRepository;
-            FileRepository = fileRepository;
+            CommonBusinessLogic = commonBusinessLogic;
         }
 
+        public readonly IWebService WebService;
         protected readonly ILogger Logger;
         public readonly IHttpCache Cache;
         public readonly IHttpSession Session;
-        public readonly IDataRepository DataRepository;
-        public readonly IFileRepository FileRepository;
+        public readonly ICommonBusinessLogic CommonBusinessLogic;
         public readonly IWebTracker WebTracker;
         protected readonly IMapper AutoMapper;
 
@@ -181,7 +179,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             var controller = context.Controller as Controller;
             controller.ViewData["Controller"] = controller;
 
-            if (Global.DisablePageCaching)
+            if (CommonBusinessLogic.GlobalOptions.DisablePageCaching)
             {
                 //Disable page caching
                 context.HttpContext.DisableResponseCache();
@@ -308,7 +306,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         protected async Task<TimeSpan> GetRetryLockRemainingTimeAsync(string retryLockKey, int expiryMinutes)
         {
-            if (Global.SkipSpamProtection)
+            if (CommonBusinessLogic.GlobalOptions.SkipSpamProtection)
             {
                 return TimeSpan.Zero;
             }
@@ -325,6 +323,30 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             await Cache.RemoveAsync($"{UserHostAddress}:{retryLockKey}:Count");
         }
 
+        public async Task TrackPageViewAsync(string pageTitle = null, string pageUrl = null)
+        {
+            if (string.IsNullOrWhiteSpace(pageTitle))
+            {
+                pageTitle = ViewBag.Title;
+            }
+
+            if (string.IsNullOrWhiteSpace(pageTitle))
+            {
+                pageTitle = RouteData.Values["action"].ToString();
+            }
+
+            if (string.IsNullOrWhiteSpace(pageUrl))
+            {
+                pageUrl = HttpContext.GetUri().ToString();
+            }
+            else if (!pageUrl.IsUrl())
+            {
+                pageUrl = Extensions.Url.RelativeToAbsoluteUrl(pageUrl, HttpContext.GetUri());
+            }
+
+
+            await this.WebTracker.SendPageViewTrackingAsync(pageTitle, pageUrl);
+        }
         #region Properties
 
         public long ReportingOrganisationId
@@ -368,7 +390,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 if (_ReportingOrganisation == null && ReportingOrganisationId > 0)
                 {
-                    _ReportingOrganisation = DataRepository.GetAll<Organisation>()
+                    _ReportingOrganisation = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                         .FirstOrDefault(o => o.OrganisationId == ReportingOrganisationId);
                 }
 
@@ -384,18 +406,18 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         public virtual User CurrentUser => VirtualUser;
 
         public bool IsTrustedIP =>
-            string.IsNullOrWhiteSpace(Global.TrustedIPDomains) || UserHostAddress.IsTrustedAddress(Global.TrustedIPDomains.SplitI());
+            string.IsNullOrWhiteSpace(CommonBusinessLogic.GlobalOptions.TrustedIPDomains) || UserHostAddress.IsTrustedAddress(CommonBusinessLogic.GlobalOptions.TrustedIPDomains.SplitI());
 
         public bool IsAdministrator => CurrentUser.IsAdministrator();
         public bool IsSuperAdministrator => IsTrustedIP && CurrentUser.IsSuperAdministrator();
         public bool IsDatabaseAdministrator => IsTrustedIP && CurrentUser.IsDatabaseAdministrator();
 
-        public bool IsTestUser => CurrentUser.EmailAddress.StartsWithI(Global.TestPrefix);
+        public bool IsTestUser => CurrentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix);
         public bool IsImpersonatingUser => OriginalUser != null && OriginalUser.IsAdministrator();
 
         protected User VirtualUser =>
             User.Identity.IsAuthenticated
-                ? ImpersonatedUserId > 0 ? DataRepository.Get<User>(ImpersonatedUserId) : DataRepository.FindUser(User)
+                ? ImpersonatedUserId > 0 ? CommonBusinessLogic.DataRepository.Get<User>(ImpersonatedUserId) : CommonBusinessLogic.DataRepository.FindUser(User)
                 : null;
         #endregion
 
@@ -412,7 +434,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     long userId = Session["OriginalUser"].ToInt64();
                     if (userId > 0)
                     {
-                        _OriginalUser = DataRepository.Get<User>(userId);
+                        _OriginalUser = CommonBusinessLogic.DataRepository.Get<User>(userId);
                     }
                 }
 
@@ -490,11 +512,11 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     }
 
                     //Tell them to verify email
-                    return View("CustomError", new ErrorViewModel(1100));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1100));
                 }
 
                 //If verification code has expired
-                if (currentUser.EmailVerifySendDate.Value.AddHours(Global.EmailVerificationExpiryHours) < VirtualDateTime.Now)
+                if (currentUser.EmailVerifySendDate.Value.AddHours(CommonBusinessLogic.GlobalOptions.EmailVerificationExpiryHours) < VirtualDateTime.Now)
                 {
                     if (IsAnyAction("Register/VerifyEmail"))
                     {
@@ -502,11 +524,11 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     }
 
                     //prompt user to click to request a new one
-                    return View("CustomError", new ErrorViewModel(1101));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1101));
                 }
 
                 //If code min time hasnt elapsed 
-                TimeSpan remainingTime = currentUser.EmailVerifySendDate.Value.AddHours(Global.EmailVerificationMinResendHours)
+                TimeSpan remainingTime = currentUser.EmailVerifySendDate.Value.AddHours(CommonBusinessLogic.GlobalOptions.EmailVerificationMinResendHours)
                                          - VirtualDateTime.Now;
                 if (remainingTime > TimeSpan.Zero)
                 {
@@ -517,7 +539,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     }
 
                     //tell them to wait
-                    return View("CustomError", new ErrorViewModel(1102, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1102, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
                 }
 
                 //if the code is still valid but min sent time has elapsed
@@ -527,7 +549,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 //Prompt user to request a new verification code
-                return View("CustomError", new ErrorViewModel(1103));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1103));
             }
 
             //Ensure admins always routed to their home page
@@ -546,7 +568,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 return RedirectToAction("Home", "Admin", new { area = "Admin" });
-                //return View("CustomError", new ErrorViewModel(1117));
+                //return View("CustomError", WebService.ErrorViewModelFactory.Create(1117));
             }
 
             //Ensure admin pages only available to administrators
@@ -635,18 +657,18 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     }
 
                     //If PIN sent and expired then prompt to request a new pin
-                    if (userOrg.PINSentDate.Value.AddDays(Global.PinInPostExpiryDays) < VirtualDateTime.Now)
+                    if (userOrg.PINSentDate.Value.AddDays(CommonBusinessLogic.GlobalOptions.PinInPostExpiryDays) < VirtualDateTime.Now)
                     {
                         if (IsAnyAction("Register/PINSent", "Register/RequestPIN"))
                         {
                             return null;
                         }
 
-                        return View("CustomError", new ErrorViewModel(1106));
+                        return View("CustomError", WebService.ErrorViewModelFactory.Create(1106));
                     }
 
                     //If PIN resends are allowed and currently on PIN send page then allow it to continue
-                    TimeSpan remainingTime = userOrg.PINSentDate.Value.AddDays(Global.PinInPostMinRepostDays) - VirtualDateTime.Now;
+                    TimeSpan remainingTime = userOrg.PINSentDate.Value.AddDays(CommonBusinessLogic.GlobalOptions.PinInPostMinRepostDays) - VirtualDateTime.Now;
                     if (remainingTime <= TimeSpan.Zero && IsAnyAction("Register/PINSent", "Register/RequestPIN"))
                     {
                         return null;
@@ -655,7 +677,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     //If PIN Not expired redirect to ActivateService where they can either enter the same pin or request a new one 
                     if (IsAnyAction("Register/RequestPIN"))
                     {
-                        return View("CustomError", new ErrorViewModel(1120, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+                        return View("CustomError", WebService.ErrorViewModelFactory.Create(1120, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
                     }
 
                     if (IsAnyAction("Register/ActivateService"))
@@ -681,7 +703,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     return null;
                 }
 
-                return View("CustomError", new ErrorViewModel(1109));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1109));
             }
 
             //Ensure pending manual registrations always redirected back to home
@@ -729,7 +751,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         protected ActionResult SessionExpiredView()
         {
             // create the session expired error model
-            var errorModel = new ErrorViewModel(1134);
+            var errorModel = WebService.ErrorViewModelFactory.Create(1134);
 
             // return the custom error view
             return View("CustomError", errorModel);

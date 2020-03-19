@@ -7,13 +7,9 @@ using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.BusinessLogic.Models.Organisation;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.Tests.TestHelpers;
@@ -30,7 +26,11 @@ using ModernSlavery.SharedKernel;
 using NUnit.Framework;
 using Microsoft.AspNetCore.Authentication;
 using ModernSlavery.BusinessLogic.Submit;
+using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {
@@ -211,7 +211,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testDraftFileBL = new DraftFileBusinessLogic(null,testFileRepository);
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(),Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -280,7 +280,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             mockedOrganisation.OrganisationId = new Random().Next(5000, 9999);
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             var expectedReturnViewModel = new ReturnViewModel {
                 ReturnId = mockedReturn.ReturnId,
@@ -311,7 +311,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             #region mocking DB
 
@@ -513,7 +513,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -543,7 +543,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             model = controller.UnstashModel<ReturnViewModel>();
 
             //DONE this should just return the correct record with returnid=1
-            Return resultDB = controller.DataRepository.GetAll<Return>().FirstOrDefault(r => r.ReturnId == testReturnId);
+            Return resultDB = controller.CommonBusinessLogic.DataRepository.GetAll<Return>().FirstOrDefault(r => r.ReturnId == testReturnId);
 
             // ASSERT:
             //3.Check that the result is not null
@@ -622,7 +622,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -827,7 +827,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
             //var mockedModel = OrganisationViewModelHelper.GetMockedOrganisationModelHelperForReturn(mockedReturn, OrganisationSizes.NotProvided);
@@ -839,7 +839,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
             ;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
@@ -905,7 +905,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -916,7 +916,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
             ;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
@@ -964,7 +964,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -976,7 +976,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.Bind(returnViewModel);
             controller.StashModel(returnViewModel);
 
-            Global.EnableSubmitAlerts = true;
+            ConfigHelpers.GlobalOptions.EnableSubmitAlerts = true;
 
             //ACT:
             var result = await controller.CheckData(returnViewModel) as RedirectToActionResult;
@@ -995,7 +995,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -1006,7 +1006,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
             ;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
@@ -1055,7 +1055,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -1182,7 +1182,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1327,7 +1327,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1432,7 +1432,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1543,7 +1543,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1625,7 +1625,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1720,7 +1720,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -1832,7 +1832,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(testUser.UserId, routeData, null);
             controller.ReportingOrganisationId = testOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabaseToConfig = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -2137,7 +2137,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             mockedOrganisation.OrganisationId = new Random().Next(1000, 9999);
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -2148,7 +2148,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -2169,7 +2169,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             expectedReturnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -2203,7 +2203,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Organisation mockedOrganisation = OrganisationHelper.GetPrivateOrganisation();
             mockedOrganisation.OrganisationId = new Random().Next(1000, 9999);
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -2214,7 +2214,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -2274,7 +2274,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             mockedOrganisation.OrganisationId = new Random().Next(1000, 9999);
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -2285,7 +2285,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -2323,7 +2323,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
 
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             await testPresenter.DiscardDraftFileAsync(actualReturnViewModel);
         }
@@ -2498,7 +2498,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -2583,7 +2583,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -2779,7 +2779,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -2986,7 +2986,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -3083,7 +3083,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -3220,7 +3220,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -3353,7 +3353,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -3442,7 +3442,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -3453,7 +3453,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -3487,7 +3487,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -3614,7 +3614,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -3710,7 +3710,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             //Test the google analytics tracker was executed once on the controller
             controller.WebTracker.GetMockFromObject()
-                .Verify(mock => mock.TrackPageViewAsync(It.IsAny<Controller>(), null, null), Times.Once());
+                .Verify(mock => mock.SendPageViewTrackingAsync(null, null), Times.Once());
 
             Assert.NotNull(result);
         }
@@ -3736,7 +3736,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -3747,7 +3747,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -3766,7 +3766,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null,testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -3792,7 +3792,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -3803,7 +3803,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
             mockedDatabase.SetupGetAll(mockedUser, mockedOrganisation, mockedUserOrganisation, mockedReturn);
@@ -3828,7 +3828,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
@@ -3840,7 +3840,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -3873,7 +3873,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -3906,7 +3906,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -3929,7 +3929,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -3940,7 +3940,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
             ;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
@@ -3989,7 +3989,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             model.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -4015,7 +4015,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -4026,7 +4026,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
             ;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
@@ -4093,7 +4093,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
             ;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
@@ -4160,7 +4160,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(testUser.UserId, mockRouteData, testUser);
             controller.ReportingOrganisationId = testUserOrganisation.OrganisationId;
-            int wrongYear = Global.FirstReportingYear - 1;
+            int wrongYear = ConfigHelpers.GlobalOptions.FirstReportingYear - 1;
 
             // Act
             var result = await controller.LateWarning($"5654:{wrongYear}") as HttpStatusViewResult;
@@ -4240,7 +4240,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -4280,7 +4280,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -4306,7 +4306,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             mockedOrganisation.OrganisationId = new Random().Next(5000, 9999);
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -4317,7 +4317,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -4335,7 +4335,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 mockedOrganisation.OrganisationId,
@@ -4369,7 +4369,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -4400,7 +4400,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -4433,7 +4433,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -4485,7 +4485,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -4757,7 +4757,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testDraftFileBL = new DraftFileBusinessLogic(null, testFileRepository);
             var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
             var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
-            var testPresenter = new SubmissionPresenter(testSubmissionService, null);
+            var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             returnViewModel.ReportInfo.Draft = await testPresenter.GetDraftFileAsync(
                 organisation.OrganisationId,
@@ -5047,7 +5047,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -5058,7 +5058,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -5088,7 +5088,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -5111,7 +5111,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, Global.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
@@ -5122,7 +5122,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
-            controller.ReportingOrganisationStartYear = Global.FirstReportingYear;
+            controller.ReportingOrganisationStartYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 

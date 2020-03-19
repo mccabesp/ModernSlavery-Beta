@@ -4,12 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Organisation;
 using ModernSlavery.WebUI.Models.Scope;
@@ -17,12 +14,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -33,23 +31,19 @@ namespace ModernSlavery.WebUI.Controllers
         #region Constructors
 
         public OrganisationController(
-            ILogger<ErrorController> logger,
-            IWebService webService,
             ISubmissionPresenter submitService,
             IScopePresenter scopePresentation,
             IScopeBusinessLogic scopeBL,
-            ICommonBusinessLogic commonBL,
             IOrganisationBusinessLogic organisationBL,
             IRegistrationRepository registrationRepository,
             [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
             [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<OrganisationController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             SubmissionService = submitService;
             ScopePresentation = scopePresentation;
             ScopeBusinessLogic = scopeBL;
             OrganisationBusinessLogic = organisationBL;
-            CommonBusinessLogic = commonBL;
             PrivateSectorRepository = privateSectorRepository;
             PublicSectorRepository = publicSectorRepository;
             RegistrationRepository = registrationRepository;
@@ -90,7 +84,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             //Get the current snapshot date
             DateTime snapshotDate = SubmissionService.GetCurrentSnapshotDate(userOrg.Organisation.SectorType).AddYears(-1);
-            if (snapshotDate.Year < Global.FirstReportingYear)
+            if (snapshotDate.Year < CommonBusinessLogic.GlobalOptions.FirstReportingYear)
             {
                 return new HttpBadRequestResult($"Snapshot year {snapshotDate.Year} is invalid");
             }
@@ -143,7 +137,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //Check the year parameters
-            if (model.SnapshotDate.Year < Global.FirstReportingYear || model.SnapshotDate.Year > VirtualDateTime.Now.Year)
+            if (model.SnapshotDate.Year < CommonBusinessLogic.GlobalOptions.FirstReportingYear || model.SnapshotDate.Year > VirtualDateTime.Now.Year)
             {
                 return new HttpBadRequestResult($"Snapshot year {model.SnapshotDate.Year} is invalid");
             }
@@ -425,10 +419,10 @@ namespace ModernSlavery.WebUI.Controllers
             //Make sure they are fully registered for one before requesting another
             if (userOrg.PINConfirmedDate == null && userOrg.PINSentDate != null)
             {
-                TimeSpan remainingTime = userOrg.PINSentDate.Value.AddMinutes(Global.LockoutMinutes) - VirtualDateTime.Now;
+                TimeSpan remainingTime = userOrg.PINSentDate.Value.AddMinutes(CommonBusinessLogic.GlobalOptions.LockoutMinutes) - VirtualDateTime.Now;
                 if (remainingTime > TimeSpan.Zero)
                 {
-                    return View("CustomError", new ErrorViewModel(3023, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(3023, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
                 }
             }
 
@@ -515,10 +509,10 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             // Send the notification to GEO for each newly orphaned organisation
-            if (!userToUnregister.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (!userToUnregister.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
             {
                 var sendEmails = new List<Task>();
-                bool testEmail = !Config.IsProduction();
+                bool testEmail = !CommonBusinessLogic.GlobalOptions.IsProduction();
                 if (orgToRemove.GetIsOrphan())
                 {
                     sendEmails.Add(CommonBusinessLogic.SendEmailService.SendGEOOrphanOrganisationNotificationAsync(orgToRemove.OrganisationName, testEmail));

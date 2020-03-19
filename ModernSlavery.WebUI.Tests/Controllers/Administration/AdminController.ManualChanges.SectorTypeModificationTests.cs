@@ -529,14 +529,14 @@ namespace ModernSlavery.WebUI.Areas.Admin.Controllers.Tests
             string[] actualResults = actualManualChangesViewModel.Results.Split(new[] {"\r\n", "\n"}, StringSplitOptions.None);
             Assert.AreEqual(3, actualResults.Length);
 
-            Organisation org1 = thisTestAdminController.DataRepository.GetAll<Organisation>()
+            Organisation org1 = thisTestAdminController.CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                 .SingleOrDefault(x => x.EmployerReference == "6B2LF57C");
             Assert.AreEqual(1, org1.LatestPublicSectorType.PublicSectorTypeId);
             Assert.AreEqual(
                 "1: 6B2LF57C:org 1 public sector type=No previous public sector type has been set to public sector type 1",
                 actualResults[0]);
 
-            Organisation org2 = thisTestAdminController.DataRepository.GetAll<Organisation>()
+            Organisation org2 = thisTestAdminController.CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                 .SingleOrDefault(x => x.EmployerReference == "D43TYU76");
             Assert.AreEqual(2, org2.LatestPublicSectorType.PublicSectorTypeId);
             Assert.AreEqual(

@@ -15,11 +15,7 @@ namespace ModernSlavery.IdentityServer4.Models.Account
         public bool AutomaticRedirectAfterSignOut { get; set; }
         public string PostLogoutRedirectUri { get; set; }
         public string ClientName { get; set; }
-
-        public Client Client
-        {
-            get { return Clients.Get().FirstOrDefault(c => c.ClientName == ClientName); }
-        }
+        public string ClientId { get; set; }
 
     }
 }

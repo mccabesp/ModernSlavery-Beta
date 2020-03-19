@@ -1,6 +1,6 @@
 ﻿using System;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Infrastructure.File;
+using ModernSlavery.Infrastructure.Options;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Classes
@@ -13,7 +13,7 @@ namespace ModernSlavery.Core.Tests.Classes
         public void ReadDataTableAsync_When_FilePath_Is_Null_Throws_ArgumentNullException()
         {
             // Arrange
-            var testSystemFileRepository = new SystemFileRepository();
+            var testSystemFileRepository = new SystemFileRepository(new StorageOptions());
 
             // Act
             var actualException =

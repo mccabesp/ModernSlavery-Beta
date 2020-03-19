@@ -29,7 +29,7 @@ namespace Repositories.RegistrationRepository
 
             // service under test
             testRegistrationRepo =
-                new ModernSlavery.BusinessLogic.Repositories.RegistrationRepository(mockDataRepo, mockLogRecordLogger.Object);
+                new ModernSlavery.Infrastructure.Data.RegistrationRepository(mockDataRepo, mockLogRecordLogger.Object);
         }
 
         private IDataRepository mockDataRepo;

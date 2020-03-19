@@ -2,14 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Submit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +14,7 @@ using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Controllers.Submission
 {
@@ -83,7 +79,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
             if (stashedReturnViewModel.ReportInfo.Draft != null && !stashedReturnViewModel.ReportInfo.Draft.IsUserAllowedAccess)
             {
                 this.CleanModelErrors<ReturnViewModel>();
-                return View("CustomError", new ErrorViewModel(3040));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(3040));
             }
 
 
@@ -200,12 +196,12 @@ namespace ModernSlavery.WebUI.Controllers.Submission
 
             if (databaseReturn == null || databaseReturn.Status == ReturnStatuses.Retired)
             {
-                DataRepository.Insert(postedReturn);
+                CommonBusinessLogic.DataRepository.Insert(postedReturn);
             }
 
             postedReturn.SetStatus(ReturnStatuses.Submitted, OriginalUser?.UserId ?? currentUser.UserId);
 
-            Organisation organisationFromDatabase = await DataRepository.GetAll<Organisation>()
+            Organisation organisationFromDatabase = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                 .FirstOrDefaultAsync(o => o.OrganisationId == postedReturnViewModel.OrganisationId);
 
             organisationFromDatabase.Returns.Add(postedReturn);
@@ -215,9 +211,9 @@ namespace ModernSlavery.WebUI.Controllers.Submission
                 organisationFromDatabase.LatestReturn = postedReturn;
             }
 
-            await DataRepository.SaveChangesAsync();
+            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
 
-            if (!currentUser.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (!currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
             {
                 await _SubmissionPresenter.SubmissionService.SubmissionBusinessLogic.SubmissionLog.WriteAsync(
                     new SubmissionLogModel {
@@ -268,14 +264,14 @@ namespace ModernSlavery.WebUI.Controllers.Submission
             postedReturnViewModel.EncryptedOrganisationId = postedReturn.Organisation.GetEncryptedId();
             this.StashModel(postedReturnViewModel);
 
-            if (Global.EnableSubmitAlerts
+            if (CommonBusinessLogic.GlobalOptions.EnableSubmitAlerts
                 && postedReturn.Organisation.Returns.Count(r => r.AccountingDate == postedReturn.AccountingDate) == 1
-                && !currentUser.EmailAddress.StartsWithI(Global.TestPrefix))
+                && !currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
             {
                 await _SubmissionService.CommonBusinessLogic.SendEmailService.SendGeoMessageAsync(
                     "GPG Data Submission Notification",
                     $"GPG data was submitted for first time in {postedReturn.AccountingDate.Year} by '{postedReturn.Organisation.OrganisationName}' on {postedReturn.StatusDate.ToShortDateString()}\n\n See {Url.Action("Report", "Viewing", new {employerIdentifier = postedReturnViewModel.EncryptedOrganisationId, year = postedReturn.AccountingDate.Year}, "https")}",
-                    currentUser.EmailAddress.StartsWithI(Global.TestPrefix));
+                    currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix));
             }
 
             _SubmissionService.CommonBusinessLogic.NotificationService.SendSuccessfulSubmissionEmailToRegisteredUsers(

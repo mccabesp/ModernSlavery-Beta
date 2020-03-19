@@ -1,10 +1,8 @@
 ﻿using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;

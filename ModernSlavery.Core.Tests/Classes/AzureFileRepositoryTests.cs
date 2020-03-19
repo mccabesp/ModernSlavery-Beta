@@ -1,6 +1,6 @@
 ﻿using System;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Infrastructure.File;
+using ModernSlavery.Tests.Common.Classes;
 using NUnit.Framework;
 
 namespace ModernSlavery.Core.Tests.Classes
@@ -14,7 +14,7 @@ namespace ModernSlavery.Core.Tests.Classes
         public void AzureFileRepository_Constructor_When_ConnectionString_Is_Not_Set_Throws_Exception(string connectionString)
         {
             // Arrange / Act
-            var actualException = Assert.Throws<ArgumentNullException>(() => { new AzureFileRepository(connectionString, null); });
+            var actualException = Assert.Throws<ArgumentNullException>(() => { new AzureFileRepository(ConfigHelpers.StorageOptions, null); });
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: connectionString", actualException.Message);
@@ -26,7 +26,7 @@ namespace ModernSlavery.Core.Tests.Classes
         {
             // Arrange / Act
             var actualException =
-                Assert.Throws<ArgumentNullException>(() => { new AzureFileRepository("some connection string", shareName); });
+                Assert.Throws<ArgumentNullException>(() => { new AzureFileRepository(ConfigHelpers.StorageOptions, null); });
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: shareName", actualException.Message);

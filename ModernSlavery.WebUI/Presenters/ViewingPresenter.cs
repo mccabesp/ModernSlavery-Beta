@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.View;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -38,15 +37,13 @@ namespace ModernSlavery.WebUI.Presenters
     public class ViewingPresenter : IViewingPresenter
     {
 
-        private readonly ICommonBusinessLogic commonLogic;
-        private readonly IDataRepository dataRepo;
-        private readonly IViewingService ViewingService;
+        private readonly ICommonBusinessLogic _commonBusinessLogic;
+        private readonly IViewingService _viewingService;
 
-        public ViewingPresenter(IDataRepository dataRepo, IViewingService viewingService, ICommonBusinessLogic commonLogic)
+        public ViewingPresenter(IViewingService viewingService, ICommonBusinessLogic commonBusinessLogic)
         {
-            this.dataRepo = dataRepo;
-            this.ViewingService = viewingService;
-            this.commonLogic = commonLogic;
+            _viewingService = viewingService;
+            _commonBusinessLogic = commonBusinessLogic;
         }
 
         public async Task<SearchViewModel> SearchAsync(EmployerSearchParameters searchParams)
@@ -82,9 +79,9 @@ namespace ModernSlavery.WebUI.Presenters
                         {"SampleOfResultsReturned", detailedListOfReturnedSearchTerms}
                     };
 
-                    //Global.AppInsightsClient?.TrackEvent("Gpg_SicCode_Suggest", telemetryProperties);
+                    //CommonBusinessLogic.GlobalOptions.AppInsightsClient?.TrackEvent("Gpg_SicCode_Suggest", telemetryProperties);
 
-                    await ViewingService.SearchBusinessLogic.SearchLog.WriteAsync(telemetryProperties);
+                    await _viewingService.SearchBusinessLogic.SearchLog.WriteAsync(telemetryProperties);
                 }
 
                 #endregion
@@ -125,7 +122,7 @@ namespace ModernSlavery.WebUI.Presenters
 
         public async Task<List<SuggestEmployerResult>> SuggestEmployerNameAsync(string searchText)
         {
-            IEnumerable<KeyValuePair<string, EmployerSearchModel>> results = await ViewingService.SearchBusinessLogic.EmployerSearchRepository.SuggestAsync(
+            IEnumerable<KeyValuePair<string, EmployerSearchModel>> results = await _viewingService.SearchBusinessLogic.EmployerSearchRepository.SuggestAsync(
                 searchText,
                 $"{nameof(EmployerSearchModel.Name)};{nameof(EmployerSearchModel.PreviousName)};{nameof(EmployerSearchModel.Abbreviations)}");
 
@@ -222,7 +219,7 @@ namespace ModernSlavery.WebUI.Presenters
         public async Task<List<SearchViewModel.SicSection>> GetAllSicSectionsAsync()
         {
             var results = new List<SearchViewModel.SicSection>();
-            var sortedSics = await dataRepo.ToListAscendingAsync<SicSection,string>(sic => sic.Description);
+            var sortedSics = await _commonBusinessLogic.DataRepository.ToListAscendingAsync<SicSection,string>(sic => sic.Description);
 
             foreach (SicSection sector in sortedSics)
             {
@@ -238,7 +235,7 @@ namespace ModernSlavery.WebUI.Presenters
         private async Task<PagedResult<EmployerSearchModel>> DoSearchAsync(EmployerSearchParameters searchParams,
             Dictionary<string, Dictionary<object, long>> facets)
         {
-            return await ViewingService.SearchBusinessLogic.EmployerSearchRepository.SearchAsync(
+            return await _viewingService.SearchBusinessLogic.EmployerSearchRepository.SearchAsync(
                 searchParams.Keywords, // .ToSearchQuery(),
                 searchParams.Page,
                 searchParams.SearchType,
@@ -254,7 +251,7 @@ namespace ModernSlavery.WebUI.Presenters
             string searchText)
         {
             IEnumerable<KeyValuePair<string, SicCodeSearchModel>> listOfSicCodeSuggestionsFromIndex =
-                await ViewingService.SearchBusinessLogic.SicCodeSearchRepository.SuggestAsync(
+                await _viewingService.SearchBusinessLogic.SicCodeSearchRepository.SuggestAsync(
                     searchText,
                     $"{nameof(SicCodeSearchModel.SicCodeDescription)},{nameof(SicCodeSearchModel.SicCodeListOfSynonyms)}",
                     null,
@@ -266,8 +263,8 @@ namespace ModernSlavery.WebUI.Presenters
         public List<OptionSelect> GetReportingYearOptions(IEnumerable<int> filterSnapshotYears)
         {
             // setup the filters
-            int firstYear = Global.FirstReportingYear;
-            int currentYear = commonLogic.GetAccountingStartDate(SectorTypes.Public).Year;
+            int firstYear = _commonBusinessLogic.GlobalOptions.FirstReportingYear;
+            int currentYear = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Public).Year;
             var allYears = new List<int>();
             for (int year = firstYear; year <= currentYear; year++)
             {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Extensions;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
@@ -65,7 +64,7 @@ namespace ModernSlavery.WebJob
             string datePart = fileName.AfterLast("_", includeWhenNoSeparator: false);
 
             int endYear = _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private).Year;
-            int startYear = Global.FirstReportingYear;
+            int startYear = _CommonBusinessLogic.GlobalOptions.FirstReportingYear;
             if (!string.IsNullOrWhiteSpace(datePart))
             {
                 int start = datePart.BeforeFirst("-").ToInt32().ToFourDigitYear();
@@ -93,7 +92,7 @@ namespace ModernSlavery.WebJob
                     filePath = Path.Combine(path, filePath);
                 }
 
-                await FileRepository.SaveCSVAsync(records, filePath);
+                await _CommonBusinessLogic.FileRepository.SaveCSVAsync(records, filePath);
             }
         }
 
@@ -112,7 +111,7 @@ namespace ModernSlavery.WebJob
                 filePath = Path.Combine(path, filePath);
             }
 
-            await FileRepository.SaveCSVAsync(records, filePath);
+            await _CommonBusinessLogic.FileRepository.SaveCSVAsync(records, filePath);
         }
 
     }

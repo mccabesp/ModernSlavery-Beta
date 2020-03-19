@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Models
 {

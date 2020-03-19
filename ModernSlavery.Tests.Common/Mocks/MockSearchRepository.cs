@@ -5,7 +5,6 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
-using ModernSlavery.Infrastructure;
 using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Tests.Common.Mocks

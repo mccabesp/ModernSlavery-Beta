@@ -4,27 +4,29 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using Microsoft.Extensions.Logging;
 using Autofac.Features.AttributeFilters;
 using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Options;
 using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {
     public class SendEmailService: ISendEmailService
     {
-        public SendEmailService(ILogger<SendEmailService> logger, [KeyFilter(QueueNames.SendEmail)] IQueue sendEmailQueue, GlobalOptions globalOptions)
+        public SendEmailService(GlobalOptions globalOptions, EmailOptions emailOptions, ILogger<SendEmailService> logger, [KeyFilter(QueueNames.SendEmail)] IQueue sendEmailQueue)
         {
-            Logger = logger;
-            SendEmailQueue = sendEmailQueue;
-            _globalOptions = globalOptions;
+            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            EmailOptions = emailOptions ?? throw new ArgumentNullException(nameof(emailOptions));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            SendEmailQueue = sendEmailQueue ?? throw new ArgumentNullException(nameof(sendEmailQueue));
         }
+        private readonly GlobalOptions GlobalOptions;
+        private readonly EmailOptions EmailOptions;
         private ILogger Logger { get; }
         private IQueue SendEmailQueue { get; }
-        private GlobalOptions _globalOptions;
 
         private async Task<bool> QueueEmailAsync<TTemplate>(TTemplate emailTemplate)
         {
@@ -54,7 +56,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
         public async Task<bool> SendCreateAccountPendingVerificationAsync(string verifyUrl, string emailAddress)
         {
             var createAccountPendingTemplate = new CreateAccountPendingVerificationTemplate {
-                Url = verifyUrl, RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(_globalOptions.TestPrefix)
+                Url = verifyUrl, RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(createAccountPendingTemplate);
@@ -63,7 +65,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
         public async Task<bool> SendChangeEmailPendingVerificationAsync(string verifyUrl, string emailAddress)
         {
             var changeEmailPendingTemplate = new ChangeEmailPendingVerificationTemplate {
-                Url = verifyUrl, RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(_globalOptions.TestPrefix)
+                Url = verifyUrl, RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changeEmailPendingTemplate);
@@ -72,7 +74,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
         public async Task<bool> SendChangeEmailCompletedVerificationAsync(string emailAddress)
         {
             var changeEmailCompletedVerification = new ChangeEmailCompletedVerificationTemplate {
-                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(_globalOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changeEmailCompletedVerification);
@@ -81,7 +83,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
         public async Task<bool> SendChangeEmailCompletedNotificationAsync(string emailAddress)
         {
             var changeEmailCompletedNotification = new ChangeEmailCompletedNotificationTemplate {
-                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(_globalOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changeEmailCompletedNotification);
@@ -90,7 +92,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
         public async Task<bool> SendChangePasswordNotificationAsync(string emailAddress)
         {
             var changePasswordCompleted = new ChangePasswordCompletedTemplate {
-                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(_globalOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changePasswordCompleted);
@@ -101,8 +103,8 @@ namespace ModernSlavery.WebUI.Shared.Classes
             var resetPasswordVerification = new ResetPasswordVerificationTemplate {
                 Url = resetUrl,
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(_globalOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(_globalOptions.TestPrefix)
+                Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(resetPasswordVerification);
@@ -112,8 +114,8 @@ namespace ModernSlavery.WebUI.Shared.Classes
         {
             var resetPasswordCompleted = new ResetPasswordCompletedTemplate {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(_globalOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(_globalOptions.TestPrefix)
+                Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(resetPasswordCompleted);
@@ -129,7 +131,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
         public async Task<bool> SendGEOOrphanOrganisationNotificationAsync(string organisationName, bool test)
         {
             var orphanOrganisationTemplate = new OrphanOrganisationTemplate {
-                RecipientEmailAddress = Config.GetAppSetting("GEODistributionList"), OrganisationName = organisationName, Test = test
+                RecipientEmailAddress = EmailOptions.GEODistributionList, OrganisationName = organisationName, Test = test
             };
 
             return await QueueEmailAsync(orphanOrganisationTemplate);
@@ -142,7 +144,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
             bool test = false)
         {
             var geoOrganisationRegistrationRequest = new GeoOrganisationRegistrationRequestTemplate {
-                RecipientEmailAddress = Config.GetAppSetting("GEODistributionList"),
+                RecipientEmailAddress = EmailOptions.GEODistributionList,
                 Test = test,
                 Name = contactName,
                 Org2 = reportingOrg,
@@ -157,8 +159,8 @@ namespace ModernSlavery.WebUI.Shared.Classes
         {
             var organisationRegistrationApproved = new OrganisationRegistrationApprovedTemplate {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(_globalOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(_globalOptions.TestPrefix),
+                Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
                 Url = returnUrl
             };
 
@@ -169,8 +171,8 @@ namespace ModernSlavery.WebUI.Shared.Classes
         {
             var organisationRegistrationDeclined = new OrganisationRegistrationDeclinedTemplate {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(_globalOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(_globalOptions.TestPrefix),
+                Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
                 Reason = reason
             };
 

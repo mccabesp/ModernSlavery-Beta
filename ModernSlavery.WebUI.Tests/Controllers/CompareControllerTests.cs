@@ -1,10 +1,7 @@
 ﻿using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Models.Compare;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebUI.Controllers;
@@ -23,6 +20,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Tests.Controllers
 {
@@ -150,7 +148,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
         public void CompareController_AddEmployer_Success_RedirectToReturnUrl()
         {
             // Arrange
-            Config.SetAppSetting("SearchService:CacheResults", "true");
+            ConfigHelpers.SearchOptions.CacheResults = true;
 
             var controller = UiTestHelper.GetController<CompareController>();
             long organisationId = 123;
@@ -300,7 +298,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
         public void CompareController_AddEmployerJS_Success_RedirectToReturnUrl()
         {
             // Arrange
-            Config.SetAppSetting("SearchService:CacheResults", "true");
+            ConfigHelpers.SearchOptions.CacheResults = true;
 
             var controller = UiTestHelper.GetController<CompareController>();
             string returnUrl = @"\viewing\search-results";
@@ -473,7 +471,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
         public void CompareController_RemoveEmployer_Success_RedirectToReturnUrl()
         {
             // Arrange
-            Config.SetAppSetting("SearchService:CacheResults", "true");
+            ConfigHelpers.SearchOptions.CacheResults = true;
             var organisationId = 123;
             var employerIdentifier = "abc123";
             var returnUrl = @"\viewing\search-results";
@@ -760,7 +758,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             // Assert
             //Test the google analytics tracker was executed once on the controller
-            controller.WebTracker.GetMockFromObject().Verify(mock => mock.TrackPageViewAsync(It.IsAny<Controller>(),"sort-employers: OrganisationName Ascending", "/compare-employers/sort-employers?OrganisationName=Ascending"), Times.Once());
+            controller.WebTracker.GetMockFromObject().Verify(mock => mock.SendPageViewTrackingAsync("sort-employers: OrganisationName Ascending", "/compare-employers/sort-employers?OrganisationName=Ascending"), Times.Once());
             
             Assert.NotNull(result);
             Assert.AreEqual(returnUrl, result.Url);
@@ -805,7 +803,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             // Assert
             //Test the google analytics tracker was executed once on the controller
-            controller.WebTracker.GetMockFromObject().Verify(mock => mock.TrackPageViewAsync(It.IsAny<Controller>(), "sort-employers: OrganisationName Descending", "/compare-employers/sort-employers?OrganisationName=Descending"), Times.Once());
+            controller.WebTracker.GetMockFromObject().Verify(mock => mock.SendPageViewTrackingAsync("sort-employers: OrganisationName Descending", "/compare-employers/sort-employers?OrganisationName=Descending"), Times.Once());
 
             Assert.NotNull(result);
             Assert.AreEqual(returnUrl, result.Url);
@@ -830,7 +828,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var testUri = new Uri("https://localhost/Viewing/compare-employers");
             controller.AddMockUriHelper(testUri.ToString(), "CompareEmployers");
 
-            var firstReportingYear = Global.FirstReportingYear;
+            var firstReportingYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
             var mockOrg = OrganisationHelper.GetOrganisationInScope("MockedOrg", firstReportingYear);
             DateTime accountingDateTime = mockOrg.SectorType.GetAccountingStartDate(firstReportingYear);
 
@@ -881,7 +879,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.CompareViewService.SortColumn = "OrganisationSize";
             controller.CompareViewService.SortAscending = false;
 
-            var firstReportingYear = Global.FirstReportingYear;
+            var firstReportingYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             var mockOrg = OrganisationHelper.GetOrganisationInScope("MockedOrg", firstReportingYear);
             DateTime accountingDateTime = mockOrg.SectorType.GetAccountingStartDate(firstReportingYear);
@@ -926,7 +924,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             routeData.Values.Add("Controller", "Viewing");
 
             var controller = UiTestHelper.GetController<CompareController>(0, routeData);
-            var firstReportingYear = Global.FirstReportingYear;
+            var firstReportingYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
             var mockOrg = OrganisationHelper.GetOrganisationInScope("MockedOrg", firstReportingYear);
             DateTime accountingDateTime = mockOrg.SectorType.GetAccountingStartDate(firstReportingYear);
 
@@ -951,7 +949,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             // Assert
             //Test the google analytics tracker was executed once on the controller
             var filename = $"Compared GPG Data {firstReportingYear}-{(firstReportingYear+1).ToTwoDigitYear()}.csv";
-            controller.WebTracker.GetMockFromObject().Verify(mock => mock.TrackPageViewAsync(It.IsAny<Controller>(), filename, null), Times.Once());
+            controller.WebTracker.GetMockFromObject().Verify(mock => mock.SendPageViewTrackingAsync(filename, null), Times.Once());
 
             Assert.NotNull(result);
             Assert.AreEqual(result.ContentType, "text/csv");
@@ -978,7 +976,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             controller.CompareViewService.SortColumn = "OrganisationSize";
             controller.CompareViewService.SortAscending = false;
 
-            var firstReportingYear = Global.FirstReportingYear;
+            var firstReportingYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
 
             var mockOrg = OrganisationHelper.GetOrganisationInScope("MockedOrg", firstReportingYear);
             DateTime accountingDateTime = mockOrg.SectorType.GetAccountingStartDate(firstReportingYear);
@@ -1004,7 +1002,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
             //Test the google analytics tracker was executed once on the controller
             var filename = $"Compared GPG Data {firstReportingYear}-{(firstReportingYear + 1).ToTwoDigitYear()}.csv";
-            controller.WebTracker.GetMockFromObject().Verify(mock => mock.TrackPageViewAsync(It.IsAny<Controller>(), filename, null), Times.Once());
+            controller.WebTracker.GetMockFromObject().Verify(mock => mock.SendPageViewTrackingAsync(filename, null), Times.Once());
 
             Assert.NotNull(result);
             Assert.AreEqual(result.ContentType, "text/csv");

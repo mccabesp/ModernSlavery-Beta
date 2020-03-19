@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Core.Models.LogModels
@@ -10,9 +9,9 @@ namespace ModernSlavery.Core.Models.LogModels
 
         public DateTime Date { get; set; } = VirtualDateTime.Now;
         public string Machine { get; set; } = $"Machine:{Environment.MachineName}";
-        public string HttpMethod { get; set; } = HttpContext.Current?.Request?.Method;
-        public string WebPath { get; set; } = HttpContext.Current?.GetUri()?.PathAndQuery;
-        public string RemoteIP { get; set; } = HttpContext.Current?.GetUserHostAddress();
+        public string HttpMethod { get; set; } 
+        public string WebPath { get; set; } 
+        public string RemoteIP { get; set; }
         public string Source { get; set; } = AppDomain.CurrentDomain.FriendlyName;
         public string Message { get; set; }
         public string Details { get; set; }

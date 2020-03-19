@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessLogic;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 
 namespace ModernSlavery.WebUI.Areas.Account.ViewServices
@@ -19,10 +17,12 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
     public class CloseAccountViewService : ICloseAccountViewService
     {
 
-        public CloseAccountViewService(IUserRepository userRepository,
+        public CloseAccountViewService(
+            IUserRepository userRepository,
             IRegistrationRepository registrationRepository,
             ILogger<CloseAccountViewService> logger,
-            ISendEmailService sendEmailService)
+            ISendEmailService sendEmailService,
+            ICommonBusinessLogic commonBusinessLogic)
         {
             UserRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             RegistrationRepository = registrationRepository ?? throw new ArgumentNullException(nameof(registrationRepository));
@@ -35,6 +35,7 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
         private IRegistrationRepository RegistrationRepository { get; }
         private ILogger<CloseAccountViewService> Logger { get; }
         private ISendEmailService SendEmailService { get; }
+        private readonly ICommonBusinessLogic _commonBusinessLogic;
 
         public async Task<ModelStateDictionary> CloseAccountAsync(User userToRetire, string currentPassword, User actionByUser)
         {
@@ -77,11 +78,11 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
                     }
                 });
 
-            if (!userToRetire.EmailAddress.StartsWithI(Global.TestPrefix))
+            if (!userToRetire.EmailAddress.StartsWithI(_commonBusinessLogic.GlobalOptions.TestPrefix))
             {
                 // Create the close account notification to user
                 var sendEmails = new List<Task>();
-                bool testEmail = !Config.IsProduction();
+                bool testEmail = !_commonBusinessLogic.GlobalOptions.IsProduction();
                 sendEmails.Add(SendEmailService.SendAccountClosedNotificationAsync(userToRetire.EmailAddress, testEmail));
 
                 //Create the notification to GEO for each newly orphaned organisation

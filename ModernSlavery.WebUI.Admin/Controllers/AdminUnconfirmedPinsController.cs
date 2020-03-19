@@ -2,23 +2,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
-    public class AdminUnconfirmedPinsController : Controller
+    public class AdminUnconfirmedPinsController : BaseController
     {
 
         private readonly IDataRepository dataRepository;
@@ -26,13 +27,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         protected readonly INotificationService NotificationService;
 
         public AdminUnconfirmedPinsController(
-            IDataRepository dataRepository,
-            INotificationService notificationService,
-            IOrganisationBusinessLogic organisationBusinessLogic
-        )
+            IOrganisationBusinessLogic organisationBusinessLogic,
+            ILogger<AdminUnconfirmedPinsController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
-            this.dataRepository = dataRepository;
-            NotificationService = notificationService;
             this.organisationBusinessLogic = organisationBusinessLogic;
         }
 
@@ -65,7 +62,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             UserOrganisation userOrganisation = await dataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == userId && uo.OrganisationId == organisationId);
 
-            if (userOrganisation.PINSentDate.Value.AddDays(Global.PinInPostExpiryDays) < VirtualDateTime.Now)
+            if (userOrganisation.PINSentDate.Value.AddDays(CommonBusinessLogic.GlobalOptions.PinInPostExpiryDays) < VirtualDateTime.Now)
             {
                 string newPin = organisationBusinessLogic.GeneratePINCode(false);
                 userOrganisation.PIN = newPin;

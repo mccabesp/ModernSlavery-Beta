@@ -2,22 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Scope;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -29,11 +25,8 @@ namespace ModernSlavery.WebUI.Controllers
         #region Constructors
 
         public ScopeController(
-            ILogger<ScopeController> logger,
-            IWebService webService,
             IScopePresenter scopeUI,
-            ICommonBusinessLogic commonBusinessLogic,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<ScopeController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             _commonBusinessLogic = commonBusinessLogic;
             ScopePresentation = scopeUI;
@@ -61,10 +54,10 @@ namespace ModernSlavery.WebUI.Controllers
             EnterCodesViewModel model = currentStateModel?.EnterCodes ?? new EnterCodesViewModel();
 
             // when spamlocked then return a CustomError view
-            TimeSpan remainingTime = await GetRetryLockRemainingTimeAsync("lastScopeCode", Global.LockoutMinutes);
+            TimeSpan remainingTime = await GetRetryLockRemainingTimeAsync("lastScopeCode", CommonBusinessLogic.GlobalOptions.LockoutMinutes);
             if (remainingTime > TimeSpan.Zero)
             {
-                return View("CustomError", new ErrorViewModel(1125, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
             }
 
             PendingFasttrackCodes = null;
@@ -85,10 +78,10 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             // When Spamlocked then return a CustomError view
-            TimeSpan remainingTime = await GetRetryLockRemainingTimeAsync("lastScopeCode", Global.LockoutMinutes);
+            TimeSpan remainingTime = await GetRetryLockRemainingTimeAsync("lastScopeCode", CommonBusinessLogic.GlobalOptions.LockoutMinutes);
             if (remainingTime > TimeSpan.Zero)
             {
-                return View("CustomError", new ErrorViewModel(1125, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
             }
 
             // the following fields are validatable at this stage
@@ -108,7 +101,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             if (stateModel == null)
             {
-                await IncrementRetryCountAsync("lastScopeCode", Global.LockoutMinutes);
+                await IncrementRetryCountAsync("lastScopeCode", CommonBusinessLogic.GlobalOptions.LockoutMinutes);
                 ModelState.AddModelError(3027);
                 this.CleanModelErrors<EnterCodesViewModel>();
                 return View("EnterCodes", model);
@@ -154,7 +147,7 @@ namespace ModernSlavery.WebUI.Controllers
         [HttpGet("in")]
         public async Task<IActionResult> InScope()
         {
-            await WebTracker.TrackPageViewAsync(this);
+            await TrackPageViewAsync();
 
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
@@ -211,7 +204,7 @@ namespace ModernSlavery.WebUI.Controllers
             var snapshotYears = new HashSet<int> {stateModel.AccountingDate.Year};
             await ScopePresentation.SaveScopesAsync(stateModel, snapshotYears);
 
-            var organisation = DataRepository.Get<Organisation>(stateModel.OrganisationId);
+            var organisation = CommonBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
             DateTime currentSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(organisation.SectorType);
             if (stateModel.AccountingDate == currentSnapshotDate)
             {
@@ -381,7 +374,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             this.StashModel(stateModel);
 
-            var organisation = DataRepository.Get<Organisation>(stateModel.OrganisationId);
+            var organisation = CommonBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
             DateTime currentSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(organisation.SectorType);
             if (stateModel.AccountingDate == currentSnapshotDate)
             {

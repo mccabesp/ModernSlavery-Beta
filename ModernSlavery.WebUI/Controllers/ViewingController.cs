@@ -8,14 +8,8 @@ using System.Threading.Tasks;
 using System.Web;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
-using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models;
 using ModernSlavery.WebUI.Models.Search;
 using Microsoft.AspNetCore.Http;
@@ -24,12 +18,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using ModernSlavery.BusinessLogic.View;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.WebUI.Shared.Abstractions;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -40,14 +34,11 @@ namespace ModernSlavery.WebUI.Controllers
         #region Constructors
 
         public ViewingController(
-            ILogger<ErrorController> logger,
-            IWebService webService,
             IViewingService viewingService,
             IViewingPresenter viewingPresenter,
             ISearchPresenter searchPresenter,
             IComparePresenter comparePresenter,
-            IDataRepository dataRepository, 
-            IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+            ILogger<ViewingController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         {
             ViewingService = viewingService;
             ViewingPresenter = viewingPresenter;
@@ -82,7 +73,7 @@ namespace ModernSlavery.WebUI.Controllers
             catch (Exception ex)
             {
                 Logger.LogError(ex, $"Cannot decrypt return id from '{employerIdentifier}'");
-                actionResult = View("CustomError", new ErrorViewModel(400));
+                actionResult = View("CustomError", WebService.ErrorViewModelFactory.Create(400));
             }
 
             return result;
@@ -96,7 +87,7 @@ namespace ModernSlavery.WebUI.Controllers
         [HttpGet("Init")]
         public IActionResult Init()
         {
-            if (!Config.IsProduction())
+            if (!CommonBusinessLogic.GlobalOptions.IsProduction())
             {
                 Logger.LogInformation("Viewing Controller Initialised");
             }
@@ -111,7 +102,7 @@ namespace ModernSlavery.WebUI.Controllers
             EmployerBackUrl = null;
             ReportBackUrl = null;
             
-            if (FeatureFlagHelper.IsFeatureEnabled(FeatureFlag.ReportingStepByStep))
+            if (WebService.FeatureSwitchOptions.IsEnabled("ReportingStepByStep"))
             {
                 return View("Launchpad/PrototypeIndex");
             }
@@ -124,7 +115,7 @@ namespace ModernSlavery.WebUI.Controllers
         [HttpGet]
         public async Task<IActionResult> Redirect()
         {
-            await WebTracker.TrackPageViewAsync(this);
+            await TrackPageViewAsync();
 
             return RedirectToActionPermanent("Index");
         }
@@ -142,7 +133,7 @@ namespace ModernSlavery.WebUI.Controllers
         public async Task<IActionResult> SearchResults([FromQuery] SearchResultsQuery searchQuery)
         {
             //Ensure search service is enabled
-            if (ViewingService.SearchBusinessLogic.EmployerSearchRepository.Disabled) return View("CustomError", new ErrorViewModel(1151,new {featureName="Search Service" }));
+            if (ViewingService.SearchBusinessLogic.EmployerSearchRepository.Disabled) return View("CustomError", WebService.ErrorViewModelFactory.Create(1151,new {featureName="Search Service" }));
 
             //When never searched in this session
             if (string.IsNullOrWhiteSpace(SearchPresenter.LastSearchParameters))
@@ -240,13 +231,13 @@ namespace ModernSlavery.WebUI.Controllers
             var model = new DownloadViewModel {Downloads = new List<DownloadViewModel.Download>()};
 
             const string filePattern = "GPGData_????-????.csv";
-            foreach (string file in await FileRepository.GetFilesAsync(Global.DownloadsLocation, filePattern))
+            foreach (string file in await CommonBusinessLogic.FileRepository.GetFilesAsync(CommonBusinessLogic.GlobalOptions.DownloadsLocation, filePattern))
             {
                 var download = new DownloadViewModel.Download {
                     Title = Path.GetFileNameWithoutExtension(file).AfterFirst("GPGData_"),
-                    Count = await FileRepository.GetMetaDataAsync(file, "RecordCount"),
+                    Count = await CommonBusinessLogic.FileRepository.GetMetaDataAsync(file, "RecordCount"),
                     Extension = Path.GetExtension(file).TrimI("."),
-                    Size = Numeric.FormatFileSize(await FileRepository.GetFileSizeAsync(file))
+                    Size = Numeric.FormatFileSize(await CommonBusinessLogic.FileRepository.GetFileSizeAsync(file))
                 };
 
                 download.Url = Url.Action("DownloadData", new {year = download.Title.BeforeFirst("-")});
@@ -270,16 +261,16 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //Ensure we have a directory
-            if (!await FileRepository.GetDirectoryExistsAsync(Global.DownloadsLocation))
+            if (!await CommonBusinessLogic.FileRepository.GetDirectoryExistsAsync(CommonBusinessLogic.GlobalOptions.DownloadsLocation))
             {
-                return new HttpNotFoundResult($"Directory '{Global.DownloadsLocation}' does not exist");
+                return new HttpNotFoundResult($"Directory '{CommonBusinessLogic.GlobalOptions.DownloadsLocation}' does not exist");
             }
 
             //Ensure we have a file
             string filePattern = $"GPGData_{year}-{year + 1}.csv";
-            IEnumerable<string> files = await FileRepository.GetFilesAsync(Global.DownloadsLocation, filePattern);
+            IEnumerable<string> files = await CommonBusinessLogic.FileRepository.GetFilesAsync(CommonBusinessLogic.GlobalOptions.DownloadsLocation, filePattern);
             string file = files.FirstOrDefault();
-            if (file == null || !await FileRepository.GetFileExistsAsync(file))
+            if (file == null || !await CommonBusinessLogic.FileRepository.GetFileExistsAsync(file))
             {
                 return new HttpNotFoundResult("Cannot find GPG data file for year: " + year);
             }
@@ -294,7 +285,7 @@ namespace ModernSlavery.WebUI.Controllers
             HttpContext.SetResponseHeader("Content-Disposition", contentDisposition.ToString());
 
             //cache old files for 1 day
-            DateTime lastWriteTime = await FileRepository.GetLastWriteTimeAsync(file);
+            DateTime lastWriteTime = await CommonBusinessLogic.FileRepository.GetLastWriteTimeAsync(file);
             if (lastWriteTime.AddMonths(12) < VirtualDateTime.Now)
             {
                 Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue {MaxAge = TimeSpan.FromDays(1), Public = true};
@@ -304,10 +295,10 @@ namespace ModernSlavery.WebUI.Controllers
             Response.BufferOutput = true;
             */
             //Track the download 
-            await WebTracker.TrackPageViewAsync(this, contentDisposition.FileName);
+            await TrackPageViewAsync(contentDisposition.FileName);
 
             //Return the data
-            return Content(await FileRepository.ReadAsync(file), "text/csv");
+            return Content(await CommonBusinessLogic.FileRepository.ReadAsync(file), "text/csv");
         }
 
         #endregion
@@ -337,7 +328,7 @@ namespace ModernSlavery.WebUI.Controllers
                 catch (Exception ex)
                 {
                     Logger.LogError(ex, "Cannot decrypt return id from query string");
-                    return View("CustomError", new ErrorViewModel(400));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(400));
                 }
 
                 string organisationIdEncrypted = organisation.GetEncryptedId();
@@ -392,7 +383,7 @@ namespace ModernSlavery.WebUI.Controllers
             catch (Exception ex)
             {
                 Logger.LogError(ex, $"Cannot decrypt return employerIdentifier from '{employerIdentifier}'");
-                return View("CustomError", new ErrorViewModel(400));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(400));
             }
 
             //Clear the default back url of the report page
@@ -419,7 +410,7 @@ namespace ModernSlavery.WebUI.Controllers
         [Obsolete("ReportDeprecated is (unsurprisingly) deprecated, please use method 'Report' instead.")] // , true)]
         public IActionResult ReportDeprecated(string employerIdentifier, int year)
         {
-            if (year < Global.FirstReportingYear || year > VirtualDateTime.Now.Year)
+            if (year < CommonBusinessLogic.GlobalOptions.FirstReportingYear || year > VirtualDateTime.Now.Year)
             {
                 return new HttpBadRequestResult($"Invalid snapshot year {year}");
             }
@@ -446,7 +437,7 @@ namespace ModernSlavery.WebUI.Controllers
                 return new HttpBadRequestResult("Missing employer identifier");
             }
 
-            if (year < Global.FirstReportingYear || year > VirtualDateTime.Now.Year)
+            if (year < CommonBusinessLogic.GlobalOptions.FirstReportingYear || year > VirtualDateTime.Now.Year)
             {
                 return new HttpBadRequestResult($"Invalid snapshot year {year}");
             }
@@ -467,7 +458,7 @@ namespace ModernSlavery.WebUI.Controllers
             catch (Exception ex)
             {
                 Logger.LogError(ex, $"Cannot decrypt return employerIdentifier from '{employerIdentifier}'");
-                return View("CustomError", new ErrorViewModel(400));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(400));
             }
 
             Organisation foundOrganisation = organisationLoadingOutcome.Result;
@@ -495,7 +486,7 @@ namespace ModernSlavery.WebUI.Controllers
                 Logger.LogError(
                     ex,
                     $"Exception processing the return information for Organisation '{foundOrganisation.OrganisationId}:{foundOrganisation.OrganisationName}'");
-                return View("CustomError", new ErrorViewModel(400));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(400));
             }
 
             #endregion

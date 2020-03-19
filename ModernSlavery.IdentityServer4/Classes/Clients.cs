@@ -1,20 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ModernSlavery.Extensions;
-using ModernSlavery.Extensions.AspNetCore;
 using IdentityServer4;
 using IdentityServer4.Models;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.IdentityServer4.Classes
 {
-    public static class Clients
+    public interface IClients
     {
+        IEnumerable<Client> Get();
+    }
 
-        private static string GpgClientSecret => Config.GetAppSetting("AuthSecret", "secret");
-
-        public static IEnumerable<Client> Get()
+    public class Clients : IClients
+    {
+        private readonly GlobalOptions _globalOptions;
+        public Clients(GlobalOptions globalOptions)
         {
-            if ((Config.IsProduction() || Config.IsPreProduction()) && GpgClientSecret.EqualsI("secret", "", null))
+            _globalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+        }
+
+        public IEnumerable<Client> Get()
+        {
+            if ((_globalOptions.IsProduction() || _globalOptions.IsPreProduction()) && _globalOptions.AuthSecret.EqualsI("secret", "", null))
             {
                 throw new Exception("Invalid ClientSecret for IdentityServer. You must set 'AuthSecret' to a unique key");
             }
@@ -23,26 +32,26 @@ namespace ModernSlavery.IdentityServer4.Classes
                 new Client {
                     ClientName = "Modern Slavery reporting service",
                     ClientId = "ModernSlaveryServiceWebsite",
-                    ClientSecrets = new List<Secret> {new Secret(GpgClientSecret.GetSHA256Checksum())},
-                    ClientUri = Startup.SiteAuthority,
+                    ClientSecrets = new List<Secret> {new Secret(_globalOptions.AuthSecret.GetSHA256Checksum())},
+                    ClientUri = _globalOptions.SiteAuthority,
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
                     RedirectUris =
                         new List<string> {
-                            Startup.SiteAuthority,
-                            Startup.SiteAuthority + "signin-oidc",
-                            Startup.SiteAuthority + "manage-organisations",
-                            Config.Configuration["DoneUrl"]
+                            _globalOptions.SiteAuthority,
+                            _globalOptions.SiteAuthority + "signin-oidc",
+                            _globalOptions.SiteAuthority + "manage-organisations",
+                            _globalOptions.DoneUrl
                         },
                     PostLogoutRedirectUris =
                         new List<string> {
-                            Config.SiteAuthority,
-                            Config.SiteAuthority + "signout-callback-oidc",
-                            Config.SiteAuthority + "manage-organisations",
-                            Config.SiteAuthority + "manage-account/complete-change-email",
-                            Config.SiteAuthority + "manage-account/close-account-completed",
-                            Config.Configuration["DoneUrl"]
+                            _globalOptions.SiteAuthority,
+                            _globalOptions.SiteAuthority + "signout-callback-oidc",
+                            _globalOptions.SiteAuthority + "manage-organisations",
+                            _globalOptions.SiteAuthority + "manage-account/complete-change-email",
+                            _globalOptions.SiteAuthority + "manage-account/close-account-completed",
+                            _globalOptions.DoneUrl
                         },
                     AllowedScopes =
                         new List<string> {
@@ -52,6 +61,5 @@ namespace ModernSlavery.IdentityServer4.Classes
                 }
             };
         }
-
     }
 }

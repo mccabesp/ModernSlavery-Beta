@@ -1,8 +1,11 @@
-﻿@using ModernSlavery.Core
-@using ModernSlavery.Core.Models.Cookies
-@using ModernSlavery.WebUI.Helpers
+﻿@using ModernSlavery.WebUI.Helpers
 @using GovUkDesignSystem
 @using GovUkDesignSystem.GovUkDesignSystemComponents
+@using ModernSlavery.WebUI.Shared.Classes.Cookies
+@using ModernSlavery.WebUI.Shared.Options
+@inject GlobalOptions globalOptions
+@inject FeatureSwitchOptions featureSwitchOptions
+@inject StaticAssetsVersioningHelper staticAssetsVersioningHelper
 @{
     string assetsPath = "/assets/images";
 }
@@ -24,10 +27,10 @@
     <link rel="apple-touch-icon" href="@(assetsPath)/govuk-apple-touch-icon.png">
 
     <!--[if !IE 8]><!-->
-    <link href="@(StaticAssetsVersioningHelper.GetAppCssFilename())" rel="stylesheet" />
+    <link href="@(staticAssetsVersioningHelper.GetAppCssFilename())" rel="stylesheet" />
     <!--<![endif]-->
     <!--[if IE 8]>
-        <link href="@(StaticAssetsVersioningHelper.GetAppIe8CssFilename())" rel="stylesheet" />
+        <link href="@(staticAssetsVersioningHelper.GetAppIe8CssFilename())" rel="stylesheet" />
     <![endif]-->
 
     <meta property="og:image" content="@(assetsPath)/govuk-opengraph-image.png">
@@ -49,10 +52,10 @@
 
     @{
         List<HeaderNavigationViewModel> headerNavigationLinks;
-        if (FeatureFlagHelper.IsFeatureEnabled(FeatureFlag.ReportingStepByStep))
+        if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
         {
             headerNavigationLinks = new List<HeaderNavigationViewModel>
-            {
+    {
                 new HeaderNavigationViewModel
                 {
                     Text = "Search",
@@ -72,8 +75,8 @@
         }
         else
         {
-             headerNavigationLinks = new List<HeaderNavigationViewModel>
-            {
+            headerNavigationLinks = new List<HeaderNavigationViewModel>
+    {
                 new HeaderNavigationViewModel
                 {
                     Text = "Search and compare",
@@ -91,7 +94,7 @@
                 }
             };
         }
-        
+
         string controllerName = ViewContext.RouteData.Values["Controller"].ToString();
         if (controllerName.StartsWith("Admin"))
         {
@@ -133,13 +136,12 @@
     }
 
     <div class="govuk-width-container">
-        
+
         @(Html.GovUkPhaseBanner(new PhaseBannerViewModel
         {
             Phase = "DISCOVERY",
             Html = @<text>This is a new service – your <a class="govuk-link" href="@Url.Action("SendFeedbackGet", "Feedback")">feedback</a> will help us to improve it.</text>
         }))
-
         @(RenderSection("BeforeMain", false))
 
         <main class="govuk-main-wrapper" id="main-content" role="main">
@@ -177,7 +179,7 @@
         }
     }))
 
-    <script src="@(StaticAssetsVersioningHelper.GetAppJsFilename())"></script>
+    <script src="@(staticAssetsVersioningHelper.GetAppJsFilename())"></script>
     <script>window.GOVUKFrontend.initAll()</script>
     @RenderSection("AfterLoadedCompiledScripts", false)
 </body>

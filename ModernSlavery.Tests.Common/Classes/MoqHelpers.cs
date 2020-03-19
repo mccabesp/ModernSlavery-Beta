@@ -10,9 +10,6 @@ using ModernSlavery.BusinessLogic.Submit;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.WebUI.Shared.Abstractions;
-using ModernSlavery.Extensions.AspNetCore;
 
 namespace ModernSlavery.Tests.Common.Classes
 {

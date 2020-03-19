@@ -1,5 +1,5 @@
-﻿@using ModernSlavery.Core
-@model ModernSlavery.WebUI.Models.Home.PrivacyStatementModel
+﻿@model ModernSlavery.WebUI.Models.Home.PrivacyStatementModel
+@inject GlobalOptions globalOptions
 @{
     ViewBag.Title = "Privacy Policy - Modern Slavery reporting service";
 }
@@ -71,26 +71,26 @@
             <h2 class="heading-medium">Your rights</h2>
             <ul class="list list-bullet">
                 <li>You can ask to see and rectify the personal information GEO holds about you. Users can do this by logging into their account on the Modern Slavery Reporting service via the manage account page.</li>
-                <li>In certain circumstances, you may also object to or restrict the processing of your data by GEO by making a request to the <a href="mailto:@(Global.GpgReportingEmail)" target="_blank">@Global.GpgReportingEmail</a> mailbox.</li>
+                <li>In certain circumstances, you may also object to or restrict the processing of your data by GEO by making a request to the <a href="mailto:@(globalOptions.GpgReportingEmail)" target="_blank">@globalOptions.GpgReportingEmail</a> mailbox.</li>
                 <li>You may delete your account within the GPG service, however GEO may retain details about your account in line with legitimate business needs and your rights under the General Data Protection Regulation.</li>
             </ul>
 
             <h2 class="heading-medium">Contact Details</h2>
-            <p>The data controller for your personal data is the Cabinet Office. The contact details for the data controller are: Cabinet Office, 70 Whitehall, London, SW1A 2AS, or 0207 276 1234, or <a href="mailto:@(Global.DataControllerEmail)" target="_blank">@(Global.DataControllerEmail)</a>.</p>
-            <p>The contact details for the data controller’s Data Protection Officer are: Stephen Jones, Data Protection Officer, Cabinet Office, Room 405, 70 Whitehall, London, SW1A 2AS, or <a href="mailto:@(Global.DataProtectionOfficerEmail)" target="_blank">@(Global.DataProtectionOfficerEmail)</a>.</p>
+            <p>The data controller for your personal data is the Cabinet Office. The contact details for the data controller are: Cabinet Office, 70 Whitehall, London, SW1A 2AS, or 0207 276 1234, or <a href="mailto:@(globalOptions.DataControllerEmail)" target="_blank">@(globalOptions.DataControllerEmail)</a>.</p>
+            <p>The contact details for the data controller’s Data Protection Officer are: Stephen Jones, Data Protection Officer, Cabinet Office, Room 405, 70 Whitehall, London, SW1A 2AS, or <a href="mailto:@(globalOptions.DataProtectionOfficerEmail)" target="_blank">@(globalOptions.DataProtectionOfficerEmail)</a>.</p>
             <p>The Data Protection Officer provides independent advice and monitoring of Cabinet Office’s use of personal information.</p>
 
             <h2 class="heading-medium">How to make a complaint</h2>
             <p>If you're unhappy with the way GEO handled your personal information, you can write to:</p>
             <p>
-                <a href="mailto:@(Global.GpgReportingEmail)" target="_blank">@Global.GpgReportingEmail</a> or in writing to:<br/>
+                <a href="mailto:@(globalOptions.GpgReportingEmail)" target="_blank">@globalOptions.GpgReportingEmail</a> or in writing to:<br />
             </p>
             <div class="panel">
                 <address style="font-style: normal">
-                    Government Equalities Office<br/>
-                    6th Floor, Sanctuary Buildings,<br/>
-                    Great Smith Street,<br/>
-                    London,<br/>
+                    Government Equalities Office<br />
+                    6th Floor, Sanctuary Buildings,<br />
+                    Great Smith Street,<br />
+                    London,<br />
                     SW1P 3BT.
                 </address>
             </div>
@@ -99,7 +99,7 @@
             @if (User.Identity.IsAuthenticated)
             {
                 <div class="form-group">
-                    <input name="command" type="submit" class="button" value="Continue"/>
+                    <input name="command" type="submit" class="button" value="Continue" />
                 </div>
             }
         </div>

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Infrastructure.File;
 using Moq;
 
 using NUnit.Framework;

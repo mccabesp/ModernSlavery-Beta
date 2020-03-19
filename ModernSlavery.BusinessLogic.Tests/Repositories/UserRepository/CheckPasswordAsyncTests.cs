@@ -3,12 +3,13 @@ using System.Threading.Tasks;
 using Autofac;
 using AutoMapper;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common;
 using Moq;
 using ModernSlavery.Entities.Enums;
-
+using ModernSlavery.SharedKernel.Options;
 using NUnit.Framework;
 
 namespace Repositories.UserRepository
@@ -24,7 +25,7 @@ namespace Repositories.UserRepository
             {
                 // Initialise AutoMapper
                 MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                    config.AddMaps(typeof(ModernSlavery.BusinessLogic.Repositories.UserRepository));
+                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
                 });
                 builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
             }
@@ -37,8 +38,7 @@ namespace Repositories.UserRepository
             mockDataRepo = new Mock<IDataRepository>();
 
             // service under test
-            testUserRepo =
-                new ModernSlavery.BusinessLogic.Repositories.UserRepository(mockDataRepo.Object, Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
+            testUserRepo = new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(),  mockDataRepo.Object, Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
         }
 
         private Mock<IDataRepository> mockDataRepo;

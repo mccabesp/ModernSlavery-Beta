@@ -24,8 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.Extensions.AspNetCore\ModernSlavery.Extensions.AspNetCore.csproj" />
     <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
+    <ProjectReference Include="..\ModernSlavery.SharedKernel\ModernSlavery.SharedKernel.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Tests.Common\ModernSlavery.Tests.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -44,7 +44,7 @@ namespace ModernSlavery.WebJob
 
             try
             {
-                await _OrganisationBL.SetUniqueEmployerReferencesAsync();
+                await _OrganisationBusinessLogic.SetUniqueEmployerReferencesAsync();
             }
             finally
             {

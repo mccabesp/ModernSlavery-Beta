@@ -1,16 +1,55 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using ModernSlavery.Extensions;
 
 namespace ModernSlavery.SharedKernel.Options
 {
-    public class GlobalOptions
+    public class GlobalOptions:IOptions
     {
+
+        public string AuthSecret {get; set;}= "secret";
+
         public string AdminEmails { get; set; }
         public string SuperAdminEmails { get; set; }
         public string DatabaseAdminEmails { get; set; }
 
         public int SessionTimeOutMinutes { get; set; } = 20;
+
+        #region Environment
+        public string Environment { get; set; }
+
+        public bool IsEnvironment(params string[] environmentNames)
+        {
+            return environmentNames.Any(en=>Environment.EqualsI(en));
+        }
+
+        public bool IsLocal()
+        {
+            return IsEnvironment("LOCAL");
+        }
+
+        public bool IsDevelopment()
+        {
+            return IsEnvironment("DEV", "DEVELOPMENT");
+        }
+
+        public bool IsStaging()
+        {
+            return IsEnvironment("STAGING");
+        }
+
+        public bool IsPreProduction()
+        {
+            return IsEnvironment("PREPROD", "PREPRODUCTION");
+        }
+
+        public bool IsProduction()
+        {
+            return IsEnvironment("PROD", "PRODUCTION");
+        }
+
+        #endregion
 
         #region Files and Directories
         public string DataPath { get; set; }
@@ -24,6 +63,11 @@ namespace ModernSlavery.SharedKernel.Options
 
         #endregion
 
+        #region App Insights
+        public string APPINSIGHTS_INSTRUMENTATIONKEY { get; set; }
+        #endregion
+
+        public int ObfuscationSeed { get; set; }=127;
 
         public int CertExpiresWarningDays { get; set; }=30;
 
@@ -46,11 +90,20 @@ namespace ModernSlavery.SharedKernel.Options
         public int EmployerCodeLength { get; set; }
         public int EmployerPageSize { get; set; }
         public string EXTERNAL_HOST { get; set; }
+        public string SiteAuthority
+        {
+            get
+            {
+                return $"https://{EXTERNAL_HOST}/";
+            }
+        }
+
         public int LevenshteinDistance { get; set; } = 5;
         public int LockoutMinutes { get; set; }
         public int MaxEmailVerifyAttempts { get; set; }
         public int MaxLoginAttempts { get; set; } = 3;
         public int MaxPinAttempts { get; set; } = 3;
+        public int MaxSnapshotDays { get; set; } = 35;
         public int MinPasswordResetMinutes { get; set; }=30;
         public int MinSignupMinutes { get; set; }
         public int PinInPostExpiryDays { get; set; }
@@ -95,7 +148,23 @@ namespace ModernSlavery.SharedKernel.Options
         public bool SendGoogleAnalyticsDataToGovUk { get; set; }
 
         public string WEBSITE_INSTANCE_ID { get; set; }
+        public string WEBSITE_LOAD_CERTIFICATES { get; set; }
+        public string CertThumprint { get; set; }
+
 
         public bool SkipSpamProtection { get; set; }
+        public int MaxNumCallsCompaniesHouseApiPerFiveMins { get; set; } = 500;
+
+        private int[] _reminderEmailDays;
+        public int[] ReminderEmailDays
+        {
+            get => _reminderEmailDays;
+            set => _reminderEmailDays = value.OrderBy(d=>d).ToArray();
+        }
+        public string IdentityApiScope { get; set; }
+        public bool PinInPostTestMode { get; set; }
+        public bool ShowEmailVerifyLink { get; set; }
+        public string GoogleAnalyticsAccountId { get; set; }
+        public string DateTimeOffset { get; set; }
     }
 }

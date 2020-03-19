@@ -47,11 +47,11 @@
     <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
     <ProjectReference Include="..\ModernSlavery.Database\ModernSlavery.Database.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Extensions.AspNetCore\ModernSlavery.Extensions.AspNetCore.csproj" />
     <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
     <ProjectReference Include="..\GovUkDesignSystem\GovUkDesignSystem.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure\ModernSlavery.Infrastructure.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Admin\ModernSlavery.WebUI.Admin.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.Register\ModernSlavery.WebUI.Register.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
   </ItemGroup>
 

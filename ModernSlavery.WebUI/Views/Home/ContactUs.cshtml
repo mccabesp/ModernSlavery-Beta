@@ -1,4 +1,4 @@
-﻿@using ModernSlavery.Core
+﻿@inject GlobalOptions globalOptions
 @{
     ViewBag.Title = "Contact us - Modern Slavery reporting service";
 }
@@ -11,7 +11,7 @@
         </h1>
         <h2 class="heading-medium">Email</h2>
         <p>
-            If you are an employer you can contact the Modern Slavery team about the service or registration issues you're having at <a href="mailto:@(Global.GpgReportingEmail)" target="_blank">@Global.GpgReportingEmail</a>
+            If you are an employer you can contact the Modern Slavery team about the service or registration issues you're having at <a href="mailto:@(globalOptions.GpgReportingEmail)" target="_blank">@globalOptions.GpgReportingEmail</a>
         </p>
 
         <h2 class="heading-medium">Online</h2>
@@ -24,11 +24,11 @@
         </p>
         <div class="panel">
             <address style="font-style: normal">
-                Modern Slavery team<br/>
-                Government Equalities Office<br/>
-                6th Floor, Sanctuary Buildings<br/>
-                Great Smith Street<br/>
-                London<br/>
+                Modern Slavery team<br />
+                Government Equalities Office<br />
+                6th Floor, Sanctuary Buildings<br />
+                Great Smith Street<br />
+                London<br />
                 SW1P 3BT
             </address>
         </div>

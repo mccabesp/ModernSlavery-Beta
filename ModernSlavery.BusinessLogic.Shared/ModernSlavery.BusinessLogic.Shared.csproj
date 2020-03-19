@@ -14,4 +14,12 @@
     <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.10.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>

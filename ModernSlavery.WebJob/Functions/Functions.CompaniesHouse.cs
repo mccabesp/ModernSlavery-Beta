@@ -37,7 +37,7 @@ namespace ModernSlavery.WebJob
 
             //RunningJobs.Add(nameof(CompaniesHouseCheck));
 
-            //IEnumerable<string> filePaths = await _FileRepository.GetFilesAsync(Global.DataPath, "GPG-DnBOrgs_*.csv");
+            //IEnumerable<string> filePaths = await _FileRepository.GetFilesAsync(_CommonBusinessLogic.GlobalOptions.DataPath, "GPG-DnBOrgs_*.csv");
             //string filePath = filePaths.OrderByDescending(f => f).FirstOrDefault();
             //var updates = 0;
             //try

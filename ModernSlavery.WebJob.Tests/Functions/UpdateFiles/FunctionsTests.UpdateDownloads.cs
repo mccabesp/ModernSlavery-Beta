@@ -2,15 +2,13 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebJob.Tests.TestHelpers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using Moq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
@@ -46,13 +44,11 @@ namespace ModernSlavery.WebJob.Tests.Functions
             var log = new Mock<ILogger>();
 
             int year = SectorTypes.Private.GetAccountingStartDate(2017).Year;
-            IEnumerable<Return> returns = await _functions.DataRepository
-                .GetAll<Return>()
-                .Where(
+            IEnumerable<Return> returns = await _functions.CommonBusinessLogic.DataRepository
+                .ToListAsync<Return>(
                     r => r.AccountingDate.Year == year
                          && r.Status == ReturnStatuses.Submitted
-                         && r.Organisation.Status == OrganisationStatuses.Active)
-                .ToListAsync();
+                         && r.Organisation.Status == OrganisationStatuses.Active);
 
             //ACT
             await _functions.UpdateDownloadFilesAsync(log.Object, "testadmin@user.com", true);
@@ -60,13 +56,13 @@ namespace ModernSlavery.WebJob.Tests.Functions
             //ASSERT
             //Check each return is in the download file
             string downloadFilePath =
-                _functions.FileRepository.GetFullPath(Path.Combine(Global.DownloadsLocation, $"GPGData_{year}-{year + 1}.csv"));
+                _functions.CommonBusinessLogic.FileRepository.GetFullPath(Path.Combine(ConfigHelpers.GlobalOptions.DownloadsLocation, $"GPGData_{year}-{year + 1}.csv"));
 
             //Check the file exists
-            Assert.That(await _functions.FileRepository.GetFileExistsAsync(downloadFilePath), $"File '{downloadFilePath}' should exist");
+            Assert.That(await _functions.CommonBusinessLogic.FileRepository.GetFileExistsAsync(downloadFilePath), $"File '{downloadFilePath}' should exist");
 
             //Get the actual results
-            List<DownloadResult> actualResults = await _functions.FileRepository.ReadCSVAsync<DownloadResult>(downloadFilePath);
+            List<DownloadResult> actualResults = await _functions.CommonBusinessLogic.FileRepository.ReadCSVAsync<DownloadResult>(downloadFilePath);
 
             //Generate the expected results
             List<DownloadResult> expectedResults = returns.Select(r => DownloadResult.Create(r)).OrderBy(d => d.EmployerName).ToList();

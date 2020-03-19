@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models;
-using ModernSlavery.Core;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.SharedKernel;
@@ -19,11 +18,11 @@ namespace ModernSlavery.WebJob
         {
             try
             {
-                string filePath = Path.Combine(Global.DownloadsPath, Filenames.OrganisationLateSubmissions);
+                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.OrganisationLateSubmissions);
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateOrganisationLateSubmissions))
-                    && await FileRepository.GetFileExistsAsync(filePath))
+                    && await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -58,8 +57,8 @@ namespace ModernSlavery.WebJob
             RunningJobs.Add(callingMethodName);
             try
             {
-                IEnumerable<LateSubmissionsFileModel> records = _SubmissionBL.GetLateSubmissions();
-                await Core.Classes.Extensions.SaveCSVAsync(FileRepository, records, filePath);
+                IEnumerable<LateSubmissionsFileModel> records = _SubmissionBusinessLogic.GetLateSubmissions();
+                await Core.Classes.Extensions.SaveCSVAsync(_CommonBusinessLogic.FileRepository, records, filePath);
             }
             finally
             {

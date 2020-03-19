@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
@@ -26,10 +25,10 @@ namespace ModernSlavery.WebJob
 
             try
             {
-                string filePath = Path.Combine(Global.DownloadsPath, Filenames.RegistrationAddresses);
+                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.RegistrationAddresses);
 
                 //Dont execute on startup if file already exists
-                if (!StartedJobs.Contains(funcName) && await FileRepository.GetFileExistsAsync(filePath))
+                if (!StartedJobs.Contains(funcName) && await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     log.LogDebug($"Skipped {funcName} at start up.");
                     return;
@@ -79,8 +78,8 @@ namespace ModernSlavery.WebJob
                         foreach (RegistrationAddressesFileModel model in latestRegistrationAddresses)
                         {
                             // get organisation scope and submission per year
-                            Return returnByYear = await _SubmissionBL.GetLatestSubmissionBySnapshotYearAsync(model.OrganisationId, year);
-                            OrganisationScope scopeByYear = await _ScopeBL.GetLatestScopeBySnapshotYearAsync(model.OrganisationId, year);
+                            Return returnByYear = await _SubmissionBusinessLogic.GetLatestSubmissionBySnapshotYearAsync(model.OrganisationId, year);
+                            OrganisationScope scopeByYear = await _ScopeBusinessLogic.GetLatestScopeBySnapshotYearAsync(model.OrganisationId, year);
 
                             // update file model with year data
                             model.HasSubmitted = returnByYear == null ? "False" : "True";
@@ -99,9 +98,9 @@ namespace ModernSlavery.WebJob
         public async Task<List<RegistrationAddressesFileModel>> GetLatestRegistrationAddressesAsync()
         {
             // Load the DnBOrgs file from storage"
-            string dnbOrgsPath = Path.Combine(Global.DataPath, Filenames.DnBOrganisations());
-            List<DnBOrgsModel> AllDnBOrgs = await FileRepository.GetFileExistsAsync(dnbOrgsPath)
-                ? await FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath)
+            string dnbOrgsPath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DataPath, Filenames.DnBOrganisations());
+            List<DnBOrgsModel> AllDnBOrgs = await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(dnbOrgsPath)
+                ? await _CommonBusinessLogic.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath)
                 : new List<DnBOrgsModel>();
             AllDnBOrgs = AllDnBOrgs.OrderBy(o => o.OrganisationName).ToList();
 
@@ -111,7 +110,7 @@ namespace ModernSlavery.WebJob
                 .ToList();
 
             // Get all the latest verified organisation registrations
-            List<Organisation> verifiedOrgs = await DataRepository.GetAll<Organisation>()
+            List<Organisation> verifiedOrgs = await _CommonBusinessLogic.DataRepository.GetAll<Organisation>()
                 .Where(uo => uo.LatestRegistration != null)
                 .Include(uo => uo.LatestRegistration)
                 .Include(uo => uo.LatestAddress)

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.Controllers;
@@ -10,11 +8,11 @@ using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ModernSlavery.BusinessLogic.Models.Account;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models.AccountModels;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 {
@@ -22,12 +20,15 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
     public class ChangeEmailViewService : IChangeEmailViewService
     {
 
-        public ChangeEmailViewService(IUserRepository userRepo, IUrlHelper urlHelper, ISendEmailService sendEmailService)
+        public ChangeEmailViewService(GlobalOptions globalOptions, IUserRepository userRepo, IUrlHelper urlHelper, ISendEmailService sendEmailService)
         {
+            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
             UserRepository = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
             UrlHelper = urlHelper ?? throw new ArgumentNullException(nameof(urlHelper));
             SendEmailService = sendEmailService;
         }
+
+        private readonly GlobalOptions GlobalOptions;
 
         private IUserRepository UserRepository { get; }
         private IUrlHelper UrlHelper { get; }
@@ -68,7 +69,7 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
             var changeEmailToken = Encryption.DecryptModel<ChangeEmailVerificationToken>(code);
 
             // ensure token hasn't expired
-            DateTime verifyExpiryDate = changeEmailToken.TokenTimestamp.AddHours(Global.EmailVerificationExpiryHours);
+            DateTime verifyExpiryDate = changeEmailToken.TokenTimestamp.AddHours(GlobalOptions.EmailVerificationExpiryHours);
             if (verifyExpiryDate < VirtualDateTime.Now)
             {
                 errorState.AddModelError(

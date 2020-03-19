@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Models.HttpResultModels;
 using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
+using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Controllers.Submission
 {
@@ -49,7 +48,7 @@ namespace ModernSlavery.WebUI.Controllers.Submission
                 && !stashedReturnViewModel.ReportInfo.Draft.IsUserAllowedAccess)
             {
                 this.CleanModelErrors<ReturnViewModel>();
-                return View("CustomError", new ErrorViewModel(3040));
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(3040));
             }
 
             stashedReturnViewModel.ReturnUrl = returnUrl ?? "EnterCalculations";

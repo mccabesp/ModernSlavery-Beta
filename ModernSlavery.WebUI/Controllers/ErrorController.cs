@@ -1,11 +1,10 @@
-﻿using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions;
+﻿using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Abstractions;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Controllers
 {
@@ -16,9 +15,7 @@ namespace ModernSlavery.WebUI.Controllers
         #region Constructors
 
         public ErrorController(
-            ILogger<ErrorController> logger,
-            IWebService webService,
-            IDataRepository dataRepository, IFileRepository fileRepository) : base(logger, webService, dataRepository, fileRepository)
+        ILogger<ErrorController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
         { }
 
         #endregion
@@ -39,7 +36,7 @@ namespace ModernSlavery.WebUI.Controllers
                 }
             }
 
-            var model = new ErrorViewModel(errorCode);
+            var model = WebService.ErrorViewModelFactory.Create(errorCode);
 
             //Get the exception which caused this error
             var errorData = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
@@ -68,7 +65,7 @@ namespace ModernSlavery.WebUI.Controllers
         [Route("/error/service-unavailable")]
         public IActionResult ServiceUnavailable()
         {
-            var model = new ErrorViewModel(1119);
+            var model = WebService.ErrorViewModelFactory.Create(1119);
             Response.StatusCode = 503;
             return View("CustomError", model);
         }

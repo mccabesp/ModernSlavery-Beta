@@ -1,5 +1,5 @@
 using System;
-using ModernSlavery.Extensions.AspNetCore;
+using ModernSlavery.Tests.Common.Classes;
 using NUnit.Framework;
 
 namespace Tests
@@ -15,7 +15,7 @@ namespace Tests
             var expectedOffsetCurrentDateTimeForSite = new TimeSpan(4, 2, 0, 0, 0);
 
             // Act
-            TimeSpan actualOffsetCurrentDateTimeForSite = Config.OffsetCurrentDateTimeForSite();
+            TimeSpan actualOffsetCurrentDateTimeForSite = TimeSpan.Parse(ConfigHelpers.GlobalOptions.DateTimeOffset);
 
             // Assert
             Assert.AreEqual(

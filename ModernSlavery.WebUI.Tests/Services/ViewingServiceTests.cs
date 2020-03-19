@@ -15,8 +15,6 @@ using MockQueryable.Moq;
 using ModernSlavery.BusinessLogic.View;
 using Moq;
 using ModernSlavery.Entities.Enums;
-using ModernSlavery.Infrastructure;
-using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Presenters;
 using NUnit.Framework;
@@ -51,7 +49,7 @@ namespace ModernSlavery.WebUI.Tests.Services
             };
 
             // Mocks
-            var testPresenter = new ViewingPresenter(Mock.Of<IDataRepository>(), Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
             List<OptionSelect> options = testPresenter.GetOrgSizeOptions(testOptions.Select(x => (int) x), null);
 
             // Assert
@@ -97,7 +95,7 @@ namespace ModernSlavery.WebUI.Tests.Services
             _mockDataRepo.Setup(x => x.GetAll<SicSection>())
                 .Returns(new List<SicSection>(testSicSections).AsQueryable().BuildMock().Object);
 
-            var testPresenter = new ViewingPresenter(Mock.Of<IDataRepository>(), Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
             List<OptionSelect> options = await testPresenter.GetSectorOptionsAsync(testOptions, null);
 
             // Assert
@@ -135,7 +133,7 @@ namespace ModernSlavery.WebUI.Tests.Services
             _mockCommonLogic.Setup(x => x.GetAccountingStartDate(It.IsAny<SectorTypes>(), 0))
                 .Returns(new DateTime(testAllYears[0], 4, 5));
 
-            var testPresenter = new ViewingPresenter(_mockDataRepo.Object, Mock.Of<IViewingService>(), _mockCommonLogic.Object);
+            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), _mockCommonLogic.Object);
             List<OptionSelect> options = testPresenter.GetReportingYearOptions(testCheckedYears);
 
             // Assert
@@ -177,7 +175,7 @@ namespace ModernSlavery.WebUI.Tests.Services
                 (int) SearchReportingStatusFilter.ReportedInTheLast7Days, (int) SearchReportingStatusFilter.ReportedLate
             };
 
-            var testPresenter = new ViewingPresenter(_mockDataRepo.Object, Mock.Of<IViewingService>(),_mockCommonLogic.Object);
+            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(),_mockCommonLogic.Object);
             List<OptionSelect> options = testPresenter.GetReportingStatusOptions(testCheckedOptions);
 
             // Assert
@@ -238,7 +236,7 @@ namespace ModernSlavery.WebUI.Tests.Services
             long totalRecords = 100;
 
             // Mocks
-            var testPresenter = new ViewingPresenter(Mock.Of<IDataRepository>(), Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
 
             var testResults = new List<EmployerSearchModel>();
             for (var i = 0; i < totalRecords; i++)
@@ -291,7 +289,7 @@ namespace ModernSlavery.WebUI.Tests.Services
             _mockSearchRepo.Setup(sr => sr.SuggestAsync(It.IsAny<string>(), It.IsAny<string>(), null, true, 10))
                 .ReturnsAsync(testRecords);
 
-            var testPresenter = new ViewingPresenter(Mock.Of<IDataRepository>(), Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
 
             // Test
             List<SuggestEmployerResult> assertResults = await testPresenter.SuggestEmployerNameAsync("testing 123");

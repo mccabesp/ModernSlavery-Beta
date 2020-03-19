@@ -21,10 +21,10 @@ namespace ModernSlavery.WebJob
             try
             {
                 //Initialise any unknown scope statuses
-                HashSet<Organisation> changedOrgs = await _ScopeBL.SetScopeStatusesAsync();
+                HashSet<Organisation> changedOrgs = await _ScopeBusinessLogic.SetScopeStatusesAsync();
 
                 //Initialise the presumed scoped
-                changedOrgs.AddRange(await _ScopeBL.SetPresumedScopesAsync());
+                changedOrgs.AddRange(await _ScopeBusinessLogic.SetPresumedScopesAsync());
 
                 //Update the search indexes
                 if (changedOrgs.Count > 0)
