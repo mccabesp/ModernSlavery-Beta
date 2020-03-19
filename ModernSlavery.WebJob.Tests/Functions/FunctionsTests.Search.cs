@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Timers;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebJob.Tests.TestHelpers;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Timers;
-using Microsoft.Extensions.Logging;
 using Moq;
-using ModernSlavery.Entities.Enums;
-
 using NUnit.Framework;
 using OrganisationHelper = ModernSlavery.WebJob.Tests.TestHelpers.OrganisationHelper;
 
@@ -23,12 +22,11 @@ namespace ModernSlavery.WebJob.Tests.Functions
     [SetCulture("en-GB")]
     public class UpdateSearchTests
     {
-
         [SetUp]
         public void BeforeEach()
         {
             //Create 10 test orgs with returns
-            IEnumerable<Organisation> orgs = OrganisationHelper.CreateTestOrganisations(10);
+            var orgs = OrganisationHelper.CreateTestOrganisations(10);
 
             //Instantiate the dependencies
             _functions = WebJobTestHelper.SetUp(orgs);
@@ -37,7 +35,8 @@ namespace ModernSlavery.WebJob.Tests.Functions
         private WebJob.Functions _functions;
 
         [Test]
-        [Ignore("incomplete test, needs reviewing to confirm that indexes are NOT recreated as part of the running of this code")]
+        [Ignore(
+            "incomplete test, needs reviewing to confirm that indexes are NOT recreated as part of the running of this code")]
         public async Task Functions_UpdateSearch()
         {
             // Arrange
@@ -59,8 +58,9 @@ namespace ModernSlavery.WebJob.Tests.Functions
             IEnumerable<Organisation> orgs = _functions.CommonBusinessLogic.DataRepository.GetAll<Organisation>();
 
             //Add a random number of in scope orgs
-            int inScope = Numeric.Rand(1, orgs.Count());
-            OrganisationHelper.AddScopeStatus(ScopeStatuses.InScope, VirtualDateTime.Now.Year, orgs.Take(inScope).ToArray());
+            var inScope = Numeric.Rand(1, orgs.Count());
+            OrganisationHelper.AddScopeStatus(ScopeStatuses.InScope, VirtualDateTime.Now.Year,
+                orgs.Take(inScope).ToArray());
 
             //Add returns to remaining orgs 
             ReturnHelper.CreateTestReturns(orgs.Skip(inScope).ToArray(), VirtualDateTime.Now.Year);
@@ -73,7 +73,8 @@ namespace ModernSlavery.WebJob.Tests.Functions
                              || o.OrganisationScopes.Any(
                                  sc =>
                                      sc.Status == ScopeRowStatuses.Active
-                                     && (sc.ScopeStatus == ScopeStatuses.InScope || sc.ScopeStatus == ScopeStatuses.PresumedInScope))))
+                                     && (sc.ScopeStatus == ScopeStatuses.InScope ||
+                                         sc.ScopeStatus == ScopeStatuses.PresumedInScope))))
                 .ToList();
 
             //ACT
@@ -82,18 +83,17 @@ namespace ModernSlavery.WebJob.Tests.Functions
             //ASSERT
 
             //Check for correct number of indexes
-            long documentCount = await _functions.SearchBusinessLogic.EmployerSearchRepository.GetDocumentCountAsync();
+            var documentCount = await _functions.SearchBusinessLogic.EmployerSearchRepository.GetDocumentCountAsync();
             Assert.That(documentCount == orgs.Count(), $"Expected '{documentCount}' indexes ");
 
             //Get the actual results
-            IList<EmployerSearchModel> actualResults = await _functions.SearchBusinessLogic.EmployerSearchRepository.ListAsync();
+            var actualResults = await _functions.SearchBusinessLogic.EmployerSearchRepository.ListAsync();
 
             //Generate the expected results
-            IEnumerable<EmployerSearchModel> expectedResults = orgs.Select(o => EmployerSearchModel.Create(o));
+            var expectedResults = orgs.Select(o => EmployerSearchModel.Create(o));
 
             //Check the results
             expectedResults.Compare(actualResults);
         }
-
     }
 }

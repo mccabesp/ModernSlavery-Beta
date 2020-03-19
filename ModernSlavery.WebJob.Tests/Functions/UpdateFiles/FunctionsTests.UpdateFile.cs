@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Extensions;
-using ModernSlavery.WebJob.Tests.TestHelpers;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using Microsoft.Extensions.Logging;
-using Moq;
+using ModernSlavery.Extensions;
 using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Tests.Common.Classes;
-using NUnit.Framework;
 using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebJob.Tests.TestHelpers;
+using Moq;
+using NUnit.Framework;
 
 namespace ModernSlavery.WebJob.Tests.Functions
 {
@@ -21,7 +19,6 @@ namespace ModernSlavery.WebJob.Tests.Functions
     [SetCulture("en-GB")]
     public class FunctionsTests
     {
-
         [SetUp]
         public void BeforeEach()
         {
@@ -62,21 +59,24 @@ namespace ModernSlavery.WebJob.Tests.Functions
         public async Task FunctionsUpdateFile_UpdateOrganisations_Shared_NoYears_UpdatesAllYearsAsync()
         {
             //ARRANGE
-            string filePath = Path.Combine(ConfigHelpers.GlobalOptions.DownloadsPath, Filenames.Organisations);
-            int endYear = SectorTypes.Private.GetAccountingStartDate().Year;
-            int startYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
-            int expectedFileCount = (endYear - startYear) + 1;
+            var filePath = Path.Combine(ConfigHelpers.GlobalOptions.DownloadsPath, Filenames.Organisations);
+            var endYear = SectorTypes.Private.GetAccountingStartDate().Year;
+            var startYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
+            var expectedFileCount = endYear - startYear + 1;
 
             //ACT
             await _functions.UpdateOrganisationsAsync(filePath);
 
             //ASSERT
             //Check each return is in the download file
-            IEnumerable<string> files = await _functions.CommonBusinessLogic.FileRepository.GetFilesAsync(ConfigHelpers.GlobalOptions.DownloadsPath);
-            Assert.AreEqual(expectedFileCount, files.Count(), $"Expected 2 files in {ConfigHelpers.GlobalOptions.DownloadsPath}");
+            var files = await _functions.CommonBusinessLogic.FileRepository.GetFilesAsync(ConfigHelpers.GlobalOptions
+                .DownloadsPath);
+            Assert.AreEqual(expectedFileCount, files.Count(),
+                $"Expected 2 files in {ConfigHelpers.GlobalOptions.DownloadsPath}");
             Assert.Multiple(
-                () => {
-                    for (int year = startYear; year <= endYear; year++)
+                () =>
+                {
+                    for (var year = startYear; year <= endYear; year++)
                     {
                         filePath = Path.Combine(
                             ConfigHelpers.GlobalOptions.DownloadsPath,
@@ -91,11 +91,11 @@ namespace ModernSlavery.WebJob.Tests.Functions
         public async Task FunctionsUpdateFile_UpdateOrganisations_Shared_SpecificYear_UpdatesOneYearAsync()
         {
             //ARRANGE
-            int endYear = SectorTypes.Private.GetAccountingStartDate().Year;
-            int startYear = endYear - 1;
+            var endYear = SectorTypes.Private.GetAccountingStartDate().Year;
+            var startYear = endYear - 1;
 
-            int year = Numeric.Rand(startYear, endYear);
-            string filePath = Path.Combine(
+            var year = Numeric.Rand(startYear, endYear);
+            var filePath = Path.Combine(
                 ConfigHelpers.GlobalOptions.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.Organisations)}_{year}-{(year + 1).ToTwoDigitYear()}{Path.GetExtension(Filenames.Organisations)}");
 
@@ -104,10 +104,11 @@ namespace ModernSlavery.WebJob.Tests.Functions
 
             //ASSERT
             //Check each return is in the download file
-            IEnumerable<string> files = await _functions.CommonBusinessLogic.FileRepository.GetFilesAsync(
+            var files = await _functions.CommonBusinessLogic.FileRepository.GetFilesAsync(
                 ConfigHelpers.GlobalOptions.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.Organisations)}_*{Path.GetExtension(Filenames.Organisations)}");
-            Assert.That(files.Count() == 1, $"Expected only 1 file in {ConfigHelpers.GlobalOptions.DownloadsPath} got {files.Count()}");
+            Assert.That(files.Count() == 1,
+                $"Expected only 1 file in {ConfigHelpers.GlobalOptions.DownloadsPath} got {files.Count()}");
             Assert.That(files.Contains(filePath), $"Expected file for year {year}");
         }
 
@@ -311,6 +312,5 @@ namespace ModernSlavery.WebJob.Tests.Functions
 
             //_functions.UpdateUsersToSendInfo(timerInfo, log.Object);
         }
-
     }
 }

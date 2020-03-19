@@ -2,27 +2,27 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Azure.Search.Models;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions;
-using Microsoft.Azure.Search.Models;
 using ModernSlavery.Infrastructure.File;
 using ModernSlavery.Infrastructure.Options;
-using NUnit.Framework;
 using ModernSlavery.SharedKernel;
+using NUnit.Framework;
 
 namespace ModernSlavery.Integration.Tests
 {
     [TestFixture]
     public class AzureFileRepositoryTests
     {
-
         [Test]
         public async Task AzureFileRepository_Append_Csv_Records_Async()
         {
             // Arrange
             var systemFileRepository = new SystemFileRepository(new StorageOptions());
 
-            string searchLogFilename = "testSearchLog" + VirtualDateTime.Now.ToString("yyyyMMdd_HHmmssfff") + "_deleteme.csv";
+            var searchLogFilename =
+                "testSearchLog" + VirtualDateTime.Now.ToString("yyyyMMdd_HHmmssfff") + "_deleteme.csv";
 
             try
             {
@@ -31,7 +31,8 @@ namespace ModernSlavery.Integration.Tests
                 // SearchParameters must be created so the 'searchParametersSentToTheSearchEngine.ToString()' below creates the queryString to send to Azure.
                 // It did happen before that version 9.0 of the library didn't override the 'tostring' and instead of returning "$count=true;$Blah" it was returning "schemdlj" (rendering our search logs useless).
                 // Leaving object 'SearchParameters' here serves as a flag that this functionality is still reporting useful info into the logs irrespective of any library updates. 
-                var searchParametersSentToTheSearchEngine = new SearchParameters {
+                var searchParametersSentToTheSearchEngine = new SearchParameters
+                {
                     SearchMode = SearchMode.Any,
                     Top = 50,
                     Skip = 100,
@@ -39,7 +40,8 @@ namespace ModernSlavery.Integration.Tests
                     QueryType = QueryType.Simple
                 };
 
-                var telemetryProperties = new Dictionary<string, string> {
+                var telemetryProperties = new Dictionary<string, string>
+                {
                     {"TimeStamp", new DateTime(2019, 06, 25, 14, 40, 54).ToString("yyyy-MM-dd HH:mm:ss.fff")},
                     {"QueryTerms", "International bank of Japan"},
                     {"ResultCount", "25"},
@@ -53,7 +55,7 @@ namespace ModernSlavery.Integration.Tests
 
                 // Act
                 await systemFileRepository.AppendCsvRecordsAsync(searchLogFilename, searchLogRecords);
-                string actualContent = await systemFileRepository.ReadAsync(searchLogFilename);
+                var actualContent = await systemFileRepository.ReadAsync(searchLogFilename);
 
                 // Assert
                 var expectedContent =
@@ -65,6 +67,5 @@ namespace ModernSlavery.Integration.Tests
                 await systemFileRepository.DeleteFileAsync(searchLogFilename);
             }
         }
-
     }
 }

@@ -5,10 +5,10 @@ namespace ModernSlavery.WebJob.Tests.TestHelpers
 {
     public static class AddressHelper
     {
-
         public static OrganisationAddress CreateTestAddress(long organisationId)
         {
-            return new OrganisationAddress {
+            return new OrganisationAddress
+            {
                 OrganisationId = organisationId,
                 Status = AddressStatuses.Active,
                 CreatedByUserId = -1,
@@ -17,6 +17,5 @@ namespace ModernSlavery.WebJob.Tests.TestHelpers
                 Country = $"Country{organisationId:000}"
             };
         }
-
     }
 }

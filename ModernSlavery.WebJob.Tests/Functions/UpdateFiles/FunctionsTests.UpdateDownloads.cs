@@ -2,17 +2,16 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
+using ModernSlavery.Entities.Enums;
+using ModernSlavery.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebJob.Tests.TestHelpers;
-using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.Classes;
 using Moq;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
-
 using NUnit.Framework;
 using OrganisationHelper = ModernSlavery.WebJob.Tests.TestHelpers.OrganisationHelper;
 
@@ -22,13 +21,12 @@ namespace ModernSlavery.WebJob.Tests.Functions
     [SetCulture("en-GB")]
     public class UpdateDownloadsFileTests
     {
-
         [SetUp]
         public void BeforeEach()
         {
             //Create 10 test orgs with returns
-            IEnumerable<Organisation> orgs = OrganisationHelper.CreateTestOrganisations(10);
-            IEnumerable<Return> returns = ReturnHelper.CreateTestReturns(orgs);
+            var orgs = OrganisationHelper.CreateTestOrganisations(10);
+            var returns = ReturnHelper.CreateTestReturns(orgs);
 
             //Instantiate the dependencies
             _functions = WebJobTestHelper.SetUp(orgs, returns);
@@ -43,7 +41,7 @@ namespace ModernSlavery.WebJob.Tests.Functions
             //ARRANGE
             var log = new Mock<ILogger>();
 
-            int year = SectorTypes.Private.GetAccountingStartDate(2017).Year;
+            var year = SectorTypes.Private.GetAccountingStartDate(2017).Year;
             IEnumerable<Return> returns = await _functions.CommonBusinessLogic.DataRepository
                 .ToListAsync<Return>(
                     r => r.AccountingDate.Year == year
@@ -55,21 +53,23 @@ namespace ModernSlavery.WebJob.Tests.Functions
 
             //ASSERT
             //Check each return is in the download file
-            string downloadFilePath =
-                _functions.CommonBusinessLogic.FileRepository.GetFullPath(Path.Combine(ConfigHelpers.GlobalOptions.DownloadsLocation, $"GPGData_{year}-{year + 1}.csv"));
+            var downloadFilePath =
+                _functions.CommonBusinessLogic.FileRepository.GetFullPath(
+                    Path.Combine(ConfigHelpers.GlobalOptions.DownloadsLocation, $"GPGData_{year}-{year + 1}.csv"));
 
             //Check the file exists
-            Assert.That(await _functions.CommonBusinessLogic.FileRepository.GetFileExistsAsync(downloadFilePath), $"File '{downloadFilePath}' should exist");
+            Assert.That(await _functions.CommonBusinessLogic.FileRepository.GetFileExistsAsync(downloadFilePath),
+                $"File '{downloadFilePath}' should exist");
 
             //Get the actual results
-            List<DownloadResult> actualResults = await _functions.CommonBusinessLogic.FileRepository.ReadCSVAsync<DownloadResult>(downloadFilePath);
+            var actualResults =
+                await _functions.CommonBusinessLogic.FileRepository.ReadCSVAsync<DownloadResult>(downloadFilePath);
 
             //Generate the expected results
-            List<DownloadResult> expectedResults = returns.Select(r => DownloadResult.Create(r)).OrderBy(d => d.EmployerName).ToList();
+            var expectedResults = returns.Select(r => DownloadResult.Create(r)).OrderBy(d => d.EmployerName).ToList();
 
             //Check the results
             expectedResults.Compare(actualResults);
         }
-
     }
 }

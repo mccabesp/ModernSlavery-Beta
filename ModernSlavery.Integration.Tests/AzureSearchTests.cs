@@ -1,21 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure.Search;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.View;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
+using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.Search;
+using ModernSlavery.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebUI.Models.Search;
-using Microsoft.Azure.Search;
-using ModernSlavery.Infrastructure.Data;
-using ModernSlavery.Infrastructure.Search;
-using Moq;
-using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Presenters;
+using Moq;
 using NUnit.Framework;
-using ModernSlavery.BusinessLogic.View;
 
 namespace ModernSlavery.Integration.Tests
 {
@@ -23,7 +23,6 @@ namespace ModernSlavery.Integration.Tests
     [SetCulture("en-GB")]
     public class AzureSearchTests
     {
-
         private readonly AzureEmployerSearchRepository _azureSearchRepo;
 
         public AzureSearchTests()
@@ -31,7 +30,9 @@ namespace ModernSlavery.Integration.Tests
             SetupHelpers.SetupMockLogRecordGlobals();
 
             //_azureSearchRepo = new AzureSearchRepository(azureSearchServiceName, azureSearchAdminApiKey, null, GlobalOptions.AppInsightsClient);
-            _azureSearchRepo = new AzureEmployerSearchRepository(ConfigHelpers.GlobalOptions,Mock.Of<ILogRecordLogger>(), ConfigHelpers.SearchOptions.AzureServiceName, ConfigHelpers.SearchOptions.EmployerIndexName,ConfigHelpers.SearchOptions.AzureApiAdminKey);
+            _azureSearchRepo = new AzureEmployerSearchRepository(ConfigHelpers.GlobalOptions,
+                Mock.Of<ILogRecordLogger>(), ConfigHelpers.SearchOptions.AzureServiceName,
+                ConfigHelpers.SearchOptions.EmployerIndexName, ConfigHelpers.SearchOptions.AzureApiAdminKey);
         }
 
         /* Tests that fail if PartialNameForSuffixSearches is missing */
@@ -104,10 +105,11 @@ namespace ModernSlavery.Integration.Tests
         // https://social.msdn.microsoft.com/Forums/azure/en-US/c23446db-17af-4b99-b76f-1a6b006612a3/azure-search-net-sdk-filter-and-startwith
         // https://stackoverflow.com/questions/40056213/behavior-of-asterisk-in-azure-search-service
         // https://stackoverflow.com/questions/40857057/how-to-practially-use-a-keywordanalyzer-in-azure-search
-        public async Task ViewingService_Search_Returns_At_Least_One_Result(string searchKeyWords, int expectedOrganisationId)
+        public async Task ViewingService_Search_Returns_At_Least_One_Result(string searchKeyWords,
+            int expectedOrganisationId)
         {
             // Arrange
-            Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockDataRepository();
+            var mockDataRepo = MoqHelpers.CreateMockDataRepository();
 
             var mockViewingService = new Mock<IViewingService>();
             mockViewingService.Setup(m => m.SearchBusinessLogic.EmployerSearchRepository).Returns(_azureSearchRepo);
@@ -118,23 +120,23 @@ namespace ModernSlavery.Integration.Tests
                     x => x.Keywords == searchKeyWords && x.Page == 1 && x.SearchType == SearchTypes.ByEmployerName);
 
             // Act
-            SearchViewModel result = await testPresenter.SearchAsync(mockedSearchParameters);
+            var result = await testPresenter.SearchAsync(mockedSearchParameters);
 
             // Assert
-            long totalNumberOfRecordsFound = result.Employers.ActualRecordTotal;
+            var totalNumberOfRecordsFound = result.Employers.ActualRecordTotal;
             Assert.GreaterOrEqual(
                 totalNumberOfRecordsFound,
                 1,
                 $"Expected term [{searchKeyWords}] to return at least one record.");
 
-            EmployerSearchModel organisationFound =
+            var organisationFound =
                 result.Employers.Results.FirstOrDefault(x => x.OrganisationId == expectedOrganisationId.ToString());
 
             Assert.NotNull(
                 organisationFound,
                 $"Search term \"{searchKeyWords}\" should have returned organisationId {expectedOrganisationId} within its list of results but it was NOT FOUND");
 
-            int organisationPosition = result.Employers.Results.IndexOf(organisationFound);
+            var organisationPosition = result.Employers.Results.IndexOf(organisationFound);
 
             Assert.LessOrEqual(
                 organisationPosition,
@@ -148,10 +150,11 @@ namespace ModernSlavery.Integration.Tests
         [TestCase(null)]
         [TestCase("")]
         [TestCase("   ")]
-        public async Task ViewingService_SearchByEmployerName_Null_Or_Empty_Search_Returns_All(string nullWhitespaceOrEmptySearchKeyWords)
+        public async Task ViewingService_SearchByEmployerName_Null_Or_Empty_Search_Returns_All(
+            string nullWhitespaceOrEmptySearchKeyWords)
         {
             // Arrange
-            Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockDataRepository();
+            var mockDataRepo = MoqHelpers.CreateMockDataRepository();
 
             const SearchTypes searchBy = SearchTypes.ByEmployerName;
             var mockViewingService = new Mock<IViewingService>();
@@ -163,10 +166,10 @@ namespace ModernSlavery.Integration.Tests
                     x => x.Keywords == nullWhitespaceOrEmptySearchKeyWords && x.Page == 1 && x.SearchType == searchBy);
 
             // Act
-            SearchViewModel result = await testPresenter.SearchAsync(mockedSearchParameters);
+            var result = await testPresenter.SearchAsync(mockedSearchParameters);
 
             // Assert
-            long actualNumberOfRecords = result.Employers.ActualRecordTotal;
+            var actualNumberOfRecords = result.Employers.ActualRecordTotal;
             Assert.GreaterOrEqual(
                 actualNumberOfRecords,
                 10000,
@@ -176,10 +179,11 @@ namespace ModernSlavery.Integration.Tests
         [TestCase(null)]
         [TestCase("")]
         [TestCase("   ")]
-        public async Task ViewingService_BySectorType_Null_Or_Empty_Search_Returns_Zero(string nullWhitespaceOrEmptySearchKeyWords)
+        public async Task ViewingService_BySectorType_Null_Or_Empty_Search_Returns_Zero(
+            string nullWhitespaceOrEmptySearchKeyWords)
         {
             // Arrange
-            Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockDataRepository();
+            var mockDataRepo = MoqHelpers.CreateMockDataRepository();
 
             const SearchTypes searchType = SearchTypes.BySectorType;
             var mockViewingService = new Mock<IViewingService>();
@@ -188,13 +192,14 @@ namespace ModernSlavery.Integration.Tests
 
             var mockedSearchParameters =
                 Mock.Of<EmployerSearchParameters>(
-                    x => x.Keywords == nullWhitespaceOrEmptySearchKeyWords && x.Page == 1 && x.SearchType == searchType);
+                    x => x.Keywords == nullWhitespaceOrEmptySearchKeyWords && x.Page == 1 &&
+                         x.SearchType == searchType);
 
             // Act
-            SearchViewModel result = await testPresenter.SearchAsync(mockedSearchParameters);
+            var result = await testPresenter.SearchAsync(mockedSearchParameters);
 
             // Assert
-            long actualNumberOfRecords = result.Employers.ActualRecordTotal;
+            var actualNumberOfRecords = result.Employers.ActualRecordTotal;
             Assert.AreEqual(
                 0,
                 actualNumberOfRecords,
@@ -204,10 +209,11 @@ namespace ModernSlavery.Integration.Tests
         [TestCase("Wolseley uk limited", 200)]
         [TestCase("Wolseley uk", 200)]
         [TestCase("Wolseley", 200)]
-        public async Task ViewingService_Search_Ignores_Terms_Limited_And_Uk_(string searchKeyWords, int maxNumberOfRecordsExpected)
+        public async Task ViewingService_Search_Ignores_Terms_Limited_And_Uk_(string searchKeyWords,
+            int maxNumberOfRecordsExpected)
         {
             // Arrange
-            Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockDataRepository();
+            var mockDataRepo = MoqHelpers.CreateMockDataRepository();
 
             var mockViewingService = new Mock<IViewingService>();
             mockViewingService.Setup(m => m.SearchBusinessLogic.EmployerSearchRepository).Returns(_azureSearchRepo);
@@ -218,10 +224,10 @@ namespace ModernSlavery.Integration.Tests
                     x => x.Keywords == searchKeyWords && x.Page == 1 && x.SearchType == SearchTypes.ByEmployerName);
 
             // Act
-            SearchViewModel result = await testPresenter.SearchAsync(mockedSearchParameters);
+            var result = await testPresenter.SearchAsync(mockedSearchParameters);
 
             // Assert
-            long totalNumberOfRecordsFound = result.Employers.ActualRecordTotal;
+            var totalNumberOfRecordsFound = result.Employers.ActualRecordTotal;
             Assert.LessOrEqual(totalNumberOfRecordsFound, maxNumberOfRecordsExpected);
         }
 
@@ -235,25 +241,28 @@ namespace ModernSlavery.Integration.Tests
         [TestCase("01210", 1)] // [confirm it's been indexed correctly -> zero leading]  01210 - Growing of grapes
         [TestCase("46310", 1)] // 46310 - Wholesale of fruit and vegetables
         [TestCase("591", 8)] // 59111-Motion picture... + 59112-Video... + 59113-Television...
-        public async Task ViewingService_GetListOfSicCodeSuggestions(string searchKeyWords, int expectedNumberOfSuggestions)
+        public async Task ViewingService_GetListOfSicCodeSuggestions(string searchKeyWords,
+            int expectedNumberOfSuggestions)
         {
             // Arrange
             var sicCodeSearchServiceClient = new SearchServiceClient(
                 ConfigHelpers.SearchOptions.AzureServiceName,
                 new SearchCredentials(ConfigHelpers.SearchOptions.AzureApiAdminKey));
 
-            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
+            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),
+                sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
 
             var mockViewingService = new Mock<IViewingService>();
             mockViewingService.Setup(m => m.SearchBusinessLogic.EmployerSearchRepository).Returns(_azureSearchRepo);
-            mockViewingService.Setup(m => m.SearchBusinessLogic.SicCodeSearchRepository).Returns(sicCodeSearchIndexClient);
+            mockViewingService.Setup(m => m.SearchBusinessLogic.SicCodeSearchRepository)
+                .Returns(sicCodeSearchIndexClient);
             var testPresenter = new ViewingPresenter(mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
 
             // Act
-            List<SicCodeSearchResult> result = await testPresenter.GetListOfSicCodeSuggestionsAsync(searchKeyWords);
+            var result = await testPresenter.GetListOfSicCodeSuggestionsAsync(searchKeyWords);
 
             // Assert
-            int actualNumberOfSuggestions = result.Count;
+            var actualNumberOfSuggestions = result.Count;
             Assert.AreEqual(
                 expectedNumberOfSuggestions,
                 actualNumberOfSuggestions,
@@ -271,7 +280,8 @@ namespace ModernSlavery.Integration.Tests
             "fruit and vegetable*",
             "46310~Wholesale of fruit and vegetables; 10390~Other processing and preserving of fruit and vegetables; 47210~Retail sale of fruit and vegetables in specialised stores; 46341~Wholesale of fruit and vegetable juices, mineral water and soft drink; 10320~Manufacture of fruit and vegetable juice")]
         [TestCase("bank*", "64191~banks; 64110~central banking; 86900~Other human health activities")]
-        public async Task ViewingService_Search_BySectorType_Selects_Sectors_That_Contain_All_Terms(string searchKeyWords,
+        public async Task ViewingService_Search_BySectorType_Selects_Sectors_That_Contain_All_Terms(
+            string searchKeyWords,
             string csvListOfSicSectionsExpectedToBeSelected)
         {
             // Arrange
@@ -279,23 +289,26 @@ namespace ModernSlavery.Integration.Tests
                 ConfigHelpers.SearchOptions.AzureServiceName,
                 new SearchCredentials(ConfigHelpers.SearchOptions.AzureApiAdminKey));
 
-            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
+            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),
+                sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
 
-            Mock<IDataRepository> mockDataRepo = MoqHelpers.CreateMockDataRepository();
+            var mockDataRepo = MoqHelpers.CreateMockDataRepository();
 
             var mockViewingService = new Mock<IViewingService>();
             mockViewingService.Setup(m => m.SearchBusinessLogic.EmployerSearchRepository).Returns(_azureSearchRepo);
-            mockViewingService.Setup(m => m.SearchBusinessLogic.SicCodeSearchRepository).Returns(sicCodeSearchIndexClient);
+            mockViewingService.Setup(m => m.SearchBusinessLogic.SicCodeSearchRepository)
+                .Returns(sicCodeSearchIndexClient);
             var testPresenter = new ViewingPresenter(mockViewingService.Object, Mock.Of<ICommonBusinessLogic>());
 
             #region Calculate the expected number of records
 
             // Convert the received csv list to a list of EmployerSearchParameters
-            IEnumerable<EmployerSearchParameters> listOfSicSectionDescriptionsToBeSelected = csvListOfSicSectionsExpectedToBeSelected
+            var listOfSicSectionDescriptionsToBeSelected = csvListOfSicSectionsExpectedToBeSelected
                 .SplitI(";")
                 .Select(
-                    sicSectionDescriptionFoundInList => {
-                        string sicCodeToSearchBy = sicSectionDescriptionFoundInList.SplitI("~")[1].Trim();
+                    sicSectionDescriptionFoundInList =>
+                    {
+                        var sicCodeToSearchBy = sicSectionDescriptionFoundInList.SplitI("~")[1].Trim();
 
                         return Mock.Of<EmployerSearchParameters>(
                             searchParam =>
@@ -308,9 +321,9 @@ namespace ModernSlavery.Integration.Tests
                     });
 
             var listOfEmployerSearchModel = new List<EmployerSearchModel>();
-            foreach (EmployerSearchParameters sicSectionDescriptionSearchParameter in listOfSicSectionDescriptionsToBeSelected)
+            foreach (var sicSectionDescriptionSearchParameter in listOfSicSectionDescriptionsToBeSelected)
             {
-                SearchViewModel sicSectionDescriptionSearchViewModel =
+                var sicSectionDescriptionSearchViewModel =
                     await testPresenter.SearchAsync(sicSectionDescriptionSearchParameter);
                 Assert.GreaterOrEqual(
                     sicSectionDescriptionSearchViewModel.EmployerEndIndex,
@@ -319,7 +332,7 @@ namespace ModernSlavery.Integration.Tests
                 listOfEmployerSearchModel.AddRange(sicSectionDescriptionSearchViewModel.Employers.Results);
             }
 
-            IOrderedEnumerable<string> expectedListOfEmployerNames =
+            var expectedListOfEmployerNames =
                 listOfEmployerSearchModel.Select(x => x.Name).DistinctI().OrderBy(x => x);
 
             #endregion
@@ -334,18 +347,17 @@ namespace ModernSlavery.Integration.Tests
                          && x.SearchMode == SearchModes.All);
 
             // Act
-            SearchViewModel keywordSearchResultSearchViewModel = await testPresenter.SearchAsync(mockedSearchParameters);
+            var keywordSearchResultSearchViewModel = await testPresenter.SearchAsync(mockedSearchParameters);
 
             // Assert
-            IOrderedEnumerable<string> actualListOfEmployerNames =
+            var actualListOfEmployerNames =
                 keywordSearchResultSearchViewModel.Employers.Results.Select(x => x.Name).DistinctI().OrderBy(x => x);
 
-            IEnumerable<string> foundMoreRecordsThanThoseExpected = actualListOfEmployerNames.Except(expectedListOfEmployerNames);
+            var foundMoreRecordsThanThoseExpected = actualListOfEmployerNames.Except(expectedListOfEmployerNames);
             Assert.IsEmpty(foundMoreRecordsThanThoseExpected);
 
-            IEnumerable<string> expectedMoreRecordsThanThoseFound = expectedListOfEmployerNames.Except(actualListOfEmployerNames);
+            var expectedMoreRecordsThanThoseFound = expectedListOfEmployerNames.Except(actualListOfEmployerNames);
             Assert.IsEmpty(expectedMoreRecordsThanThoseFound);
         }
-
     }
 }
