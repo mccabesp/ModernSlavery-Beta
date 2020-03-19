@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 using ModernSlavery.Extensions;
-using System;
 
 namespace ModernSlavery.SharedKernel.Interfaces
 {
@@ -15,21 +15,23 @@ namespace ModernSlavery.SharedKernel.Interfaces
 
     public class SnapshotDateHelper : ISnapshotDateHelper
     {
+        private readonly IConfiguration _configuration;
+
+        public int? _FirstReportingYear;
+
         public SnapshotDateHelper(IConfiguration configuration)
         {
             _configuration = configuration;
             PrivateAccountingDate = _configuration.GetValue<DateTime>("PrivateAccountingDate");
             PublicAccountingDate = _configuration.GetValue<DateTime>("PublicAccountingDate");
-
         }
 
-        public int? _FirstReportingYear;
         public int FirstReportingYear
         {
             get
             {
-
-                if (!_FirstReportingYear.HasValue) _FirstReportingYear = _configuration.GetValue("FirstReportingYear", 2017);
+                if (!_FirstReportingYear.HasValue)
+                    _FirstReportingYear = _configuration.GetValue("FirstReportingYear", 2017);
                 return _FirstReportingYear.Value;
             }
             set
@@ -43,14 +45,12 @@ namespace ModernSlavery.SharedKernel.Interfaces
         public DateTime PublicAccountingDate { get; }
         public int CurrentSnapshotYear => GetSnapshotDate(SectorTypes.Private).Year;
 
-        readonly IConfiguration _configuration;
-
         public DateTime GetSnapshotDate(SectorTypes sectorType, int year = 0)
         {
             var tempDay = 0;
             var tempMonth = 0;
 
-            DateTime now = VirtualDateTime.Now;
+            var now = VirtualDateTime.Now;
 
             switch (sectorType)
             {
@@ -63,13 +63,11 @@ namespace ModernSlavery.SharedKernel.Interfaces
                     tempMonth = PublicAccountingDate.Month;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(sectorType), sectorType, "Cannot calculate accounting date for this sector type");
+                    throw new ArgumentOutOfRangeException(nameof(sectorType), sectorType,
+                        "Cannot calculate accounting date for this sector type");
             }
 
-            if (year == 0)
-            {
-                year = now.Year;
-            }
+            if (year == 0) year = now.Year;
 
             var tempDate = new DateTime(year, tempMonth, tempDay);
 

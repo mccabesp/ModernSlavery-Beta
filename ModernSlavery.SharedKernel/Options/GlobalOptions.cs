@@ -5,10 +5,11 @@ using ModernSlavery.Extensions;
 
 namespace ModernSlavery.SharedKernel.Options
 {
-    public class GlobalOptions:IOptions
+    public class GlobalOptions : IOptions
     {
+        private int[] _reminderEmailDays;
 
-        public string AuthSecret {get; set;}= "secret";
+        public string AuthSecret { get; set; } = "secret";
 
         public string AdminEmails { get; set; }
         public string SuperAdminEmails { get; set; }
@@ -16,60 +17,15 @@ namespace ModernSlavery.SharedKernel.Options
 
         public int SessionTimeOutMinutes { get; set; } = 20;
 
-        #region Environment
-        public string Environment { get; set; }
-
-        public bool IsEnvironment(params string[] environmentNames)
-        {
-            return environmentNames.Any(en=>Environment.EqualsI(en));
-        }
-
-        public bool IsLocal()
-        {
-            return IsEnvironment("LOCAL");
-        }
-
-        public bool IsDevelopment()
-        {
-            return IsEnvironment("DEV", "DEVELOPMENT");
-        }
-
-        public bool IsStaging()
-        {
-            return IsEnvironment("STAGING");
-        }
-
-        public bool IsPreProduction()
-        {
-            return IsEnvironment("PREPROD", "PREPRODUCTION");
-        }
-
-        public bool IsProduction()
-        {
-            return IsEnvironment("PROD", "PRODUCTION");
-        }
-
-        #endregion
-
-        #region Files and Directories
-        public string DataPath { get; set; }
-        public string DownloadsPath => Path.Combine(DataPath, "Downloads");
-
-        public string LogPath { get; set; }
-
-        public string DownloadsLocation { get; set; }
-
-        public string SaveDraftPath { get; set; }
-
-        #endregion
-
         #region App Insights
+
         public string APPINSIGHTS_INSTRUMENTATIONKEY { get; set; }
+
         #endregion
 
-        public int ObfuscationSeed { get; set; }=127;
+        public int ObfuscationSeed { get; set; } = 127;
 
-        public int CertExpiresWarningDays { get; set; }=30;
+        public int CertExpiresWarningDays { get; set; } = 30;
 
         public string TrustedIPDomains { get; set; }
 
@@ -79,9 +35,9 @@ namespace ModernSlavery.SharedKernel.Options
 
         public bool EnableSubmitAlerts { get; set; } = true;
 
-        public bool EncryptEmails { get; set; }=true;
+        public bool EncryptEmails { get; set; } = true;
         public bool MaintenanceMode { get; set; }
-        public bool StickySessions { get; set; }=true;
+        public bool StickySessions { get; set; } = true;
 
 
         public DateTime PrivacyChangedDate { get; set; }
@@ -90,13 +46,8 @@ namespace ModernSlavery.SharedKernel.Options
         public int EmployerCodeLength { get; set; }
         public int EmployerPageSize { get; set; }
         public string EXTERNAL_HOST { get; set; }
-        public string SiteAuthority
-        {
-            get
-            {
-                return $"https://{EXTERNAL_HOST}/";
-            }
-        }
+
+        public string SiteAuthority => $"https://{EXTERNAL_HOST}/";
 
         public int LevenshteinDistance { get; set; } = 5;
         public int LockoutMinutes { get; set; }
@@ -104,7 +55,7 @@ namespace ModernSlavery.SharedKernel.Options
         public int MaxLoginAttempts { get; set; } = 3;
         public int MaxPinAttempts { get; set; } = 3;
         public int MaxSnapshotDays { get; set; } = 35;
-        public int MinPasswordResetMinutes { get; set; }=30;
+        public int MinPasswordResetMinutes { get; set; } = 30;
         public int MinSignupMinutes { get; set; }
         public int PinInPostExpiryDays { get; set; }
         public DateTime PinExpiresDate => VirtualDateTime.Now.AddDays(0 - PinInPostExpiryDays);
@@ -144,7 +95,7 @@ namespace ModernSlavery.SharedKernel.Options
         public string GovUkNotifyPinInThePostTemplateId { get; set; }
 
         public DateTime ActionHubSwitchOverDate { get; set; }
-        
+
         public bool SendGoogleAnalyticsDataToGovUk { get; set; }
 
         public string WEBSITE_INSTANCE_ID { get; set; }
@@ -155,16 +106,65 @@ namespace ModernSlavery.SharedKernel.Options
         public bool SkipSpamProtection { get; set; }
         public int MaxNumCallsCompaniesHouseApiPerFiveMins { get; set; } = 500;
 
-        private int[] _reminderEmailDays;
         public int[] ReminderEmailDays
         {
             get => _reminderEmailDays;
-            set => _reminderEmailDays = value.OrderBy(d=>d).ToArray();
+            set => _reminderEmailDays = value.OrderBy(d => d).ToArray();
         }
+
         public string IdentityApiScope { get; set; }
         public bool PinInPostTestMode { get; set; }
         public bool ShowEmailVerifyLink { get; set; }
         public string GoogleAnalyticsAccountId { get; set; }
         public string DateTimeOffset { get; set; }
+
+        #region Environment
+
+        public string Environment { get; set; }
+
+        public bool IsEnvironment(params string[] environmentNames)
+        {
+            return environmentNames.Any(en => Environment.EqualsI(en));
+        }
+
+        public bool IsLocal()
+        {
+            return IsEnvironment("LOCAL");
+        }
+
+        public bool IsDevelopment()
+        {
+            return IsEnvironment("DEV", "DEVELOPMENT");
+        }
+
+        public bool IsStaging()
+        {
+            return IsEnvironment("STAGING");
+        }
+
+        public bool IsPreProduction()
+        {
+            return IsEnvironment("PREPROD", "PREPRODUCTION");
+        }
+
+        public bool IsProduction()
+        {
+            return IsEnvironment("PROD", "PRODUCTION");
+        }
+
+        #endregion
+
+        #region Files and Directories
+
+        public string DataPath { get; set; }
+        public string DownloadsPath => Path.Combine(DataPath, "Downloads");
+
+        public string LogPath { get; set; }
+
+        public string DownloadsLocation { get; set; }
+
+        public string SaveDraftPath { get; set; }
+
+        #endregion
     }
 }

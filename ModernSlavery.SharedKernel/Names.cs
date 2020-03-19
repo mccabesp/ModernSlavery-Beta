@@ -1,8 +1,8 @@
-﻿using ModernSlavery.Extensions;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using ModernSlavery.Extensions;
 
 namespace ModernSlavery.SharedKernel
 {
@@ -18,12 +18,10 @@ namespace ModernSlavery.SharedKernel
                 .GetCustomAttribute<DisplayAttribute>()
                 ?.Name;
         }
-
     }
 
     public static class Filenames
     {
-
         public const string Organisations = "GPG-Organisations.csv";
         public const string Users = "GPG-Users.csv";
         public const string Registrations = "GPG-Registrations.csv";
@@ -57,37 +55,33 @@ namespace ModernSlavery.SharedKernel
             return $"GPG-DnBOrgs_{year:yyyy}-{year++:yy}.csv";
         }
 
-        public static string PreviousDnBOrganisations(int year=0)
+        public static string PreviousDnBOrganisations(int year = 0)
         {
             if (year == 0) year = VirtualDateTime.Now.Year;
             return $"GPG-DnBOrgs_{year--:yyyy}-{year:yy}.csv";
         }
+
         public static string GetRootFilename(string filePath)
         {
-            string path = Path.GetDirectoryName(filePath);
-            string fileName = Path.GetFileNameWithoutExtension(filePath);
-            string extension = Path.GetExtension(filePath);
-            string prefix = fileName.BeforeFirst("_");
+            var path = Path.GetDirectoryName(filePath);
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
+            var extension = Path.GetExtension(filePath);
+            var prefix = fileName.BeforeFirst("_");
             return $"{prefix}{extension}";
         }
-
     }
 
     public static class QueueNames
     {
-
         public const string ExecuteWebJob = "execute-webjob";
         public const string SendEmail = "send-email";
         public const string SendNotifyEmail = "send-notify-email";
         public const string LogEvent = "log-event";
         public const string LogRecord = "log-record";
-
     }
 
     public static class CookieNames
     {
-
         public const string LastCompareQuery = "compare";
-
     }
 }
