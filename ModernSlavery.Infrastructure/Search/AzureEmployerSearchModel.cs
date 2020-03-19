@@ -7,13 +7,11 @@ using ModernSlavery.Core.Models;
 namespace ModernSlavery.Infrastructure
 {
     [Serializable]
-    public class AzureEmployerSearchModel: EmployerSearchModel
+    public class AzureEmployerSearchModel : EmployerSearchModel
     {
         #region Organisation Properties
 
-        [Key]
-
-        public override string OrganisationId { get; set; }
+        [Key] public override string OrganisationId { get; set; }
 
         [IsSearchable]
         [Analyzer(AnalyzerName.AsString.EnLucene)]
@@ -25,11 +23,9 @@ namespace ModernSlavery.Infrastructure
         [Analyzer(AnalyzerName.AsString.EnLucene)]
         public override string PreviousName { get; set; }
 
-        [IsSearchable]
-        public override string PartialNameForSuffixSearches { get; set; }
+        [IsSearchable] public override string PartialNameForSuffixSearches { get; set; }
 
-        [IsSearchable]
-        public string PartialNameForCompleteTokenSearches { get; set; }
+        [IsSearchable] public string PartialNameForCompleteTokenSearches { get; set; }
 
         [IsSearchable]
         [Analyzer(AnalyzerName.AsString.EnLucene)]
@@ -40,9 +36,7 @@ namespace ModernSlavery.Infrastructure
         [IsFacetable]
         public override int Size { get; set; }
 
-        [IsFilterable]
-        [IsFacetable]
-        public override string[] SicSectionIds { get; set; }
+        [IsFilterable] [IsFacetable] public override string[] SicSectionIds { get; set; }
 
         public override string[] SicSectionNames { get; set; }
 
@@ -51,24 +45,15 @@ namespace ModernSlavery.Infrastructure
         [IsFacetable]
         public override string[] SicCodeIds { get; set; }
 
-        [IsSearchable]
-        public override string[] SicCodeListOfSynonyms { get; set; }
+        [IsSearchable] public override string[] SicCodeListOfSynonyms { get; set; }
 
-        [IsFilterable]
-        [IsFacetable]
-        public override string[] ReportedYears { get; set; }
+        [IsFilterable] [IsFacetable] public override string[] ReportedYears { get; set; }
 
-        [IsFilterable]
-        [IsFacetable]
-        public override DateTimeOffset LatestReportedDate { get; set; }
+        [IsFilterable] [IsFacetable] public override DateTimeOffset LatestReportedDate { get; set; }
 
-        [IsFilterable]
-        [IsFacetable]
-        public override string[] ReportedLateYears { get; set; }
+        [IsFilterable] [IsFacetable] public override string[] ReportedLateYears { get; set; }
 
-        [IsFilterable]
-        [IsFacetable]
-        public override string[] ReportedExplanationYears { get; set; }
+        [IsFilterable] [IsFacetable] public override string[] ReportedExplanationYears { get; set; }
 
         #endregion
     }

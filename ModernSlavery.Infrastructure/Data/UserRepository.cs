@@ -15,14 +15,14 @@ using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Data
 {
-
     public class UserRepository : IUserRepository
     {
         private readonly DatabaseOptions DatabaseOptions;
         private readonly GlobalOptions GlobalOptions;
-        public UserRepository(DatabaseOptions databaseOptions, GlobalOptions globalOptions, IDataRepository dataRepository, IUserLogRecord userRecordLog, IMapper autoMapper)
-        {
 
+        public UserRepository(DatabaseOptions databaseOptions, GlobalOptions globalOptions,
+            IDataRepository dataRepository, IUserLogRecord userRecordLog, IMapper autoMapper)
+        {
             DatabaseOptions = databaseOptions ?? throw new ArgumentNullException(nameof(databaseOptions));
             GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
             DataRepository = dataRepository ?? throw new ArgumentNullException(nameof(dataRepository));
@@ -50,7 +50,7 @@ namespace ModernSlavery.Infrastructure.Data
             {
                 var encryptedEmail = Encryption.EncryptData(email.ToLower());
 
-                var user = await DataRepository.FirstOrDefaultAsync<User>(u=>
+                var user = await DataRepository.FirstOrDefaultAsync<User>(u =>
                     // filter by email address
                     u.EmailAddress == encryptedEmail
                     // skip or filter by user status
@@ -58,19 +58,20 @@ namespace ModernSlavery.Infrastructure.Data
 
                 if (user != null) return user;
             }
-        
-            return await DataRepository.FirstOrDefaultAsync<User>(u=>
+
+            return await DataRepository.FirstOrDefaultAsync<User>(u =>
                 // filter by email address
                 u.EmailAddress.ToLower() == email.ToLower()
                 // skip or filter by user status
-                 && (filterStatuses.Length == 0 || filterStatuses.Contains(u.Status)));
+                && (filterStatuses.Length == 0 || filterStatuses.Contains(u.Status)));
         }
 
         public async Task<List<User>> FindAllUsersByNameAsync(string name)
         {
-            string nameForSearch = name?.ToLower();
+            var nameForSearch = name?.ToLower();
 
-            return await DataRepository.ToListAsync<User>(x => x.Fullname.ToLower().Contains(nameForSearch) || x.ContactFullname.ToLower().Contains(nameForSearch));
+            return await DataRepository.ToListAsync<User>(x =>
+                x.Fullname.ToLower().Contains(nameForSearch) || x.ContactFullname.ToLower().Contains(nameForSearch));
         }
 
         public async Task<bool> CheckPasswordAsync(User user, string password)
@@ -82,10 +83,7 @@ namespace ModernSlavery.Infrastructure.Data
                 {
                     user.LoginAttempts = 0;
 
-                    if (user.HashingAlgorithm != HashingAlgorithm.PBKDF2)
-                    {
-                        UpdateUserPasswordUsingPBKDF2(user, password);
-                    }
+                    if (user.HashingAlgorithm != HashingAlgorithm.PBKDF2) UpdateUserPasswordUsingPBKDF2(user, password);
 
                     return true;
                 }
@@ -102,25 +100,17 @@ namespace ModernSlavery.Infrastructure.Data
 
         public async Task UpdateEmailAsync(User userToUpdate, string newEmailAddress)
         {
-            if (userToUpdate is null)
-            {
-                throw new ArgumentNullException(nameof(userToUpdate));
-            }
+            if (userToUpdate is null) throw new ArgumentNullException(nameof(userToUpdate));
 
-            if (newEmailAddress.IsNullOrWhiteSpace())
-            {
-                throw new ArgumentNullException(nameof(newEmailAddress));
-            }
+            if (newEmailAddress.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(newEmailAddress));
 
             if (userToUpdate.Status != UserStatuses.Active)
-            {
                 throw new ArgumentException($"Can only update emails for active users. UserId={userToUpdate.UserId}");
-            }
 
-            string oldEmailAddress = userToUpdate.EmailAddress;
+            var oldEmailAddress = userToUpdate.EmailAddress;
 
             // update email
-            DateTime now = VirtualDateTime.Now;
+            var now = VirtualDateTime.Now;
             userToUpdate.EmailAddress = newEmailAddress;
             userToUpdate.EmailVerifiedDate = now;
             userToUpdate.Modified = now;
@@ -129,25 +119,19 @@ namespace ModernSlavery.Infrastructure.Data
             await DataRepository.SaveChangesAsync();
 
             // log email change
-            await UserRecordLog.LogEmailChangedAsync(oldEmailAddress, newEmailAddress, userToUpdate, userToUpdate.EmailAddress);
+            await UserRecordLog.LogEmailChangedAsync(oldEmailAddress, newEmailAddress, userToUpdate,
+                userToUpdate.EmailAddress);
         }
 
         public async Task UpdatePasswordAsync(User userToUpdate, string newPassword)
         {
-            if (userToUpdate is null)
-            {
-                throw new ArgumentNullException(nameof(userToUpdate));
-            }
+            if (userToUpdate is null) throw new ArgumentNullException(nameof(userToUpdate));
 
-            if (newPassword.IsNullOrWhiteSpace())
-            {
-                throw new ArgumentNullException(nameof(newPassword));
-            }
+            if (newPassword.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(newPassword));
 
             if (userToUpdate.Status != UserStatuses.Active)
-            {
-                throw new ArgumentException($"Can only update passwords for active users. UserId={userToUpdate.UserId}");
-            }
+                throw new ArgumentException(
+                    $"Can only update passwords for active users. UserId={userToUpdate.UserId}");
 
             UpdateUserPasswordUsingPBKDF2(userToUpdate, newPassword);
 
@@ -162,27 +146,16 @@ namespace ModernSlavery.Infrastructure.Data
 
         public async Task<bool> UpdateDetailsAsync(User userToUpdate, UpdateDetailsModel changeDetails)
         {
-            if (userToUpdate is null)
-            {
-                throw new ArgumentNullException(nameof(userToUpdate));
-            }
+            if (userToUpdate is null) throw new ArgumentNullException(nameof(userToUpdate));
 
-            if (changeDetails is null)
-            {
-                throw new ArgumentNullException(nameof(changeDetails));
-            }
+            if (changeDetails is null) throw new ArgumentNullException(nameof(changeDetails));
 
             if (userToUpdate.Status != UserStatuses.Active)
-            {
                 throw new ArgumentException($"Can only update details for active users. UserId={userToUpdate.UserId}");
-            }
 
             // check we have changes
             var originalDetails = AutoMapper.Map<UpdateDetailsModel>(userToUpdate);
-            if (originalDetails.Equals(changeDetails))
-            {
-                return false;
-            }
+            if (originalDetails.Equals(changeDetails)) return false;
 
             // update current user with new details
             userToUpdate.Firstname = changeDetails.FirstName;
@@ -200,7 +173,8 @@ namespace ModernSlavery.Infrastructure.Data
             await DataRepository.SaveChangesAsync();
 
             // log details changed
-            await UserRecordLog.LogDetailsChangedAsync(originalDetails, changeDetails, userToUpdate, userToUpdate.EmailAddress);
+            await UserRecordLog.LogDetailsChangedAsync(originalDetails, changeDetails, userToUpdate,
+                userToUpdate.EmailAddress);
 
             // success
             return true;
@@ -208,15 +182,10 @@ namespace ModernSlavery.Infrastructure.Data
 
         public async Task RetireUserAsync(User userToRetire)
         {
-            if (userToRetire is null)
-            {
-                throw new ArgumentNullException(nameof(userToRetire));
-            }
+            if (userToRetire is null) throw new ArgumentNullException(nameof(userToRetire));
 
             if (userToRetire.Status != UserStatuses.Active)
-            {
                 throw new ArgumentException($"Can only retire active users. UserId={userToRetire.UserId}");
-            }
 
             // update status
             userToRetire.SetStatus(UserStatuses.Retired, userToRetire, "User retired");
@@ -239,6 +208,18 @@ namespace ModernSlavery.Infrastructure.Data
             throw new NotImplementedException();
         }
 
+        public void UpdateUserPasswordUsingPBKDF2(User user, string password)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            var salt = Crypto.GetSalt();
+            user.Salt = Convert.ToBase64String(salt);
+            user.PasswordHash = Crypto.GetPBKDF2(password, salt);
+            user.HashingAlgorithm = HashingAlgorithm.PBKDF2;
+
+            DataRepository.SaveChangesAsync().Wait();
+        }
+
         private bool CheckPasswordBasedOnHashingAlgorithm(User user, string password)
         {
             switch (user.HashingAlgorithm)
@@ -251,28 +232,15 @@ namespace ModernSlavery.Infrastructure.Data
                 case HashingAlgorithm.PBKDF2:
                     return user.PasswordHash == Crypto.GetPBKDF2(password, Convert.FromBase64String(user.Salt));
                 case HashingAlgorithm.PBKDF2AppliedToSHA512:
-                    return user.PasswordHash == Crypto.GetPBKDF2(Crypto.GetSHA512Checksum(password), Convert.FromBase64String(user.Salt));
+                    return user.PasswordHash == Crypto.GetPBKDF2(Crypto.GetSHA512Checksum(password),
+                        Convert.FromBase64String(user.Salt));
                 case HashingAlgorithm.Unknown:
                     break;
                 default:
                     throw new InvalidEnumArgumentException($"Invalid enum argument: {user.HashingAlgorithm}");
             }
+
             throw new InvalidOperationException($"Hashing algorithm should not be {user.HashingAlgorithm}");
-        }
-
-        public void UpdateUserPasswordUsingPBKDF2(User user, string password)
-        {
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            byte[] salt = Crypto.GetSalt();
-            user.Salt = Convert.ToBase64String(salt);
-            user.PasswordHash = Crypto.GetPBKDF2(password, salt);
-            user.HashingAlgorithm = HashingAlgorithm.PBKDF2;
-
-            DataRepository.SaveChangesAsync().Wait();
         }
 
         #region Dependencies
@@ -302,7 +270,5 @@ namespace ModernSlavery.Infrastructure.Data
         }
 
         #endregion
-
     }
-
 }

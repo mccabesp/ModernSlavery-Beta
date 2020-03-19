@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.ApplicationInsights;
+﻿using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.Extensibility.Implementation;
 
@@ -23,8 +20,9 @@ namespace ModernSlavery.Infrastructure.Telemetry
                 //if (!Debugger.IsAttached
                 TelemetryDebugWriter.IsTracingDisabled = false;
 
-                TelemetryProcessorChainBuilder builder = TelemetryConfiguration.Active.TelemetryProcessorChainBuilder;
-                builder.Use(next => new DependencyTelemetryFilter(next, "file.core.windows.net", "HEAD /common/", "404"));
+                var builder = TelemetryConfiguration.Active.TelemetryProcessorChainBuilder;
+                builder.Use(
+                    next => new DependencyTelemetryFilter(next, "file.core.windows.net", "HEAD /common/", "404"));
                 builder.Build();
             }
         }

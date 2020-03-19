@@ -2,7 +2,6 @@
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Logging;
 
@@ -10,21 +9,15 @@ namespace ModernSlavery.Infrastructure.Queue
 {
     public static class AzureQueuesExtensions
     {
-
         public static void RegisterAzureQueue(this ContainerBuilder builder,
             string azureConnectionString,
             string queueName,
             bool supportLargeMessages = true)
         {
             if (string.IsNullOrWhiteSpace(azureConnectionString))
-            {
                 throw new ArgumentNullException(nameof(azureConnectionString));
-            }
 
-            if (string.IsNullOrWhiteSpace(queueName))
-            {
-                throw new ArgumentNullException(nameof(queueName));
-            }
+            if (string.IsNullOrWhiteSpace(queueName)) throw new ArgumentNullException(nameof(queueName));
 
             builder.Register(
                     ctx =>
@@ -37,22 +30,23 @@ namespace ModernSlavery.Infrastructure.Queue
 
         public static void RegisterLogRecord(this ContainerBuilder builder, string fileName)
         {
-            if (string.IsNullOrWhiteSpace(fileName))throw new ArgumentNullException(nameof(fileName));
+            if (string.IsNullOrWhiteSpace(fileName)) throw new ArgumentNullException(nameof(fileName));
 
-            string applicationName = AppDomain.CurrentDomain.FriendlyName;
+            var applicationName = AppDomain.CurrentDomain.FriendlyName;
 
             builder.RegisterType<LogRecordLogger>()
                 .Keyed<ILogRecordLogger>(fileName)
                 .SingleInstance()
                 .WithParameter("applicationName", AppDomain.CurrentDomain.FriendlyName)
-                .WithParameter("fileName",fileName);
+                .WithParameter("fileName", fileName);
         }
 
         /// <summary>
         ///     Adds the LogEvent queue as logging provider to the application
         /// </summary>
         /// <param name="factory"></param>
-        public static ILoggerFactory UseLogEventQueueLogger(this ILoggerFactory factory, IServiceProvider serviceProvider)
+        public static ILoggerFactory UseLogEventQueueLogger(this ILoggerFactory factory,
+            IServiceProvider serviceProvider)
         {
             // Resolve filter options
             var filterOptions = serviceProvider.GetService<LoggerFilterOptions>();
@@ -62,7 +56,8 @@ namespace ModernSlavery.Infrastructure.Queue
             var logEventQueue = lifetimeScope.Resolve<LogEventQueue>();
 
             // Create the logging provider
-            factory.AddProvider(new LogEventLoggerProvider(logEventQueue, AppDomain.CurrentDomain.FriendlyName, filterOptions));
+            factory.AddProvider(new LogEventLoggerProvider(logEventQueue, AppDomain.CurrentDomain.FriendlyName,
+                filterOptions));
 
             return factory;
         }
@@ -74,7 +69,7 @@ namespace ModernSlavery.Infrastructure.Queue
         public static ILoggingBuilder AddAzureQueueLogger(this ILoggingBuilder builder)
         {
             // Build the current service provider
-            ServiceProvider serviceProvider = builder.Services.BuildServiceProvider();
+            var serviceProvider = builder.Services.BuildServiceProvider();
 
             // Resolve filter options
             var filterOptions = serviceProvider.GetService<LoggerFilterOptions>();
@@ -84,8 +79,8 @@ namespace ModernSlavery.Infrastructure.Queue
             var logEventQueue = lifetimeScope.Resolve<LogEventQueue>();
 
             // Register the logging provider
-            return builder.AddProvider(new LogEventLoggerProvider(logEventQueue, AppDomain.CurrentDomain.FriendlyName, filterOptions));
+            return builder.AddProvider(new LogEventLoggerProvider(logEventQueue, AppDomain.CurrentDomain.FriendlyName,
+                filterOptions));
         }
-
     }
 }

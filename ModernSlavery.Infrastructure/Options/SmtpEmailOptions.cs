@@ -3,9 +3,8 @@
 namespace ModernSlavery.Infrastructure.Message
 {
     [Options("Email:Providers:Smtp")]
-    public class SmtpEmailOptions:IOptions
+    public class SmtpEmailOptions : IOptions
     {
-
         public bool? Enabled { get; set; } = true;
 
         public string SenderName { get; set; }
@@ -31,7 +30,5 @@ namespace ModernSlavery.Infrastructure.Message
         public string Username2 { get; set; }
 
         public string Password2 { get; set; }
-
     }
-
 }

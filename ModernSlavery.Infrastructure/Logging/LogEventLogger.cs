@@ -7,7 +7,6 @@ namespace ModernSlavery.Infrastructure.Logging
 {
     public class LogEventLogger : ILogger
     {
-
         private readonly string _category;
         private readonly Func<string, string, LogLevel, bool> _filter;
         private readonly LogLevel _minLevel;
@@ -19,10 +18,7 @@ namespace ModernSlavery.Infrastructure.Logging
             Func<string, string, LogLevel, bool> filter)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
-            if (string.IsNullOrWhiteSpace(category))
-            {
-                throw new ArgumentNullException(nameof(category));
-            }
+            if (string.IsNullOrWhiteSpace(category)) throw new ArgumentNullException(nameof(category));
 
             _category = category;
             _minLevel = minLevel;
@@ -46,21 +42,21 @@ namespace ModernSlavery.Infrastructure.Logging
             Func<TState, Exception, string> formatter)
         {
             //Check logging for this level is enabled
-            if (!IsEnabled(logLevel))
-            {
-                return;
-            }
+            if (!IsEnabled(logLevel)) return;
 
             var entry = new LogEntryModel {Message = formatter(state, exception)};
 
             if (exception != null)
             {
                 entry.Message = Lists.ToDelimitedString(Environment.NewLine, null, exception.Message, entry.Message);
-                entry.Stacktrace = string.IsNullOrWhiteSpace(exception.StackTrace) ? Environment.StackTrace : exception.StackTrace;
-                Exception innerException = exception.GetInnermostException();
+                entry.Stacktrace = string.IsNullOrWhiteSpace(exception.StackTrace)
+                    ? Environment.StackTrace
+                    : exception.StackTrace;
+                var innerException = exception.GetInnermostException();
                 if (innerException != null)
                 {
-                    entry.Stacktrace = Lists.ToDelimitedString(Environment.NewLine, null, innerException.StackTrace, entry.Stacktrace);
+                    entry.Stacktrace = Lists.ToDelimitedString(Environment.NewLine, null, innerException.StackTrace,
+                        entry.Stacktrace);
                     entry.Details = Lists.ToDelimitedString(
                         Environment.NewLine,
                         null,
@@ -69,13 +65,9 @@ namespace ModernSlavery.Infrastructure.Logging
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(_category))
-            {
-                entry.Source = _category;
-            }
+            if (!string.IsNullOrWhiteSpace(_category)) entry.Source = _category;
 
             await _provider.WriteAsync(logLevel, entry);
         }
-
     }
 }

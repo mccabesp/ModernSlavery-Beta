@@ -3,7 +3,7 @@
 namespace ModernSlavery.Infrastructure.Options
 {
     [Options("Security")]
-    public class SecurityOptions:IOptions
+    public class SecurityOptions : IOptions
     {
     }
 }

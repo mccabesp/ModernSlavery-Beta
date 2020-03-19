@@ -13,16 +13,16 @@ using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Data
 {
-    public class ShortCodesRepository: IShortCodesRepository
+    public class ShortCodesRepository : IShortCodesRepository
     {
+        private readonly IFileRepository FileRepository;
+        private readonly GlobalOptions GlobalOptions;
+
         public ShortCodesRepository(IFileRepository fileRepository, GlobalOptions globalOptions)
         {
             FileRepository = fileRepository ?? throw new ArgumentNullException(nameof(fileRepository));
             GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
         }
-
-        private readonly IFileRepository FileRepository;
-        private GlobalOptions GlobalOptions;
 
         #region Properties
 
@@ -42,11 +42,8 @@ namespace ModernSlavery.Infrastructure.Data
             {
                 if (_ShortCodes == null || _ShortCodesLastLoaded.AddMinutes(5) < VirtualDateTime.Now)
                 {
-                    List<ShortCodeModel> orgs = await LoadIfNewerAsync();
-                    if (orgs != null)
-                    {
-                        _ShortCodes = orgs;
-                    }
+                    var orgs = await LoadIfNewerAsync();
+                    if (orgs != null) _ShortCodes = orgs;
 
                     _ShortCodesLastLoaded = VirtualDateTime.Now;
                 }
@@ -81,34 +78,23 @@ namespace ModernSlavery.Infrastructure.Data
 
         public async Task<List<ShortCodeModel>> LoadIfNewerAsync()
         {
-            string shortCodesPath = Path.Combine(GlobalOptions.DataPath, Filenames.ShortCodes);
-            bool fileExists = await FileRepository.GetFileExistsAsync(shortCodesPath);
+            var shortCodesPath = Path.Combine(GlobalOptions.DataPath, Filenames.ShortCodes);
+            var fileExists = await FileRepository.GetFileExistsAsync(shortCodesPath);
 
-            if (!fileExists)
-            {
-                return null;
-            }
+            if (!fileExists) return null;
 
-            DateTime newloadTime = fileExists ? await FileRepository.GetLastWriteTimeAsync(shortCodesPath) : DateTime.MinValue;
+            var newloadTime =
+                fileExists ? await FileRepository.GetLastWriteTimeAsync(shortCodesPath) : DateTime.MinValue;
 
-            if (_ShortCodesLoaded > DateTime.MinValue && newloadTime <= _ShortCodesLoaded)
-            {
-                return null;
-            }
+            if (_ShortCodesLoaded > DateTime.MinValue && newloadTime <= _ShortCodesLoaded) return null;
 
-            string orgs = fileExists ? await FileRepository.ReadAsync(shortCodesPath) : null;
-            if (string.IsNullOrWhiteSpace(orgs))
-            {
-                throw new Exception($"No content not load '{shortCodesPath}'");
-            }
+            var orgs = fileExists ? await FileRepository.ReadAsync(shortCodesPath) : null;
+            if (string.IsNullOrWhiteSpace(orgs)) throw new Exception($"No content not load '{shortCodesPath}'");
 
             _ShortCodesLoaded = newloadTime;
 
-            List<ShortCodeModel> list = await FileRepository.ReadCSVAsync<ShortCodeModel>(shortCodesPath);
-            if (!list.Any())
-            {
-                throw new Exception($"No records found in '{shortCodesPath}'");
-            }
+            var list = await FileRepository.ReadCSVAsync<ShortCodeModel>(shortCodesPath);
+            if (!list.Any()) throw new Exception($"No records found in '{shortCodesPath}'");
 
             list = list.OrderBy(c => c.ShortCode).ToList();
 
@@ -116,6 +102,5 @@ namespace ModernSlavery.Infrastructure.Data
         }
 
         #endregion
-
     }
 }

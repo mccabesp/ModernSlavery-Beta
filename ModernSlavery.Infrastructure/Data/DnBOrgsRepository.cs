@@ -5,59 +5,43 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
-using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.BusinessLogic.Classes
 {
-    public class DnBOrgsRepository: IDnBOrgsRepository
+    public class DnBOrgsRepository : IDnBOrgsRepository
     {
-        public DnBOrgsRepository([KeyFilter(QueueNames.ExecuteWebJob)]IQueue executeWebjobQueue, IFileRepository fileRepository,string dataPath)
+        private readonly string DataPath;
+
+        private readonly IQueue ExecuteWebjobQueue;
+        private readonly IFileRepository FileRepository;
+
+        public DnBOrgsRepository([KeyFilter(QueueNames.ExecuteWebJob)] IQueue executeWebjobQueue,
+            IFileRepository fileRepository, string dataPath)
         {
             ExecuteWebjobQueue = executeWebjobQueue;
             FileRepository = fileRepository;
             DataPath = dataPath;
         }
 
-        private readonly IQueue ExecuteWebjobQueue;
-        private readonly IFileRepository FileRepository;
-        private readonly string DataPath;
-
-
-        #region Properties
-        private DateTime _DnBOrgsLoaded;
-        internal DateTime _DnBOrgsLastLoaded;
-        private List<DnBOrgsModel> _DnBOrgs;
-        private readonly SemaphoreSlim _DnBOrgsLock = new SemaphoreSlim(1, 1);
-        #endregion
-
         public async Task UploadAsync(List<DnBOrgsModel> newOrgs)
         {
-            if (newOrgs == null || newOrgs.Count == 0)
-            {
-                throw new ArgumentNullException(nameof(newOrgs));
-            }
+            if (newOrgs == null || newOrgs.Count == 0) throw new ArgumentNullException(nameof(newOrgs));
 
             //Check new file
-            int count = newOrgs.Count(o => string.IsNullOrWhiteSpace(o.DUNSNumber));
+            var count = newOrgs.Count(o => string.IsNullOrWhiteSpace(o.DUNSNumber));
             if (count > 0)
-            {
                 throw new Exception($"There are {count} organisations in the D&B file without a DUNS number");
-            }
 
-            List<DnBOrgsModel> allDnBOrgs = await GetAllDnBOrgsAsync();
+            var allDnBOrgs = await GetAllDnBOrgsAsync();
             //Check for no organisation name
             count = allDnBOrgs == null ? 0 : allDnBOrgs.Count(o => string.IsNullOrWhiteSpace(o.OrganisationName));
-            if (count > 0)
-            {
-                throw new Exception($"There are {count} organisations with no OrganisationName detected.");
-            }
+            if (count > 0) throw new Exception($"There are {count} organisations with no OrganisationName detected.");
 
             //Check for no addresses
             count = allDnBOrgs == null ? 0 : allDnBOrgs.Count(o => !o.IsValidAddress());
@@ -70,72 +54,53 @@ namespace ModernSlavery.BusinessLogic.Classes
 
             //Check for duplicate DUNS
             count = newOrgs.Count() - newOrgs.Select(o => o.DUNSNumber).Distinct().Count();
-            if (count > 0)
-            {
-                throw new Exception($"There are {count} duplicate DUNS numbers detected");
-            }
+            if (count > 0) throw new Exception($"There are {count} duplicate DUNS numbers detected");
 
             //Check for duplicate employer references
-            IEnumerable<string> employerReferences =
+            var employerReferences =
                 newOrgs.Where(o => !string.IsNullOrWhiteSpace(o.EmployerReference)).Select(o => o.EmployerReference);
             count = employerReferences.Count() - employerReferences.Distinct().Count();
-            if (count > 0)
-            {
-                throw new Exception($"There are {count} duplicate EmployerReferences detected");
-            }
+            if (count > 0) throw new Exception($"There are {count} duplicate EmployerReferences detected");
 
             //Fix Company Number
             Parallel.ForEach(
                 newOrgs.Where(o => !string.IsNullOrWhiteSpace(o.CompanyNumber)),
-                dnbOrg => {
-                    if (dnbOrg.CompanyNumber.IsNumber())
-                    {
-                        dnbOrg.CompanyNumber = dnbOrg.CompanyNumber.PadLeft(8, '0');
-                    }
+                dnbOrg =>
+                {
+                    if (dnbOrg.CompanyNumber.IsNumber()) dnbOrg.CompanyNumber = dnbOrg.CompanyNumber.PadLeft(8, '0');
                 });
 
             //Check for duplicate company numbers
-            IEnumerable<string> companyNumbers =
+            var companyNumbers =
                 newOrgs.Where(o => !string.IsNullOrWhiteSpace(o.CompanyNumber)).Select(o => o.CompanyNumber);
             count = companyNumbers.Count() - companyNumbers.Distinct().Count();
-            if (count > 0)
-            {
-                throw new Exception($"There are {count} duplicate CompanyNumbers detected");
-            }
+            if (count > 0) throw new Exception($"There are {count} duplicate CompanyNumbers detected");
 
             //Copy all old settings to new 
             if (allDnBOrgs != null)
-            {
                 Parallel.ForEach(
                     newOrgs,
-                    newOrg => {
-                        DnBOrgsModel oldOrg = allDnBOrgs.FirstOrDefault(o => o.DUNSNumber == newOrg.DUNSNumber);
+                    newOrg =>
+                    {
+                        var oldOrg = allDnBOrgs.FirstOrDefault(o => o.DUNSNumber == newOrg.DUNSNumber);
                         //Make sure missing old orgs are copied accross
-                        if (oldOrg == null)
-                        {
-                            return;
-                        }
+                        if (oldOrg == null) return;
 
-                        if (string.IsNullOrWhiteSpace(newOrg.EmployerReference) && !string.IsNullOrWhiteSpace(oldOrg.EmployerReference))
-                        {
+                        if (string.IsNullOrWhiteSpace(newOrg.EmployerReference) &&
+                            !string.IsNullOrWhiteSpace(oldOrg.EmployerReference))
                             newOrg.EmployerReference = oldOrg.EmployerReference;
-                        }
                     });
-            }
         }
 
         public async Task ImportAsync(IDataRepository dataRepository, User currentUser)
         {
             await ClearAllDnBOrgsAsync(); //Must clear first 
 
-            List<DnBOrgsModel> allDnBOrgs = await GetAllDnBOrgsAsync();
+            var allDnBOrgs = await GetAllDnBOrgsAsync();
 
             //Check for duplicate DUNS
-            int count = allDnBOrgs.Count() - allDnBOrgs.Select(o => o.DUNSNumber).Distinct().Count();
-            if (count > 0)
-            {
-                throw new Exception($"There are {count} duplicate DUNS numbers detected");
-            }
+            var count = allDnBOrgs.Count() - allDnBOrgs.Select(o => o.DUNSNumber).Distinct().Count();
+            if (count > 0) throw new Exception($"There are {count} duplicate DUNS numbers detected");
 
             //Check for no addresses
             count = allDnBOrgs.Count(o => !o.IsValidAddress());
@@ -148,32 +113,24 @@ namespace ModernSlavery.BusinessLogic.Classes
 
 
             //Check for duplicate employer references
-            IEnumerable<string> employerReferences =
+            var employerReferences =
                 allDnBOrgs.Where(o => !string.IsNullOrWhiteSpace(o.EmployerReference)).Select(o => o.EmployerReference);
             count = employerReferences.Count() - employerReferences.Distinct().Count();
-            if (count > 0)
-            {
-                throw new Exception($"There are {count} duplicate EmployerReferences detected");
-            }
+            if (count > 0) throw new Exception($"There are {count} duplicate EmployerReferences detected");
 
             //Fix Company Number
             Parallel.ForEach(
                 allDnBOrgs.Where(o => !string.IsNullOrWhiteSpace(o.CompanyNumber)),
-                dnbOrg => {
-                    if (dnbOrg.CompanyNumber.IsNumber())
-                    {
-                        dnbOrg.CompanyNumber = dnbOrg.CompanyNumber.PadLeft(8, '0');
-                    }
+                dnbOrg =>
+                {
+                    if (dnbOrg.CompanyNumber.IsNumber()) dnbOrg.CompanyNumber = dnbOrg.CompanyNumber.PadLeft(8, '0');
                 });
 
             //Check for duplicate company numbers
-            IEnumerable<string> companyNumbers =
+            var companyNumbers =
                 allDnBOrgs.Where(o => !string.IsNullOrWhiteSpace(o.CompanyNumber)).Select(o => o.CompanyNumber);
             count = companyNumbers.Count() - companyNumbers.Distinct().Count();
-            if (count > 0)
-            {
-                throw new Exception($"There are {count} duplicate CompanyNumbers detected");
-            }
+            if (count > 0) throw new Exception($"There are {count} duplicate CompanyNumbers detected");
 
             //Check companies have been updated
             count = allDnBOrgs.Count(
@@ -190,16 +147,15 @@ namespace ModernSlavery.BusinessLogic.Classes
             //Count records requiring import
             count = allDnBOrgs.Count(
                 o => !o.GetIsDissolved()
-                     && (o.ImportedDate == null || string.IsNullOrWhiteSpace(o.CompanyNumber) || o.ImportedDate < o.StatusCheckedDate));
-            if (count == 0)
-            {
-                throw new Exception("There are no records requiring import");
-            }
+                     && (o.ImportedDate == null || string.IsNullOrWhiteSpace(o.CompanyNumber) ||
+                         o.ImportedDate < o.StatusCheckedDate));
+            if (count == 0) throw new Exception("There are no records requiring import");
 
             //Execute the webjob
             await ExecuteWebjobQueue.AddMessageAsync(
                 new QueueWrapper("command=DnBImport&currentUserId=" + currentUser.UserId));
         }
+
         public async Task<List<DnBOrgsModel>> GetAllDnBOrgsAsync()
         {
             //Asynchronously wait to enter the Semaphore. If no-one has been granted access to the Semaphore, code execution will proceed, otherwise this thread waits here until the semaphore is released 
@@ -208,11 +164,8 @@ namespace ModernSlavery.BusinessLogic.Classes
             {
                 if (_DnBOrgs == null || _DnBOrgsLastLoaded.AddMinutes(5) < VirtualDateTime.Now)
                 {
-                    List<DnBOrgsModel> orgs = await LoadIfNewerAsync();
-                    if (orgs != null)
-                    {
-                        _DnBOrgs = orgs;
-                    }
+                    var orgs = await LoadIfNewerAsync();
+                    if (orgs != null) _DnBOrgs = orgs;
 
                     _DnBOrgsLastLoaded = VirtualDateTime.Now;
                 }
@@ -247,58 +200,50 @@ namespace ModernSlavery.BusinessLogic.Classes
 
         public async Task<List<DnBOrgsModel>> LoadIfNewerAsync()
         {
-            string dnbOrgsPath = Path.Combine(DataPath, Filenames.DnBOrganisations());
-            bool fileExists = await FileRepository.GetFileExistsAsync(dnbOrgsPath);
+            var dnbOrgsPath = Path.Combine(DataPath, Filenames.DnBOrganisations());
+            var fileExists = await FileRepository.GetFileExistsAsync(dnbOrgsPath);
 
             //Copy the previous years if no current year
             if (!fileExists)
             {
-                string dnbOrgsPathPrevious = Path.Combine(DataPath, Filenames.PreviousDnBOrganisations());
+                var dnbOrgsPathPrevious = Path.Combine(DataPath, Filenames.PreviousDnBOrganisations());
                 if (await FileRepository.GetFileExistsAsync(dnbOrgsPathPrevious))
                 {
-                    await FileRepository.WriteAsync(dnbOrgsPath, await FileRepository.ReadBytesAsync(dnbOrgsPathPrevious));
+                    await FileRepository.WriteAsync(dnbOrgsPath,
+                        await FileRepository.ReadBytesAsync(dnbOrgsPathPrevious));
                     fileExists = await FileRepository.GetFileExistsAsync(dnbOrgsPath);
                 }
             }
 
-            if (!fileExists)
-            {
-                return null;
-            }
+            if (!fileExists) return null;
 
-            DateTime newloadTime = fileExists ? await FileRepository.GetLastWriteTimeAsync(dnbOrgsPath) : DateTime.MinValue;
+            var newloadTime = fileExists ? await FileRepository.GetLastWriteTimeAsync(dnbOrgsPath) : DateTime.MinValue;
 
-            if (_DnBOrgsLoaded > DateTime.MinValue && newloadTime <= _DnBOrgsLoaded)
-            {
-                return null;
-            }
+            if (_DnBOrgsLoaded > DateTime.MinValue && newloadTime <= _DnBOrgsLoaded) return null;
 
-            string orgs = fileExists ? await FileRepository.ReadAsync(dnbOrgsPath) : null;
-            if (string.IsNullOrWhiteSpace(orgs))
-            {
-                throw new Exception($"No content not load '{dnbOrgsPath}'");
-            }
+            var orgs = fileExists ? await FileRepository.ReadAsync(dnbOrgsPath) : null;
+            if (string.IsNullOrWhiteSpace(orgs)) throw new Exception($"No content not load '{dnbOrgsPath}'");
 
             _DnBOrgsLoaded = newloadTime;
 
-            List<DnBOrgsModel> list = await FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
-            if (list.Count < 1)
-            {
-                throw new Exception($"No records found in '{dnbOrgsPath}'");
-            }
+            var list = await FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath);
+            if (list.Count < 1) throw new Exception($"No records found in '{dnbOrgsPath}'");
 
-            foreach (DnBOrgsModel org in list.OrderBy(o => o.OrganisationName))
-            {
+            foreach (var org in list.OrderBy(o => o.OrganisationName))
                 if (org.CompanyNumber.IsNumber())
-                {
                     org.CompanyNumber = org.CompanyNumber.PadLeft(8, '0');
-                }
-            }
 
             return list;
         }
 
 
-    }
+        #region Properties
 
+        private DateTime _DnBOrgsLoaded;
+        internal DateTime _DnBOrgsLastLoaded;
+        private List<DnBOrgsModel> _DnBOrgs;
+        private readonly SemaphoreSlim _DnBOrgsLock = new SemaphoreSlim(1, 1);
+
+        #endregion
+    }
 }

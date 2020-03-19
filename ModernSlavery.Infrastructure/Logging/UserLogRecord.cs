@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
@@ -16,21 +15,19 @@ namespace ModernSlavery.Infrastructure.Logging
 {
     public class UserLogRecord : LogRecordLogger, IUserLogRecord
     {
-
         public UserLogRecord(
             GlobalOptions globalOptions,
             LogRecordQueue queue)
-            : base(globalOptions,queue, AppDomain.CurrentDomain.FriendlyName, Filenames.UserLog) { }
+            : base(globalOptions, queue, AppDomain.CurrentDomain.FriendlyName, Filenames.UserLog)
+        {
+        }
 
         public async Task LogEmailChangedAsync(string oldEmailAddress,
             string newEmailAddress,
             User userToUpdate,
             string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix))
-            {
-                return;
-            }
+            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(
@@ -45,10 +42,7 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task LogPasswordChangedAsync(User userToUpdate, string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix))
-            {
-                return;
-            }
+            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(
@@ -66,10 +60,7 @@ namespace ModernSlavery.Infrastructure.Logging
             User userToUpdate,
             string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix))
-            {
-                return;
-            }
+            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(
@@ -84,10 +75,7 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task LogUserRetiredAsync(User retiredUser, string actionByEmailAddress)
         {
-            if (retiredUser.EmailAddress.StartsWithI(GlobalOptions.TestPrefix))
-            {
-                return;
-            }
+            if (retiredUser.EmailAddress.StartsWithI(GlobalOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(
@@ -99,7 +87,5 @@ namespace ModernSlavery.Infrastructure.Logging
                     UserStatuses.Retired.ToString(),
                     actionByEmailAddress));
         }
-
     }
-
 }

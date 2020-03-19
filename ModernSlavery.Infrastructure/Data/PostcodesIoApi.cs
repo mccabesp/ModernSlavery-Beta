@@ -7,7 +7,6 @@ namespace ModernSlavery.Infrastructure
 {
     public class PostcodesIoApi : IPostcodeChecker
     {
-
         public async Task<bool> IsValidPostcode(string postcode)
         {
             try
@@ -16,13 +15,13 @@ namespace ModernSlavery.Infrastructure
                 {
                     httpClient.BaseAddress = new Uri("https://api.postcodes.io");
 
-                    string path = $"/postcodes/{postcode}/validate";
+                    var path = $"/postcodes/{postcode}/validate";
 
-                    HttpResponseMessage response = await httpClient.GetAsync(path);
+                    var response = await httpClient.GetAsync(path);
 
                     if (response.IsSuccessStatusCode)
                     {
-                        string bodyString = await response.Content.ReadAsStringAsync();
+                        var bodyString = await response.Content.ReadAsStringAsync();
                         var body = JsonConvert.DeserializeObject<PostcodesIoApiValidateResponse>(bodyString);
                         return body.result;
                     }
@@ -35,13 +34,10 @@ namespace ModernSlavery.Infrastructure
                 return false;
             }
         }
-
     }
 
     internal class PostcodesIoApiValidateResponse
     {
-
         public bool result { get; set; }
-
     }
 }

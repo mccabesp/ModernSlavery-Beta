@@ -14,15 +14,18 @@ namespace ModernSlavery.Infrastructure.File
 {
     public class SystemFileRepository : IFileRepository
     {
-        private readonly StorageOptions _storageOptions;
         private readonly DirectoryInfo _rootDir;
+        private readonly StorageOptions _storageOptions;
 
         public SystemFileRepository(StorageOptions storageOptions)
         {
             _storageOptions = storageOptions ?? throw new ArgumentNullException(nameof(storageOptions));
-            if (string.IsNullOrWhiteSpace(storageOptions.LocalStorageRoot)) throw new ArgumentNullException(nameof(storageOptions.LocalStorageRoot));
+            if (string.IsNullOrWhiteSpace(storageOptions.LocalStorageRoot))
+                throw new ArgumentNullException(nameof(storageOptions.LocalStorageRoot));
 
-            var rootPath = string.IsNullOrWhiteSpace(storageOptions.LocalStorageRoot) ? AppDomain.CurrentDomain.BaseDirectory : FileSystem.ExpandLocalPath(storageOptions.LocalStorageRoot);
+            var rootPath = string.IsNullOrWhiteSpace(storageOptions.LocalStorageRoot)
+                ? AppDomain.CurrentDomain.BaseDirectory
+                : FileSystem.ExpandLocalPath(storageOptions.LocalStorageRoot);
             _rootDir = new DirectoryInfo(storageOptions.LocalStorageRoot);
         }
 
@@ -70,27 +73,23 @@ namespace ModernSlavery.Infrastructure.File
             await Task.Run(() => CopyFile(sourceFilePath, destinationFilePath, overwrite));
         }
 
-        public async Task<IEnumerable<string>> GetFilesAsync(string directoryPath, string searchPattern = null, bool recursive = false)
+        public async Task<IEnumerable<string>> GetFilesAsync(string directoryPath, string searchPattern = null,
+            bool recursive = false)
         {
             return await Task.Run(() => GetFiles(directoryPath, searchPattern, recursive));
         }
 
-        public async Task<bool> GetAnyFileExistsAsync(string directoryPath, string searchPattern = null, bool recursive = false)
+        public async Task<bool> GetAnyFileExistsAsync(string directoryPath, string searchPattern = null,
+            bool recursive = false)
         {
             return await Task.Run(() => GetAnyFileExists(directoryPath, searchPattern, recursive));
         }
 
         public async Task<string> ReadAsync(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             return await Task.Run(() => System.IO.File.ReadAllText(filePath));
         }
@@ -107,7 +106,7 @@ namespace ModernSlavery.Infrastructure.File
 
         public async Task<DataTable> ReadDataTableAsync(string filePath)
         {
-            IEnumerable<string> fileContent = await GetFilesAsync(filePath);
+            var fileContent = await GetFilesAsync(filePath);
             return fileContent.FirstOrDefault()?.ToDataTable();
         }
 
@@ -134,15 +133,9 @@ namespace ModernSlavery.Infrastructure.File
 
         public string GetFullPath(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             return filePath;
         }
@@ -159,49 +152,34 @@ namespace ModernSlavery.Infrastructure.File
 
         public Task SetMetaDataAsync(string filePath, string key, string value)
         {
-            IDictionary<string, string> metaData = LoadMetaData(filePath);
+            var metaData = LoadMetaData(filePath);
 
-            if (metaData.ContainsKey(key) && metaData[key] == value)
-            {
-                return Task.CompletedTask;
-            }
+            if (metaData.ContainsKey(key) && metaData[key] == value) return Task.CompletedTask;
 
             if (!string.IsNullOrWhiteSpace(value))
-            {
                 metaData[key] = value;
-            }
-            else if (metaData.ContainsKey(key))
-            {
-                metaData.Remove(key);
-            }
+            else if (metaData.ContainsKey(key)) metaData.Remove(key);
 
             SaveMetaData(filePath, metaData);
 
             return Task.CompletedTask;
         }
 
-        private IEnumerable<string> GetDirectories(string directoryPath, string searchPattern = null, bool recursive = false)
+        private IEnumerable<string> GetDirectories(string directoryPath, string searchPattern = null,
+            bool recursive = false)
         {
             if (string.IsNullOrWhiteSpace(directoryPath))
-            {
                 directoryPath = _rootDir.FullName;
-            }
             else if (!Path.IsPathRooted(directoryPath))
-            {
                 directoryPath = Path.Combine(_rootDir.FullName, directoryPath);
-            }
-            else if (directoryPath == "\\")
-            {
-                directoryPath = _rootDir.FullName;
-            }
+            else if (directoryPath == "\\") directoryPath = _rootDir.FullName;
 
             if (!Directory.Exists(directoryPath))
-            {
                 throw new DirectoryNotFoundException($"Cannot find directory '{directoryPath}'");
-            }
 
-            string[] results = string.IsNullOrWhiteSpace(searchPattern)
-                ? Directory.GetDirectories(directoryPath, "*.*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
+            var results = string.IsNullOrWhiteSpace(searchPattern)
+                ? Directory.GetDirectories(directoryPath, "*.*",
+                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
                 : Directory.GetDirectories(
                     directoryPath,
                     searchPattern,
@@ -213,30 +191,18 @@ namespace ModernSlavery.Infrastructure.File
         private bool GetFileExists(string filePath)
 
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             return System.IO.File.Exists(filePath);
         }
 
         private void CreateDirectory(string directoryPath)
         {
-            if (string.IsNullOrWhiteSpace(directoryPath))
-            {
-                throw new ArgumentNullException(nameof(directoryPath));
-            }
+            if (string.IsNullOrWhiteSpace(directoryPath)) throw new ArgumentNullException(nameof(directoryPath));
 
-            if (!Path.IsPathRooted(directoryPath))
-            {
-                directoryPath = Path.Combine(_rootDir.FullName, directoryPath);
-            }
+            if (!Path.IsPathRooted(directoryPath)) directoryPath = Path.Combine(_rootDir.FullName, directoryPath);
 
             var retries = 0;
             Retry:
@@ -246,10 +212,7 @@ namespace ModernSlavery.Infrastructure.File
             }
             catch (IOException)
             {
-                if (retries >= 10)
-                {
-                    throw;
-                }
+                if (retries >= 10) throw;
 
                 retries++;
                 Thread.Sleep(500);
@@ -259,82 +222,49 @@ namespace ModernSlavery.Infrastructure.File
 
         private bool GetDirectoryExists(string directoryPath)
         {
-            if (string.IsNullOrWhiteSpace(directoryPath))
-            {
-                throw new ArgumentNullException(nameof(directoryPath));
-            }
+            if (string.IsNullOrWhiteSpace(directoryPath)) throw new ArgumentNullException(nameof(directoryPath));
 
-            if (!Path.IsPathRooted(directoryPath))
-            {
-                directoryPath = Path.Combine(_rootDir.FullName, directoryPath);
-            }
+            if (!Path.IsPathRooted(directoryPath)) directoryPath = Path.Combine(_rootDir.FullName, directoryPath);
 
             return Directory.Exists(directoryPath);
         }
 
         private DateTime GetLastWriteTime(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             return System.IO.File.GetLastWriteTime(filePath);
         }
 
         private long GetFileSize(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             return new FileInfo(filePath).Length;
         }
 
         private void DeleteFile(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             var retries = 0;
             Retry:
             try
             {
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
+                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
 
-                string metaPath = filePath + ".metadata";
-                if (System.IO.File.Exists(metaPath))
-                {
-                    System.IO.File.Delete(metaPath);
-                }
+                var metaPath = filePath + ".metadata";
+                if (System.IO.File.Exists(metaPath)) System.IO.File.Delete(metaPath);
             }
             catch (IOException)
             {
-                if (retries >= 10)
-                {
-                    throw;
-                }
+                if (retries >= 10) throw;
 
                 retries++;
                 Thread.Sleep(500);
@@ -344,55 +274,36 @@ namespace ModernSlavery.Infrastructure.File
 
         private void CopyFile(string sourceFilePath, string destinationFilePath, bool overwrite)
         {
-            if (string.IsNullOrWhiteSpace(sourceFilePath))
-            {
-                throw new ArgumentNullException(nameof(sourceFilePath));
-            }
+            if (string.IsNullOrWhiteSpace(sourceFilePath)) throw new ArgumentNullException(nameof(sourceFilePath));
 
-            if (!Path.IsPathRooted(sourceFilePath))
-            {
-                sourceFilePath = Path.Combine(_rootDir.FullName, sourceFilePath);
-            }
+            if (!Path.IsPathRooted(sourceFilePath)) sourceFilePath = Path.Combine(_rootDir.FullName, sourceFilePath);
 
             if (!System.IO.File.Exists(sourceFilePath))
-            {
                 throw new FileNotFoundException($"Cannot find source file '{sourceFilePath}'");
-            }
 
             if (string.IsNullOrWhiteSpace(destinationFilePath))
-            {
                 throw new ArgumentNullException(nameof(destinationFilePath));
-            }
 
             if (!Path.IsPathRooted(destinationFilePath))
-            {
                 destinationFilePath = Path.Combine(_rootDir.FullName, destinationFilePath);
-            }
 
             if (System.IO.File.Exists(destinationFilePath) && !overwrite)
-            {
                 throw new Exception($"Destination file '{destinationFilePath}' exists.");
-            }
 
             var retries = 0;
             Retry:
             try
             {
                 System.IO.File.Copy(sourceFilePath, destinationFilePath, true);
-                string sourceFileMetaPath = sourceFilePath + ".metadata";
-                string destinationFileMetaPath = destinationFilePath + ".metadata";
+                var sourceFileMetaPath = sourceFilePath + ".metadata";
+                var destinationFileMetaPath = destinationFilePath + ".metadata";
 
                 if (System.IO.File.Exists(sourceFileMetaPath))
-                {
                     System.IO.File.Copy(sourceFileMetaPath, destinationFileMetaPath, true);
-                }
             }
             catch (IOException)
             {
-                if (retries >= 10)
-                {
-                    throw;
-                }
+                if (retries >= 10) throw;
 
                 retries++;
                 Thread.Sleep(500);
@@ -402,71 +313,49 @@ namespace ModernSlavery.Infrastructure.File
 
         private IEnumerable<string> GetFiles(string filePath, string searchPattern = null, bool recursive = false)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             if (!Directory.Exists(filePath))
-            {
                 throw new DirectoryNotFoundException($"Cannot find directory '{filePath}'");
-            }
 
-            string[] results = string.IsNullOrWhiteSpace(searchPattern)
-                ? Directory.GetFiles(filePath, "*.*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
-                : Directory.GetFiles(filePath, searchPattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+            var results = string.IsNullOrWhiteSpace(searchPattern)
+                ? Directory.GetFiles(filePath, "*.*",
+                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
+                : Directory.GetFiles(filePath, searchPattern,
+                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
             for (var i = 0; i < results.Length; i++)
-            {
                 if (results[i].StartsWithI(_rootDir.FullName))
-                {
                     results[i] = results[i].Substring(_rootDir.FullName.Length);
-                }
-            }
 
             return results;
         }
 
         private bool GetAnyFileExists(string directoryPath, string searchPattern = null, bool recursive = false)
         {
-            if (string.IsNullOrWhiteSpace(directoryPath))
-            {
-                throw new ArgumentNullException(nameof(directoryPath));
-            }
+            if (string.IsNullOrWhiteSpace(directoryPath)) throw new ArgumentNullException(nameof(directoryPath));
 
-            if (!Path.IsPathRooted(directoryPath))
-            {
-                directoryPath = Path.Combine(_rootDir.FullName, directoryPath);
-            }
+            if (!Path.IsPathRooted(directoryPath)) directoryPath = Path.Combine(_rootDir.FullName, directoryPath);
 
             if (!Directory.Exists(directoryPath))
-            {
                 throw new DirectoryNotFoundException($"Cannot find directory '{directoryPath}'");
-            }
 
-            string[] results = string.IsNullOrWhiteSpace(searchPattern)
-                ? Directory.GetFiles(directoryPath, "*.*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
-                : Directory.GetFiles(directoryPath, searchPattern, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+            var results = string.IsNullOrWhiteSpace(searchPattern)
+                ? Directory.GetFiles(directoryPath, "*.*",
+                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly)
+                : Directory.GetFiles(directoryPath, searchPattern,
+                    recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
             return results.Any();
         }
 
         private void Read(string filePath, Stream stream)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             using (Stream fs = System.IO.File.OpenRead(filePath))
             {
@@ -476,37 +365,23 @@ namespace ModernSlavery.Infrastructure.File
 
         private byte[] ReadBytes(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             return System.IO.File.ReadAllBytes(filePath);
         }
 
         private void Append(string filePath, string text)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             //Ensure the directory exists
-            string directory = Path.GetDirectoryName(filePath);
+            var directory = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
-            {
                 Directory.CreateDirectory(directory);
-            }
 
             var retries = 0;
             Retry:
@@ -516,10 +391,7 @@ namespace ModernSlavery.Infrastructure.File
             }
             catch (IOException)
             {
-                if (retries >= 10)
-                {
-                    throw;
-                }
+                if (retries >= 10) throw;
 
                 retries++;
                 Thread.Sleep(500);
@@ -529,22 +401,14 @@ namespace ModernSlavery.Infrastructure.File
 
         private void Write(string filePath, byte[] bytes)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             //Ensure the directory exists
-            string directory = Path.GetDirectoryName(filePath);
+            var directory = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
-            {
                 Directory.CreateDirectory(directory);
-            }
 
             var retries = 0;
             Retry:
@@ -554,10 +418,7 @@ namespace ModernSlavery.Infrastructure.File
             }
             catch (IOException)
             {
-                if (retries >= 10)
-                {
-                    throw;
-                }
+                if (retries >= 10) throw;
 
                 retries++;
                 Thread.Sleep(500);
@@ -567,38 +428,27 @@ namespace ModernSlavery.Infrastructure.File
 
         private void Write(string filePath, Stream stream)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
             //Ensure the directory exists
-            string directory = Path.GetDirectoryName(filePath);
+            var directory = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
-            {
                 Directory.CreateDirectory(directory);
-            }
 
             var retries = 0;
             Retry:
             try
             {
-                using (FileStream fs = System.IO.File.OpenWrite(filePath))
+                using (var fs = System.IO.File.OpenWrite(filePath))
                 {
                     stream.CopyTo(fs);
                 }
             }
             catch (IOException)
             {
-                if (retries >= 10)
-                {
-                    throw;
-                }
+                if (retries >= 10) throw;
 
                 retries++;
                 Thread.Sleep(500);
@@ -608,27 +458,16 @@ namespace ModernSlavery.Infrastructure.File
 
         private void Write(string filePath, FileInfo uploadFile)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            if (!uploadFile.Exists)
-            {
-                throw new FileNotFoundException(nameof(uploadFile));
-            }
+            if (!uploadFile.Exists) throw new FileNotFoundException(nameof(uploadFile));
 
             //Ensure the directory exists
-            string directory = Path.GetDirectoryName(filePath);
+            var directory = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
-            {
                 Directory.CreateDirectory(directory);
-            }
 
             var retries = 0;
             Retry:
@@ -638,10 +477,7 @@ namespace ModernSlavery.Infrastructure.File
             }
             catch (IOException)
             {
-                if (retries >= 10)
-                {
-                    throw;
-                }
+                if (retries >= 10) throw;
 
                 retries++;
                 Thread.Sleep(500);
@@ -651,23 +487,14 @@ namespace ModernSlavery.Infrastructure.File
 
         private IDictionary<string, string> LoadMetaData(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            if (!System.IO.File.Exists(filePath))
-            {
-                throw new FileNotFoundException("Cant find file", filePath);
-            }
+            if (!System.IO.File.Exists(filePath)) throw new FileNotFoundException("Cant find file", filePath);
 
-            string metaPath = filePath + ".metadata";
-            string metaJson = System.IO.File.Exists(metaPath) ? System.IO.File.ReadAllText(metaPath) : null;
+            var metaPath = filePath + ".metadata";
+            var metaJson = System.IO.File.Exists(metaPath) ? System.IO.File.ReadAllText(metaPath) : null;
             if (!string.IsNullOrWhiteSpace(metaJson))
             {
                 var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(metaJson);
@@ -680,39 +507,25 @@ namespace ModernSlavery.Infrastructure.File
         private void SaveMetaData(string filePath, IDictionary<string, string> metaData)
 
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-            {
-                throw new ArgumentNullException(nameof(filePath));
-            }
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath))
-            {
-                filePath = Path.Combine(_rootDir.FullName, filePath);
-            }
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            string metaPath = filePath + ".metadata";
+            var metaPath = filePath + ".metadata";
 
             string metaJson = null;
             if (metaData != null && metaData.Count > 0 && metaData.Values.Any(kv => !string.IsNullOrWhiteSpace(kv)))
-            {
                 metaJson = JsonConvert.SerializeObject(metaData);
-            }
 
             if (!string.IsNullOrWhiteSpace(metaJson))
-            {
                 System.IO.File.WriteAllText(metaPath, metaJson);
-            }
-            else if (System.IO.File.Exists(metaPath))
-            {
-                System.IO.File.Delete(metaPath);
-            }
+            else if (System.IO.File.Exists(metaPath)) System.IO.File.Delete(metaPath);
         }
 
         private string GetMetaData(string filePath, string key)
         {
-            IDictionary<string, string> metaData = LoadMetaData(filePath);
+            var metaData = LoadMetaData(filePath);
             return metaData.ContainsKey(key) ? metaData[key] : null;
         }
-
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
@@ -8,10 +7,8 @@ using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Infrastructure.Data
 {
-
     public class RegistrationRepository : IRegistrationRepository
     {
-
         public RegistrationRepository(IDataRepository dataRepository, IRegistrationLogRecord registrationLog)
         {
             DataRepository = dataRepository ?? throw new ArgumentNullException(nameof(dataRepository));
@@ -24,21 +21,20 @@ namespace ModernSlavery.Infrastructure.Data
             userToRetire.UserOrganisations.ForEach(uo => uo.Organisation.UserOrganisations.Remove(uo));
 
             // get all latest registrations assigned to this user or latest registration is null
-            IEnumerable<UserOrganisation> latestRegistrationsByUser = userToRetire.UserOrganisations
+            var latestRegistrationsByUser = userToRetire.UserOrganisations
                 .Where(
-                    uo => uo.Organisation.LatestRegistration == null || uo.Organisation.LatestRegistration.UserId == userToRetire.UserId);
+                    uo => uo.Organisation.LatestRegistration == null ||
+                          uo.Organisation.LatestRegistration.UserId == userToRetire.UserId);
 
             // update those latest registrations
             latestRegistrationsByUser.ForEach(
-                async userOrgToUnregister => {
-                    Organisation sourceOrg = userOrgToUnregister.Organisation;
+                async userOrgToUnregister =>
+                {
+                    var sourceOrg = userOrgToUnregister.Organisation;
 
                     // update latest registration (if one exists)
-                    UserOrganisation newLatestReg = sourceOrg.GetLatestRegistration();
-                    if (newLatestReg != null)
-                    {
-                        sourceOrg.LatestRegistration = newLatestReg;
-                    }
+                    var newLatestReg = sourceOrg.GetLatestRegistration();
+                    if (newLatestReg != null) sourceOrg.LatestRegistration = newLatestReg;
 
                     // log unregistered via closed account
                     await RegistrationLog.LogUserAccountClosedAsync(userOrgToUnregister, actionByUser.EmailAddress);
@@ -53,42 +49,30 @@ namespace ModernSlavery.Infrastructure.Data
 
         public async Task RemoveRegistrationAsync(UserOrganisation userOrgToUnregister, User actionByUser)
         {
-            if (userOrgToUnregister is null)
-            {
-                throw new ArgumentNullException(nameof(userOrgToUnregister));
-            }
+            if (userOrgToUnregister is null) throw new ArgumentNullException(nameof(userOrgToUnregister));
 
-            if (actionByUser is null)
-            {
-                throw new ArgumentNullException(nameof(actionByUser));
-            }
+            if (actionByUser is null) throw new ArgumentNullException(nameof(actionByUser));
 
-            Organisation sourceOrg = userOrgToUnregister.Organisation;
+            var sourceOrg = userOrgToUnregister.Organisation;
 
             // Remove the user registration from the organisation
             sourceOrg.UserOrganisations.Remove(userOrgToUnregister);
 
             // update latest registration (if one exists)
-            if (sourceOrg.LatestRegistration == null || sourceOrg.LatestRegistration.UserId == userOrgToUnregister.UserId)
+            if (sourceOrg.LatestRegistration == null ||
+                sourceOrg.LatestRegistration.UserId == userOrgToUnregister.UserId)
             {
-                UserOrganisation newLatestReg = sourceOrg.GetLatestRegistration();
-                if (newLatestReg != null)
-                {
-                    sourceOrg.LatestRegistration = newLatestReg;
-                }
+                var newLatestReg = sourceOrg.GetLatestRegistration();
+                if (newLatestReg != null) sourceOrg.LatestRegistration = newLatestReg;
             }
 
             // log record
             if (userOrgToUnregister.UserId == actionByUser.UserId)
-            {
                 // unregistered self
                 await RegistrationLog.LogUnregisteredSelfAsync(userOrgToUnregister, actionByUser.EmailAddress);
-            }
             else
-            {
                 // unregistered by someone else
                 await RegistrationLog.LogUnregisteredAsync(userOrgToUnregister, actionByUser.EmailAddress);
-            }
 
             // Remove user organisation
             DataRepository.Delete(userOrgToUnregister);
@@ -123,7 +107,5 @@ namespace ModernSlavery.Infrastructure.Data
         }
 
         #endregion
-
     }
-
 }

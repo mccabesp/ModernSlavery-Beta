@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Azure.Storage.Blob.Protocol;
-using ModernSlavery.Core.Models;
-using ModernSlavery.SharedKernel;
+﻿using ModernSlavery.Core.Models;
 using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Options
 {
     [Options("Search")]
-    public class SearchOptions: IOptions
+    public class SearchOptions : IOptions
     {
         public string AzureServiceName { get; set; }
         public string AzureApiAdminKey { get; set; }

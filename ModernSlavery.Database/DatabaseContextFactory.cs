@@ -8,7 +8,6 @@ namespace ModernSlavery.Database
     /// </summary>
     public class DatabaseContextFactory : IDesignTimeDbContextFactory<DatabaseContext>
     {
-
         public DatabaseContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<DatabaseContext>();
@@ -17,6 +16,5 @@ namespace ModernSlavery.Database
             optionsBuilder.UseSqlServer(DatabaseContext.ConnectionString, options => options.EnableRetryOnFailure());
             return new DatabaseContext(optionsBuilder.Options);
         }
-
     }
 }

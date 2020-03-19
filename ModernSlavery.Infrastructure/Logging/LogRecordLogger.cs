@@ -10,23 +10,18 @@ namespace ModernSlavery.Infrastructure.Logging
 {
     public class LogRecordLogger : ILogRecordLogger
     {
-
-        private readonly IQueue queue;
         private readonly string fileName;
         protected readonly GlobalOptions GlobalOptions;
 
-        public LogRecordLogger(GlobalOptions globalOptions, LogRecordQueue queue, string applicationName, string fileName)
+        private readonly IQueue queue;
+
+        public LogRecordLogger(GlobalOptions globalOptions, LogRecordQueue queue, string applicationName,
+            string fileName)
         {
             GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
-            if (string.IsNullOrWhiteSpace(applicationName))
-            {
-                throw new ArgumentNullException(nameof(applicationName));
-            }
+            if (string.IsNullOrWhiteSpace(applicationName)) throw new ArgumentNullException(nameof(applicationName));
 
-            if (string.IsNullOrWhiteSpace(fileName))
-            {
-                throw new ArgumentNullException(nameof(fileName));
-            }
+            if (string.IsNullOrWhiteSpace(fileName)) throw new ArgumentNullException(nameof(fileName));
 
             this.queue = queue ?? throw new ArgumentNullException(nameof(queue));
             ApplicationName = applicationName;
@@ -37,18 +32,15 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task WriteAsync(IEnumerable<object> records)
         {
-            foreach (object record in records)
-            {
-                await WriteAsync(record);
-            }
+            foreach (var record in records) await WriteAsync(record);
         }
 
         public async Task WriteAsync(object record)
         {
-            var wrapper = new LogRecordWrapperModel {ApplicationName = ApplicationName, FileName = fileName, Record = record};
+            var wrapper = new LogRecordWrapperModel
+                {ApplicationName = ApplicationName, FileName = fileName, Record = record};
 
             await queue.AddMessageAsync(wrapper);
         }
-
     }
 }

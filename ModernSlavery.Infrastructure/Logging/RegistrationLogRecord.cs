@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Entities;
@@ -13,10 +12,11 @@ namespace ModernSlavery.Infrastructure.Logging
 {
     public class RegistrationLogRecord : LogRecordLogger, IRegistrationLogRecord
     {
-
         public RegistrationLogRecord(GlobalOptions globalOptions,
             LogRecordQueue queue)
-            : base(globalOptions, queue, AppDomain.CurrentDomain.FriendlyName, Filenames.RegistrationLog) { }
+            : base(globalOptions, queue, AppDomain.CurrentDomain.FriendlyName, Filenames.RegistrationLog)
+        {
+        }
 
         public async Task LogUnregisteredAsync(UserOrganisation unregisteredUserOrg, string actionByEmailAddress)
         {
@@ -35,17 +35,15 @@ namespace ModernSlavery.Infrastructure.Logging
 
         private async Task LogAsync(UserOrganisation logUserOrg, string status, string actionByEmailAddress)
         {
-            Organisation logOrg = logUserOrg.Organisation;
-            User logUser = logUserOrg.User;
-            OrganisationAddress logAddress = logUserOrg.Address;
+            var logOrg = logUserOrg.Organisation;
+            var logUser = logUserOrg.User;
+            var logAddress = logUserOrg.Address;
 
-            if (logUser.EmailAddress.StartsWithI(GlobalOptions.TestPrefix))
-            {
-                return;
-            }
+            if (logUser.EmailAddress.StartsWithI(GlobalOptions.TestPrefix)) return;
 
             await WriteAsync(
-                new RegisterLogModel {
+                new RegisterLogModel
+                {
                     StatusDate = VirtualDateTime.Now,
                     Status = status,
                     ActionBy = actionByEmailAddress,
@@ -66,7 +64,5 @@ namespace ModernSlavery.Infrastructure.Logging
                     ContactPhoneNumber = logUser.ContactPhoneNumber
                 });
         }
-
     }
-
 }

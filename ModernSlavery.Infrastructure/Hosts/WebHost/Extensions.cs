@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Threading;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Infrastructure.Hosts.WebHost
 {
     public static partial class Extensions
     {
-        public static IHostBuilder ConfigureWebHostBuilder<TStartup>(this IHostBuilder hostBuilder, string contentRoot = null, string webRoot = null) where TStartup : IStartup
+        public static IHostBuilder ConfigureWebHostBuilder<TStartup>(this IHostBuilder hostBuilder,
+            string contentRoot = null, string webRoot = null) where TStartup : IStartup
         {
             //Build the configuration settings
             var config = Hosts.Extensions.BuildConfiguration();
@@ -31,8 +23,9 @@ namespace ModernSlavery.Infrastructure.Hosts.WebHost
             {
                 webHostBuilder.UseConfiguration(config);
                 webHostBuilder.CaptureStartupErrors(true);
-                webHostBuilder.UseSetting(WebHostDefaults.DetailedErrorsKey, "true"); //When enabled (or when the Environment is set to Development), the app captures detailed exceptions.
-                                                                                      //webHostBuilder.UseEnvironment(configBuilder.EnvironmentName);
+                webHostBuilder.UseSetting(WebHostDefaults.DetailedErrorsKey,
+                    "true"); //When enabled (or when the Environment is set to Development), the app captures detailed exceptions.
+                //webHostBuilder.UseEnvironment(configBuilder.EnvironmentName);
 
                 webHostBuilder.ConfigureKestrel(
                     options =>
@@ -41,16 +34,19 @@ namespace ModernSlavery.Infrastructure.Hosts.WebHost
                         //options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
                     });
 
-                if (!string.IsNullOrWhiteSpace(contentRoot)) webHostBuilder.UseContentRoot(contentRoot); //Specify the root path of the content
+                if (!string.IsNullOrWhiteSpace(contentRoot))
+                    webHostBuilder.UseContentRoot(contentRoot); //Specify the root path of the content
 
-                if (!string.IsNullOrWhiteSpace(webRoot)) webHostBuilder.UseWebRoot(webRoot); //Specify the root path of the site
+                if (!string.IsNullOrWhiteSpace(webRoot))
+                    webHostBuilder.UseWebRoot(webRoot); //Specify the root path of the site
 
                 //Load the services from the startup class
                 webHostBuilder.UseStartup(typeof(TStartup));
 
                 //Add the logging to the web host
                 webHostBuilder.ConfigureLogging(
-                    builder => {
+                    builder =>
+                    {
                         //For more info see https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.2
                         builder.ClearProviders();
                         builder.AddConfiguration(config.GetSection("Logging"));
@@ -63,7 +59,6 @@ namespace ModernSlavery.Infrastructure.Hosts.WebHost
                         builder.AddApplicationInsights(); 
                         */
                     });
-
             });
         }
     }

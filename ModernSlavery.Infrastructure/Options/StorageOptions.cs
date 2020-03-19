@@ -3,7 +3,7 @@
 namespace ModernSlavery.Infrastructure.Options
 {
     [Options("Security")]
-    public class StorageOptions:IOptions
+    public class StorageOptions : IOptions
     {
         public string AzureConnectionString { get; set; }
         public string AzureShareName { get; set; }

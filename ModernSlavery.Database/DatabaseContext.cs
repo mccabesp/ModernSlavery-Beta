@@ -5,93 +5,47 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using ModernSlavery.Entities;
 using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Database
 {
     public partial class DatabaseContext : DbContext, IDbContext
     {
-        public readonly GlobalOptions GlobalOptions;
+        public static string ConnectionString =
+            @"Server=(localdb)\ProjectsV13;Initial Catalog=ModernSlaveryDb;Trusted_Connection=True;";
+
         public readonly DatabaseOptions DatabaseOptions;
-        public static string ConnectionString = @"Server=(localdb)\ProjectsV13;Initial Catalog=ModernSlaveryDb;Trusted_Connection=True;";
+        public readonly GlobalOptions GlobalOptions;
 
         public DatabaseContext(GlobalOptions globalOptions, DatabaseOptions databaseOptions)
         {
-            this.GlobalOptions = globalOptions;
-            this.DatabaseOptions = databaseOptions;
+            GlobalOptions = globalOptions;
+            DatabaseOptions = databaseOptions;
             if (!string.IsNullOrWhiteSpace(DatabaseOptions.ConnectionString))
-            {
                 ConnectionString = DatabaseOptions.ConnectionString;
-            }
 
-            if (databaseOptions.UseMigrations)
-            {
-                EnsureMigrated();
-            }
+            if (databaseOptions.UseMigrations) EnsureMigrated();
         }
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options, bool useMigrations = false) : base(options)
         {
-            if (useMigrations)
-            {
-                EnsureMigrated();
-            }
+            if (useMigrations) EnsureMigrated();
         }
-
-        #region Tables
-        public virtual DbSet<AddressStatus> AddressStatus { get; set; }
-        public virtual DbSet<Organisation> Organisation { get; set; }
-        public virtual DbSet<OrganisationAddress> OrganisationAddress { get; set; }
-        public virtual DbSet<OrganisationName> OrganisationName { get; set; }
-        public virtual DbSet<OrganisationReference> OrganisationReference { get; set; }
-        public virtual DbSet<OrganisationScope> OrganisationScope { get; set; }
-        public virtual DbSet<OrganisationSicCode> OrganisationSicCode { get; set; }
-        public virtual DbSet<OrganisationStatus> OrganisationStatus { get; set; }
-        public virtual DbSet<Return> Return { get; set; }
-        public virtual DbSet<ReturnStatus> ReturnStatus { get; set; }
-        public virtual DbSet<SicCode> SicCodes { get; set; }
-        public virtual DbSet<SicSection> SicSections { get; set; }
-        public virtual DbSet<User> User { get; set; }
-        public virtual DbSet<UserOrganisation> UserOrganisations { get; set; }
-        public virtual DbSet<UserSetting> UserSettings { get; set; }
-        public virtual DbSet<UserStatus> UserStatuses { get; set; }
-        public virtual DbSet<PublicSectorType> PublicSectorTypes { get; set; }
-        public virtual DbSet<OrganisationPublicSectorType> OrganisationPublicSectorTypes { get; set; }
-        public virtual DbSet<Feedback> Feedback { get; set; }
-        public virtual DbSet<AuditLog> AuditLogs { get; set; }
-        public virtual DbSet<ReminderEmail> ReminderEmails { get; set; }
-        #endregion
-
-        #region Views
-        public virtual DbSet<UserInfoView> UserInfoView { get; set; }
-        public virtual DbSet<OrganisationAddressInfoView> OrganisationAddressInfoView { get; set; }
-        public virtual DbSet<OrganisationInfoView> OrganisationInfoView { get; set; }
-        public virtual DbSet<OrganisationRegistrationInfoView> OrganisationRegistrationInfoView { get; set; }
-        public virtual DbSet<OrganisationScopeAndReturnInfoView> OrganisationScopeAndReturnInfoView { get; set; }
-        public virtual DbSet<OrganisationScopeInfoView> OrganisationScopeInfoView { get; set; }
-        public virtual DbSet<OrganisationSearchInfoView> OrganisationSearchInfoView { get; set; }
-        public virtual DbSet<OrganisationSicCodeInfoView> OrganisationSicCodeInfoView { get; set; }
-        public virtual DbSet<OrganisationSubmissionInfoView> OrganisationSubmissionInfoView { get; set; }
-        public virtual DbSet<UserLinkedOrganisationsView> UserLinkedOrganisationsView { get; set; }
-        public virtual DbSet<UserStatusInfoView> UserStatusInfoView { get; set; }
-        #endregion
 
         public async Task<int> SaveChangesAsync()
         {
             #region Validate the new or changed entities
 
-            IEnumerable<object> entities = from e in ChangeTracker.Entries()
+            var entities = from e in ChangeTracker.Entries()
                 where e.State == EntityState.Added
                       || e.State == EntityState.Modified
                 select e.Entity;
 
             var innerExceptions = new List<ValidationException>();
-            foreach (object entity in entities)
+            foreach (var entity in entities)
             {
                 var validationContext = new ValidationContext(entity);
 
@@ -105,10 +59,7 @@ namespace ModernSlavery.Database
                 }
             }
 
-            if (innerExceptions.Any())
-            {
-                throw new AggregateException(innerExceptions);
-            }
+            if (innerExceptions.Any()) throw new AggregateException(innerExceptions);
 
             #endregion
 
@@ -132,7 +83,7 @@ namespace ModernSlavery.Database
         {
             var dataTableOfOrganisations = new DataTable("MyDataTableOfOrganisations");
             dataTableOfOrganisations = ConvertToDataTable(listOfOrganisations);
-            var connectionString=this.Database.GetDbConnection().ConnectionString;
+            var connectionString = Database.GetDbConnection().ConnectionString;
             using (var conn = new SqlConnection(connectionString))
             {
                 using (var command = new SqlCommand(string.Empty, conn))
@@ -144,7 +95,8 @@ namespace ModernSlavery.Database
                         var tempTableName = "#TempBulkUpdateTable";
 
                         // Make sure the temp table doesn't exist
-                        command.CommandText = $" IF OBJECT_ID('tempdb..{tempTableName}') IS NOT NULL DROP Table {tempTableName}; ";
+                        command.CommandText =
+                            $" IF OBJECT_ID('tempdb..{tempTableName}') IS NOT NULL DROP Table {tempTableName}; ";
                         command.ExecuteNonQuery();
 
                         // Create the temp table on database
@@ -176,12 +128,13 @@ namespace ModernSlavery.Database
                         command.ExecuteNonQuery();
 
                         // Dropping the temp table
-                        command.CommandText = $" IF OBJECT_ID('tempdb..{tempTableName}') IS NOT NULL DROP Table {tempTableName}; ";
+                        command.CommandText =
+                            $" IF OBJECT_ID('tempdb..{tempTableName}') IS NOT NULL DROP Table {tempTableName}; ";
                         command.ExecuteNonQuery();
                     }
                     catch (Exception ex)
                     {
-                        string mesage = ex.Message;
+                        var mesage = ex.Message;
                         // Handle exception properly
                     }
                     finally
@@ -195,10 +148,8 @@ namespace ModernSlavery.Database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-            {
                 //Setup the SQL server with automatic retry on failure
                 optionsBuilder.UseSqlServer(ConnectionString, options => options.EnableRetryOnFailure());
-            }
 
             //Use lazy loading for related virtual items
             optionsBuilder.UseLazyLoadingProxies();
@@ -209,7 +160,8 @@ namespace ModernSlavery.Database
         /// </summary>
         /// <param name="listOfOrganisationsToConvert"></param>
         /// <returns></returns>
-        private DataTable ConvertToDataTable<TEntity>(IEnumerable<TEntity> listOfOrganisationsToConvert) where TEntity : class
+        private DataTable ConvertToDataTable<TEntity>(IEnumerable<TEntity> listOfOrganisationsToConvert)
+            where TEntity : class
         {
             var table = new DataTable();
 
@@ -218,24 +170,62 @@ namespace ModernSlavery.Database
             table.Columns.Add("SecurityCodeExpiryDateTime", typeof(DateTime));
             table.Columns.Add("SecurityCodeCreatedDateTime", typeof(DateTime));
 
-            foreach (TEntity item in listOfOrganisationsToConvert)
+            foreach (var item in listOfOrganisationsToConvert)
             {
                 var itemObject = (object) item;
                 var orgObject = itemObject as Organisation;
 
                 if (orgObject != null)
-                {
                     table.Rows.Add(
                         orgObject.OrganisationId,
                         orgObject.SecurityCode,
                         orgObject.SecurityCodeExpiryDateTime,
                         orgObject.SecurityCodeCreatedDateTime);
-                }
             }
 
             return table;
         }
 
-    }
+        #region Tables
 
+        public virtual DbSet<AddressStatus> AddressStatus { get; set; }
+        public virtual DbSet<Organisation> Organisation { get; set; }
+        public virtual DbSet<OrganisationAddress> OrganisationAddress { get; set; }
+        public virtual DbSet<OrganisationName> OrganisationName { get; set; }
+        public virtual DbSet<OrganisationReference> OrganisationReference { get; set; }
+        public virtual DbSet<OrganisationScope> OrganisationScope { get; set; }
+        public virtual DbSet<OrganisationSicCode> OrganisationSicCode { get; set; }
+        public virtual DbSet<OrganisationStatus> OrganisationStatus { get; set; }
+        public virtual DbSet<Return> Return { get; set; }
+        public virtual DbSet<ReturnStatus> ReturnStatus { get; set; }
+        public virtual DbSet<SicCode> SicCodes { get; set; }
+        public virtual DbSet<SicSection> SicSections { get; set; }
+        public virtual DbSet<User> User { get; set; }
+        public virtual DbSet<UserOrganisation> UserOrganisations { get; set; }
+        public virtual DbSet<UserSetting> UserSettings { get; set; }
+        public virtual DbSet<UserStatus> UserStatuses { get; set; }
+        public virtual DbSet<PublicSectorType> PublicSectorTypes { get; set; }
+        public virtual DbSet<OrganisationPublicSectorType> OrganisationPublicSectorTypes { get; set; }
+        public virtual DbSet<Feedback> Feedback { get; set; }
+        public virtual DbSet<AuditLog> AuditLogs { get; set; }
+        public virtual DbSet<ReminderEmail> ReminderEmails { get; set; }
+
+        #endregion
+
+        #region Views
+
+        public virtual DbSet<UserInfoView> UserInfoView { get; set; }
+        public virtual DbSet<OrganisationAddressInfoView> OrganisationAddressInfoView { get; set; }
+        public virtual DbSet<OrganisationInfoView> OrganisationInfoView { get; set; }
+        public virtual DbSet<OrganisationRegistrationInfoView> OrganisationRegistrationInfoView { get; set; }
+        public virtual DbSet<OrganisationScopeAndReturnInfoView> OrganisationScopeAndReturnInfoView { get; set; }
+        public virtual DbSet<OrganisationScopeInfoView> OrganisationScopeInfoView { get; set; }
+        public virtual DbSet<OrganisationSearchInfoView> OrganisationSearchInfoView { get; set; }
+        public virtual DbSet<OrganisationSicCodeInfoView> OrganisationSicCodeInfoView { get; set; }
+        public virtual DbSet<OrganisationSubmissionInfoView> OrganisationSubmissionInfoView { get; set; }
+        public virtual DbSet<UserLinkedOrganisationsView> UserLinkedOrganisationsView { get; set; }
+        public virtual DbSet<UserStatusInfoView> UserStatusInfoView { get; set; }
+
+        #endregion
+    }
 }

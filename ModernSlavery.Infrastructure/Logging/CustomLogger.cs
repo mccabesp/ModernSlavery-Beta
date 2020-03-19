@@ -4,9 +4,8 @@ using Serilog;
 
 namespace ModernSlavery.Infrastructure.Logging
 {
-    public class CustomLogger: ICustomLogger
+    public class CustomLogger : ICustomLogger
     {
-
         public void Debug(string message, object values = null)
         {
             Log.Debug(GetLogMessage(message, values), values);
@@ -47,7 +46,5 @@ namespace ModernSlavery.Infrastructure.Logging
                 throw;
             }
         }
-
     }
-
 }

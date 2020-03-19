@@ -8,7 +8,6 @@ namespace ModernSlavery.Infrastructure.Telemetry
 {
     public class DependencyTelemetryFilter : ITelemetryProcessor
     {
-
         private readonly string HostName;
         private readonly ITelemetryProcessor Next;
         private readonly string OperationName;
@@ -21,22 +20,15 @@ namespace ModernSlavery.Infrastructure.Telemetry
         /// <param name="hostName">The suffix of the host name of the dependency (e.g., file.core.windows.net)</param>
         /// <param name="operationName">The HTTP method and path prefix (e.g., GET /Common/App_Data/ </param>
         /// <param name="resultCodes">The list of result codes to regard as successful</param>
-        public DependencyTelemetryFilter(ITelemetryProcessor next, string hostName, string operationName, params string[] resultCodes)
+        public DependencyTelemetryFilter(ITelemetryProcessor next, string hostName, string operationName,
+            params string[] resultCodes)
         {
-            if (string.IsNullOrWhiteSpace(hostName))
-            {
-                throw new ArgumentNullException(nameof(hostName));
-            }
+            if (string.IsNullOrWhiteSpace(hostName)) throw new ArgumentNullException(nameof(hostName));
 
-            if (string.IsNullOrWhiteSpace(operationName))
-            {
-                throw new ArgumentNullException(nameof(operationName));
-            }
+            if (string.IsNullOrWhiteSpace(operationName)) throw new ArgumentNullException(nameof(operationName));
 
             if (resultCodes == null || resultCodes.Length == 0 || resultCodes.Any(on => string.IsNullOrWhiteSpace(on)))
-            {
                 throw new ArgumentNullException(nameof(resultCodes));
-            }
 
             HostName = hostName;
             OperationName = operationName;
@@ -61,6 +53,5 @@ namespace ModernSlavery.Infrastructure.Telemetry
                 Next.Process(item);
             }
         }
-
     }
 }

@@ -1,11 +1,10 @@
-﻿using ModernSlavery.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using ModernSlavery.Entities;
 
 namespace ModernSlavery.Database
 {
     public partial class DatabaseContext : DbContext
     {
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Map the correct entity to table names
@@ -27,7 +26,8 @@ namespace ModernSlavery.Database
             #region AddressStatus
 
             modelBuilder.Entity<AddressStatus>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.AddressStatusId).HasName("PK_dbo.AddressStatus");
 
                     entity.HasIndex(e => e.AddressId)
@@ -58,7 +58,8 @@ namespace ModernSlavery.Database
             #region OrganisationAddress
 
             modelBuilder.Entity<OrganisationAddress>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.AddressId).HasName("PK_dbo.OrganisationAddresses");
 
                     entity.HasIndex(e => e.OrganisationId)
@@ -103,7 +104,8 @@ namespace ModernSlavery.Database
             #region OrganisationName
 
             modelBuilder.Entity<OrganisationName>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.OrganisationNameId).HasName("PK_dbo.OrganisationNames");
 
                     entity.HasIndex(e => e.Created)
@@ -132,7 +134,8 @@ namespace ModernSlavery.Database
             #region OrganisationReference
 
             modelBuilder.Entity<OrganisationReference>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.OrganisationReferenceId).HasName("PK_dbo.OrganisationReferences");
 
                     entity.HasIndex(e => e.Created)
@@ -166,7 +169,8 @@ namespace ModernSlavery.Database
             #region Organisation
 
             modelBuilder.Entity<Organisation>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.OrganisationId).HasName("PK_dbo.Organisations");
 
                     entity.HasIndex(e => e.CompanyNumber)
@@ -215,7 +219,8 @@ namespace ModernSlavery.Database
 
                     entity.Property(e => e.EmployerReference).HasMaxLength(10);
 
-                    entity.Property(e => e.LatestRegistrationOrganisationId).HasColumnName("LatestRegistration_OrganisationId");
+                    entity.Property(e => e.LatestRegistrationOrganisationId)
+                        .HasColumnName("LatestRegistration_OrganisationId");
 
                     entity.Property(e => e.LatestRegistrationUserId).HasColumnName("LatestRegistration_UserId");
 
@@ -249,7 +254,8 @@ namespace ModernSlavery.Database
                     entity.HasOne(d => d.LatestPublicSectorType)
                         .WithMany(x => x.Organisations)
                         .HasForeignKey(d => d.LatestPublicSectorTypeId)
-                        .HasConstraintName("FK_dbo.Organisations_dbo.OrganisationPublicSectorTypes_LatestPublicSectorTypeId");
+                        .HasConstraintName(
+                            "FK_dbo.Organisations_dbo.OrganisationPublicSectorTypes_LatestPublicSectorTypeId");
                 });
 
             #endregion
@@ -257,7 +263,8 @@ namespace ModernSlavery.Database
             #region OrganisationScope
 
             modelBuilder.Entity<OrganisationScope>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.OrganisationScopeId).HasName("PK_dbo.OrganisationScopes");
 
                     entity.HasIndex(e => e.OrganisationId)
@@ -307,7 +314,8 @@ namespace ModernSlavery.Database
             #region OrganisationSicCode
 
             modelBuilder.Entity<OrganisationSicCode>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.OrganisationSicCodeId).HasName("PK_dbo.OrganisationSicCodes");
 
                     entity.HasIndex(e => e.Created)
@@ -340,7 +348,8 @@ namespace ModernSlavery.Database
             #region OrganisationStatus
 
             modelBuilder.Entity<OrganisationStatus>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.OrganisationStatusId).HasName("PK_dbo.OrganisationStatus");
                     entity.HasIndex(e => e.ByUserId)
                         .HasName("IX_ByUserId");
@@ -371,7 +380,8 @@ namespace ModernSlavery.Database
             #region Return
 
             modelBuilder.Entity<Return>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.ReturnId).HasName("PK_dbo.Returns");
 
                     entity.HasIndex(e => e.AccountingDate)
@@ -415,7 +425,8 @@ namespace ModernSlavery.Database
             #region ReturnStatus
 
             modelBuilder.Entity<ReturnStatus>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.ReturnStatusId).HasName("PK_dbo.ReturnStatus");
 
                     entity.HasIndex(e => e.ByUserId)
@@ -447,7 +458,8 @@ namespace ModernSlavery.Database
             #region SicCode
 
             modelBuilder.Entity<SicCode>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.SicCodeId).HasName("PK_dbo.SicCodes");
 
                     entity.HasIndex(e => e.SicSectionId)
@@ -475,7 +487,8 @@ namespace ModernSlavery.Database
             #region SicSection
 
             modelBuilder.Entity<SicSection>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.SicSectionId).HasName("PK_dbo.SicSections");
 
                     entity.Property(e => e.SicSectionId)
@@ -492,7 +505,8 @@ namespace ModernSlavery.Database
             #region UserOrganisation
 
             modelBuilder.Entity<UserOrganisation>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => new {e.UserId, e.OrganisationId}).HasName("PK_dbo.UserOrganisations");
 
                     entity.HasIndex(e => e.AddressId)
@@ -530,7 +544,8 @@ namespace ModernSlavery.Database
             #region User
 
             modelBuilder.Entity<User>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.UserId).HasName("PK_dbo.Users");
 
                     entity.HasIndex(e => e.ContactEmailAddress)
@@ -589,7 +604,8 @@ namespace ModernSlavery.Database
             #region UserSetting
 
             modelBuilder.Entity<UserSetting>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => new {e.UserId, e.Key}).HasName("PK_dbo.UserSettings");
 
                     entity.HasIndex(e => e.UserId)
@@ -608,7 +624,8 @@ namespace ModernSlavery.Database
             #region UserStatus
 
             modelBuilder.Entity<UserStatus>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.UserStatusId).HasName("PK_dbo.UserStatus");
 
                     entity.HasIndex(e => e.ByUserId)
@@ -641,7 +658,8 @@ namespace ModernSlavery.Database
             #region PublicSectorType
 
             modelBuilder.Entity<PublicSectorType>(
-                entity => {
+                entity =>
+                {
                     entity.HasKey(e => e.PublicSectorTypeId).HasName("PK_dbo.PublicSectorTypes");
 
                     entity.Property(e => e.Description)
@@ -656,8 +674,10 @@ namespace ModernSlavery.Database
             #region OrganisationPublicSectorType
 
             modelBuilder.Entity<OrganisationPublicSectorType>(
-                entity => {
-                    entity.HasKey(e => e.OrganisationPublicSectorTypeId).HasName("PK_dbo.OrganisationPublicSectorTypes");
+                entity =>
+                {
+                    entity.HasKey(e => e.OrganisationPublicSectorTypeId)
+                        .HasName("PK_dbo.OrganisationPublicSectorTypes");
 
                     entity.HasIndex(e => e.Created).HasName("IX_Created");
 
@@ -695,6 +715,7 @@ namespace ModernSlavery.Database
             #endregion
 
             #region Views
+
             modelBuilder.Entity<OrganisationAddressInfoView>(entity =>
             {
                 entity.HasNoKey();
@@ -1023,10 +1044,7 @@ namespace ModernSlavery.Database
                     .HasMaxLength(154);
             });
 
-
             #endregion
         }
-
     }
-
 }
