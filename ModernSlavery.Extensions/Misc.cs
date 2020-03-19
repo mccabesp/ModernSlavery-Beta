@@ -15,7 +15,6 @@ namespace ModernSlavery.Extensions
 {
     public static class Misc
     {
-
         public static Assembly GetTopAssembly()
         {
             return Assembly.GetEntryAssembly();
@@ -26,14 +25,12 @@ namespace ModernSlavery.Extensions
             await Task.WhenAll(source.Select(async s => await method(s)));
         }
 
-        public static TValue GetAttributeValue<TAttribute, TValue>(this Type type, Func<TAttribute, TValue> valueSelector)
+        public static TValue GetAttributeValue<TAttribute, TValue>(this Type type,
+            Func<TAttribute, TValue> valueSelector)
             where TAttribute : Attribute
         {
             var att = type.GetCustomAttributes(typeof(TAttribute), true).FirstOrDefault() as TAttribute;
-            if (att != null)
-            {
-                return valueSelector(att);
-            }
+            if (att != null) return valueSelector(att);
 
             return default;
         }
@@ -41,20 +38,14 @@ namespace ModernSlavery.Extensions
         public static string CorrectNull(this object text)
         {
             var str = text as string;
-            if (string.IsNullOrWhiteSpace(str) || str.EqualsI("null"))
-            {
-                return null;
-            }
+            if (string.IsNullOrWhiteSpace(str) || str.EqualsI("null")) return null;
 
             return str;
         }
 
         public static bool IsNull(this object item)
         {
-            if (item == null || System.Convert.IsDBNull(item))
-            {
-                return true;
-            }
+            if (item == null || Convert.IsDBNull(item)) return true;
 
             return false;
         }
@@ -67,7 +58,7 @@ namespace ModernSlavery.Extensions
 
         public static DateTime GetAssemblyCreationTime(this Assembly assembly)
         {
-            string filePath = assembly.Location;
+            var filePath = assembly.Location;
 
             return File.GetCreationTime(filePath);
             ;
@@ -75,7 +66,7 @@ namespace ModernSlavery.Extensions
 
         public static string GetAssemblyCopyright(this Assembly assembly)
         {
-            FileVersionInfo version = FileVersionInfo.GetVersionInfo(assembly.Location);
+            var version = FileVersionInfo.GetVersionInfo(assembly.Location);
 
             return version.LegalCopyright;
         }
@@ -85,35 +76,24 @@ namespace ModernSlavery.Extensions
         {
             //Bind the parameters
             if (obj != null && !string.IsNullOrWhiteSpace(text))
-            {
-                foreach (PropertyInfo prop in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                foreach (var prop in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
                 {
-                    string value = prop.GetValue(obj, null)?.ToString();
-                    if (string.IsNullOrWhiteSpace(prop.Name) || string.IsNullOrWhiteSpace(value))
-                    {
-                        continue;
-                    }
+                    var value = prop.GetValue(obj, null)?.ToString();
+                    if (string.IsNullOrWhiteSpace(prop.Name) || string.IsNullOrWhiteSpace(value)) continue;
 
                     text = text.ReplaceI("{" + prop.Name + "}", value);
                 }
-            }
 
             return text;
         }
 
         public static bool IsWrapped<T>(this T[] data, T[] prefix, T[] suffix)
         {
-            if (data.Length < prefix.Length + suffix.Length)
-            {
-                return false;
-            }
+            if (data.Length < prefix.Length + suffix.Length) return false;
 
-            T[] end = data.SubArray(0, prefix.Length);
+            var end = data.SubArray(0, prefix.Length);
 
-            if (!end.SequenceEqual(prefix))
-            {
-                return false;
-            }
+            if (!end.SequenceEqual(prefix)) return false;
 
             end = data.SubArray(data.Length - suffix.Length, suffix.Length);
 
@@ -138,10 +118,7 @@ namespace ModernSlavery.Extensions
 
         public static T[] SubArray<T>(this T[] data, int index, int length)
         {
-            if (length > data.Length)
-            {
-                length = data.Length;
-            }
+            if (length > data.Length) length = data.Length;
 
             var result = new T[length];
             Buffer.BlockCopy(data, index, result, 0, length);
@@ -151,86 +128,51 @@ namespace ModernSlavery.Extensions
 
         public static bool EqualsI(this object item, params object[] values)
         {
-            if (item == null && values.Contains(null))
-            {
-                return true;
-            }
+            if (item == null && values.Contains(null)) return true;
 
             if (item != null && values != null)
-            {
-                foreach (object value in values)
-                {
+                foreach (var value in values)
                     if (item.Equals(value))
-                    {
                         return true;
-                    }
-                }
-            }
 
             return false;
         }
 
         public static bool IsAny(this object item, params object[] values)
         {
-            if (item == null && values.Contains(null))
-            {
-                return true;
-            }
+            if (item == null && values.Contains(null)) return true;
 
-            foreach (object value in values)
-            {
+            foreach (var value in values)
                 if (item.Equals(value))
-                {
                     return true;
-                }
-            }
 
             return false;
         }
 
         public static bool IsAny(this char text, params char[] chars)
         {
-            foreach (char ch in chars)
-            {
+            foreach (var ch in chars)
                 if (text.Equals(ch))
-                {
                     return true;
-                }
-            }
 
             return false;
         }
 
         public static bool ToBoolean(this object text, bool defaultValue = false)
         {
-            if (text.IsNull())
-            {
-                return defaultValue;
-            }
+            if (text.IsNull()) return defaultValue;
 
-            if (text is bool)
-            {
-                return (bool) text;
-            }
+            if (text is bool) return (bool) text;
 
-            string str = System.Convert.ToString(text);
+            var str = Convert.ToString(text);
             if (!string.IsNullOrWhiteSpace(str))
             {
-                if (str.EqualsI("1", "yes"))
-                {
-                    return true;
-                }
+                if (str.EqualsI("1", "yes")) return true;
 
-                if (str.EqualsI("0", "no"))
-                {
-                    return false;
-                }
+                if (str.EqualsI("0", "no")) return false;
 
                 bool parsedValue;
-                if (bool.TryParse(str, out parsedValue))
-                {
-                    return parsedValue;
-                }
+                if (bool.TryParse(str, out parsedValue)) return parsedValue;
             }
 
             return defaultValue;
@@ -238,22 +180,14 @@ namespace ModernSlavery.Extensions
 
         public static int ToInt32(this object text, int defaultValue = 0)
         {
-            if (text.IsNull())
-            {
-                return defaultValue;
-            }
+            if (text.IsNull()) return defaultValue;
 
-            if (text is decimal || text is double || text is int || text is long || text is byte || text.GetType().IsEnum)
-            {
-                return System.Convert.ToInt32(text);
-            }
+            if (text is decimal || text is double || text is int || text is long || text is byte ||
+                text.GetType().IsEnum) return Convert.ToInt32(text);
 
-            string str = System.Convert.ToString(text);
+            var str = Convert.ToString(text);
             int parsedValue;
-            if (!string.IsNullOrWhiteSpace(str) && int.TryParse(str, out parsedValue))
-            {
-                return parsedValue;
-            }
+            if (!string.IsNullOrWhiteSpace(str) && int.TryParse(str, out parsedValue)) return parsedValue;
 
             return defaultValue;
         }
@@ -265,32 +199,21 @@ namespace ModernSlavery.Extensions
 
         public static long ToInt64(this object text, long defaultValue = 0)
         {
-            if (text.IsNull())
-            {
-                return defaultValue;
-            }
+            if (text.IsNull()) return defaultValue;
 
-            if (text is decimal || text is double || text is int || text is long || text is byte || text.GetType().IsEnum)
-            {
-                return System.Convert.ToInt64(text);
-            }
+            if (text is decimal || text is double || text is int || text is long || text is byte ||
+                text.GetType().IsEnum) return Convert.ToInt64(text);
 
-            string str = System.Convert.ToString(text);
+            var str = Convert.ToString(text);
             long parsedValue;
-            if (!string.IsNullOrWhiteSpace(str) && long.TryParse(str, out parsedValue))
-            {
-                return parsedValue;
-            }
+            if (!string.IsNullOrWhiteSpace(str) && long.TryParse(str, out parsedValue)) return parsedValue;
 
             return defaultValue;
         }
 
         public static string FormatDecimal(this decimal? value, string format)
         {
-            if (value == null)
-            {
-                value = default(decimal);
-            }
+            if (value == null) value = default(decimal);
 
             return value.Value.ToString(format);
         }
@@ -299,13 +222,8 @@ namespace ModernSlavery.Extensions
         {
             string result = null;
             if (text is string)
-            {
                 result = (string) text;
-            }
-            else if (!text.IsNull())
-            {
-                result = System.Convert.ToString(text);
-            }
+            else if (!text.IsNull()) result = Convert.ToString(text);
 
             return string.IsNullOrWhiteSpace(result) ? null : result;
         }
@@ -314,13 +232,8 @@ namespace ModernSlavery.Extensions
         {
             string result = null;
             if (text is string)
-            {
                 result = (string) text;
-            }
-            else if (!text.IsNull())
-            {
-                result = System.Convert.ToString(text);
-            }
+            else if (!text.IsNull()) result = Convert.ToString(text);
 
             return string.IsNullOrWhiteSpace(result) ? string.Empty : result;
         }
@@ -329,47 +242,29 @@ namespace ModernSlavery.Extensions
         {
             string result = null;
             if (text is string)
-            {
                 result = (string) text;
-            }
-            else if (!text.IsNull())
-            {
-                result = System.Convert.ToString(text);
-            }
+            else if (!text.IsNull()) result = Convert.ToString(text);
 
             return string.IsNullOrWhiteSpace(result) ? replacement : result;
         }
 
         public static DateTime ToDateTime(this object text)
         {
-            if (text.IsNull())
-            {
-                return DateTime.MinValue;
-            }
+            if (text.IsNull()) return DateTime.MinValue;
 
-            if (text is DateTime)
-            {
-                return (DateTime) text;
-            }
+            if (text is DateTime) return (DateTime) text;
 
-            string str = System.Convert.ToString(text);
+            var str = Convert.ToString(text);
             if (!string.IsNullOrWhiteSpace(str))
             {
                 DateTime parsedValue;
-                if (DateTime.TryParseExact(str, Time.ShortDateFormat, null, DateTimeStyles.AssumeLocal, out parsedValue))
-                {
-                    return parsedValue;
-                }
+                if (DateTime.TryParseExact(str, Time.ShortDateFormat, null, DateTimeStyles.AssumeLocal, out parsedValue)
+                ) return parsedValue;
 
-                if (DateTime.TryParseExact(str, Time.ShortDateFormat, null, DateTimeStyles.AssumeLocal, out parsedValue))
-                {
-                    return parsedValue;
-                }
+                if (DateTime.TryParseExact(str, Time.ShortDateFormat, null, DateTimeStyles.AssumeLocal, out parsedValue)
+                ) return parsedValue;
 
-                if (DateTime.TryParse(str, out parsedValue))
-                {
-                    return parsedValue;
-                }
+                if (DateTime.TryParse(str, out parsedValue)) return parsedValue;
             }
 
             return DateTime.MinValue;
@@ -380,28 +275,29 @@ namespace ModernSlavery.Extensions
             return
                 type.IsValueType
                 || type.IsPrimitive
-                || new[] {typeof(string), typeof(decimal), typeof(DateTime), typeof(DateTimeOffset), typeof(TimeSpan), typeof(Guid)}
+                || new[]
+                    {
+                        typeof(string), typeof(decimal), typeof(DateTime), typeof(DateTimeOffset), typeof(TimeSpan),
+                        typeof(Guid)
+                    }
                     .Contains(type)
-                || System.Convert.GetTypeCode(type) != TypeCode.Object;
+                || Convert.GetTypeCode(type) != TypeCode.Object;
         }
 
         public static object CopyProperties(this object source, object target)
         {
-            Type targetType = target.GetType();
-            foreach (PropertyInfo sourceProperty in source.GetType().GetProperties())
+            var targetType = target.GetType();
+            foreach (var sourceProperty in source.GetType().GetProperties())
             {
-                MethodInfo propGetter = sourceProperty.GetGetMethod();
-                PropertyInfo targetProperty = targetType.GetProperty(sourceProperty.Name);
-                if (targetProperty == null)
-                {
-                    continue;
-                }
+                var propGetter = sourceProperty.GetGetMethod();
+                var targetProperty = targetType.GetProperty(sourceProperty.Name);
+                if (targetProperty == null) continue;
 
-                MethodInfo propSetter = targetProperty.GetSetMethod();
+                var propSetter = targetProperty.GetSetMethod();
                 // check the property has a setter
                 if (propSetter != null)
                 {
-                    object valueToSet = propGetter.Invoke(source, null);
+                    var valueToSet = propGetter.Invoke(source, null);
                     propSetter.Invoke(target, new[] {valueToSet});
                 }
             }
@@ -411,8 +307,8 @@ namespace ModernSlavery.Extensions
 
         public static void SetProperty(this object source, string propName, object valueToSet)
         {
-            PropertyInfo sourceProperty = source.GetType().GetProperty(propName);
-            MethodInfo propSetter = sourceProperty.GetSetMethod();
+            var sourceProperty = source.GetType().GetProperty(propName);
+            var propSetter = sourceProperty.GetSetMethod();
             propSetter.Invoke(source, new[] {valueToSet});
         }
 
@@ -420,10 +316,12 @@ namespace ModernSlavery.Extensions
         {
             try
             {
-                PropertyInfo myInfo = Object.GetType().GetPropertyInfo(PropertyName);
+                var myInfo = Object.GetType().GetPropertyInfo(PropertyName);
                 return myInfo.GetValue(Object, null);
             }
-            catch { }
+            catch
+            {
+            }
 
             return null;
         }
@@ -432,15 +330,15 @@ namespace ModernSlavery.Extensions
         {
             try
             {
-                int i = propertyName.IndexOf(".");
-                if (i > -1)
-                {
-                    return type.GetType().GetProperty(propertyName.Substring(0, i));
-                }
+                var i = propertyName.IndexOf(".");
+                if (i > -1) return type.GetType().GetProperty(propertyName.Substring(0, i));
 
-                return type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                return type.GetProperty(propertyName,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             }
-            catch { }
+            catch
+            {
+            }
 
             return null;
         }
@@ -449,15 +347,9 @@ namespace ModernSlavery.Extensions
             StringComparer comparer = null,
             bool newIfEmpty = false)
         {
-            if (comparer == null)
-            {
-                comparer = StringComparer.CurrentCultureIgnoreCase;
-            }
+            if (comparer == null) comparer = StringComparer.CurrentCultureIgnoreCase;
 
-            if (obj == null || obj.IsEnumerable())
-            {
-                return newIfEmpty ? new Dictionary<string, object>(comparer) : null;
-            }
+            if (obj == null || obj.IsEnumerable()) return newIfEmpty ? new Dictionary<string, object>(comparer) : null;
 
             return obj.GetType()
                 .GetProperties()
@@ -468,39 +360,31 @@ namespace ModernSlavery.Extensions
         public static bool SetPropertyValue(object obj, string propertyName, object value, bool recursive = false)
         {
             PropertyInfo myInfo = null;
-            Type myType = obj.GetType();
+            var myType = obj.GetType();
             try
             {
                 myInfo = GetPropertyInfo(myType, propertyName);
                 if (myInfo == null)
                 {
-                    if (!recursive)
-                    {
-                        return false;
-                    }
+                    if (!recursive) return false;
 
-                    PropertyInfo[] properties = myType.GetProperties();
-                    foreach (PropertyInfo property in properties)
+                    var properties = myType.GetProperties();
+                    foreach (var property in properties)
                     {
-                        object propValue = property.GetValue(obj, null);
-                        if (IsSimpleType(property.PropertyType)) { }
+                        var propValue = property.GetValue(obj, null);
+                        if (IsSimpleType(property.PropertyType))
+                        {
+                        }
                         else if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType))
                         {
                             var enumerable = (IEnumerable) propValue;
-                            foreach (object child in enumerable)
-                            {
+                            foreach (var child in enumerable)
                                 if (SetPropertyValue(child, propertyName, value, recursive))
-                                {
                                     return true;
-                                }
-                            }
                         }
                         else
                         {
-                            if (SetPropertyValue(propValue, propertyName, value, recursive))
-                            {
-                                return true;
-                            }
+                            if (SetPropertyValue(propValue, propertyName, value, recursive)) return true;
                         }
                     }
                 }
@@ -510,7 +394,7 @@ namespace ModernSlavery.Extensions
             }
             catch (Exception ex)
             {
-                string m = ex.Message;
+                var m = ex.Message;
             }
 
             return false;
@@ -520,49 +404,38 @@ namespace ModernSlavery.Extensions
         public static void FormatDecimals(this object obj)
         {
             // Loop through all properties
-            foreach (PropertyInfo p in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+            foreach (var p in obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                object value = p.GetValue(obj);
-                if (value == null)
-                {
-                    continue;
-                }
+                var value = p.GetValue(obj);
+                if (value == null) continue;
 
-                Type type = value.GetType();
-                if (type != typeof(decimal))
-                {
-                    continue;
-                }
+                var type = value.GetType();
+                if (type != typeof(decimal)) continue;
 
                 // for every property loop through all attributes
                 foreach (DisplayFormatAttribute a in p.GetCustomAttributes(typeof(DisplayFormatAttribute), false))
                 {
-                    if (string.IsNullOrWhiteSpace(a.DataFormatString))
-                    {
-                        continue;
-                    }
+                    if (string.IsNullOrWhiteSpace(a.DataFormatString)) continue;
 
                     p.SetValue(obj, decimal.Parse(string.Format(a.DataFormatString, value)));
                 }
             }
         }
 
-        public static MethodBase FindParentWithAttribute<T>(this MethodBase callingMethod, int parentOffset = 0) where T : Attribute
+        public static MethodBase FindParentWithAttribute<T>(this MethodBase callingMethod, int parentOffset = 0)
+            where T : Attribute
         {
             // Iterate throught all attributes
-            StackFrame[] frames = new StackTrace().GetFrames();
+            var frames = new StackTrace().GetFrames();
 
-            for (int i = 1 + parentOffset; i < frames.Length; i++)
+            for (var i = 1 + parentOffset; i < frames.Length; i++)
             {
-                StackFrame frame = frames[i];
+                var frame = frames[i];
                 if (frame.HasMethod())
                 {
-                    MethodBase method = frame.GetMethod();
+                    var method = frame.GetMethod();
 
-                    if (method.GetCustomAttribute<T>() != null)
-                    {
-                        return method;
-                    }
+                    if (method.GetCustomAttribute<T>() != null) return method;
                 }
             }
 
@@ -580,13 +453,13 @@ namespace ModernSlavery.Extensions
         }
 
         /// <summary>
-        /// Merges the source object into a new target
+        ///     Merges the source object into a new target
         /// </summary>
         /// <param name="source"></param>
         /// <param name="target"></param>
         /// <param name="overwriteExisting"></param>
         /// <returns></returns>
-        public static dynamic MergeDynamic(this object source, object target, bool overwriteExisting=false)
+        public static dynamic MergeDynamic(this object source, object target, bool overwriteExisting = false)
         {
             IDictionary<string, object> result = new ExpandoObject();
             IDictionary<string, object> sourceExpando = source.ToDynamic();
@@ -596,27 +469,26 @@ namespace ModernSlavery.Extensions
                 result[key] = targetExpando[key];
 
             foreach (var key in sourceExpando.Keys)
-            if (overwriteExisting || !targetExpando.ContainsKey(key))
-                result[key] = sourceExpando[key];
+                if (overwriteExisting || !targetExpando.ContainsKey(key))
+                    result[key] = sourceExpando[key];
 
             return result.ToExpando();
         }
 
-       /// <summary>
-       /// Extension method that turns a dictionary of string and object to an ExpandoObject
-       /// </summary>
-       public static ExpandoObject ToExpando(this IDictionary<string, object> dictionary)
-       {
+        /// <summary>
+        ///     Extension method that turns a dictionary of string and object to an ExpandoObject
+        /// </summary>
+        public static ExpandoObject ToExpando(this IDictionary<string, object> dictionary)
+        {
             var expando = new ExpandoObject();
-            var expandoDic = (IDictionary<string, object>)expando;
-  
+            var expandoDic = (IDictionary<string, object>) expando;
+
             // go through the items in the dictionary and copy over the key value pairs)
             foreach (var kvp in dictionary)
-            {
                 // if the value can also be turned into an ExpandoObject, then do it!
                 if (kvp.Value is IDictionary<string, object>)
                 {
-                    var expandoValue = ((IDictionary<string, object>)kvp.Value).ToExpando();
+                    var expandoValue = ((IDictionary<string, object>) kvp.Value).ToExpando();
                     expandoDic.Add(kvp.Key, expandoValue);
                 }
                 else if (kvp.Value is ICollection)
@@ -625,26 +497,23 @@ namespace ModernSlavery.Extensions
                     // along the way into expando objects
                     var itemList = new List<object>();
                     foreach (var item in (ICollection) kvp.Value)
-                    {
                         if (item is IDictionary<string, object>)
                         {
-                            var expandoItem = ((IDictionary<string, object>)item).ToExpando();
+                            var expandoItem = ((IDictionary<string, object>) item).ToExpando();
                             itemList.Add(expandoItem);
                         }
                         else
                         {
                             itemList.Add(item);
                         }
-                    }
-  
+
                     expandoDic.Add(kvp.Key, itemList);
                 }
                 else
                 {
                     expandoDic.Add(kvp);
                 }
-            }
-  
+
             return expando;
         }
     }

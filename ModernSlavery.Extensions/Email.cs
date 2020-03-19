@@ -10,22 +10,15 @@ namespace ModernSlavery.Extensions
 {
     public static class Email
     {
-
         [DebuggerStepThrough]
         public static bool IsEmailAddress(this string inputEmail)
         {
-            if (string.IsNullOrWhiteSpace(inputEmail))
-            {
-                return false;
-            }
+            if (string.IsNullOrWhiteSpace(inputEmail)) return false;
 
             try
             {
                 var email = new MailAddress(inputEmail);
-                if (email == null || string.IsNullOrWhiteSpace(email.Address))
-                {
-                    return false;
-                }
+                if (email == null || string.IsNullOrWhiteSpace(email.Address)) return false;
             }
             catch (FormatException)
             {
@@ -37,10 +30,7 @@ namespace ModernSlavery.Extensions
 
         public static string GetEmailAddress(this string email)
         {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                return "";
-            }
+            if (string.IsNullOrWhiteSpace(email)) return "";
 
             try
             {
@@ -67,24 +57,15 @@ namespace ModernSlavery.Extensions
             bool test = false)
         {
             if (string.IsNullOrWhiteSpace(senderEmailAddress))
-            {
                 throw new ArgumentNullException(nameof(senderEmailAddress), "Missing or empty senderEmailAddress");
-            }
 
             if (string.IsNullOrWhiteSpace(recipients))
-            {
                 throw new ArgumentNullException(nameof(recipients), "Missing or empty recipients");
-            }
 
-            if (string.IsNullOrWhiteSpace(html))
-            {
-                throw new ArgumentNullException(nameof(html), "Missing or empty html");
-            }
+            if (string.IsNullOrWhiteSpace(html)) throw new ArgumentNullException(nameof(html), "Missing or empty html");
 
             if (string.IsNullOrWhiteSpace(senderEmailAddress))
-            {
                 throw new ArgumentNullException(nameof(senderEmailAddress), "Missing or empty senderEmailAddress");
-            }
 
             var mySmtpClient = new SmtpClient(smtpServer);
 
@@ -92,14 +73,10 @@ namespace ModernSlavery.Extensions
             if (!string.IsNullOrWhiteSpace(smtpServer))
             {
                 if (string.IsNullOrWhiteSpace(smtpUsername))
-                {
                     throw new ArgumentNullException(nameof(smtpUsername), "Missing or empty SmtpUsername");
-                }
 
                 if (string.IsNullOrWhiteSpace(smtpPassword))
-                {
                     throw new ArgumentNullException(nameof(smtpPassword), "Missing or empty SmtpPassword");
-                }
 
                 mySmtpClient.Port = smtpPort;
                 mySmtpClient.EnableSsl = true;
@@ -115,7 +92,8 @@ namespace ModernSlavery.Extensions
             var basicAuthenticationInfo = new NetworkCredential(smtpUsername, smtpPassword);
             mySmtpClient.Credentials = basicAuthenticationInfo;
 
-            var myMail = new MailMessage {
+            var myMail = new MailMessage
+            {
                 From = new MailAddress(senderEmailAddress, senderName),
                 Subject = subject,
                 SubjectEncoding = Encoding.UTF8,
@@ -126,36 +104,26 @@ namespace ModernSlavery.Extensions
 
             //Add
             if (!string.IsNullOrWhiteSpace(replyEmailAddress))
-            {
                 myMail.ReplyToList.Add(new MailAddress(replyEmailAddress, senderName));
-            }
 
             // set body-message and encoding
             // text or html
 
             // add mailaddresses
-            foreach (string recipient in recipients.SplitI(";"))
-            {
-                myMail.To.Add(new MailAddress(recipient));
-            }
+            foreach (var recipient in recipients.SplitI(";")) myMail.To.Add(new MailAddress(recipient));
 
             //Add the attachment
             if (!test)
             {
                 if (attachment == null)
-                {
                     await mySmtpClient.SendMailAsync(myMail);
-                }
                 else
-                {
                     using (var stream = new MemoryStream(attachment))
                     {
                         myMail.Attachments.Add(new Attachment(stream, attachmentFilename));
                         await mySmtpClient.SendMailAsync(myMail);
                     }
-                }
             }
         }
-
     }
 }

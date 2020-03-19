@@ -14,10 +14,9 @@ namespace ModernSlavery.Extensions
 {
     public static class Lists
     {
-
         public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IQueryable<T> query)
         {
-            foreach (T entity in query)
+            foreach (var entity in query)
                 yield return entity;
         }
 
@@ -26,25 +25,13 @@ namespace ModernSlavery.Extensions
             int maxItems = 0,
             StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries)
         {
-            if (string.IsNullOrWhiteSpace(list))
-            {
-                return new string[0];
-            }
+            if (string.IsNullOrWhiteSpace(list)) return new string[0];
 
-            if (separators == null)
-            {
-                throw new ArgumentNullException("separators");
-            }
+            if (separators == null) throw new ArgumentNullException("separators");
 
-            if (separators == string.Empty)
-            {
-                return list.ToCharArray().Select(c => c.ToString()).ToArray();
-            }
+            if (separators == string.Empty) return list.ToCharArray().Select(c => c.ToString()).ToArray();
 
-            if (maxItems > 0)
-            {
-                return list.Split(separators.ToCharArray(), maxItems, options);
-            }
+            if (maxItems > 0) return list.Split(separators.ToCharArray(), maxItems, options);
 
             return list.Split(separators.ToCharArray(), options);
         }
@@ -61,21 +48,15 @@ namespace ModernSlavery.Extensions
 
         public static bool ContainsI(this IEnumerable<string> list, params string[] text)
         {
-            if (list == null || text == null || text.Length == 0)
-            {
-                return false;
-            }
+            if (list == null || text == null || text.Length == 0) return false;
 
-            List<string> li = list.ToList();
+            var li = list.ToList();
             return text.Any(t => li.Any(l => l.EqualsI(t)));
         }
 
         public static bool ContainsI(this string source, params string[] list)
         {
-            if (string.IsNullOrWhiteSpace(source))
-            {
-                return false;
-            }
+            if (string.IsNullOrWhiteSpace(source)) return false;
 
             return list.Any(i => source.ContainsI(i));
         }
@@ -84,27 +65,18 @@ namespace ModernSlavery.Extensions
         {
             return list.ToList().FindIndex(l => l.EqualsI(text));
         }
-        
+
         public static bool ContainsAllEmails(this IEnumerable<string> inputEmails)
         {
             var found = false;
-            foreach (string email in inputEmails)
+            foreach (var email in inputEmails)
             {
-                if (string.IsNullOrWhiteSpace(email))
-                {
-                    continue;
-                }
+                if (string.IsNullOrWhiteSpace(email)) continue;
 
-                string address = email.GetEmailAddress();
-                if (string.IsNullOrWhiteSpace(address))
-                {
-                    return false;
-                }
+                var address = email.GetEmailAddress();
+                if (string.IsNullOrWhiteSpace(address)) return false;
 
-                if (!address.IsEmailAddress())
-                {
-                    return false;
-                }
+                if (!address.IsEmailAddress()) return false;
 
                 found = true;
             }
@@ -120,44 +92,25 @@ namespace ModernSlavery.Extensions
                 var keyValues = new List<KeyValuePair<string, string>>();
                 foreach (string key in collection.Keys)
                 {
-                    if (string.IsNullOrWhiteSpace(collection[key]))
-                    {
-                        continue;
-                    }
+                    if (string.IsNullOrWhiteSpace(collection[key])) continue;
 
                     if (allowDuplicateKeys)
-                    {
-                        foreach (string value in collection[key].SplitI(","))
-                        {
+                        foreach (var value in collection[key].SplitI(","))
                             keyValues.Add(new KeyValuePair<string, string>(key, value));
-                        }
-                    }
                     else
-                    {
                         keyValues.Add(new KeyValuePair<string, string>(key, collection[key]));
-                    }
                 }
 
-                foreach (KeyValuePair<string, string> keyValue in keyValues)
+                foreach (var keyValue in keyValues)
                 {
-                    if (string.IsNullOrWhiteSpace(keyValue.Value))
-                    {
-                        continue;
-                    }
+                    if (string.IsNullOrWhiteSpace(keyValue.Value)) continue;
 
-                    if (!string.IsNullOrWhiteSpace(data))
-                    {
-                        data += "&";
-                    }
+                    if (!string.IsNullOrWhiteSpace(data)) data += "&";
 
                     if (string.IsNullOrWhiteSpace(keyValue.Key))
-                    {
                         data += keyValue.Value;
-                    }
                     else
-                    {
                         data += $"{WebUtility.UrlEncode(keyValue.Key)}={keyValue.Value}";
-                    }
                 }
             }
 
@@ -166,23 +119,19 @@ namespace ModernSlavery.Extensions
 
         public static NameValueCollection FromQueryString(this string querystring)
         {
-            return string.IsNullOrWhiteSpace(querystring) ? null : QueryHelpers.ParseNullableQuery(querystring).ToNameValueCollection();
+            return string.IsNullOrWhiteSpace(querystring)
+                ? null
+                : QueryHelpers.ParseNullableQuery(querystring).ToNameValueCollection();
         }
 
         public static NameValueCollection ToNameValueCollection(this Dictionary<string, StringValues> dictionary)
         {
             var collection = new NameValueCollection();
-            foreach (string key in dictionary.Keys)
-            {
+            foreach (var key in dictionary.Keys)
                 if (dictionary[key] == "")
-                {
                     collection[null] = key;
-                }
                 else
-                {
                     collection[key] = dictionary[key];
-                }
-            }
 
             return collection;
         }
@@ -192,32 +141,22 @@ namespace ModernSlavery.Extensions
             return list.ToDelimitedString(delimiter, appendage);
         }
 
-        public static string ToDelimitedString<T>(this IEnumerable<T> list, string delimiter = ",", string appendage = null)
+        public static string ToDelimitedString<T>(this IEnumerable<T> list, string delimiter = ",",
+            string appendage = null)
         {
-            if (list == null)
-            {
-                return null;
-            }
+            if (list == null) return null;
 
             string result = null;
 
-            foreach (T item in list)
+            foreach (var item in list)
             {
-                if (item == null)
-                {
-                    continue;
-                }
+                if (item == null) continue;
 
-                string text = item.ToString();
-                if (string.IsNullOrWhiteSpace(text))
-                {
-                    continue;
-                }
+                var text = item.ToString();
+                if (string.IsNullOrWhiteSpace(text)) continue;
 
                 if (result != null && !string.IsNullOrEmpty(delimiter) && !result.EndsWithI(delimiter))
-                {
                     result += delimiter;
-                }
 
                 result += text + appendage;
             }
@@ -242,38 +181,23 @@ namespace ModernSlavery.Extensions
             string lastSeparator = null,
             bool allowDuplicates = true)
         {
-            if (list == null)
-            {
-                return null;
-            }
+            if (list == null) return null;
 
             string result = null;
 
             for (var i = 0; i < list.Count; i++)
             {
-                T item = list[i];
-                string text = item.ToString();
-                if (string.IsNullOrWhiteSpace(text))
-                {
-                    continue;
-                }
+                var item = list[i];
+                var text = item.ToString();
+                if (string.IsNullOrWhiteSpace(text)) continue;
 
-                if (result != null)
-                {
-                    result += i == list.Count - 1 ? lastSeparator : separator;
-                }
+                if (result != null) result += i == list.Count - 1 ? lastSeparator : separator;
 
-                string str = item.ToString();
-                if (allowDuplicates || !str.StartsWithI(prefix))
-                {
-                    result += prefix;
-                }
+                var str = item.ToString();
+                if (allowDuplicates || !str.StartsWithI(prefix)) result += prefix;
 
                 result += str;
-                if (allowDuplicates || !str.EndsWithI(suffix))
-                {
-                    result += suffix;
-                }
+                if (allowDuplicates || !str.EndsWithI(suffix)) result += suffix;
             }
 
             return result;
@@ -281,10 +205,7 @@ namespace ModernSlavery.Extensions
 
         public static SortedSet<T> ToSortedSet<T>(this IEnumerable<T> list)
         {
-            if (list == null || !list.Any())
-            {
-                return new SortedSet<T>();
-            }
+            if (list == null || !list.Any()) return new SortedSet<T>();
 
             return new SortedSet<T>(list);
         }
@@ -304,10 +225,7 @@ namespace ModernSlavery.Extensions
 
         public static void AddRange<T>(this HashSet<T> targetCollection, IEnumerable<T> collection)
         {
-            foreach (T item in collection)
-            {
-                targetCollection.Add(item);
-            }
+            foreach (var item in collection) targetCollection.Add(item);
         }
 
         public static void AddRange<T>(this SortedSet<T> targetCollection, params T[] pars)
@@ -317,26 +235,17 @@ namespace ModernSlavery.Extensions
 
         public static void AddRange<T>(this SortedSet<T> targetCollection, IEnumerable<T> collection)
         {
-            foreach (T item in collection)
-            {
-                targetCollection.Add(item);
-            }
+            foreach (var item in collection) targetCollection.Add(item);
         }
 
         public static List<string> RemoveI(this List<string> source, params string[] collection)
         {
-            foreach (string item in collection)
+            foreach (var item in collection)
             {
-                if (string.IsNullOrWhiteSpace(item))
-                {
-                    continue;
-                }
+                if (string.IsNullOrWhiteSpace(item)) continue;
 
-                int i = source.IndexOfI(item);
-                if (i > -1)
-                {
-                    source.RemoveAt(i);
-                }
+                var i = source.IndexOfI(item);
+                if (i > -1) source.RemoveAt(i);
             }
 
             return source;
@@ -346,23 +255,17 @@ namespace ModernSlavery.Extensions
         {
             var table = new DataTable(tableName);
 
-            foreach (T item in list)
+            foreach (var item in list)
             {
                 var jObject = item as JObject;
 
-                if (jObject == null)
-                {
-                    jObject = JObject.FromObject(item);
-                }
+                if (jObject == null) jObject = JObject.FromObject(item);
 
-                DataRow row = table.NewRow();
+                var row = table.NewRow();
 
-                foreach (KeyValuePair<string, JToken> col in jObject)
+                foreach (var col in jObject)
                 {
-                    if (!table.Columns.Contains(col.Key))
-                    {
-                        table.Columns.Add(col.Key);
-                    }
+                    if (!table.Columns.Contains(col.Key)) table.Columns.Add(col.Key);
 
                     row[col.Key] = col.Value;
                 }
@@ -384,22 +287,19 @@ namespace ModernSlavery.Extensions
 
         public static List<T> ToListOrEmpty<T>(this IEnumerable<T> collection)
         {
-            if (collection == null)
-            {
-                return new List<T>();
-            }
+            if (collection == null) return new List<T>();
 
             return collection.ToList();
         }
 
         public static IEnumerable<T> Randomise<T>(this IList<T> list)
         {
-            int[] indexes = Enumerable.Range(0, list.Count).ToArray();
+            var indexes = Enumerable.Range(0, list.Count).ToArray();
             var generator = new Random();
 
             for (var i = 0; i < list.Count; ++i)
             {
-                int position = generator.Next(i, list.Count);
+                var position = generator.Next(i, list.Count);
 
                 yield return list[indexes[position]];
 
@@ -409,16 +309,13 @@ namespace ModernSlavery.Extensions
 
         public static IEnumerable<T> Page<T>(this IEnumerable<T> list, int pageSize, int page)
         {
-            int skip = (page - 1) * pageSize;
+            var skip = (page - 1) * pageSize;
             return list.Skip(skip).Take(pageSize);
         }
 
         public static IEnumerable<IEnumerable<T>> GetPermutations<T>(this IEnumerable<T> list, int length)
         {
-            if (length == 1)
-            {
-                return list.Select(t => new[] {t});
-            }
+            if (length == 1) return list.Select(t => new[] {t});
 
             return GetPermutations(list, length - 1)
                 .SelectMany(
@@ -428,27 +325,18 @@ namespace ModernSlavery.Extensions
 
         public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
+            if (source == null) throw new ArgumentNullException(nameof(source));
 
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
+            if (action == null) throw new ArgumentNullException(nameof(action));
 
-            foreach (T item in source)
-            {
-                action(item);
-            }
+            foreach (var item in source) action(item);
         }
 
         public static void AddOrUpdate<T>(this IList<T> source, IList<T> replacements)
         {
             for (var i = 0; i < source.Count; i++)
             {
-                int i2 = replacements.IndexOf(source[i]);
+                var i2 = replacements.IndexOf(source[i]);
                 if (i2 > -1)
                 {
                     source[i] = replacements[i2];
@@ -461,21 +349,18 @@ namespace ModernSlavery.Extensions
 
         public static IEnumerable<T> Flatten<T>(this IEnumerable<T> e, Func<T, IEnumerable<T>> f)
         {
-            if (e == null)
-            {
-                return null;
-            }
+            if (e == null) return null;
 
             return e.SelectMany(c => f(c).Flatten(f)).Concat(e);
         }
-
     }
 
     [Serializable]
     public class NameValueSetting
     {
-
-        public NameValueSetting() { }
+        public NameValueSetting()
+        {
+        }
 
         public NameValueSetting(string name, string value)
         {
@@ -483,19 +368,17 @@ namespace ModernSlavery.Extensions
             Value = value;
         }
 
-        [XmlAttribute("name")]
-        public string Name { get; set; }
+        [XmlAttribute("name")] public string Name { get; set; }
 
-        [XmlAttribute("value")]
-        public string Value { get; set; }
-
+        [XmlAttribute("value")] public string Value { get; set; }
     }
 
     [Serializable]
     public class NameValueElement
     {
-
-        public NameValueElement() { }
+        public NameValueElement()
+        {
+        }
 
         public NameValueElement(string name, string value)
         {
@@ -503,11 +386,8 @@ namespace ModernSlavery.Extensions
             Value = value;
         }
 
-        [XmlAttribute("name")]
-        public string Name { get; set; }
+        [XmlAttribute("name")] public string Name { get; set; }
 
-        [XmlText]
-        public string Value { get; set; }
-
+        [XmlText] public string Value { get; set; }
     }
 }

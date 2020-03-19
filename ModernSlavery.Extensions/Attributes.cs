@@ -4,10 +4,8 @@ using System.Reflection;
 
 namespace ModernSlavery.Extensions
 {
-
     public static class Attributes
     {
-
         // Enum
         public static TAttribute GetAttribute<TAttribute>(this Enum value) where TAttribute : Attribute
         {
@@ -22,7 +20,5 @@ namespace ModernSlavery.Extensions
         {
             return value.GetType().GetCustomAttribute<TAttribute>();
         }
-
     }
-
 }

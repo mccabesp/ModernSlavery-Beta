@@ -7,7 +7,6 @@ namespace ModernSlavery.Extensions
 {
     public static class Reflect
     {
-
         public static Dictionary<string, object> GetPropertiesDictionary(this object source,
             BindingFlags filterFlags = BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance)
         {
@@ -22,7 +21,7 @@ namespace ModernSlavery.Extensions
 
         public static R GetProperty<R>(this object obj, string property)
         {
-            PropertyInfo value = obj.GetType().GetProperty(property);
+            var value = obj.GetType().GetProperty(property);
             return (R) value.GetValue(obj);
         }
 
@@ -31,10 +30,9 @@ namespace ModernSlavery.Extensions
             // Obtain the custom attribute for the method. 
             // The value returned contains the StateMachineType property. 
             // Null is returned if the attribute isn't present for the method. 
-            var attrib = (AsyncStateMachineAttribute)method.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
+            var attrib = (AsyncStateMachineAttribute) method.GetCustomAttribute(typeof(AsyncStateMachineAttribute));
 
             return attrib != null;
         }
-
     }
 }

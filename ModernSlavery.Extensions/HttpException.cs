@@ -5,7 +5,6 @@ namespace ModernSlavery.Extensions
 {
     public class HttpException : Exception
     {
-
         public readonly int StatusCode;
 
         public HttpException(int statusCode, string message = null) : base(message)
@@ -17,6 +16,5 @@ namespace ModernSlavery.Extensions
         {
             StatusCode = (int) statusCode;
         }
-
     }
 }

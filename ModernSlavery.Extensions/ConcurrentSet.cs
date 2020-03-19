@@ -8,10 +8,11 @@ namespace ModernSlavery.Extensions
 {
     public class ConcurrentSet<T> : IEnumerable<T>, ISet<T>, ICollection<T>
     {
-
         private readonly ConcurrentDictionary<T, byte> _dictionary = new ConcurrentDictionary<T, byte>();
 
-        public ConcurrentSet() { }
+        public ConcurrentSet()
+        {
+        }
 
         public ConcurrentSet(IEnumerable<T> source)
         {
@@ -89,10 +90,7 @@ namespace ModernSlavery.Extensions
         /// </exception>
         void ICollection<T>.Add(T item)
         {
-            if (!Add(item))
-            {
-                throw new ArgumentException("Item already exists in set.");
-            }
+            if (!Add(item)) throw new ArgumentException("Item already exists in set.");
         }
 
         /// <summary>
@@ -103,10 +101,7 @@ namespace ModernSlavery.Extensions
         /// <exception cref="T:System.ArgumentNullException"><paramref name="other" /> is null.</exception>
         public void UnionWith(IEnumerable<T> other)
         {
-            foreach (T item in other)
-            {
-                TryAdd(item);
-            }
+            foreach (var item in other) TryAdd(item);
         }
 
         /// <summary>
@@ -116,14 +111,10 @@ namespace ModernSlavery.Extensions
         /// <exception cref="T:System.ArgumentNullException"><paramref name="other" /> is null.</exception>
         public void IntersectWith(IEnumerable<T> other)
         {
-            IList<T> enumerable = other as IList<T> ?? other.ToArray();
-            foreach (T item in this)
-            {
+            var enumerable = other as IList<T> ?? other.ToArray();
+            foreach (var item in this)
                 if (!enumerable.Contains(item))
-                {
                     TryRemove(item);
-                }
-            }
         }
 
         /// <summary>
@@ -133,10 +124,7 @@ namespace ModernSlavery.Extensions
         /// <exception cref="T:System.ArgumentNullException"><paramref name="other" /> is null.</exception>
         public void ExceptWith(IEnumerable<T> other)
         {
-            foreach (T item in other)
-            {
-                TryRemove(item);
-            }
+            foreach (var item in other) TryRemove(item);
         }
 
         /// <summary>
@@ -160,7 +148,7 @@ namespace ModernSlavery.Extensions
         /// <exception cref="T:System.ArgumentNullException"><paramref name="other" /> is null.</exception>
         public bool IsSubsetOf(IEnumerable<T> other)
         {
-            IList<T> enumerable = other as IList<T> ?? other.ToArray();
+            var enumerable = other as IList<T> ?? other.ToArray();
             return this.AsParallel().All(enumerable.Contains);
         }
 
@@ -188,7 +176,7 @@ namespace ModernSlavery.Extensions
         /// <exception cref="T:System.ArgumentNullException"><paramref name="other" /> is null.</exception>
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
-            IList<T> enumerable = other as IList<T> ?? other.ToArray();
+            var enumerable = other as IList<T> ?? other.ToArray();
             return Count != enumerable.Count && IsSupersetOf(enumerable);
         }
 
@@ -202,7 +190,7 @@ namespace ModernSlavery.Extensions
         /// <exception cref="T:System.ArgumentNullException"><paramref name="other" /> is null.</exception>
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
-            IList<T> enumerable = other as IList<T> ?? other.ToArray();
+            var enumerable = other as IList<T> ?? other.ToArray();
             return Count != enumerable.Count && IsSubsetOf(enumerable);
         }
 
@@ -229,7 +217,7 @@ namespace ModernSlavery.Extensions
         /// <exception cref="T:System.ArgumentNullException"><paramref name="other" /> is null.</exception>
         public bool SetEquals(IEnumerable<T> other)
         {
-            IList<T> enumerable = other as IList<T> ?? other.ToArray();
+            var enumerable = other as IList<T> ?? other.ToArray();
             return Count == enumerable.Count && enumerable.AsParallel().All(Contains);
         }
 
@@ -280,10 +268,7 @@ namespace ModernSlavery.Extensions
 
         public void Remove(IEnumerable<T> other)
         {
-            foreach (T item in other)
-            {
-                TryRemove(item);
-            }
+            foreach (var item in other) TryRemove(item);
         }
 
         public T[] ToArray()
@@ -301,6 +286,5 @@ namespace ModernSlavery.Extensions
             byte donotcare;
             return _dictionary.TryRemove(item, out donotcare);
         }
-
     }
 }

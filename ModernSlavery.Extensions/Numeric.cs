@@ -6,7 +6,6 @@ namespace ModernSlavery.Extensions
 {
     public static class Numeric
     {
-
         public static Random Random = new Random(VirtualDateTime.Now.Millisecond);
 
         /// <summary>
@@ -26,16 +25,14 @@ namespace ModernSlavery.Extensions
             }
 
             //Get all values within the range
-            int[] range = Enumerable.Range(Min, (Max - Min) + 1).ToArray();
+            var range = Enumerable.Range(Min, Max - Min + 1).ToArray();
 
             //Normalise all excludes and sort
             excludes = new SortedSet<int>(excludes).ToArray();
 
             //Throw wrror if all values are excluded
             if (range.SequenceEqual(excludes))
-            {
                 throw new ArgumentOutOfRangeException(nameof(excludes), "All values cannot be excluded");
-            }
 
             //Get a random value unit it is not in the cluded range
             do
@@ -57,49 +54,29 @@ namespace ModernSlavery.Extensions
         {
             if (roundDown)
             {
-                if (size < 1024)
-                {
-                    return size.ToInt32().ToString(formatString) + " b";
-                }
+                if (size < 1024) return size.ToInt32().ToString(formatString) + " b";
 
-                if (size < 1048576)
-                {
-                    return (size / 1024).ToInt32().ToString(formatString) + " kb";
-                }
+                if (size < 1048576) return (size / 1024).ToInt32().ToString(formatString) + " kb";
 
                 return (size / 10485.76 / 100).ToInt32().ToString(formatString) + " mb";
             }
 
-            if (size < 1024)
-            {
-                return Math.Round(size).ToString(formatString) + " b";
-            }
+            if (size < 1024) return Math.Round(size).ToString(formatString) + " b";
 
-            if (size < 1048576)
-            {
-                return Math.Round(size / 1024).ToString(formatString) + " kb";
-            }
+            if (size < 1048576) return Math.Round(size / 1024).ToString(formatString) + " kb";
 
             return (Math.Round(size / 10485.76) / 100).ToString(formatString) + " mb";
         }
 
         public static bool Contains(this int[] numbers, int value)
         {
-            if (numbers == null || numbers.Length < 1)
-            {
-                return false;
-            }
+            if (numbers == null || numbers.Length < 1) return false;
 
-            foreach (int i in numbers)
-            {
+            foreach (var i in numbers)
                 if (i == value)
-                {
                     return true;
-                }
-            }
 
             return false;
         }
-
     }
 }

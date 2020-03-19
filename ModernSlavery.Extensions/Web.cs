@@ -10,16 +10,13 @@ namespace ModernSlavery.Extensions
 {
     public static class Web
     {
-
         public enum HttpMethods
         {
-
             Get,
             Post,
             Delete,
             Patch,
             Put
-
         }
 
         public static async Task<string> CallApiAsync(HttpMethods httpMethod,
@@ -40,34 +37,26 @@ namespace ModernSlavery.Extensions
                 }
 
                 if (headers != null)
-                {
-                    foreach (string key in headers.Keys)
-                    {
+                    foreach (var key in headers.Keys)
                         client.DefaultRequestHeaders.Add(key, headers[key]);
-                    }
-                }
 
                 HttpContent httpContent = null;
                 if (body != null)
                 {
                     if (!httpMethod.IsAny(HttpMethods.Post, HttpMethods.Put, HttpMethods.Patch))
-                    {
                         throw new ArgumentOutOfRangeException(
                             nameof(httpMethod),
                             "HttpMethod must be Post, Put or Patch when a body is specified");
-                    }
 
-                    if (string.IsNullOrWhiteSpace(body))
-                    {
-                        throw new ArgumentNullException("body", "body is empty");
-                    }
+                    if (string.IsNullOrWhiteSpace(body)) throw new ArgumentNullException("body", "body is empty");
 
                     httpContent = new StringContent(
                         body,
                         Encoding.UTF8,
                         httpMethod == HttpMethods.Patch ? "application/json-patch+json" : "application/json");
                 }
-                else if (httpMethod.IsAny(HttpMethods.Post, HttpMethods.Put, HttpMethods.Patch) && (headers == null || headers.Count == 0))
+                else if (httpMethod.IsAny(HttpMethods.Post, HttpMethods.Put, HttpMethods.Patch) &&
+                         (headers == null || headers.Count == 0))
                 {
                     throw new ArgumentOutOfRangeException(
                         nameof(body),
@@ -75,27 +64,23 @@ namespace ModernSlavery.Extensions
                 }
 
 
-                using (HttpResponseMessage response = httpMethod == HttpMethods.Get ? await client.GetAsync(url) :
+                using (var response = httpMethod == HttpMethods.Get ? await client.GetAsync(url) :
                     httpMethod == HttpMethods.Delete ? await client.DeleteAsync(url) :
                     httpMethod == HttpMethods.Post ? await client.PostAsync(url, httpContent) :
                     httpMethod == HttpMethods.Put ? await client.PutAsync(url, httpContent) :
                     httpMethod == HttpMethods.Patch ? await client.PatchAsync(url, httpContent) :
-                    throw new ArgumentOutOfRangeException(nameof(httpMethod), "HttpMethod must be Get, Delete, Post or Put"))
+                    throw new ArgumentOutOfRangeException(nameof(httpMethod),
+                        "HttpMethod must be Get, Delete, Post or Put"))
                 {
                     response.EnsureSuccessStatusCode();
-                    string responseBody = await response.Content.ReadAsStringAsync();
+                    var responseBody = await response.Content.ReadAsStringAsync();
                     if (headers != null)
-                    {
-                        foreach (KeyValuePair<string, IEnumerable<string>> header in response.Headers)
-                        {
+                        foreach (var header in response.Headers)
                             headers[header.Key] = header.Value.Distinct().ToDelimitedString();
-                        }
-                    }
 
                     return responseBody;
                 }
             }
         }
-
     }
 }

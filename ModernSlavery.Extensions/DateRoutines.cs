@@ -8,13 +8,9 @@ namespace ModernSlavery.Extensions
     /// </summary>
     public static class DateTimeRoutines
     {
-
         public static string ToFriendlyDate(this DateTime date)
         {
-            if (date == DateTime.MinValue)
-            {
-                return null;
-            }
+            if (date == DateTime.MinValue) return null;
 
             var day = "th";
             switch (date.Day)
@@ -40,12 +36,9 @@ namespace ModernSlavery.Extensions
 
         public static string ToFriendly(this DateTime date, bool showTime = true, string emptyValue = "Never")
         {
-            if (date == DateTime.MinValue)
-            {
-                return emptyValue;
-            }
+            if (date == DateTime.MinValue) return emptyValue;
 
-            TimeSpan span = VirtualDateTime.Now - date;
+            var span = VirtualDateTime.Now - date;
 
             // Normalize time span
             var future = false;
@@ -57,18 +50,15 @@ namespace ModernSlavery.Extensions
             }
 
             // Test for Now
-            double totalSeconds = span.TotalSeconds;
-            if (totalSeconds < 0.9)
-            {
-                return "Now";
-            }
+            var totalSeconds = span.TotalSeconds;
+            if (totalSeconds < 0.9) return "Now";
 
             // Date/time near current date/time
-            string format = future ? "In {0} {1}" : "{0} {1} ago";
+            var format = future ? "In {0} {1}" : "{0} {1} ago";
             if (totalSeconds < 55)
             {
                 // Seconds
-                int seconds = Math.Max(1, span.Seconds);
+                var seconds = Math.Max(1, span.Seconds);
                 return string.Format(
                     format,
                     seconds,
@@ -78,7 +68,7 @@ namespace ModernSlavery.Extensions
             if (totalSeconds < 55 * 60)
             {
                 // Minutes
-                int minutes = Math.Max(1, span.Minutes);
+                var minutes = Math.Max(1, span.Minutes);
                 return string.Format(
                     format,
                     minutes,
@@ -88,7 +78,7 @@ namespace ModernSlavery.Extensions
             if (totalSeconds < 24 * 60 * 60)
             {
                 // Hours
-                int hours = Math.Max(1, span.Hours);
+                var hours = Math.Max(1, span.Hours);
                 return string.Format(
                     format,
                     hours,
@@ -110,30 +100,20 @@ namespace ModernSlavery.Extensions
             {
                 // Absolute date
                 if (date.Year == VirtualDateTime.Now.Year)
-                {
                     format = date.ToString(@"MMM d");
-                }
                 else
-                {
                     format = date.ToString(@"MMM d, yyyy");
-                }
             }
 
             // Add time
-            if (!showTime)
-            {
-                return format;
-            }
+            if (!showTime) return format;
 
             return string.Format("{0} at {1:hh:mm}", format, date);
         }
 
         public static string ToFriendly(this TimeSpan interval, string zeroText = null, int maxParts = 4)
         {
-            if (interval <= TimeSpan.Zero)
-            {
-                return zeroText;
-            }
+            if (interval <= TimeSpan.Zero) return zeroText;
 
             string result = null;
             var parts = 0;
@@ -147,10 +127,7 @@ namespace ModernSlavery.Extensions
             if (interval.Hours > 0 && parts < maxParts)
             {
                 parts++;
-                if (result != null)
-                {
-                    result += parts == maxParts ? " and " : ", ";
-                }
+                if (result != null) result += parts == maxParts ? " and " : ", ";
 
                 result += interval.Hours;
                 result += " hour" + (interval.Hours > 1 ? "s" : "");
@@ -159,10 +136,7 @@ namespace ModernSlavery.Extensions
             if (interval.Minutes > 0 && parts < maxParts)
             {
                 parts++;
-                if (result != null)
-                {
-                    result += parts == maxParts ? " and " : ", ";
-                }
+                if (result != null) result += parts == maxParts ? " and " : ", ";
 
                 result += interval.Minutes;
                 result += " minute" + (interval.Minutes > 1 ? "s" : "");
@@ -171,10 +145,7 @@ namespace ModernSlavery.Extensions
             if (interval.Days == 0 && interval.Hours == 0 && interval.Seconds > 0 && parts < maxParts)
             {
                 parts++;
-                if (result != null)
-                {
-                    result += parts == maxParts ? " and " : ", ";
-                }
+                if (result != null) result += parts == maxParts ? " and " : ", ";
 
                 result += interval.Seconds;
                 result += " second" + (interval.Seconds > 1 ? "s" : "");
@@ -187,29 +158,25 @@ namespace ModernSlavery.Extensions
         {
             return dateTime.ToString(Time.ShortDateFormat);
         }
-        
+
         public static DateTime FromSmallDateTime(this string shortDateTime, bool defaultMaxDateTime = false)
         {
             DateTime dateTime;
-            if (DateTime.TryParseExact(shortDateTime, Time.ShortDateFormat, null, DateTimeStyles.AssumeLocal, out dateTime))
-            {
-                return dateTime;
-            }
+            if (DateTime.TryParseExact(shortDateTime, Time.ShortDateFormat, null, DateTimeStyles.AssumeLocal,
+                out dateTime)) return dateTime;
 
             return defaultMaxDateTime ? DateTime.MaxValue : DateTime.MinValue;
         }
-        
+
         public static DateTime FromShortestDateTime(this string shorterDateTime)
         {
             DateTime dateTime;
-            if (DateTime.TryParseExact(shorterDateTime, Time.ShortestDateFormat, null, DateTimeStyles.AssumeLocal, out dateTime))
-            {
-                return dateTime;
-            }
+            if (DateTime.TryParseExact(shorterDateTime, Time.ShortestDateFormat, null, DateTimeStyles.AssumeLocal,
+                out dateTime)) return dateTime;
 
             return DateTime.MinValue;
         }
-        
+
         public static int ToFourDigitYear(this int year)
         {
             try
@@ -226,6 +193,5 @@ namespace ModernSlavery.Extensions
         {
             return new DateTime(year, 1, 1).ToString("yy").ToInt32();
         }
-
     }
 }

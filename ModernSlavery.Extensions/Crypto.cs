@@ -9,7 +9,6 @@ namespace ModernSlavery.Extensions
 {
     public static class Crypto
     {
-
         public static string GetPBKDF2(string password,
             byte[] salt,
             KeyDerivationPrf prfunction = KeyDerivationPrf.HMACSHA1,
@@ -29,7 +28,7 @@ namespace ModernSlavery.Extensions
         {
             // generate a salt using a secure PRNG
             var salt = new byte[saltSizeInBit / 8];
-            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(salt);
             }
@@ -40,17 +39,17 @@ namespace ModernSlavery.Extensions
 
         public static string GetSHA512Checksum(string text, bool base64encode = true)
         {
-            byte[] checksumData = Encoding.UTF8.GetBytes(text);
-            byte[] hash = SHA512.Create().ComputeHash(checksumData);
-            string calculatedChecksum = base64encode ? Convert.ToBase64String(hash) : Encoding.UTF8.GetString(hash);
+            var checksumData = Encoding.UTF8.GetBytes(text);
+            var hash = SHA512.Create().ComputeHash(checksumData);
+            var calculatedChecksum = base64encode ? Convert.ToBase64String(hash) : Encoding.UTF8.GetString(hash);
             return calculatedChecksum;
         }
 
         public static string GetSHA256Checksum(this string text)
         {
-            byte[] checksumData = Encoding.UTF8.GetBytes(text);
-            byte[] hash = SHA256.Create().ComputeHash(checksumData);
-            string calculatedChecksum = Convert.ToBase64String(hash);
+            var checksumData = Encoding.UTF8.GetBytes(text);
+            var hash = SHA256.Create().ComputeHash(checksumData);
+            var calculatedChecksum = Convert.ToBase64String(hash);
             return calculatedChecksum;
         }
 
@@ -73,6 +72,5 @@ namespace ModernSlavery.Extensions
 
             return new string(chars);
         }
-
     }
 }

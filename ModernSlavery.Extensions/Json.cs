@@ -7,7 +7,6 @@ namespace ModernSlavery.Extensions
 {
     public static class Json
     {
-
         /// <summary>
         ///     Serializes objects ignoiring null, recursive and disposed objects
         /// </summary>
@@ -15,39 +14,37 @@ namespace ModernSlavery.Extensions
         /// <returns></returns>
         public static string SerializeObjectDisposed(object value, bool ignoreNulls = false)
         {
-            string json = JsonConvert.SerializeObject(
+            var json = JsonConvert.SerializeObject(
                 value,
-                new JsonSerializerSettings {
+                new JsonSerializerSettings
+                {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore, //Ignore recursive objects
                     NullValueHandling =
-                        ignoreNulls ? NullValueHandling.Ignore : NullValueHandling.Include, //Ignore null objects (including disposed)
+                        ignoreNulls
+                            ? NullValueHandling.Ignore
+                            : NullValueHandling.Include, //Ignore null objects (including disposed)
                     ContractResolver = new DisposedContractResolver() //Resolve data ignoring disposed exceptions
                 });
             return json;
         }
-
     }
 
     public class DisposedContractResolver : DefaultContractResolver
     {
-
         protected override IValueProvider CreateMemberValueProvider(MemberInfo member)
         {
-            IValueProvider provider = base.CreateMemberValueProvider(member);
-            if (provider != null)
-            {
-                provider = new DisposedValueProvider(provider);
-            }
+            var provider = base.CreateMemberValueProvider(member);
+            if (provider != null) provider = new DisposedValueProvider(provider);
 
             return provider;
         }
 
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
-            JsonProperty property = base.CreateProperty(member, memberSerialization);
+            var property = base.CreateProperty(member, memberSerialization);
 
-#warning member.ToString().ContainsI("LazyLoader") must be removed when upgrade from EntityFramework Core 2.1 to 2.2 
-#warning member.DeclaringType.ToString().ContainsI("Castle.Proxies") must be removed when no longer serializing EntityFramework entities 
+#warning member.ToString().ContainsI("LazyLoader") must be removed when upgrade from EntityFramework Core 2.1 to 2.2
+#warning member.DeclaringType.ToString().ContainsI("Castle.Proxies") must be removed when no longer serializing EntityFramework entities
             /* The first part of the following line because v2.1 of EF.Core does not yet have attribute to prevent Serialization of 
              * The LazyLoader object iself which is added in Version 2.2 - this can be removed later when we upgrade to v2.2
              * The second part is to prevent serialization of virtual members  which have not yet been LazyLoaded otherwise 
@@ -58,13 +55,10 @@ namespace ModernSlavery.Extensions
             if (member.ToString().ContainsI("LazyLoader") //Part 1 - prevent serialization of lazy loader
                 || member.DeclaringType.ToString().ContainsI("Castle.Proxies")
             ) //Prevents serialization of lazyloaded members not yet loaded
-            {
                 property.Ignored = true;
-            }
 
             return property;
         }
-
     }
 
     /// <summary>
@@ -73,7 +67,6 @@ namespace ModernSlavery.Extensions
     /// </summary>
     public class DisposedValueProvider : IValueProvider
     {
-
         private readonly IValueProvider Provider;
 
         public DisposedValueProvider(IValueProvider provider)
@@ -94,10 +87,7 @@ namespace ModernSlavery.Extensions
             }
             catch (Exception ex)
             {
-                if (ex.InnerException is ObjectDisposedException)
-                {
-                    return;
-                }
+                if (ex.InnerException is ObjectDisposedException) return;
 
                 throw;
             }
@@ -116,14 +106,10 @@ namespace ModernSlavery.Extensions
             }
             catch (JsonSerializationException ex)
             {
-                if (ex.InnerException is ObjectDisposedException)
-                {
-                    return null;
-                }
+                if (ex.InnerException is ObjectDisposedException) return null;
 
                 throw;
             }
         }
-
     }
 }

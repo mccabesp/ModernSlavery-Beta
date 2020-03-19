@@ -7,28 +7,21 @@ namespace ModernSlavery.Extensions
 {
     public static class AutoMap
     {
-
         public static S GetClone<S>(this S source)
         {
-            if (source == null || source.Equals(default(S)))
-            {
-                return default;
-            }
+            if (source == null || source.Equals(default(S))) return default;
 
             var mapperConfig = new MapperConfiguration(cfg => { cfg.CreateMap<S, S>(); });
-            IMapper iMapper = mapperConfig.CreateMapper();
+            var iMapper = mapperConfig.CreateMapper();
             return iMapper.Map<S, S>(source);
         }
 
         public static T Convert<S, T>(this S source)
         {
-            if (source == null || source.Equals(default(S)) || source.Equals(default(T)))
-            {
-                return default;
-            }
+            if (source == null || source.Equals(default(S)) || source.Equals(default(T))) return default;
 
             var mapperConfig = new MapperConfiguration(cfg => { cfg.CreateMap<S, T>(); });
-            IMapper iMapper = mapperConfig.CreateMapper();
+            var iMapper = mapperConfig.CreateMapper();
 
             return iMapper.Map<S, T>(source);
         }
@@ -70,12 +63,10 @@ namespace ModernSlavery.Extensions
             bool ignoreObjectTypes = false) where S : class
         {
             var target = newObject as S;
-            if (target == default(S))
-            {
-                target = Convert<T, S>(newObject);
-            }
+            if (target == default(S)) target = Convert<T, S>(newObject);
 
-            var config = new ComparisonConfig {
+            var config = new ComparisonConfig
+            {
                 CaseSensitive = caseSensitive,
                 IgnoreCollectionOrder = ignoreCollectionOrder,
                 ShowBreadcrumb = true,
@@ -89,22 +80,16 @@ namespace ModernSlavery.Extensions
                 MaxStructDepth = 1
             };
 
-            if (membersToIgnore != null && membersToIgnore.Any())
-            {
-                config.MembersToIgnore = membersToIgnore.ToList();
-            }
+            if (membersToIgnore != null && membersToIgnore.Any()) config.MembersToIgnore = membersToIgnore.ToList();
 
-            if (membersToInclude != null && membersToInclude.Any())
-            {
-                config.MembersToInclude = membersToInclude.ToList();
-            }
+            if (membersToInclude != null && membersToInclude.Any()) config.MembersToInclude = membersToInclude.ToList();
 
             //This is the comparison class
             var compareLogic = new CompareLogic(config);
-            ComparisonResult results = compareLogic.Compare(oldObject, target);
-            foreach (Difference diff in results.Differences)
-            {
-                yield return new Diff {
+            var results = compareLogic.Compare(oldObject, target);
+            foreach (var diff in results.Differences)
+                yield return new Diff
+                {
                     Name =
                         $"{(diff.PropertyName.StartsWith($"{diff.ParentPropertyName}.") ? null : diff.ParentPropertyName)}{diff.PropertyName}.{diff.ChildPropertyName}"
                             .TrimI("."),
@@ -112,12 +97,10 @@ namespace ModernSlavery.Extensions
                     NewValue = diff.Object2Value,
                     Description = diff.ToString()
                 };
-            }
         }
 
         public class Diff
         {
-
             public string Description;
             public object Name;
             public object NewValue;
@@ -127,8 +110,6 @@ namespace ModernSlavery.Extensions
             {
                 return Description;
             }
-
         }
-
     }
 }

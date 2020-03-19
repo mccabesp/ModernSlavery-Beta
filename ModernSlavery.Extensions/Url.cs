@@ -5,15 +5,11 @@ namespace ModernSlavery.Extensions
 {
     public static class Url
     {
-
         public static bool IsUrl(this string url)
         {
             try
             {
-                if (!url.StartsWithI("http:") && !url.StartsWithI("https:") && !url.StartsWithI("file:"))
-                {
-                    return false;
-                }
+                if (!url.StartsWithI("http:") && !url.StartsWithI("https:") && !url.StartsWithI("file:")) return false;
 
                 var uri = new Uri(url, UriKind.Absolute);
                 return uri.IsAbsoluteUri;
@@ -38,23 +34,14 @@ namespace ModernSlavery.Extensions
         {
             return new Uri($"{uri.Scheme}://{uri.Authority}/");
         }
-        
+
         public static string RelativeToAbsoluteUrl(string relativeUrl, Uri baseUrl)
         {
-            if (baseUrl == null)
-            {
-                throw new ArgumentNullException(nameof(baseUrl));
-            }
+            if (baseUrl == null) throw new ArgumentNullException(nameof(baseUrl));
 
-            if (relativeUrl.StartsWithI("http://", "https://"))
-            {
-                return relativeUrl;
-            }
+            if (relativeUrl.StartsWithI("http://", "https://")) return relativeUrl;
 
-            if (!relativeUrl.StartsWith("/"))
-            {
-                relativeUrl += $"/{relativeUrl}";
-            }
+            if (!relativeUrl.StartsWith("/")) relativeUrl += $"/{relativeUrl}";
 
             return new Uri(GetBaseUri(baseUrl), relativeUrl).ToString();
         }
@@ -119,6 +106,5 @@ namespace ModernSlavery.Extensions
         {
             return filePath?.Replace('/', '\\');
         }
-
     }
 }

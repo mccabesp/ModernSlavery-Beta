@@ -8,12 +8,11 @@ namespace ModernSlavery.Extensions
 {
     public static class Concurrency
     {
-
         public static async Task<T> WhenAny<T>(this IEnumerable<Task<T>> tasks,
             CancellationTokenSource cancellationToken,
             Func<T, bool> predicate)
         {
-            List<Task<T>> taskList = tasks.ToList();
+            var taskList = tasks.ToList();
 
             Task<T> completedTask = null;
 
@@ -35,6 +34,5 @@ namespace ModernSlavery.Extensions
 
             return completedTask == null ? default : completedTask.Result;
         }
-        
     }
 }
