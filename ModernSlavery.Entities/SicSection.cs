@@ -6,7 +6,6 @@ namespace ModernSlavery.Entities
 {
     public partial class SicSection
     {
-
         public SicSection()
         {
             SicCodes = new HashSet<SicCode>();
@@ -17,6 +16,5 @@ namespace ModernSlavery.Entities
         public DateTime Created { get; set; } = VirtualDateTime.Now;
 
         public virtual ICollection<SicCode> SicCodes { get; set; }
-
     }
 }

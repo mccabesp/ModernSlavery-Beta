@@ -2,7 +2,7 @@
 
 namespace ModernSlavery.Entities
 {
-    public partial class OrganisationAddressInfoView
+    public class OrganisationAddressInfoView
     {
         public long OrganisationId { get; set; }
         public string AddressStatus { get; set; }

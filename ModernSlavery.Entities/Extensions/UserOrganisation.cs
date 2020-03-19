@@ -11,10 +11,10 @@ namespace ModernSlavery.Entities
     [DebuggerDisplay("({Organisation}),({User})")]
     public partial class UserOrganisation
     {
-
         public string GetReviewCode()
         {
-            return Encryption.EncryptQuerystring(UserId + ":" + OrganisationId + ":" + VirtualDateTime.Now.ToSmallDateTime());
+            return Encryption.EncryptQuerystring(UserId + ":" + OrganisationId + ":" +
+                                                 VirtualDateTime.Now.ToSmallDateTime());
         }
 
         public IEnumerable<UserOrganisation> GetAssociatedUsers()
@@ -26,6 +26,5 @@ namespace ModernSlavery.Entities
                           && uo.PINConfirmedDate != null
                           && uo.User.Status == UserStatuses.Active);
         }
-
     }
 }

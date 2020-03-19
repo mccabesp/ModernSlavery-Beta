@@ -6,7 +6,6 @@ namespace ModernSlavery.Entities
 {
     public class AddressStatus
     {
-
         public long AddressStatusId { get; set; }
         public long AddressId { get; set; }
         public AddressStatuses Status { get; set; }
@@ -16,6 +15,5 @@ namespace ModernSlavery.Entities
 
         public virtual OrganisationAddress Address { get; set; }
         public virtual User ByUser { get; set; }
-
     }
 }

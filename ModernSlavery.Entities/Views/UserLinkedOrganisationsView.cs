@@ -1,6 +1,6 @@
 ﻿namespace ModernSlavery.Entities
 {
-    public partial class UserLinkedOrganisationsView
+    public class UserLinkedOrganisationsView
     {
         public long UserId { get; set; }
         public long OrganisationId { get; set; }

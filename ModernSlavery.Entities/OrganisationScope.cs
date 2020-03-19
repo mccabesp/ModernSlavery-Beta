@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModernSlavery.Extensions;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Entities
 {
     public class OrganisationScope
     {
-
         public OrganisationScope()
         {
             Organisations = new HashSet<Organisation>();
@@ -32,6 +31,5 @@ namespace ModernSlavery.Entities
 
         public virtual Organisation Organisation { get; set; }
         public virtual ICollection<Organisation> Organisations { get; set; }
-
     }
 }

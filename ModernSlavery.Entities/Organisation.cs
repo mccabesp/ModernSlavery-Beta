@@ -8,7 +8,6 @@ namespace ModernSlavery.Entities
 {
     public partial class Organisation
     {
-
         public Organisation()
         {
             OrganisationAddresses = new HashSet<OrganisationAddress>();

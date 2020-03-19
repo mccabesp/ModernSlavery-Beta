@@ -1,12 +1,11 @@
 ﻿using System;
-using ModernSlavery.Extensions;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Entities
 {
     public class OrganisationStatus
     {
-
         public long OrganisationStatusId { get; set; }
         public long OrganisationId { get; set; }
         public OrganisationStatuses Status { get; set; }
@@ -17,6 +16,5 @@ namespace ModernSlavery.Entities
 
         public virtual User ByUser { get; set; }
         public virtual Organisation Organisation { get; set; }
-
     }
 }

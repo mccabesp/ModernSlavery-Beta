@@ -3,11 +3,9 @@ using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Entities
 {
-
     [Serializable]
     public class PublicSectorType
     {
-
         public int PublicSectorTypeId { get; set; }
 
         public string Description { get; set; }
@@ -17,15 +15,10 @@ namespace ModernSlavery.Entities
         public override bool Equals(object obj)
         {
             // Check for null values and compare run-time types.
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
+            if (obj == null || GetType() != obj.GetType()) return false;
 
             var target = (PublicSectorType) obj;
             return PublicSectorTypeId == target.PublicSectorTypeId;
         }
-
     }
-
 }

@@ -2,7 +2,7 @@
 
 namespace ModernSlavery.Entities
 {
-    public partial class UserStatusInfoView
+    public class UserStatusInfoView
     {
         public long UserId { get; set; }
         public string UserName { get; set; }

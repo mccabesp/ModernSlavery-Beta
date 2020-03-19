@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.Extensions;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Entities
 {
@@ -11,12 +11,24 @@ namespace ModernSlavery.Entities
     {
         public override bool Equals(object obj)
         {
-            if (obj == null)return false;
+            if (obj == null) return false;
 
             var address = obj as OrganisationAddress;
-            if (address == null)return false;
+            if (address == null) return false;
 
             return AddressId == address.AddressId;
+        }
+
+        public bool AddressMatches(OrganisationAddress other)
+        {
+            return string.Equals(Address1, other.Address1, StringComparison.Ordinal)
+                   && string.Equals(Address2, other.Address2, StringComparison.Ordinal)
+                   && string.Equals(Address3, other.Address3, StringComparison.Ordinal)
+                   && string.Equals(TownCity, other.TownCity, StringComparison.Ordinal)
+                   && string.Equals(County, other.County, StringComparison.Ordinal)
+                   && string.Equals(Country, other.Country, StringComparison.Ordinal)
+                   && string.Equals(PostCode, other.PostCode, StringComparison.Ordinal)
+                   && string.Equals(PoBox, other.PoBox, StringComparison.Ordinal);
         }
 
         #region Methods
@@ -24,53 +36,29 @@ namespace ModernSlavery.Entities
         public List<string> GetList()
         {
             var list = new List<string>();
-            if (!string.IsNullOrWhiteSpace(Address1))
-            {
-                list.Add(Address1.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(Address1)) list.Add(Address1.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(Address2))
-            {
-                list.Add(Address2.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(Address2)) list.Add(Address2.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(Address3))
-            {
-                list.Add(Address3.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(Address3)) list.Add(Address3.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(TownCity))
-            {
-                list.Add(TownCity.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(TownCity)) list.Add(TownCity.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(County))
-            {
-                list.Add(County.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(County)) list.Add(County.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(Country))
-            {
-                list.Add(Country.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(Country)) list.Add(Country.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(PostCode))
-            {
-                list.Add(PostCode.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(PostCode)) list.Add(PostCode.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(PoBox))
-            {
-                list.Add(PoBox.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(PoBox)) list.Add(PoBox.TrimI());
 
             return list;
         }
 
         public bool EqualsI(OrganisationAddress address)
         {
-            string add1 = GetAddressString();
-            string add2 = address == null ? null : address.GetAddressString();
+            var add1 = GetAddressString();
+            var add2 = address == null ? null : address.GetAddressString();
             return add1.EqualsI(add2);
         }
 
@@ -81,29 +69,25 @@ namespace ModernSlavery.Entities
 
         public UserOrganisation GetFirstRegistration()
         {
-            return UserOrganisations.OrderBy(uo => uo.PINConfirmedDate).FirstOrDefault(uo => uo.PINConfirmedDate > Created);
+            return UserOrganisations.OrderBy(uo => uo.PINConfirmedDate)
+                .FirstOrDefault(uo => uo.PINConfirmedDate > Created);
         }
 
         public DateTime GetFirstRegisteredDate()
         {
-            UserOrganisation firstRegistration = GetFirstRegistration();
+            var firstRegistration = GetFirstRegistration();
             return firstRegistration?.PINConfirmedDate ?? Created;
         }
 
         public void SetStatus(AddressStatuses status, long byUserId, string details = null, DateTime? statusDate = null)
         {
-            if (status == Status && details == StatusDetails && statusDate == null)
-            {
-                return;
-            }
+            if (status == Status && details == StatusDetails && statusDate == null) return;
 
-            if (statusDate == null || statusDate == DateTime.MinValue)
-            {
-                statusDate = VirtualDateTime.Now;
-            }
+            if (statusDate == null || statusDate == DateTime.MinValue) statusDate = VirtualDateTime.Now;
 
             AddressStatuses.Add(
-                new AddressStatus {
+                new AddressStatus
+                {
                     AddressId = AddressId,
                     Status = status,
                     StatusDate = statusDate.Value,
@@ -116,18 +100,5 @@ namespace ModernSlavery.Entities
         }
 
         #endregion
-
-        public bool AddressMatches(OrganisationAddress other)
-        {
-            return String.Equals(Address1, other.Address1, StringComparison.Ordinal)
-                   && String.Equals(Address2, other.Address2, StringComparison.Ordinal)
-                   && String.Equals(Address3, other.Address3, StringComparison.Ordinal)
-                   && String.Equals(TownCity, other.TownCity, StringComparison.Ordinal)
-                   && String.Equals(County, other.County, StringComparison.Ordinal)
-                   && String.Equals(Country, other.Country, StringComparison.Ordinal)
-                   && String.Equals(PostCode, other.PostCode, StringComparison.Ordinal)
-                   && String.Equals(PoBox, other.PoBox, StringComparison.Ordinal);
-        }
-
     }
 }

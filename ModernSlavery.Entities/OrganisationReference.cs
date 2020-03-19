@@ -5,7 +5,6 @@ namespace ModernSlavery.Entities
 {
     public class OrganisationReference
     {
-
         public long OrganisationReferenceId { get; set; }
         public long OrganisationId { get; set; }
         public string ReferenceName { get; set; }
@@ -13,6 +12,5 @@ namespace ModernSlavery.Entities
         public DateTime Created { get; set; } = VirtualDateTime.Now;
 
         public virtual Organisation Organisation { get; set; }
-
     }
 }

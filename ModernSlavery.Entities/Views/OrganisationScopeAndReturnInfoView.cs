@@ -1,6 +1,6 @@
 ﻿namespace ModernSlavery.Entities
 {
-    public partial class OrganisationScopeAndReturnInfoView
+    public class OrganisationScopeAndReturnInfoView
     {
         public long OrganisationId { get; set; }
         public string OrganisationName { get; set; }

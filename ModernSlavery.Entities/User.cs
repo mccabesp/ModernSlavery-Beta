@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography;
-using ModernSlavery.Extensions;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Entities
 {
     public partial class User
     {
+        private string _ContactEmailAddress;
+
+        [NotMapped] public string _EmailAddress;
 
         public User()
         {
@@ -26,34 +29,27 @@ namespace ModernSlavery.Entities
         public string Firstname { get; set; }
         public string Lastname { get; set; }
 
-        [NotMapped]
-        public string _EmailAddress;
-
         public string EmailAddress
         {
             get
             {
                 if (!string.IsNullOrWhiteSpace(_EmailAddress))
-                {
                     try
                     {
                         return Encryption.DecryptData(_EmailAddress);
                     }
-                    catch (CryptographicException) { }
-                }
+                    catch (CryptographicException)
+                    {
+                    }
 
                 return _EmailAddress;
             }
             set
             {
                 if (!string.IsNullOrWhiteSpace(value) && EncryptEmails)
-                {
                     _EmailAddress = Encryption.EncryptData(value.ToLower());
-                }
                 else
-                {
                     _EmailAddress = value;
-                }
             }
         }
 
@@ -62,20 +58,17 @@ namespace ModernSlavery.Entities
         public string ContactLastName { get; set; }
         public string ContactOrganisation { get; set; }
 
-        private string _ContactEmailAddress;
         public string ContactEmailAddress
         {
-            get => string.IsNullOrWhiteSpace(_ContactEmailAddress) ? _ContactEmailAddress : Encryption.DecryptData(_ContactEmailAddress);
+            get => string.IsNullOrWhiteSpace(_ContactEmailAddress)
+                ? _ContactEmailAddress
+                : Encryption.DecryptData(_ContactEmailAddress);
             set
             {
                 if (!string.IsNullOrWhiteSpace(value) && EncryptEmails)
-                {
                     _ContactEmailAddress = Encryption.EncryptData(value);
-                }
                 else
-                {
                     _ContactEmailAddress = value;
-                }
             }
         }
 
@@ -115,6 +108,5 @@ namespace ModernSlavery.Entities
         public virtual ICollection<UserSetting> UserSettings { get; set; }
         public virtual ICollection<UserStatus> UserStatusesByUser { get; set; }
         public virtual ICollection<UserStatus> UserStatuses { get; set; }
-
     }
 }

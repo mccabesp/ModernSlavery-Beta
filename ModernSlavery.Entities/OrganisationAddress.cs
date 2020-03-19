@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModernSlavery.Extensions;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Entities
 {
     public partial class OrganisationAddress
     {
-
         public OrganisationAddress()
         {
             AddressStatuses = new HashSet<AddressStatus>();
@@ -39,6 +38,5 @@ namespace ModernSlavery.Entities
         public virtual ICollection<AddressStatus> AddressStatuses { get; set; }
         public virtual ICollection<Organisation> Organisations { get; set; }
         public virtual ICollection<UserOrganisation> UserOrganisations { get; set; }
-
     }
 }

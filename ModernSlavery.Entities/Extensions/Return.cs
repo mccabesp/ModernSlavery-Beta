@@ -8,16 +8,12 @@ namespace ModernSlavery.Entities
     [Serializable]
     public partial class Return
     {
-
         [NotMapped]
         public string ResponsiblePerson
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(LastName))
-                {
-                    return null;
-                }
+                if (string.IsNullOrWhiteSpace(LastName)) return null;
 
                 return $"{FirstName} {LastName} ({JobTitle})";
             }
@@ -62,10 +58,7 @@ namespace ModernSlavery.Entities
         public override bool Equals(object obj)
         {
             // Check for null values and compare run-time types.
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
+            if (obj == null || GetType() != obj.GetType()) return false;
 
             var target = (Return) obj;
             return ReturnId == target.ReturnId;
@@ -78,7 +71,7 @@ namespace ModernSlavery.Entities
 
         public bool IsSubmitted()
         {
-            return Status == ModernSlavery.Entities.Enums.ReturnStatuses.Submitted;
+            return Status == Enums.ReturnStatuses.Submitted;
         }
 
         public bool HasBonusesPaid()
@@ -112,13 +105,11 @@ namespace ModernSlavery.Entities
 
         public void SetStatus(ReturnStatuses status, long byUserId, string details = null)
         {
-            if (status == Status && details == StatusDetails)
-            {
-                return;
-            }
+            if (status == Status && details == StatusDetails) return;
 
             ReturnStatuses.Add(
-                new ReturnStatus {
+                new ReturnStatus
+                {
                     ReturnId = ReturnId,
                     Status = status,
                     StatusDate = VirtualDateTime.Now,
@@ -132,120 +123,53 @@ namespace ModernSlavery.Entities
 
         public bool Equals(Return model)
         {
-            if (AccountingDate != model.AccountingDate)
-            {
-                return false;
-            }
+            if (AccountingDate != model.AccountingDate) return false;
 
-            if (CompanyLinkToGPGInfo != model.CompanyLinkToGPGInfo)
-            {
-                return false;
-            }
+            if (CompanyLinkToGPGInfo != model.CompanyLinkToGPGInfo) return false;
 
-            if (DiffMeanBonusPercent != model.DiffMeanBonusPercent)
-            {
-                return false;
-            }
+            if (DiffMeanBonusPercent != model.DiffMeanBonusPercent) return false;
 
-            if (DiffMeanHourlyPayPercent != model.DiffMeanHourlyPayPercent)
-            {
-                return false;
-            }
+            if (DiffMeanHourlyPayPercent != model.DiffMeanHourlyPayPercent) return false;
 
-            if (DiffMedianBonusPercent != model.DiffMedianBonusPercent)
-            {
-                return false;
-            }
+            if (DiffMedianBonusPercent != model.DiffMedianBonusPercent) return false;
 
-            if (DiffMedianHourlyPercent != model.DiffMedianBonusPercent)
-            {
-                return false;
-            }
+            if (DiffMedianHourlyPercent != model.DiffMedianBonusPercent) return false;
 
-            if (FemaleLowerPayBand != model.FemaleLowerPayBand)
-            {
-                return false;
-            }
+            if (FemaleLowerPayBand != model.FemaleLowerPayBand) return false;
 
-            if (FemaleMedianBonusPayPercent != model.FemaleMedianBonusPayPercent)
-            {
-                return false;
-            }
+            if (FemaleMedianBonusPayPercent != model.FemaleMedianBonusPayPercent) return false;
 
-            if (FemaleMiddlePayBand != model.FemaleMiddlePayBand)
-            {
-                return false;
-            }
+            if (FemaleMiddlePayBand != model.FemaleMiddlePayBand) return false;
 
-            if (FemaleUpperPayBand != model.FemaleUpperPayBand)
-            {
-                return false;
-            }
+            if (FemaleUpperPayBand != model.FemaleUpperPayBand) return false;
 
-            if (FemaleUpperQuartilePayBand != model.FemaleUpperQuartilePayBand)
-            {
-                return false;
-            }
+            if (FemaleUpperQuartilePayBand != model.FemaleUpperQuartilePayBand) return false;
 
-            if (FirstName != model.FirstName)
-            {
-                return false;
-            }
+            if (FirstName != model.FirstName) return false;
 
-            if (LastName != model.LastName)
-            {
-                return false;
-            }
+            if (LastName != model.LastName) return false;
 
-            if (JobTitle != model.JobTitle)
-            {
-                return false;
-            }
+            if (JobTitle != model.JobTitle) return false;
 
-            if (MaleLowerPayBand != model.MaleLowerPayBand)
-            {
-                return false;
-            }
+            if (MaleLowerPayBand != model.MaleLowerPayBand) return false;
 
-            if (MaleMedianBonusPayPercent != model.MaleMedianBonusPayPercent)
-            {
-                return false;
-            }
+            if (MaleMedianBonusPayPercent != model.MaleMedianBonusPayPercent) return false;
 
-            if (MaleUpperQuartilePayBand != model.MaleUpperQuartilePayBand)
-            {
-                return false;
-            }
+            if (MaleUpperQuartilePayBand != model.MaleUpperQuartilePayBand) return false;
 
-            if (MaleMiddlePayBand != model.MaleMiddlePayBand)
-            {
-                return false;
-            }
+            if (MaleMiddlePayBand != model.MaleMiddlePayBand) return false;
 
-            if (MaleUpperPayBand != model.MaleUpperPayBand)
-            {
-                return false;
-            }
+            if (MaleUpperPayBand != model.MaleUpperPayBand) return false;
 
-            if (OrganisationId != model.OrganisationId)
-            {
-                return false;
-            }
+            if (OrganisationId != model.OrganisationId) return false;
 
-            if (MinEmployees != model.MinEmployees)
-            {
-                return false;
-            }
+            if (MinEmployees != model.MinEmployees) return false;
 
-            if (MaxEmployees != model.MaxEmployees)
-            {
-                return false;
-            }
+            if (MaxEmployees != model.MaxEmployees) return false;
 
             return true;
         }
 
-        
 
         public string GetReportingPeriod()
         {
@@ -253,6 +177,5 @@ namespace ModernSlavery.Entities
         }
 
         #endregion
-
     }
 }

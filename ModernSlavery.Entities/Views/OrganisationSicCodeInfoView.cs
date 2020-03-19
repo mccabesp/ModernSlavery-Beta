@@ -1,6 +1,6 @@
 ﻿namespace ModernSlavery.Entities
 {
-    public partial class OrganisationSicCodeInfoView
+    public class OrganisationSicCodeInfoView
     {
         public long OrganisationId { get; set; }
         public int? SicCodeId { get; set; }

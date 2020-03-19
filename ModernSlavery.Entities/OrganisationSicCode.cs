@@ -5,7 +5,6 @@ namespace ModernSlavery.Entities
 {
     public class OrganisationSicCode
     {
-
         public int SicCodeId { get; set; }
         public long OrganisationId { get; set; }
         public DateTime Created { get; set; } = VirtualDateTime.Now;
@@ -15,6 +14,5 @@ namespace ModernSlavery.Entities
 
         public virtual Organisation Organisation { get; set; }
         public virtual SicCode SicCode { get; set; }
-
     }
 }

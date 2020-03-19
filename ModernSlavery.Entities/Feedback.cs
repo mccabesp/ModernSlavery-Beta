@@ -5,7 +5,6 @@ namespace ModernSlavery.Entities
 {
     public class Feedback
     {
-
         public long FeedbackId { get; set; }
 
         #region DifficultyTypes
@@ -14,8 +13,7 @@ namespace ModernSlavery.Entities
 
         #endregion
 
-        [MaxLength(2000)]
-        public string Details { get; set; }
+        [MaxLength(2000)] public string Details { get; set; }
 
         public string EmailAddress { get; set; }
         public string PhoneNumber { get; set; }
@@ -42,8 +40,7 @@ namespace ModernSlavery.Entities
 
         public bool? OtherSource { get; set; }
 
-        [MaxLength(2000)]
-        public string OtherSourceText { get; set; }
+        [MaxLength(2000)] public string OtherSourceText { get; set; }
 
         #endregion
 
@@ -61,8 +58,7 @@ namespace ModernSlavery.Entities
 
         public bool? OtherReason { get; set; }
 
-        [MaxLength(2000)]
-        public string OtherReasonText { get; set; }
+        [MaxLength(2000)] public string OtherReasonText { get; set; }
 
         #endregion
 
@@ -80,21 +76,17 @@ namespace ModernSlavery.Entities
 
         public bool? OtherPerson { get; set; }
 
-        [MaxLength(2000)]
-        public string OtherPersonText { get; set; }
+        [MaxLength(2000)] public string OtherPersonText { get; set; }
 
         #endregion
-
     }
 
     public enum DifficultyTypes
     {
-
         VeryEasy = 0,
         Easy = 1,
         Neutral = 2,
         Difficult = 3,
         VeryDifficult = 4
-
     }
 }

@@ -6,7 +6,6 @@ namespace ModernSlavery.Entities
 {
     public partial class SicCode
     {
-
         public SicCode()
         {
             OrganisationSicCodes = new HashSet<OrganisationSicCode>();
@@ -19,6 +18,5 @@ namespace ModernSlavery.Entities
 
         public virtual SicSection SicSection { get; set; }
         public virtual ICollection<OrganisationSicCode> OrganisationSicCodes { get; set; }
-
     }
 }

@@ -4,35 +4,30 @@ using System.Diagnostics;
 using System.Linq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.Extensions;
-using Microsoft.Extensions.Configuration;
 using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Entities
 {
-
     [Serializable]
     [DebuggerDisplay("{UserId}, {EmailAddress}, {Status}")]
     public partial class User
     {
         private GlobalOptions GlobalOptions;
 
-        private string AdminEmails => GlobalOptions.AdminEmails;
-        private string SuperAdminEmails => GlobalOptions.SuperAdminEmails;
-        private string DatabaseAdminEmails => GlobalOptions.DatabaseAdminEmails;
-
         public User(GlobalOptions globalOptions)
         {
             GlobalOptions = globalOptions;
         }
 
-        [NotMapped]
-        public bool EncryptEmails => GlobalOptions.EncryptEmails;
+        private string AdminEmails => GlobalOptions.AdminEmails;
+        private string SuperAdminEmails => GlobalOptions.SuperAdminEmails;
+        private string DatabaseAdminEmails => GlobalOptions.DatabaseAdminEmails;
 
-        [NotMapped]
-        public string Fullname => (Firstname + " " + Lastname).TrimI();
+        [NotMapped] public bool EncryptEmails => GlobalOptions.EncryptEmails;
 
-        [NotMapped]
-        public string ContactFullname => (ContactFirstName + " " + ContactLastName).TrimI();
+        [NotMapped] public string Fullname => (Firstname + " " + Lastname).TrimI();
+
+        [NotMapped] public string ContactFullname => (ContactFirstName + " " + ContactLastName).TrimI();
 
         [NotMapped]
         public TimeSpan LockRemaining =>
@@ -59,11 +54,8 @@ namespace ModernSlavery.Entities
         {
             get
             {
-                string value = GetSetting(UserSettingKeys.AcceptedPrivacyStatement);
-                if (value == null)
-                {
-                    return null;
-                }
+                var value = GetSetting(UserSettingKeys.AcceptedPrivacyStatement);
+                if (value == null) return null;
 
                 return DateTime.Parse(value);
             }
@@ -72,31 +64,27 @@ namespace ModernSlavery.Entities
 
         public bool IsAdministrator()
         {
-            if (!EmailAddress.IsEmailAddress())
-            {
-                throw new ArgumentException("Bad email address");
-            }
+            if (!EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
 
             if (string.IsNullOrWhiteSpace(AdminEmails))
-            {
                 throw new ArgumentException("Missing AdminEmails from web.config");
-            }
 
             return EmailAddress.LikeAny(AdminEmails.SplitI(";"));
         }
 
         public bool IsSuperAdministrator()
         {
-            if (!EmailAddress.IsEmailAddress())throw new ArgumentException("Bad email address");
+            if (!EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
 
-            if (string.IsNullOrWhiteSpace(SuperAdminEmails))throw new ArgumentException("Missing SuperAdminEmails from web.config");
+            if (string.IsNullOrWhiteSpace(SuperAdminEmails))
+                throw new ArgumentException("Missing SuperAdminEmails from web.config");
 
             return EmailAddress.LikeAny(SuperAdminEmails.SplitI(";"));
         }
 
         public bool IsDatabaseAdministrator()
         {
-            if (!EmailAddress.IsEmailAddress())throw new ArgumentException("Bad email address");
+            if (!EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
 
             if (string.IsNullOrWhiteSpace(DatabaseAdminEmails))
                 return IsSuperAdministrator();
@@ -115,13 +103,11 @@ namespace ModernSlavery.Entities
         public void SetStatus(UserStatuses status, User byUser, string details = null)
         {
             //ByUser must be an object and not the id itself otherwise a foreign key exception is thrown with EF core due to being unable to resolve the ByUserId
-            if (status == Status && details == StatusDetails)
-            {
-                return;
-            }
+            if (status == Status && details == StatusDetails) return;
 
             UserStatuses.Add(
-                new UserStatus {
+                new UserStatus
+                {
                     User = this,
                     Status = status,
                     StatusDate = VirtualDateTime.Now,
@@ -135,25 +121,19 @@ namespace ModernSlavery.Entities
 
         public string GetSetting(UserSettingKeys key)
         {
-            UserSetting setting = UserSettings.FirstOrDefault(s => s.Key == key);
+            var setting = UserSettings.FirstOrDefault(s => s.Key == key);
 
-            if (setting != null && !string.IsNullOrWhiteSpace(setting.Value))
-            {
-                return setting.Value;
-            }
+            if (setting != null && !string.IsNullOrWhiteSpace(setting.Value)) return setting.Value;
 
             return null;
         }
 
         public void SetSetting(UserSettingKeys key, string value)
         {
-            UserSetting setting = UserSettings.FirstOrDefault(s => s.Key == key);
+            var setting = UserSettings.FirstOrDefault(s => s.Key == key);
             if (string.IsNullOrWhiteSpace(value))
             {
-                if (setting != null)
-                {
-                    UserSettings.Remove(setting);
-                }
+                if (setting != null) UserSettings.Remove(setting);
             }
             else if (setting == null)
             {
@@ -168,35 +148,27 @@ namespace ModernSlavery.Entities
 
         public string GetVerifyUrl()
         {
-            if (EmailVerifiedDate != null)
-            {
-                return null;
-            }
+            if (EmailVerifiedDate != null) return null;
 
-            string verifyCode = Encryption.EncryptQuerystring(UserId + ":" + Created.ToSmallDateTime());
-            string verifyUrl = $"/register/verify-email?code={verifyCode}";
+            var verifyCode = Encryption.EncryptQuerystring(UserId + ":" + Created.ToSmallDateTime());
+            var verifyUrl = $"/register/verify-email?code={verifyCode}";
             return verifyUrl;
         }
 
         public string GetPasswordResetUrl()
         {
-            string resetCode = Encryption.EncryptQuerystring(UserId + ":" + VirtualDateTime.Now.ToSmallDateTime());
-            string resetUrl = $"/register/enter-new-password?code={resetCode}";
+            var resetCode = Encryption.EncryptQuerystring(UserId + ":" + VirtualDateTime.Now.ToSmallDateTime());
+            var resetUrl = $"/register/enter-new-password?code={resetCode}";
             return resetUrl;
         }
 
         public override bool Equals(object obj)
         {
             // Check for null values and compare run-time types.
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
+            if (obj == null || GetType() != obj.GetType()) return false;
 
             var target = (User) obj;
             return UserId == target.UserId;
         }
-
     }
-
 }

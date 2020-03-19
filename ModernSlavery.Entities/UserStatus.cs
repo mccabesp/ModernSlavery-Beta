@@ -1,12 +1,11 @@
 ﻿using System;
-using ModernSlavery.Extensions;
 using ModernSlavery.Entities.Enums;
+using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Entities
 {
     public class UserStatus
     {
-
         public long UserStatusId { get; set; }
         public long UserId { get; set; }
         public UserStatuses Status { get; set; }
@@ -16,6 +15,5 @@ namespace ModernSlavery.Entities
 
         public virtual User ByUser { get; set; }
         public virtual User User { get; set; }
-
     }
 }

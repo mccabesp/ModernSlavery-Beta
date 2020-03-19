@@ -2,7 +2,7 @@
 
 namespace ModernSlavery.Entities
 {
-    public partial class OrganisationSubmissionInfoView
+    public class OrganisationSubmissionInfoView
     {
         public long OrganisationId { get; set; }
         public DateTime? LatestReturnAccountingDate { get; set; }

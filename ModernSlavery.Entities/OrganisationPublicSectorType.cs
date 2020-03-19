@@ -4,11 +4,9 @@ using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Entities
 {
-
     [Serializable]
     public class OrganisationPublicSectorType
     {
-
         public long OrganisationPublicSectorTypeId { get; set; }
 
         public int PublicSectorTypeId { get; set; }
@@ -24,6 +22,5 @@ namespace ModernSlavery.Entities
         public virtual PublicSectorType PublicSectorType { get; set; }
 
         public virtual ICollection<Organisation> Organisations { get; set; }
-
     }
 }

@@ -7,7 +7,6 @@ namespace ModernSlavery.Entities
 {
     public partial class UserOrganisation
     {
-
         public UserOrganisation()
         {
             Organisations = new HashSet<Organisation>();
@@ -33,6 +32,5 @@ namespace ModernSlavery.Entities
         public virtual OrganisationAddress Address { get; set; }
 
         public virtual User User { get; set; }
-
     }
 }
