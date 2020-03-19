@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using ModernSlavery.Entities;
 using ModernSlavery.Extensions;
@@ -31,20 +30,19 @@ namespace ModernSlavery.Core.Models
             return Encryption.EncryptQuerystring(OrganisationId);
         }
 
-        public static EmployerSearchModel Create(Organisation org, bool keyOnly = false, List<SicCodeSearchModel> listOfSicCodeSearchModels = null)
+        public static EmployerSearchModel Create(Organisation org, bool keyOnly = false,
+            List<SicCodeSearchModel> listOfSicCodeSearchModels = null)
         {
-            if (keyOnly)
-            {
-                return new EmployerSearchModel { OrganisationId = org.OrganisationId.ToString() };
-            }
+            if (keyOnly) return new EmployerSearchModel {OrganisationId = org.OrganisationId.ToString()};
 
             // Get the last two names for the org. Most recent name first
-            string[] names = org.OrganisationNames.Select(n => n.Name).Reverse().Take(2).ToArray();
+            var names = org.OrganisationNames.Select(n => n.Name).Reverse().Take(2).ToArray();
 
             var abbreviations = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
             names.ForEach(n => abbreviations.Add(n.ToAbbr()));
             names.ForEach(n => abbreviations.Add(n.ToAbbr(".")));
-            var excludes = new[] { "Ltd", "Limited", "PLC", "Corporation", "Incorporated", "LLP", "The", "And", "&", "For", "Of", "To" };
+            var excludes = new[]
+                {"Ltd", "Limited", "PLC", "Corporation", "Incorporated", "LLP", "The", "And", "&", "For", "Of", "To"};
             names.ForEach(n => abbreviations.Add(n.ToAbbr(excludeWords: excludes)));
             names.ForEach(n => abbreviations.Add(n.ToAbbr(".", excludeWords: excludes)));
 
@@ -60,9 +58,9 @@ namespace ModernSlavery.Core.Models
             }
 
             //Get the latest sic codes
-            IEnumerable<OrganisationSicCode> sicCodes = org.GetSicCodes();
+            var sicCodes = org.GetSicCodes();
 
-            Return[] submittedReports = org.GetSubmittedReports().ToArray();
+            var submittedReports = org.GetSubmittedReports().ToArray();
 
             var result = new EmployerSearchModel
             {
@@ -73,7 +71,7 @@ namespace ModernSlavery.Core.Models
                 PartialNameForSuffixSearches = org.OrganisationName,
                 PartialNameForCompleteTokenSearches = org.OrganisationName,
                 Abbreviations = abbreviations.ToArray(),
-                Size = org.LatestReturn == null ? 0 : (int)org.LatestReturn.OrganisationSize,
+                Size = org.LatestReturn == null ? 0 : (int) org.LatestReturn.OrganisationSize,
                 SicSectionIds = sicCodes.Select(sic => sic.SicCode.SicSectionId.ToString()).Distinct().ToArray(),
                 SicSectionNames = sicCodes.Select(sic => sic.SicCode.SicSection.Description).Distinct().ToArray(),
                 SicCodeIds = sicCodes.Select(sicCode => sicCode.SicCodeId.ToString()).Distinct().ToArray(),
@@ -81,39 +79,36 @@ namespace ModernSlavery.Core.Models
                 LatestReportedDate = submittedReports.Select(x => x.Created).FirstOrDefault(),
                 ReportedYears = submittedReports.Select(x => x.AccountingDate.Year.ToString()).ToArray(),
                 ReportedLateYears =
-                    submittedReports.Where(x => x.IsLateSubmission).Select(x => x.AccountingDate.Year.ToString()).ToArray(),
-                ReportedExplanationYears = submittedReports.Where(x => string.IsNullOrEmpty(x.CompanyLinkToGPGInfo) == false)
+                    submittedReports.Where(x => x.IsLateSubmission).Select(x => x.AccountingDate.Year.ToString())
+                        .ToArray(),
+                ReportedExplanationYears = submittedReports
+                    .Where(x => string.IsNullOrEmpty(x.CompanyLinkToGPGInfo) == false)
                     .Select(x => x.AccountingDate.Year.ToString())
                     .ToArray()
             };
 
             if (listOfSicCodeSearchModels != null)
-            {
                 result.SicCodeListOfSynonyms = result.GetListOfSynonyms(result.SicCodeIds, listOfSicCodeSearchModels);
-            }
 
             return result;
         }
 
-        private string[] GetListOfSynonyms(string[] resultSicCodeIds, List<SicCodeSearchModel> listOfSicCodeSearchModels)
+        private string[] GetListOfSynonyms(string[] resultSicCodeIds,
+            List<SicCodeSearchModel> listOfSicCodeSearchModels)
         {
             var result = new List<string>();
 
-            foreach (string resultSicCodeId in resultSicCodeIds)
+            foreach (var resultSicCodeId in resultSicCodeIds)
             {
-                SicCodeSearchModel sicCodeSearchModel = listOfSicCodeSearchModels.FirstOrDefault(x => x.SicCodeId == resultSicCodeId);
+                var sicCodeSearchModel = listOfSicCodeSearchModels.FirstOrDefault(x => x.SicCodeId == resultSicCodeId);
 
-                if (sicCodeSearchModel == null)
-                {
-                    continue;
-                }
+                if (sicCodeSearchModel == null) continue;
 
                 result.Add(sicCodeSearchModel.SicCodeDescription);
 
-                if (sicCodeSearchModel.SicCodeListOfSynonyms != null && sicCodeSearchModel.SicCodeListOfSynonyms.Length > 0)
-                {
+                if (sicCodeSearchModel.SicCodeListOfSynonyms != null &&
+                    sicCodeSearchModel.SicCodeListOfSynonyms.Length > 0)
                     result.AddRange(sicCodeSearchModel.SicCodeListOfSynonyms);
-                }
             }
 
             return result.Any()
@@ -140,6 +135,7 @@ namespace ModernSlavery.Core.Models
         public virtual DateTimeOffset LatestReportedDate { get; set; }
         public virtual string[] ReportedLateYears { get; set; }
         public virtual string[] ReportedExplanationYears { get; set; }
+
         #endregion
     }
 }

@@ -17,13 +17,15 @@ namespace ModernSlavery.Core.Classes
     /// <summary>
     ///     Compares two data source types to see if one can replace the other
     /// </summary>
-    public class SourceComparer: ISourceComparer
+    public class SourceComparer : ISourceComparer
     {
         private readonly IConfiguration _configuration;
+
         public SourceComparer(IConfiguration configuration)
         {
             _configuration = configuration;
         }
+
         private string AdminEmails => _configuration.GetValue<string>("AdminEmails");
 
         public bool CanReplace(string source, string target)
@@ -33,38 +35,22 @@ namespace ModernSlavery.Core.Classes
 
         public bool CanReplace(string source, IEnumerable<string> targets)
         {
-            foreach (string target in targets)
-            {
+            foreach (var target in targets)
                 if (Parse(source) < Parse(target))
-                {
                     return false;
-                }
-            }
 
             return true;
         }
 
         public int Parse(string source)
         {
-            if (source.EqualsI("admin", "administrator") || IsAdministrator(source))
-            {
-                return 4;
-            }
+            if (source.EqualsI("admin", "administrator") || IsAdministrator(source)) return 4;
 
-            if (IsCoHo(source))
-            {
-                return 3;
-            }
+            if (IsCoHo(source)) return 3;
 
-            if (source.EqualsI("user") || source.IsEmailAddress())
-            {
-                return 2;
-            }
+            if (source.EqualsI("user") || source.IsEmailAddress()) return 2;
 
-            if (IsDnB(source) || source.EqualsI("Manual"))
-            {
-                return 1;
-            }
+            if (IsDnB(source) || source.EqualsI("Manual")) return 1;
 
             return 0;
         }
@@ -84,12 +70,9 @@ namespace ModernSlavery.Core.Classes
             if (!emailAddress.IsEmailAddress()) return false;
 
             if (string.IsNullOrWhiteSpace(AdminEmails))
-            {
                 throw new ArgumentException("Missing AdminEmails from web.config");
-            }
 
             return emailAddress.LikeAny(AdminEmails.SplitI(";"));
         }
     }
-
 }

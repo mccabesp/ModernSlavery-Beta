@@ -7,7 +7,6 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
     [Serializable]
     public class CustomError
     {
-
         public CustomError(int code, string description)
         {
             Code = code;
@@ -15,7 +14,9 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         }
 
         public CustomError(HttpStatusCode httpStatusCode, string description)
-            : this(httpStatusCode.ToInt32(), description) { }
+            : this(httpStatusCode.ToInt32(), description)
+        {
+        }
 
         public int Code { get; set; }
         public string Description { get; set; }
@@ -27,12 +28,11 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
 
         public HttpException ToHttpException()
         {
-            HttpStatusCode codeConvertedToStatus = Enum.IsDefined(typeof(HttpStatusCode), Code)
+            var codeConvertedToStatus = Enum.IsDefined(typeof(HttpStatusCode), Code)
                 ? (HttpStatusCode) Code
                 : HttpStatusCode.NotFound;
 
             return new HttpException(codeConvertedToStatus, Description);
         }
-
     }
 }

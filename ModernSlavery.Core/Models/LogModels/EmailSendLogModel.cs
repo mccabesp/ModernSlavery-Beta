@@ -6,7 +6,6 @@ namespace ModernSlavery.Core.Models.LogModels
     [Serializable]
     public class EmailSendLogModel
     {
-
         public DateTime Date { get; set; } = VirtualDateTime.Now;
         public string Machine { get; set; } = $"Machine:{Environment.MachineName}";
         public string Source { get; set; } = AppDomain.CurrentDomain.FriendlyName;
@@ -17,6 +16,5 @@ namespace ModernSlavery.Core.Models.LogModels
         public string Recipients { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
-
     }
 }

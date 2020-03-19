@@ -5,7 +5,6 @@ namespace ModernSlavery.Core.Interfaces
 {
     public interface IDataTransaction
     {
-
         /// <summary>
         ///     Creates a transaction for aggregating data update operations
         /// </summary>
@@ -15,7 +14,5 @@ namespace ModernSlavery.Core.Interfaces
         void CommitTransaction();
 
         void RollbackTransaction();
-
     }
-
 }

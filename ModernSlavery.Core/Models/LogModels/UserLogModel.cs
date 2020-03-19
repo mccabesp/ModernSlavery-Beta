@@ -4,12 +4,12 @@ using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Core.Models.LogModels
 {
-
     [Serializable]
     public class UserLogModel
     {
-
-        public UserLogModel() { }
+        public UserLogModel()
+        {
+        }
 
         public UserLogModel(string userId,
             string emailAddress,
@@ -43,7 +43,5 @@ namespace ModernSlavery.Core.Models.LogModels
         public string TargetOldValue { get; set; }
 
         public string TargetNewValue { get; set; }
-
     }
-
 }

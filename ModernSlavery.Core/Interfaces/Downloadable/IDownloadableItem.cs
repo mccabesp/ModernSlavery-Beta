@@ -2,9 +2,7 @@
 {
     public interface IDownloadableItem
     {
-
         string Filepath { get; }
         string Name { get; }
-
     }
 }

@@ -10,7 +10,6 @@ namespace ModernSlavery.Core.Models
     [Serializable]
     public class EmployerRecord
     {
-
         public Dictionary<string, string> References = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public long OrganisationId { get; set; }
         public string DUNSNumber { get; set; }
@@ -63,40 +62,19 @@ namespace ModernSlavery.Core.Models
         public List<string> GetAddressList()
         {
             var list = new List<string>();
-            if (!string.IsNullOrWhiteSpace(Address1))
-            {
-                list.Add(Address1);
-            }
+            if (!string.IsNullOrWhiteSpace(Address1)) list.Add(Address1);
 
-            if (!string.IsNullOrWhiteSpace(Address2))
-            {
-                list.Add(Address2);
-            }
+            if (!string.IsNullOrWhiteSpace(Address2)) list.Add(Address2);
 
-            if (!string.IsNullOrWhiteSpace(Address3))
-            {
-                list.Add(Address3);
-            }
+            if (!string.IsNullOrWhiteSpace(Address3)) list.Add(Address3);
 
-            if (!string.IsNullOrWhiteSpace(City))
-            {
-                list.Add(City);
-            }
+            if (!string.IsNullOrWhiteSpace(City)) list.Add(City);
 
-            if (!string.IsNullOrWhiteSpace(County))
-            {
-                list.Add(County);
-            }
+            if (!string.IsNullOrWhiteSpace(County)) list.Add(County);
 
-            if (!string.IsNullOrWhiteSpace(Country))
-            {
-                list.Add(Country);
-            }
+            if (!string.IsNullOrWhiteSpace(Country)) list.Add(Country);
 
-            if (!string.IsNullOrWhiteSpace(PoBox))
-            {
-                list.Add(PoBox);
-            }
+            if (!string.IsNullOrWhiteSpace(PoBox)) list.Add(PoBox);
 
             return list;
         }
@@ -115,16 +93,14 @@ namespace ModernSlavery.Core.Models
 
         public bool IsValidAddress()
         {
-            bool isUK = Country.IsUK();
+            var isUK = Country.IsUK();
             if (isUK)
-            {
                 return !string.IsNullOrWhiteSpace(Address1)
                        || !string.IsNullOrWhiteSpace(Address2)
                        || !string.IsNullOrWhiteSpace(Address3)
                        || !string.IsNullOrWhiteSpace(City)
                        || !string.IsNullOrWhiteSpace(PostCode)
                        || !string.IsNullOrWhiteSpace(PoBox);
-            }
 
             return !string.IsNullOrWhiteSpace(Country)
                    && (!string.IsNullOrWhiteSpace(Address1)
@@ -139,17 +115,15 @@ namespace ModernSlavery.Core.Models
         public SortedSet<int> GetSicCodes()
         {
             var codes = new SortedSet<int>();
-            foreach (string sicCode in SicCodeIds.SplitI())
-            {
-                codes.Add(sicCode.ToInt32());
-            }
+            foreach (var sicCode in SicCodeIds.SplitI()) codes.Add(sicCode.ToInt32());
 
             return codes;
         }
 
         public AddressModel GetAddressModel()
         {
-            return new AddressModel {
+            return new AddressModel
+            {
                 Address1 = Address1,
                 Address2 = Address2,
                 Address3 = Address3,
@@ -163,17 +137,11 @@ namespace ModernSlavery.Core.Models
 
         public bool IsAuthorised(string emailAddress)
         {
-            if (!emailAddress.IsEmailAddress())
-            {
-                throw new ArgumentException("Bad email address");
-            }
+            if (!emailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
 
-            if (string.IsNullOrWhiteSpace(EmailDomains))
-            {
-                return false;
-            }
+            if (string.IsNullOrWhiteSpace(EmailDomains)) return false;
 
-            List<string> emailDomains = EmailDomains.SplitI(";")
+            var emailDomains = EmailDomains.SplitI(";")
                 .Select(ep => ep.ContainsI("*@") ? ep : ep.Contains('@') ? "*" + ep : "*@" + ep)
                 .ToList();
             return emailDomains.Count > 0 && emailAddress.LikeAny(emailDomains);
@@ -182,18 +150,11 @@ namespace ModernSlavery.Core.Models
         public static EmployerRecord Create(Organisation org, long userId = 0)
         {
             OrganisationAddress address = null;
-            if (userId > 0)
-            {
-                address = org.UserOrganisations.FirstOrDefault(uo => uo.UserId == userId)?.Address;
-            }
+            if (userId > 0) address = org.UserOrganisations.FirstOrDefault(uo => uo.UserId == userId)?.Address;
+
+            if (address == null) address = org.LatestAddress;
 
             if (address == null)
-            {
-                address = org.LatestAddress;
-            }
-
-            if (address == null)
-            {
                 return new EmployerRecord
                 {
                     OrganisationId = org.OrganisationId,
@@ -213,7 +174,6 @@ namespace ModernSlavery.Core.Models
                         r => r.ReferenceValue,
                         StringComparer.OrdinalIgnoreCase)
                 };
-            }
 
             return new EmployerRecord
             {

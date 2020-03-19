@@ -2,11 +2,9 @@
 
 namespace ModernSlavery.Core.Models
 {
-
     [Serializable]
     public class UpdateDetailsModel
     {
-
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
@@ -18,7 +16,5 @@ namespace ModernSlavery.Core.Models
         public bool SendUpdates { get; set; }
 
         public bool AllowContact { get; set; }
-
     }
-
 }

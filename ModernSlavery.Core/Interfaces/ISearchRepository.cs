@@ -35,6 +35,5 @@ namespace ModernSlavery.Core.Interfaces
             string filter = null,
             string highlights = null,
             SearchModes searchMode = SearchModes.Any);
-
     }
 }

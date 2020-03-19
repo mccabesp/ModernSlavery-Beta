@@ -7,8 +7,9 @@ namespace ModernSlavery.Core.Models.LogModels
     [Serializable]
     public class ManualChangeLogModel
     {
-
-        public ManualChangeLogModel() { }
+        public ManualChangeLogModel()
+        {
+        }
 
         public ManualChangeLogModel(string methodName,
             ManualActions action,
@@ -44,6 +45,5 @@ namespace ModernSlavery.Core.Models.LogModels
         public string Details { get; set; }
         public string Comment { get; set; }
         public string Source { get; set; }
-
     }
 }

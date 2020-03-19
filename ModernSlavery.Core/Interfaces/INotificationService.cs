@@ -10,8 +10,13 @@ namespace ModernSlavery.Core.Interfaces
         void SendRemovedUserFromOrganisationEmail(string emailAddress, string organisationName, string removedUserName);
         void SendScopeChangeInEmail(string emailAddress, string organisationName);
         void SendScopeChangeOutEmail(string emailAddress, string organisationName);
-        void SendSuccessfulSubmissionEmail(string emailAddress, string organisationName, string submittedOrUpdated, string reportingPeriod, string reportLink);
-        void SendSuccessfulSubmissionEmailToRegisteredUsers(Return postedReturn, string reportLink, string submittedOrUpdated);
+
+        void SendSuccessfulSubmissionEmail(string emailAddress, string organisationName, string submittedOrUpdated,
+            string reportingPeriod, string reportLink);
+
+        void SendSuccessfulSubmissionEmailToRegisteredUsers(Return postedReturn, string reportLink,
+            string submittedOrUpdated);
+
         void SendUserAddedEmailToExistingUsers(Organisation organisation, User addedUser);
         void SendUserAddedToOrganisationEmail(string emailAddress, string organisationName, string username);
     }

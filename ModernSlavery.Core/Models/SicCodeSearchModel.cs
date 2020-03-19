@@ -7,7 +7,6 @@ namespace ModernSlavery.Core.Models
     [Serializable]
     public class SicCodeSearchModel
     {
-
         private string _consolidatedSynonyms;
 
         public virtual string SicCodeId { get; set; }
@@ -25,31 +24,20 @@ namespace ModernSlavery.Core.Models
                 _consolidatedSynonyms = value?.Trim();
 
                 if (!string.IsNullOrEmpty(_consolidatedSynonyms))
-                {
                     SicCodeListOfSynonyms = _consolidatedSynonyms.SplitI();
-                }
             }
         }
 
         public override bool Equals(object value)
         {
             // Is null?
-            if (ReferenceEquals(null, value))
-            {
-                return false;
-            }
+            if (ReferenceEquals(null, value)) return false;
 
             // Is the same object?
-            if (ReferenceEquals(this, value))
-            {
-                return true;
-            }
+            if (ReferenceEquals(this, value)) return true;
 
             // Is the same type?
-            if (value.GetType() != GetType())
-            {
-                return false;
-            }
+            if (value.GetType() != GetType()) return false;
 
             return IsEqual((SicCodeSearchModel) value);
         }
@@ -57,16 +45,10 @@ namespace ModernSlavery.Core.Models
         public bool Equals(SicCodeSearchModel sicCodeSearchModel)
         {
             // Is null?
-            if (ReferenceEquals(null, sicCodeSearchModel))
-            {
-                return false;
-            }
+            if (ReferenceEquals(null, sicCodeSearchModel)) return false;
 
             // Is the same object?
-            if (ReferenceEquals(this, sicCodeSearchModel))
-            {
-                return true;
-            }
+            if (ReferenceEquals(this, sicCodeSearchModel)) return true;
 
             return IsEqual(sicCodeSearchModel);
         }
@@ -83,16 +65,10 @@ namespace ModernSlavery.Core.Models
 
         public static bool operator ==(SicCodeSearchModel sicCodeSearchModelA, SicCodeSearchModel sicCodeSearchModelB)
         {
-            if (ReferenceEquals(sicCodeSearchModelA, sicCodeSearchModelB))
-            {
-                return true;
-            }
+            if (ReferenceEquals(sicCodeSearchModelA, sicCodeSearchModelB)) return true;
 
             // Ensure that source for equality "sicCodeSearchModelA" isn't null
-            if (ReferenceEquals(null, sicCodeSearchModelA))
-            {
-                return false;
-            }
+            if (ReferenceEquals(null, sicCodeSearchModelA)) return false;
 
             return sicCodeSearchModelA.Equals(sicCodeSearchModelB);
         }
@@ -104,8 +80,8 @@ namespace ModernSlavery.Core.Models
 
         public string ToLogFriendlyString()
         {
-            string sicCodeIdWithoutSpaces = SicCodeId?.Trim();
-            string sicCodeDescriptionSubstring = SicCodeDescription?
+            var sicCodeIdWithoutSpaces = SicCodeId?.Trim();
+            var sicCodeDescriptionSubstring = SicCodeDescription?
                 .Trim()
                 .Substring(
                     0,
@@ -113,6 +89,5 @@ namespace ModernSlavery.Core.Models
 
             return $"{sicCodeIdWithoutSpaces}-{sicCodeDescriptionSubstring}";
         }
-
     }
 }

@@ -1,12 +1,12 @@
-﻿using ModernSlavery.Entities.Enums;
-using System.Net;
+﻿using System.Net;
+using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.Core.Classes.ErrorMessages
 {
     public class InternalMessages
     {
-
-        public static CustomError SameScopesCannotBeUpdated(ScopeStatuses newScopeStatus, ScopeStatuses oldScopeStatus, int snapshotYear)
+        public static CustomError SameScopesCannotBeUpdated(ScopeStatuses newScopeStatus, ScopeStatuses oldScopeStatus,
+            int snapshotYear)
         {
             return new CustomError(
                 4006,
@@ -29,7 +29,8 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
 
         public static CustomError SecurityCodeCannotModifyAnAlreadyExpiredSecurityCodeErrorMessage()
         {
-            return new CustomError(4004, "Cannot modify the security code information of an already expired security code");
+            return new CustomError(4004,
+                "Cannot modify the security code information of an already expired security code");
         }
 
         public static CustomError SecurityCodeCreateIsOnlyAllowedToNonRetiredOrgsErrorMessage(string organisationName,
@@ -48,15 +49,18 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
 
         public static CustomError HttpNotFoundCausedByOrganisationIdNotInDatabase(string employerIdentifier)
         {
-            return new CustomError(HttpStatusCode.NotFound, $"Employer: Could not find organisation '{employerIdentifier}'");
+            return new CustomError(HttpStatusCode.NotFound,
+                $"Employer: Could not find organisation '{employerIdentifier}'");
         }
 
         public static CustomError HttpGoneCausedByOrganisationBeingInactive(OrganisationStatuses organisationStatus)
         {
-            return new CustomError(HttpStatusCode.Gone, $"Employer: The status of this organisation is '{organisationStatus}'");
+            return new CustomError(HttpStatusCode.Gone,
+                $"Employer: The status of this organisation is '{organisationStatus}'");
         }
 
-        public static CustomError HttpNotFoundCausedByOrganisationReturnNotInDatabase(string organisationIdEncrypted, int year)
+        public static CustomError HttpNotFoundCausedByOrganisationReturnNotInDatabase(string organisationIdEncrypted,
+            int year)
         {
             return new CustomError(
                 HttpStatusCode.NotFound,
@@ -65,13 +69,14 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
 
         public static CustomError HttpGoneCausedByReportNotHavingBeenSubmitted(int reportYear, string reportStatus)
         {
-            return new CustomError(HttpStatusCode.Gone, $"Employer report '{reportYear}' is showing with status '{reportStatus}'");
+            return new CustomError(HttpStatusCode.Gone,
+                $"Employer report '{reportYear}' is showing with status '{reportStatus}'");
         }
 
         public static CustomError HttpNotFoundCausedByReturnIdNotInDatabase(string returnIdEncrypted)
         {
-            return new CustomError(HttpStatusCode.NotFound, $"Employer: Could not find GPG Data for returnId:'{returnIdEncrypted}'");
+            return new CustomError(HttpStatusCode.NotFound,
+                $"Employer: Could not find GPG Data for returnId:'{returnIdEncrypted}'");
         }
-
     }
 }

@@ -9,11 +9,12 @@ namespace ModernSlavery.Core.Models
     [Serializable]
     public class DnBOrgsModel
     {
+        private readonly ISnapshotDateHelper _snapshotDateHelper;
+
         public DnBOrgsModel(ISnapshotDateHelper snapshotDateHelper)
         {
             _snapshotDateHelper = snapshotDateHelper;
         }
-        readonly ISnapshotDateHelper _snapshotDateHelper;
 
         public string DUNSNumber { get; set; }
         public string EmployerReference { get; set; }
@@ -73,16 +74,14 @@ namespace ModernSlavery.Core.Models
         //True is org dissolved before current accounting date
         public bool GetIsDissolved()
         {
-            return DateOfCessation != null && DateOfCessation < _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private);
+            return DateOfCessation != null &&
+                   DateOfCessation < _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private);
         }
 
         public SortedSet<int> GetSicCodesIds()
         {
             var codes = new SortedSet<int>();
-            foreach (string sicCode in SicCode.SplitI())
-            {
-                codes.Add(sicCode.ToInt32());
-            }
+            foreach (var sicCode in SicCode.SplitI()) codes.Add(sicCode.ToInt32());
 
             return codes;
         }
@@ -90,45 +89,21 @@ namespace ModernSlavery.Core.Models
         public List<string> GetList()
         {
             var list = new List<string>();
-            if (!string.IsNullOrWhiteSpace(AddressLine1))
-            {
-                list.Add(AddressLine1.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(AddressLine1)) list.Add(AddressLine1.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(AddressLine2))
-            {
-                list.Add(AddressLine2.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(AddressLine2)) list.Add(AddressLine2.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(AddressLine3))
-            {
-                list.Add(AddressLine3.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(AddressLine3)) list.Add(AddressLine3.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(City))
-            {
-                list.Add(City.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(City)) list.Add(City.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(County))
-            {
-                list.Add(County.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(County)) list.Add(County.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(Country))
-            {
-                list.Add(Country.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(Country)) list.Add(Country.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(PostalCode))
-            {
-                list.Add(PostalCode.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(PostalCode)) list.Add(PostalCode.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(PoBox))
-            {
-                list.Add(PoBox.TrimI());
-            }
+            if (!string.IsNullOrWhiteSpace(PoBox)) list.Add(PoBox.TrimI());
 
             return list;
         }
@@ -140,16 +115,14 @@ namespace ModernSlavery.Core.Models
 
         public bool IsValidAddress()
         {
-            bool isUK = Country.IsUK();
+            var isUK = Country.IsUK();
             if (isUK)
-            {
                 return !string.IsNullOrWhiteSpace(AddressLine1)
                        || !string.IsNullOrWhiteSpace(AddressLine2)
                        || !string.IsNullOrWhiteSpace(AddressLine3)
                        || !string.IsNullOrWhiteSpace(City)
                        || !string.IsNullOrWhiteSpace(PostalCode)
                        || !string.IsNullOrWhiteSpace(PoBox);
-            }
 
             return !string.IsNullOrWhiteSpace(Country)
                    && (!string.IsNullOrWhiteSpace(AddressLine1)
@@ -160,6 +133,5 @@ namespace ModernSlavery.Core.Models
                        || !string.IsNullOrWhiteSpace(PostalCode)
                        || !string.IsNullOrWhiteSpace(PoBox));
         }
-
     }
 }

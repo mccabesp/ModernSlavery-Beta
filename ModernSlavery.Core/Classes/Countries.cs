@@ -12,8 +12,8 @@ namespace ModernSlavery.Core.Classes
 {
     public class Country
     {
-
-        public static readonly Country[] List = {
+        public static readonly Country[] List =
+        {
             new Country("Afghanistan", "AF", "AFG", "004"),
             new Country("Åland Islands", "AX", "ALA", "248"),
             new Country("Albania", "AL", "ALB", "008"),
@@ -302,10 +302,7 @@ namespace ModernSlavery.Core.Classes
 
         public static string FindTwoLetterCode(string country)
         {
-            if (string.IsNullOrWhiteSpace(country))
-            {
-                return null;
-            }
+            if (string.IsNullOrWhiteSpace(country)) return null;
 
             return List.FirstOrDefault(
                     c => c.Name.EqualsI(country)
@@ -314,6 +311,5 @@ namespace ModernSlavery.Core.Classes
                          || c.NumericCode.EqualsI(country))
                 ?.TwoLetterCode;
         }
-
     }
 }

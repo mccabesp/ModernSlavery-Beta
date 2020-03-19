@@ -1,12 +1,11 @@
-﻿using ModernSlavery.SharedKernel;
-using System;
+﻿using System;
+using ModernSlavery.SharedKernel;
 
 namespace ModernSlavery.Core.Models
 {
     [Serializable]
     public class UnfinishedOrgsModel
     {
-
         public string DUNSNumber { get; set; }
         public string EmployerReference { get; set; }
         public string SecurityToken { get; set; }
@@ -24,6 +23,5 @@ namespace ModernSlavery.Core.Models
         public string AddressLine2 { get; set; }
         public string City { get; set; }
         public string PostCode { get; set; }
-
     }
 }

@@ -1,9 +1,7 @@
 ﻿namespace ModernSlavery.Core.EmailTemplates
 {
-
     public abstract class EmailTemplate
     {
-
         /// <summary>
         ///     The email address that will receive the email
         /// </summary>
@@ -20,7 +18,5 @@
         ///     Refactor: Integration tests should implement a test email provider rather than use a flag like this
         /// </summary>
         public bool Simulate { get; set; }
-
     }
-
 }

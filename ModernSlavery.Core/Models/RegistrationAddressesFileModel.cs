@@ -5,7 +5,6 @@ namespace ModernSlavery.Core.Models
 {
     public class RegistrationAddressesFileModel
     {
-
         public long OrganisationId { get; set; }
         public string DUNSNumber { get; set; }
         public string EmployerReference { get; set; }
@@ -27,6 +26,5 @@ namespace ModernSlavery.Core.Models
         public string Expires { get; set; }
         public ScopeStatuses? ScopeStatus { get; set; }
         public string HasSubmitted { get; set; }
-
     }
 }

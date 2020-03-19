@@ -4,7 +4,6 @@ namespace ModernSlavery.Core.Interfaces
 {
     public interface IHashSet<T>
     {
-
         int Count { get; }
         void Add(params T[] items);
         void Remove(params T[] items);
@@ -13,6 +12,5 @@ namespace ModernSlavery.Core.Interfaces
 
         IEnumerable<T> AsEnumerable();
         IList<T> ToList();
-
     }
 }

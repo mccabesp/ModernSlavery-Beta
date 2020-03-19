@@ -1,13 +1,12 @@
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
 using System;
 using System.ComponentModel.DataAnnotations;
+using ModernSlavery.Entities;
+using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Core.Models
 {
     public class DownloadResult
     {
-
         public string EmployerName { get; set; }
         public string Address { get; set; }
         public string CompanyNumber { get; set; }
@@ -38,8 +37,10 @@ namespace ModernSlavery.Core.Models
         {
             return new DownloadResult
             {
-                EmployerName = @return.Organisation.GetName(@return.StatusDate)?.Name ?? @return.Organisation.OrganisationName,
-                Address = @return.Organisation.GetAddressString(@return.StatusDate, delimiter: "," + Environment.NewLine),
+                EmployerName = @return.Organisation.GetName(@return.StatusDate)?.Name ??
+                               @return.Organisation.OrganisationName,
+                Address = @return.Organisation.GetAddressString(@return.StatusDate,
+                    delimiter: "," + Environment.NewLine),
                 CompanyNumber = @return.Organisation?.CompanyNumber,
                 SicCodes = @return.Organisation?.GetSicCodeIdsString(@return.StatusDate, "," + Environment.NewLine),
                 DiffMeanHourlyPercent = @return.DiffMeanHourlyPayPercent,
@@ -65,6 +66,5 @@ namespace ModernSlavery.Core.Models
                 DateSubmitted = @return.Modified
             };
         }
-
     }
 }

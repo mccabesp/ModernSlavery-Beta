@@ -8,7 +8,6 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
 {
     public class CustomErrorMessagesSection : ConfigurationSection
     {
-
         [ConfigurationProperty("", IsRequired = true, IsDefaultCollection = true)]
         [ConfigurationCollection(typeof(CustomErrorMessages), AddItemName = "CustomErrorMessage")]
         public CustomErrorMessages Messages
@@ -22,12 +21,10 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         {
             return false;
         }
-
     }
 
     public class CustomErrorMessages : ConfigurationElementCollection
     {
-
         private static CustomErrorMessagesSection _DefaultSection;
 
         private Dictionary<int, CustomErrorMessage> _PageErrors;
@@ -39,11 +36,9 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
             get
             {
                 if (_PageErrors == null)
-                {
                     _PageErrors = this.ToList<CustomErrorMessage>()
                         .Where(e => string.IsNullOrWhiteSpace(e.Validator))
                         .ToDictionary(c => c.Code);
-                }
 
                 return _PageErrors;
             }
@@ -54,11 +49,9 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
             get
             {
                 if (_ValidationErrors == null)
-                {
                     _ValidationErrors = this.ToList<CustomErrorMessage>()
                         .Where(e => !string.IsNullOrWhiteSpace(e.Validator))
                         .ToDictionary(c => c.Validator, StringComparer.CurrentCultureIgnoreCase);
-                }
 
                 return _ValidationErrors;
             }
@@ -68,7 +61,8 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
 
         protected override string ElementName => "CustomErrorMessage";
 
-        public override ConfigurationElementCollectionType CollectionType => ConfigurationElementCollectionType.BasicMap;
+        public override ConfigurationElementCollectionType CollectionType =>
+            ConfigurationElementCollectionType.BasicMap;
 
         public static CustomErrorMessagesSection DefaultSection
         {
@@ -76,10 +70,10 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
             {
                 if (_DefaultSection == null)
                 {
-                    string filePath = $"{AppDomain.CurrentDomain.BaseDirectory}App_Data\\CustomErrorMessages.config";
+                    var filePath = $"{AppDomain.CurrentDomain.BaseDirectory}App_Data\\CustomErrorMessages.config";
                     var map = new ExeConfigurationFileMap {ExeConfigFilename = filePath};
-                    Configuration config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
-                    ConfigurationSection theSection = config.GetSection("CustomErrorMessages");
+                    var config = ConfigurationManager.OpenMappedExeConfiguration(map, ConfigurationUserLevel.None);
+                    var theSection = config.GetSection("CustomErrorMessages");
                     _DefaultSection = (CustomErrorMessagesSection) theSection;
                 }
 
@@ -132,29 +126,23 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
             var CustomErrorMessagesSection = (CustomErrorMessagesSection) config.GetSection("CustomErrorMessages");
 
             //Get the account settings section
-            if (CustomErrorMessagesSection == null)
-            {
-                CustomErrorMessagesSection = new CustomErrorMessagesSection();
-            }
+            if (CustomErrorMessagesSection == null) CustomErrorMessagesSection = new CustomErrorMessagesSection();
 
             if (CustomErrorMessagesSection.Messages == null)
-            {
                 CustomErrorMessagesSection.Messages = new CustomErrorMessages();
-            }
 
-            CustomErrorMessages results = CustomErrorMessagesSection.Messages;
+            var results = CustomErrorMessagesSection.Messages;
 
-            if (results == null)
-            {
-                throw new Exception("You must enter all the http error codes and messages.");
-            }
+            if (results == null) throw new Exception("You must enter all the http error codes and messages.");
 
             return results;
         }
 
         public static CustomErrorMessage GetPageError(int code)
         {
-            return DefaultSection.Messages.PageErrors.ContainsKey(code) ? DefaultSection.Messages.PageErrors?[code] : null;
+            return DefaultSection.Messages.PageErrors.ContainsKey(code)
+                ? DefaultSection.Messages.PageErrors?[code]
+                : null;
         }
 
         public static CustomErrorMessage GetValidationError(string validator)
@@ -193,13 +181,11 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         {
             return DefaultSection.Messages.ValidationErrors[validator]?.Description;
         }
-
     }
 
     [Serializable]
     public class CustomErrorMessage : ConfigurationElement
     {
-
         private readonly bool _isReadOnly;
 
         [ConfigurationProperty("code", IsKey = true, IsRequired = true)]
@@ -289,6 +275,5 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         {
             return $"{Title} {Description}".Trim();
         }
-
     }
 }

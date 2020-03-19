@@ -11,15 +11,12 @@ namespace ModernSlavery.Core.Classes
     [Obsolete("Please use other classes that implement IObfuscator")]
     public interface IEncryptionHandler
     {
-
         string EncryptAndEncode(long valueToEncryptAndEncode);
         string DecryptAndDecode(string valueToDecryptAndDecode);
-
     }
 
     public class EncryptionHandler : IEncryptionHandler
     {
-
         public string EncryptAndEncode(long valueToEncryptAndEncode)
         {
             return EncryptAndEncode(valueToEncryptAndEncode.ToInt32());
@@ -34,6 +31,5 @@ namespace ModernSlavery.Core.Classes
         {
             return Encryption.EncryptQuerystring(valueToEncryptAndEncode.ToString());
         }
-
     }
 }

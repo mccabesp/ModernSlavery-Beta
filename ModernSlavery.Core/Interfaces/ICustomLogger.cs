@@ -7,6 +7,5 @@
         void Warning(string message, object values = null);
         void Error(string message, object values = null);
         void Fatal(string message, object values = null);
-
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace ModernSlavery.Core.EmailTemplates
 {
-
-    public class ChangePasswordCompletedTemplate : EmailTemplate { }
-
+    public class ChangePasswordCompletedTemplate : EmailTemplate
+    {
+    }
 }

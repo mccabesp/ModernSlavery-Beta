@@ -5,7 +5,6 @@ namespace ModernSlavery.Core.Interfaces
 {
     public interface IPagedRepository<T>
     {
-
         void Insert(T entity);
         void Delete(T entity);
         void ClearSearch();
@@ -13,6 +12,5 @@ namespace ModernSlavery.Core.Interfaces
         Task<PagedResult<T>> SearchAsync(string searchText, int page, int pageSize, bool test = false);
 
         Task<string> GetSicCodesAsync(string companyNumber);
-
     }
 }

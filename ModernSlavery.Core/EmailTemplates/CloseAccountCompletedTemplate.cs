@@ -1,6 +1,6 @@
 ﻿namespace ModernSlavery.Core.EmailTemplates
 {
-
-    public class CloseAccountCompletedTemplate : EmailTemplate { }
-
+    public class CloseAccountCompletedTemplate : EmailTemplate
+    {
+    }
 }

@@ -6,7 +6,6 @@ namespace ModernSlavery.Core.Models.LogModels
     [Serializable]
     public class RegisterLogModel
     {
-
         public DateTime StatusDate { get; set; }
         public string Status { get; set; }
         public string ActionBy { get; set; }
@@ -25,6 +24,5 @@ namespace ModernSlavery.Core.Models.LogModels
         public string ContactJobTitle { get; set; }
         public string ContactOrganisation { get; set; }
         public string ContactPhoneNumber { get; set; }
-
     }
 }

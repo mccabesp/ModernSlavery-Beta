@@ -9,7 +9,6 @@ namespace ModernSlavery.Core.Models
     [Serializable]
     public class ViewDataModel
     {
-
         public long OrganisationId { get; set; }
         public SectorTypes SectorType { get; set; }
         public string OrganisationName { get; set; }
@@ -27,7 +26,5 @@ namespace ModernSlavery.Core.Models
         }
 
         public string SicSectionIds { get; set; }
-        
     }
-
 }

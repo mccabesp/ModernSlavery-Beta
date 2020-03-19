@@ -5,7 +5,6 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
     [Serializable]
     public class CustomResult<T>
     {
-
         public CustomResult(T result)
         {
             Result = result;
@@ -37,6 +36,5 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         public CustomError ErrorMessage { get; set; }
         public bool Succeeded => ErrorMessage == null;
         public bool Failed => ErrorMessage != null;
-
     }
 }

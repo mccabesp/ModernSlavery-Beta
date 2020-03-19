@@ -7,7 +7,6 @@ namespace ModernSlavery.Core.Models.LogModels
     [Serializable]
     public class SubmissionLogModel
     {
-
         public DateTime StatusDate { get; set; }
         public ReturnStatuses Status { get; set; }
         public string Details { get; set; }
@@ -48,6 +47,5 @@ namespace ModernSlavery.Core.Models.LogModels
         public DateTime Modified { get; set; }
         public string Browser { get; set; }
         public string SessionId { get; set; }
-
     }
 }

@@ -1,12 +1,11 @@
-﻿using ModernSlavery.Entities.Enums;
+﻿using System;
+using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
-using System;
 
 namespace ModernSlavery.Core.Models
 {
     public class OrganisationsFileModel
     {
-
         public long OrganisationId { get; set; }
         public string DUNSNumber { get; set; }
         public string EmployerReference { get; set; }
@@ -32,6 +31,5 @@ namespace ModernSlavery.Core.Models
         public DateTime? SecurityCodeCreatedDateTime { get; set; }
 
         #endregion
-
     }
 }

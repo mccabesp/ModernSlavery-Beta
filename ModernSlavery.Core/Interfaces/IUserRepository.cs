@@ -7,10 +7,8 @@ using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.Core.Interfaces
 {
-
     public interface IUserRepository : IDataTransaction
     {
-
         Task<bool> CheckPasswordAsync(User user, string password);
 
         Task<User> FindBySubjectIdAsync(long subjectId, params UserStatuses[] filterStatuses);
@@ -34,5 +32,4 @@ namespace ModernSlavery.Core.Interfaces
         Task RetireUserAsync(User userToRetire);
         void UpdateUserPasswordUsingPBKDF2(User currentUser, string password);
     }
-
 }

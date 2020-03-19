@@ -6,7 +6,6 @@ namespace ModernSlavery.Core.Classes
 {
     public class InternalObfuscator : IObfuscator
     {
-
         private readonly Obfuscator _obfuscator;
 
         public InternalObfuscator(int seed)
@@ -28,6 +27,5 @@ namespace ModernSlavery.Core.Classes
         {
             return _obfuscator.Deobfuscate(value); // 15
         }
-
     }
 }

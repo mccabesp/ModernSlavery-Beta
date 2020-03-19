@@ -12,7 +12,10 @@ namespace ModernSlavery.Core.Interfaces
         Task<bool> SendCreateAccountPendingVerificationAsync(string verifyUrl, string emailAddress);
         Task<bool> SendGeoMessageAsync(string subject, string message, bool test = false);
         Task<bool> SendGEOOrphanOrganisationNotificationAsync(string organisationName, bool test);
-        Task<bool> SendGEORegistrationRequestAsync(string reviewUrl, string contactName, string reportingOrg, string reportingAddress, bool test = false);
+
+        Task<bool> SendGEORegistrationRequestAsync(string reviewUrl, string contactName, string reportingOrg,
+            string reportingAddress, bool test = false);
+
         Task<bool> SendRegistrationApprovedAsync(string returnUrl, string emailAddress, bool test = false);
         Task<bool> SendRegistrationDeclinedAsync(string emailAddress, string reason);
         Task<bool> SendResetPasswordCompletedAsync(string emailAddress);

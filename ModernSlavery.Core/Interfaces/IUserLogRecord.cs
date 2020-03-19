@@ -6,8 +6,8 @@ namespace ModernSlavery.Core.Interfaces
 {
     public interface IUserLogRecord : ILogRecordLogger
     {
-
-        Task LogEmailChangedAsync(string oldEmailAddress, string newEmailAddress, User userToUpdate, string actionByEmailAddress);
+        Task LogEmailChangedAsync(string oldEmailAddress, string newEmailAddress, User userToUpdate,
+            string actionByEmailAddress);
 
         Task LogPasswordChangedAsync(User userToUpdate, string actionByEmailAddress);
 
@@ -17,6 +17,5 @@ namespace ModernSlavery.Core.Interfaces
             string emailAddress);
 
         Task LogUserRetiredAsync(User userToUpdate, string actionByEmailAddress);
-
     }
 }

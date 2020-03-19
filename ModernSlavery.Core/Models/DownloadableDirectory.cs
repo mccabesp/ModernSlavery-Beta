@@ -7,7 +7,6 @@ namespace ModernSlavery.Core.Models
 {
     public class DownloadableDirectory : IDownloadableDirectory
     {
-
         private string _name;
 
         public DownloadableDirectory(string filePath)
@@ -23,10 +22,7 @@ namespace ModernSlavery.Core.Models
         {
             get
             {
-                if (string.IsNullOrEmpty(_name))
-                {
-                    _name = Filepath.AfterLastAny("\\/", StringComparison.Ordinal);
-                }
+                if (string.IsNullOrEmpty(_name)) _name = Filepath.AfterLastAny("\\/", StringComparison.Ordinal);
 
                 return _name;
             }
@@ -40,13 +36,12 @@ namespace ModernSlavery.Core.Models
         /// <param name="directoryPath"></param>
         public static DownloadableDirectory GetSpecialParentFolderInfo(string directoryPath)
         {
-            int lastPositionOfSlash = directoryPath.LastIndexOfAny(new[] {'\\', '/'});
-            string parentDirectoryPath = directoryPath.Remove(lastPositionOfSlash);
+            var lastPositionOfSlash = directoryPath.LastIndexOfAny(new[] {'\\', '/'});
+            var parentDirectoryPath = directoryPath.Remove(lastPositionOfSlash);
 
             var specialFolderFileInfo = new DownloadableDirectory(parentDirectoryPath) {Name = ".."};
 
             return specialFolderFileInfo;
         }
-
     }
 }

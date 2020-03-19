@@ -8,10 +8,11 @@ namespace ModernSlavery.Core.Interfaces
 {
     public interface IFileRepository
     {
-
         string RootDir { get; }
 
-        Task<IEnumerable<string>> GetDirectoriesAsync(string directoryPath, string searchPattern = null, bool recursive = false);
+        Task<IEnumerable<string>> GetDirectoriesAsync(string directoryPath, string searchPattern = null,
+            bool recursive = false);
+
         Task CreateDirectoryAsync(string directoryPath);
 
         Task<bool> GetDirectoryExistsAsync(string directoryPath);
@@ -23,7 +24,9 @@ namespace ModernSlavery.Core.Interfaces
         Task DeleteFileAsync(string filePath);
         Task CopyFileAsync(string sourceFilePath, string destinationFilePath, bool overwrite);
 
-        Task<IEnumerable<string>> GetFilesAsync(string directoryPath, string searchPattern = null, bool recursive = false);
+        Task<IEnumerable<string>> GetFilesAsync(string directoryPath, string searchPattern = null,
+            bool recursive = false);
+
         Task<bool> GetAnyFileExistsAsync(string directoryPath, string searchPattern = null, bool recursive = false);
 
         Task<string> ReadAsync(string filePath);
@@ -44,6 +47,5 @@ namespace ModernSlavery.Core.Interfaces
 
         Task<string> GetMetaDataAsync(string filePath, string key);
         Task SetMetaDataAsync(string filePath, string key, string value);
-
     }
 }

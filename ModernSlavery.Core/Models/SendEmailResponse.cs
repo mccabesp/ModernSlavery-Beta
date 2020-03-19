@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ModernSlavery.Core.Models
+﻿namespace ModernSlavery.Core.Models
 {
     public class SendEmailResponse
     {
