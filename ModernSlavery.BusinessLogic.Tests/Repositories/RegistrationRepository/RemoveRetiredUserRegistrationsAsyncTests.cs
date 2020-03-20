@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using ModernSlavery.BusinessLogic.Register;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Infrastructure.Data;
 using ModernSlavery.Tests.Common.Classes;
@@ -24,14 +26,14 @@ namespace Repositories.UserRepository
             mockLogRecordLogger = new Mock<IRegistrationLogRecord>();
 
             // service under test
-            testRegistrationRepo =
-                new ModernSlavery.Infrastructure.Data.RegistrationRepository(mockDataRepo, mockLogRecordLogger.Object);
+            testRegistrationBusinessLogic =
+                new RegistrationBusinessLogic(mockDataRepo, mockLogRecordLogger.Object);
         }
 
         private IDataRepository mockDataRepo;
         private Mock<IRegistrationLogRecord> mockLogRecordLogger;
 
-        private IRegistrationRepository testRegistrationRepo;
+        private IRegistrationBusinessLogic testRegistrationBusinessLogic;
 
         [Test]
         public async Task UnregistersAllOrganisationsForUser()
@@ -57,7 +59,7 @@ namespace Repositories.UserRepository
                 .Returns(Task.CompletedTask);
 
             // Act
-            await testRegistrationRepo.RemoveRetiredUserRegistrationsAsync(testRetiredUser, testRetiredUser);
+            await testRegistrationBusinessLogic.RemoveRetiredUserRegistrationsAsync(testRetiredUser, testRetiredUser);
 
             // Assert user org removed
             Assert.IsFalse(

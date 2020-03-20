@@ -1,5 +1,5 @@
 ﻿using System;
-using ModernSlavery.Infrastructure.Queue;
+using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
 using NUnit.Framework;
@@ -24,7 +24,7 @@ namespace ModernSlavery.Core.Tests.LogRecordLogger
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Infrastructure.Logging.LogRecordLogger(ConfigHelpers.GlobalOptions, mockQueue.Object,
+                () => new Infrastructure.Storage.LogRecordLogger(ConfigHelpers.GlobalOptions, mockQueue.Object,
                     testAppName, "TestFilename"));
 
             // Assert
@@ -38,7 +38,7 @@ namespace ModernSlavery.Core.Tests.LogRecordLogger
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Infrastructure.Logging.LogRecordLogger(ConfigHelpers.GlobalOptions, mockQueue.Object,
+                () => new Infrastructure.Storage.LogRecordLogger(ConfigHelpers.GlobalOptions, mockQueue.Object,
                     "TestAppName", testFilename));
 
             // Assert
@@ -51,7 +51,7 @@ namespace ModernSlavery.Core.Tests.LogRecordLogger
             // Act
             var actualExpection =
                 Assert.Throws<ArgumentNullException>(() =>
-                    new Infrastructure.Logging.LogRecordLogger(ConfigHelpers.GlobalOptions, null, "TestAppName",
+                    new Infrastructure.Storage.LogRecordLogger(ConfigHelpers.GlobalOptions, null, "TestAppName",
                         "TestFilename"));
 
             // Assert

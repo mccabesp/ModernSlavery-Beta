@@ -1,5 +1,5 @@
 ﻿using System;
-using ModernSlavery.Infrastructure.File;
+using ModernSlavery.Infrastructure.Storage.Classes;
 using ModernSlavery.Tests.Common.Classes;
 using NUnit.Framework;
 

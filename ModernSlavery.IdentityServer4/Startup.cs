@@ -20,17 +20,17 @@ using Microsoft.IdentityModel.Logging;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
+using ModernSlavery.Database.Classes;
 using ModernSlavery.Infrastructure.Configuration;
-using ModernSlavery.Infrastructure.Data;
-using ModernSlavery.Infrastructure.File;
 using ModernSlavery.Infrastructure.Hosts.WebHost;
-using ModernSlavery.Infrastructure.Logging;
-using ModernSlavery.Infrastructure.Options;
-using ModernSlavery.Infrastructure.Queue;
+using ModernSlavery.Infrastructure.Storage;
+using ModernSlavery.Infrastructure.Storage.Classes;
 using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Options;
+using ModernSlavery.Infrastructure.Hosts.WebHost;
+using ModernSlavery.Infrastructure.Hosts;
 
 namespace ModernSlavery.IdentityServer4
 {
@@ -118,28 +118,16 @@ namespace ModernSlavery.IdentityServer4
             //Override any test services
             ConfigureTestServices?.Invoke(services);
 
-            //Create the Autofac inversion of control container
-            var builder = new ContainerBuilder();
+            //Register the external dependencies
+            var dependencyBuilder = new DependencyBuilder(services);
 
-            // Note that Populate is basically a foreach to add things
-            // into Autofac that are in the collection. If you register
-            // things in Autofac BEFORE Populate then the stuff in the
-            // ServiceCollection can override those things; if you register
-            // AFTER Populate those registrations can override things
-            // in the ServiceCollection. Mix and match as needed.
-            builder.Populate(services);
+            //Override any test services
+            ConfigureTestContainer?.Invoke(dependencyBuilder.Builder);
 
-            //Configure the container
-            var container=BuildContainer(builder);
+            //Register the web host dependencies
+            dependencyBuilder.Bind<WebHostDependencyModule>();
 
-            //Register Autofac as the service provider
-            _ServiceProvider = new AutofacServiceProvider(container);
-            services.AddSingleton(_ServiceProvider);
-
-            //Register the webJobs IJobActivator
-            services.AddSingleton(container);
-
-            return container.Resolve<IServiceProvider>();
+            return dependencyBuilder.Build();
         }
 
         // ConfigureContainer is where you can register things directly
@@ -188,9 +176,6 @@ namespace ModernSlavery.IdentityServer4
 
             // Register Action helpers
             builder.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>().SingleInstance();
-
-            //Override any test services
-            ConfigureTestContainer?.Invoke(builder);
 
             // Initialise AutoMapper
             MapperConfiguration mapperConfig = new MapperConfiguration(config => {
@@ -259,9 +244,9 @@ namespace ModernSlavery.IdentityServer4
             }
 
             app.UseRouting();
-            app.UseMaintenancePageMiddleware(globalOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
-            app.UseStickySessionMiddleware(globalOptions.StickySessions); //Enable/Disable sticky sessions based on  
-            app.UseSecurityHeaderMiddleware(); //Add/remove security headers from all responses
+            app.UseMiddleware<MaintenancePageMiddleware>(globalOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
+            app.UseMiddleware<StickySessionMiddleware>(globalOptions.StickySessions); //Enable/Disable sticky sessions based on  
+            app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses
 
             //app.UseMvcWithDefaultRoute();
             app.UseEndpoints(endpoints =>

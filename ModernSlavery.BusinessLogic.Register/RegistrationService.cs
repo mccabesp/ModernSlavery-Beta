@@ -8,6 +8,8 @@ namespace ModernSlavery.BusinessLogic.Register
 {
     public interface IRegistrationService
     {
+        IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
+
         ILogRecordLogger BadSicLog { get; }
         ILogRecordLogger RegistrationLog { get; }
 
@@ -28,7 +30,7 @@ namespace ModernSlavery.BusinessLogic.Register
         public RegistrationService(
             [KeyFilter(Filenames.BadSicLog)] ILogRecordLogger badSicLog,
             [KeyFilter(Filenames.RegistrationLog)] ILogRecordLogger registrationLog,
-            IRegistrationService registrationBusinessLogic,
+            IRegistrationBusinessLogic registrationBusinessLogic,
             IScopeBusinessLogic scopeBL,
             IOrganisationBusinessLogic orgBL,
             ICommonBusinessLogic commonBusinessLogic,
@@ -40,6 +42,7 @@ namespace ModernSlavery.BusinessLogic.Register
             [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository
         )
         {
+            RegistrationBusinessLogic = registrationBusinessLogic;
             BadSicLog = badSicLog;
             RegistrationLog = registrationLog;
 
@@ -53,7 +56,8 @@ namespace ModernSlavery.BusinessLogic.Register
             PinInThePostService = pinInThePostService;
             PostcodeChecker = postcodeChecker;
         }
-
+        public IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
+        
         public ILogRecordLogger BadSicLog { get; }
         public ILogRecordLogger RegistrationLog { get; }
 

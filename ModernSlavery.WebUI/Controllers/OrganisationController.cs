@@ -13,6 +13,7 @@ using ModernSlavery.WebUI.Models.Scope;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessLogic.Register;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.Entities;
@@ -35,7 +36,7 @@ namespace ModernSlavery.WebUI.Controllers
             IScopePresenter scopePresentation,
             IScopeBusinessLogic scopeBL,
             IOrganisationBusinessLogic organisationBL,
-            IRegistrationRepository registrationRepository,
+            IRegistrationBusinessLogic registrationBusinessLogic,
             [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
             [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
             ILogger<OrganisationController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
@@ -46,7 +47,7 @@ namespace ModernSlavery.WebUI.Controllers
             OrganisationBusinessLogic = organisationBL;
             PrivateSectorRepository = privateSectorRepository;
             PublicSectorRepository = publicSectorRepository;
-            RegistrationRepository = registrationRepository;
+            RegistrationBusinessLogic = registrationBusinessLogic;
         }
 
         #endregion
@@ -365,7 +366,7 @@ namespace ModernSlavery.WebUI.Controllers
 
         public IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
 
-        public IRegistrationRepository RegistrationRepository { get; }
+        public IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
 
         #endregion
 
@@ -490,7 +491,7 @@ namespace ModernSlavery.WebUI.Controllers
             // Remove the registration
             User actionByUser = IsImpersonatingUser == false ? currentUser : OriginalUser;
             Organisation orgToRemove = userOrgToUnregister.Organisation;
-            await RegistrationRepository.RemoveRegistrationAsync(userOrgToUnregister, actionByUser);
+            await RegistrationBusinessLogic.RemoveRegistrationAsync(userOrgToUnregister, actionByUser);
 
             // Email user that has been unregistered
             CommonBusinessLogic.NotificationService.SendRemovedUserFromOrganisationEmail(

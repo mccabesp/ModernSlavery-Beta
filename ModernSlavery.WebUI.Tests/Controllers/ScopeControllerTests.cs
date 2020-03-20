@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.WebUI.Shared.Models;

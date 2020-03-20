@@ -8,6 +8,7 @@ using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessLogic.Register;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Entities;
 
@@ -19,20 +20,20 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 
         public CloseAccountViewService(
             IUserRepository userRepository,
-            IRegistrationRepository registrationRepository,
+            IRegistrationBusinessLogic registrationBusinessLogic,
             ILogger<CloseAccountViewService> logger,
             ISendEmailService sendEmailService,
             ICommonBusinessLogic commonBusinessLogic)
         {
             UserRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-            RegistrationRepository = registrationRepository ?? throw new ArgumentNullException(nameof(registrationRepository));
+            RegistrationBusinessLogic = registrationBusinessLogic ?? throw new ArgumentNullException(nameof(registrationBusinessLogic));
             Logger = logger;
             SendEmailService = sendEmailService;
         }
 
 
         private IUserRepository UserRepository { get; }
-        private IRegistrationRepository RegistrationRepository { get; }
+        private IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
         private ILogger<CloseAccountViewService> Logger { get; }
         private ISendEmailService SendEmailService { get; }
         private readonly ICommonBusinessLogic _commonBusinessLogic;
@@ -58,7 +59,7 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
                     try
                     {
                         // update retired user registrations 
-                        await RegistrationRepository.RemoveRetiredUserRegistrationsAsync(userToRetire, actionByUser);
+                        await RegistrationBusinessLogic.RemoveRetiredUserRegistrationsAsync(userToRetire, actionByUser);
 
                         // retire user
                         await UserRepository.RetireUserAsync(userToRetire);

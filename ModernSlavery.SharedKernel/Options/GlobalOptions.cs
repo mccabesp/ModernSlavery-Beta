@@ -7,6 +7,8 @@ namespace ModernSlavery.SharedKernel.Options
 {
     public class GlobalOptions : IOptions
     {
+        public string DefaultEncryptionKey { get; set; }
+
         private int[] _reminderEmailDays;
 
         public string AuthSecret { get; set; } = "secret";

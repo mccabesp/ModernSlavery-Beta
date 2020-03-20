@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Search;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
 using NUnit.Framework;

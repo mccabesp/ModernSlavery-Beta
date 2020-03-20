@@ -15,7 +15,6 @@ using ModernSlavery.Tests.Common;
 using AutoMapper;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Models.Downloadable;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Infrastructure.Data;
 using ModernSlavery.WebUI.Admin.Controllers;

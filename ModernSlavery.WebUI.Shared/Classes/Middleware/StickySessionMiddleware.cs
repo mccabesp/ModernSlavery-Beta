@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using ModernSlavery.Extensions;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Middleware
 {

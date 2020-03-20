@@ -3,59 +3,28 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using Autofac.Features.AttributeFilters;
-using AutoMapper;
-using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Areas.Account.Abstractions;
-using ModernSlavery.WebUI.Areas.Account.ViewServices;
 using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.Azure.Search;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
-using Microsoft.WindowsAzure.Storage.RetryPolicies;
-using ModernSlavery.BusinessLogic.Admin;
-using HttpSession = ModernSlavery.WebUI.Shared.Classes.HttpSession;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.WebUI.Admin.Classes;
-using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.BusinessLogic.Classes;
-using ModernSlavery.Database.Classes;
-using ModernSlavery.Infrastructure;
-using ModernSlavery.Infrastructure.Configuration;
-using ModernSlavery.Infrastructure.Data;
-using ModernSlavery.Infrastructure.File;
-using ModernSlavery.Infrastructure.Hosts.WebHost;
-using ModernSlavery.Infrastructure.Logging;
-using ModernSlavery.Infrastructure.Message;
-using ModernSlavery.Infrastructure.Options;
-using ModernSlavery.Infrastructure.Queue;
-using ModernSlavery.Infrastructure.Search;
-using ModernSlavery.Infrastructure.Telemetry;
 using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.WebUI.Helpers;
-using ModernSlavery.WebUI.Presenters;
-using ModernSlavery.WebUI.Register.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Interfaces;
-using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Options;
-using ModernSlavery.WebUI.Shared.Services;
+using ModernSlavery.Infrastructure.CompaniesHouse;
+using ModernSlavery.Infrastructure.Configuration;
+using ModernSlavery.Infrastructure.Hosts.WebHost;
+using ModernSlavery.Infrastructure.Storage;
 
 namespace ModernSlavery.WebUI
 {
@@ -91,6 +60,9 @@ namespace ModernSlavery.WebUI
 
             //Initialise the virtual date and time
             VirtualDateTime.Initialise(globalOptions.DateTimeOffset);
+
+                        //Set the default encryption key
+            Encryption.SetDefaultEncryptionKey(globalOptions.DefaultEncryptionKey);
 
             //Allow handler for caching of http responses
             services.AddResponseCaching();
@@ -176,219 +148,16 @@ namespace ModernSlavery.WebUI
             //Override any test services
             ConfigureTestServices?.Invoke(services);
 
-            //Create the Autofac inversion of control container
-            var builder = new ContainerBuilder();
-
-            // Note that Populate is basically a foreach to add things
-            // into Autofac that are in the collection. If you register
-            // things in Autofac BEFORE Populate then the stuff in the
-            // ServiceCollection can override those things; if you register
-            // AFTER Populate those registrations can override things
-            // in the ServiceCollection. Mix and match as needed.
-            builder.Populate(services);
-
-            //Configure the container
-            var container = BuildContainer(builder);
-
-            //Register Autofac as the service provider
-            _ServiceProvider = new AutofacServiceProvider(container);
-            services.AddSingleton(_ServiceProvider);
-
-            //Register the container
-            services.AddSingleton(container);
-
-            return container.Resolve<IServiceProvider>();
-        }
-
-        // ConfigureContainer is where you can register things directly
-        // with Autofac. This runs after ConfigureServices so the things
-        // here will override registrations made in ConfigureServices.
-        // Don't build the container; that gets done for you. If you
-        // need a reference to the container, you need to use the
-        // "Without ConfigureContainer" mechanism shown later.
-        private IContainer BuildContainer(ContainerBuilder builder)
-        {
-            var globalOptions = OptionsBinder.Get<GlobalOptions>();
-            var storageOptions = OptionsBinder.Get<StorageOptions>();
-            var searchOptions = OptionsBinder.Get<SearchOptions>();
-
-            //Register the configuration
-            builder.RegisterInstance(_Config).SingleInstance();
-
-            builder.AddDataAccessServices();
-
-            builder.RegisterType<SqlRepository>()
-                .As<IDataRepository>()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<PublicSectorRepository>()
-                .As<IPagedRepository<EmployerRecord>>()
-                .Keyed<IPagedRepository<EmployerRecord>>("Public")
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<PrivateSectorRepository>()
-                .As<IPagedRepository<EmployerRecord>>()
-                .Keyed<IPagedRepository<EmployerRecord>>("Private")
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<CompaniesHouseAPI>()
-                .As<ICompaniesHouseAPI>()
-                .SingleInstance()
-                .WithParameter(
-                    (p, ctx) => p.ParameterType == typeof(HttpClient),
-                    (p, ctx) => ctx.Resolve<IHttpClientFactory>().CreateClient(nameof(ICompaniesHouseAPI)));
-
-            // use the 'localStorageRoot' when hosting the storage in a local folder
-            if (string.IsNullOrWhiteSpace(storageOptions.LocalStorageRoot))
-            {
-                builder.Register(
-                        c => new AzureFileRepository(storageOptions,
-                            new ExponentialRetry(TimeSpan.FromMilliseconds(500), 10)))
-                    .As<IFileRepository>()
-                    .SingleInstance();
-            }
-            else
-            {
-                builder.Register(c => new SystemFileRepository(storageOptions)).As<IFileRepository>().SingleInstance();
-            }
-
-            // Register queues
-            builder.RegisterAzureQueue(storageOptions.AzureConnectionString, QueueNames.SendEmail);
-            builder.RegisterAzureQueue(storageOptions.AzureConnectionString, QueueNames.SendNotifyEmail);
-            builder.RegisterAzureQueue(storageOptions.AzureConnectionString, QueueNames.ExecuteWebJob);
-            
-            //Register Email queuers
-            builder.RegisterType<SendEmailService>().As<ISendEmailService>().SingleInstance();
-            builder.RegisterType<NotificationService>().As<INotificationService>().SingleInstance();
-
-            // Register queues (without key filtering)
-            builder.Register(c => new LogEventQueue(storageOptions.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
-            builder.Register(c => new LogRecordQueue(storageOptions.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
-
-            // Register record loggers
-            builder.RegisterLogRecord(Filenames.BadSicLog);
-            builder.RegisterLogRecord(Filenames.ManualChangeLog);
-            builder.RegisterLogRecord(Filenames.RegistrationLog);
-            builder.RegisterLogRecord(Filenames.SubmissionLog);
-            builder.RegisterLogRecord(Filenames.SearchLog);
-
-            // Register log records (without key filtering)
-            builder.RegisterType<UserLogRecord>().As<IUserLogRecord>().SingleInstance();
-            builder.RegisterType<RegistrationLogRecord>().As<IRegistrationLogRecord>().SingleInstance();
-
-            // Setup azure search
-            builder.Register(c => new SearchServiceClient(searchOptions.AzureServiceName, new SearchCredentials(searchOptions.AzureApiAdminKey)))
-                .As<ISearchServiceClient>()
-                .SingleInstance();
-
-            builder.RegisterType<AzureEmployerSearchRepository>()
-                .As<ISearchRepository<EmployerSearchModel>>()
-                .SingleInstance()
-                .WithParameter("serviceName", searchOptions.AzureServiceName)
-                .WithParameter("indexName", searchOptions.EmployerIndexName)
-                .WithParameter("adminApiKey", searchOptions.AzureApiAdminKey)
-                .WithParameter("disabled", searchOptions.Disabled);
-
-            builder.RegisterType<AzureSicCodeSearchRepository>()
-                .As<ISearchRepository<SicCodeSearchModel>>()
-                .SingleInstance()
-                .WithParameter("indexName", searchOptions.SicCodeIndexName)
-                .WithParameter("disabled", searchOptions.Disabled);
-
-
-            // BL Services
-            builder.RegisterType<CommonBusinessLogic>().As<ICommonBusinessLogic>().SingleInstance();
-
-            builder.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<RegistrationRepository>().As<IRegistrationRepository>().InstancePerLifetimeScope();
-
-            builder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>().InstancePerLifetimeScope();
-            builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerLifetimeScope();
-            builder.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>().InstancePerLifetimeScope();
-
-            builder.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>().SingleInstance();
-            builder.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance();
-            builder.RegisterType<UpdateFromCompaniesHouseService>().As<UpdateFromCompaniesHouseService>().InstancePerLifetimeScope();
-
-            // register web ui services
-            builder.RegisterType<DraftFileBusinessLogic>().As<IDraftFileBusinessLogic>().SingleInstance();
-            builder.RegisterType<DownloadableFileBusinessLogic>().As<IDownloadableFileBusinessLogic>().InstancePerLifetimeScope();
-
-            builder.RegisterType<ChangeDetailsViewService>().As<IChangeDetailsViewService>().InstancePerLifetimeScope();
-            builder.RegisterType<ChangeEmailViewService>().As<IChangeEmailViewService>().InstancePerLifetimeScope();
-            builder.RegisterType<ChangePasswordViewService>().As<IChangePasswordViewService>().InstancePerLifetimeScope();
-            builder.RegisterType<CloseAccountViewService>().As<ICloseAccountViewService>().InstancePerLifetimeScope();
-            builder.RegisterType<SubmissionPresenter>().As<ISubmissionPresenter>().InstancePerLifetimeScope();
-            builder.RegisterType<ViewingPresenter>().As<IViewingPresenter>().InstancePerLifetimeScope();
-            builder.RegisterType<AdminService>().As<IAdminService>().InstancePerLifetimeScope();
-            builder.RegisterType<SearchPresenter>().As<ISearchPresenter>().InstancePerLifetimeScope();
-            builder.RegisterType<ComparePresenter>().As<IComparePresenter>().InstancePerLifetimeScope();
-            builder.RegisterType<ScopePresenter>().As<IScopePresenter>().InstancePerLifetimeScope();
-            builder.RegisterType<AdminSearchService>().As<AdminSearchService>().InstancePerLifetimeScope();
-            builder.RegisterType<AuditLogger>().As<AuditLogger>().InstancePerLifetimeScope();
-
-            //Register some singletons
-            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance().WithParameter("seed",globalOptions.ObfuscationSeed);
-            builder.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
-            builder.RegisterType<PinInThePostService>().As<PinInThePostService>().SingleInstance();
-            builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
-
-            //Register factories
-            builder.RegisterType<ErrorViewModelFactory>().As<IErrorViewModelFactory>().SingleInstance();
-
-            //Register HttpCache and HttpSession
-            builder.RegisterType<HttpSession>().As<IHttpSession>().InstancePerLifetimeScope();
-            builder.RegisterType<HttpCache>().As<IHttpCache>().SingleInstance();
-
-            // Register Action helpers
-            builder.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>().SingleInstance();
-            builder.Register(
-                x => {
-                    ActionContext actionContext = x.Resolve<IActionContextAccessor>().ActionContext;
-                    var factory = x.Resolve<IUrlHelperFactory>();
-                    return factory.GetUrlHelper(actionContext);
-                });
-
-            //Register WebTracker
-            builder.RegisterType<GoogleAnalyticsTracker>()
-                .As<IWebTracker>()
-                .SingleInstance()
-                .WithParameter(
-                    (p, ctx) => p.ParameterType == typeof(HttpClient),
-                    (p, ctx) => ctx.Resolve<IHttpClientFactory>().CreateClient(nameof(IWebTracker)))
-                .WithParameter("trackingId", _Config["GoogleAnalyticsAccountId"]);
-
-            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            builder.RegisterAssemblyTypes(typeof(BaseController).Assembly)
-                .Where(t => t.IsAssignableTo<BaseController>())
-                .InstancePerLifetimeScope()
-                .WithAttributeFiltering();
-
-            //TODO: Implement AutoFac modules
-            //builder.RegisterModule(new AutofacModule());
+            //Register the external dependencies
+            var dependencyBuilder = new DependencyBuilder(services);
 
             //Override any test services
-            ConfigureTestContainer?.Invoke(builder);
+            ConfigureTestContainer?.Invoke(dependencyBuilder.Builder);
 
-            // Initialise AutoMapper
-            MapperConfiguration mapperConfig = new MapperConfiguration(config => {
-                // register all out mapper profiles (classes/mappers/*)
-                config.AddMaps(typeof(Program));
-                // allows auto mapper to inject our dependencies
-                //config.ConstructServicesUsing(serviceTypeToConstruct =>
-                //{
-                //    //TODO
-                //});
-            });
+            //Register the web host dependencies
+            dependencyBuilder.Bind<WebHostDependencyModule>();
 
-            // only during development, validate your mappings; remove it before release
-            if (_Config["Environment"].EqualsI("Development", "Local"))
-                mapperConfig.AssertConfigurationIsValid();
-
-            builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
-
-            //Build the container
-            return builder.Build();
+            return dependencyBuilder.Build();
         }
 
         // Configure is where you add middleware. This is called after
@@ -396,9 +165,6 @@ namespace ModernSlavery.WebUI
         // here if you need to resolve things from the container.
         public void Configure(IApplicationBuilder app)
         {
-            //Set the default encryption key
-            Encryption.SetDefaultEncryptionKey(_Config["DefaultEncryptionKey"]);
-
             var lifetime = app.ApplicationServices.GetService<IApplicationLifetime>();
             var loggerFactory = app.ApplicationServices.GetService<ILoggerFactory>();
             var globalOptions = OptionsBinder.Get<GlobalOptions>();
@@ -454,14 +220,14 @@ namespace ModernSlavery.WebUI
             app.UseAuthentication(); //Ensure the OIDC IDentity Server authentication services execute on each http request - Must be before UseMVC
             app.UseAuthorization();
             app.UseCookiePolicy();
-            app.UseMaintenancePageMiddleware(globalOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
-            app.UseStickySessionMiddleware(globalOptions.StickySessions); //Enable/Disable sticky sessions based on  
+            app.UseMiddleware<MaintenancePageMiddleware>(globalOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
+            app.UseMiddleware<StickySessionMiddleware>(globalOptions.StickySessions); //Enable/Disable sticky sessions based on  
 
             //Force basic authentication
             if (_Config.GetValue("BasicAuthentication:Enabled",false))
                 app.UseMiddleware<BasicAuthenticationMiddleware>(_Config.GetValue("BasicAuthentication:Username", _Config["BasicAuthentication:Password"])); 
 
-            app.UseSecurityHeaderMiddleware(); //Add/remove security headers from all responses
+            app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses
 
             //app.UseMvcWithDefaultRoute();
             app.UseEndpoints(endpoints =>

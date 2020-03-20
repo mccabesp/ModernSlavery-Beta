@@ -5,7 +5,7 @@ using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
-using ModernSlavery.Infrastructure.WebjobHost;
+using ModernSlavery.Infrastructure.Hosts.WebjobHost;
 
 namespace ModernSlavery.WebJob
 {

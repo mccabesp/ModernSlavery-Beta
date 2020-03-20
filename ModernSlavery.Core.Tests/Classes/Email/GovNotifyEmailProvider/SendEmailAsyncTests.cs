@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
 using Moq.Protected;
@@ -27,7 +27,7 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
 
             mockEmailTemplateRepo = new Mock<IEmailTemplateRepository>();
 
-            mockLogger = new Mock<ILogger<Infrastructure.Message.GovNotifyEmailProvider>>();
+            mockLogger = new Mock<ILogger<Infrastructure.Messaging.GovNotifyEmailProvider>>();
 
             mockHttpClientFactory.Setup(_ => _.CreateClient(It.IsAny<string>()))
                 .Returns(new HttpClient(mockHttpMessageHandler.Object));
@@ -41,7 +41,7 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
             };
 
             // service under test
-            testNotifyEmailProvider = new Infrastructure.Message.GovNotifyEmailProvider(
+            testNotifyEmailProvider = new Infrastructure.Messaging.GovNotifyEmailProvider(
                 mockHttpClientFactory.Object,
                 mockEmailTemplateRepo.Object,
                 mockGovNotifyOptions.Object,
@@ -64,12 +64,12 @@ namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
 
         private Mock<IEmailTemplateRepository> mockEmailTemplateRepo;
         private Mock<GovNotifyOptions> mockGovNotifyOptions;
-        private Mock<ILogger<Infrastructure.Message.GovNotifyEmailProvider>> mockLogger;
+        private Mock<ILogger<Infrastructure.Messaging.GovNotifyEmailProvider>> mockLogger;
 
         private Mock<IHttpClientFactory> mockHttpClientFactory;
         private Mock<HttpMessageHandler> mockHttpMessageHandler;
 
-        private Infrastructure.Message.GovNotifyEmailProvider testNotifyEmailProvider;
+        private Infrastructure.Messaging.GovNotifyEmailProvider testNotifyEmailProvider;
 
         [TestCase(false, ProductionApiKey, ProductionServiceId)]
         [TestCase(true, TestApiKey, TestServiceId)]

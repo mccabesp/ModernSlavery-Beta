@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using ModernSlavery.BusinessLogic;
@@ -19,17 +18,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Database;
-using ModernSlavery.Infrastructure;
-using ModernSlavery.Infrastructure.Data;
-using ModernSlavery.Infrastructure.Logging;
-using ModernSlavery.Infrastructure.Message;
-using ModernSlavery.Infrastructure.Queue;
 using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Core.EmailTemplates;
+using ModernSlavery.Database.Classes;
+using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Configuration;
-using ModernSlavery.Infrastructure.File;
-using ModernSlavery.Infrastructure.Options;
+using ModernSlavery.Infrastructure.Messaging;
+using ModernSlavery.Infrastructure.Storage;
+using ModernSlavery.Infrastructure.Storage.Classes;
 
 namespace ModernSlavery.WebJob
 {
@@ -69,29 +66,16 @@ namespace ModernSlavery.WebJob
 
             services.AddApplicationInsightsTelemetry(_Config.GetValue("ApplicationInsights:InstrumentationKey", _Config["APPINSIGHTS-INSTRUMENTATIONKEY"]));
 
-            //Create the Autofac inversion of control container
-            var builder = new ContainerBuilder();
-
-            // Note that Populate is basically a foreach to add things
-            // into Autofac that are in the collection. If you register
-            // things in Autofac BEFORE Populate then the stuff in the
-            // ServiceCollection can override those things; if you register
-            // AFTER Populate those registrations can override things
-            // in the ServiceCollection. Mix and match as needed.
-            builder.Populate(services);
-
-            //Configure the container
-            var container = BuildContainer(builder);
-
-            //Register Autofac as the service provider
-            _ServiceProvider = new AutofacServiceProvider(container);
-            services.AddSingleton(_ServiceProvider);
-
-            //Register the webJobs IJobActivator
-            services.AddSingleton(container);
             services.AddSingleton<IJobActivator, AutofacJobActivator>();
 
-            return container.Resolve<IServiceProvider>();
+            //Register the external dependencies
+            var dependencyBuilder = new DependencyBuilder(services);
+
+            //Register the webjob host dependencies
+            dependencyBuilder.Bind<WebjobHostDependencyModule>();
+
+            return dependencyBuilder.Build();
+
         }
 
         private IContainer BuildContainer(ContainerBuilder builder)

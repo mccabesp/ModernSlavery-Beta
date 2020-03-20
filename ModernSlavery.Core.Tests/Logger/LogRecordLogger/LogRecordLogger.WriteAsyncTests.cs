@@ -14,16 +14,16 @@ namespace ModernSlavery.Core.Tests.LogRecordLogger
         [SetUp]
         public void BeforeEach()
         {
-            mockQueue = new Mock<Infrastructure.Queue.AzureQueue>("TestConnectionString", "TestQueueName")
+            mockQueue = new Mock<Infrastructure.Storage.AzureQueue>("TestConnectionString", "TestQueueName")
                 {CallBase = true};
 
             mockLogRecordLogger =
-                new Mock<Infrastructure.Logging.LogRecordLogger>(mockQueue.Object, testApplicationName, testFileName)
+                new Mock<Infrastructure.Storage.LogRecordLogger>(mockQueue.Object, testApplicationName, testFileName)
                     {CallBase = true};
         }
 
-        private Mock<Infrastructure.Queue.AzureQueue> mockQueue;
-        private Mock<Infrastructure.Logging.LogRecordLogger> mockLogRecordLogger;
+        private Mock<Infrastructure.Storage.AzureQueue> mockQueue;
+        private Mock<Infrastructure.Storage.LogRecordLogger> mockLogRecordLogger;
 
         private readonly string testApplicationName = "LogRecordUnitTests";
         private readonly string testFileName = "LogRecordUnitTest.csv";

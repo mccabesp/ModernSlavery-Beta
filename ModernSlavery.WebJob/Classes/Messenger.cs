@@ -6,7 +6,7 @@ using ModernSlavery.Extensions;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Models.LogModels;
-using ModernSlavery.Infrastructure.Message;
+using ModernSlavery.Infrastructure.Messaging;
 
 namespace ModernSlavery.WebJob
 {

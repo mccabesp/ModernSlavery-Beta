@@ -3,8 +3,9 @@ using Microsoft.Extensions.Configuration;
 using ModernSlavery.Core.Options;
 using ModernSlavery.Extensions;
 using ModernSlavery.Infrastructure.Configuration;
-using ModernSlavery.Infrastructure.Message;
-using ModernSlavery.Infrastructure.Options;
+using ModernSlavery.Infrastructure.Messaging;
+using ModernSlavery.Infrastructure.Search;
+using ModernSlavery.Infrastructure.Storage.Classes;
 using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.WebUI.Options;
 

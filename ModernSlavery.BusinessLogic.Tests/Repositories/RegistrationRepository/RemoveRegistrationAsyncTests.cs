@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using ModernSlavery.BusinessLogic.Register;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database.Classes;
 using ModernSlavery.Entities;
 using ModernSlavery.Infrastructure.Data;
 using ModernSlavery.Tests.Common.Classes;
@@ -24,14 +26,13 @@ namespace Repositories.RegistrationRepository
             mockLogRecordLogger = new Mock<IRegistrationLogRecord>();
 
             // service under test
-            testRegistrationRepo =
-                new ModernSlavery.Infrastructure.Data.RegistrationRepository(mockDataRepo, mockLogRecordLogger.Object);
+            testRegistrationBusinessLogic =new RegistrationBusinessLogic(mockDataRepo, mockLogRecordLogger.Object);
         }
 
         private IDataRepository mockDataRepo;
         private Mock<IRegistrationLogRecord> mockLogRecordLogger;
 
-        private IRegistrationRepository testRegistrationRepo;
+        private IRegistrationBusinessLogic testRegistrationBusinessLogic;
 
         [Test]
         public async Task UserCanUnregisterAnotherUser()
@@ -60,7 +61,7 @@ namespace Repositories.RegistrationRepository
                 .Returns(Task.CompletedTask);
 
             // Act
-            await testRegistrationRepo.RemoveRegistrationAsync(testUserOrg, testActionByUser);
+            await testRegistrationBusinessLogic.RemoveRegistrationAsync(testUserOrg, testActionByUser);
 
             // Assert user org removed
             Assert.IsNull(mockDataRepo.GetAll<UserOrganisation>().Where(uo => uo == testUserOrg).FirstOrDefault());
@@ -92,7 +93,7 @@ namespace Repositories.RegistrationRepository
                 .Returns(Task.CompletedTask);
 
             // Act
-            await testRegistrationRepo.RemoveRegistrationAsync(testUserOrg, testUnregisterUser);
+            await testRegistrationBusinessLogic.RemoveRegistrationAsync(testUserOrg, testUnregisterUser);
 
             // Assert user org removed
             Assert.IsNull(mockDataRepo.GetAll<UserOrganisation>().Where(uo => uo == testUserOrg).FirstOrDefault());

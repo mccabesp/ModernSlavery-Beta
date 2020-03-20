@@ -11,11 +11,6 @@ namespace ModernSlavery.Database.Classes
 {
     public static class Extensions
     {
-        public static void AddDataAccessServices(this ContainerBuilder builder)
-        {
-            builder.RegisterType<DatabaseContext>().As<IDbContext>().InstancePerLifetimeScope();
-        }
-
         internal static List<T> SqlQuery<T>(this IDbConnection connection, string query, ILogger logger = null)
         {
             if (connection.State != ConnectionState.Open) connection.Open();

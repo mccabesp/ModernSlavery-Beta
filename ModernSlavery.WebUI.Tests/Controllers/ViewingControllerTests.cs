@@ -21,7 +21,6 @@ using ModernSlavery.SharedKernel;
 
 using NUnit.Framework;
 using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;

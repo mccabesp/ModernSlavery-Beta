@@ -40,10 +40,10 @@ using Newtonsoft.Json;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Infrastructure;
 using ModernSlavery.BusinessLogic.Admin;
+using ModernSlavery.BusinessLogic.Register;
 using ModernSlavery.Infrastructure.Data;
-using ModernSlavery.Infrastructure.File;
-using ModernSlavery.Infrastructure.Options;
-using ModernSlavery.Infrastructure.Queue;
+using ModernSlavery.Infrastructure.Storage;
+using ModernSlavery.Infrastructure.Storage.Classes;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.SharedKernel.Interfaces;
@@ -249,7 +249,7 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
             builder.Register(c => new MockSearchRepository()).As<ISearchRepository<EmployerSearchModel>>().SingleInstance();
             builder.Register(c => Mock.Of<ISearchRepository<SicCodeSearchModel>>()).As<ISearchRepository<SicCodeSearchModel>>();
             builder.RegisterType<UserRepository>().As<IUserRepository>().SingleInstance();
-            builder.RegisterType<RegistrationRepository>().As<IRegistrationRepository>().SingleInstance();
+            builder.RegisterType<RegistrationService>().As<IRegistrationService>().SingleInstance();
 
             // BL Services
             builder.RegisterInstance(ConfigHelpers.Config);

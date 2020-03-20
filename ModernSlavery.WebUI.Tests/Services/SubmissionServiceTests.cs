@@ -18,14 +18,11 @@ using MockQueryable.Moq;
 using Moq;
 using ModernSlavery.Entities.Enums;
 using ModernSlavery.SharedKernel;
-
 using NUnit.Framework;
 using RangeAttribute = System.ComponentModel.DataAnnotations.RangeAttribute;
 using Autofac;
 using ModernSlavery.BusinessLogic.Submit;
-using ModernSlavery.Infrastructure.File;
-using ModernSlavery.Infrastructure.Options;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Infrastructure.Storage.Classes;
 using ModernSlavery.WebUI.Presenters;
 
 namespace ModernSlavery.Tests

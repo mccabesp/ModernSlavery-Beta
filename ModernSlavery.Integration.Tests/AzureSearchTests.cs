@@ -7,7 +7,6 @@ using ModernSlavery.BusinessLogic.View;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Extensions;
-using ModernSlavery.Infrastructure.Data;
 using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;

@@ -26,7 +26,6 @@ using ModernSlavery.SharedKernel;
 using NUnit.Framework;
 using Microsoft.AspNetCore.Authentication;
 using ModernSlavery.BusinessLogic.Submit;
-using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Models;

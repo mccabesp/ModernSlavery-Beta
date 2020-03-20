@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Extensions;
 using ModernSlavery.Infrastructure.Options;
+using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Search;
 using ModernSlavery.WebUI.Shared.Interfaces;
