@@ -41,11 +41,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Entities\ModernSlavery.Entities.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Core.Entities\ModernSlavery.Core.Entities.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Storage\ModernSlavery.Infrastructure.Storage.csproj" />
     <ProjectReference Include="..\ModernSlavery.Tests.Common\ModernSlavery.Tests.Common.csproj" />
-    <ProjectReference Include="..\ModernSlavery.WebUI\ModernSlavery.WebUI.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Hosts.Web\ModernSlavery.Hosts.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

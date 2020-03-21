@@ -8,7 +8,6 @@ using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Shared.Classes;
 using StackExchange.Redis;
 
 namespace ModernSlavery.Infrastructure.Hosts.WebHost

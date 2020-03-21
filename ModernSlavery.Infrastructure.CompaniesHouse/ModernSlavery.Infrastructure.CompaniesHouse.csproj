@@ -12,9 +12,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Shared\ModernSlavery.Infrastructure.Shared.csproj" />
-    <ProjectReference Include="..\ModernSlavery.SharedKernel\ModernSlavery.SharedKernel.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Core.SharedKernel\ModernSlavery.Core.SharedKernel.csproj" />
   </ItemGroup>
 
 </Project>

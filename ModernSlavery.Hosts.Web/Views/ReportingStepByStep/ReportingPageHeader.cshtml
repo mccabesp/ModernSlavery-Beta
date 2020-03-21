@@ -1,0 +1,7 @@
+﻿@using ModernSlavery.WebUI.Views.Components.StepByStep
+@{ await Html.RenderPartialAsync("/Views/Components/StepByStep/StepByStepPageHeader.cshtml",
+       new StepByStepPageHeaderViewModel
+       {
+           Title = "Report your Modern Slavery statement: step by step",
+           StandalonePageUrl = Url.Action("StepByStepStandalone", "ReportingStepByStep")
+       }); }

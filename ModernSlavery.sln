@@ -4,13 +4,13 @@ VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Core", "ModernSlavery.Core\ModernSlavery.Core.csproj", "{7A23F343-E179-4866-B40C-CC5B8FD87695}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Database", "ModernSlavery.Database\ModernSlavery.Database.csproj", "{F3DB4C50-110C-44BB-A308-B924FA0BE635}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure.Database", "ModernSlavery.Infrastructure.Database\ModernSlavery.Infrastructure.Database.csproj", "{F3DB4C50-110C-44BB-A308-B924FA0BE635}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI", "ModernSlavery.WebUI\ModernSlavery.WebUI.csproj", "{73D4A349-7276-4C72-9C67-A8FD08D7ED82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Hosts.Web", "ModernSlavery.Hosts.Web\ModernSlavery.Hosts.Web.csproj", "{73D4A349-7276-4C72-9C67-A8FD08D7ED82}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebJob", "ModernSlavery.WebJob\ModernSlavery.WebJob.csproj", "{1DF71C5E-2C26-43ED-80EA-79317303909F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Hosts.Webjob", "ModernSlavery.Hosts.Webjob\ModernSlavery.Hosts.Webjob.csproj", "{1DF71C5E-2C26-43ED-80EA-79317303909F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.IdentityServer4", "ModernSlavery.IdentityServer4\ModernSlavery.IdentityServer4.csproj", "{F0DBFCDC-2EC9-4181-BF63-1B8F3D585A4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Hosts.IdServer", "ModernSlavery.Hosts.IdServer\ModernSlavery.Hosts.IdServer.csproj", "{F0DBFCDC-2EC9-4181-BF63-1B8F3D585A4E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic", "ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj", "{700A7499-DF43-4E1D-8519-4A45FAB7C782}"
 EndProject
@@ -20,27 +20,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutomationTests", "Automati
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{6EB28909-F4E9-402E-A247-01532AAC6841}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Extensions", "ModernSlavery.Extensions\ModernSlavery.Extensions.csproj", "{EF13B99F-16E1-4F04-BC21-882D146AA7FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Core.Extensions", "ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj", "{EF13B99F-16E1-4F04-BC21-882D146AA7FD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Tests", "ModernSlavery.BusinessLogic.Tests\ModernSlavery.BusinessLogic.Tests.csproj", "{ACF2521C-403C-4C9E-9724-C1B2CC17B2F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebJob.Tests", "ModernSlavery.WebJob.Tests\ModernSlavery.WebJob.Tests.csproj", "{A4D035C6-DDC6-4064-81F4-3184765B177D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Hosts.Webjob.Tests", "ModernSlavery.Hosts.Webjob.Tests\ModernSlavery.Hosts.Webjob.Tests.csproj", "{A4D035C6-DDC6-4064-81F4-3184765B177D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Tests", "ModernSlavery.WebUI.Tests\ModernSlavery.WebUI.Tests.csproj", "{ADB4DCF7-1D43-41EF-9FD3-DA4C36D923AB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Core.Tests", "ModernSlavery.Core.Tests\ModernSlavery.Core.Tests.csproj", "{0DE531BB-3B5C-47C1-8644-0251F73B31A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Database.Tests", "ModernSlavery.Database.Tests\ModernSlavery.Database.Tests.csproj", "{6E500FE9-E063-4F07-89EF-C94F8345A0AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure.Database.Tests", "ModernSlavery.Infrastructure.Database.Tests\ModernSlavery.Infrastructure.Database.Tests.csproj", "{6E500FE9-E063-4F07-89EF-C94F8345A0AB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Shared.Tests", "ModernSlavery.Extensions.AspNetCore.Tests\ModernSlavery.WebUI.Shared.Tests.csproj", "{F68B4A44-85EF-4DAA-AC28-DB14C10D83C7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Extensions.Tests", "ModernSlavery.Extensions.Tests\ModernSlavery.Extensions.Tests.csproj", "{FE05F883-4F1C-4C8E-AF41-A08B07C799F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Core.Extensions.Tests", "ModernSlavery.Core.Extensions.Tests\ModernSlavery.Core.Extensions.Tests.csproj", "{FE05F883-4F1C-4C8E-AF41-A08B07C799F2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Integration.Tests", "ModernSlavery.Integration.Tests\ModernSlavery.Integration.Tests.csproj", "{26013934-6DF5-49C7-A825-7FC40D651C3A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUkDesignSystem", "GovUkDesignSystem\GovUkDesignSystem.csproj", "{AE3D6DDB-5C46-4149-A74B-4C631FFC1C33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.GDSDesignSystem", "ModernSlavery.WebUI.GDSDesignSystem\ModernSlavery.WebUI.GDSDesignSystem.csproj", "{AE3D6DDB-5C46-4149-A74B-4C631FFC1C33}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WarmUp", "ModernSlavery.WarmUp\ModernSlavery.WarmUp.csproj", "{BE071C9E-B424-4F70-A1EC-6ECB15399C6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Hosts.WebWarmer", "ModernSlavery.Hosts.WebWarmer\ModernSlavery.Hosts.WebWarmer.csproj", "{BE071C9E-B424-4F70-A1EC-6ECB15399C6E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Files", "_Solution Files", "{B6D69B70-7603-463C-955C-EEB92FF2EC25}"
 	ProjectSection(SolutionItems) = preProject
@@ -57,7 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Files", "_Solutio
 		SolutionVersionInfo.cs = SolutionVersionInfo.cs
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.SharedKernel", "ModernSlavery.SharedKernel\ModernSlavery.SharedKernel.csproj", "{CD0DC980-B4CE-4F21-920A-2711E586C305}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Core.SharedKernel", "ModernSlavery.Core.SharedKernel\ModernSlavery.Core.SharedKernel.csproj", "{CD0DC980-B4CE-4F21-920A-2711E586C305}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebUI", "WebUI", "{3085FCFE-FAF9-4B1D-AB8C-F4AA1C1AAB6B}"
 EndProject
@@ -67,13 +65,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Shared"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.DevOps", "ModernSlavery.WebUI.DevOps\ModernSlavery.WebUI.DevOps.csproj", "{E7F0FAF1-C6E0-415A-AF5E-D4C6B631E414}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Register", "ModernSlavery.WebUI.Register\ModernSlavery.WebUI.Register.csproj", "{4949E9FC-7C01-418A-BE91-53CE9F5A1A39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Registration", "ModernSlavery.WebUI.Registration\ModernSlavery.WebUI.Registration.csproj", "{4949E9FC-7C01-418A-BE91-53CE9F5A1A39}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Submit", "ModernSlavery.WebUI.Submit\ModernSlavery.WebUI.Submit.csproj", "{7A52730D-DABB-45F9-A7DC-344240C956D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Submission", "ModernSlavery.WebUI.Submission\ModernSlavery.WebUI.Submission.csproj", "{7A52730D-DABB-45F9-A7DC-344240C956D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.View", "ModernSlavery.WebUI.View\ModernSlavery.WebUI.View.csproj", "{75A179DF-BE22-4A01-BB04-6AE10C377E2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Viewing", "ModernSlavery.WebUI.Viewing\ModernSlavery.WebUI.Viewing.csproj", "{75A179DF-BE22-4A01-BB04-6AE10C377E2B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Entities", "ModernSlavery.Entities\ModernSlavery.Entities.csproj", "{373FD2AD-1EC2-4415-BBA2-6D1098961D03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Core.Entities", "ModernSlavery.Core.Entities\ModernSlavery.Core.Entities.csproj", "{373FD2AD-1EC2-4415-BBA2-6D1098961D03}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{71F10B1A-9F35-4CC7-817F-B918D93DB555}"
 EndProject
@@ -83,33 +81,35 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Admin", "ModernSlavery.BusinessLogic.Admin\ModernSlavery.BusinessLogic.Admin.csproj", "{B24AD52C-5C38-444E-8932-97227DC42E13}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Register", "ModernSlavery.BusinessLogic.Register\ModernSlavery.BusinessLogic.Register.csproj", "{B7680916-4A4F-40FF-B744-67F39741A901}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Registration", "ModernSlavery.BusinessLogic.Registration\ModernSlavery.BusinessLogic.Registration.csproj", "{B7680916-4A4F-40FF-B744-67F39741A901}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Submit", "ModernSlavery.BusinessLogic.Submit\ModernSlavery.BusinessLogic.Submit.csproj", "{62BF103A-43A7-4260-B64E-E3833975950A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Submission", "ModernSlavery.BusinessLogic.Submission\ModernSlavery.BusinessLogic.Submission.csproj", "{62BF103A-43A7-4260-B64E-E3833975950A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.DevOps", "ModernSlavery.BusinessLogic.DevOps\ModernSlavery.BusinessLogic.DevOps.csproj", "{318A4FCC-454B-4A40-BE10-C19417675217}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.View", "ModernSlavery.BusinessLogic.View\ModernSlavery.BusinessLogic.View.csproj", "{27C22FC8-C51A-4094-AC55-DE27C50142BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessLogic.Viewing", "ModernSlavery.BusinessLogic.Viewing\ModernSlavery.BusinessLogic.Viewing.csproj", "{27C22FC8-C51A-4094-AC55-DE27C50142BD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure", "ModernSlavery.Infrastructure\ModernSlavery.Infrastructure.csproj", "{CD90FF8F-8E1F-4493-87AC-64985CBAFF40}"
 EndProject
 Project("{F088123C-0E9E-452A-89E6-6BA2F21D5CAC}") = "ModernSlavery.DependencyValidation", "ModernSlavery.DependencyValidation\ModernSlavery.DependencyValidation.modelproj", "{C4404764-0AAF-414D-BF8D-DA0E72F5DFA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Infrastructure.Configuration", "ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj", "{2289645D-3F88-4D28-A63F-A4329C0DB106}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure.Configuration", "ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj", "{2289645D-3F88-4D28-A63F-A4329C0DB106}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Infrastructure.Shared", "ModernSlavery.Infrastructure.Shared\ModernSlavery.Infrastructure.Shared.csproj", "{19ACB6D6-1459-432D-B75E-0FB6559304B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure.Shared", "ModernSlavery.Infrastructure.Shared\ModernSlavery.Infrastructure.Shared.csproj", "{19ACB6D6-1459-432D-B75E-0FB6559304B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Infrastructure.Storage", "ModernSlavery.Infrastructure.Storage\ModernSlavery.Infrastructure.Storage.csproj", "{C774795B-40EF-4BEE-AE6C-B1CE959E07E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure.Storage", "ModernSlavery.Infrastructure.Storage\ModernSlavery.Infrastructure.Storage.csproj", "{C774795B-40EF-4BEE-AE6C-B1CE959E07E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Infrastructure.Hosts", "ModernSlavery.Infrastructure.Hosts\ModernSlavery.Infrastructure.Hosts.csproj", "{59FB1254-FEF6-4447-883D-050C95066507}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure.Hosts", "ModernSlavery.Infrastructure.Hosts\ModernSlavery.Infrastructure.Hosts.csproj", "{59FB1254-FEF6-4447-883D-050C95066507}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Infrastructure.Search", "ModernSlavery.Infrastructure.Search\ModernSlavery.Infrastructure.Search.csproj", "{939B2AB2-562F-4424-877B-227322A167F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure.Search", "ModernSlavery.Infrastructure.Search\ModernSlavery.Infrastructure.Search.csproj", "{939B2AB2-562F-4424-877B-227322A167F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Infrastructure.Messaging", "ModernSlavery.Infrastructure.Messaging\ModernSlavery.Infrastructure.Messaging.csproj", "{C2A20438-701E-4C5A-A560-A31EE6BB8DA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure.Messaging", "ModernSlavery.Infrastructure.Messaging\ModernSlavery.Infrastructure.Messaging.csproj", "{C2A20438-701E-4C5A-A560-A31EE6BB8DA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Infrastructure.CompaniesHouse", "ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj", "{2B79D056-5E61-41BA-B596-9FD39EE8759E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure.CompaniesHouse", "ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj", "{2B79D056-5E61-41BA-B596-9FD39EE8759E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosts", "Hosts", "{4E86431F-FE6D-4E65-AC46-360C844EC263}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Shared.Tests", "ModernSlavery.WebUI.Shared.Tests\ModernSlavery.WebUI.Shared.Tests.csproj", "{ECA8B010-BB73-4BD6-BB34-046A8E432AED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -169,10 +169,6 @@ Global
 		{6E500FE9-E063-4F07-89EF-C94F8345A0AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E500FE9-E063-4F07-89EF-C94F8345A0AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E500FE9-E063-4F07-89EF-C94F8345A0AB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F68B4A44-85EF-4DAA-AC28-DB14C10D83C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F68B4A44-85EF-4DAA-AC28-DB14C10D83C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F68B4A44-85EF-4DAA-AC28-DB14C10D83C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F68B4A44-85EF-4DAA-AC28-DB14C10D83C7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FE05F883-4F1C-4C8E-AF41-A08B07C799F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FE05F883-4F1C-4C8E-AF41-A08B07C799F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE05F883-4F1C-4C8E-AF41-A08B07C799F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -281,6 +277,10 @@ Global
 		{2B79D056-5E61-41BA-B596-9FD39EE8759E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B79D056-5E61-41BA-B596-9FD39EE8759E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B79D056-5E61-41BA-B596-9FD39EE8759E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECA8B010-BB73-4BD6-BB34-046A8E432AED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECA8B010-BB73-4BD6-BB34-046A8E432AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECA8B010-BB73-4BD6-BB34-046A8E432AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECA8B010-BB73-4BD6-BB34-046A8E432AED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -299,11 +299,10 @@ Global
 		{ADB4DCF7-1D43-41EF-9FD3-DA4C36D923AB} = {165A87E4-ED4A-4509-A52C-81748DE7286F}
 		{0DE531BB-3B5C-47C1-8644-0251F73B31A3} = {165A87E4-ED4A-4509-A52C-81748DE7286F}
 		{6E500FE9-E063-4F07-89EF-C94F8345A0AB} = {165A87E4-ED4A-4509-A52C-81748DE7286F}
-		{F68B4A44-85EF-4DAA-AC28-DB14C10D83C7} = {165A87E4-ED4A-4509-A52C-81748DE7286F}
 		{FE05F883-4F1C-4C8E-AF41-A08B07C799F2} = {165A87E4-ED4A-4509-A52C-81748DE7286F}
 		{26013934-6DF5-49C7-A825-7FC40D651C3A} = {165A87E4-ED4A-4509-A52C-81748DE7286F}
 		{AE3D6DDB-5C46-4149-A74B-4C631FFC1C33} = {3085FCFE-FAF9-4B1D-AB8C-F4AA1C1AAB6B}
-		{BE071C9E-B424-4F70-A1EC-6ECB15399C6E} = {3085FCFE-FAF9-4B1D-AB8C-F4AA1C1AAB6B}
+		{BE071C9E-B424-4F70-A1EC-6ECB15399C6E} = {4E86431F-FE6D-4E65-AC46-360C844EC263}
 		{CD0DC980-B4CE-4F21-920A-2711E586C305} = {6EB28909-F4E9-402E-A247-01532AAC6841}
 		{7180FE40-A39D-482B-AEB0-E12D97AE4F5C} = {3085FCFE-FAF9-4B1D-AB8C-F4AA1C1AAB6B}
 		{73C3B043-3113-4009-AB76-7D9A98221D35} = {3085FCFE-FAF9-4B1D-AB8C-F4AA1C1AAB6B}
@@ -326,6 +325,7 @@ Global
 		{939B2AB2-562F-4424-877B-227322A167F5} = {71F10B1A-9F35-4CC7-817F-B918D93DB555}
 		{C2A20438-701E-4C5A-A560-A31EE6BB8DA6} = {71F10B1A-9F35-4CC7-817F-B918D93DB555}
 		{2B79D056-5E61-41BA-B596-9FD39EE8759E} = {71F10B1A-9F35-4CC7-817F-B918D93DB555}
+		{ECA8B010-BB73-4BD6-BB34-046A8E432AED} = {165A87E4-ED4A-4509-A52C-81748DE7286F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CBCD6EE1-83A9-461C-820C-9D31E0347395}

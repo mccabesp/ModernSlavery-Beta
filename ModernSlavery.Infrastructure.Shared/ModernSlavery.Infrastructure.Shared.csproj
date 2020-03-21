@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.SharedKernel\ModernSlavery.SharedKernel.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Core.SharedKernel\ModernSlavery.Core.SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

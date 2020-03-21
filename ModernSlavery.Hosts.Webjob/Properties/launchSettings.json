@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ModernSlavery.WebJob": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Local"
+      }
+    }
+  }
+}

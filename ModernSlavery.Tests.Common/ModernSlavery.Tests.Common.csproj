@@ -40,7 +40,7 @@
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Search\ModernSlavery.Infrastructure.Search.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Storage\ModernSlavery.Infrastructure.Storage.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure\ModernSlavery.Infrastructure.csproj" />
-    <ProjectReference Include="..\ModernSlavery.WebUI\ModernSlavery.WebUI.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Hosts.Web\ModernSlavery.Hosts.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

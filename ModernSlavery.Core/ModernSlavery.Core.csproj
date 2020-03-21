@@ -28,9 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.Entities\ModernSlavery.Entities.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Extensions\ModernSlavery.Extensions.csproj" />
-    <ProjectReference Include="..\ModernSlavery.SharedKernel\ModernSlavery.SharedKernel.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Core.Entities\ModernSlavery.Core.Entities.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Core.SharedKernel\ModernSlavery.Core.SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
