@@ -34,14 +34,14 @@ namespace ModernSlavery.Tests.Common.Classes
         {
             var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
             var fakeSubmissionBusinessLogic = new SubmissionBusinessLogic(fakeCommonBusinessLogic,
-                fakeCommonBusinessLogic.DataRepository, Mock.Of<ILogRecordLogger>());
+                fakeCommonBusinessLogic.DataRepository, Mock.Of<IRecordLogger>());
             return fakeSubmissionBusinessLogic;
         }
 
         public static ISearchBusinessLogic CreateFakeSearchBusinessLogic()
         {
             var fakeSearchBusinessLogic = new SearchBusinessLogic(Mock.Of<ISearchRepository<EmployerSearchModel>>(),
-                Mock.Of<ISearchRepository<SicCodeSearchModel>>(), Mock.Of<ILogRecordLogger>());
+                Mock.Of<ISearchRepository<SicCodeSearchModel>>(), Mock.Of<IRecordLogger>());
             return fakeSearchBusinessLogic;
         }
 

@@ -8,107 +8,82 @@ using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Extensions;
+using ModernSlavery.WebUI.Shared.Options;
 using StackExchange.Redis;
+using DataProtectionOptions = ModernSlavery.WebUI.Shared.Options.DataProtectionOptions;
 
 namespace ModernSlavery.Infrastructure.Hosts.WebHost
 {
     public static partial class Extensions
     {
-        public static IServiceCollection AddDistributedCache(this IServiceCollection services, IConfiguration config)
+        public static (IServiceCollection, DistributedCacheOptions) AddDistributedCache(this IServiceCollection services, DistributedCacheOptions cacheOptions)
         {
-            var cacheType = config.GetValue("DistributedCache:Type", "Memory");
-
-            switch (cacheType.ToLower())
+            switch (cacheOptions.Type)
             {
                 case "redis":
-                    var redisConnectionString = config.GetConnectionString("RedisCache");
-                    if (string.IsNullOrWhiteSpace(redisConnectionString))
-                        redisConnectionString = config.GetValue("DistributedCache:ConnectionString", "");
-                    if (string.IsNullOrWhiteSpace(redisConnectionString))
-                        throw new Exception(
-                            "Cannot find 'RedisCache' ConnectionString or 'DistributedCache:ConnectionString'");
-                    services.AddStackExchangeRedisCache(options => { options.Configuration = redisConnectionString; });
+                    if (string.IsNullOrWhiteSpace(cacheOptions.AzureConnectionString)) throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
+
+                    services.AddStackExchangeRedisCache(options => { options.Configuration = cacheOptions.AzureConnectionString; });
                     break;
                 case "memory":
                     //Use a memory cache
                     services.AddDistributedMemoryCache();
                     break;
                 default:
-                    throw new Exception($"Unrecognised DistributedCache:Type='{cacheType}'");
+                    throw new Exception($"Unrecognised DistributedCache:Type='{cacheOptions.Type}'");
             }
 
-            return services;
+            return (services, cacheOptions);
         }
 
-        public static IServiceCollection AddDataProtection(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddDataProtection(this (IServiceCollection Services, DistributedCacheOptions CacheOptions) options, DataProtectionOptions dataProtectionOptions)
         {
-            var storageType = config.GetValue("DataProtection:Type", "Local");
-            var applicationDiscriminator = config.GetValue("DataProtection:ApplicationDiscriminator", "");
-
-            switch (storageType.ToLower())
+            switch (dataProtectionOptions.Type.ToLower())
             {
                 case "redis":
-                    var redisConnectionString = config.GetConnectionString("RedisCache");
-                    if (string.IsNullOrWhiteSpace(redisConnectionString))
-                        redisConnectionString = config.GetValue("DistributedCache:ConnectionString", "");
-                    if (string.IsNullOrWhiteSpace(redisConnectionString))
-                        redisConnectionString = config.GetValue("DataProtection:ConnectionString", "");
-                    if (string.IsNullOrWhiteSpace(redisConnectionString))
-                        throw new Exception(
-                            "Cannot find 'RedisCache' ConnectionString or 'DistributedCache:ConnectionString' or 'DataProtection:ConnectionString'");
+                    if (string.IsNullOrWhiteSpace(options.CacheOptions.AzureConnectionString))throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
 
-                    var keyName = config.GetValue("DataProtection:KeyName", "DataProtection-Keys");
-                    if (string.IsNullOrWhiteSpace(keyName))
-                        throw new Exception("Invalid or missing setting 'DataProtection:KeyName'");
+                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.KeyName))throw new Exception("Invalid or missing setting 'DataProtection:KeyName'");
 
-                    var redis = ConnectionMultiplexer.Connect(redisConnectionString);
-                    services.AddDataProtection(options =>
+                    var redis = ConnectionMultiplexer.Connect(options.CacheOptions.AzureConnectionString);
+                    options.Services.AddDataProtection(options =>
                     {
-                        options.ApplicationDiscriminator = applicationDiscriminator;
-                    }).PersistKeysToStackExchangeRedis(redis, keyName);
+                        options.ApplicationDiscriminator = dataProtectionOptions.ApplicationDiscriminator;
+                    }).PersistKeysToStackExchangeRedis(redis, dataProtectionOptions.KeyName);
                     break;
                 case "blob":
                     //Use blob storage to persist data protection keys equivalent to old MachineKeys
-                    var storageConnectionString = config.GetConnectionString("AzureStorage");
-                    if (string.IsNullOrWhiteSpace(storageConnectionString))
-                        storageConnectionString = config.GetValue("DataProtection:ConnectionString", "");
-                    if (string.IsNullOrWhiteSpace(storageConnectionString))
-                        throw new Exception(
-                            "Cannot find 'AzureStorage' ConnectionString or 'DataProtection:ConnectionString'");
+                    if (string.IsNullOrWhiteSpace(options.CacheOptions.AzureConnectionString)) throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
 
-                    var containerName = config.GetValue("DataProtection:Container", "shared-configuration");
-                    if (string.IsNullOrWhiteSpace(containerName))
-                        throw new Exception("Invalid or missing setting 'DataProtection:Container'");
+                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.Container))throw new Exception("Invalid or missing setting 'DataProtection:Container'");
 
-                    var keyFilePath = config.GetValue("DataProtection:FilePath", "data-protection/keys.xml");
-                    if (string.IsNullOrWhiteSpace(keyFilePath))
-                        throw new Exception("Invalid or missing setting 'DataProtection:FilePath'");
+                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.KeyFilepath))throw new Exception("Invalid or missing setting 'DataProtection:KeyFilePath'");
 
                     //Get or create the container automatically
-                    var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+                    var storageAccount = CloudStorageAccount.Parse(options.CacheOptions.AzureConnectionString);
                     var blobClient = storageAccount.CreateCloudBlobClient();
 
-                    var keyContainer = blobClient.GetContainerReference(containerName);
+                    var keyContainer = blobClient.GetContainerReference(dataProtectionOptions.Container);
                     keyContainer.CreateIfNotExists();
 
-                    services.AddDataProtection(options =>
+                    options.Services.AddDataProtection(options =>
                     {
-                        options.ApplicationDiscriminator = applicationDiscriminator;
-                    }).PersistKeysToAzureBlobStorage(keyContainer, keyFilePath);
+                        options.ApplicationDiscriminator = dataProtectionOptions.ApplicationDiscriminator;
+                    }).PersistKeysToAzureBlobStorage(keyContainer, dataProtectionOptions.KeyFilepath);
                     break;
                 case "memory":
-                    services.AddDataProtection(options =>
+                    options.Services.AddDataProtection(options =>
                     {
-                        options.ApplicationDiscriminator = applicationDiscriminator;
+                        options.ApplicationDiscriminator = dataProtectionOptions.ApplicationDiscriminator;
                     });
                     break;
                 case "none":
                     break;
                 default:
-                    throw new Exception($"Unrecognised DataProtection:Type='{storageType}'");
+                    throw new Exception($"Unrecognised DataProtection:Type='{dataProtectionOptions.Type}'");
             }
 
-            return services;
+            return options.Services;
         }
 
         /// <summary>

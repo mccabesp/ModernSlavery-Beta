@@ -7,9 +7,9 @@ namespace ModernSlavery.BusinessLogic.Admin
 {
     public interface IAdminService
     {
-        ILogRecordLogger ManualChangeLog { get; }
-        ILogRecordLogger BadSicLog { get; }
-        ILogRecordLogger RegistrationLog { get; }
+        IRecordLogger ManualChangeLog { get; }
+        IRecordLogger BadSicLog { get; }
+        IRecordLogger RegistrationLog { get; }
         IShortCodesRepository ShortCodesRepository { get; }
         IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
         ISearchBusinessLogic SearchBusinessLogic { get; set; }
@@ -27,9 +27,9 @@ namespace ModernSlavery.BusinessLogic.Admin
     public class AdminService : IAdminService
     {
         public AdminService(
-            [KeyFilter(Filenames.ManualChangeLog)] ILogRecordLogger manualChangeLog,
-            [KeyFilter(Filenames.BadSicLog)] ILogRecordLogger badSicLog,
-            [KeyFilter(Filenames.RegistrationLog)] ILogRecordLogger registrationLog,
+            [KeyFilter(Filenames.ManualChangeLog)] IRecordLogger manualChangeLog,
+            [KeyFilter(Filenames.BadSicLog)] IRecordLogger badSicLog,
+            [KeyFilter(Filenames.RegistrationLog)] IRecordLogger registrationLog,
             IShortCodesRepository shortCodesRepository,
             IOrganisationBusinessLogic organisationBusinessLogic,
             ISearchBusinessLogic searchBusinessLogic,
@@ -61,9 +61,9 @@ namespace ModernSlavery.BusinessLogic.Admin
             CommonBusinessLogic = commonBusinessLogic;
         }
 
-        public ILogRecordLogger ManualChangeLog { get; }
-        public ILogRecordLogger BadSicLog { get; }
-        public ILogRecordLogger RegistrationLog { get; }
+        public IRecordLogger ManualChangeLog { get; }
+        public IRecordLogger BadSicLog { get; }
+        public IRecordLogger RegistrationLog { get; }
 
         public IShortCodesRepository ShortCodesRepository { get; }
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }

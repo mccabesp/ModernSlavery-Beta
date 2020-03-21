@@ -131,7 +131,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
             _configuredIUserRepository = new Infrastructure.Data.UserRepository(new DatabaseOptions(),
                 new GlobalOptions(),
                 configurableDataRepository.Object,
-                Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
+                Mock.Of<IUserLogger>(), DependencyContainer.Resolve<IMapper>());
         }
 
         public class DependencyModule : Module

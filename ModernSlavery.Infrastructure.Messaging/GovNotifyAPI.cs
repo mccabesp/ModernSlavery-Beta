@@ -11,11 +11,11 @@ namespace ModernSlavery.Infrastructure.Messaging
     public class GovNotifyAPI : IGovNotifyAPI
     {
         private readonly NotificationClient _client;
-        private readonly ICustomLogger CustomLogger;
+        private readonly IEventLogger CustomLogger;
 
         private readonly GovNotifyOptions Options;
 
-        public GovNotifyAPI(GovNotifyOptions options, ICustomLogger customLogger)
+        public GovNotifyAPI(GovNotifyOptions options, IEventLogger customLogger)
         {
             Options = options ?? throw new ArgumentNullException(nameof(options));
             CustomLogger = customLogger ?? throw new ArgumentNullException(nameof(customLogger));

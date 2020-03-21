@@ -21,7 +21,7 @@ namespace ModernSlavery.Infrastructure.Data
         private readonly GlobalOptions GlobalOptions;
 
         public UserRepository(DatabaseOptions databaseOptions, GlobalOptions globalOptions,
-            IDataRepository dataRepository, IUserLogRecord userRecordLog, IMapper autoMapper)
+            IDataRepository dataRepository, IUserLogger userRecordLog, IMapper autoMapper)
         {
             DatabaseOptions = databaseOptions ?? throw new ArgumentNullException(nameof(databaseOptions));
             GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
@@ -247,7 +247,7 @@ namespace ModernSlavery.Infrastructure.Data
 
         public IDataRepository DataRepository { get; }
 
-        public IUserLogRecord UserRecordLog { get; }
+        public IUserLogger UserRecordLog { get; }
         public IMapper AutoMapper { get; }
 
         #endregion

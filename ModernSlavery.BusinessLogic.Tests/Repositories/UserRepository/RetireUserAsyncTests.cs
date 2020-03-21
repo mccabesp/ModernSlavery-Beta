@@ -26,7 +26,7 @@ namespace Repositories.UserRepository
             // mock data 
             mockDataRepo = new Mock<IDataRepository>().SetupGetAll(UserHelpers.CreateUsers());
 
-            mockUserLogRecord = new Mock<IUserLogRecord>();
+            mockUserLogRecord = new Mock<IUserLogger>();
 
             // service under test
             testUserRepo =
@@ -48,7 +48,7 @@ namespace Repositories.UserRepository
         }
 
         private Mock<IDataRepository> mockDataRepo;
-        private Mock<IUserLogRecord> mockUserLogRecord;
+        private Mock<IUserLogger> mockUserLogRecord;
 
         private IUserRepository testUserRepo;
 

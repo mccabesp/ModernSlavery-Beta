@@ -45,7 +45,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             var submissionBusinessLogic = new SubmissionBusinessLogic(
                 Mock.Of<ICommonBusinessLogic>(),
                 Mock.Of<IDataRepository>(),
-                Mock.Of<ILogRecordLogger>());
+                Mock.Of<IRecordLogger>());
 
             var organisation = OrganisationHelper.GetOrganisationInAGivenScope(scope, "employerRefInScope", 2017);
             var returnToConvert = ReturnHelper.CreateTestReturn(organisation);
@@ -176,7 +176,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             var submissionBusinessLogic = new SubmissionBusinessLogic(
                 Mock.Of<ICommonBusinessLogic>(),
                 mockedDataRepository.Object,
-                Mock.Of<ILogRecordLogger>());
+                Mock.Of<IRecordLogger>());
 
             // Act
             var actualConvertedReturnViewModel = submissionBusinessLogic.GetLateSubmissions();

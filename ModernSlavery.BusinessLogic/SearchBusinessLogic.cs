@@ -13,7 +13,7 @@ namespace ModernSlavery.BusinessLogic
 {
     public interface ISearchBusinessLogic
     {
-        ILogRecordLogger SearchLog { get; }
+        IRecordLogger SearchLog { get; }
         ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; set; }
         ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
         IEnumerable<Organisation> LookupSearchableOrganisations(IList<Organisation> organisations);
@@ -25,7 +25,7 @@ namespace ModernSlavery.BusinessLogic
         public SearchBusinessLogic(
             ISearchRepository<EmployerSearchModel> employerSearchRepository,
             ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
-            [KeyFilter(Filenames.SearchLog)] ILogRecordLogger searchLog
+            [KeyFilter(Filenames.SearchLog)] IRecordLogger searchLog
         )
         {
             EmployerSearchRepository = employerSearchRepository;
@@ -36,7 +36,7 @@ namespace ModernSlavery.BusinessLogic
         public ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; set; }
         public ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
 
-        public ILogRecordLogger SearchLog { get; }
+        public IRecordLogger SearchLog { get; }
 
 
         //Returns a list of organisaations to include in search indexes

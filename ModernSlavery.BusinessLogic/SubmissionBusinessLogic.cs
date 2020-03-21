@@ -18,7 +18,7 @@ namespace ModernSlavery.BusinessLogic
 {
     public interface ISubmissionBusinessLogic
     {
-        ILogRecordLogger SubmissionLog { get; }
+        IRecordLogger SubmissionLog { get; }
 
         // Submission
         Task<Return> GetSubmissionByReturnIdAsync(long returnId);
@@ -34,7 +34,7 @@ namespace ModernSlavery.BusinessLogic
         private readonly ICommonBusinessLogic _commonBusinessLogic;
 
         public SubmissionBusinessLogic(ICommonBusinessLogic commonBusinessLogic, IDataRepository dataRepo,
-            [KeyFilter(Filenames.SubmissionLog)] ILogRecordLogger submissionLog)
+            [KeyFilter(Filenames.SubmissionLog)] IRecordLogger submissionLog)
         {
             _commonBusinessLogic = commonBusinessLogic;
             DataRepository = dataRepo;
@@ -42,7 +42,7 @@ namespace ModernSlavery.BusinessLogic
         }
 
         private IDataRepository DataRepository { get; }
-        public ILogRecordLogger SubmissionLog { get; }
+        public IRecordLogger SubmissionLog { get; }
 
         #region Repo
 

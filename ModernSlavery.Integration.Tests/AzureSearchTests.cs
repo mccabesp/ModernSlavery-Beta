@@ -30,7 +30,7 @@ namespace ModernSlavery.Integration.Tests
 
             //_azureSearchRepo = new AzureSearchRepository(azureSearchServiceName, azureSearchAdminApiKey, null, GlobalOptions.AppInsightsClient);
             _azureSearchRepo = new AzureEmployerSearchRepository(ConfigHelpers.GlobalOptions,
-                Mock.Of<ILogRecordLogger>(), ConfigHelpers.SearchOptions.AzureServiceName,
+                Mock.Of<IRecordLogger>(), ConfigHelpers.SearchOptions.AzureServiceName,
                 ConfigHelpers.SearchOptions.EmployerIndexName, ConfigHelpers.SearchOptions.AzureApiAdminKey);
         }
 
@@ -248,7 +248,7 @@ namespace ModernSlavery.Integration.Tests
                 ConfigHelpers.SearchOptions.AzureServiceName,
                 new SearchCredentials(ConfigHelpers.SearchOptions.AzureApiAdminKey));
 
-            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),
+            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<IRecordLogger>(),
                 sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
 
             var mockViewingService = new Mock<IViewingService>();
@@ -288,7 +288,7 @@ namespace ModernSlavery.Integration.Tests
                 ConfigHelpers.SearchOptions.AzureServiceName,
                 new SearchCredentials(ConfigHelpers.SearchOptions.AzureApiAdminKey));
 
-            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),
+            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<IRecordLogger>(),
                 sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
 
             var mockDataRepo = MoqHelpers.CreateMockDataRepository();

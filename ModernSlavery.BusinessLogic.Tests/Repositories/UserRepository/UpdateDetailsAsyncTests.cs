@@ -26,7 +26,7 @@ namespace Repositories.UserRepository
             // mock data 
             mockDataRepo = new Mock<IDataRepository>().SetupGetAll(UserHelpers.CreateUsers());
 
-            mockLogRecordLogger = new Mock<IUserLogRecord>();
+            mockLogRecordLogger = new Mock<IUserLogger>();
 
             // service under test
             testUserRepo = new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(),
@@ -48,7 +48,7 @@ namespace Repositories.UserRepository
         }
 
         private Mock<IDataRepository> mockDataRepo;
-        private Mock<IUserLogRecord> mockLogRecordLogger;
+        private Mock<IUserLogger> mockLogRecordLogger;
         private IUserRepository testUserRepo;
 
         [TestCase]

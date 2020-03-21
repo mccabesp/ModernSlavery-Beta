@@ -14,17 +14,17 @@ namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
         [SetUp]
         public void BeforeEach()
         {
-            mockQueue = new Mock<Infrastructure.Storage.AzureQueue>("TestConnectionString", "TestQueueName")
+            mockQueue = new Mock<Infrastructure.Storage.MessageQueues.AzureQueue>("TestConnectionString", "TestQueueName")
                 {CallBase = true};
 
-            mockLogEventLoggerProvider = new Mock<Infrastructure.Storage.LogEventLoggerProvider>(
+            mockLogEventLoggerProvider = new Mock<Infrastructure.Logging.EventLoggerProvider>(
                 mockQueue.Object,
                 testApplicationName,
                 new LoggerFilterOptions()) {CallBase = true};
         }
 
-        private Mock<Infrastructure.Storage.AzureQueue> mockQueue;
-        private Mock<Infrastructure.Storage.LogEventLoggerProvider> mockLogEventLoggerProvider;
+        private Mock<Infrastructure.Storage.MessageQueues.AzureQueue> mockQueue;
+        private Mock<Infrastructure.Logging.EventLoggerProvider> mockLogEventLoggerProvider;
 
         private readonly string testApplicationName = "LogEventUnitTests";
 

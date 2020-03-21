@@ -1,0 +1,97 @@
+﻿using Autofac;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.DependencyInjection;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Database;
+using ModernSlavery.Extensions;
+using ModernSlavery.Infrastructure.CompaniesHouse;
+using ModernSlavery.Infrastructure.Logging;
+using ModernSlavery.Infrastructure.Messaging;
+using ModernSlavery.Infrastructure.Search;
+using ModernSlavery.Infrastructure.Storage;
+using ModernSlavery.SharedKernel.Extensions;
+using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.WebUI.Shared.Options;
+using DataProtectionOptions = Microsoft.AspNetCore.DataProtection.DataProtectionOptions;
+using ResponseCachingOptions = Microsoft.AspNetCore.ResponseCaching.ResponseCachingOptions;
+
+namespace ModernSlavery.WebJob
+{
+    public class AppDependencyModule: IDependencyModule
+    {
+        private readonly GlobalOptions _globalOptions;
+        private readonly CompaniesHouseOptions _coHoOptions;
+        private readonly ResponseCachingOptions _responseCachingOptions;
+        private readonly DistributedCacheOptions _distributedCacheOptions;
+        private readonly DataProtectionOptions _dataProtectionOptions;
+
+        public AppDependencyModule(GlobalOptions globalOptions, CompaniesHouseOptions coHoOptions, ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions, DataProtectionOptions dataProtectionOptions)
+        {
+            _globalOptions = globalOptions;
+            _coHoOptions = coHoOptions;
+            _responseCachingOptions = responseCachingOptions;
+            _distributedCacheOptions = distributedCacheOptions;
+            _dataProtectionOptions = dataProtectionOptions;
+        }
+
+        public void Bind(ContainerBuilder builder, IServiceCollection services)
+        {
+            services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
+
+            services.AddApplicationInsightsTelemetry(_globalOptions.APPINSIGHTS_INSTRUMENTATIONKEY);
+
+            services.AddSingleton<IJobActivator, AutofacJobActivator>();
+
+            //Register the database dependencies
+            builder.RegisterDependencyModule<DatabaseDependencyModule>();
+
+            //Register the file storage dependencies
+            builder.RegisterDependencyModule<FileStorageDependencyModule>();
+
+            //Register the log storage dependencies
+            builder.RegisterDependencyModule<LoggingDependencyModule>();
+
+            //Register the search dependencies
+            builder.RegisterDependencyModule<SearchDependencyModule>();
+
+            //Register the companies house dependencies
+            builder.RegisterDependencyModule<CompaniesHouseDependencyModule>();
+
+            //Register the messaging dependencies
+            builder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
+            builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
+
+            // Register the email template dependencies
+            builder.RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates"))).As<IEmailTemplateRepository>().SingleInstance();
+
+            //Register some singletons
+            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance().WithParameter("seed", _globalOptions.ObfuscationSeed);
+            builder.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
+
+            // Register email provider dependencies
+            builder.RegisterType<GovNotifyEmailProvider>().SingleInstance();
+            builder.RegisterType<SmtpEmailProvider>().SingleInstance();
+            builder.RegisterType<EmailProvider>().SingleInstance();
+
+            #region Register the busines logic dependencies
+            builder.RegisterType<CommonBusinessLogic>().As<ICommonBusinessLogic>().SingleInstance();
+            builder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>().InstancePerDependency();
+            builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerDependency();
+            builder.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>().InstancePerDependency();
+            builder.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>().InstancePerDependency();
+            builder.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance();
+            builder.RegisterType<UpdateFromCompaniesHouseService>().As<UpdateFromCompaniesHouseService>().InstancePerDependency();
+            #endregion
+
+            // Need to register webJob class in Autofac as well
+            builder.RegisterType<Functions>().InstancePerDependency();
+            builder.RegisterType<DisableWebjobProvider>().SingleInstance();
+
+        }
+    }
+}

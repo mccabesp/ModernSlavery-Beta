@@ -10,8 +10,8 @@ namespace ModernSlavery.BusinessLogic.Register
     {
         IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
 
-        ILogRecordLogger BadSicLog { get; }
-        ILogRecordLogger RegistrationLog { get; }
+        IRecordLogger BadSicLog { get; }
+        IRecordLogger RegistrationLog { get; }
 
         public IPinInThePostService PinInThePostService { get; }
         public IPostcodeChecker PostcodeChecker { get; }
@@ -28,8 +28,8 @@ namespace ModernSlavery.BusinessLogic.Register
     public class RegistrationService : IRegistrationService
     {
         public RegistrationService(
-            [KeyFilter(Filenames.BadSicLog)] ILogRecordLogger badSicLog,
-            [KeyFilter(Filenames.RegistrationLog)] ILogRecordLogger registrationLog,
+            [KeyFilter(Filenames.BadSicLog)] IRecordLogger badSicLog,
+            [KeyFilter(Filenames.RegistrationLog)] IRecordLogger registrationLog,
             IRegistrationBusinessLogic registrationBusinessLogic,
             IScopeBusinessLogic scopeBL,
             IOrganisationBusinessLogic orgBL,
@@ -58,8 +58,8 @@ namespace ModernSlavery.BusinessLogic.Register
         }
         public IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
         
-        public ILogRecordLogger BadSicLog { get; }
-        public ILogRecordLogger RegistrationLog { get; }
+        public IRecordLogger BadSicLog { get; }
+        public IRecordLogger RegistrationLog { get; }
 
         public IPinInThePostService PinInThePostService { get; }
         public IPostcodeChecker PostcodeChecker { get; }

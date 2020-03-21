@@ -29,11 +29,11 @@ namespace ModernSlavery.BusinessLogic
         private const string DetailsOfChange = "Replaced by CoHo";
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
 
-        private readonly ICustomLogger _CustomLogger;
+        private readonly IEventLogger _CustomLogger;
         private readonly IDataRepository _DataRepository;
         private readonly IPostcodeChecker _PostcodeChecker;
 
-        public UpdateFromCompaniesHouseService(ICustomLogger customLogger, IDataRepository dataRepository,
+        public UpdateFromCompaniesHouseService(IEventLogger customLogger, IDataRepository dataRepository,
             ICompaniesHouseAPI companiesHouseAPI, IPostcodeChecker postcodeChecker)
         {
             _CustomLogger = customLogger;

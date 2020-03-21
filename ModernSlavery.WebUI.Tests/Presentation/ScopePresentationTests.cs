@@ -49,7 +49,7 @@ namespace ModernSlavery.Tests
 
             mockFileRepo = new Mock<IFileRepository>();
 
-            testSearchBL = new SearchBusinessLogic(testSearchRepo,Mock.Of<ISearchRepository<SicCodeSearchModel>>(),Mock.Of<ILogRecordLogger>());
+            testSearchBL = new SearchBusinessLogic(testSearchRepo,Mock.Of<ISearchRepository<SicCodeSearchModel>>(),Mock.Of<IRecordLogger>());
 
             // setup mocks ans ensures they call their implementations. (We override calls per test when need be!)
             mockScopeBL = new Mock<ScopeBusinessLogic>(testCommonBL, mockDataRepo.Object, testSearchBL);

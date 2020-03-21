@@ -21,13 +21,13 @@ namespace ModernSlavery.Infrastructure.Search
     {
         protected readonly Lazy<Task<ISearchServiceClient>> _searchServiceClient;
         private readonly TelemetryClient _telemetryClient;
-        public readonly ILogRecordLogger SearchLog;
+        public readonly IRecordLogger SearchLog;
         protected Lazy<Task<ISearchIndexClient>> _searchIndexClient;
         protected string _suggesterName;
 
 
         public AzureSicCodeSearchRepository(
-            [KeyFilter(Filenames.SearchLog)] ILogRecordLogger searchLog,
+            [KeyFilter(Filenames.SearchLog)] IRecordLogger searchLog,
             ISearchServiceClient searchServiceClient, string indexName, bool disabled = false)
         {
             Disabled = disabled;

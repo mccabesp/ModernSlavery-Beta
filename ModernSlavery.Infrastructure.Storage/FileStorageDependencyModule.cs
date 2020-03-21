@@ -1,11 +1,12 @@
 ﻿using System;
 using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Infrastructure.Storage.Classes;
+using ModernSlavery.Infrastructure.Storage.FileRepositories;
 using ModernSlavery.SharedKernel.Interfaces;
 
-namespace ModernSlavery.Infrastructure.Messaging
+namespace ModernSlavery.Infrastructure.Storage
 {
     public class FileStorageDependencyModule: IDependencyModule
     {
@@ -15,7 +16,7 @@ namespace ModernSlavery.Infrastructure.Messaging
             _options = options;
         }
 
-        public void Bind(ContainerBuilder builder) 
+        public void Bind(ContainerBuilder builder, IServiceCollection services)
         {
             // use the 'localStorageRoot' when hosting the storage in a local folder
             if (string.IsNullOrWhiteSpace(_options.LocalStorageRoot))

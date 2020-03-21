@@ -5,8 +5,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Infrastructure.Options;
-using ModernSlavery.Infrastructure.Storage.Classes;
+using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.SharedKernel.Interfaces;
 
@@ -17,9 +16,9 @@ namespace ModernSlavery.WebJob
 
         public Functions(
             StorageOptions storageOptions,
-            ICustomLogger customLogger,
-            [KeyFilter(Filenames.BadSicLog)]ILogRecordLogger badSicLog,
-            [KeyFilter(Filenames.ManualChangeLog)]ILogRecordLogger manualChangeLog,
+            IEventLogger customLogger,
+            [KeyFilter(Filenames.BadSicLog)]IRecordLogger badSicLog,
+            [KeyFilter(Filenames.ManualChangeLog)]IRecordLogger manualChangeLog,
             IMessenger messenger,
             ICommonBusinessLogic commonBusinessLogic,
             ISearchRepository<EmployerSearchModel> employerSearchRepository,
@@ -49,9 +48,9 @@ namespace ModernSlavery.WebJob
 
         private readonly StorageOptions _StorageOptions;
 
-        private readonly ICustomLogger _CustomLogger;
-        private readonly ILogRecordLogger _BadSicLog;
-        private readonly ILogRecordLogger _ManualChangeLog;
+        private readonly IEventLogger _CustomLogger;
+        private readonly IRecordLogger _BadSicLog;
+        private readonly IRecordLogger _ManualChangeLog;
         private readonly IMessenger _Messenger;
         public readonly ICommonBusinessLogic CommonBusinessLogic;
         private readonly ISearchRepository<EmployerSearchModel> _EmployerSearchRepository;

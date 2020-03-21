@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Infrastructure.Storage.Classes;
+using ModernSlavery.Infrastructure.Storage.MessageQueues;
 using ModernSlavery.SharedKernel;
 using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.SharedKernel.Options;
@@ -18,7 +19,7 @@ namespace ModernSlavery.Infrastructure.Storage
             _options = options;
         }
 
-        public void Bind(ContainerBuilder builder)
+        public void Bind(ContainerBuilder builder, IServiceCollection services)
         {
             // Register queues
             builder.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.SendEmail);

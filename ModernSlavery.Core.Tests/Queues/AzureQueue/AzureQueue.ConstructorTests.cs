@@ -14,7 +14,7 @@ namespace ModernSlavery.Core.Tests.AzureQueue
             // Act
             var actualExpection =
                 Assert.Throws<ArgumentNullException>(() =>
-                    new Infrastructure.Storage.AzureQueue(testConnString, "TestQueueName"));
+                    new Infrastructure.Storage.MessageQueues.AzureQueue(testConnString, "TestQueueName"));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: connectionString", actualExpection.Message);
@@ -28,7 +28,7 @@ namespace ModernSlavery.Core.Tests.AzureQueue
             // Act
             var actualExpection =
                 Assert.Throws<ArgumentNullException>(() =>
-                    new Infrastructure.Storage.AzureQueue("TestConnectionString", testQueueName));
+                    new Infrastructure.Storage.MessageQueues.AzureQueue("TestConnectionString", testQueueName));
 
             // Assert
             Assert.AreEqual("Value cannot be null.\r\nParameter name: queueName", actualExpection.Message);

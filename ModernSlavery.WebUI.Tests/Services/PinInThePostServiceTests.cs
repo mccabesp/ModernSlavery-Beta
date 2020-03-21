@@ -11,7 +11,7 @@ namespace ModernSlavery.WebUI.Tests.Services
     [TestFixture]
     public class PinInThePostServiceTests
     {
-        private IPinInThePostService PinInThePostService=new PinInThePostService(null,Mock.Of<ICustomLogger>(),Mock.Of<IGovNotifyAPI>());
+        private IPinInThePostService PinInThePostService=new PinInThePostService(null,Mock.Of<IEventLogger>(),Mock.Of<IGovNotifyAPI>());
 
         private void AssertListEqual(List<string> listOne, List<string> listTwo)
         {

@@ -24,9 +24,11 @@ using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Database.Classes;
 using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Configuration;
+using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.Infrastructure.Storage.Classes;
+using ModernSlavery.Infrastructure.Storage.FileRepositories;
+using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
 namespace ModernSlavery.WebJob
 {
@@ -35,7 +37,6 @@ namespace ModernSlavery.WebJob
         private readonly IConfiguration _Config;
         private readonly ILogger _Logger;
         private IServiceProvider _ServiceProvider;
-        private OptionsBinder OptionsBinder;
 
         public Startup(IConfiguration config)
         {
@@ -47,155 +48,23 @@ namespace ModernSlavery.WebJob
         // called by the runtime before the ConfigureContainer method, below.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            #region Bind the options classes and register as services
-            OptionsBinder = new OptionsBinder(services, _Config);
-            OptionsBinder.BindAssemblies("ModernSlavery");
-            var globalOptions = OptionsBinder.Get<GlobalOptions>();
-            var coHoOptions = OptionsBinder.Get<CompaniesHouseOptions>();
-            #endregion
-
-            //Add a dedicated httpClient for Companies house API with exponential retry policy
-            services.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI), (httpClient)=>
-                {
-                    CompaniesHouseAPI.SetupHttpClient(httpClient, coHoOptions.ApiServer, coHoOptions.ApiKey);
-                })
-                .SetHandlerLifetime(TimeSpan.FromMinutes(10))
-                .AddPolicyHandler(CompaniesHouseAPI.GetRetryPolicy());
-
-            services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
-
-            services.AddApplicationInsightsTelemetry(_Config.GetValue("ApplicationInsights:InstrumentationKey", _Config["APPINSIGHTS-INSTRUMENTATIONKEY"]));
-
-            services.AddSingleton<IJobActivator, AutofacJobActivator>();
-
-            //Register the external dependencies
-            var dependencyBuilder = new DependencyBuilder(services);
-
-            //Register the webjob host dependencies
-            dependencyBuilder.Bind<WebjobHostDependencyModule>();
-
-            return dependencyBuilder.Build();
-
-        }
-
-        private IContainer BuildContainer(ContainerBuilder builder)
-        {
-            var globalOptions = OptionsBinder.Get<GlobalOptions>();
-            var databaseOptions = OptionsBinder.Get<DatabaseOptions>();
-            var storageOptions = OptionsBinder.Get<StorageOptions>();
-            var searchOptions = OptionsBinder.Get<SearchOptions>();
-
-            // Need to register webJob class in Autofac as well
-            builder.RegisterType<Functions>().InstancePerDependency();
-            builder.RegisterType<DisableWebjobProvider>().SingleInstance();
-
-            #region Database
-            builder.Register(c => new SqlRepository(new DatabaseContext(globalOptions, databaseOptions)))
-                .As<IDataRepository>()
-                .InstancePerDependency();
-            #endregion
-
-            #region Companies House AP
-            builder.RegisterType<CompaniesHouseAPI>()
-                .As<ICompaniesHouseAPI>()
-                .SingleInstance()
-                .WithParameter(
-                    (p, ctx) => p.ParameterType == typeof(HttpClient),
-                    (p, ctx) => ctx.Resolve<IHttpClientFactory>().CreateClient(nameof(ICompaniesHouseAPI)));
-
-            #endregion
-
-            #region File Storage
-            if (string.IsNullOrWhiteSpace(storageOptions.LocalStorageRoot))
-            {
-                //Exponential retry policy is recommended for background tasks - see https://docs.microsoft.com/en-us/azure/architecture/best-practices/retry-service-specific#azure-storage
-                builder.Register(
-                        c => new AzureFileRepository(storageOptions,new ExponentialRetry(TimeSpan.FromSeconds(3), 10)))
-                    .As<IFileRepository>()
-                    .SingleInstance();
-            }
-            else
-            {
-                builder.Register(c => new SystemFileRepository(storageOptions)).As<IFileRepository>().SingleInstance();
-            }
-            #endregion
-
-            builder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
-            builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
-
-            #region Search
-            builder.Register(c => new SearchServiceClient(searchOptions.AzureServiceName, new SearchCredentials(searchOptions.AzureApiAdminKey)))
-                .As<ISearchServiceClient>()
-                .SingleInstance();
-
-            builder.RegisterType<AzureEmployerSearchRepository>()
-                .As<ISearchRepository<EmployerSearchModel>>()
-                .SingleInstance()
-                .WithParameter("serviceName", searchOptions.AzureServiceName)
-                .WithParameter("adminApiKey", searchOptions.AzureApiAdminKey)
-                .WithParameter("disabled", searchOptions.Disabled);
-
-            builder.RegisterType<AzureSicCodeSearchRepository>()
-                .As<ISearchRepository<SicCodeSearchModel>>()
-                .SingleInstance()
-                .WithParameter("disabled", searchOptions.Disabled);
-            #endregion
-
-            #region Email Templates
-            builder.RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates")))
-                .As<IEmailTemplateRepository>()
-                .SingleInstance();
-            #endregion
-
-            // BL Services
-            builder.RegisterInstance(_Config).SingleInstance();
-
-            #region Business Logic
-            builder.RegisterType<CommonBusinessLogic>().As<ICommonBusinessLogic>().SingleInstance();
-            builder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>().InstancePerDependency();
-            builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerDependency();
-            builder.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>().InstancePerDependency();
-            builder.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>().InstancePerDependency();
-            builder.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance();
-            builder.RegisterType<UpdateFromCompaniesHouseService>().As<UpdateFromCompaniesHouseService>().InstancePerDependency();
-            #endregion
-
-            //Register some singletons
-            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance().WithParameter("seed", globalOptions.ObfuscationSeed);
-            builder.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
-
-            // Register queues (without key filtering)
-            builder.Register(c => new LogEventQueue(storageOptions.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
-            builder.Register(c => new LogRecordQueue(storageOptions.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
-
-            // Register record log queues
-            builder.RegisterLogRecord(Filenames.EmailSendLog);
-            builder.RegisterLogRecord(Filenames.StannpSendLog);
-            builder.RegisterLogRecord(Filenames.ManualChangeLog);
-            builder.RegisterLogRecord(Filenames.BadSicLog);
-
-
-            // Register record log records (without key filtering)
-            builder.RegisterType<UserLogRecord>().As<IUserLogRecord>().SingleInstance();
-
-            // Register email providers
-            builder.RegisterType<GovNotifyEmailProvider>().SingleInstance();
-            builder.RegisterType<SmtpEmailProvider>().SingleInstance();
-            builder.RegisterType<EmailProvider>().SingleInstance();
-
-            //Build the container
-            return builder.Build();
+            //Load all configuration options and use them to register all dependencies
+            return services.ConfigureDependencies<AppDependencyModule>(_Config);
         }
 
         public void Configure(IApplicationBuilder app=null)
         {
+            var fileRepository = _ServiceProvider.GetService<IFileRepository>();
+            var globalOptions = _ServiceProvider.GetService<GlobalOptions>();
+
+            //Initialise the virtual date and time
+            VirtualDateTime.Initialise(globalOptions.DateTimeOffset);
+
             //Set the default encryption key
-            Encryption.SetDefaultEncryptionKey(_Config["DefaultEncryptionKey"]);
+            Encryption.SetDefaultEncryptionKey(globalOptions.DefaultEncryptionKey);
 
             //Ensure SicSectorSynonyms exist on remote 
 
-            var fileRepository = _ServiceProvider.GetService<IFileRepository>();
-            var globalOptions = _ServiceProvider.GetService<GlobalOptions>();
 
             //Initialise the virtual date and time
             VirtualDateTime.Initialise(globalOptions.DateTimeOffset);

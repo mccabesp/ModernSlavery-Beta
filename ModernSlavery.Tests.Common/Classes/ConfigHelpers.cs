@@ -5,7 +5,7 @@ using ModernSlavery.Extensions;
 using ModernSlavery.Infrastructure.Configuration;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Search;
-using ModernSlavery.Infrastructure.Storage.Classes;
+using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.WebUI.Options;
 

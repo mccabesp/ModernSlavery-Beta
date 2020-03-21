@@ -20,7 +20,7 @@ namespace ModernSlavery.Core.Tests.Classes
                 new SearchCredentials(ConfigHelpers.SearchOptions.AzureApiAdminKey));
 
             // Act
-            var actualSicCodeSearchRepository = new AzureSicCodeSearchRepository(Mock.Of<ILogRecordLogger>(),
+            var actualSicCodeSearchRepository = new AzureSicCodeSearchRepository(Mock.Of<IRecordLogger>(),
                 sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
 
             // Assert

@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Controllers
         #region Constructors
 
         public HomeController(
-            ICustomLogger customLogger,
+            IEventLogger customLogger,
             IScopePresenter scopeUIService,
             IShortCodesRepository shortCodesRepository,
             ILogger<HomeController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
@@ -37,7 +37,7 @@ namespace ModernSlavery.WebUI.Controllers
         #endregion
 
         #region Dependencies
-        private readonly ICustomLogger CustomLogger;
+        private readonly IEventLogger CustomLogger;
 
         public IScopePresenter ScopePresentation { get; }
         public IShortCodesRepository ShortCodesRepository { get; }

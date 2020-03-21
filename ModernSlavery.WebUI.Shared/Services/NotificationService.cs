@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Shared.Services
 {
     public class NotificationService: INotificationService
     {
-        public NotificationService(GlobalOptions globalOptions, ILogger<NotificationService> logger, ICustomLogger customLogger, [KeyFilter(QueueNames.SendNotifyEmail)]IQueue sendNotifyEmailQueue)
+        public NotificationService(GlobalOptions globalOptions, ILogger<NotificationService> logger, IEventLogger customLogger, [KeyFilter(QueueNames.SendNotifyEmail)]IQueue sendNotifyEmailQueue)
         {
             GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Shared.Services
 
         private readonly GlobalOptions GlobalOptions;
         private ILogger Logger { get; }
-        private ICustomLogger CustomLogger { get; }
+        private IEventLogger CustomLogger { get; }
         public IQueue SendNotifyEmailQueue { get; }
 
         public async void SendSuccessfulSubmissionEmail(string emailAddress,

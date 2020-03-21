@@ -28,7 +28,7 @@ namespace ModernSlavery.Infrastructure.Configuration
         public void Bind<TModule>() where TModule : class, IDependencyModule
         {
             //Resolve a new instance of the dependencies module
-            Builder.BindResolvedDependencyModule<TModule>();
+            Builder.RegisterDependencyModule<TModule>();
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             var moduleTypes = assembly.ExportedTypes.Where(p => type.IsAssignableFrom(p));
 
             foreach (var moduleType in moduleTypes)
-                Builder.BindResolvedDependencyModule(moduleType);
+                Builder.RegisterDependencyModule(moduleType);
         }
 
         public IServiceProvider Build()

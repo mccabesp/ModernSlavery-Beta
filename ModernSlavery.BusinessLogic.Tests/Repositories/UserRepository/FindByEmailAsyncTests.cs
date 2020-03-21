@@ -27,7 +27,7 @@ namespace Repositories.UserRepository
             // service under test
             testUserRepo =
                 new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(),
-                    mockDataRepo.Object, Mock.Of<IUserLogRecord>(), DependencyContainer.Resolve<IMapper>());
+                    mockDataRepo.Object, Mock.Of<IUserLogger>(), DependencyContainer.Resolve<IMapper>());
         }
 
         public class DependencyModule : Module

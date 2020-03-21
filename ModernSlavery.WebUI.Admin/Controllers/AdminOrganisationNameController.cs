@@ -20,13 +20,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private readonly IDataRepository dataRepository;
         private readonly ICompaniesHouseAPI companiesHouseApi;
         private readonly AuditLogger auditLogger;
-        private readonly ICustomLogger customLogger;
+        private readonly IEventLogger customLogger;
 
 
         public AdminOrganisationNameController(
             IDataRepository dataRepository,
             ICompaniesHouseAPI companiesHouseApi,
-            AuditLogger auditLogger, ICustomLogger customLogger)
+            AuditLogger auditLogger, IEventLogger customLogger)
         {
             this.dataRepository = dataRepository;
             this.companiesHouseApi = companiesHouseApi;

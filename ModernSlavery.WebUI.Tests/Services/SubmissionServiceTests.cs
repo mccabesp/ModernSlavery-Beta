@@ -22,7 +22,8 @@ using NUnit.Framework;
 using RangeAttribute = System.ComponentModel.DataAnnotations.RangeAttribute;
 using Autofac;
 using ModernSlavery.BusinessLogic.Submit;
-using ModernSlavery.Infrastructure.Storage.Classes;
+using ModernSlavery.Infrastructure.Storage;
+using ModernSlavery.Infrastructure.Storage.FileRepositories;
 using ModernSlavery.WebUI.Presenters;
 
 namespace ModernSlavery.Tests

@@ -100,7 +100,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             var mockedCommonBusinessLogic = Get<ICommonBusinessLogic>();
 
             var submissionBusinessLogic =
-                new SubmissionBusinessLogic(mockedCommonBusinessLogic, dataRepository, Mock.Of<ILogRecordLogger>());
+                new SubmissionBusinessLogic(mockedCommonBusinessLogic, dataRepository, Mock.Of<IRecordLogger>());
 
             var mockedScopeBusinessLogic = Get<IScopeBusinessLogic>();
             var mockedSecurityCodeBusinessLogic = Get<ISecurityCodeBusinessLogic>();

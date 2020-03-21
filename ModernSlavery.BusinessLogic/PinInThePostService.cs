@@ -11,12 +11,12 @@ namespace ModernSlavery.BusinessLogic
     public class PinInThePostService : IPinInThePostService
     {
         private const int NotifyAddressLineLength = 35;
-        private readonly ICustomLogger CustomLogger;
+        private readonly IEventLogger CustomLogger;
 
         private readonly GlobalOptions GlobalOptions;
         private readonly IGovNotifyAPI govNotifyApi;
 
-        public PinInThePostService(GlobalOptions globalOptions, ICustomLogger customLogger, IGovNotifyAPI govNotifyApi)
+        public PinInThePostService(GlobalOptions globalOptions, IEventLogger customLogger, IGovNotifyAPI govNotifyApi)
         {
             GlobalOptions = globalOptions;
             CustomLogger = customLogger;

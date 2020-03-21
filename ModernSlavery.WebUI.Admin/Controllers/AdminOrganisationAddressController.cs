@@ -22,14 +22,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private readonly IDataRepository dataRepository;
         private readonly ICompaniesHouseAPI companiesHouseApi;
         private readonly AuditLogger auditLogger;
-        private readonly ICustomLogger customLogger;
+        private readonly IEventLogger customLogger;
         private readonly IUpdateFromCompaniesHouseService UpdateFromCompaniesHouseService;
 
         public AdminOrganisationAddressController(
             IDataRepository dataRepository,
             ICompaniesHouseAPI companiesHouseApi,
             IUpdateFromCompaniesHouseService updateFromCompaniesHouseService,
-            AuditLogger auditLogger, ICustomLogger customLogger)
+            AuditLogger auditLogger, IEventLogger customLogger)
         {
             this.dataRepository = dataRepository;
             this.companiesHouseApi = companiesHouseApi;

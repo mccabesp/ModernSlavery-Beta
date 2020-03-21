@@ -24,140 +24,29 @@ using ModernSlavery.WebUI.Shared.Options;
 using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Configuration;
 using ModernSlavery.Infrastructure.Hosts.WebHost;
+using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Storage;
+using ModernSlavery.Infrastructure.Storage.MessageQueues;
+using ModernSlavery.Infrastructure.Telemetry;
 
 namespace ModernSlavery.WebUI
 {
     public class Startup:IStartup
     {
-
-        public static Action<IServiceCollection> ConfigureTestServices;
-        public static Action<ContainerBuilder> ConfigureTestContainer;
-
         private readonly IConfiguration _Config;
         private readonly ILogger _Logger;
-        private IServiceProvider _ServiceProvider;
-        private OptionsBinder OptionsBinder;
         public Startup(IConfiguration config)
         {
             _Config = config;
             _Logger = Activator.CreateInstance<Logger<Startup>>();
         }
 
-        public static HttpMessageHandler BackChannelHandler { get; set; }
-
         // ConfigureServices is where you register dependencies. This gets
         // called by the runtime before the ConfigureContainer method, below.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            #region Bind the options classes and register as services
-            OptionsBinder = new OptionsBinder(services, _Config);
-            OptionsBinder.BindAssemblies("ModernSlavery");
-            var globalOptions = OptionsBinder.Get<GlobalOptions>();
-            var coHoOptions = OptionsBinder.Get<CompaniesHouseOptions>();
-            var responseCachingOptions = OptionsBinder.Get<ResponseCachingOptions>();
-            #endregion
-
-            //Initialise the virtual date and time
-            VirtualDateTime.Initialise(globalOptions.DateTimeOffset);
-
-                        //Set the default encryption key
-            Encryption.SetDefaultEncryptionKey(globalOptions.DefaultEncryptionKey);
-
-            //Allow handler for caching of http responses
-            services.AddResponseCaching();
-
-            //Add a dedicated httpclient for Google Analytics tracking with exponential retry policy
-            services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), GoogleAnalyticsTracker.SetupHttpClient)
-                .SetHandlerLifetime(TimeSpan.FromMinutes(10))
-                .AddPolicyHandler(GoogleAnalyticsTracker.GetRetryPolicy());
-
-            //Add a dedicated httpclient for Companies house API with exponential retry policy
-            services.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI), (httpClient) =>
-                {
-                    CompaniesHouseAPI.SetupHttpClient(httpClient, coHoOptions.ApiServer, coHoOptions.ApiKey);
-                })
-                .SetHandlerLifetime(TimeSpan.FromMinutes(10))
-                .AddPolicyHandler(CompaniesHouseAPI.GetRetryPolicy());
-
-            //Allow creation of a static http context anywhere
-            services.AddHttpContextAccessor();
-
-            services.AddControllersWithViews(
-                    options => {
-                        options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
-                        options.ModelMetadataDetailsProviders.Add(
-                            new TrimModelBinder()); //Set DisplayMetadata to input empty strings as null
-                        options.ModelMetadataDetailsProviders.Add(
-                            new DefaultResourceValidationMetadataProvider()); // sets default resource type to use for display text and error messages
-                        responseCachingOptions.CacheProfiles.ForEach(p=> options.CacheProfiles.Add(p));//Load the response cache profiles from options
-                        options.Filters.Add<ErrorHandlingFilter>();
-                    })
-                .AddControllersAsServices() // Add controllers as services so attribute filters be resolved in contructors.
-                // Set the default resolver to use Pascalcase instead of the default camelCase which may break Ajaz responses
-                .AddJsonOptions(options => 
-                { 
-                    options.JsonSerializerOptions.PropertyNameCaseInsensitive=true;
-                    options.JsonSerializerOptions.PropertyNamingPolicy = null; 
-                })
-                .AddDataAnnotationsLocalization(
-                    options => { options.DataAnnotationLocalizerProvider = DataAnnotationLocalizerProvider.DefaultResourceHandler; });
-
-            var mvcBuilder=services.AddRazorPages();
-
-            // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
-            // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
-            if (_Config["Environment"].EqualsI("Development","Local"))mvcBuilder.AddRazorRuntimeCompilation();
-
-
-            //Add antiforgery token by default to forms
-            services.AddAntiforgery();
-
-            //Add services needed for sessions
-            services.AddSession(
-                o => {
-                    o.Cookie.IsEssential = true; //This is required otherwise session will not load
-                    o.Cookie.SecurePolicy = CookieSecurePolicy.Always; //Equivalent to <httpCookies requireSSL="true" /> from Web.Config
-                    o.Cookie.HttpOnly = false; //Always use https cookies
-                    o.Cookie.SameSite = SameSiteMode.Strict;
-                    o.Cookie.Domain = globalOptions.EXTERNAL_HOST.BeforeFirst(":"); //Domain cannot be an authority and contain a port number
-                    o.IdleTimeout =
-                        TimeSpan.FromMinutes(_Config.GetValue("SessionTimeOutMinutes", 20)); //Equivalent to <sessionState timeout="20"> from old Web.config
-                });
-
-            //Add the distributed cache and data protection
-            services.AddDistributedCache(_Config).AddDataProtection(_Config);
-
-            services.AddApplicationInsightsTelemetry(_Config.GetValue("ApplicationInsights:InstrumentationKey", _Config["APPINSIGHTS-INSTRUMENTATIONKEY"]));
-
-            //This may now be required 
-            services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
-
-            //Register StaticAssetsVersioningHelper
-            services.AddSingleton<StaticAssetsVersioningHelper>();
-
-            //Configure the services required for authentication by IdentityServer
-            string authority = _Config["Environment"].EqualsI("Local") ? _Config["IDENTITY_ISSUER"] : $"{globalOptions.SiteAuthority}account/";
-            services.AddIdentityServerClient(
-                authority,
-                globalOptions.SiteAuthority,
-                "ModernSlaveryServiceWebsite",
-                _Config.GetValue("AuthSecret", "secret"),
-                BackChannelHandler);
-
-            //Override any test services
-            ConfigureTestServices?.Invoke(services);
-
-            //Register the external dependencies
-            var dependencyBuilder = new DependencyBuilder(services);
-
-            //Override any test services
-            ConfigureTestContainer?.Invoke(dependencyBuilder.Builder);
-
-            //Register the web host dependencies
-            dependencyBuilder.Bind<WebHostDependencyModule>();
-
-            return dependencyBuilder.Build();
+            //Load all configuration options and use them to register all dependencies
+            return services.ConfigureDependencies<AppDependencyModule>(_Config);
         }
 
         // Configure is where you add middleware. This is called after
@@ -167,8 +56,14 @@ namespace ModernSlavery.WebUI
         {
             var lifetime = app.ApplicationServices.GetService<IApplicationLifetime>();
             var loggerFactory = app.ApplicationServices.GetService<ILoggerFactory>();
-            var globalOptions = OptionsBinder.Get<GlobalOptions>();
-            var responseCachingOptions = OptionsBinder.Get<ResponseCachingOptions>();
+            var globalOptions = app.ApplicationServices.GetService<GlobalOptions>();
+            var responseCachingOptions = app.ApplicationServices.GetService<ResponseCachingOptions>();
+
+            //Initialise the virtual date and time
+            VirtualDateTime.Initialise(globalOptions.DateTimeOffset);
+
+            //Set the default encryption key
+            Encryption.SetDefaultEncryptionKey(globalOptions.DefaultEncryptionKey);
 
             loggerFactory.UseLogEventQueueLogger(app.ApplicationServices);
 

@@ -29,11 +29,11 @@ namespace ModernSlavery.Infrastructure.Search
         private readonly Lazy<Task<ISearchServiceClient>> _serviceClient;
         private readonly TelemetryClient _telemetryClient;
         private readonly GlobalOptions GlobalOptions;
-        public readonly ILogRecordLogger SearchLog;
+        public readonly IRecordLogger SearchLog;
 
         public AzureEmployerSearchRepository(
             GlobalOptions globalOptions,
-            [KeyFilter(Filenames.SearchLog)] ILogRecordLogger searchLog,
+            [KeyFilter(Filenames.SearchLog)] IRecordLogger searchLog,
             string serviceName,
             string indexName,
             string adminApiKey = null,

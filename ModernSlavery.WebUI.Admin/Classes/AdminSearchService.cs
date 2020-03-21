@@ -27,7 +27,7 @@ namespace ModernSlavery.WebUI.Admin.Classes
 
     public class AdminSearchService
     {
-        public AdminSearchService(ICustomLogger customLogger, IDataRepository dataRepository)
+        public AdminSearchService(IEventLogger customLogger, IDataRepository dataRepository)
         {
             this.CustomLogger = customLogger;
             this.dataRepository = dataRepository;
@@ -35,7 +35,7 @@ namespace ModernSlavery.WebUI.Admin.Classes
         }
 
         private readonly IDataRepository dataRepository;
-        private readonly ICustomLogger CustomLogger;
+        private readonly IEventLogger CustomLogger;
 
         private object cacheLock=new object();
         private DateTime cacheLastUpdated = DateTime.MinValue;

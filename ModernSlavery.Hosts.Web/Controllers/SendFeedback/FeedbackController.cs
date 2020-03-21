@@ -14,10 +14,10 @@ namespace ModernSlavery.WebUI.Controllers.SendFeedback
     public class FeedbackController : Controller
     {
         private readonly IDataRepository dataRepository;
-        private readonly ICustomLogger CustomLogger;
+        private readonly IEventLogger CustomLogger;
 
         public FeedbackController(
-            ICustomLogger customLogger,
+            IEventLogger customLogger,
             IDataRepository dataRepository)
         {
             CustomLogger = customLogger;

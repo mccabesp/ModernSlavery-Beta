@@ -19,7 +19,7 @@ namespace ModernSlavery.Infrastructure.Messaging
             GlobalOptions globalOptions,
             IEmailTemplateRepository emailTemplateRepo,
             ILogger logger,
-            [KeyFilter(Filenames.EmailSendLog)] ILogRecordLogger emailSendLog)
+            [KeyFilter(Filenames.EmailSendLog)] IRecordLogger emailSendLog)
         {
             EmailTemplateRepo = emailTemplateRepo ?? throw new ArgumentNullException(nameof(emailTemplateRepo));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -125,7 +125,7 @@ namespace ModernSlavery.Infrastructure.Messaging
         public IEmailTemplateRepository EmailTemplateRepo { get; }
 
         public ILogger Logger { get; }
-        public ILogRecordLogger EmailSendLog { get; }
+        public IRecordLogger EmailSendLog { get; }
 
         #endregion
     }

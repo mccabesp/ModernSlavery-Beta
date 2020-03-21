@@ -23,7 +23,7 @@ namespace Repositories.UserRepository
             var dbContext = AutoFacHelpers.CreateInMemoryTestDatabase(UserOrganisationHelper.CreateRegistrations());
 
             mockDataRepo = new SqlRepository(dbContext);
-            mockLogRecordLogger = new Mock<IRegistrationLogRecord>();
+            mockLogRecordLogger = new Mock<IRegistrationLogger>();
 
             // service under test
             testRegistrationBusinessLogic =
@@ -31,7 +31,7 @@ namespace Repositories.UserRepository
         }
 
         private IDataRepository mockDataRepo;
-        private Mock<IRegistrationLogRecord> mockLogRecordLogger;
+        private Mock<IRegistrationLogger> mockLogRecordLogger;
 
         private IRegistrationBusinessLogic testRegistrationBusinessLogic;
 

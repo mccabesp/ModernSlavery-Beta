@@ -19,7 +19,7 @@ namespace ModernSlavery.Infrastructure.Messaging
             SmtpEmailOptions smtpEmailOptions,
             GlobalOptions globalOptions,
             ILogger<SmtpEmailProvider> logger,
-            [KeyFilter(Filenames.EmailSendLog)] ILogRecordLogger emailSendLog)
+            [KeyFilter(Filenames.EmailSendLog)] IRecordLogger emailSendLog)
             : base(globalOptions, emailTemplateRepo, logger, emailSendLog)
         {
             Options = smtpEmailOptions ?? throw new ArgumentNullException(nameof(smtpEmailOptions));

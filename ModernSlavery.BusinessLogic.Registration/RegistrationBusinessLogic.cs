@@ -17,7 +17,7 @@ namespace ModernSlavery.BusinessLogic.Register
 
     public class RegistrationBusinessLogic: IRegistrationBusinessLogic
     {
-        public RegistrationBusinessLogic(IDataRepository dataRepository, IRegistrationLogRecord registrationLog)
+        public RegistrationBusinessLogic(IDataRepository dataRepository, IRegistrationLogger registrationLog)
         {
             DataRepository = dataRepository ?? throw new ArgumentNullException(nameof(dataRepository));
             RegistrationLog = registrationLog ?? throw new ArgumentNullException(nameof(registrationLog));
@@ -25,7 +25,7 @@ namespace ModernSlavery.BusinessLogic.Register
 
         private readonly IDataRepository DataRepository;
 
-        private readonly IRegistrationLogRecord RegistrationLog;
+        private readonly IRegistrationLogger RegistrationLog;
 
         public async Task RemoveRetiredUserRegistrationsAsync(User userToRetire, User actionByUser)
         {

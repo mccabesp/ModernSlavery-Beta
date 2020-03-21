@@ -16,4 +16,9 @@
     <ProjectReference Include="..\ModernSlavery.Core.SharedKernel\ModernSlavery.Core.SharedKernel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Classes\" />
+    <Folder Include="Logging\" />
+  </ItemGroup>
+
 </Project>

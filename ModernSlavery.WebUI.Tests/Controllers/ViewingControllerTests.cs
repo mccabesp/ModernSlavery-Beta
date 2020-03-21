@@ -238,7 +238,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             var submissionBusinessLogic = new SubmissionBusinessLogic(
                 UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>(),
                 UiTestHelper.DIContainer.Resolve<IDataRepository>(),
-                Mock.Of<ILogRecordLogger>());
+                Mock.Of<IRecordLogger>());
 
             var organisationBusinessLogic = new OrganisationBusinessLogic(
                 UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>(),

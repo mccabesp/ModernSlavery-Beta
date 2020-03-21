@@ -5,7 +5,8 @@ using System.Web;
 using Microsoft.Azure.Search.Models;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Extensions;
-using ModernSlavery.Infrastructure.Storage.Classes;
+using ModernSlavery.Infrastructure.Storage;
+using ModernSlavery.Infrastructure.Storage.FileRepositories;
 using ModernSlavery.SharedKernel;
 using NUnit.Framework;
 

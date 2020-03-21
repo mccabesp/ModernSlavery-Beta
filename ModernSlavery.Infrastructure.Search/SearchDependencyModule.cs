@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.Azure.Search;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.SharedKernel;
@@ -15,7 +16,7 @@ namespace ModernSlavery.Infrastructure.Search
             _options = options;
         }
 
-        public void Bind(ContainerBuilder builder)
+        public void Bind(ContainerBuilder builder, IServiceCollection services)
         {
             // Setup azure search
             builder.Register(c => new SearchServiceClient(_options.AzureServiceName, new SearchCredentials(_options.AzureApiAdminKey)))
