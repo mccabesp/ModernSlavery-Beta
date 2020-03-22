@@ -13,7 +13,7 @@ namespace ModernSlavery.Core.Entities
     {
         private GlobalOptions GlobalOptions;
 
-        public User(GlobalOptions globalOptions)
+        public User(GlobalOptions globalOptions):this()
         {
             GlobalOptions = globalOptions;
         }
