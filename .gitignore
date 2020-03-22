@@ -452,6 +452,7 @@ ClientBin/
 *.dbmdl
 *.dbproj.schemaview
 *.pfx
+!LocalHost.pfx
 *.publishsettings
 node_modules/
 orleans.codegen.cs
