@@ -1,4 +1,4 @@
-﻿namespace ModernSlavery.BusinessLogic.Submit
+﻿namespace ModernSlavery.BusinessLogic.Submission
 {
     public interface ISubmissionService
     {

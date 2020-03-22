@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Autofac;
+﻿using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database.Classes;
-using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Infrastructure.Database.Classes;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Infrastructure.Database
 {
     public class DatabaseDependencyModule : IDependencyModule
     {

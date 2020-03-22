@@ -5,10 +5,10 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
-using ModernSlavery.Database.Classes;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Infrastructure.Database.Classes;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Infrastructure.Database
 {
     public partial class DatabaseContext : DbContext
     {

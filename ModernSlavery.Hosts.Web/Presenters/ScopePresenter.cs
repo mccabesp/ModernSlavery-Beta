@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
 using ModernSlavery.WebUI.Models.Scope;
+using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Presenters

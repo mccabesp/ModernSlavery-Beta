@@ -3,14 +3,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 

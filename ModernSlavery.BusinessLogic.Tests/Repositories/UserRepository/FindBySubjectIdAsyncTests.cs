@@ -2,17 +2,17 @@
 using System.Threading.Tasks;
 using Autofac;
 using AutoMapper;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel.Options;
+using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Tests.Common;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
 using NUnit.Framework;
 
-namespace Repositories.UserRepository
+namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
 {
     [TestFixture]
     [SetCulture("en-GB")]
@@ -26,7 +26,7 @@ namespace Repositories.UserRepository
 
             // service under test
             testUserRepo =
-                new ModernSlavery.Infrastructure.Data.UserRepository(new DatabaseOptions(), new GlobalOptions(),
+                new ModernSlavery.Infrastructure.Database.Classes.UserRepository(new DatabaseOptions(), new GlobalOptions(),
                     mockDataRepo.Object, Mock.Of<IUserLogger>(), DependencyContainer.Resolve<IMapper>());
         }
 
@@ -37,7 +37,7 @@ namespace Repositories.UserRepository
                 // Initialise AutoMapper
                 var mapperConfig = new MapperConfiguration(config =>
                 {
-                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Data.UserRepository));
+                    config.AddMaps(typeof(ModernSlavery.Infrastructure.Database.Classes.UserRepository));
                 });
                 builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
             }

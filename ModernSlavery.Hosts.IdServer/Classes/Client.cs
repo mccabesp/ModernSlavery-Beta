@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ModernSlavery.IdentityServer4.Classes
+namespace ModernSlavery.IdServer.Classes
 {
     public class ClientConfigModel
     {

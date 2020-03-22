@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Web;
-using ModernSlavery.Core;
-using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Mvc.Filters;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel.Options;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 {
     public class SpamProtectionAttribute : ActionFilterAttribute
     {

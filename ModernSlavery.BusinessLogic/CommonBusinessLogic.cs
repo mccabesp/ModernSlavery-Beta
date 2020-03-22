@@ -1,9 +1,9 @@
 ﻿using System;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.BusinessLogic
 {

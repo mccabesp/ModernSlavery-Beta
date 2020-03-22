@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using GovUkDesignSystem.Attributes;
-using GovUkDesignSystem.GovUkDesignSystemComponents;
-using GovUkDesignSystem.Helpers;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
+using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents;
+using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
 
-namespace GovUkDesignSystem.HtmlGenerators
+namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 {
     internal static class RadiosHtmlGenerator
     {

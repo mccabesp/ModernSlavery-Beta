@@ -1,9 +1,9 @@
 ﻿using System;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using NUnit.Framework;
 
-namespace ModernSlavery.WebJob.Tests
+namespace ModernSlavery.Hosts.Webjob.Tests
 {
     [TestFixture]
     public class WebJobConfigurationTests

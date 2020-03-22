@@ -2,18 +2,18 @@
 using System.Threading.Tasks;
 using System.Web;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Models.Register;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.BusinessLogic.Register;
+using ModernSlavery.BusinessLogic.Registration;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Controllers

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.SharedKernel.Options
+namespace ModernSlavery.Core.SharedKernel.Options
 {
     public class GlobalOptions : IOptions
     {

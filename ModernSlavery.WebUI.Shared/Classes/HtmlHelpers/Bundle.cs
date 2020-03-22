@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
 {
 
     public class Bundle

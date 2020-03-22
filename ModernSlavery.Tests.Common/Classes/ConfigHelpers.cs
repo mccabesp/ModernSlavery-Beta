@@ -1,13 +1,13 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Options;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Infrastructure.Configuration;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.SharedKernel.Options;
-using ModernSlavery.WebUI.Options;
+using ModernSlavery.WebUI.Classes.Options;
 
 namespace ModernSlavery.Tests.Common.Classes
 {

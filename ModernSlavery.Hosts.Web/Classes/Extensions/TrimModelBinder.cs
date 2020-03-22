@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace ModernSlavery.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes.Extensions
 {
     public class TrimModelBinder : IDisplayMetadataProvider
     {

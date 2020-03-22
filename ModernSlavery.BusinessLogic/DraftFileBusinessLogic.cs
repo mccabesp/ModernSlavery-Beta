@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel.Options;
 using Newtonsoft.Json;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 

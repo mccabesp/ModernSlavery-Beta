@@ -2,20 +2,23 @@
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 
-public class MockGovNotify : IGovNotifyAPI
+namespace ModernSlavery.WebUI.Tests.Mocks
 {
-
-    public SendEmailResponse SendEmail(SendEmailRequest sendEmailRequest)
+    public class MockGovNotify : IGovNotifyAPI
     {
-        return new SendEmailResponse { EmailId = "MOCK_RESPONSE_ID"};
+
+        public SendEmailResponse SendEmail(SendEmailRequest sendEmailRequest)
+        {
+            return new SendEmailResponse { EmailId = "MOCK_RESPONSE_ID"};
+        }
+
+
+        public SendLetterResponse SendLetter(string templateId,
+            Dictionary<string, dynamic> personalisation,
+            string clientReference = null)
+        {
+            return new SendLetterResponse { LetterId = "MOCK_RESPONSE_ID"};
+        }
+
     }
-
-
-    public SendLetterResponse SendLetter(string templateId,
-        Dictionary<string, dynamic> personalisation,
-        string clientReference = null)
-    {
-        return new SendLetterResponse { LetterId = "MOCK_RESPONSE_ID"};
-    }
-
 }

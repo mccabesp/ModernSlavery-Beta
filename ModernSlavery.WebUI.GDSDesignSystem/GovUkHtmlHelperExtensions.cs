@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using GovUkDesignSystem.GovUkDesignSystemComponents;
-using GovUkDesignSystem.GovUkDesignSystemComponents.SubComponents;
-using GovUkDesignSystem.HtmlGenerators;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents;
+using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents.SubComponents;
+using ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators;
 
-namespace GovUkDesignSystem
+namespace ModernSlavery.WebUI.GDSDesignSystem
 {
     public static class GovUkHtmlHelperExtensions
     {

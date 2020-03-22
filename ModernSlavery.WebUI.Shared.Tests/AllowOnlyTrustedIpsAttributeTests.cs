@@ -8,15 +8,13 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 using Moq;
-
 using NUnit.Framework;
 
-namespace ModernSlavery.API.Tests.Filters
+namespace ModernSlavery.WebUI.Shared.Tests
 {
     public class AllowOnlyTrustedDomainsAttributeTests
     {

@@ -1,4 +1,4 @@
-﻿namespace ModernSlavery.WebUI.Models.Viewing
+﻿namespace ModernSlavery.WebUI.Models.Viewing.EmployerDetails.BonusPay
 {
     public class BonusDiffTextViewModel
     {

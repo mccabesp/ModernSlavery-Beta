@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using ModernSlavery.Core.Interfaces;
 
-namespace ModernSlavery.Database.Classes
+namespace ModernSlavery.Infrastructure.Database.Classes
 {
     public class SqlRepository : IDataRepository, IDataTransaction
     {

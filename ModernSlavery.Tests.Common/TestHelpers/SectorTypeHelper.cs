@@ -1,7 +1,7 @@
 ﻿using System;
 using Autofac;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Tests.Common.Classes;
 
 namespace ModernSlavery.Tests.Common.TestHelpers

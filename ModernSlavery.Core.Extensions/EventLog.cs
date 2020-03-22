@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     public static class EventLog
     {

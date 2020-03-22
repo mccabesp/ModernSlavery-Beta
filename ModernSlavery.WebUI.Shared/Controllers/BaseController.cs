@@ -4,24 +4,24 @@ using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
-using ModernSlavery.Entities;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using Newtonsoft.Json;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using Extensions = ModernSlavery.Core.Extensions.Extensions;
 
 namespace ModernSlavery.WebUI.Shared.Controllers
 {
@@ -54,7 +54,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         #endregion
 
-        public string UserHostAddress => HttpContext.GetUserHostAddress();
+        public string UserHostAddress => Extensions.GetUserHostAddress(HttpContext);
 
         #region Navigation
         public Uri RequestUrl => HttpContext.GetUri();
@@ -341,7 +341,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             }
             else if (!pageUrl.IsUrl())
             {
-                pageUrl = Extensions.Url.RelativeToAbsoluteUrl(pageUrl, HttpContext.GetUri());
+                pageUrl = Core.Extensions.Url.RelativeToAbsoluteUrl(pageUrl, HttpContext.GetUri());
             }
 
 
@@ -763,12 +763,12 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         public void StashModel<T>(T model)
         {
-            Session[this + ":Model"] = ModernSlavery.Extensions.Json.SerializeObjectDisposed(model);
+            Session[this + ":Model"] = Core.Extensions.Json.SerializeObjectDisposed(model);
         }
 
         public void StashModel<KeyT, ModelT>(KeyT keyController, ModelT model)
         {
-            Session[keyController + ":Model"] = ModernSlavery.Extensions.Json.SerializeObjectDisposed(model);
+            Session[keyController + ":Model"] = Core.Extensions.Json.SerializeObjectDisposed(model);
         }
 
         public void ClearStash()

@@ -2,7 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Middleware
 {

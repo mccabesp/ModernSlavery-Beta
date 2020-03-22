@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
 
 namespace ModernSlavery.Core.Interfaces
 {

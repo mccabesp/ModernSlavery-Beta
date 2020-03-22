@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace ModernSlavery.Infrastructure
+namespace ModernSlavery.Core.Interfaces
 {
     public interface IPostcodeChecker
     {

@@ -7,6 +7,7 @@
     // c# 6 doesnt compile with razor in mvc5 so cant use string templates here :( need to update to MVC 6
     string mailto = string.Join("", "mailto:", emailAdd, "?subject=", emailSubject);
 }
+@using ModernSlavery.Core.SharedKernel.Options
 @using ModernSlavery.WebUI.Classes.Formatters
 @model ModernSlavery.WebUI.Models.Scope.ScopingViewModel
 <div class="grid-row">

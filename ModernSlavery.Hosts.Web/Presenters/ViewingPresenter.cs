@@ -4,14 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.View;
+using ModernSlavery.BusinessLogic.Viewing;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Models.Search;
 
 namespace ModernSlavery.WebUI.Presenters

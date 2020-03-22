@@ -1,7 +1,7 @@
 ﻿using System;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.Entities
+namespace ModernSlavery.Core.Entities
 {
     public class OrganisationReference
     {

@@ -10,13 +10,12 @@ using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.BusinessLogic.Models.Organisation;
 using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.BusinessLogic.Submit;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.BusinessLogic.Submission;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.WebUI.Classes.Options;
 using ModernSlavery.WebUI.Models.Submit;
-using ModernSlavery.WebUI.Options;
 
 namespace ModernSlavery.WebUI.Presenters
 {

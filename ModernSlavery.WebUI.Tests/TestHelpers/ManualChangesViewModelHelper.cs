@@ -1,8 +1,7 @@
 ﻿using ModernSlavery.WebUI.Admin.Models;
 using Moq;
 
-
-namespace ModernSlavery.Tests.TestHelpers
+namespace ModernSlavery.WebUI.Tests.TestHelpers
 {
     public class ManualChangesViewModelHelper
     {

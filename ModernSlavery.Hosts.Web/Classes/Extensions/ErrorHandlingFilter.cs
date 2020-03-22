@@ -1,12 +1,12 @@
-﻿using ModernSlavery.Extensions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
-namespace ModernSlavery.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes.Extensions
 {
     public class ErrorHandlingFilter : ExceptionFilterAttribute
     {

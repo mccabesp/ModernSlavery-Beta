@@ -1,4 +1,4 @@
-﻿namespace ModernSlavery.SharedKernel.Options
+﻿namespace ModernSlavery.Core.SharedKernel.Options
 {
     public interface IOptions
     {

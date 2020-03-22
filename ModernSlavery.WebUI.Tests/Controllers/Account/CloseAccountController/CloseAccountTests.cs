@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
-using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Areas.Account.ViewModels;
-using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.EmailTemplates;
-using Moq;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebUI.Areas.Account.ViewModels.CloseAccount;
+using ModernSlavery.WebUI.Tests.TestHelpers;
+using Moq;
 using NUnit.Framework;
 
-namespace Account.Controllers.CloseAccountController
+namespace ModernSlavery.WebUI.Tests.Controllers.Account.CloseAccountController
 {
 
     public class CloseAccountTests

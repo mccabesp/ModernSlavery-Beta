@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
 using Moq;
 
 namespace ModernSlavery.Tests.Common.TestHelpers

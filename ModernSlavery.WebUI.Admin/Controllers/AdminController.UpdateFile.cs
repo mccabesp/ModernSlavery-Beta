@@ -2,8 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Shared.Controllers;
 
 namespace ModernSlavery.WebUI.Admin.Controllers

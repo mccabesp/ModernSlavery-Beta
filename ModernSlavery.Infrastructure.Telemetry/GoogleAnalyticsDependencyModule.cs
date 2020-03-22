@@ -6,8 +6,8 @@ using System.Text;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel.Options;
 using Polly;
 using Polly.Extensions.Http;
 

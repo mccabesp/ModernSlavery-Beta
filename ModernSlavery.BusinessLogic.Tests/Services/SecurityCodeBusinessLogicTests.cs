@@ -1,7 +1,6 @@
 ﻿using System;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using Moq;
 using NUnit.Framework;
 

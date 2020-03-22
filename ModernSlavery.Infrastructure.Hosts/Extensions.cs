@@ -5,7 +5,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Infrastructure.Configuration;
 using Serilog;
 using Serilog.Core;

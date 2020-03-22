@@ -1,7 +1,7 @@
-using GovUkDesignSystem;
-using GovUkDesignSystem.Attributes.ValidationAttributes;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Models.CompaniesHouse;
-using ModernSlavery.Entities;
+using ModernSlavery.WebUI.GDSDesignSystem;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {

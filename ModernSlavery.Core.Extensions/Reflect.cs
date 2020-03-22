@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     public static class Reflect
     {

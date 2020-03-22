@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     public static class Encryption
     {

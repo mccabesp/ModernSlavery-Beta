@@ -5,7 +5,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.IdentityServer4.Models.Consent;
 using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
@@ -13,8 +12,9 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.IdServer.Models.Consent;
 
-namespace ModernSlavery.IdentityServer4.Controllers
+namespace ModernSlavery.IdServer.Controllers
 {
     /// <summary>
     ///     This controller processes the consent UI

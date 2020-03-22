@@ -1,4 +1,4 @@
-﻿namespace ModernSlavery.SharedKernel.Interfaces
+﻿namespace ModernSlavery.Core.SharedKernel.Interfaces
 {
     public interface IObfuscator
     {

@@ -1,4 +1,4 @@
-﻿@model GovUkDesignSystem.GovUkDesignSystemComponents.TagViewModel
+﻿@model ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents.TagViewModel
 
 <strong class="govuk-tag @(Model.Classes)"
         @(Html.Raw(Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : ""))>

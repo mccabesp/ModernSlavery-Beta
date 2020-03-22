@@ -1,12 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.TestHelpers;
 
-namespace ModernSlavery.WebJob.Tests.TestHelpers
+namespace ModernSlavery.Hosts.Webjob.Tests.TestHelpers
 {
     public static class OrganisationHelper
     {

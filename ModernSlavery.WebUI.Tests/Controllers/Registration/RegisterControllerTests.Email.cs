@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Register;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
 using Moq;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.WebUI.Shared.Controllers;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Services;
@@ -21,20 +21,19 @@ using ModernSlavery.WebUI.Shared.Services;
 namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 {
     [TestFixture]
-    [SetCulture("en-GB")]
     public partial class RegisterControllerTests
     {
 
-        public static UserOrganisation CreateUserOrganisation(Organisation org, long userId, DateTime? pinConfirmedDate)
+        public static UserOrganisation CreateUserOrganisation(Core.Entities.Organisation org, long userId, DateTime? pinConfirmedDate)
         {
             return new UserOrganisation {
                 Organisation = org, UserId = userId, PINConfirmedDate = pinConfirmedDate, Address = new OrganisationAddress()
             };
         }
 
-        public static Organisation createPrivateOrganisation(long organisationId, string organisationName, int companyNumber)
+        public static Core.Entities.Organisation createPrivateOrganisation(long organisationId, string organisationName, int companyNumber)
         {
-            return new Organisation {
+            return new Core.Entities.Organisation {
                 OrganisationId = organisationId,
                 OrganisationName = organisationName,
                 SectorType = SectorTypes.Private,
@@ -43,9 +42,9 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             };
         }
 
-        public static Organisation createPublicOrganisation(long organisationId, string organisationName, int companyNumber)
+        public static Core.Entities.Organisation createPublicOrganisation(long organisationId, string organisationName, int companyNumber)
         {
-            return new Organisation {
+            return new Core.Entities.Organisation {
                 OrganisationId = organisationId,
                 OrganisationName = organisationName,
                 SectorType = SectorTypes.Public,
@@ -72,7 +71,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
         {
             // Arrange
             var organisationId = 100;
-            Organisation organisation = createPrivateOrganisation(organisationId, "Company1", 12345678);
+            Core.Entities.Organisation organisation = createPrivateOrganisation(organisationId, "Company1", 12345678);
             User existingUser1 = CreateUser(1, "user1@test.com");
             User existingUser2 = CreateUser(2, "user2@test.com");
             User newUser = CreateUser(3, "user3@test.com");
@@ -155,7 +154,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
         {
             // Arrange
             var organisationId = 100;
-            Organisation organisation = createPrivateOrganisation(organisationId, "Company1", 12345678);
+            Core.Entities.Organisation organisation = createPrivateOrganisation(organisationId, "Company1", 12345678);
             User existingUser1 = CreateUser(1, "user1@test.com");
             User existingUser2 = CreateUser(2, "user2@test.com");
             User newUser = CreateUser(3, "user3@test.com");
@@ -261,7 +260,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             //1.Arrange the test setup variables
             var user = new User {UserId = 1, EmailAddress = "test@hotmail.com", EmailVerifiedDate = null};
 
-            var organisation = new Organisation {OrganisationId = 1};
+            var organisation = new Core.Entities.Organisation {OrganisationId = 1};
             var userOrganisation = new UserOrganisation {
                 OrganisationId = organisation.OrganisationId,
                 Organisation = organisation,

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using ModernSlavery.BusinessLogic.Models.Compare;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.WebUI.Models
+namespace ModernSlavery.WebUI.Models.Compare
 {
     public class CompareViewModel
     {

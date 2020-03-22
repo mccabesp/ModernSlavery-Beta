@@ -1,10 +1,9 @@
 ﻿using Autofac.Features.AttributeFilters;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Infrastructure;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
 
-namespace ModernSlavery.BusinessLogic.Register
+namespace ModernSlavery.BusinessLogic.Registration
 {
     public interface IRegistrationService
     {

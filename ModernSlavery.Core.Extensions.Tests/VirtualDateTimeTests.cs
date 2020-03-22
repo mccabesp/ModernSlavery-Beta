@@ -2,7 +2,7 @@ using System;
 using ModernSlavery.Tests.Common.Classes;
 using NUnit.Framework;
 
-namespace ModernSlavery.Extensions.Tests
+namespace ModernSlavery.Core.Extensions.Tests
 {
     [TestFixture]
     public class VirtualDateTimeTests

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reflection;
-using GovUkDesignSystem.Helpers;
+using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
 
-namespace GovUkDesignSystem.Attributes
+namespace ModernSlavery.WebUI.GDSDesignSystem.Attributes
 {
     /// <summary>
     ///     Label text for Radio buttons and Checkboxes

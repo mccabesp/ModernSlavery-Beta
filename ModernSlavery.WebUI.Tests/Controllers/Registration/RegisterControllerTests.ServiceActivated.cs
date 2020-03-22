@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Register;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
 using NUnit.Framework;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.Entities.Enums;
 using ModernSlavery.Tests.Common.TestHelpers;
 
 namespace ModernSlavery.WebUI.Tests.Controllers.Registration
@@ -27,7 +26,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             //ARRANGE:
             //create a user who does exist in the db
             var user = new User {UserId = 1, EmailAddress = "test@hotmail.com", EmailVerifiedDate = VirtualDateTime.Now};
-            var org = new Organisation {OrganisationId = 1, SectorType = SectorTypes.Private, Status = OrganisationStatuses.Pending};
+            var org = new Core.Entities.Organisation {OrganisationId = 1, SectorType = SectorTypes.Private, Status = OrganisationStatuses.Pending};
 
             //TODO: Refactoring to user the same Helpers (ie AddScopeStatus.AddScopeStatus)
             org.OrganisationScopes.Add(
@@ -85,7 +84,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             mockRouteData.Values.Add("Action", "ServiceActivated");
             mockRouteData.Values.Add("Controller", "Register");
 
-            var mockOrg = new Organisation {
+            var mockOrg = new Core.Entities.Organisation {
                 OrganisationId = 52425, SectorType = SectorTypes.Private, OrganisationName = "Mock Organisation Ltd"
             };
 

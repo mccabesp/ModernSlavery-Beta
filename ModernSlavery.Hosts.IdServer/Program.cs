@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using ModernSlavery.Extensions;
 using Microsoft.Extensions.Hosting;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Infrastructure.Hosts.WebHost;
 
-namespace ModernSlavery.IdentityServer4
+namespace ModernSlavery.IdServer
 {
     public class Program
     {

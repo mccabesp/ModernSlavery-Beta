@@ -2,28 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MockQueryable.Moq;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.Mocks;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.Tests.TestHelpers;
 using ModernSlavery.WebUI.Models.Scope;
-using ModernSlavery.WebUI.Tests.TestHelpers;
-using MockQueryable.Moq;
-using Moq;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
-using NUnit.Framework;
-using ModernSlavery.WebUI.Shared.Models;
-using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Tests.TestHelpers;
+using Moq;
+using NUnit.Framework;
 
-namespace ModernSlavery.Tests
+namespace ModernSlavery.WebUI.Tests.Presentation
 {
 
     [TestFixture(Category = "Presentation")]

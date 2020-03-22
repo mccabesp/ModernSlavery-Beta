@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Extensions;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.EmailTemplates;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Infrastructure.Messaging;
 
-namespace ModernSlavery.WebJob
+namespace ModernSlavery.Hosts.Webjob.Classes
 {
     public interface IMessenger
     {

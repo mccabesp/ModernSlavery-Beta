@@ -1,12 +1,12 @@
 ﻿using System;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Admin.Models;
-using GovUkDesignSystem.Parsers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {

@@ -3,10 +3,10 @@ using System.IO;
 using System.Linq;
 using CsvHelper;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {

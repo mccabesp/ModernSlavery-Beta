@@ -1,6 +1,14 @@
 ﻿@inject IOptionsSnapshot<ViewingOptions> ViewingOptions
-@inject ModernSlavery.SharedKernel.Interfaces.ISnapshotDateHelper SnapshotDateHelper
-@model EmployerDetailsViewModel
+@inject ISnapshotDateHelper SnapshotDateHelper
+@using ModernSlavery.Core.Entities
+@using ModernSlavery.Core.Extensions
+@using ModernSlavery.Core.SharedKernel
+@using ModernSlavery.Core.SharedKernel.Interfaces
+@using ModernSlavery.WebUI.Classes.Options
+@using ModernSlavery.WebUI.Models.Viewing
+@using ModernSlavery.WebUI.Models.Viewing.EmployerDetails
+@using ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
+@model ModernSlavery.WebUI.Models.Viewing.EmployerDetails.EmployerDetailsViewModel
 @{
     //Required for variables in Sitemap taghelpers
     ViewBag.EmployerName = Model.Organisation.OrganisationName;

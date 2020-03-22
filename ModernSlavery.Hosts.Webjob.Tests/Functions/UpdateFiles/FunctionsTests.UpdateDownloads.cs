@@ -4,18 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Hosts.Webjob.Tests.TestHelpers;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebJob.Tests.TestHelpers;
 using Moq;
 using NUnit.Framework;
-using OrganisationHelper = ModernSlavery.WebJob.Tests.TestHelpers.OrganisationHelper;
+using OrganisationHelper = ModernSlavery.Hosts.Webjob.Tests.TestHelpers.OrganisationHelper;
 
-namespace ModernSlavery.WebJob.Tests.Functions
+namespace ModernSlavery.Hosts.Webjob.Tests.Functions.UpdateFiles
 {
     [TestFixture]
     [SetCulture("en-GB")]
@@ -32,7 +31,7 @@ namespace ModernSlavery.WebJob.Tests.Functions
             _functions = WebJobTestHelper.SetUp(orgs, returns);
         }
 
-        private WebJob.Functions _functions;
+        private Jobs.Functions _functions;
 
         [Test]
         [Description("Check download file populated OK")]

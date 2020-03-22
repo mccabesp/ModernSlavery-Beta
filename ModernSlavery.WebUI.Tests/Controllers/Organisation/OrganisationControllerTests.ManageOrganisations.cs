@@ -1,15 +1,13 @@
-﻿using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.Tests.TestHelpers;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Tests.TestHelpers;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
-using ModernSlavery.Entities.Enums;
 
-namespace ModernSlavery.WebUI.Tests.Controllers
+namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
 {
 
     public partial class OrganisationControllerTests
@@ -23,9 +21,9 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             User mockUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             mockUser.UserSettings = new[] {new UserSetting(UserSettingKeys.AcceptedPrivacyStatement, VirtualDateTime.Now.ToString())};
 
-            Organisation mockOrg = OrganisationHelper.GetPublicOrganisation();
-            Organisation mockOrg2 = OrganisationHelper.GetPublicOrganisation();
-            Organisation mockOrg3 = OrganisationHelper.GetPublicOrganisation();
+            Core.Entities.Organisation mockOrg = OrganisationHelper.GetPublicOrganisation();
+            Core.Entities.Organisation mockOrg2 = OrganisationHelper.GetPublicOrganisation();
+            Core.Entities.Organisation mockOrg3 = OrganisationHelper.GetPublicOrganisation();
 
             UserOrganisation mockUserOrg1 = UserOrganisationHelper.LinkUserWithOrganisation(mockUser, mockOrg);
             UserOrganisation mockUserOrg2 = UserOrganisationHelper.LinkUserWithOrganisation(mockUser, mockOrg2);

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using ModernSlavery.Extensions;
 using Microsoft.Extensions.Configuration;
+using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.WebJob
+namespace ModernSlavery.Hosts.Webjob
 {
     //Allows disabling of named webjob methods in DisabledWebjobs section of appsettings.json
     //This only applies to timed-functions

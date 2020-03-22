@@ -1,13 +1,12 @@
 ﻿using System.Linq;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Tests.Common.Classes;
 using MockQueryable.Moq;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Tests.Common.Classes;
 using Moq;
-
 using NUnit.Framework;
 
-namespace ModernSlavery.Tests
+namespace ModernSlavery.WebUI.Tests
 {
     [TestFixture]
     [SetCulture("en-GB")]

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using GovUkDesignSystem.Attributes.ValidationAttributes;
-using GovUkDesignSystem.GovUkDesignSystemComponents;
-using GovUkDesignSystem.Helpers;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
+using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents;
+using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
 
-namespace GovUkDesignSystem.HtmlGenerators
+namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 {
     internal static class CharacterCountHtmlGenerator
     {

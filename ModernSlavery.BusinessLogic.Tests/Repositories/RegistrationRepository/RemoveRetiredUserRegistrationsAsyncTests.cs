@@ -1,16 +1,15 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Register;
+using ModernSlavery.BusinessLogic.Registration;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database.Classes;
-using ModernSlavery.Entities;
-using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Tests.TestHelpers;
+using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
 using NUnit.Framework;
 
-namespace Repositories.UserRepository
+namespace ModernSlavery.BusinessLogic.Tests.Repositories.RegistrationRepository
 {
     [TestFixture]
     [SetCulture("en-GB")]

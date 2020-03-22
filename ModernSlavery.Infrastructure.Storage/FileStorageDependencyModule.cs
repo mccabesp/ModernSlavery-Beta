@@ -3,8 +3,8 @@ using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;
-using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Storage
 {

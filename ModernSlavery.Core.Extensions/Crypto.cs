@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     public static class Crypto
     {

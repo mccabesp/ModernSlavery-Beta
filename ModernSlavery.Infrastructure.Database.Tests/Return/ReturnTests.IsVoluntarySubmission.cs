@@ -1,10 +1,10 @@
-﻿using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
+﻿using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.TestHelpers;
 using NUnit.Framework;
 
-namespace ModernSlavery.Database.ReturnTests
+namespace ModernSlavery.Infrastructure.Database.Tests.Return
 {
     [TestFixture]
     public class IsVoluntarySubmissionTests
@@ -33,7 +33,7 @@ namespace ModernSlavery.Database.ReturnTests
             var actual = testReturn.IsVoluntarySubmission();
 
             // Assert
-            Assert.IsTrue(actual);
+            Assert.IsTrue((bool) actual);
         }
 
         [TestCase(SectorTypes.Private, 0, ScopeStatuses.InScope)]
@@ -97,7 +97,7 @@ namespace ModernSlavery.Database.ReturnTests
             var actual = testReturn.IsVoluntarySubmission();
 
             // Assert
-            Assert.IsFalse(actual);
+            Assert.IsFalse((bool) actual);
         }
     }
 }

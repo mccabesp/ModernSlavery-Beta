@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.Entities
+namespace ModernSlavery.Core.Entities
 {
     public partial class User
     {

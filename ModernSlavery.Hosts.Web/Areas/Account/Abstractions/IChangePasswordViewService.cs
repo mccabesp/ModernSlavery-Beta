@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using ModernSlavery.Entities;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Areas.Account.Abstractions
 {

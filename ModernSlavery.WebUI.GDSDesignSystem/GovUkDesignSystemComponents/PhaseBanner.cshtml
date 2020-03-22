@@ -1,5 +1,5 @@
-﻿@using GovUkDesignSystem.GovUkDesignSystemComponents
-@model GovUkDesignSystem.GovUkDesignSystemComponents.PhaseBannerViewModel
+﻿@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
+@model ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents.PhaseBannerViewModel
 
 <div class="govuk-phase-banner @(Model.Classes)"
      @(Html.Raw(Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : ""))>

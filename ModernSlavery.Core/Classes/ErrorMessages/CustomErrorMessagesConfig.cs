@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Classes.ErrorMessages
 {

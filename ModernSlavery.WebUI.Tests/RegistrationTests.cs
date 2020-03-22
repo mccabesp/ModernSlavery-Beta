@@ -2,28 +2,25 @@
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
-using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Register;
-using ModernSlavery.WebUI.Tests;
-using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Moq;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.WebUI.Shared.Classes;
-using NUnit.Framework;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebUI.Controllers;
+using ModernSlavery.WebUI.Models.Register;
+using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Tests.TestHelpers;
+using Moq;
+using NUnit.Framework;
 
-namespace ModernSlavery.Tests
+namespace ModernSlavery.WebUI.Tests
 {
     [TestFixture]
     [SetCulture("en-GB")]

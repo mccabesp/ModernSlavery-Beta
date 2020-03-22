@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Extensions;
 
 namespace ModernSlavery.WebUI.Shared.Models
 {

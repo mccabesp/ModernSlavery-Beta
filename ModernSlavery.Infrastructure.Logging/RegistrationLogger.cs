@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models.LogModels;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Logging
 {

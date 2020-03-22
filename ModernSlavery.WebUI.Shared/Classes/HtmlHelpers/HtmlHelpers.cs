@@ -8,19 +8,18 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel.Options;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using CompareAttribute = System.ComponentModel.DataAnnotations.CompareAttribute;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
 {
     public static class HtmlHelpers
     {

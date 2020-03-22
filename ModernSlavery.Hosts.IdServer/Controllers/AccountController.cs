@@ -10,8 +10,6 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
-using ModernSlavery.Extensions;
-using ModernSlavery.IdentityServer4.Models.Account;
 using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Events;
@@ -25,14 +23,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Models.Account;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.IdentityServer4.Classes;
+using ModernSlavery.IdServer.Models.Account;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
-namespace ModernSlavery.IdentityServer4.Controllers
+namespace ModernSlavery.IdServer.Controllers
 {
     /// <summary>
     ///     This sample controller implements a typical login/logout/provision workflow for local and external accounts.
@@ -167,7 +165,7 @@ namespace ModernSlavery.IdentityServer4.Controllers
                             new UserLoginFailureEvent(model.Username, AccountOptions.TooManySigninAttemptsErrorMessage));
                         ModelState.AddModelError(
                             "",
-                            $"{AccountOptions.TooManySigninAttemptsErrorMessage}<br/>Please try again in {user.LockRemaining.ToFriendly(maxParts: 2)}.");
+                            $"{AccountOptions.TooManySigninAttemptsErrorMessage}<br/>Please try again in {DateTimeRoutines.ToFriendly(user.LockRemaining, maxParts: 2)}.");
                     }
                     else if (await _userRepository.CheckPasswordAsync(user, model.Password) == false)
                     {

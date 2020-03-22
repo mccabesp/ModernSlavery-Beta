@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.Entities;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Tests.Common.TestHelpers;
 using NUnit.Framework;
 
-namespace ModernSlavery.Database.Tests
+namespace ModernSlavery.Infrastructure.Database.Tests
 {
     [TestFixture]
     public class OrganisationTests
@@ -29,7 +29,7 @@ namespace ModernSlavery.Database.Tests
         {
             // Arrange - Act
             var returnedDates = _testOrganisation.GetRecentReportingYears(countOfYears);
-            var actualCountOfReturnedDates = returnedDates.Count();
+            var actualCountOfReturnedDates = Enumerable.Count<int>(returnedDates);
 
             // Assert
             Assert.AreEqual(expected, actualCountOfReturnedDates);
@@ -41,7 +41,7 @@ namespace ModernSlavery.Database.Tests
         {
             // Arrange - Act
             var returnsAvailableInPreviousYears = _testOrganisation.GetRecentReports(countOfYears);
-            var actualCount = returnsAvailableInPreviousYears.Count();
+            var actualCount = Enumerable.Count<Core.Entities.Return>(returnsAvailableInPreviousYears);
 
             // Assert
             Assert.AreEqual(expected, actualCount);
@@ -53,13 +53,13 @@ namespace ModernSlavery.Database.Tests
             // todo: the logic under test here should be changed, since it's not correct that a 'new return' - filled with zeroes!! - is created if the system doesn't find one a return on the database for a particular year.
 
             // Arrange
-            _testOrganisation.Returns = new List<Return>(); // remove returns
+            _testOrganisation.Returns = new List<Core.Entities.Return>(); // remove returns
 
             // Act
             var returnsAvailableForTheLastTwoYears = _testOrganisation.GetRecentReports(2);
-            var actualCount = returnsAvailableForTheLastTwoYears.Count();
-            var returnForCurrentYear = returnsAvailableForTheLastTwoYears.ElementAt(0);
-            var returnForPreviousYear = returnsAvailableForTheLastTwoYears.ElementAt(1);
+            var actualCount = Enumerable.Count<Core.Entities.Return>(returnsAvailableForTheLastTwoYears);
+            var returnForCurrentYear = Enumerable.ElementAt<Core.Entities.Return>(returnsAvailableForTheLastTwoYears, 0);
+            var returnForPreviousYear = Enumerable.ElementAt<Core.Entities.Return>(returnsAvailableForTheLastTwoYears, 1);
 
             // Assert
             Assert.AreEqual(2, actualCount);

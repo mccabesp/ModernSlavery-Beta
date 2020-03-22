@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 using NUnit.Framework;
 
 namespace ModernSlavery.Tests.Common.Classes

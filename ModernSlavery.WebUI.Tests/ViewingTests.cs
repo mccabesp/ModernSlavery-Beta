@@ -1,15 +1,15 @@
 ﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Search;
-using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.WebUI.Controllers;
+using ModernSlavery.WebUI.Models.Search;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using NUnit.Framework;
 
-namespace ModernSlavery.Tests
+namespace ModernSlavery.WebUI.Tests
 {
     [TestFixture]
     [SetCulture("en-GB")]

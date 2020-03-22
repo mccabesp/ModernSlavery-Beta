@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Models.Search;

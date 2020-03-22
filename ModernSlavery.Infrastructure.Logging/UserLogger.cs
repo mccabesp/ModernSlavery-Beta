@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Options;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.Infrastructure.Logging

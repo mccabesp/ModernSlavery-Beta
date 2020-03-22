@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using ModernSlavery.Entities;
-using GovUkDesignSystem;
-using GovUkDesignSystem.Attributes;
-using GovUkDesignSystem.Attributes.ValidationAttributes;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.WebUI.GDSDesignSystem;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {

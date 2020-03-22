@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions;
 
 namespace ModernSlavery.WebUI.Models.Search
 {

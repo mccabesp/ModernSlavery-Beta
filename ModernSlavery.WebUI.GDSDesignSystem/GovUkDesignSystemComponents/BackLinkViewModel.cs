@@ -1,7 +1,7 @@
 ﻿using System;
-using GovUkDesignSystem.GovUkDesignSystemComponents.SubComponents;
+using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents.SubComponents;
 
-namespace GovUkDesignSystem.GovUkDesignSystemComponents
+namespace ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
 {
     public class BackLinkViewModel : IHtmlText
     {

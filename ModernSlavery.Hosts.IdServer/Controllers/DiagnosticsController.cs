@@ -4,12 +4,12 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.IdentityServer4.Models.Diagnostics;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.IdServer.Models.Diagnostics;
 
-namespace ModernSlavery.IdentityServer4.Controllers
+namespace ModernSlavery.IdServer.Controllers
 {
     [Authorize]
     public class DiagnosticsController : Controller

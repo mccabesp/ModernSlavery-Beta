@@ -1,4 +1,5 @@
-﻿@if (!Context.GetUri().PathAndQuery.EqualsI(Url.Action("SendFeedbackGet", "Feedback"), Url.Action("ServiceUnavailable", "Error")))
+﻿@using ModernSlavery.Core.Extensions
+@if (!Context.GetUri().PathAndQuery.EqualsI(Url.Action("SendFeedbackGet", "Feedback"), Url.Action("ServiceUnavailable", "Error")))
 {
     <p>
         <strong class="phase-tag">DISCOVERY</strong>

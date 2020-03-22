@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
-namespace ModernSlavery.WebUI.Models
+namespace ModernSlavery.WebUI.Models.Viewing
 {
 
     [Serializable]

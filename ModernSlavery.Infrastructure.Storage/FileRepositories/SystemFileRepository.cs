@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.Infrastructure.Storage.FileRepositories

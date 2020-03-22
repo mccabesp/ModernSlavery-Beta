@@ -2,8 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using ModernSlavery.WebUI.Areas.Account.Resources;
 using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
-namespace ModernSlavery.WebUI.Areas.Account.ViewModels
+namespace ModernSlavery.WebUI.Areas.Account.ViewModels.CloseAccount
 {
 
     [Serializable]

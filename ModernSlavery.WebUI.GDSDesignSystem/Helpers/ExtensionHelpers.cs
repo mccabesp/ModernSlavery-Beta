@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Extensions.Primitives;
 
-namespace GovUkDesignSystem.Helpers
+namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
 {
     public static class ExtensionHelpers
     {

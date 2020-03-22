@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions;
-using ModernSlavery.Entities;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Options;
 
-namespace ModernSlavery.BusinessLogic.Classes
+namespace ModernSlavery.WebUI.Registration.Classes
 {
     public class PublicSectorRepository : IPagedRepository<EmployerRecord>
     {

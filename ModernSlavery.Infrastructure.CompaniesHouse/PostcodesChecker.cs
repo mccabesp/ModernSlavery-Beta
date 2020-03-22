@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ModernSlavery.Core.Interfaces;
 using Newtonsoft.Json;
 
-namespace ModernSlavery.Infrastructure
+namespace ModernSlavery.Infrastructure.CompaniesHouse
 {
     public class PostcodesChecker : IPostcodeChecker
     {

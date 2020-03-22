@@ -1,4 +1,4 @@
-﻿namespace GovUkDesignSystem.GovUkDesignSystemComponents
+﻿namespace ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
 {
     public class CheckboxesViewModel : ItemSetViewModel
     {

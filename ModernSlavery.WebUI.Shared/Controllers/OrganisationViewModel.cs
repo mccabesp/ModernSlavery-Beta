@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
-namespace ModernSlavery.WebUI.Shared.Models
+namespace ModernSlavery.WebUI.Shared.Controllers
 {
     [Serializable]
     public class OrganisationViewModel

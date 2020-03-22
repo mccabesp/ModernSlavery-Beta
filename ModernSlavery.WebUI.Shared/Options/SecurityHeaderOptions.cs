@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Shared.Options
 {

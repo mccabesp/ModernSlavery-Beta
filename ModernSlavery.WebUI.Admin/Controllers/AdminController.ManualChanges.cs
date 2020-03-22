@@ -8,16 +8,16 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.Core.SharedKernel;
 using Newtonsoft.Json;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
@@ -861,7 +861,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 string prevSicCodes = org.GetSicCodeIdsString();
 
                 // remove all existing sic codes
-                org.GetSicCodes().ForEach(ent => ent.Retired = VirtualDateTime.Now);
+                Lists.ForEach<OrganisationSicCode>(org.GetSicCodes(), ent => ent.Retired = VirtualDateTime.Now);
 
                 // set new sic codes
                 parsedSicCodes.ForEach(

@@ -3,7 +3,7 @@ using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Messaging
 {

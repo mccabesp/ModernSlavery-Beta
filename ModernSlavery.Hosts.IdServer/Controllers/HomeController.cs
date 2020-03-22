@@ -3,17 +3,17 @@
 
 
 using System.Threading.Tasks;
-using ModernSlavery.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
-namespace ModernSlavery.IdentityServer4.Controllers
+namespace ModernSlavery.IdServer.Controllers
 {
     [Route("Home")]
     public class HomeController : BaseController

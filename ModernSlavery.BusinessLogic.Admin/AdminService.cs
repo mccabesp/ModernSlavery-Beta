@@ -1,7 +1,7 @@
 ﻿using Autofac.Features.AttributeFilters;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.BusinessLogic.Admin
 {

@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Models
 {
@@ -59,7 +59,7 @@ namespace ModernSlavery.Core.Models
                 FemaleTopQuartile = @return.FemaleUpperQuartilePayBand,
                 CompanyLinkToGPGInfo = @return.CompanyLinkToGPGInfo,
                 ResponsiblePerson = @return.ResponsiblePerson,
-                EmployerSize = @return.OrganisationSize.GetAttribute<DisplayAttribute>().Name,
+                EmployerSize = Attributes.GetAttribute<DisplayAttribute>((Enum) @return.OrganisationSize).Name,
                 CurrentName = @return.Organisation?.OrganisationName,
                 SubmittedAfterTheDeadline = @return.IsLateSubmission,
                 DueDate = @return.AccountingDate.AddYears(1),

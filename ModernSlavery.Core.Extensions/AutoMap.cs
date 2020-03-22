@@ -3,7 +3,7 @@ using System.Linq;
 using AutoMapper;
 using KellermanSoftware.CompareNetObjects;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     public static class AutoMap
     {

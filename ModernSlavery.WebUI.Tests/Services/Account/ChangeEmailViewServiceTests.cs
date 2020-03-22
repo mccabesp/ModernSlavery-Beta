@@ -1,17 +1,16 @@
 ﻿using System.Threading.Tasks;
-using ModernSlavery.Entities;
-using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Areas.Account.Abstractions;
-using ModernSlavery.WebUI.Areas.Account.ViewServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
-using Moq;
-using ModernSlavery.Entities.Enums;
 using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.WebUI.Areas.Account.Abstractions;
+using ModernSlavery.WebUI.Areas.Account.ViewServices;
+using ModernSlavery.WebUI.Tests.TestHelpers;
+using Moq;
 using NUnit.Framework;
 
-namespace Account.ViewServices
+namespace ModernSlavery.WebUI.Tests.Services.Account
 {
 
     [TestFixture]

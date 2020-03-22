@@ -1,11 +1,10 @@
 ﻿using System;
-using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
 using NUnit.Framework;
 
-namespace ModernSlavery.Core.Tests.LogRecordLogger
+namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
 {
     [TestFixture]
     public class ConstrutorTests

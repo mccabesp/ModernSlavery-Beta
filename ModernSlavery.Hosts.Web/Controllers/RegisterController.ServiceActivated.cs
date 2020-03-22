@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Models.Register;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Controllers
 {

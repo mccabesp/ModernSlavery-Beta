@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Submit;
+using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.BusinessLogic.Submission;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
-namespace ModernSlavery.WebUI.Controllers.Submission
+namespace ModernSlavery.WebUI.Controllers
 {
     [Authorize]
     [Route("Submit")]

@@ -10,12 +10,11 @@ using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Compare;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessLogic
 {

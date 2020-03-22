@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.Controllers;
 using ModernSlavery.WebUI.Areas.Account.Resources;
@@ -9,10 +8,12 @@ using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessLogic.Models.Account;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel.Options;
+using ModernSlavery.WebUI.Areas.Account.ViewModels.ChangeEmail;
+using ModernSlavery.WebUI.Classes.Extensions;
 
 namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 {

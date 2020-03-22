@@ -4,10 +4,9 @@ using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Storage
 {

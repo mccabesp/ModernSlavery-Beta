@@ -6,7 +6,7 @@ using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
-namespace ModernSlavery.Core.Tests.LogRecordLogger
+namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
 {
     [TestFixture]
     public class WriteAsyncTests

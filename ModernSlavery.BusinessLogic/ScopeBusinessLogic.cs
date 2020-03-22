@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.FileModels;
 using ModernSlavery.BusinessLogic.Models.Scope;
 using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.BusinessLogic
 {

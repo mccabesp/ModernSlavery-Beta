@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
-using ModernSlavery.Entities;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.SharedKernel;
 
-namespace ModernSlavery.WebUI.Admin
+namespace ModernSlavery.WebUI.Admin.Classes
 {
     public static class DataMigrations
     {

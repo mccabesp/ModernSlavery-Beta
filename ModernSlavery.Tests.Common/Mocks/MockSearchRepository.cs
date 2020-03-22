@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.Tests.Common.Mocks
 {

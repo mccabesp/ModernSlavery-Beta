@@ -1,11 +1,11 @@
-﻿using ModernSlavery.Core.Classes;
+﻿using ModernSlavery.WebUI.Classes;
 
-namespace ModernSlavery.WebUI.Models
+namespace ModernSlavery.WebUI.Models.Viewing.EmployerDetails
 {
     public class EmployerDetailsViewModel
     {
 
-        public Entities.Organisation Organisation { get; set; }
+        public Core.Entities.Organisation Organisation { get; set; }
 
         public string LastSearchUrl { get; set; }
 

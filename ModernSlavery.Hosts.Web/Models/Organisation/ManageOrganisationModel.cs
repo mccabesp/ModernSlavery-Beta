@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ModernSlavery.BusinessLogic.Models.Organisation;
-using ModernSlavery.Entities;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Models.Organisation
 {
@@ -17,7 +17,7 @@ namespace ModernSlavery.WebUI.Models.Organisation
 
         public string EncCurrentOrgId { get; set; }
 
-        public Entities.Organisation Organisation => CurrentUserOrg.Organisation;
+        public Core.Entities.Organisation Organisation => CurrentUserOrg.Organisation;
 
     }
 

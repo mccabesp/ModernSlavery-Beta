@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using IdentityModel;
 using IdentityServer4.Validation;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
 
-namespace ModernSlavery.IdentityServer4.Classes
+namespace ModernSlavery.IdServer.Classes
 {
     public class CustomResourceOwnerPasswordValidator : IResourceOwnerPasswordValidator
     {

@@ -4,10 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
 using ModernSlavery.WebUI.Models.Register;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -16,7 +12,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Controllers
@@ -1315,7 +1315,7 @@ namespace ModernSlavery.WebUI.Controllers
             catch (Exception ex)
             {
                 //This line is to help diagnose object reference not found exception raised at this point 
-                Logger.LogWarning(ex, Extensions.Json.SerializeObjectDisposed(m));
+                Logger.LogWarning(ex, Core.Extensions.Json.SerializeObjectDisposed(m));
                 throw;
             }
 
@@ -1722,7 +1722,7 @@ namespace ModernSlavery.WebUI.Controllers
             //This line is to help diagnose object reference not found exception raised at this point 
             if (address == null)
             {
-                Logger.LogDebug("Address should not be null", Extensions.Json.SerializeObjectDisposed(model));
+                Logger.LogDebug("Address should not be null", Core.Extensions.Json.SerializeObjectDisposed(model));
             }
 
             #endregion
@@ -1743,7 +1743,7 @@ namespace ModernSlavery.WebUI.Controllers
             //This line is to help diagnose object reference not found exception raised at this point 
             if (address == null)
             {
-                Logger.LogWarning("Address should not be null", Extensions.Json.SerializeObjectDisposed(model));
+                Logger.LogWarning("Address should not be null", Core.Extensions.Json.SerializeObjectDisposed(model));
             }
 
             userOrg.Address = address;
@@ -1847,7 +1847,7 @@ namespace ModernSlavery.WebUI.Controllers
                     {
                         CommonBusinessLogic.DataRepository.RollbackTransaction();
                         sendRequest = false;
-                        Logger.LogWarning(ex, Extensions.Json.SerializeObjectDisposed(model));
+                        Logger.LogWarning(ex, Core.Extensions.Json.SerializeObjectDisposed(model));
                         throw;
                     }
                 });

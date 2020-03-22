@@ -1,25 +1,25 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Controllers.Submission;
-using ModernSlavery.WebUI.Tests.TestHelpers;
+using Autofac;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using NUnit.Framework;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.Tests.Common.TestHelpers;
-using Autofac;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Submit;
+using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.BusinessLogic.Submission;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;
 using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
+using NUnit.Framework;
 
-namespace ModernSlavery.WebUI.Tests.Controllers
+namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 {
 
     public partial class SubmitControllerTests
@@ -31,7 +31,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
         {
             // Arrange
             var user = new User {UserId = 1, EmailAddress = "magnuski@hotmail.com", EmailVerifiedDate = VirtualDateTime.Now};
-            var organisation = new Organisation {OrganisationId = 1, SectorType = SectorTypes.Public};
+            var organisation = new Core.Entities.Organisation {OrganisationId = 1, SectorType = SectorTypes.Public};
             var userOrganisation = new UserOrganisation {
                 OrganisationId = organisation.OrganisationId,
                 Organisation = organisation,

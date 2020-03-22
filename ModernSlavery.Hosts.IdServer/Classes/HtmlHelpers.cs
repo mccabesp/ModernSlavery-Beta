@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Classes.HtmlHelpers;
 
-namespace ModernSlavery.IdentityServer4.Classes
+namespace ModernSlavery.IdServer.Classes
 {
     public static class HtmlHelpers
     {

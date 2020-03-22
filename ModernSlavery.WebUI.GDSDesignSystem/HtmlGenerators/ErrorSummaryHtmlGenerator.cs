@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GovUkDesignSystem.GovUkDesignSystemComponents;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents;
 
-namespace GovUkDesignSystem.HtmlGenerators
+namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 {
     public static class ErrorSummaryHtmlGenerator
     {

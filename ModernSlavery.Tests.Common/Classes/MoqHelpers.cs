@@ -3,12 +3,12 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Submit;
+using ModernSlavery.BusinessLogic.Submission;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 using Moq;
 
 namespace ModernSlavery.Tests.Common.Classes

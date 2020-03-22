@@ -1,6 +1,6 @@
-﻿using ModernSlavery.SharedKernel.Options;
+﻿using ModernSlavery.Core.SharedKernel.Options;
 
-namespace ModernSlavery.WebUI.Options
+namespace ModernSlavery.WebUI.Classes.Options
 {
     [Options("Web:Submission")]
     public class SubmissionOptions:IOptions

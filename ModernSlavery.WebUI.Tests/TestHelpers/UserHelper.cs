@@ -1,11 +1,9 @@
 ﻿using System;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using Moq;
-using ModernSlavery.Entities.Enums;
 
-
-namespace ModernSlavery.Tests.TestHelpers
+namespace ModernSlavery.WebUI.Tests.TestHelpers
 {
     public static class UserHelper
     {

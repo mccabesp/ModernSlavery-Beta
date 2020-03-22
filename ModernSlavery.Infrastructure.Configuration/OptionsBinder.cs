@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Configuration
 {

@@ -2,7 +2,7 @@ using System;
 using ModernSlavery.Tests.Common.Classes;
 using NUnit.Framework;
 
-namespace Tests
+namespace ModernSlavery.WebUI.Shared.Tests
 {
     [TestFixture]
     public class ConfigTests

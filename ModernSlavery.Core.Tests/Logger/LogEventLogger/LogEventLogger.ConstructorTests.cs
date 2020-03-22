@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
-namespace ModernSlavery.Core.Tests.LogEventLoggerProvider
+namespace ModernSlavery.Core.Tests.Logger.LogEventLogger
 {
     [TestFixture]
     public class ConstructorTests

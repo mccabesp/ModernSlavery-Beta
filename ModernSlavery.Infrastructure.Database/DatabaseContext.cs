@@ -7,10 +7,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using ModernSlavery.Entities;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Entities.Views;
+using ModernSlavery.Core.SharedKernel.Options;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Infrastructure.Database
 {
     public partial class DatabaseContext : DbContext, IDbContext
     {

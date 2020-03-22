@@ -1,9 +1,9 @@
 ﻿using System;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using NUnit.Framework;
 
-namespace ModernSlavery.Database.Tests
+namespace ModernSlavery.Infrastructure.Database.Tests
 {
     [TestFixture]
     public class DatabaseConfigurationTests

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using ModernSlavery.Extensions;
 using IdentityServer4;
 using IdentityServer4.Models;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel.Options;
 
-namespace ModernSlavery.IdentityServer4.Classes
+namespace ModernSlavery.IdServer.Classes
 {
     public interface IClients
     {

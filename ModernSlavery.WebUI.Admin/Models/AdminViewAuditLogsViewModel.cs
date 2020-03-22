@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using ModernSlavery.Entities;
-using GovUkDesignSystem;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.WebUI.GDSDesignSystem;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {

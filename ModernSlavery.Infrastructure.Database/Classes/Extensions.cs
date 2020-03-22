@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using Autofac;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.Database.Classes
+namespace ModernSlavery.Infrastructure.Database.Classes
 {
     public static class Extensions
     {

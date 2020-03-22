@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using GovUkDesignSystem.Helpers;
 using Microsoft.AspNetCore.Http;
+using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
 
-namespace GovUkDesignSystem.Parsers
+namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
 {
     public static class GovUkRequestParser
     {

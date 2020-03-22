@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 using Notify.Authentication;
 using NUnit.Framework;
 
-namespace ModernSlavery.Core.Tests.Email.GovNotifyEmailProvider
+namespace ModernSlavery.Core.Tests.Classes.Email.GovNotifyEmailProvider
 {
     [TestFixture]
     [SetCulture("en-GB")]

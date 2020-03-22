@@ -1,4 +1,5 @@
-﻿@model ModernSlavery.WebUI.Models.Search.SearchViewModel
+﻿@using ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
+@model ModernSlavery.WebUI.Models.Search.SearchViewModel
 @{
     bool showPrev = Model.Employers.CurrentPage > 1;
     bool showNext = Model.Employers.CurrentPage < Model.Employers.PageCount;

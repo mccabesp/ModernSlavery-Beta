@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace GovUkDesignSystem.Helpers
+namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
 {
     internal static class ExpressionHelpers
     {

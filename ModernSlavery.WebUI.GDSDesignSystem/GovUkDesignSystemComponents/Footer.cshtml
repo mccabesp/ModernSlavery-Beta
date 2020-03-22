@@ -1,5 +1,5 @@
-﻿@using GovUkDesignSystem.GovUkDesignSystemComponents
-@model GovUkDesignSystem.GovUkDesignSystemComponents.FooterViewModel
+﻿@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
+@model ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents.FooterViewModel
 
 <footer class="govuk-footer @(Model.Classes)" role="contentinfo"
         @(Html.Raw(Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : ""))>

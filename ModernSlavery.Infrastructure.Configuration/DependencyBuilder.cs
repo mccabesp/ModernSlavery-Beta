@@ -4,8 +4,8 @@ using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using ModernSlavery.SharedKernel.Extensions;
-using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel.Extensions;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Configuration
 {

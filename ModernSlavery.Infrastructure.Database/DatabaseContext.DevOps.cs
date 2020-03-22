@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Infrastructure.Database
 {
     public partial class DatabaseContext
     {

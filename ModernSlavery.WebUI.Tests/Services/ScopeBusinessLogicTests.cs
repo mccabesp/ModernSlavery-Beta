@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
+using MockQueryable.Moq;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.Mocks;
-using MockQueryable.Moq;
 using Moq;
-using ModernSlavery.Entities.Enums;
 using NUnit.Framework;
 
-namespace ModernSlavery.Tests
+namespace ModernSlavery.WebUI.Tests.Services
 {
 
     // TODO: Move to BL test project :)

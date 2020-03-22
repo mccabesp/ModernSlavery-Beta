@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Models.Organisation;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Options;
+using ModernSlavery.WebUI.Classes.Options;
 using ModernSlavery.WebUI.Presenters;
 using Moq;
-
 using NUnit.Framework;
 
-namespace ModernSlavery.Tests.Services.SubmissionService
+namespace ModernSlavery.WebUI.Tests.Services.Submission
 {
 
     public class GetAllEditableReportsAsyncTests

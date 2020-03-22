@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using Newtonsoft.Json;
 
-namespace ModernSlavery.Core.Classes
+namespace ModernSlavery.WebUI.Classes
 {
     public class SessionList<T> : IHashSet<T>
     {

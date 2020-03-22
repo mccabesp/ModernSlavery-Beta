@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
-namespace ModernSlavery.WebUI.Controllers.ReportingStepByStep
+namespace ModernSlavery.WebUI.Controllers
 {
     public class ReportingStepByStepController : Controller
     {

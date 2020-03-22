@@ -1,5 +1,5 @@
 ﻿using ModernSlavery.Core.Models;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Search
 {

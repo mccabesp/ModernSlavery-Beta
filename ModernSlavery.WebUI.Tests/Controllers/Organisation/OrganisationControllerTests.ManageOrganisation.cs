@@ -1,18 +1,18 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic;
-using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Organisation;
-using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Moq;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Controllers;
+using ModernSlavery.WebUI.Models.Organisation;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using ModernSlavery.WebUI.Tests.TestHelpers;
+using Moq;
 using NUnit.Framework;
 
-namespace ModernSlavery.WebUI.Tests.Controllers
+namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
 {
 
     public partial class OrganisationControllerTests

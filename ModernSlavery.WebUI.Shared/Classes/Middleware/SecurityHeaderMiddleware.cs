@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Middleware

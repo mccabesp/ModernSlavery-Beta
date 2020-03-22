@@ -1,8 +1,8 @@
 ﻿using System;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Submit;
+using ModernSlavery.BusinessLogic.Submission;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Presenters;
 using Moq;

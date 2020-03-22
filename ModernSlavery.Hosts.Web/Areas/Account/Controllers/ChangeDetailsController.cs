@@ -7,9 +7,12 @@ using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities;
+using ModernSlavery.WebUI.Areas.Account.ViewModels.ChangeDetails;
+using ModernSlavery.WebUI.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Areas.Account.Controllers

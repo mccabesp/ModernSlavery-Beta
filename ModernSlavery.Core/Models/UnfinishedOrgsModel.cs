@@ -1,5 +1,5 @@
 ﻿using System;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.Core.Models
 {

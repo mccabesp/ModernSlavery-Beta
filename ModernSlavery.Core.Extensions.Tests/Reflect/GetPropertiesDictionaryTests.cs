@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace ModernSlavery.Extensions.Tests.Reflect
+namespace ModernSlavery.Core.Extensions.Tests.Reflect
 {
     [TestFixture]
     public class GetPropertiesDictionaryTests

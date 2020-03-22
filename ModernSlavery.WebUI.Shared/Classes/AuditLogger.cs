@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Shared.Classes

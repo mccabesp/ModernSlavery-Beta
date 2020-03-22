@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     public static class Url
     {

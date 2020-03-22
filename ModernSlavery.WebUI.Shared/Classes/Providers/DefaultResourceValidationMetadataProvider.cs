@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.WebUI.Shared.Classes.Providers
 {
 
     public class DefaultResourceValidationMetadataProvider : IValidationMetadataProvider

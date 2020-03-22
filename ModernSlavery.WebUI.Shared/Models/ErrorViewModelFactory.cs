@@ -2,7 +2,7 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.WebUI.Shared.Models

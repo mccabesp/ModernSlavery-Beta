@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Xml.Serialization;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.WebUI.Admin.Models

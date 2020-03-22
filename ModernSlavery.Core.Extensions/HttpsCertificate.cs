@@ -2,7 +2,7 @@
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     public static class HttpsCertificate
     {

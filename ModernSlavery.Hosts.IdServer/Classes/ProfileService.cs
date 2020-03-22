@@ -5,11 +5,10 @@ using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Entities;
 
-namespace ModernSlavery.IdentityServer4.Classes
+namespace ModernSlavery.IdServer.Classes
 {
     public class CustomProfileService : IProfileService
     {

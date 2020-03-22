@@ -1,7 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Mvc.Rendering
 @using ModernSlavery.BusinessLogic
+@using ModernSlavery.Core.Entities
+@using ModernSlavery.Core.SharedKernel
+@using ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
 @inject CommonBusinessLogic commonBusinessLogic
-@model ModernSlavery.WebUI.Shared.Models.OrganisationViewModel
+@model ModernSlavery.WebUI.Shared.Controllers.OrganisationViewModel
 @{
     ViewBag.Title = "Add your organisation's sectors - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as RegisterController;

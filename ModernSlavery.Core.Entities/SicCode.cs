@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.Entities
+namespace ModernSlavery.Core.Entities
 {
     public partial class SicCode
     {

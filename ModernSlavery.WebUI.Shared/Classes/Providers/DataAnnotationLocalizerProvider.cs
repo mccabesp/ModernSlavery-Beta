@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Reflection;
 using Microsoft.Extensions.Localization;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.WebUI.Shared.Classes.Providers
 {
 
     public static class DataAnnotationLocalizerProvider

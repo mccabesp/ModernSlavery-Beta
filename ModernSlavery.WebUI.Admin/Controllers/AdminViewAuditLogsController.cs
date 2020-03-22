@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Admin.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {

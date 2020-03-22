@@ -3,8 +3,7 @@ using Microsoft.Azure.Search;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Search
 {

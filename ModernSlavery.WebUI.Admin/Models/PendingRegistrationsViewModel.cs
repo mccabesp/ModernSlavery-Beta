@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ModernSlavery.Entities;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {

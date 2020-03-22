@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.WebUI.Models.Scope
 {

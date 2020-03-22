@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     /// <summary>
     ///     Miscellaneous and parsing methods for DateTime

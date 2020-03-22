@@ -1,40 +1,21 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
-using ModernSlavery.Extensions;
-using ModernSlavery.IdentityServer4.Classes;
-using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
-using AutoMapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.WindowsAzure.Storage.RetryPolicies;
-using ModernSlavery.Database.Classes;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Infrastructure.Configuration;
-using ModernSlavery.Infrastructure.Hosts.WebHost;
-using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.SharedKernel.Options;
-using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Options;
-using ModernSlavery.Infrastructure.Hosts.WebHost;
-using ModernSlavery.Infrastructure.Hosts;
-using ModernSlavery.Infrastructure.Logging;
-using ModernSlavery.Infrastructure.Storage.FileRepositories;
-using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
-namespace ModernSlavery.IdentityServer4
+namespace ModernSlavery.IdServer
 {
     public class Startup:IStartup
     {

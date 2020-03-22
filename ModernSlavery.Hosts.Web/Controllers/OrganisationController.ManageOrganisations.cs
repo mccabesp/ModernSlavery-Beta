@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessLogic.Models.Organisation;
-using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Classes;
 using ModernSlavery.WebUI.Models.Organisation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.WebUI.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Controllers

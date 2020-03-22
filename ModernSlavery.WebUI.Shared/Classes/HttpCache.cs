@@ -2,7 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using Newtonsoft.Json;
 

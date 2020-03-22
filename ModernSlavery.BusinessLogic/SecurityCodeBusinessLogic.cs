@@ -1,7 +1,7 @@
 ﻿using System;
 using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.BusinessLogic
 {

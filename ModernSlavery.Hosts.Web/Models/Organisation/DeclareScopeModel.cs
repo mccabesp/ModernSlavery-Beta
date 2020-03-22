@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Models.Organisation
 {

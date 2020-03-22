@@ -1,4 +1,4 @@
-﻿using ModernSlavery.SharedKernel.Options;
+﻿using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Messaging
 {

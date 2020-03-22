@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
+using ModernSlavery.WebUI.Areas.Account.ViewModels.ChangeDetails;
+using ModernSlavery.WebUI.Areas.Account.ViewModels.ManageAccount;
 
 namespace ModernSlavery.WebUI.Classes.Mappers
 {

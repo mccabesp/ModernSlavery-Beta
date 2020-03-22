@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ModernSlavery.Entities;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Entities.Views;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Infrastructure.Database
 {
     public partial class DatabaseContext : DbContext
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GovUkDesignSystem.GovUkDesignSystemComponents
+namespace ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
 {
     public abstract class ItemSetViewModel
     {

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Web;
-using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class PreventDuplicatePostAttribute : ActionFilterAttribute

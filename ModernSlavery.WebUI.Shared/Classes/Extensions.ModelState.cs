@@ -1,5 +1,4 @@
 ﻿using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Reflection;
 using System.ComponentModel;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {

@@ -4,15 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Views.Home;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Cookies;
 using ModernSlavery.WebUI.Shared.Interfaces;
 

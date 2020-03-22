@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
-using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using Moq;
 
-namespace ModernSlavery.WebUI.Tests.TestHelpers
+namespace ModernSlavery.Tests.Common.TestHelpers
 {
     public static class UserOrganisationHelper
     {

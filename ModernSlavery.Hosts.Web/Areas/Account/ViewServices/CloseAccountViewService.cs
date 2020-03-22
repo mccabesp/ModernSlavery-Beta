@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Extensions;
 using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Register;
+using ModernSlavery.BusinessLogic.Registration;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
+using ModernSlavery.WebUI.Areas.Account.ViewModels.ChangePassword;
 
 namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 {

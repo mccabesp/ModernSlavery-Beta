@@ -1,6 +1,6 @@
-﻿using ModernSlavery.SharedKernel.Interfaces;
+﻿using ModernSlavery.Core.SharedKernel.Interfaces;
 
-namespace ModernSlavery.BusinessLogic.View
+namespace ModernSlavery.BusinessLogic.Viewing
 {
     public interface IViewingService
     {

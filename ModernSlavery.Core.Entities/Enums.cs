@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ModernSlavery.Entities.Enums
+namespace ModernSlavery.Core.Entities
 {
     public enum UserStatuses : byte
     {

@@ -5,7 +5,7 @@ using ModernSlavery.Core.Interfaces;
 using Moq;
 using NUnit.Framework;
 
-namespace ModernSlavery.Core.Tests.AzureQueue
+namespace ModernSlavery.Core.Tests.Queues.AzureQueue
 {
     [TestFixture]
     public class AddMessageAsyncTests

@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ModernSlavery.IdentityServer4.Models.Grants
+namespace ModernSlavery.IdServer.Models.Grants
 {
     public class GrantsViewModel
     {

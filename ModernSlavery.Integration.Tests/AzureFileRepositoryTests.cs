@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Azure.Search.Models;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;
-using ModernSlavery.SharedKernel;
 using NUnit.Framework;
 
 namespace ModernSlavery.Integration.Tests

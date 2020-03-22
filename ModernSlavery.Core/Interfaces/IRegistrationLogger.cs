@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using ModernSlavery.Entities;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Core.Interfaces
 {

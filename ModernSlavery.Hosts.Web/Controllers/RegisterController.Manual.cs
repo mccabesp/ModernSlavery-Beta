@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities;
 using ModernSlavery.WebUI.Shared.Models;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Controllers
 {

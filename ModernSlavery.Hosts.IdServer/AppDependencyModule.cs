@@ -2,28 +2,28 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Autofac;
 using AutoMapper;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.SharedKernel.Extensions;
+using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel.Options;
+using ModernSlavery.IdServer.Classes;
+using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Hosts.WebHost;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.SharedKernel.Extensions;
-using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.SharedKernel.Options;
-using System.Security.Cryptography.X509Certificates;
-using IdentityServer4.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using ModernSlavery.IdentityServer4.Classes;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
 using ModernSlavery.WebUI.Shared.Options;
 
-namespace ModernSlavery.IdentityServer4
+namespace ModernSlavery.IdServer
 {
     public class AppDependencyModule: IDependencyModule
     {

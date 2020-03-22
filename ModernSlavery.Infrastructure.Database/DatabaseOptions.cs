@@ -1,6 +1,6 @@
-﻿using ModernSlavery.SharedKernel.Options;
+﻿using ModernSlavery.Core.SharedKernel.Options;
 
-namespace ModernSlavery.Database
+namespace ModernSlavery.Infrastructure.Database
 {
     [Options("Database")]
     public class DatabaseOptions : IOptions

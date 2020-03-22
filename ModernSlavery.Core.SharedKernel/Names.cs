@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.SharedKernel
+namespace ModernSlavery.Core.SharedKernel
 {
     public static class EnumHelper
     {

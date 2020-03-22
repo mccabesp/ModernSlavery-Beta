@@ -1,10 +1,10 @@
 ﻿using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Logging
 {

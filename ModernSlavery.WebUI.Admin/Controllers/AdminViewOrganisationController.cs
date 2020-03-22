@@ -1,7 +1,7 @@
 ﻿using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {

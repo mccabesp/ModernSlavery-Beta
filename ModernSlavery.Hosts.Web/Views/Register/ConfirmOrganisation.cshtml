@@ -1,9 +1,10 @@
+@using ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
 @using ModernSlavery.WebUI.Shared.Controllers
 @{
     ViewBag.Title = "Confirm your organisation - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
 }
-@model ModernSlavery.WebUI.Shared.Models.OrganisationViewModel
+@model OrganisationViewModel
 
 <div id="confirm-organisation-content">
     @if (controller.PendingFasttrackCodes == null)

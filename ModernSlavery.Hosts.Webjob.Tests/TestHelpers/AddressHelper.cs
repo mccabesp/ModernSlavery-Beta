@@ -1,7 +1,6 @@
-﻿using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
+﻿using ModernSlavery.Core.Entities;
 
-namespace ModernSlavery.WebJob.Tests.TestHelpers
+namespace ModernSlavery.Hosts.Webjob.Tests.TestHelpers
 {
     public static class AddressHelper
     {

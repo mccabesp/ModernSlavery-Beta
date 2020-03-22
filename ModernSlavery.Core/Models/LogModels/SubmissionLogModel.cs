@@ -1,6 +1,6 @@
 ﻿using System;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.Core.Models.LogModels
 {

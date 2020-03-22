@@ -2,7 +2,7 @@
 using System.IO;
 using Microsoft.AspNetCore.StaticFiles;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     public static class FileSystem
     {

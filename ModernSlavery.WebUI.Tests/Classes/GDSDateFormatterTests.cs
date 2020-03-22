@@ -2,7 +2,7 @@
 using ModernSlavery.WebUI.Classes.Formatters;
 using NUnit.Framework;
 
-namespace ModernSlavery.Tests
+namespace ModernSlavery.WebUI.Tests.Classes
 {
 
     [TestFixture]

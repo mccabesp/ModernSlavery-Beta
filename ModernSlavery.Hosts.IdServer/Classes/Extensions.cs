@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Infrastructure.Database.Classes;
 
-namespace ModernSlavery.IdentityServer4.Classes
+namespace ModernSlavery.IdServer.Classes
 {
     public static class CustomIdentityServerBuilderExtensions
     {

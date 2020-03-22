@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ModernSlavery.WebUI.Models;
 using ModernSlavery.WebUI.Models.Search;
+using ModernSlavery.WebUI.Models.Viewing;
 
 namespace ModernSlavery.WebUI.Classes.Mappers
 {

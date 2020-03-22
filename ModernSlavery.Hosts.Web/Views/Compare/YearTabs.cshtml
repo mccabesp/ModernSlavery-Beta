@@ -1,6 +1,9 @@
 ﻿@inject IOptionsSnapshot<ViewingOptions> ViewingOptions
-@inject ModernSlavery.SharedKernel.Interfaces.ISnapshotDateHelper SnapshotDateHelper
-@model CompareViewModel
+@inject ISnapshotDateHelper SnapshotDateHelper
+@using ModernSlavery.Core.Extensions
+@using ModernSlavery.Core.SharedKernel.Interfaces
+@using ModernSlavery.WebUI.Classes.Options
+@model ModernSlavery.WebUI.Models.Compare.CompareViewModel
 @{
     int endYear = SnapshotDateHelper.CurrentSnapshotYear;
     int startYear = endYear - (ViewingOptions.Value.ShowReportYearCount - 1);

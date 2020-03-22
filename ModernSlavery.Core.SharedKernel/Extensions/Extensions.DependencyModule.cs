@@ -1,9 +1,9 @@
 ﻿using System;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
-using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 
-namespace ModernSlavery.SharedKernel.Extensions
+namespace ModernSlavery.Core.SharedKernel.Extensions
 {
     public static partial class Extensions
     {

@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions;
-using Microsoft.Extensions.Logging;
 using Autofac.Features.AttributeFilters;
+using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.EmailTemplates;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Options;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.WebUI.Shared.Services
 {
     public class SendEmailService: ISendEmailService
     {

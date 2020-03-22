@@ -1,4 +1,4 @@
-﻿namespace ModernSlavery.Entities
+﻿namespace ModernSlavery.Core.Entities.Views
 {
     public class OrganisationScopeAndReturnInfoView
     {

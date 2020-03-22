@@ -1,15 +1,14 @@
 ﻿using System.Threading.Tasks;
-using ModernSlavery.Entities;
-using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Areas.Account.Resources;
-using ModernSlavery.WebUI.Areas.Account.ViewModels;
-using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.WebUI.Areas.Account.Resources;
+using ModernSlavery.WebUI.Areas.Account.ViewModels.ChangeDetails;
+using ModernSlavery.WebUI.Tests.TestHelpers;
 using NUnit.Framework;
 
-namespace Account.Controllers.ChangeDetailsController
+namespace ModernSlavery.WebUI.Tests.Controllers.Account.ChangeDetailsController
 {
 
     public class ChangeDetailsTests

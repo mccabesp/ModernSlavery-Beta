@@ -1,6 +1,6 @@
 ﻿using System;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces.Downloadable;
-using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Core.Models
 {

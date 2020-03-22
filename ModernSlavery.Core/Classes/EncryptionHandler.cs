@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Web;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Classes
 {

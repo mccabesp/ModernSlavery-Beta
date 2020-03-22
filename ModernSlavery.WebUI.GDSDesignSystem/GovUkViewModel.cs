@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using GovUkDesignSystem.Helpers;
 using Microsoft.Extensions.Primitives;
+using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
 
-namespace GovUkDesignSystem
+namespace ModernSlavery.WebUI.GDSDesignSystem
 {
     public abstract class GovUkViewModel
     {

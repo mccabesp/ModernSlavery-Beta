@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using ModernSlavery.Entities.Enums;
 using Newtonsoft.Json;
 
-namespace ModernSlavery.Entities
+namespace ModernSlavery.Core.Entities
 {
     public class AuditLog
     {

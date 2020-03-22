@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
-using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Infrastructure.Logging
 {

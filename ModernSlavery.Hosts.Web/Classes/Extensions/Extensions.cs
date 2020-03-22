@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.Extensions;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.WebUI.Classes
+namespace ModernSlavery.WebUI.Classes.Extensions
 {
     public static partial class Extensions
     {

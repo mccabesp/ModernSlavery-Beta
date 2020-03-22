@@ -2,8 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.Core.Entities;
 using Moq;
 
 namespace ModernSlavery.Tests.Common.TestHelpers

@@ -9,10 +9,10 @@ using Microsoft.ApplicationInsights;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
 using Index = Microsoft.Azure.Search.Models.Index;
 
 namespace ModernSlavery.Infrastructure.Search

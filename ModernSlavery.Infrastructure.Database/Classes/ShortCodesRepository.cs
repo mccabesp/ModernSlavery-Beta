@@ -5,13 +5,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Options;
 
-namespace ModernSlavery.Infrastructure.Data
+namespace ModernSlavery.Infrastructure.Database.Classes
 {
     public class ShortCodesRepository : IShortCodesRepository
     {

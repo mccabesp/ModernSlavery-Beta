@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
 
-namespace ModernSlavery.BusinessLogic.Register
+namespace ModernSlavery.BusinessLogic.Registration
 {
     public interface IRegistrationBusinessLogic
     {

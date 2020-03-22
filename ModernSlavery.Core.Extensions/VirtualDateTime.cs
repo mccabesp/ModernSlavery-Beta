@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     public static class VirtualDateTime
     {

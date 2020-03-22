@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
-using ModernSlavery.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Logging
 {

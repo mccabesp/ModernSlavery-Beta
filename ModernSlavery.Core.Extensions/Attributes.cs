@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     public static class Attributes
     {

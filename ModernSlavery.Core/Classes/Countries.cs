@@ -6,7 +6,7 @@
  */
 
 using System.Linq;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Classes
 {

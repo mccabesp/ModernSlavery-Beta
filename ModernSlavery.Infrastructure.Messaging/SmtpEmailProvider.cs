@@ -6,10 +6,10 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Messaging
 {

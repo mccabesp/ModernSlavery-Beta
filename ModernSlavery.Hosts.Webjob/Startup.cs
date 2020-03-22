@@ -1,36 +1,19 @@
 ﻿using System;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using ModernSlavery.BusinessLogic;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.Extensions;
-using Microsoft.Azure.Search;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage.RetryPolicies;
-using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.Database;
-using ModernSlavery.Infrastructure.Search;
-using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.Core.EmailTemplates;
-using ModernSlavery.Database.Classes;
-using ModernSlavery.Infrastructure.CompaniesHouse;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Infrastructure.Configuration;
-using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Messaging;
-using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.Infrastructure.Storage.FileRepositories;
-using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
-namespace ModernSlavery.WebJob
+namespace ModernSlavery.Hosts.Webjob
 {
     public class Startup:IStartup
     {

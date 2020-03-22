@@ -1,12 +1,13 @@
 ﻿using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Models.Submit;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Controllers;
 
-namespace ModernSlavery.WebUI.Controllers.Submission
+namespace ModernSlavery.WebUI.Controllers
 {
     public partial class SubmitController : BaseController
     {

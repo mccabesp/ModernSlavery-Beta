@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
 
 namespace ModernSlavery.Core.Interfaces
 {

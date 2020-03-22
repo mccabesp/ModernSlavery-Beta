@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.Core.Models
 {

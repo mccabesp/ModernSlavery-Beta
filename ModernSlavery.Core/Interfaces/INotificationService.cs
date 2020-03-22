@@ -1,4 +1,4 @@
-﻿using ModernSlavery.Entities;
+﻿using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Core.Interfaces
 {

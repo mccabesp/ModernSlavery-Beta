@@ -1,26 +1,26 @@
 ﻿using Autofac;
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.SharedKernel.Extensions;
+using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel.Options;
+using ModernSlavery.Hosts.Webjob.Classes;
+using ModernSlavery.Hosts.Webjob.Jobs;
 using ModernSlavery.Infrastructure.CompaniesHouse;
+using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.SharedKernel.Extensions;
-using ModernSlavery.SharedKernel.Interfaces;
-using ModernSlavery.SharedKernel.Options;
 using ModernSlavery.WebUI.Shared.Options;
 using DataProtectionOptions = Microsoft.AspNetCore.DataProtection.DataProtectionOptions;
 using ResponseCachingOptions = Microsoft.AspNetCore.ResponseCaching.ResponseCachingOptions;
 
-namespace ModernSlavery.WebJob
+namespace ModernSlavery.Hosts.Webjob
 {
     public class AppDependencyModule: IDependencyModule
     {

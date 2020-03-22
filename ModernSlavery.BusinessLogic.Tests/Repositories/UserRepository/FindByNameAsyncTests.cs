@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Autofac;
 using AutoMapper;
 using MockQueryable.Moq;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Database;
-using ModernSlavery.Entities;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.SharedKernel.Options;
+using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Tests.Common;
 using Moq;
 using NUnit.Framework;
@@ -128,7 +128,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
                         .BuildMock()
                         .Object);
 
-            _configuredIUserRepository = new Infrastructure.Data.UserRepository(new DatabaseOptions(),
+            _configuredIUserRepository = new Infrastructure.Database.Classes.UserRepository(new DatabaseOptions(),
                 new GlobalOptions(),
                 configurableDataRepository.Object,
                 Mock.Of<IUserLogger>(), DependencyContainer.Resolve<IMapper>());
@@ -141,7 +141,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
                 // Initialise AutoMapper
                 var mapperConfig = new MapperConfiguration(config =>
                 {
-                    config.AddMaps(typeof(Infrastructure.Data.UserRepository));
+                    config.AddMaps(typeof(Infrastructure.Database.Classes.UserRepository));
                 });
                 builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
             }

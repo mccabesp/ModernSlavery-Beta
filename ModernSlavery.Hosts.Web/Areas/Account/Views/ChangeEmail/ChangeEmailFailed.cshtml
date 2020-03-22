@@ -1,4 +1,5 @@
-﻿@if (ViewContext.ModelState.ErrorCount > 0)
+﻿@using ModernSlavery.WebUI.Classes.Extensions
+@if (ViewContext.ModelState.ErrorCount > 0)
 {
     @await Html.PartialAsync("Patterns/ErrorSummary", ViewContext.ModelState)
 }

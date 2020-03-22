@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.BusinessLogic.Models.Compare
 {

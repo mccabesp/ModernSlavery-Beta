@@ -4,9 +4,10 @@ using ModernSlavery.WebUI.Areas.Account.Abstractions;
 using ModernSlavery.WebUI.Areas.Account.Resources;
 using ModernSlavery.WebUI.Areas.Account.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using ModernSlavery.Entities;
 using ModernSlavery.BusinessLogic;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.WebUI.Areas.Account.ViewModels.ChangePassword;
 
 namespace ModernSlavery.WebUI.Areas.Account.ViewServices
 {

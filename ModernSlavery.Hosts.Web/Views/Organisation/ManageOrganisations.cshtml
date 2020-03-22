@@ -1,5 +1,9 @@
-﻿@inject ModernSlavery.SharedKernel.Interfaces.ISnapshotDateHelper SnapshotDateHelper
-@model IEnumerable<ModernSlavery.Entities.UserOrganisation>
+﻿@inject ISnapshotDateHelper SnapshotDateHelper
+@using ModernSlavery.Core.Entities
+@using ModernSlavery.Core.Extensions
+@using ModernSlavery.Core.SharedKernel.Interfaces
+@using ModernSlavery.WebUI.Classes.Extensions
+@model IEnumerable<ModernSlavery.Core.Entities.UserOrganisation>
 @{
     ViewBag.Title = "Manage your organisation - Modern Slavery reporting service";
     bool hasRegisteredOrgs = Model.Any();

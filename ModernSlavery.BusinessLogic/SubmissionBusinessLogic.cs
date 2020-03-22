@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
@@ -8,11 +9,10 @@ using ModernSlavery.BusinessLogic.Models;
 using ModernSlavery.BusinessLogic.Models.FileModels;
 using ModernSlavery.BusinessLogic.Models.Submit;
 using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.BusinessLogic
 {
@@ -134,7 +134,7 @@ namespace ModernSlavery.BusinessLogic
                         MaleUpperQuartilePayBand = j.r.MaleUpperQuartilePayBand,
                         CompanyLink = j.r.CompanyLinkToGPGInfo,
                         ResponsiblePerson = j.r.ResponsiblePerson,
-                        OrganisationSize = j.r.OrganisationSize.GetAttribute<DisplayAttribute>().Name,
+                        OrganisationSize = Attributes.GetAttribute<DisplayAttribute>((Enum) j.r.OrganisationSize).Name,
                         Modifications = j.r.Modifications,
                         EHRCResponse = j.r.EHRCResponse
                     });

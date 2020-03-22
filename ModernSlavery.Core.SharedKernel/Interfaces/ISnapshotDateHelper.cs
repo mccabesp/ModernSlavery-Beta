@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.SharedKernel.Interfaces
+namespace ModernSlavery.Core.SharedKernel.Interfaces
 {
     public interface ISnapshotDateHelper
     {

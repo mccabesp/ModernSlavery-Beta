@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 
-namespace ModernSlavery.IdentityServer4.Models.Consent
+namespace ModernSlavery.IdServer.Models.Consent
 {
     public class ConsentViewModel : ConsentInputModel
     {

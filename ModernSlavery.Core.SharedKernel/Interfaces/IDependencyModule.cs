@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ModernSlavery.SharedKernel.Interfaces
+namespace ModernSlavery.Core.SharedKernel.Interfaces
 {
     public interface IDependencyModule
     {

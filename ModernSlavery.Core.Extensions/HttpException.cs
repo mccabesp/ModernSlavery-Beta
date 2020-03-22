@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace ModernSlavery.Extensions
+namespace ModernSlavery.Core.Extensions
 {
     public class HttpException : Exception
     {

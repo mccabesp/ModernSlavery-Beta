@@ -1,24 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.Extensions;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebUI.Controllers;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using NUnit.Framework;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using ModernSlavery.WebUI.Shared.Models;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Tests.Common.TestHelpers;
 
-namespace ModernSlavery.WebUI.Tests.Controllers.Registration
+namespace ModernSlavery.WebUI.Tests
 {
     [TestFixture]
     public partial class RegisterControllerTests
@@ -4507,7 +4507,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Check sic codes
             Assert.That(org.OrganisationSicCodes != null && org.OrganisationSicCodes.Count == 4, "There should now be 4 SicCodes");
-            Assert.That(org.GetSicCodeIds().SequenceEqual(selectedEmployer.GetSicCodes()), "Wrong sic codes saved");
+            Assert.That(Enumerable.SequenceEqual(org.GetSicCodeIds(), selectedEmployer.GetSicCodes()), "Wrong sic codes saved");
             Assert.That(org.GetSicSource() == selectedEmployer.SicSource, "Wrong sic source saved");
 
             //Check user org

@@ -3,25 +3,28 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
 
-public class MockClassQueue : IQueue
+namespace ModernSlavery.Tests.Common.Mocks
 {
-    private readonly Queue<object> _queue = new Queue<object>();
-
-    public MockClassQueue(string queueName)
+    public class MockClassQueue : IQueue
     {
-        Name = queueName;
-    }
+        private readonly Queue<object> _queue = new Queue<object>();
 
-    public string Name { get; }
+        public MockClassQueue(string queueName)
+        {
+            Name = queueName;
+        }
 
-    public Task AddMessageAsync<T>(T instance)
-    {
-        _queue.Enqueue(instance);
-        return Task.CompletedTask;
-    }
+        public string Name { get; }
 
-    public Task AddMessageAsync(string message)
-    {
-        throw new NotImplementedException();
+        public Task AddMessageAsync<T>(T instance)
+        {
+            _queue.Enqueue(instance);
+            return Task.CompletedTask;
+        }
+
+        public Task AddMessageAsync(string message)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GovUkDesignSystem.Attributes
+namespace ModernSlavery.WebUI.GDSDesignSystem.Attributes
 {
     public class GovUkDisplayNameForErrorsAttribute : Attribute
     {

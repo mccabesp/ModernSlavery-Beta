@@ -5,18 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
+using ModernSlavery.Hosts.Webjob.Tests.TestHelpers;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebJob.Tests.TestHelpers;
 using Moq;
 using NUnit.Framework;
-using OrganisationHelper = ModernSlavery.WebJob.Tests.TestHelpers.OrganisationHelper;
+using OrganisationHelper = ModernSlavery.Hosts.Webjob.Tests.TestHelpers.OrganisationHelper;
 
-namespace ModernSlavery.WebJob.Tests.Functions
+namespace ModernSlavery.Hosts.Webjob.Tests.Functions
 {
     [TestFixture]
     [SetCulture("en-GB")]
@@ -32,7 +31,7 @@ namespace ModernSlavery.WebJob.Tests.Functions
             _functions = WebJobTestHelper.SetUp(orgs);
         }
 
-        private WebJob.Functions _functions;
+        private Jobs.Functions _functions;
 
         [Test]
         [Ignore(

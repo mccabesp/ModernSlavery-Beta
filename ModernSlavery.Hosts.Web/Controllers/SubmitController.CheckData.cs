@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic.Classes;
-using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.Extensions;
-using ModernSlavery.WebUI.Models.Submit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.BusinessLogic.Classes;
+using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
-using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.WebUI.Models.Submit;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
-namespace ModernSlavery.WebUI.Controllers.Submission
+namespace ModernSlavery.WebUI.Controllers
 {
     public partial class SubmitController : BaseController
     {

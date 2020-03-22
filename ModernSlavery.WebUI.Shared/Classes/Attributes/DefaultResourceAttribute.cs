@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 {
 
     [AttributeUsage(AttributeTargets.Class)]

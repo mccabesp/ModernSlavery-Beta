@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Admin.Models;
 
 namespace ModernSlavery.WebUI.Admin.Classes

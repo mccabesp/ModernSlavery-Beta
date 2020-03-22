@@ -1,10 +1,10 @@
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.TestHelpers;
 using NUnit.Framework;
 
-namespace ModernSlavery.Database.ReturnTests
+namespace ModernSlavery.Infrastructure.Database.Tests.Return
 {
     [TestFixture]
     public class IsLateSubmissionTests

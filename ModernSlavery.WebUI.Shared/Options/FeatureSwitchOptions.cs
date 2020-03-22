@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using ModernSlavery.Extensions;
-using ModernSlavery.SharedKernel.Options;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Shared.Options
 {

@@ -1,5 +1,5 @@
 ﻿using System;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Models.Scope
 {

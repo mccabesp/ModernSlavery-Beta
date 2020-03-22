@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GovUkDesignSystem.Attributes.ValidationAttributes
+namespace ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class GovUkValidateRequiredAttribute : Attribute

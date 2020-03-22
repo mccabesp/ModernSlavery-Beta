@@ -3,30 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Autofac;
+using MockQueryable.Moq;
 using ModernSlavery.BusinessLogic;
 using ModernSlavery.BusinessLogic.Classes;
 using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.BusinessLogic.Submission;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Extensions;
-using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.Tests.TestHelpers;
-using ModernSlavery.WebUI.Models.Submit;
-using ModernSlavery.WebUI.Tests.TestHelpers;
-using MockQueryable.Moq;
-using Moq;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
-using NUnit.Framework;
-using RangeAttribute = System.ComponentModel.DataAnnotations.RangeAttribute;
-using Autofac;
-using ModernSlavery.BusinessLogic.Submit;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebUI.Models.Submit;
 using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Tests.TestHelpers;
+using Moq;
+using NUnit.Framework;
+using RangeAttribute = System.ComponentModel.DataAnnotations.RangeAttribute;
 
-namespace ModernSlavery.Tests
+namespace ModernSlavery.WebUI.Tests.Services
 {
 
     [TestFixture]

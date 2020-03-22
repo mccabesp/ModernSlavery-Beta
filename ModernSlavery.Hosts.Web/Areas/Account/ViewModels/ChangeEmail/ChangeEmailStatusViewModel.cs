@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModernSlavery.WebUI.Areas.Account.ViewModels
+namespace ModernSlavery.WebUI.Areas.Account.ViewModels.ChangeEmail
 {
 
     [Serializable]

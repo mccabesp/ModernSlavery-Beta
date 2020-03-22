@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.SharedKernel.Interfaces;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Tests.Common.Classes;
 using Moq;
 using NUnit.Framework;
 
-namespace ModernSlavery.BusinessLogic.Tests.ScopeBusinessLogic
+namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
 {
     [TestFixture]
     [SetCulture("en-GB")]

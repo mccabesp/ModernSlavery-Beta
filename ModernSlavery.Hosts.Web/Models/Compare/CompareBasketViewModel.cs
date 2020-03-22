@@ -1,4 +1,4 @@
-﻿namespace ModernSlavery.WebUI.Models
+﻿namespace ModernSlavery.WebUI.Models.Compare
 {
     public class CompareBasketViewModel
     {

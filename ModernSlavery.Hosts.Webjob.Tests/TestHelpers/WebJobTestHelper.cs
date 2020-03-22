@@ -6,22 +6,22 @@ using ModernSlavery.BusinessLogic;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Infrastructure.Data;
+using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Hosts.Webjob.Classes;
 using ModernSlavery.Infrastructure.Search;
-using ModernSlavery.SharedKernel.Interfaces;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.Mocks;
 using ModernSlavery.Tests.Common.TestHelpers;
 using Moq;
 
-namespace ModernSlavery.WebJob.Tests.TestHelpers
+namespace ModernSlavery.Hosts.Webjob.Tests.TestHelpers
 {
     internal static class WebJobTestHelper
     {
         private static IContainer BuildContainerIoC(params object[] dbObjects)
         {
             var builder = new ContainerBuilder();
-            builder.RegisterType<WebJob.Functions>().InstancePerDependency();
+            builder.RegisterType<Jobs.Functions>().InstancePerDependency();
 
             //Create an in-memory version of the database
             if (dbObjects != null && dbObjects.Length > 0)
@@ -77,10 +77,10 @@ namespace ModernSlavery.WebJob.Tests.TestHelpers
             return builder.Build();
         }
 
-        public static WebJob.Functions SetUp(params object[] dbObjects)
+        public static Jobs.Functions SetUp(params object[] dbObjects)
         {
             var containerIoc = BuildContainerIoC(dbObjects);
-            var functions = containerIoc.Resolve<WebJob.Functions>();
+            var functions = containerIoc.Resolve<Jobs.Functions>();
 
             return functions;
         }

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using GovUkDesignSystem.GovUkDesignSystemComponents.SubComponents;
+using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents.SubComponents;
 
 namespace ModernSlavery.WebUI.Views.Components.StepByStep
 {

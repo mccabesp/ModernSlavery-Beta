@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GovUkDesignSystem.Helpers
+namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
 {
     public static class TypeHelpers
     {

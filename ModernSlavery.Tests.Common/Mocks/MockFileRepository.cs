@@ -5,8 +5,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Extensions;
 
 namespace ModernSlavery.Tests.Common.Mocks
 {

@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using ModernSlavery.Entities.Enums;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Core.Classes.ErrorMessages
 {

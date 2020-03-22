@@ -2,11 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System.Linq;
-using ModernSlavery.IdentityServer4.Classes;
-using IdentityServer4.Models;
-
-namespace ModernSlavery.IdentityServer4.Models.Account
+namespace ModernSlavery.IdServer.Models.Account
 {
     public class LoggedOutViewModel
     {

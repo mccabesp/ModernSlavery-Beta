@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Tests.Common.TestHelpers
 {

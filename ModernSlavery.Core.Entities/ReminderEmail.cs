@@ -1,7 +1,7 @@
 ﻿using System;
-using ModernSlavery.SharedKernel;
+using ModernSlavery.Core.SharedKernel;
 
-namespace ModernSlavery.Entities
+namespace ModernSlavery.Core.Entities
 {
     public class ReminderEmail
     {

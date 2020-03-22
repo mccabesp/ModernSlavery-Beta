@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Entities;
-using ModernSlavery.Entities.Enums;
-using ModernSlavery.SharedKernel;
-using ModernSlavery.Extensions;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.WebUI.Shared.Controllers;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Shared.Models;
 
@@ -77,7 +77,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             var sicCode2 = new SicCode {
                 SicCodeId = 10520, Description = "Desc2", SicSection = new SicSection {SicSectionId = "4326", Description = "Section2"}
             };
-            var org0 = new Organisation {
+            var org0 = new Core.Entities.Organisation {
                 OrganisationId = 1,
                 OrganisationName = "Company1",
                 SectorType = SectorTypes.Private,

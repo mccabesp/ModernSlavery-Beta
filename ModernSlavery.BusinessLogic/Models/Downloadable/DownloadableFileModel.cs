@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Extensions;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.BusinessLogic.Models.Downloadable
 {

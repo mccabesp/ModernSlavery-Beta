@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GovUkDesignSystem.GovUkDesignSystemComponents.SubComponents
+namespace ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents.SubComponents
 {
     public class PageHeadingHtml
     {

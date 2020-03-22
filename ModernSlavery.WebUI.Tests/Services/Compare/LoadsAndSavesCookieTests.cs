@@ -1,14 +1,14 @@
-﻿using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Options;
-using Microsoft.AspNetCore.Http;
-using Moq;
-using ModernSlavery.SharedKernel;
+﻿using Microsoft.AspNetCore.Http;
+using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Tests.Common.Classes;
+using ModernSlavery.WebUI.Classes.Options;
 using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using Moq;
 using NUnit.Framework;
 using HttpContext = Microsoft.AspNetCore.Http.HttpContext;
 
-namespace ModernSlavery.Tests.Services.Compare
+namespace ModernSlavery.WebUI.Tests.Services.Compare
 {
 
     public class LoadsAndSavesCookieTests

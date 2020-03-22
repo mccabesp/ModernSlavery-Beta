@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Autofac;
-using ModernSlavery.Extensions;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Hosting;
-using System.Threading.Tasks;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Hosts.Webjob.Jobs;
 using ModernSlavery.Infrastructure.Hosts.WebjobHost;
 
-namespace ModernSlavery.WebJob
+namespace ModernSlavery.Hosts.Webjob
 {
     // To learn more about Microsoft Azure WebJobs SDK, please see https://go.microsoft.com/fwlink/?LinkID=320976
     public class Program
