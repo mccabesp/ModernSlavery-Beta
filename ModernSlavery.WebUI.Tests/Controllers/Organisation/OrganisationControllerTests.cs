@@ -461,7 +461,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
             Expect(actionResult.ViewName.EqualsI("ScopeDeclared"), "Expected ScopeDeclared view");
             Expect(actionResult.ViewData.ModelState.IsValid, "Expected Valid viewstate");
             IQueryable<OrganisationScope> orgScopes =
-                controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationScope>().Where(os => os.OrganisationId == testOrgId);
+                controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationScope>().Where(os => os.OrganisationId == testOrgId);
 
             Expect(orgScopes.Count() == 3, "Expected three organisation scopes");
 

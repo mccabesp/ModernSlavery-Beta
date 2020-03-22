@@ -76,10 +76,10 @@ namespace ModernSlavery.WebUI.Tests.Services
                 LateReason = "A LateReason"
             };
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
             // Mocks
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             mockDataRepo.Setup(x => x.Get<Organisation>(It.IsAny<long>())).Returns(mockedOrganisation);
@@ -123,13 +123,13 @@ namespace ModernSlavery.WebUI.Tests.Services
             Organisation mockedOrganisation = OrganisationHelper.GetPublicOrganisation();
             mockedOrganisation.OrganisationId = new Random().Next(1000, 9999);
             UserOrganisation mockedUserOrganisation = UserOrganisationHelper.LinkUserWithOrganisation(mockedUser, mockedOrganisation);
-            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.GlobalOptions.FirstReportingYear);
+            Return mockedReturn = ReturnHelper.GetSubmittedReturnForOrganisationAndYear(mockedUserOrganisation, ConfigHelpers.SharedOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockedOrganisation, mockedReturn);
 
             var testDraftFileBL = new DraftFileBusinessLogic(null,new SystemFileRepository(new StorageOptions()));
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Act
@@ -175,10 +175,10 @@ namespace ModernSlavery.WebUI.Tests.Services
                 Organisation = new Organisation {SectorType = SectorTypes.Private}
             };
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
             // Mocks
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
             
             // Copy the original
@@ -235,10 +235,10 @@ namespace ModernSlavery.WebUI.Tests.Services
 
             decimal changeValue = 0;
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
             // Mocks
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Assert all figures
@@ -267,10 +267,10 @@ namespace ModernSlavery.WebUI.Tests.Services
         {
             var testOldReturn = new Return {Organisation = new Organisation {SectorType = SectorTypes.Private}};
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
             // Mocks
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Copy the original
@@ -302,10 +302,10 @@ namespace ModernSlavery.WebUI.Tests.Services
 
             var changeValue = "Mr T";
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
             // Mocks
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Assert all figures
@@ -334,10 +334,10 @@ namespace ModernSlavery.WebUI.Tests.Services
         {
             var testOldReturn = new Return {CompanyLinkToGPGInfo = "", Organisation = new Organisation {SectorType = SectorTypes.Private}};
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
             // Mocks
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Copy the original
@@ -405,9 +405,9 @@ namespace ModernSlavery.WebUI.Tests.Services
                         .BuildMock()
                         .Object);
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Assert
@@ -445,9 +445,9 @@ namespace ModernSlavery.WebUI.Tests.Services
                 testYear,
                 testUserId);
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileFileBusinessLogic);
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileFileBusinessLogic);
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Test
@@ -560,9 +560,9 @@ namespace ModernSlavery.WebUI.Tests.Services
             // Mocks
             mockDataRepo.Setup(dr => dr.GetAll<UserOrganisation>()).Returns(new UserOrganisation[] { }.AsQueryable().BuildMock().Object);
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
             // Test
             var ex = Assert.ThrowsAsync<AuthenticationException>(
@@ -638,9 +638,9 @@ namespace ModernSlavery.WebUI.Tests.Services
             var testOrg = new Organisation {LatestReturn = null};
             var testSnapshotYear = 2000;
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Assert
@@ -656,9 +656,9 @@ namespace ModernSlavery.WebUI.Tests.Services
             var testOrg = new Organisation {LatestReturn = new Return {AccountingDate = new DateTime(2018, 4, 5)}};
             var testSnapshotYear = 2017;
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Assert
@@ -674,9 +674,9 @@ namespace ModernSlavery.WebUI.Tests.Services
             var testOrg = new Organisation {LatestReturn = new Return {AccountingDate = new DateTime(2017, 4, 5)}};
             var testSnapshotYear = 2017;
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Assert
@@ -692,9 +692,9 @@ namespace ModernSlavery.WebUI.Tests.Services
             var testOrg = new Organisation {LatestReturn = new Return {AccountingDate = new DateTime(2016, 4, 5)}};
             var testSnapshotYear = 2017;
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
 
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Assert

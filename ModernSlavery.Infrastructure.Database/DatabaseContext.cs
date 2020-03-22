@@ -19,11 +19,11 @@ namespace ModernSlavery.Infrastructure.Database
             @"Server=(localdb)\ProjectsV13;Initial Catalog=ModernSlaveryDb;Trusted_Connection=True;";
 
         public readonly DatabaseOptions DatabaseOptions;
-        public readonly GlobalOptions GlobalOptions;
+        public readonly SharedOptions SharedOptions;
 
-        public DatabaseContext(GlobalOptions globalOptions, DatabaseOptions databaseOptions)
+        public DatabaseContext(SharedOptions sharedOptions, DatabaseOptions databaseOptions)
         {
-            GlobalOptions = globalOptions;
+            SharedOptions = sharedOptions;
             DatabaseOptions = databaseOptions;
             if (!string.IsNullOrWhiteSpace(DatabaseOptions.ConnectionString))
                 ConnectionString = DatabaseOptions.ConnectionString;

@@ -15,9 +15,9 @@ namespace ModernSlavery.Infrastructure.Logging
     public class UserLogger : RecordLogger, IUserLogger
     {
         public UserLogger(
-            GlobalOptions globalOptions,
+            SharedOptions sharedOptions,
             LogRecordQueue queue)
-            : base(globalOptions, queue, AppDomain.CurrentDomain.FriendlyName, Filenames.UserLog)
+            : base(sharedOptions, queue, AppDomain.CurrentDomain.FriendlyName, Filenames.UserLog)
         {
         }
 
@@ -26,7 +26,7 @@ namespace ModernSlavery.Infrastructure.Logging
             User userToUpdate,
             string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix)) return;
+            if (userToUpdate.EmailAddress.StartsWithI(SharedOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(
@@ -41,7 +41,7 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task LogPasswordChangedAsync(User userToUpdate, string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix)) return;
+            if (userToUpdate.EmailAddress.StartsWithI(SharedOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(
@@ -59,7 +59,7 @@ namespace ModernSlavery.Infrastructure.Logging
             User userToUpdate,
             string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(GlobalOptions.TestPrefix)) return;
+            if (userToUpdate.EmailAddress.StartsWithI(SharedOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(
@@ -74,7 +74,7 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task LogUserRetiredAsync(User retiredUser, string actionByEmailAddress)
         {
-            if (retiredUser.EmailAddress.StartsWithI(GlobalOptions.TestPrefix)) return;
+            if (retiredUser.EmailAddress.StartsWithI(SharedOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(

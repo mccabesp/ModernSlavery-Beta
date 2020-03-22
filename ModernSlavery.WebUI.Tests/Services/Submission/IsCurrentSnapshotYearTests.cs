@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
     {
 
         private ISubmissionService mockSubmissionService;
-        private ICommonBusinessLogic mockCommonBusinessLogic;
+        private ISharedBusinessLogic mockSharedBusinessLogic;
         private Mock<IDataRepository> mockDataRepo;
         private Mock<IDraftFileBusinessLogic> mockDraftFileBL;
         private Mock<IFileRepository> mockFileRepo;
@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
         [SetUp]
         public void BeforeEach()
         {
-            mockCommonBusinessLogic = MoqHelpers.CreateFakeCommonBusinessLogic();
+            mockSharedBusinessLogic = MoqHelpers.CreateFakeSharedBusinessLogic();
             mockDataRepo = MoqHelpers.CreateMockDataRepository();
             mockScopeBL = new Mock<IScopeBusinessLogic>();
             mockDraftFileBL = new Mock<IDraftFileBusinessLogic>();
@@ -38,7 +38,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
         public void ReturnsFalseWhenNotCurrentYear(SectorTypes testSector, int testYear)
         {
             // Arrange
-            DateTime testSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSector);
+            DateTime testSnapshotDate = mockSharedBusinessLogic.GetAccountingStartDate(testSector);
             var expectCalledGetSnapshotDate = false;
 
             // Mocks
@@ -71,11 +71,11 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
         public void ReturnsTrueForCurrentYear(SectorTypes testSector)
         {
             // Arrange
-            DateTime testSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSector);
+            DateTime testSnapshotDate = mockSharedBusinessLogic.GetAccountingStartDate(testSector);
             int testYear = testSnapshotDate.Year;
 
             // Mocks
-            var testSubmissionService = new SubmissionService(mockCommonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
+            var testSubmissionService = new SubmissionService(mockSharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), Mock.Of<IDraftFileBusinessLogic>());
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
             // Assert

@@ -45,14 +45,14 @@ namespace ModernSlavery.Core.Tests.Classes.Email.GovNotifyEmailProvider
                 mockHttpClientFactory.Object,
                 mockEmailTemplateRepo.Object,
                 mockGovNotifyOptions.Object,
-                ConfigHelpers.GlobalOptions,
+                ConfigHelpers.SharedOptions,
                 mockLogger.Object, Mock.Of<IRecordLogger>());
         }
 
         [TearDown]
         public void AfterEach()
         {
-            ConfigHelpers.GlobalOptions.Environment = "Local";
+            ConfigHelpers.SharedOptions.Environment = "Local";
         }
 
         // notify keys broken down for testing
@@ -113,7 +113,7 @@ namespace ModernSlavery.Core.Tests.Classes.Email.GovNotifyEmailProvider
             Environment.SetEnvironmentVariable("Vault", " ");
 
             // set the environment to test
-            ConfigHelpers.GlobalOptions.Environment = testEnvironment;
+            ConfigHelpers.SharedOptions.Environment = testEnvironment;
 
             mockHttpMessageHandler
                 .Protected()

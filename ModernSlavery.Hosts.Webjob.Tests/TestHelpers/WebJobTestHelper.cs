@@ -47,7 +47,7 @@ namespace ModernSlavery.Hosts.Webjob.Tests.TestHelpers
 
             // BL Services
             builder.RegisterInstance(ConfigHelpers.Config).SingleInstance();
-            builder.RegisterType<CommonBusinessLogic>().As<ICommonBusinessLogic>().InstancePerLifetimeScope();
+            builder.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().InstancePerLifetimeScope();
             builder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>().InstancePerLifetimeScope();
             builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerLifetimeScope();
             builder.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>()
@@ -60,7 +60,7 @@ namespace ModernSlavery.Hosts.Webjob.Tests.TestHelpers
 
             //Register some singletons
             builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
-                .WithParameter("seed", ConfigHelpers.GlobalOptions.ObfuscationSeed);
+                .WithParameter("seed", ConfigHelpers.SharedOptions.ObfuscationSeed);
             builder.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
 
             builder.Register(c => Mock.Of<IMessenger>()).As<IMessenger>().SingleInstance();

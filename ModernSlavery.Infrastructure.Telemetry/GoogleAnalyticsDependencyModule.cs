@@ -15,10 +15,10 @@ namespace ModernSlavery.Infrastructure.Telemetry
 {
     public class GoogleAnalyticsDependencyModule : IDependencyModule
     {
-        private readonly GlobalOptions _globalOptions;
-        public GoogleAnalyticsDependencyModule(GlobalOptions globalOptions)
+        private readonly SharedOptions _sharedOptions;
+        public GoogleAnalyticsDependencyModule(SharedOptions sharedOptions)
         {
-            _globalOptions = globalOptions;
+            _sharedOptions = sharedOptions;
         }
 
         public void Bind(ContainerBuilder builder, IServiceCollection services)
@@ -45,7 +45,7 @@ namespace ModernSlavery.Infrastructure.Telemetry
                 .WithParameter(
                     (p, ctx) => p.ParameterType == typeof(HttpClient),
                     (p, ctx) => ctx.Resolve<IHttpClientFactory>().CreateClient(nameof(IWebTracker)))
-                .WithParameter("trackingId", _globalOptions.GoogleAnalyticsAccountId);
+                .WithParameter("trackingId", _sharedOptions.GoogleAnalyticsAccountId);
 
 
         }

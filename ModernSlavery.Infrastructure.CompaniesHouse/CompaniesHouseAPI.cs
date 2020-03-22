@@ -23,15 +23,15 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
 
         private readonly HttpClient _httpClient;
         private readonly Uri BaseUri;
-        private readonly GlobalOptions GlobalOptions;
+        private readonly SharedOptions SharedOptions;
 
         private readonly CompaniesHouseOptions Options;
 
-        public CompaniesHouseAPI(CompaniesHouseOptions options, GlobalOptions globalOptions)
+        public CompaniesHouseAPI(CompaniesHouseOptions options, SharedOptions sharedOptions)
         {
             Options = options ?? throw new ArgumentNullException("You must provide the companies house options",
                 nameof(CompaniesHouseOptions));
-            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             BaseUri = new Uri(Options.ApiServer);
             _apiKey = Options.ApiKey;
             MaxRecords = Options.MaxRecords;
@@ -62,7 +62,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                 var id = Numeric.Rand(100000, int.MaxValue - 1);
                 var employer = new EmployerRecord
                 {
-                    OrganisationName = GlobalOptions.TestPrefix + "_Ltd_" + id,
+                    OrganisationName = SharedOptions.TestPrefix + "_Ltd_" + id,
                     CompanyNumber = ("_" + id).Left(10),
                     Address1 = "Test Address 1",
                     Address2 = "Test Address 2",

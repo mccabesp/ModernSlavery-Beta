@@ -4,7 +4,7 @@
 @using ModernSlavery.WebUI.Shared.Classes.Cookies
 @using ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
 @using ModernSlavery.WebUI.Shared.Options
-@inject GlobalOptions globalOptions
+@inject SharedOptions sharedOptions
 @inject StaticAssetsVersioningHelper staticAssetsVersioningHelper
 @inject FeatureSwitchOptions featureSwitchOptions
 @{
@@ -27,7 +27,7 @@
 
     @if (User.Identity.IsAuthenticated)
     {
-        <meta http-equiv="refresh" content="@(globalOptions.SessionTimeOutMinutes * 60);@Url.Action("SessionExpired", "Home", null, "https")" />
+        <meta http-equiv="refresh" content="@(sharedOptions.SessionTimeOutMinutes * 60);@Url.Action("SessionExpired", "Home", null, "https")" />
     }
     <meta name="google-site-verification" content="uRt7CAkfClOB8Jig6Pw2-DELUWuuyG2kYKip0UThxhg" />
 

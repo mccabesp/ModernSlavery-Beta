@@ -76,9 +76,9 @@ namespace ModernSlavery.BusinessLogic
         private readonly IScopeBusinessLogic _scopeLogic;
         private readonly ISecurityCodeBusinessLogic _securityCodeLogic;
         private readonly ISubmissionBusinessLogic _submissionLogic;
-        private readonly ICommonBusinessLogic _commonBusinessLogic;
+        private readonly ISharedBusinessLogic _sharedBusinessLogic;
 
-        public OrganisationBusinessLogic(ICommonBusinessLogic commonBusinessLogic,
+        public OrganisationBusinessLogic(ISharedBusinessLogic sharedBusinessLogic,
             IDataRepository dataRepo,
             ISubmissionBusinessLogic submissionLogic,
             IScopeBusinessLogic scopeLogic,
@@ -87,7 +87,7 @@ namespace ModernSlavery.BusinessLogic
             IDnBOrgsRepository dnBOrgsRepository,
             IObfuscator obfuscator)
         {
-            _commonBusinessLogic = commonBusinessLogic;
+            _sharedBusinessLogic = sharedBusinessLogic;
             _DataRepository = dataRepo;
             _submissionLogic = submissionLogic;
             _scopeLogic = scopeLogic;
@@ -197,16 +197,16 @@ namespace ModernSlavery.BusinessLogic
 
         public virtual string GenerateEmployerReference()
         {
-            return Crypto.GeneratePasscode(_commonBusinessLogic.GlobalOptions.EmployerCodeChars.ToCharArray(),
-                _commonBusinessLogic.GlobalOptions.EmployerCodeLength);
+            return Crypto.GeneratePasscode(_sharedBusinessLogic.SharedOptions.EmployerCodeChars.ToCharArray(),
+                _sharedBusinessLogic.SharedOptions.EmployerCodeLength);
         }
 
         public virtual string GeneratePINCode(bool isTestUser)
         {
             if (isTestUser) return "ABCDEFG";
 
-            return Crypto.GeneratePasscode(_commonBusinessLogic.GlobalOptions.PINChars.ToCharArray(),
-                _commonBusinessLogic.GlobalOptions.PINLength);
+            return Crypto.GeneratePasscode(_sharedBusinessLogic.SharedOptions.PINChars.ToCharArray(),
+                _sharedBusinessLogic.SharedOptions.PINLength);
         }
 
         public virtual async Task<CustomResult<OrganisationScope>> SetAsScopeAsync(string employerRef,
@@ -461,7 +461,7 @@ namespace ModernSlavery.BusinessLogic
         public IEnumerable<OrganisationSicCode> GetSicCodes(Organisation org, DateTime? maxDate = null)
         {
             if (maxDate == null || maxDate.Value == DateTime.MinValue)
-                maxDate = _commonBusinessLogic.GetAccountingStartDate(org.SectorType).AddYears(1);
+                maxDate = _sharedBusinessLogic.GetAccountingStartDate(org.SectorType).AddYears(1);
 
             return org.OrganisationSicCodes.Where(s =>
                 s.Created < maxDate.Value && (s.Retired == null || s.Retired.Value > maxDate.Value));
@@ -481,7 +481,7 @@ namespace ModernSlavery.BusinessLogic
         public string GetSicSource(Organisation org, DateTime? maxDate = null)
         {
             if (maxDate == null || maxDate.Value == DateTime.MinValue)
-                maxDate = _commonBusinessLogic.GetAccountingStartDate(org.SectorType).AddYears(1);
+                maxDate = _sharedBusinessLogic.GetAccountingStartDate(org.SectorType).AddYears(1);
 
             return org.OrganisationSicCodes
                 .FirstOrDefault(

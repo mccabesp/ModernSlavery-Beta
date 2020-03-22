@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         public DownloadableFileController(
             IDownloadableFileBusinessLogic downloadableFileBusinessLogic,
-            ILogger<DownloadableFileController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<DownloadableFileController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             _downloadableFileBusinessLogic = downloadableFileBusinessLogic;
         }
@@ -93,12 +93,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private async Task<IEnumerable<IDownloadableItem>> FetchDownloadablesFromSubfolderAsync(string fp, string subfolderName)
         {
             //var logsPathToProcess = string.IsNullOrEmpty(fp)
-            //    ? Path.Combine(CommonBusinessLogic.GlobalOptions.LogPath, subfolderName)
+            //    ? Path.Combine(SharedBusinessLogic.SharedOptions.LogPath, subfolderName)
             //    : fp;
 
             // Storage explorer, we DO want to change
             string logsPathToProcess = string.IsNullOrWhiteSpace(fp)
-                ? Path.Combine(CommonBusinessLogic.GlobalOptions.LogPath, subfolderName).Replace("\\", "/")
+                ? Path.Combine(SharedBusinessLogic.SharedOptions.LogPath, subfolderName).Replace("\\", "/")
                 : fp;
 
             IEnumerable<IDownloadableItem> listOfDownloadableItems =

@@ -43,18 +43,18 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                List<int> returnYears = Queryable.Where<Return>(_CommonBusinessLogic.DataRepository.GetAll<Return>(), r => r.Status == ReturnStatuses.Submitted)
+                List<int> returnYears = Queryable.Where<Return>(_SharedBusinessLogic.DataRepository.GetAll<Return>(), r => r.Status == ReturnStatuses.Submitted)
                     .Select(r => r.AccountingDate.Year)
                     .Distinct()
                     .ToList();
 
                 //Get the downloads location
-                string downloadsLocation = _CommonBusinessLogic.GlobalOptions.DownloadsLocation;
+                string downloadsLocation = _SharedBusinessLogic.SharedOptions.DownloadsLocation;
 
                 //Ensure we have a directory
-                if (!await _CommonBusinessLogic.FileRepository.GetDirectoryExistsAsync(downloadsLocation))
+                if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(downloadsLocation))
                 {
-                    await _CommonBusinessLogic.FileRepository.CreateDirectoryAsync(downloadsLocation);
+                    await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(downloadsLocation);
                 }
 
                 foreach (int year in returnYears)
@@ -62,24 +62,24 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     //If another server is already in process of creating a file then skip
 
                     string downloadFilePattern = $"GPGData_{year}-{year + 1}.csv";
-                    IEnumerable<string> files = await _CommonBusinessLogic.FileRepository.GetFilesAsync(downloadsLocation, downloadFilePattern);
+                    IEnumerable<string> files = await _SharedBusinessLogic.FileRepository.GetFilesAsync(downloadsLocation, downloadFilePattern);
                     string oldDownloadFilePath = files.FirstOrDefault();
 
                     //Skip if the file already exists and is newer than 1 hour or older than 1 year
                     if (oldDownloadFilePath != null && !force)
                     {
-                        DateTime lastWriteTime = await _CommonBusinessLogic.FileRepository.GetLastWriteTimeAsync(oldDownloadFilePath);
+                        DateTime lastWriteTime = await _SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(oldDownloadFilePath);
                         if (lastWriteTime.AddHours(1) >= VirtualDateTime.Now || lastWriteTime.AddYears(2) <= VirtualDateTime.Now)
                         {
                             continue;
                         }
                     }
 
-                    List<Return> returns = await Queryable.Where<Return>(_CommonBusinessLogic.DataRepository.GetAll<Return>(), r => r.AccountingDate.Year == year
+                    List<Return> returns = await Queryable.Where<Return>(_SharedBusinessLogic.DataRepository.GetAll<Return>(), r => r.AccountingDate.Year == year
                                                                                                                                && r.Status == ReturnStatuses.Submitted
                                                                                                                                && r.Organisation.Status == OrganisationStatuses.Active)
                         .ToListAsync();
-                    returns.RemoveAll(r => r.Organisation.OrganisationName.StartsWithI(_CommonBusinessLogic.GlobalOptions.TestPrefix));
+                    returns.RemoveAll(r => r.Organisation.OrganisationName.StartsWithI(_SharedBusinessLogic.SharedOptions.TestPrefix));
 
                     List<DownloadResult> downloadData = returns.ToList()
                         .Select(r => DownloadResult.Create(r))
@@ -87,16 +87,16 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         .ToList();
 
                     string newFilePath =
-                        _CommonBusinessLogic.FileRepository.GetFullPath(Path.Combine(downloadsLocation, $"GPGData_{year}-{year + 1}.csv"));
+                        _SharedBusinessLogic.FileRepository.GetFullPath(Path.Combine(downloadsLocation, $"GPGData_{year}-{year + 1}.csv"));
                     try
                     {
                         if (downloadData.Any())
                         {
-                            await Core.Classes.Extensions.SaveCSVAsync(_CommonBusinessLogic.FileRepository, downloadData, newFilePath, oldDownloadFilePath);
+                            await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, downloadData, newFilePath, oldDownloadFilePath);
                         }
                         else if (!string.IsNullOrWhiteSpace(oldDownloadFilePath))
                         {
-                            await _CommonBusinessLogic.FileRepository.DeleteFileAsync(oldDownloadFilePath);
+                            await _SharedBusinessLogic.FileRepository.DeleteFileAsync(oldDownloadFilePath);
                         }
                     }
                     catch (Exception ex)

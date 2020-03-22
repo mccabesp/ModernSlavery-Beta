@@ -20,10 +20,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.SendInfo);
+                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.SendInfo);
 
                 //Dont execute on startup if file already exists
-                if (!Functions.StartedJobs.Contains(nameof(UpdateUsersToSendInfo)) && await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
+                if (!Functions.StartedJobs.Contains(nameof(UpdateUsersToSendInfo)) && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -56,7 +56,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             Functions.RunningJobs.Add(nameof(UpdateUsersToSendInfo));
             try
             {
-                List<User> users = await Queryable.Where<User>(_CommonBusinessLogic.DataRepository.GetAll<User>(), user => user.Status == UserStatuses.Active
+                List<User> users = await Queryable.Where<User>(_SharedBusinessLogic.DataRepository.GetAll<User>(), user => user.Status == UserStatuses.Active
                                                                                                                         && Enumerable.Any<UserSetting>(user.UserSettings, us => us.Key == UserSettingKeys.SendUpdates && us.Value.ToLower() == "true"))
                     .ToListAsync();
                 var records = users.Select(
@@ -73,7 +73,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             u.ContactOrganisation
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(_CommonBusinessLogic.FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
             }
             finally
             {

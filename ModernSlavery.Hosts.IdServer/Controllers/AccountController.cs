@@ -55,7 +55,7 @@ namespace ModernSlavery.IdServer.Controllers
             IAuthenticationSchemeProvider schemeProvider,
             IEventService events,
             IUserRepository userRepository,
-            ILogger<AccountController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<AccountController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             _userRepository = userRepository;
             _interaction = interaction;
@@ -80,7 +80,7 @@ namespace ModernSlavery.IdServer.Controllers
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
             {
-                return Redirect(CommonBusinessLogic.GlobalOptions.SiteAuthority + "manage-organisations");
+                return Redirect(SharedBusinessLogic.SharedOptions.SiteAuthority + "manage-organisations");
             }
 
             // build a model so we know what to show on the login page
@@ -222,8 +222,8 @@ namespace ModernSlavery.IdServer.Controllers
                     int loginAttempts = string.IsNullOrWhiteSpace(login) ? 0 : login.AfterFirst("|").ToInt32();
                     TimeSpan lockRemaining = loginDate == DateTime.MinValue
                         ? TimeSpan.Zero
-                        : loginDate.AddMinutes(CommonBusinessLogic.GlobalOptions.LockoutMinutes) - VirtualDateTime.Now;
-                    if (loginAttempts >= CommonBusinessLogic.GlobalOptions.MaxLoginAttempts && lockRemaining > TimeSpan.Zero)
+                        : loginDate.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) - VirtualDateTime.Now;
+                    if (loginAttempts >= SharedBusinessLogic.SharedOptions.MaxLoginAttempts && lockRemaining > TimeSpan.Zero)
                     {
                         await _events.RaiseAsync(
                             new UserLoginFailureEvent(model.Username, AccountOptions.TooManySigninAttemptsErrorMessage));
@@ -236,7 +236,7 @@ namespace ModernSlavery.IdServer.Controllers
                         await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "Invalid user"));
                         ModelState.AddModelError("", AccountOptions.InvalidCredentialsErrorMessage);
                         loginAttempts++;
-                        await WebService.Cache.AddAsync($"{model.Username}:login", $"{VirtualDateTime.Now}|{loginAttempts}",absoluteExpiration: VirtualDateTime.Now.AddMinutes(CommonBusinessLogic.GlobalOptions.LockoutMinutes));
+                        await WebService.Cache.AddAsync($"{model.Username}:login", $"{VirtualDateTime.Now}|{loginAttempts}",absoluteExpiration: VirtualDateTime.Now.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes));
                     }
                 }
             }
@@ -256,7 +256,7 @@ namespace ModernSlavery.IdServer.Controllers
             //If there is no logoutid then sign-out via webui
             if (string.IsNullOrWhiteSpace(logoutId))
             {
-                return Redirect(CommonBusinessLogic.GlobalOptions.SiteAuthority + "sign-out");
+                return Redirect(SharedBusinessLogic.SharedOptions.SiteAuthority + "sign-out");
             }
 
             // build a model so the logout page knows what to display

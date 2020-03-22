@@ -31,12 +31,12 @@ namespace ModernSlavery.BusinessLogic
 
     public class SubmissionBusinessLogic : ISubmissionBusinessLogic
     {
-        private readonly ICommonBusinessLogic _commonBusinessLogic;
+        private readonly ISharedBusinessLogic _sharedBusinessLogic;
 
-        public SubmissionBusinessLogic(ICommonBusinessLogic commonBusinessLogic, IDataRepository dataRepo,
+        public SubmissionBusinessLogic(ISharedBusinessLogic sharedBusinessLogic, IDataRepository dataRepo,
             [KeyFilter(Filenames.SubmissionLog)] IRecordLogger submissionLog)
         {
-            _commonBusinessLogic = commonBusinessLogic;
+            _sharedBusinessLogic = sharedBusinessLogic;
             DataRepository = dataRepo;
             SubmissionLog = submissionLog;
         }
@@ -149,8 +149,8 @@ namespace ModernSlavery.BusinessLogic
         public virtual IEnumerable<LateSubmissionsFileModel> GetLateSubmissions()
         {
             // get the snapshot dates to filter submissions by
-            var curPrivateSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Private);
-            var curPublicSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Public);
+            var curPrivateSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(SectorTypes.Private);
+            var curPublicSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(SectorTypes.Public);
             var prevPrivateSnapshotDate = curPrivateSnapshotDate.AddYears(-1);
             var prevPublicSnapshotDate = curPublicSnapshotDate.AddYears(-1);
 

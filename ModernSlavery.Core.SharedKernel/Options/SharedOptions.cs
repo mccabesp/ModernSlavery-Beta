@@ -5,7 +5,7 @@ using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.SharedKernel.Options
 {
-    public class GlobalOptions : IOptions
+    public class SharedOptions : IOptions
     {
         public string DefaultEncryptionKey { get; set; }
 

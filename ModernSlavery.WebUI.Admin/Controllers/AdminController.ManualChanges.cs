@@ -70,7 +70,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 throw new ArgumentException("ERROR: parameters must be empty");
             }
 
-            int count = await CommonBusinessLogic.DataRepository.GetAll<OrganisationName>()
+            int count = await SharedBusinessLogic.DataRepository.GetAll<OrganisationName>()
                 .Where(o => o.Name.ToLower().Contains(" ltd"))
                 .Select(o => o.OrganisationId)
                 .Distinct()
@@ -514,7 +514,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (!test && listOfModifiedOrgs.Count > 0)
             {
-                await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 //todo: writer.WriteLine(Color.Green, $"INFO: Changes saved to database, attempting to update search index.");
 
                 await AdminService.SearchBusinessLogic.UpdateSearchIndexAsync(listOfModifiedOrgs.ToArray());
@@ -535,7 +535,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Fix latest registrations
 
-            IQueryable<Organisation> orgs = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+            IQueryable<Organisation> orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                 .Where(o => o.LatestRegistration == null && o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null));
             var subCount = 0;
             foreach (Organisation org in orgs)
@@ -554,7 +554,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (!test && subCount > 0)
             {
-                await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
             }
 
             if (subCount == 0)
@@ -568,7 +568,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Fix latest returns
 
-            orgs = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+            orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                 .Where(o => o.LatestReturn == null && o.Returns.Any(r => r.Status == ReturnStatuses.Submitted));
             subCount = 0;
             foreach (Organisation org in orgs)
@@ -587,7 +587,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (!test && subCount > 0)
             {
-                await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
             }
 
             if (subCount == 0)
@@ -601,7 +601,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Fix latest scopes
 
-            orgs = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+            orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                 .Where(o => o.LatestScope == null && o.OrganisationScopes.Any(s => s.ScopeStatus != ScopeStatuses.Unknown));
             subCount = 0;
             foreach (Organisation org in orgs)
@@ -620,7 +620,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (!test && subCount > 0)
             {
-                await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
             }
 
             if (subCount == 0)
@@ -699,7 +699,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     processedCoNos.Add(newValue);
                 }
 
-                Organisation org = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
@@ -716,7 +716,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         $"{i}: WARNING '{employerRef}' '{org.OrganisationName}' Company Number='{org.CompanyNumber}' already set to '{oldValue}'");
                 }
                 else if (!string.IsNullOrWhiteSpace(newValue)
-                         && await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                         && await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                              .AnyAsync(o => o.CompanyNumber == newValue && o.OrganisationId != org.OrganisationId))
                 {
                     writer.WriteLine(Color.Red, $"{i}: ERROR '{employerRef}' Another organisation exists with this company number");
@@ -741,7 +741,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 oldValue,
                                 newValue,
                                 comment));
-                        await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                     }
                 }
 
@@ -791,7 +791,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 processed.Add(employerRef);
 
                 // ensure the employer ref exists
-                Organisation org = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
                 if (org == null)
                 {
@@ -839,7 +839,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (string sc in sicCodes)
                 {
                     int parsedSc = int.Parse(sc);
-                    if (CommonBusinessLogic.DataRepository.GetAll<SicCode>().Any(x => x.SicCodeId == parsedSc) == false)
+                    if (SharedBusinessLogic.DataRepository.GetAll<SicCode>().Any(x => x.SicCodeId == parsedSc) == false)
                     {
                         invalidSicCodes.Add(sc);
                     }
@@ -867,7 +867,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 parsedSicCodes.ForEach(
                     x => {
                         var sic = new OrganisationSicCode {Organisation = org, SicCodeId = x, Source = "Manual"};
-                        CommonBusinessLogic.DataRepository.Insert(sic);
+                        SharedBusinessLogic.DataRepository.Insert(sic);
                         org.OrganisationSicCodes.Add(sic);
                     });
 
@@ -889,7 +889,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             oldValue,
                             newValue,
                             comment));
-                    await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                    await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
                 count++;
@@ -938,7 +938,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 processed.Add(employerRef);
 
                 // ensure the employer ref exists
-                Organisation org = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
                 if (org == null)
                 {
@@ -1078,7 +1078,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 org.LatestAddress = newAddress;
 
-                CommonBusinessLogic.DataRepository.Insert(newAddress);
+                SharedBusinessLogic.DataRepository.Insert(newAddress);
                 org.OrganisationAddresses.Add(newAddress);
 
                 //Output the actual execution result
@@ -1099,7 +1099,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             oldValue,
                             newValue,
                             comment));
-                    await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                    await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
                 count++;
@@ -1148,7 +1148,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 processed.Add(employerRef);
 
                 // ensure the employer ref exists
-                Organisation org = CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
                 if (org == null)
                 {
@@ -1199,7 +1199,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure the public sector type exists
-                var newSectorType = CommonBusinessLogic.DataRepository.Get<PublicSectorType>(parsedPublicSectorTypeId);
+                var newSectorType = SharedBusinessLogic.DataRepository.Get<PublicSectorType>(parsedPublicSectorTypeId);
                 if (newSectorType == null)
                 {
                     writer.WriteLine(
@@ -1231,7 +1231,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     PublicSectorType = newSectorType,
                     Source = "Manual"
                 };
-                CommonBusinessLogic.DataRepository.Insert(newOrgSectorClass);
+                SharedBusinessLogic.DataRepository.Insert(newOrgSectorClass);
                 org.LatestPublicSectorType = newOrgSectorClass;
 
                 //Output the actual execution result
@@ -1255,7 +1255,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             oldValue,
                             newValue,
                             comment));
-                    await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                    await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
                 count++;
@@ -1325,7 +1325,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 processedNumbers.Add(newValue);
 
-                Organisation org = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
@@ -1348,7 +1348,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         $"{i}: ERROR '{employerRef}' '{org.OrganisationName}' already holds a different DUNS Number='{org.DUNSNumber}'");
                     continue;
                 }
-                else if (await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                else if (await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .AnyAsync(o => o.DUNSNumber == newValue && o.OrganisationId != org.OrganisationId))
                 {
                     writer.WriteLine(Color.Red, $"{i}: ERROR '{employerRef}' Another organisation exists with this DUNS number");
@@ -1372,7 +1372,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 oldValue,
                                 newValue,
                                 comment));
-                        await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                     }
                 }
 
@@ -1420,7 +1420,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 processed.Add(employerRef);
 
-                Organisation org = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
@@ -1435,7 +1435,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                int year = number.ToInt32(AdminService.CommonBusinessLogic.GetAccountingStartDate(org.SectorType).Year);
+                int year = number.ToInt32(AdminService.SharedBusinessLogic.GetAccountingStartDate(org.SectorType).Year);
                 Return @return = org.Returns.OrderByDescending(o => o.StatusDate)
                     .FirstOrDefault(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year);
                 if (@return == null)
@@ -1481,7 +1481,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             newValue.ToString(),
                             comment,
                             $"Year={year} Employer='{employerRef}'"));
-                    await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                    await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
                 count++;
@@ -1535,7 +1535,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     ReferenceValue = employerRef
                 };
 
-                Organisation org = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
@@ -1569,7 +1569,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (!test)
                 {
                     await AdminService.ManualChangeLog.WriteAsync(manualChangeLogModel);
-                    await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                    await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                     await AdminService.SearchBusinessLogic.UpdateSearchIndexAsync(org);
                 }
 
@@ -1617,7 +1617,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 processed.Add(employerRef);
 
-                Organisation org = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
@@ -1652,7 +1652,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 oldValue.ToString(),
                                 newValue.ToString(),
                                 comment));
-                        await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
                         //Add or remove this organisation to/from the search index
                         await AdminService.SearchBusinessLogic.UpdateSearchIndexAsync(org);
@@ -1705,7 +1705,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 var newSector = SectorTypes.Public;
 
-                Organisation org = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
@@ -1719,7 +1719,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (Return @return in org.Returns)
                 {
                     DateTime oldDate = @return.AccountingDate;
-                    DateTime newDate = AdminService.CommonBusinessLogic.GetAccountingStartDate(newSector,oldDate.Year);
+                    DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector,oldDate.Year);
                     if (oldDate == newDate)
                     {
                         continue;
@@ -1733,7 +1733,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (OrganisationScope scope in org.OrganisationScopes)
                 {
                     DateTime oldDate = scope.SnapshotDate;
-                    DateTime newDate = AdminService.CommonBusinessLogic.GetAccountingStartDate(newSector,oldDate.Year);
+                    DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector,oldDate.Year);
                     if (oldDate == newDate)
                     {
                         continue;
@@ -1805,7 +1805,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         foreach (Return @return in org.Returns)
                         {
                             DateTime oldDate = @return.AccountingDate;
-                            DateTime newDate = AdminService.CommonBusinessLogic.GetAccountingStartDate(newSector,oldDate.Year);
+                            DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector,oldDate.Year);
                             if (oldDate == newDate)
                             {
                                 continue;
@@ -1835,7 +1835,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         foreach (OrganisationScope scope in org.OrganisationScopes)
                         {
                             DateTime oldDate = scope.SnapshotDate;
-                            DateTime newDate = AdminService.CommonBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                            DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate)
                             {
                                 continue;
@@ -1862,7 +1862,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     writer.WriteLine($"{i}: {employerRef}: {org.OrganisationName} sector {oldSector} set to '{newSector}'");
                     if (!test)
                     {
-                        await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                     }
                 }
 
@@ -1912,7 +1912,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 var newSector = SectorTypes.Private;
 
-                Organisation org = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
@@ -1926,7 +1926,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (Return @return in org.Returns)
                 {
                     DateTime oldDate = @return.AccountingDate;
-                    DateTime newDate = AdminService.CommonBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                     if (oldDate == newDate)
                     {
                         continue;
@@ -1940,7 +1940,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (OrganisationScope scope in org.OrganisationScopes)
                 {
                     DateTime oldDate = scope.SnapshotDate;
-                    DateTime newDate = AdminService.CommonBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                     if (oldDate == newDate)
                     {
                         continue;
@@ -2013,7 +2013,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         comment));
                             }
 
-                            CommonBusinessLogic.DataRepository.Delete(sic);
+                            SharedBusinessLogic.DataRepository.Delete(sic);
                         }
                     }
 
@@ -2023,7 +2023,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         foreach (Return @return in org.Returns)
                         {
                             DateTime oldDate = @return.AccountingDate;
-                            DateTime newDate = AdminService.CommonBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                            DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate)
                             {
                                 continue;
@@ -2060,7 +2060,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         foreach (OrganisationScope scope in org.OrganisationScopes)
                         {
                             DateTime oldDate = scope.SnapshotDate;
-                            DateTime newDate = AdminService.CommonBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                            DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate)
                             {
                                 continue;
@@ -2087,7 +2087,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     writer.WriteLine($"{i}: {employerRef}: {org.OrganisationName} sector {oldSector} set to '{newSector}'");
                     if (!test)
                     {
-                        await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                     }
                 }
 
@@ -2144,7 +2144,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                Organisation org = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
@@ -2157,7 +2157,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(Color.Orange, $"{i}: WARNING: '{employerRef}' '{org.OrganisationName}' already set to '{newValue}'");
                 }
-                else if (await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                else if (await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .AnyAsync(o => o.OrganisationName.ToLower() == newValue.ToLower() && o.OrganisationId != org.OrganisationId))
                 {
                     writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Another organisation exists with this company name");
@@ -2201,7 +2201,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     writer.WriteLine($"{i}: {employerRef}: '{oldValue}' set to '{newValue}'");
                     if (!test)
                     {
-                        await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                     }
                 }
 
@@ -2258,7 +2258,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                Organisation org = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
@@ -2271,7 +2271,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(Color.Orange, $"{i}: WARNING: '{employerRef}' '{org.OrganisationName}' already set to '{newValue}'");
                 }
-                else if (await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                else if (await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .AnyAsync(o => o.OrganisationName.ToLower() == newValue.ToLower() && o.OrganisationId != org.OrganisationId))
                 {
                     writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Another organisation exists with this company name");
@@ -2325,7 +2325,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         comment));
                             }
 
-                            CommonBusinessLogic.DataRepository.Delete(name);
+                            SharedBusinessLogic.DataRepository.Delete(name);
                         }
 
                         org.OrganisationNames.Add(
@@ -2349,7 +2349,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     writer.WriteLine($"{i}: {employerRef}: '{oldValue}' set to '{newValue}'");
                     if (!test)
                     {
-                        await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                     }
                 }
 
@@ -2436,7 +2436,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     string hasBeenWillBe = test ? "will be" : "has been";
                     string createdOrExtended = manualAction == ManualActions.Extend ? "extended" : "created";
                     string securityCodeHiddenOrShow =
-                        test ? new string('*', CommonBusinessLogic.GlobalOptions.PINLength) : $"{securityCodeWorksOutcome.Result.SecurityCode}";
+                        test ? new string('*', SharedBusinessLogic.SharedOptions.PINLength) : $"{securityCodeWorksOutcome.Result.SecurityCode}";
                     writer.WriteLine(
                         $"{i}: {securityCodeWorksOutcome.Result}: {hasBeenWillBe} {createdOrExtended} to be '{securityCodeHiddenOrShow}' and will expire on '{securityCodeWorksOutcome.Result.SecurityCodeExpiryDateTime:dd/MMMM/yyyy}'");
 
@@ -2474,7 +2474,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (!test && listOfModifiedOrgs.Count > 0)
             {
-                await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 writer.WriteLine(Color.Green, "INFO: Changes saved to database");
             }
 
@@ -2587,7 +2587,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (!test && listOfModifiedOrgs.Count > 0)
             {
-                await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 writer.WriteLine(Color.Green, "INFO: Changes saved to database");
             }
 
@@ -2688,7 +2688,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (!test && securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses.Count > 0)
                 {
-                    CommonBusinessLogic.DataRepository.UpdateChangesInBulk(securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses);
+                    SharedBusinessLogic.DataRepository.UpdateChangesInBulk(securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses);
                     writer.WriteLine(Color.Green, "INFO: Changes saved to database");
                 }
 
@@ -2781,7 +2781,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (!test && securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses.Count > 0)
                 {
-                    CommonBusinessLogic.DataRepository.UpdateChangesInBulk(securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses);
+                    SharedBusinessLogic.DataRepository.UpdateChangesInBulk(securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses);
                     writer.WriteLine(Color.Green, "INFO: Changes saved to database");
                 }
 

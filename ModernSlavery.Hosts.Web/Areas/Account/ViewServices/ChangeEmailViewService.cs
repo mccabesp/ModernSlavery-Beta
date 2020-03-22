@@ -21,15 +21,15 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
     public class ChangeEmailViewService : IChangeEmailViewService
     {
 
-        public ChangeEmailViewService(GlobalOptions globalOptions, IUserRepository userRepo, IUrlHelper urlHelper, ISendEmailService sendEmailService)
+        public ChangeEmailViewService(SharedOptions sharedOptions, IUserRepository userRepo, IUrlHelper urlHelper, ISendEmailService sendEmailService)
         {
-            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             UserRepository = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
             UrlHelper = urlHelper ?? throw new ArgumentNullException(nameof(urlHelper));
             SendEmailService = sendEmailService;
         }
 
-        private readonly GlobalOptions GlobalOptions;
+        private readonly SharedOptions SharedOptions;
 
         private IUserRepository UserRepository { get; }
         private IUrlHelper UrlHelper { get; }
@@ -70,7 +70,7 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
             var changeEmailToken = Encryption.DecryptModel<ChangeEmailVerificationToken>(code);
 
             // ensure token hasn't expired
-            DateTime verifyExpiryDate = changeEmailToken.TokenTimestamp.AddHours(GlobalOptions.EmailVerificationExpiryHours);
+            DateTime verifyExpiryDate = changeEmailToken.TokenTimestamp.AddHours(SharedOptions.EmailVerificationExpiryHours);
             if (verifyExpiryDate < VirtualDateTime.Now)
             {
                 errorState.AddModelError(

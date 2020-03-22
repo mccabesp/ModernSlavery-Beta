@@ -26,7 +26,7 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
 
         public ChangePasswordController(
             IChangePasswordViewService changePasswordService,
-            ILogger<ChangePasswordController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<ChangePasswordController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             ChangePasswordService = changePasswordService;
         }

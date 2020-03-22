@@ -79,7 +79,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
                     });
 
             var downloadableFileBusinessLogic = IocContainer.Resolve<IDownloadableFileBusinessLogic>();
-            var commonBusinessLogic = IocContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = IocContainer.Resolve<ISharedBusinessLogic>();
 
             var webService = IocContainer.Resolve<IWebService>();
 
@@ -87,7 +87,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
                 downloadableFileBusinessLogic,
                 configurableLogger.Object,
                 webService,
-                commonBusinessLogic);
+                sharedBusinessLogic);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile(filePath);
@@ -146,14 +146,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
                     });
 
             var downloadableFileBusinessLogic = IocContainer.Resolve<IDownloadableFileBusinessLogic>();
-            var commonBusinessLogic = IocContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = IocContainer.Resolve<ISharedBusinessLogic>();
 
             var webService = IocContainer.Resolve<IWebService>();
 
             _TestDownloadableFileController = new DownloadableFileController(
                 downloadableFileBusinessLogic,
                 configurableLogger.Object, webService,
-                commonBusinessLogic);
+                sharedBusinessLogic);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile(filePath);
@@ -215,14 +215,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
                 .Setup(x => x.GetFileRemovingSensitiveInformationAsync(It.IsAny<string>()))
                 .ThrowsAsync(new FileNotFoundException());
 
-            var commonBusinessLogic = IocContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = IocContainer.Resolve<ISharedBusinessLogic>();
 
             var webService = IocContainer.Resolve<IWebService>();
 
             _TestDownloadableFileController = new DownloadableFileController(
                 configurableDownloadableFileBusinessLogic.Object,
                 configurableLogger.Object, webService,
-                commonBusinessLogic);
+                sharedBusinessLogic);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile("AFilePath");
@@ -260,12 +260,12 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
                 .ReturnsAsync(new DownloadableFileModel("someName") {DataTable = new DataTable()});
 
             var webService = IocContainer.Resolve<IWebService>();
-            var commonBusinessLogic = IocContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = IocContainer.Resolve<ISharedBusinessLogic>();
 
             _TestDownloadableFileController = new DownloadableFileController(
                 configurableDownloadableFileBusinessLogic.Object,
                 null, webService,
-                commonBusinessLogic);
+                sharedBusinessLogic);
 
             // Act
             IActionResult actualResult = await _TestDownloadableFileController.DownloadFile("AFilePath");
@@ -291,14 +291,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
                 .Setup(x => x.GetListOfDownloadableItemsFromPathAsync(It.IsAny<string>()))
                 .Callback((string fp) => { actualPath = fp; })
                 .ReturnsAsync(new List<IDownloadableItem>());
-            var commonBusinessLogic = IocContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = IocContainer.Resolve<ISharedBusinessLogic>();
 
             var webService = IocContainer.Resolve<IWebService>();
 
             _TestDownloadableFileController = new DownloadableFileController(
                 configurableDownloadableFileBusinessLogic.Object,
                 null, webService,
-                commonBusinessLogic);
+                sharedBusinessLogic);
 
             // Act
             await _TestDownloadableFileController.WebsiteLogs(filePath);
@@ -348,14 +348,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
                 .Callback((string fp) => { actualPath = fp; })
                 .ReturnsAsync(new List<IDownloadableItem>());
 
-            var commonBusinessLogic = IocContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = IocContainer.Resolve<ISharedBusinessLogic>();
 
             var webService = IocContainer.Resolve<IWebService>();
 
             _TestDownloadableFileController = new DownloadableFileController(
                 configurableDownloadableFileBusinessLogic.Object,
                 null, webService,
-                commonBusinessLogic);
+                sharedBusinessLogic);
 
             // Act
             await _TestDownloadableFileController.WebjobLogs(filePath);
@@ -404,14 +404,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
                 .Setup(x => x.GetListOfDownloadableItemsFromPathAsync(It.IsAny<string>()))
                 .Callback((string fp) => { actualPath = fp; })
                 .ReturnsAsync(new List<IDownloadableItem>());
-            var commonBusinessLogic = IocContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = IocContainer.Resolve<ISharedBusinessLogic>();
 
             var webService = IocContainer.Resolve<IWebService>();
 
             _TestDownloadableFileController = new DownloadableFileController(
                 configurableDownloadableFileBusinessLogic.Object,
                 null, webService,
-                commonBusinessLogic);
+                sharedBusinessLogic);
 
             // Act
             await _TestDownloadableFileController.IdentityLogs(filePath);
@@ -459,14 +459,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
                 .Setup(x => x.GetListOfDownloadableItemsFromPathAsync(It.IsAny<string>()))
                 .ReturnsAsync(listOfDownloadableItems);
 
-            var commonBusinessLogic = IocContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = IocContainer.Resolve<ISharedBusinessLogic>();
 
             var webService = IocContainer.Resolve<IWebService>();
 
             _TestDownloadableFileController = new DownloadableFileController(
                 configurableDownloadableFileBusinessLogic.Object,
                 null, webService,
-                commonBusinessLogic);
+                sharedBusinessLogic);
         }
 
     }

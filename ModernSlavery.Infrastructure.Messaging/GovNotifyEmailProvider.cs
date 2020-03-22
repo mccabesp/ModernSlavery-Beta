@@ -18,10 +18,10 @@ namespace ModernSlavery.Infrastructure.Messaging
             IHttpClientFactory httpClientFactory,
             IEmailTemplateRepository emailTemplateRepo,
             GovNotifyOptions govNotifyOptions,
-            GlobalOptions globalOptions,
+            SharedOptions sharedOptions,
             ILogger<GovNotifyEmailProvider> logger,
             [KeyFilter(Filenames.EmailSendLog)] IRecordLogger emailSendLog)
-            : base(globalOptions, emailTemplateRepo, logger, emailSendLog)
+            : base(sharedOptions, emailTemplateRepo, logger, emailSendLog)
         {
             Options = govNotifyOptions
                       ?? throw new ArgumentNullException("You must provide the gov notify email options",
@@ -57,7 +57,7 @@ namespace ModernSlavery.Infrastructure.Messaging
             var mergeParameters = parameters.GetPropertiesDictionary();
 
             // prefix subject with environment name
-            mergeParameters["Environment"] = GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] ";
+            mergeParameters["Environment"] = SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] ";
 
             // determine which client to use
             var client = test ? TestClient : ProductionClient;

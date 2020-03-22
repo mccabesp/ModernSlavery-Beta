@@ -26,16 +26,16 @@ namespace ModernSlavery.WebUI.Controllers
 
         public ScopeController(
             IScopePresenter scopeUI,
-            ILogger<ScopeController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<ScopeController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
-            _commonBusinessLogic = commonBusinessLogic;
+            _sharedBusinessLogic = sharedBusinessLogic;
             ScopePresentation = scopeUI;
         }
 
         #endregion
 
         #region Dependencies
-        public ICommonBusinessLogic _commonBusinessLogic { get; set; }
+        public ISharedBusinessLogic _sharedBusinessLogic { get; set; }
 
         public IScopePresenter ScopePresentation { get; }
 
@@ -54,7 +54,7 @@ namespace ModernSlavery.WebUI.Controllers
             EnterCodesViewModel model = currentStateModel?.EnterCodes ?? new EnterCodesViewModel();
 
             // when spamlocked then return a CustomError view
-            TimeSpan remainingTime = await GetRetryLockRemainingTimeAsync("lastScopeCode", CommonBusinessLogic.GlobalOptions.LockoutMinutes);
+            TimeSpan remainingTime = await GetRetryLockRemainingTimeAsync("lastScopeCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
             if (remainingTime > TimeSpan.Zero)
             {
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
@@ -78,7 +78,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             // When Spamlocked then return a CustomError view
-            TimeSpan remainingTime = await GetRetryLockRemainingTimeAsync("lastScopeCode", CommonBusinessLogic.GlobalOptions.LockoutMinutes);
+            TimeSpan remainingTime = await GetRetryLockRemainingTimeAsync("lastScopeCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
             if (remainingTime > TimeSpan.Zero)
             {
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
@@ -101,7 +101,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             if (stateModel == null)
             {
-                await IncrementRetryCountAsync("lastScopeCode", CommonBusinessLogic.GlobalOptions.LockoutMinutes);
+                await IncrementRetryCountAsync("lastScopeCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
                 ModelState.AddModelError(3027);
                 this.CleanModelErrors<EnterCodesViewModel>();
                 return View("EnterCodes", model);
@@ -204,14 +204,14 @@ namespace ModernSlavery.WebUI.Controllers
             var snapshotYears = new HashSet<int> {stateModel.AccountingDate.Year};
             await ScopePresentation.SaveScopesAsync(stateModel, snapshotYears);
 
-            var organisation = CommonBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            DateTime currentSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(organisation.SectorType);
+            var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
+            DateTime currentSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType);
             if (stateModel.AccountingDate == currentSnapshotDate)
             {
                 IEnumerable<string> emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
                 foreach (string emailAddress in emailAddressesForOrganisation)
                 {
-                    _commonBusinessLogic.NotificationService.SendScopeChangeInEmail(emailAddress, organisation.OrganisationName);
+                    _sharedBusinessLogic.NotificationService.SendScopeChangeInEmail(emailAddress, organisation.OrganisationName);
                 }
             }
 
@@ -374,14 +374,14 @@ namespace ModernSlavery.WebUI.Controllers
 
             this.StashModel(stateModel);
 
-            var organisation = CommonBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            DateTime currentSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(organisation.SectorType);
+            var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
+            DateTime currentSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType);
             if (stateModel.AccountingDate == currentSnapshotDate)
             {
                 IEnumerable<string> emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
                 foreach (string emailAddress in emailAddressesForOrganisation)
                 {
-                    _commonBusinessLogic.NotificationService.SendScopeChangeOutEmail(emailAddress, organisation.OrganisationName);
+                    _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(emailAddress, organisation.OrganisationName);
                 }
             }
 

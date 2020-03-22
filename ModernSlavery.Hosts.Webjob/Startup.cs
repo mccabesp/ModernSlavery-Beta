@@ -38,21 +38,21 @@ namespace ModernSlavery.Hosts.Webjob
         public void Configure(IApplicationBuilder app=null)
         {
             var fileRepository = _ServiceProvider.GetService<IFileRepository>();
-            var globalOptions = _ServiceProvider.GetService<GlobalOptions>();
+            var sharedOptions = _ServiceProvider.GetService<SharedOptions>();
 
             //Initialise the virtual date and time
-            VirtualDateTime.Initialise(globalOptions.DateTimeOffset);
+            VirtualDateTime.Initialise(sharedOptions.DateTimeOffset);
 
             //Set the default encryption key
-            Encryption.SetDefaultEncryptionKey(globalOptions.DefaultEncryptionKey);
+            Encryption.SetDefaultEncryptionKey(sharedOptions.DefaultEncryptionKey);
 
             //Ensure SicSectorSynonyms exist on remote 
 
 
             //Initialise the virtual date and time
-            VirtualDateTime.Initialise(globalOptions.DateTimeOffset);
+            VirtualDateTime.Initialise(sharedOptions.DateTimeOffset);
 
-            Task.WaitAll(Core.Classes.Extensions.PushRemoteFileAsync(fileRepository, Filenames.SicSectorSynonyms, globalOptions.DataPath));
+            Task.WaitAll(Core.Classes.Extensions.PushRemoteFileAsync(fileRepository, Filenames.SicSectorSynonyms, sharedOptions.DataPath));
 
             // Register email templates
             var emailTemplatesConfigPath = "Email:Templates";

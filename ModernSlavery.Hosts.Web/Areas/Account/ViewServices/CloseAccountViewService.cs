@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
             IRegistrationBusinessLogic registrationBusinessLogic,
             ILogger<CloseAccountViewService> logger,
             ISendEmailService sendEmailService,
-            ICommonBusinessLogic commonBusinessLogic)
+            ISharedBusinessLogic sharedBusinessLogic)
         {
             UserRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             RegistrationBusinessLogic = registrationBusinessLogic ?? throw new ArgumentNullException(nameof(registrationBusinessLogic));
@@ -37,7 +37,7 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
         private IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
         private ILogger<CloseAccountViewService> Logger { get; }
         private ISendEmailService SendEmailService { get; }
-        private readonly ICommonBusinessLogic _commonBusinessLogic;
+        private readonly ISharedBusinessLogic _sharedBusinessLogic;
 
         public async Task<ModelStateDictionary> CloseAccountAsync(User userToRetire, string currentPassword, User actionByUser)
         {
@@ -80,11 +80,11 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
                     }
                 });
 
-            if (!userToRetire.EmailAddress.StartsWithI(_commonBusinessLogic.GlobalOptions.TestPrefix))
+            if (!userToRetire.EmailAddress.StartsWithI(_sharedBusinessLogic.SharedOptions.TestPrefix))
             {
                 // Create the close account notification to user
                 var sendEmails = new List<Task>();
-                bool testEmail = !_commonBusinessLogic.GlobalOptions.IsProduction();
+                bool testEmail = !_sharedBusinessLogic.SharedOptions.IsProduction();
                 sendEmails.Add(SendEmailService.SendAccountClosedNotificationAsync(userToRetire.EmailAddress, testEmail));
 
                 //Create the notification to GEO for each newly orphaned organisation

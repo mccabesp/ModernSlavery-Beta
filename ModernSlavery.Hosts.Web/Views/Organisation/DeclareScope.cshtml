@@ -1,4 +1,4 @@
-﻿@inject GlobalOptions globalOptions
+﻿@inject SharedOptions sharedOptions
 @{
     ViewBag.Title = "We need more information - Modern Slavery reporting service";
 }
@@ -38,7 +38,7 @@
                 </fieldset>
             </div>
             <p>
-                If you don't know if your organisation is required to report please read the <a href="@globalOptions.WhoNeedsToReportGuidanceLink" target="_blank" rel="noopener noreferrer">guidance</a>.
+                If you don't know if your organisation is required to report please read the <a href="@sharedOptions.WhoNeedsToReportGuidanceLink" target="_blank" rel="noopener noreferrer">guidance</a>.
             </p>
 
             <div class="form-group">

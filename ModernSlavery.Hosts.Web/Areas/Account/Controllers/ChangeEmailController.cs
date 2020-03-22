@@ -27,7 +27,7 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
 
         public ChangeEmailController(
             IChangeEmailViewService changeEmailService,
-            ILogger<ChangeEmailController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<ChangeEmailController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             ChangeEmailService = changeEmailService;
         }

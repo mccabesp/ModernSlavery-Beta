@@ -20,10 +20,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.Registrations);
+                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.Registrations);
 
                 //Dont execute on startup if file already exists
-                if (!Functions.StartedJobs.Contains(nameof(UpdateRegistrations)) && await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
+                if (!Functions.StartedJobs.Contains(nameof(UpdateRegistrations)) && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -58,7 +58,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             Functions.RunningJobs.Add(nameof(UpdateRegistrations));
             try
             {
-                List<UserOrganisation> userOrgs = Queryable.Where<UserOrganisation>(_CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>(), uo => uo.User.Status == UserStatuses.Active && uo.PINConfirmedDate != null)
+                List<UserOrganisation> userOrgs = Queryable.Where<UserOrganisation>(_SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>(), uo => uo.User.Status == UserStatuses.Active && uo.PINConfirmedDate != null)
                     .OrderBy(uo => uo.Organisation.OrganisationName)
                     .Include(uo => uo.Organisation.LatestScope)
                     .Include(uo => uo.User)
@@ -90,7 +90,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             Address = uo.Address?.GetAddressString()
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(_CommonBusinessLogic.FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
             }
             finally
             {

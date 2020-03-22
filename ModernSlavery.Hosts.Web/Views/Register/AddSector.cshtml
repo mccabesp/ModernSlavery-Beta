@@ -3,7 +3,7 @@
 @using ModernSlavery.Core.Entities
 @using ModernSlavery.Core.SharedKernel
 @using ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
-@inject CommonBusinessLogic commonBusinessLogic
+@inject SharedBusinessLogic sharedBusinessLogic
 @model ModernSlavery.WebUI.Shared.Controllers.OrganisationViewModel
 @{
     ViewBag.Title = "Add your organisation's sectors - Modern Slavery reporting service";
@@ -97,7 +97,7 @@
                             <summary role="button" aria-controls="details-content-0" aria-expanded="true">View SIC codes</summary>
                             <div class="panel panel-border-narrow" id="details-content-0" aria-hidden="false">
                                 <div style="overflow:auto;height:200px;border:inset;">
-                                    @await Html.PartialAsync("_SicCodeList", commonBusinessLogic.DataRepository
+                                    @await Html.PartialAsync("_SicCodeList", sharedBusinessLogic.DataRepository
                                         .GetAll<SicCode>()
                                         .Select(x => x.SicCodeId)
                                         .ToList())

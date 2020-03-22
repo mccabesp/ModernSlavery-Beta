@@ -17,12 +17,12 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
         private readonly IDataRepository _DataRepository;
-        private readonly GlobalOptions _globalOptions;
-        public PublicSectorRepository(IDataRepository dataRepository, ICompaniesHouseAPI companiesHouseAPI, GlobalOptions globalOptions)
+        private readonly SharedOptions _sharedOptions;
+        public PublicSectorRepository(IDataRepository dataRepository, ICompaniesHouseAPI companiesHouseAPI, SharedOptions sharedOptions)
         {
             _DataRepository = dataRepository;
             _CompaniesHouseAPI = companiesHouseAPI;
-            _globalOptions = globalOptions;
+            _sharedOptions = sharedOptions;
         }
 
         public async Task<PagedResult<EmployerRecord>> SearchAsync(string searchText, int page, int pageSize, bool test = false)
@@ -36,7 +36,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
                 int id = Numeric.Rand(min, int.MaxValue - 1);
                 var employer = new EmployerRecord {
-                    OrganisationName = _globalOptions.TestPrefix + "_GovDept_" + id,
+                    OrganisationName = _sharedOptions.TestPrefix + "_GovDept_" + id,
                     CompanyNumber = ("_" + id).Left(10),
                     Address1 = "Test Address 1",
                     Address2 = "Test Address 2",

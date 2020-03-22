@@ -69,9 +69,9 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
             controller.Bind(returnViewModel);
 
-            var commonBusinessLogic = UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>();
+            var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();
             var testDraftFileBL = new DraftFileBusinessLogic(null,new SystemFileRepository(new StorageOptions()));
-            var testSubmissionService = new SubmissionService(commonBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
+            var testSubmissionService = new SubmissionService(sharedBusinessLogic, Mock.Of<ISubmissionBusinessLogic>(), Mock.Of<IScopeBusinessLogic>(), testDraftFileBL);
             var testPresenter = new SubmissionPresenter(testSubmissionService, ConfigHelpers.SubmissionOptions, null);
 
 

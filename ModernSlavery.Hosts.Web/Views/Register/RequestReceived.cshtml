@@ -1,5 +1,5 @@
 ﻿@using ModernSlavery.Core.SharedKernel.Options
-@inject GlobalOptions globalOptions
+@inject SharedOptions sharedOptions
 @{
     ViewBag.Title = "Registration request received - Modern Slavery reporting service";
 }
@@ -35,7 +35,7 @@
                 </p>
                 <p>If we need more information to complete your registration, we will call or email you.</p>
                 <p>If you have not heard from us after 5 working days, please check your junk email folder.</p>
-                <p>For help with your registration, please contact <a href="mailto:@(globalOptions.GpgReportingEmail)" target="_blank">@globalOptions.GpgReportingEmail</a></p>
+                <p>For help with your registration, please contact <a href="mailto:@(sharedOptions.GpgReportingEmail)" target="_blank">@sharedOptions.GpgReportingEmail</a></p>
                 <div class="bold-small">
                     More options
                 </div>

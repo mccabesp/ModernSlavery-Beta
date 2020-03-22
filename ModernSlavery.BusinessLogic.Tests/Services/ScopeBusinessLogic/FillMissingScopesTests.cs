@@ -29,18 +29,18 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
             var mockedNotificationService = Get<INotificationService>();
             var mockedFileRepository = Get<IFileRepository>();
             var mockedDataRepository = Get<IDataRepository>();
-            mockCommonBusinessLogic = new CommonBusinessLogic(mockedSnapshotDateHelper, mockedSourceComparer,
+            mockSharedBusinessLogic = new SharedBusinessLogic(mockedSnapshotDateHelper, mockedSourceComparer,
                 mockedSendEmailService, mockedNotificationService, mockedFileRepository, mockedDataRepository);
 
             // sut
             scopeBusinessLogic = new BusinessLogic.ScopeBusinessLogic(
-                mockCommonBusinessLogic,
+                mockSharedBusinessLogic,
                 mockDataRepository.Object,
                 null, null);
         }
 
         private Mock<IDataRepository> mockDataRepository;
-        private ICommonBusinessLogic mockCommonBusinessLogic;
+        private ISharedBusinessLogic mockSharedBusinessLogic;
 
         // sut
         private IScopeBusinessLogic scopeBusinessLogic;
@@ -59,8 +59,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
             Assert.IsTrue(actualChanged, "Expected change for missing scopes");
 
             // test the count of scopes set is correct
-            var currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
-            var expectedScopeCount = currentSnapshotDate.Year - ConfigHelpers.GlobalOptions.FirstReportingYear + 1;
+            var currentSnapshotDate = mockSharedBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
+            var expectedScopeCount = currentSnapshotDate.Year - ConfigHelpers.SharedOptions.FirstReportingYear + 1;
             Assert.AreEqual(expectedScopeCount, testOrg.OrganisationScopes.Count);
 
             // check each scope before current snapshot year are set to presumed out of scope
@@ -81,7 +81,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
         public void PresumesInScopeForSnapshotYearsDuringAndAfterOrgCreatedDate(SectorTypes testSectorType)
         {
             // setup
-            var testCreatedDate = mockCommonBusinessLogic.GetAccountingStartDate(testSectorType).AddYears(-1);
+            var testCreatedDate = mockSharedBusinessLogic.GetAccountingStartDate(testSectorType).AddYears(-1);
             var testOrg = CreateOrgWithNoScopes(1, testSectorType, testCreatedDate);
 
             // act
@@ -91,8 +91,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
             Assert.IsTrue(actualChanged, "Expected change for missing scopes");
 
             // test the count of scopes set is correct
-            var currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
-            var expectedScopeCount = currentSnapshotDate.Year - ConfigHelpers.GlobalOptions.FirstReportingYear + 1;
+            var currentSnapshotDate = mockSharedBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
+            var expectedScopeCount = currentSnapshotDate.Year - ConfigHelpers.SharedOptions.FirstReportingYear + 1;
             Assert.AreEqual(expectedScopeCount, testOrg.OrganisationScopes.Count);
 
             // check each scope after created date is set to presumed in of scope
@@ -116,8 +116,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
         {
             // setup
             var testSnapshotDate =
-                mockCommonBusinessLogic.GetAccountingStartDate(testSectorType,
-                    ConfigHelpers.GlobalOptions.FirstReportingYear);
+                mockSharedBusinessLogic.GetAccountingStartDate(testSectorType,
+                    ConfigHelpers.SharedOptions.FirstReportingYear);
             var testOrg = CreateOrgWithScopeForAllYears(1, testSectorType, testDeclaredScopeStatus, testSnapshotDate);
 
             // act
@@ -140,8 +140,8 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
         {
             // setup
             var testCreatedDate =
-                mockCommonBusinessLogic.GetAccountingStartDate(testSectorType,
-                    ConfigHelpers.GlobalOptions.FirstReportingYear);
+                mockSharedBusinessLogic.GetAccountingStartDate(testSectorType,
+                    ConfigHelpers.SharedOptions.FirstReportingYear);
             var testOrg = CreateOrgWithDeclaredAndPresumedScopes(
                 testSectorType,
                 testDeclaredScopeStatus,

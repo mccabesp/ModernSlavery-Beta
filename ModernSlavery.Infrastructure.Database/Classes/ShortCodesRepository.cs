@@ -16,12 +16,12 @@ namespace ModernSlavery.Infrastructure.Database.Classes
     public class ShortCodesRepository : IShortCodesRepository
     {
         private readonly IFileRepository FileRepository;
-        private readonly GlobalOptions GlobalOptions;
+        private readonly SharedOptions SharedOptions;
 
-        public ShortCodesRepository(IFileRepository fileRepository, GlobalOptions globalOptions)
+        public ShortCodesRepository(IFileRepository fileRepository, SharedOptions sharedOptions)
         {
             FileRepository = fileRepository ?? throw new ArgumentNullException(nameof(fileRepository));
-            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
         }
 
         #region Properties
@@ -78,7 +78,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
         public async Task<List<ShortCodeModel>> LoadIfNewerAsync()
         {
-            var shortCodesPath = Path.Combine(GlobalOptions.DataPath, Filenames.ShortCodes);
+            var shortCodesPath = Path.Combine(SharedOptions.DataPath, Filenames.ShortCodes);
             var fileExists = await FileRepository.GetFileExistsAsync(shortCodesPath);
 
             if (!fileExists) return null;

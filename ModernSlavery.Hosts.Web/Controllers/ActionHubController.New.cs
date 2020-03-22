@@ -17,7 +17,7 @@ namespace ModernSlavery.WebUI.Controllers
         #region Constructors
 
         public ActionHubController(
-            ILogger<ActionHubController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<ActionHubController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
         }
 
@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Controllers
 
         private bool UseNewActionHub()
         {
-            return VirtualDateTime.Now >= CommonBusinessLogic.GlobalOptions.ActionHubSwitchOverDate;
+            return VirtualDateTime.Now >= SharedBusinessLogic.SharedOptions.ActionHubSwitchOverDate;
         }
 
         // GET: ActionHub

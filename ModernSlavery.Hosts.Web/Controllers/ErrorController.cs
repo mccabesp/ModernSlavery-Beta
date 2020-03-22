@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Controllers
         #region Constructors
 
         public ErrorController(
-        ILogger<ErrorController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+        ILogger<ErrorController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         { }
 
         #endregion

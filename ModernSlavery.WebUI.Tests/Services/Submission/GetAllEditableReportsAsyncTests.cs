@@ -18,7 +18,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
     public class GetAllEditableReportsAsyncTests
     {
 
-        private ICommonBusinessLogic mockCommonBusinessLogic;
+        private ISharedBusinessLogic mockSharedBusinessLogic;
         private Mock<IDataRepository> mockDataRepo;
         private Mock<IDraftFileBusinessLogic> mockDraftFileBL;
         private Mock<IScopeBusinessLogic> mockScopeBL;
@@ -26,7 +26,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
         [SetUp]
         public void BeforeEach()
         {
-            mockCommonBusinessLogic = MoqHelpers.CreateFakeCommonBusinessLogic();
+            mockSharedBusinessLogic = MoqHelpers.CreateFakeSharedBusinessLogic();
             mockDataRepo = MoqHelpers.CreateMockDataRepository();
             mockScopeBL = new Mock<IScopeBusinessLogic>();
             mockDraftFileBL = new Mock<IDraftFileBusinessLogic>();
@@ -44,7 +44,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
             var testConfig = new SubmissionOptions {EditableReportCount = testEditableReportCount};
             var testOrg = new Organisation {OrganisationId = 1, SectorType = testSector};
             var testUserOrg = new UserOrganisation {Organisation = testOrg};
-            DateTime testSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
+            DateTime testSnapshotDate = mockSharedBusinessLogic.GetAccountingStartDate(testOrg.SectorType);
 
             var mockService = new Mock<SubmissionPresenter>(
                 mockDataRepo.Object,

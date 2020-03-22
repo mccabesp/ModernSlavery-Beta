@@ -4,7 +4,7 @@ namespace ModernSlavery.BusinessLogic.Viewing
 {
     public interface IViewingService
     {
-        ICommonBusinessLogic CommonBusinessLogic { get; }
+        ISharedBusinessLogic SharedBusinessLogic { get; }
         IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
         ISubmissionBusinessLogic SubmissionBusinessLogic { get; set; }
         ISearchBusinessLogic SearchBusinessLogic { get; set; }
@@ -16,19 +16,19 @@ namespace ModernSlavery.BusinessLogic.Viewing
     {
         public ViewingService(
             IOrganisationBusinessLogic organisationBusinessLogic,
-            ICommonBusinessLogic commonBusinessLogic,
+            ISharedBusinessLogic sharedBusinessLogic,
             ISubmissionBusinessLogic submissionBusinessLogic,
             ISearchBusinessLogic searchBusinessLogic,
             IObfuscator obfuscator)
         {
             OrganisationBusinessLogic = organisationBusinessLogic;
-            CommonBusinessLogic = commonBusinessLogic;
+            SharedBusinessLogic = sharedBusinessLogic;
             SubmissionBusinessLogic = submissionBusinessLogic;
             SearchBusinessLogic = searchBusinessLogic;
             Obfuscator = obfuscator;
         }
 
-        public ICommonBusinessLogic CommonBusinessLogic { get; }
+        public ISharedBusinessLogic SharedBusinessLogic { get; }
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
         public ISubmissionBusinessLogic SubmissionBusinessLogic { get; set; }
         public ISearchBusinessLogic SearchBusinessLogic { get; set; }

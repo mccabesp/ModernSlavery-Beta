@@ -24,7 +24,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(FixOrganisationsNamesAsync));
             try
             {
-                List<Organisation> orgs = await _CommonBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync();
+                List<Organisation> orgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync();
 
                 var count = 0;
                 var i = 0;
@@ -51,7 +51,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 comment));
 
                         names[1].Created = names[0].Created;
-                        _CommonBusinessLogic.DataRepository.Delete(names[0]);
+                        _SharedBusinessLogic.DataRepository.Delete(names[0]);
                         names.RemoveAt(0);
                         changed = true;
                     }
@@ -81,7 +81,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     if (changed)
                     {
                         count++;
-                        await _CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                        await _SharedBusinessLogic.DataRepository.SaveChangesAsync();
                     }
                 }
 

@@ -1,7 +1,7 @@
 ﻿@using ModernSlavery.Core.SharedKernel.Options
 @using ModernSlavery.WebUI.Views.Components.StepByStep
 @model ModernSlavery.WebUI.Models.ReportingStepByStep.ReportingStepsViewModel
-@inject GlobalOptions globalOptions
+@inject SharedOptions sharedOptions
 @{
     var steps = new List<StepViewModel>
 {
@@ -132,7 +132,7 @@
     {
                 new StepTask {
                     TaskText = "Submit your Modern Slavery statement",
-                    TaskUrl = @globalOptions.StartUrl ?? Url.Action(nameof(OrganisationController.ManageOrganisations), "Organisation") },
+                    TaskUrl = @sharedOptions.StartUrl ?? Url.Action(nameof(OrganisationController.ManageOrganisations), "Organisation") },
             }
         },
         new StepViewModel

@@ -11,18 +11,18 @@ namespace ModernSlavery.Core.Entities
     [DebuggerDisplay("{UserId}, {EmailAddress}, {Status}")]
     public partial class User
     {
-        private GlobalOptions GlobalOptions;
+        private SharedOptions SharedOptions;
 
-        public User(GlobalOptions globalOptions):this()
+        public User(SharedOptions sharedOptions):this()
         {
-            GlobalOptions = globalOptions;
+            SharedOptions = sharedOptions;
         }
 
-        private string AdminEmails => GlobalOptions.AdminEmails;
-        private string SuperAdminEmails => GlobalOptions.SuperAdminEmails;
-        private string DatabaseAdminEmails => GlobalOptions.DatabaseAdminEmails;
+        private string AdminEmails => SharedOptions.AdminEmails;
+        private string SuperAdminEmails => SharedOptions.SuperAdminEmails;
+        private string DatabaseAdminEmails => SharedOptions.DatabaseAdminEmails;
 
-        [NotMapped] public bool EncryptEmails => GlobalOptions.EncryptEmails;
+        [NotMapped] public bool EncryptEmails => SharedOptions.EncryptEmails;
 
         [NotMapped] public string Fullname => (Firstname + " " + Lastname).TrimI();
 
@@ -30,9 +30,9 @@ namespace ModernSlavery.Core.Entities
 
         [NotMapped]
         public TimeSpan LockRemaining =>
-            LoginDate == null || LoginAttempts < GlobalOptions.MaxLoginAttempts
+            LoginDate == null || LoginAttempts < SharedOptions.MaxLoginAttempts
                 ? TimeSpan.Zero
-                : LoginDate.Value.AddMinutes(GlobalOptions.LockoutMinutes) - VirtualDateTime.Now;
+                : LoginDate.Value.AddMinutes(SharedOptions.LockoutMinutes) - VirtualDateTime.Now;
 
         [NotMapped]
         public bool SendUpdates

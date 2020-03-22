@@ -25,7 +25,7 @@ namespace ModernSlavery.IdServer.Controllers
         public HomeController(
             IIdentityServerInteractionService interaction,
             IEventService events,
-            ILogger<HomeController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<HomeController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             _interaction = interaction;
             _events = events;
@@ -45,7 +45,7 @@ namespace ModernSlavery.IdServer.Controllers
         [Route("~/login/login")]
         public IActionResult RedirectOldLogin()
         {
-            return Redirect(CommonBusinessLogic.GlobalOptions.SiteAuthority);
+            return Redirect(SharedBusinessLogic.SharedOptions.SiteAuthority);
         }
 
         /// <summary>

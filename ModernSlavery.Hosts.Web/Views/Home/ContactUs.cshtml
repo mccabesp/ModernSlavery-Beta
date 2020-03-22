@@ -1,5 +1,5 @@
 ﻿@using ModernSlavery.Core.SharedKernel.Options
-@inject GlobalOptions globalOptions
+@inject SharedOptions sharedOptions
 @{
     ViewBag.Title = "Contact us - Modern Slavery reporting service";
 }
@@ -12,7 +12,7 @@
         </h1>
         <h2 class="heading-medium">Email</h2>
         <p>
-            If you are an employer you can contact the Modern Slavery team about the service or registration issues you're having at <a href="mailto:@(globalOptions.GpgReportingEmail)" target="_blank">@globalOptions.GpgReportingEmail</a>
+            If you are an employer you can contact the Modern Slavery team about the service or registration issues you're having at <a href="mailto:@(sharedOptions.GpgReportingEmail)" target="_blank">@sharedOptions.GpgReportingEmail</a>
         </p>
 
         <h2 class="heading-medium">Online</h2>

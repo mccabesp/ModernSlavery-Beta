@@ -12,9 +12,9 @@ namespace ModernSlavery.Infrastructure.Logging
 {
     public class RegistrationLogger : RecordLogger, IRegistrationLogger
     {
-        public RegistrationLogger(GlobalOptions globalOptions,
+        public RegistrationLogger(SharedOptions sharedOptions,
             LogRecordQueue queue)
-            : base(globalOptions, queue, AppDomain.CurrentDomain.FriendlyName, Filenames.RegistrationLog)
+            : base(sharedOptions, queue, AppDomain.CurrentDomain.FriendlyName, Filenames.RegistrationLog)
         {
         }
 
@@ -39,7 +39,7 @@ namespace ModernSlavery.Infrastructure.Logging
             var logUser = logUserOrg.User;
             var logAddress = logUserOrg.Address;
 
-            if (logUser.EmailAddress.StartsWithI(GlobalOptions.TestPrefix)) return;
+            if (logUser.EmailAddress.StartsWithI(SharedOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new RegisterLogModel

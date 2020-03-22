@@ -1,5 +1,5 @@
 @using ModernSlavery.Core.SharedKernel.Options
-@inject GlobalOptions globalOptions
+@inject SharedOptions sharedOptions
 @{
     ViewBag.Title = "Modern Slavery statement";
     ViewBag.pageDescription = "Find and compare Modern Slavery information reported by employers. Learn more about Modern Slavery and how to eliminate it.";
@@ -40,7 +40,7 @@
     <div class="column-three-thirds">
         <div class="column-two-thirds">
             <div class="heading-xsmall">
-                For employers to <a href="@(globalOptions.StartUrl ?? Url.Action(nameof(OrganisationController.ManageOrganisations), "Organisation")) ">submit Modern Slavery statement</a>
+                For employers to <a href="@(sharedOptions.StartUrl ?? Url.Action(nameof(OrganisationController.ManageOrganisations), "Organisation")) ">submit Modern Slavery statement</a>
             </div>
         </div>
     </div>

@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Tests.Presentation
         private Mock<IFileRepository> mockFileRepo;
         private Mock<OrganisationBusinessLogic> mockOrganisationBL;
         private Mock<ScopeBusinessLogic> mockScopeBL;
-        private readonly ICommonBusinessLogic testCommonBL = MoqHelpers.CreateFakeCommonBusinessLogic();
+        private readonly ISharedBusinessLogic testCommonBL = MoqHelpers.CreateFakeSharedBusinessLogic();
         private ScopePresenter testScopePresenter;
 
         private ISearchBusinessLogic testSearchBL;
@@ -286,7 +286,7 @@ namespace ModernSlavery.WebUI.Tests.Presentation
             var testSecurityTok = "11113333";
             var testModel = new EnterCodesViewModel {EmployerReference = testEmployerRef, SecurityToken = testSecurityTok};
 
-            DateTime testExpiredDate = VirtualDateTime.Now.AddDays(-(ConfigHelpers.GlobalOptions.SecurityCodeExpiryDays + 1));
+            DateTime testExpiredDate = VirtualDateTime.Now.AddDays(-(ConfigHelpers.SharedOptions.SecurityCodeExpiryDays + 1));
 
             //Always returns an organisation and scope
             mockDataRepo.SetupGetAll(new Organisation(), new OrganisationScope());
@@ -310,7 +310,7 @@ namespace ModernSlavery.WebUI.Tests.Presentation
             var testSecurityTok = "11113333";
             var testModel = new EnterCodesViewModel {EmployerReference = testEmployerRef, SecurityToken = testSecurityTok};
 
-            DateTime testExpiredDate = VirtualDateTime.Now.AddDays(-(ConfigHelpers.GlobalOptions.SecurityCodeExpiryDays - 1));
+            DateTime testExpiredDate = VirtualDateTime.Now.AddDays(-(ConfigHelpers.SharedOptions.SecurityCodeExpiryDays - 1));
 
             //Always returns an organisation and scope
             mockDataRepo.SetupGetAll(new Organisation(), new OrganisationScope());

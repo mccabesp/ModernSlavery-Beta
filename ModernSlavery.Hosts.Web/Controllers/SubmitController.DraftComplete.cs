@@ -46,7 +46,7 @@ namespace ModernSlavery.WebUI.Controllers
         [PreventDuplicatePost]
         public IActionResult DraftCompletePost(string command)
         {
-            string doneUrl = CommonBusinessLogic.GlobalOptions.DoneUrl ?? Url.Action("Index", "Viewing", null, "https");
+            string doneUrl = SharedBusinessLogic.SharedOptions.DoneUrl ?? Url.Action("Index", "Viewing", null, "https");
 
             return Redirect(doneUrl);
         }

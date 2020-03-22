@@ -221,7 +221,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Account.CloseAccountController
                     23322,
                     mockRouteData,
                     registrations);
-            var verifiedUser = controller.CommonBusinessLogic.DataRepository.Get<User>((long) 23322);
+            var verifiedUser = controller.SharedBusinessLogic.DataRepository.Get<User>((long) 23322);
 
             var mockEmailQueue = new Mock<IQueue>();
 

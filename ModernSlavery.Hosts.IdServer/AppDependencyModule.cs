@@ -31,15 +31,15 @@ namespace ModernSlavery.IdServer
         public static Action<ContainerBuilder> ConfigureTestContainer;
 
         private readonly ILogger _Logger;
-        private readonly GlobalOptions _globalOptions;
+        private readonly SharedOptions _sharedOptions;
         private readonly StorageOptions _storageOptions;
         private readonly DistributedCacheOptions _distributedCacheOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
 
-        public AppDependencyModule(ILogger<AppDependencyModule> logger, GlobalOptions globalOptions, StorageOptions storageOptions, DistributedCacheOptions distributedCacheOptions, DataProtectionOptions dataProtectionOptions)
+        public AppDependencyModule(ILogger<AppDependencyModule> logger, SharedOptions sharedOptions, StorageOptions storageOptions, DistributedCacheOptions distributedCacheOptions, DataProtectionOptions dataProtectionOptions)
         {
             _Logger = logger;
-            _globalOptions = globalOptions;
+            _sharedOptions = sharedOptions;
             _storageOptions = storageOptions;
             _distributedCacheOptions = distributedCacheOptions;
             _dataProtectionOptions = dataProtectionOptions;
@@ -52,8 +52,8 @@ namespace ModernSlavery.IdServer
 
             services.AddSingleton<IEventSink, AuditEventSink>();
 
-            var clients = new Clients(_globalOptions);
-            var resources = new Resources(_globalOptions);
+            var clients = new Clients(_sharedOptions);
+            var resources = new Resources(_sharedOptions);
 
             var identityServer = services.AddIdentityServer(
                     options => {
@@ -69,10 +69,10 @@ namespace ModernSlavery.IdServer
                 //.AddInMemoryApiResources(Resources.GetApiResources())
                 .AddCustomUserStore();
 
-            if (Debugger.IsAttached || _globalOptions.IsDevelopment() || _globalOptions.IsLocal())
+            if (Debugger.IsAttached || _sharedOptions.IsDevelopment() || _sharedOptions.IsLocal())
                 identityServer.AddDeveloperSigningCredential();
             else
-                identityServer.AddSigningCredential(LoadCertificate(_globalOptions));
+                identityServer.AddSigningCredential(LoadCertificate(_sharedOptions));
 
             #endregion
 
@@ -88,13 +88,13 @@ namespace ModernSlavery.IdServer
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
-            if (_globalOptions.IsDevelopment() || _globalOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
+            if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
 
             //Add the distributed cache and data protection
             services.AddDistributedCache(_distributedCacheOptions).AddDataProtection(_dataProtectionOptions);
 
             //Add app insights tracking
-            services.AddApplicationInsightsTelemetry(_globalOptions.APPINSIGHTS_INSTRUMENTATIONKEY);
+            services.AddApplicationInsightsTelemetry(_sharedOptions.APPINSIGHTS_INSTRUMENTATIONKEY);
 
             //This may now be required 
             services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
@@ -136,13 +136,13 @@ namespace ModernSlavery.IdServer
 
         }
 
-        private X509Certificate2 LoadCertificate(GlobalOptions globalOptions)
+        private X509Certificate2 LoadCertificate(SharedOptions sharedOptions)
         {
             //Load the site certificate
-            string certThumprint = globalOptions.WEBSITE_LOAD_CERTIFICATES.SplitI(";").FirstOrDefault();
+            string certThumprint = sharedOptions.WEBSITE_LOAD_CERTIFICATES.SplitI(";").FirstOrDefault();
             if (string.IsNullOrWhiteSpace(certThumprint))
             {
-                certThumprint = _globalOptions.CertThumprint.SplitI(";").FirstOrDefault();
+                certThumprint = _sharedOptions.CertThumprint.SplitI(";").FirstOrDefault();
             }
 
             X509Certificate2 cert = null;
@@ -160,22 +160,22 @@ namespace ModernSlavery.IdServer
                     $"Successfully loaded certificate '{cert.FriendlyName}' expiring '{cert.GetExpirationDateString()}' from file '{certPath}'");
             }
 
-            if (globalOptions.CertExpiresWarningDays > 0)
+            if (sharedOptions.CertExpiresWarningDays > 0)
             {
                 DateTime expires = cert.GetExpirationDateString().ToDateTime();
                 if (expires < VirtualDateTime.UtcNow)
                 {
                     _Logger.LogError(
-                        $"The website certificate for '{globalOptions.EXTERNAL_HOST}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
+                        $"The website certificate for '{sharedOptions.EXTERNAL_HOST}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
                 }
                 else
                 {
                     TimeSpan remainingTime = expires - VirtualDateTime.Now;
 
-                    if (expires < VirtualDateTime.UtcNow.AddDays(globalOptions.CertExpiresWarningDays))
+                    if (expires < VirtualDateTime.UtcNow.AddDays(sharedOptions.CertExpiresWarningDays))
                     {
                         _Logger.LogWarning(
-                            $"The website certificate for '{globalOptions.SiteAuthority}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
+                            $"The website certificate for '{sharedOptions.SiteAuthority}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
                     }
                 }
             }

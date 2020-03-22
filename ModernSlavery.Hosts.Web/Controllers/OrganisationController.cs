@@ -40,7 +40,7 @@ namespace ModernSlavery.WebUI.Controllers
             IRegistrationBusinessLogic registrationBusinessLogic,
             [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
             [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
-            ILogger<OrganisationController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<OrganisationController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             SubmissionService = submitService;
             ScopePresentation = scopePresentation;
@@ -86,7 +86,7 @@ namespace ModernSlavery.WebUI.Controllers
 
             //Get the current snapshot date
             DateTime snapshotDate = SubmissionService.GetCurrentSnapshotDate(userOrg.Organisation.SectorType).AddYears(-1);
-            if (snapshotDate.Year < CommonBusinessLogic.GlobalOptions.FirstReportingYear)
+            if (snapshotDate.Year < SharedBusinessLogic.SharedOptions.FirstReportingYear)
             {
                 return new HttpBadRequestResult($"Snapshot year {snapshotDate.Year} is invalid");
             }
@@ -139,7 +139,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //Check the year parameters
-            if (model.SnapshotDate.Year < CommonBusinessLogic.GlobalOptions.FirstReportingYear || model.SnapshotDate.Year > VirtualDateTime.Now.Year)
+            if (model.SnapshotDate.Year < SharedBusinessLogic.SharedOptions.FirstReportingYear || model.SnapshotDate.Year > VirtualDateTime.Now.Year)
             {
                 return new HttpBadRequestResult($"Snapshot year {model.SnapshotDate.Year} is invalid");
             }
@@ -359,7 +359,7 @@ namespace ModernSlavery.WebUI.Controllers
         public IScopePresenter ScopePresentation { get; }
 
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
-        public ICommonBusinessLogic CommonBusinessLogic { get; }
+        public ISharedBusinessLogic SharedBusinessLogic { get; }
 
         public IScopeBusinessLogic ScopeBusinessLogic { get; }
 
@@ -421,7 +421,7 @@ namespace ModernSlavery.WebUI.Controllers
             //Make sure they are fully registered for one before requesting another
             if (userOrg.PINConfirmedDate == null && userOrg.PINSentDate != null)
             {
-                TimeSpan remainingTime = userOrg.PINSentDate.Value.AddMinutes(CommonBusinessLogic.GlobalOptions.LockoutMinutes) - VirtualDateTime.Now;
+                TimeSpan remainingTime = userOrg.PINSentDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) - VirtualDateTime.Now;
                 if (remainingTime > TimeSpan.Zero)
                 {
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(3023, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
@@ -495,7 +495,7 @@ namespace ModernSlavery.WebUI.Controllers
             await RegistrationBusinessLogic.RemoveRegistrationAsync(userOrgToUnregister, actionByUser);
 
             // Email user that has been unregistered
-            CommonBusinessLogic.NotificationService.SendRemovedUserFromOrganisationEmail(
+            SharedBusinessLogic.NotificationService.SendRemovedUserFromOrganisationEmail(
                 userToUnregister.EmailAddress,
                 orgToRemove.OrganisationName,
                 userToUnregister.Fullname);
@@ -504,20 +504,20 @@ namespace ModernSlavery.WebUI.Controllers
             IEnumerable<string> emailAddressesForOrganisation = orgToRemove.UserOrganisations.Select(uo => uo.User.EmailAddress);
             foreach (string emailAddress in emailAddressesForOrganisation)
             {
-                CommonBusinessLogic.NotificationService.SendRemovedUserFromOrganisationEmail(
+                SharedBusinessLogic.NotificationService.SendRemovedUserFromOrganisationEmail(
                     emailAddress,
                     orgToRemove.OrganisationName,
                     userToUnregister.Fullname);
             }
 
             // Send the notification to GEO for each newly orphaned organisation
-            if (!userToUnregister.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
+            if (!userToUnregister.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
                 var sendEmails = new List<Task>();
-                bool testEmail = !CommonBusinessLogic.GlobalOptions.IsProduction();
+                bool testEmail = !SharedBusinessLogic.SharedOptions.IsProduction();
                 if (orgToRemove.GetIsOrphan())
                 {
-                    sendEmails.Add(CommonBusinessLogic.SendEmailService.SendGEOOrphanOrganisationNotificationAsync(orgToRemove.OrganisationName, testEmail));
+                    sendEmails.Add(SharedBusinessLogic.SendEmailService.SendGEOOrphanOrganisationNotificationAsync(orgToRemove.OrganisationName, testEmail));
                 }
 
                 await Task.WhenAll(sendEmails);

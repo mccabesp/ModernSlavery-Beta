@@ -45,7 +45,7 @@ namespace ModernSlavery.IdServer
 
             var lifetime = app.ApplicationServices.GetService<IApplicationLifetime>();
             var loggerFactory = app.ApplicationServices.GetService<ILoggerFactory>();
-            var globalOptions = app.ApplicationServices.GetService<GlobalOptions>();
+            var sharedOptions = app.ApplicationServices.GetService<SharedOptions>();
             var responseCachingOptions = app.ApplicationServices.GetService<ResponseCachingOptions>();
 
             loggerFactory.UseLogEventQueueLogger(app.ApplicationServices);
@@ -88,8 +88,8 @@ namespace ModernSlavery.IdServer
             }
 
             app.UseRouting();
-            app.UseMiddleware<MaintenancePageMiddleware>(globalOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
-            app.UseMiddleware<StickySessionMiddleware>(globalOptions.StickySessions); //Enable/Disable sticky sessions based on  
+            app.UseMiddleware<MaintenancePageMiddleware>(sharedOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
+            app.UseMiddleware<StickySessionMiddleware>(sharedOptions.StickySessions); //Enable/Disable sticky sessions based on  
             app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses
 
             //app.UseMvcWithDefaultRoute();

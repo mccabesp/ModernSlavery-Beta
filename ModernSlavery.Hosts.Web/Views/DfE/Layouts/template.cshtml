@@ -1,7 +1,7 @@
 ﻿@using ModernSlavery.Core.SharedKernel.Options
 @using ModernSlavery.WebUI.Shared.Classes.Cookies
 @using ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
-@inject GlobalOptions globalOptions;
+@inject SharedOptions sharedOptions;
 @{
     Layout = "../../govuk/layouts/template.cshtml";
 }
@@ -11,7 +11,7 @@
 
     @RenderSection("Head", false)
     
-    @if (globalOptions.IsLocal())
+    @if (sharedOptions.IsLocal())
     {
         @Html.UnpackBundle("/assets/stylesheets/application.min.css", "all")
     }
@@ -30,7 +30,7 @@
     <script src="~/assets/javascripts/jquery-1.11.3.min.js"></script>
     <script src="~/assets/javascripts/jquery.tablesorter.min.js"></script>
 
-    @if (globalOptions.IsLocal())
+    @if (sharedOptions.IsLocal())
     {
         @Html.UnpackBundle("/assets/javascripts/application.min.js")
     }
@@ -58,7 +58,7 @@
             // Configure profiles and make interface public
             // for custom dimensions, virtual pageviews and events
             GOVUK.analytics = new GOVUK.Analytics({
-                universalId: '@globalOptions.GoogleAnalyticsAccountId',
+                universalId: '@sharedOptions.GoogleAnalyticsAccountId',
                 cookieDomain: cookieDomain
             });
 

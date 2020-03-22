@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Controllers
             ISearchPresenter searchViewService,
             IComparePresenter compareViewService,
             IOrganisationBusinessLogic organisationBusinessLogic,
-            ILogger<CompareController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<CompareController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             OrganisationBusinessLogic = organisationBusinessLogic;
             SearchViewService = searchViewService;
@@ -239,7 +239,7 @@ namespace ModernSlavery.WebUI.Controllers
             {
                 CompareViewService.SortColumn = null;
                 CompareViewService.SortAscending = true;
-                year = CommonBusinessLogic.GlobalOptions.FirstReportingYear;
+                year = SharedBusinessLogic.SharedOptions.FirstReportingYear;
             }
 
             //Load employers from querystring (via shared email)
@@ -323,7 +323,7 @@ namespace ModernSlavery.WebUI.Controllers
         {
             if (year == 0)
             {
-                year = CommonBusinessLogic.GlobalOptions.FirstReportingYear;
+                year = SharedBusinessLogic.SharedOptions.FirstReportingYear;
             }
 
             string args = command.AfterFirst(":");
@@ -351,7 +351,7 @@ namespace ModernSlavery.WebUI.Controllers
         {
             if (year == 0)
             {
-                year = CommonBusinessLogic.GlobalOptions.FirstReportingYear;
+                year = SharedBusinessLogic.SharedOptions.FirstReportingYear;
             }
 
             var result = await CompareEmployers(year) as ViewResult;

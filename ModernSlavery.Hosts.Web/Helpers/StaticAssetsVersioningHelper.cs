@@ -17,12 +17,12 @@ namespace ModernSlavery.WebUI.Helpers
 
     public class StaticAssetsVersioningHelper : IStaticAssetsVersioningHelper
     {
-        public StaticAssetsVersioningHelper(GlobalOptions globalOptions)
+        public StaticAssetsVersioningHelper(SharedOptions sharedOptions)
         {
-            _globalOptions = globalOptions;
+            _sharedOptions = sharedOptions;
         }
 
-        private readonly GlobalOptions _globalOptions;
+        private readonly SharedOptions _sharedOptions;
         private const string PathFromExecutableToWwwRoot = "wwwroot";
         private const string CompiledDirectory = "compiled";
 
@@ -38,7 +38,7 @@ namespace ModernSlavery.WebUI.Helpers
 
         private string GetStaticFile(string directory, string fileRegex)
         {
-            if (_globalOptions.IsLocal())
+            if (_sharedOptions.IsLocal())
             {
                 // When developing locally, skip the cache
                 return FindMatchingFile(directory, fileRegex);

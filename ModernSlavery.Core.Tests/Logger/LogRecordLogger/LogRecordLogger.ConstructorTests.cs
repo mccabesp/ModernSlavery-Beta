@@ -24,7 +24,7 @@ namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Infrastructure.Logging.RecordLogger(ConfigHelpers.GlobalOptions, mockQueue.Object,
+                () => new Infrastructure.Logging.RecordLogger(ConfigHelpers.SharedOptions, mockQueue.Object,
                     testAppName, "TestFilename"));
 
             // Assert
@@ -38,7 +38,7 @@ namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Infrastructure.Logging.RecordLogger(ConfigHelpers.GlobalOptions, mockQueue.Object,
+                () => new Infrastructure.Logging.RecordLogger(ConfigHelpers.SharedOptions, mockQueue.Object,
                     "TestAppName", testFilename));
 
             // Assert
@@ -51,7 +51,7 @@ namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
             // Act
             var actualExpection =
                 Assert.Throws<ArgumentNullException>(() =>
-                    new Infrastructure.Logging.RecordLogger(ConfigHelpers.GlobalOptions, null, "TestAppName",
+                    new Infrastructure.Logging.RecordLogger(ConfigHelpers.SharedOptions, null, "TestAppName",
                         "TestFilename"));
 
             // Assert

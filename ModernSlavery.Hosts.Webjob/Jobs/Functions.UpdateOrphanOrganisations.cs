@@ -25,10 +25,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.OrphanOrganisations);
+                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.OrphanOrganisations);
 
                 //Dont execute on startup if file already exists
-                if (!Functions.StartedJobs.Contains(funcName) && await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
+                if (!Functions.StartedJobs.Contains(funcName) && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     log.LogDebug($"Skipped {funcName} at start up.");
                     return;
@@ -101,8 +101,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private async Task<List<UnregisteredOrganisationsFileModel>> GetOrphanOrganisationsAsync()
         {
             // Get all the latest organisations with no registrations
-            DateTime pinExpiresDate = _CommonBusinessLogic.GlobalOptions.PinExpiresDate;
-            List<Organisation> unregisteredOrgs = await Queryable.Where<Organisation>(_CommonBusinessLogic.DataRepository.GetAll<Organisation>(), o => o.Status == OrganisationStatuses.Active
+            DateTime pinExpiresDate = _SharedBusinessLogic.SharedOptions.PinExpiresDate;
+            List<Organisation> unregisteredOrgs = await Queryable.Where<Organisation>(_SharedBusinessLogic.DataRepository.GetAll<Organisation>(), o => o.Status == OrganisationStatuses.Active
                                                                                                                                             && (o.LatestScope.ScopeStatus == ScopeStatuses.InScope
                                                                                                                                                 || o.LatestScope.ScopeStatus == ScopeStatuses.PresumedInScope)
                                                                                                                                             && (o.UserOrganisations == null

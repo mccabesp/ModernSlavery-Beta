@@ -13,12 +13,12 @@ namespace ModernSlavery.BusinessLogic
         private const int NotifyAddressLineLength = 35;
         private readonly IEventLogger CustomLogger;
 
-        private readonly GlobalOptions GlobalOptions;
+        private readonly SharedOptions SharedOptions;
         private readonly IGovNotifyAPI govNotifyApi;
 
-        public PinInThePostService(GlobalOptions globalOptions, IEventLogger customLogger, IGovNotifyAPI govNotifyApi)
+        public PinInThePostService(SharedOptions sharedOptions, IEventLogger customLogger, IGovNotifyAPI govNotifyApi)
         {
-            GlobalOptions = globalOptions;
+            SharedOptions = sharedOptions;
             CustomLogger = customLogger;
             this.govNotifyApi = govNotifyApi;
         }
@@ -37,9 +37,9 @@ namespace ModernSlavery.BusinessLogic
                 .PostCode;
 
             //string returnUrl = controller.Url.Action(nameof(OrganisationController.ManageOrganisations), "Organisation", null, "https");
-            var pinExpiryDate = VirtualDateTime.Now.AddDays(GlobalOptions.PinInPostExpiryDays);
+            var pinExpiryDate = VirtualDateTime.Now.AddDays(SharedOptions.PinInPostExpiryDays);
 
-            var templateId = GlobalOptions.GovUkNotifyPinInThePostTemplateId;
+            var templateId = SharedOptions.GovUkNotifyPinInThePostTemplateId;
 
             var personalisation = new Dictionary<string, dynamic>
             {

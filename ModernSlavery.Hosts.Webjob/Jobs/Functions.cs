@@ -21,7 +21,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             [KeyFilter(Filenames.BadSicLog)]IRecordLogger badSicLog,
             [KeyFilter(Filenames.ManualChangeLog)]IRecordLogger manualChangeLog,
             IMessenger messenger,
-            ICommonBusinessLogic commonBusinessLogic,
+            ISharedBusinessLogic sharedBusinessLogic,
             ISearchRepository<EmployerSearchModel> employerSearchRepository,
             ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
             ISubmissionBusinessLogic submissionBusinessLogic,
@@ -35,7 +35,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             _BadSicLog = badSicLog;
             _ManualChangeLog = manualChangeLog;
             _Messenger = messenger;
-            CommonBusinessLogic = commonBusinessLogic;
+            SharedBusinessLogic = sharedBusinessLogic;
             _EmployerSearchRepository = employerSearchRepository;
             _SicCodeSearchRepository = sicCodeSearchRepository;
             _SubmissionBusinessLogic = submissionBusinessLogic;
@@ -53,11 +53,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private readonly IRecordLogger _BadSicLog;
         private readonly IRecordLogger _ManualChangeLog;
         private readonly IMessenger _Messenger;
-        public readonly ICommonBusinessLogic CommonBusinessLogic;
+        public readonly ISharedBusinessLogic SharedBusinessLogic;
         private readonly ISearchRepository<EmployerSearchModel> _EmployerSearchRepository;
         private readonly ISearchRepository<SicCodeSearchModel> _SicCodeSearchRepository;
         private readonly IScopeBusinessLogic _ScopeBusinessLogic;
-        private readonly ICommonBusinessLogic _CommonBusinessLogic;
+        private readonly ISharedBusinessLogic _SharedBusinessLogic;
         private readonly ISubmissionBusinessLogic _SubmissionBusinessLogic;
         private readonly IOrganisationBusinessLogic _OrganisationBusinessLogic;
         public readonly ISearchBusinessLogic SearchBusinessLogic;

@@ -15,7 +15,7 @@ namespace ModernSlavery.Tests.Common.Classes
 {
     public static class MoqHelpers
     {
-        public static ICommonBusinessLogic CreateFakeCommonBusinessLogic()
+        public static ISharedBusinessLogic CreateFakeSharedBusinessLogic()
         {
             var mockedSnapshotDateHelper = new Mock<ISnapshotDateHelper>();
             var mockedSourceComparer = new Mock<ISourceComparer>();
@@ -23,18 +23,18 @@ namespace ModernSlavery.Tests.Common.Classes
             var mockedNotificationService = new Mock<INotificationService>();
             var mockedFileRepository = new Mock<IFileRepository>();
             var mockedDataRepository = new Mock<IDataRepository>();
-            var mockCommonBusinessLogic = new CommonBusinessLogic(mockedSnapshotDateHelper.Object,
+            var mockSharedBusinessLogic = new SharedBusinessLogic(mockedSnapshotDateHelper.Object,
                 mockedSourceComparer.Object, mockedSendEmailService.Object, mockedNotificationService.Object,
                 mockedFileRepository.Object, mockedDataRepository.Object);
 
-            return mockCommonBusinessLogic;
+            return mockSharedBusinessLogic;
         }
 
         public static ISubmissionBusinessLogic CreateFakeSubmissionBusinessLogic()
         {
-            var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
-            var fakeSubmissionBusinessLogic = new SubmissionBusinessLogic(fakeCommonBusinessLogic,
-                fakeCommonBusinessLogic.DataRepository, Mock.Of<IRecordLogger>());
+            var fakeSharedBusinessLogic = CreateFakeSharedBusinessLogic();
+            var fakeSubmissionBusinessLogic = new SubmissionBusinessLogic(fakeSharedBusinessLogic,
+                fakeSharedBusinessLogic.DataRepository, Mock.Of<IRecordLogger>());
             return fakeSubmissionBusinessLogic;
         }
 
@@ -47,28 +47,28 @@ namespace ModernSlavery.Tests.Common.Classes
 
         public static IScopeBusinessLogic CreateFakeScopeBusinessLogic()
         {
-            var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
+            var fakeSharedBusinessLogic = CreateFakeSharedBusinessLogic();
             var fakeSearchBusinessLogic = CreateFakeSearchBusinessLogic();
-            var fakeScopeBusinessLogic = new ScopeBusinessLogic(fakeCommonBusinessLogic,
-                fakeCommonBusinessLogic.DataRepository, fakeSearchBusinessLogic, null);
+            var fakeScopeBusinessLogic = new ScopeBusinessLogic(fakeSharedBusinessLogic,
+                fakeSharedBusinessLogic.DataRepository, fakeSearchBusinessLogic, null);
             return fakeScopeBusinessLogic;
         }
 
         public static IDraftFileBusinessLogic CreateFakeDraftBusinessLogic()
         {
-            var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
-            var fakeDraftBusinessLogic = new DraftFileBusinessLogic(null, fakeCommonBusinessLogic.FileRepository);
+            var fakeSharedBusinessLogic = CreateFakeSharedBusinessLogic();
+            var fakeDraftBusinessLogic = new DraftFileBusinessLogic(null, fakeSharedBusinessLogic.FileRepository);
             return fakeDraftBusinessLogic;
         }
 
         public static ISubmissionService CreateFakeSubmissionService()
         {
-            var fakeCommonBusinessLogic = CreateFakeCommonBusinessLogic();
+            var fakeSharedBusinessLogic = CreateFakeSharedBusinessLogic();
             var fakeSubmissionBusinessLogic = CreateFakeSubmissionBusinessLogic();
             var fakeScopeBusinessLogic = CreateFakeScopeBusinessLogic();
             var fakeDraftBusinessLogic = CreateFakeDraftBusinessLogic();
 
-            var fakeSubmissionService = new SubmissionService(fakeCommonBusinessLogic, fakeSubmissionBusinessLogic,
+            var fakeSubmissionService = new SubmissionService(fakeSharedBusinessLogic, fakeSubmissionBusinessLogic,
                 fakeScopeBusinessLogic, fakeDraftBusinessLogic);
             return fakeSubmissionService;
         }

@@ -1,5 +1,5 @@
 ﻿@inject IOptionsSnapshot<SubmissionOptions> SubmissionOptions
-@inject GlobalOptions globalOptions
+@inject SharedOptions sharedOptions
 @using ModernSlavery.BusinessLogic.Models.Organisation
 @using ModernSlavery.Core.Entities
 @using ModernSlavery.Core.Extensions
@@ -48,7 +48,7 @@
                     If you are a private or voluntary organisation and need to change your organisation name,
                     sector information, or address you should do this via Companies House.
                     Changes that you make will automatically be reflected on this site.
-                    If this information is not available on Companies House, please contact <a href="mailto:@(globalOptions.GpgReportingEmail)" target="_blank">@globalOptions.GpgReportingEmail</a>
+                    If this information is not available on Companies House, please contact <a href="mailto:@(sharedOptions.GpgReportingEmail)" target="_blank">@sharedOptions.GpgReportingEmail</a>
                 </p>
             </div>
         </details>

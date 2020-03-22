@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Tests.Services
     public class ViewingServiceTests
     {
 
-        private Mock<ICommonBusinessLogic> _mockCommonLogic;
+        private Mock<ISharedBusinessLogic> _mockCommonLogic;
         private Mock<IDataRepository> _mockDataRepo;
         private Mock<ISearchRepository<EmployerSearchModel>> _mockSearchRepo;
         private Mock<ISearchRepository<SicCodeSearchModel>> _mockSearchSicCodeRepo;
@@ -36,7 +36,7 @@ namespace ModernSlavery.WebUI.Tests.Services
             _mockDataRepo = MoqHelpers.CreateMockDataRepository();
             _mockSearchRepo = new Mock<ISearchRepository<EmployerSearchModel>>();
             _mockSearchSicCodeRepo = new Mock<ISearchRepository<SicCodeSearchModel>>();
-            _mockCommonLogic = new Mock<ICommonBusinessLogic>();
+            _mockCommonLogic = new Mock<ISharedBusinessLogic>();
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace ModernSlavery.WebUI.Tests.Services
             };
 
             // Mocks
-            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ISharedBusinessLogic>());
             List<OptionSelect> options = testPresenter.GetOrgSizeOptions(testOptions.Select(x => (int) x), null);
 
             // Assert
@@ -94,7 +94,7 @@ namespace ModernSlavery.WebUI.Tests.Services
             _mockDataRepo.Setup(x => x.GetAll<SicSection>())
                 .Returns(new List<SicSection>(testSicSections).AsQueryable().BuildMock().Object);
 
-            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ISharedBusinessLogic>());
             List<OptionSelect> options = await testPresenter.GetSectorOptionsAsync(testOptions, null);
 
             // Assert
@@ -235,7 +235,7 @@ namespace ModernSlavery.WebUI.Tests.Services
             long totalRecords = 100;
 
             // Mocks
-            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ISharedBusinessLogic>());
 
             var testResults = new List<EmployerSearchModel>();
             for (var i = 0; i < totalRecords; i++)
@@ -288,7 +288,7 @@ namespace ModernSlavery.WebUI.Tests.Services
             _mockSearchRepo.Setup(sr => sr.SuggestAsync(It.IsAny<string>(), It.IsAny<string>(), null, true, 10))
                 .ReturnsAsync(testRecords);
 
-            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ICommonBusinessLogic>());
+            var testPresenter = new ViewingPresenter(Mock.Of<IViewingService>(), Mock.Of<ISharedBusinessLogic>());
 
             // Test
             List<SuggestEmployerResult> assertResults = await testPresenter.SuggestEmployerNameAsync("testing 123");

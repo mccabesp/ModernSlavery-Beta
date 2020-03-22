@@ -13,7 +13,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
     public class IsHistoricSnapshotYearTests
     {
 
-        private ICommonBusinessLogic mockCommonBusinessLogic;
+        private ISharedBusinessLogic mockSharedBusinessLogic;
         private Mock<IDataRepository> mockDataRepo;
         private Mock<IDraftFileBusinessLogic> mockDraftFileBL;
         private Mock<IFileRepository> mockFileRepo;
@@ -22,7 +22,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
         [SetUp]
         public void BeforeEach()
         {
-            mockCommonBusinessLogic = MoqHelpers.CreateFakeCommonBusinessLogic();
+            mockSharedBusinessLogic = MoqHelpers.CreateFakeSharedBusinessLogic();
             mockDataRepo = MoqHelpers.CreateMockDataRepository();
             mockScopeBL = new Mock<IScopeBusinessLogic>();
             mockDraftFileBL = new Mock<IDraftFileBusinessLogic>();
@@ -36,7 +36,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
         public void ReturnsTrueForHistoricYears(SectorTypes testSector, int testHistoricYear)
         {
             // Arrange
-            DateTime testSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSector);
+            DateTime testSnapshotDate = mockSharedBusinessLogic.GetAccountingStartDate(testSector);
             var expectCalledGetSnapshotDate = false;
 
             // Mocks
@@ -69,7 +69,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Submission
         public void ReturnsFalseForHistoricYears(SectorTypes testSector)
         {
             // Arrange
-            DateTime testSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSector);
+            DateTime testSnapshotDate = mockSharedBusinessLogic.GetAccountingStartDate(testSector);
             int testHistoricYear = testSnapshotDate.Year;
             var expectCalledGetSnapshotDate = false;
 

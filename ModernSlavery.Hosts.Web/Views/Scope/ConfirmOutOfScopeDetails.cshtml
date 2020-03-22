@@ -1,7 +1,7 @@
-﻿@inject GlobalOptions globalOptions
+﻿@inject SharedOptions sharedOptions
 @{
     ViewBag.Title = "Confirm your organisation - Modern Slavery reporting service";
-    string emailAdd = globalOptions.GpgReportingEmail;
+    string emailAdd = sharedOptions.GpgReportingEmail;
     string emailSubject = System.Net.WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));
 
     // c# 6 doesnt compile with razor in mvc5 so cant use string templates here :( need to update to MVC 6
@@ -46,7 +46,7 @@
 
             <p class="text">
                 If your organisation name or address is incorrect,
-                please email us at <a href="@mailto" target="_blank">@globalOptions.GpgReportingEmail</a> and let us know the correct information.
+                please email us at <a href="@mailto" target="_blank">@sharedOptions.GpgReportingEmail</a> and let us know the correct information.
             </p>
         }
     </div>

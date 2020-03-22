@@ -15,15 +15,15 @@ namespace ModernSlavery.WebUI.Shared.Services
 {
     public class NotificationService: INotificationService
     {
-        public NotificationService(GlobalOptions globalOptions, ILogger<NotificationService> logger, IEventLogger customLogger, [KeyFilter(QueueNames.SendNotifyEmail)]IQueue sendNotifyEmailQueue)
+        public NotificationService(SharedOptions sharedOptions, ILogger<NotificationService> logger, IEventLogger customLogger, [KeyFilter(QueueNames.SendNotifyEmail)]IQueue sendNotifyEmailQueue)
         {
-            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             CustomLogger = customLogger ?? throw new ArgumentNullException(nameof(customLogger));
             SendNotifyEmailQueue = sendNotifyEmailQueue ?? throw new ArgumentNullException(nameof(sendNotifyEmailQueue));
         }
 
-        private readonly GlobalOptions GlobalOptions;
+        private readonly SharedOptions SharedOptions;
         private ILogger Logger { get; }
         private IEventLogger CustomLogger { get; }
         public IQueue SendNotifyEmailQueue { get; }
@@ -39,7 +39,7 @@ namespace ModernSlavery.WebUI.Shared.Services
                 {"SubmittedOrUpdated", submittedOrUpdated},
                 {"ReportingPeriod", reportingPeriod},
                 {"ReportLink", reportLink},
-                {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
+                {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
@@ -55,7 +55,7 @@ namespace ModernSlavery.WebUI.Shared.Services
             var personalisation = new Dictionary<string, dynamic> {
                 {"PIN", pin},
                 {"OrganisationName", organisationName},
-                {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
+                {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
@@ -71,7 +71,7 @@ namespace ModernSlavery.WebUI.Shared.Services
             var personalisation = new Dictionary<string, dynamic> {
                 {"OrganisationName", organisationName},
                 {"Username", username},
-                {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
+                {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
@@ -87,7 +87,7 @@ namespace ModernSlavery.WebUI.Shared.Services
             var personalisation = new Dictionary<string, dynamic> {
                 {"OrganisationName", organisationName},
                 {"RemovedUser", removedUserName},
-                {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
+                {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
@@ -101,7 +101,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         public async void SendScopeChangeInEmail(string emailAddress, string organisationName)
         {
             var personalisation = new Dictionary<string, dynamic> {
-                {"OrganisationName", organisationName}, {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
+                {"OrganisationName", organisationName}, {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
@@ -115,7 +115,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         public async void SendScopeChangeOutEmail(string emailAddress, string organisationName)
         {
             var personalisation = new Dictionary<string, dynamic> {
-                {"OrganisationName", organisationName}, {"Environment", GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] "}
+                {"OrganisationName", organisationName}, {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest

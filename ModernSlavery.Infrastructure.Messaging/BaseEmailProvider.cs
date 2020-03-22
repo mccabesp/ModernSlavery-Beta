@@ -16,7 +16,7 @@ namespace ModernSlavery.Infrastructure.Messaging
     public abstract class BaseEmailProvider
     {
         public BaseEmailProvider(
-            GlobalOptions globalOptions,
+            SharedOptions sharedOptions,
             IEmailTemplateRepository emailTemplateRepo,
             ILogger logger,
             [KeyFilter(Filenames.EmailSendLog)] IRecordLogger emailSendLog)
@@ -24,11 +24,11 @@ namespace ModernSlavery.Infrastructure.Messaging
             EmailTemplateRepo = emailTemplateRepo ?? throw new ArgumentNullException(nameof(emailTemplateRepo));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             EmailSendLog = emailSendLog ?? throw new ArgumentNullException(nameof(emailSendLog));
-            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
         }
 
         public virtual bool Enabled { get; } = true;
-        public GlobalOptions GlobalOptions { get; }
+        public SharedOptions SharedOptions { get; }
 
         public abstract Task<SendEmailResult> SendEmailAsync<TModel>(string emailAddress, string templateId,
             TModel parameters, bool test);

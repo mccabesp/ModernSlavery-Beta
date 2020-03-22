@@ -30,11 +30,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         private void UpdateFromCompaniesHouse(string runId)
         {
-            int maxNumCallCompaniesHouseApi = _CommonBusinessLogic.GlobalOptions.MaxNumCallsCompaniesHouseApiPerFiveMins;
+            int maxNumCallCompaniesHouseApi = _SharedBusinessLogic.SharedOptions.MaxNumCallsCompaniesHouseApiPerFiveMins;
 
             for (var i = 0; i < maxNumCallCompaniesHouseApi; i++)
             {
-                long organisationId = _CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+                long organisationId = _SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .Where(org => !org.OptedOutFromCompaniesHouseUpdate && org.CompanyNumber != null && org.CompanyNumber != "")
                     .OrderByDescending(org => org.LastCheckedAgainstCompaniesHouse == null)
                     .ThenBy(org => org.LastCheckedAgainstCompaniesHouse)

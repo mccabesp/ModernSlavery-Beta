@@ -25,10 +25,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.RegistrationAddresses);
+                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.RegistrationAddresses);
 
                 //Dont execute on startup if file already exists
-                if (!Functions.StartedJobs.Contains(funcName) && await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
+                if (!Functions.StartedJobs.Contains(funcName) && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     log.LogDebug($"Skipped {funcName} at start up.");
                     return;
@@ -98,9 +98,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         public async Task<List<RegistrationAddressesFileModel>> GetLatestRegistrationAddressesAsync()
         {
             // Load the DnBOrgs file from storage"
-            string dnbOrgsPath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DataPath, Filenames.DnBOrganisations());
-            List<DnBOrgsModel> AllDnBOrgs = await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(dnbOrgsPath)
-                ? await Core.Classes.Extensions.ReadCSVAsync<DnBOrgsModel>(_CommonBusinessLogic.FileRepository, dnbOrgsPath)
+            string dnbOrgsPath = Path.Combine(_SharedBusinessLogic.SharedOptions.DataPath, Filenames.DnBOrganisations());
+            List<DnBOrgsModel> AllDnBOrgs = await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(dnbOrgsPath)
+                ? await Core.Classes.Extensions.ReadCSVAsync<DnBOrgsModel>(_SharedBusinessLogic.FileRepository, dnbOrgsPath)
                 : new List<DnBOrgsModel>();
             AllDnBOrgs = AllDnBOrgs.OrderBy(o => o.OrganisationName).ToList();
 
@@ -110,7 +110,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 .ToList();
 
             // Get all the latest verified organisation registrations
-            List<Organisation> verifiedOrgs = await Queryable.Where<Organisation>(_CommonBusinessLogic.DataRepository.GetAll<Organisation>(), uo => uo.LatestRegistration != null)
+            List<Organisation> verifiedOrgs = await Queryable.Where<Organisation>(_SharedBusinessLogic.DataRepository.GetAll<Organisation>(), uo => uo.LatestRegistration != null)
                 .Include(uo => uo.LatestRegistration)
                 .Include(uo => uo.LatestAddress)
                 .Include(uo => uo.LatestReturn)

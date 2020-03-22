@@ -52,19 +52,19 @@ namespace ModernSlavery.BusinessLogic
 
     public class ScopeBusinessLogic : IScopeBusinessLogic
     {
-        private readonly ICommonBusinessLogic _commonBusinessLogic;
+        private readonly ISharedBusinessLogic _sharedBusinessLogic;
         private readonly ISearchBusinessLogic _searchBusinessLogic;
-        private readonly GlobalOptions GlobalOptions;
+        private readonly SharedOptions SharedOptions;
 
-        public ScopeBusinessLogic(ICommonBusinessLogic commonBusinessLogic,
+        public ScopeBusinessLogic(ISharedBusinessLogic sharedBusinessLogic,
             IDataRepository dataRepo,
             ISearchBusinessLogic searchBusinessLogic,
-            GlobalOptions globalOptions)
+            SharedOptions sharedOptions)
         {
-            _commonBusinessLogic = commonBusinessLogic;
+            _sharedBusinessLogic = sharedBusinessLogic;
             _searchBusinessLogic = searchBusinessLogic;
             DataRepository = dataRepo;
-            GlobalOptions = globalOptions;
+            SharedOptions = sharedOptions;
         }
 
         private IDataRepository DataRepository { get; }
@@ -322,8 +322,8 @@ namespace ModernSlavery.BusinessLogic
 
         public bool FillMissingScopes(Organisation org)
         {
-            var firstYear = GlobalOptions.FirstReportingYear;
-            var currentSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(org.SectorType);
+            var firstYear = SharedOptions.FirstReportingYear;
+            var currentSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(org.SectorType);
             var currentSnapshotYear = currentSnapshotDate.Year;
             var prevYearScope = ScopeStatuses.Unknown;
             var neverDeclaredScope = true;
@@ -390,13 +390,13 @@ namespace ModernSlavery.BusinessLogic
             // get all orgs of any status
             var allOrgs = await DataRepository.ToListAsync<Organisation>();
 
-            var firstYear = GlobalOptions.FirstReportingYear;
+            var firstYear = SharedOptions.FirstReportingYear;
 
             // find all orgs who have no scope or unknown scope statuses
             var orgsWithMissingScope = new HashSet<OrganisationMissingScope>();
             foreach (var org in allOrgs)
             {
-                var currentSnapshotDate = _commonBusinessLogic.GetAccountingStartDate(org.SectorType);
+                var currentSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(org.SectorType);
                 var currentYear = currentSnapshotDate.Year;
                 var missingSnapshotYears = new List<int>();
 
@@ -439,7 +439,7 @@ namespace ModernSlavery.BusinessLogic
                     nameof(scopeStatus));
 
             //Check for conflict with previous years scope
-            if (snapshotDate.Year > GlobalOptions.FirstReportingYear)
+            if (snapshotDate.Year > SharedOptions.FirstReportingYear)
             {
                 var previousScope = GetLatestScopeStatusForSnapshotYear(org, snapshotDate.Year - 1);
                 if (previousScope == ScopeStatuses.InScope && scopeStatus == ScopeStatuses.PresumedOutOfScope
@@ -505,7 +505,7 @@ namespace ModernSlavery.BusinessLogic
         public virtual OrganisationScope GetLatestScopeBySnapshotYear(Organisation organisation, int snapshotYear = 0)
         {
             if (snapshotYear == 0)
-                snapshotYear = _commonBusinessLogic.GetAccountingStartDate(organisation.SectorType).Year;
+                snapshotYear = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).Year;
 
             var orgScope = organisation.OrganisationScopes
                 .SingleOrDefault(s => s.SnapshotDate.Year == snapshotYear && s.Status == ScopeRowStatuses.Active);

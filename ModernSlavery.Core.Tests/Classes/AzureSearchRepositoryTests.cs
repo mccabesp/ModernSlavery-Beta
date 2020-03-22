@@ -24,7 +24,7 @@ namespace ModernSlavery.Core.Tests.Classes
             string nullTestIndexName = null;
 
             // Act
-            TestDelegate testDelegate = () => new AzureEmployerSearchRepository(ConfigHelpers.GlobalOptions,
+            TestDelegate testDelegate = () => new AzureEmployerSearchRepository(ConfigHelpers.SharedOptions,
                 Mock.Of<IRecordLogger>(), nullTestServiceName, nullTestIndexName);
 
             // Assert

@@ -15,7 +15,7 @@ namespace ModernSlavery.BusinessLogic.Registration
         public IPinInThePostService PinInThePostService { get; }
         public IPostcodeChecker PostcodeChecker { get; }
 
-        public ICommonBusinessLogic CommonBusinessLogic { get; }
+        public ISharedBusinessLogic SharedBusinessLogic { get; }
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
         public IScopeBusinessLogic ScopeBusinessLogic { get; }
         public ISearchBusinessLogic SearchBusinessLogic { get; }
@@ -32,7 +32,7 @@ namespace ModernSlavery.BusinessLogic.Registration
             IRegistrationBusinessLogic registrationBusinessLogic,
             IScopeBusinessLogic scopeBL,
             IOrganisationBusinessLogic orgBL,
-            ICommonBusinessLogic commonBusinessLogic,
+            ISharedBusinessLogic sharedBusinessLogic,
             ISearchBusinessLogic searchBusinessLogic,
             IUserRepository userRepository,
             IPinInThePostService pinInThePostService,
@@ -47,7 +47,7 @@ namespace ModernSlavery.BusinessLogic.Registration
 
             ScopeBusinessLogic = scopeBL;
             OrganisationBusinessLogic = orgBL;
-            CommonBusinessLogic = commonBusinessLogic;
+            SharedBusinessLogic = sharedBusinessLogic;
             SearchBusinessLogic = searchBusinessLogic;
             PrivateSectorRepository = privateSectorRepository;
             PublicSectorRepository = publicSectorRepository;
@@ -63,7 +63,7 @@ namespace ModernSlavery.BusinessLogic.Registration
         public IPinInThePostService PinInThePostService { get; }
         public IPostcodeChecker PostcodeChecker { get; }
 
-        public ICommonBusinessLogic CommonBusinessLogic { get; }
+        public ISharedBusinessLogic SharedBusinessLogic { get; }
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
         public IScopeBusinessLogic ScopeBusinessLogic { get; }
         public ISearchBusinessLogic SearchBusinessLogic { get; }

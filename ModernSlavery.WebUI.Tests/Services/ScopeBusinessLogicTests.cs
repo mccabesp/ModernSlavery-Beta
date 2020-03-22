@@ -28,7 +28,7 @@ namespace ModernSlavery.WebUI.Tests.Services
 
         private Mock<IDataRepository> mockDataRepo;
         private Mock<IFileRepository> mockFileRepo;
-        private readonly ICommonBusinessLogic testCommonBL = MoqHelpers.CreateFakeCommonBusinessLogic();
+        private readonly ISharedBusinessLogic testCommonBL = MoqHelpers.CreateFakeSharedBusinessLogic();
 
         private IList<Organisation> testOrgData;
         private IList<OrganisationScope> testOrgScopeData;

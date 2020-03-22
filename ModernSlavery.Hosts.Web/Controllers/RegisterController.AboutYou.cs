@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Controllers
             await Cache.RemoveAsync($"{UserHostAddress}:LastSignupDate");
             if (value > DateTime.MinValue)
             {
-                await Cache.AddAsync($"{UserHostAddress}:LastSignupDate", value, value.AddMinutes(CommonBusinessLogic.GlobalOptions.MinSignupMinutes));
+                await Cache.AddAsync($"{UserHostAddress}:LastSignupDate", value, value.AddMinutes(SharedBusinessLogic.SharedOptions.MinSignupMinutes));
             }
         }
 
@@ -42,8 +42,8 @@ namespace ModernSlavery.WebUI.Controllers
             DateTime lastSignupDate = await GetLastSignupDateAsync();
             TimeSpan remainingTime = lastSignupDate == DateTime.MinValue
                 ? TimeSpan.Zero
-                : lastSignupDate.AddMinutes(CommonBusinessLogic.GlobalOptions.MinSignupMinutes) - VirtualDateTime.Now;
-            if (!CommonBusinessLogic.GlobalOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
+                : lastSignupDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinSignupMinutes) - VirtualDateTime.Now;
+            if (!SharedBusinessLogic.SharedOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
             {
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
             }
@@ -98,8 +98,8 @@ namespace ModernSlavery.WebUI.Controllers
             DateTime lastSignupDate = await GetLastSignupDateAsync();
             TimeSpan remainingTime = lastSignupDate == DateTime.MinValue
                 ? TimeSpan.Zero
-                : lastSignupDate.AddMinutes(CommonBusinessLogic.GlobalOptions.MinSignupMinutes) - VirtualDateTime.Now;
-            if (!CommonBusinessLogic.GlobalOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
+                : lastSignupDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinSignupMinutes) - VirtualDateTime.Now;
+            if (!SharedBusinessLogic.SharedOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
             {
                 ModelState.AddModelError(3024, null, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)});
             }
@@ -139,7 +139,7 @@ namespace ModernSlavery.WebUI.Controllers
                         return View("AboutYou", model);
                     }
 
-                    remainingTime = currentUser.EmailVerifySendDate.Value.AddHours(CommonBusinessLogic.GlobalOptions.EmailVerificationExpiryHours)
+                    remainingTime = currentUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours)
                                     - VirtualDateTime.Now;
                     if (remainingTime > TimeSpan.Zero)
                     {
@@ -150,15 +150,15 @@ namespace ModernSlavery.WebUI.Controllers
                 }
 
                 //Delete the previous user org if there is one
-                UserOrganisation userOrg = await CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
+                UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                     .FirstOrDefaultAsync(uo => uo.UserId == currentUser.UserId);
                 if (userOrg != null)
                 {
-                    CommonBusinessLogic.DataRepository.Delete(userOrg);
+                    SharedBusinessLogic.DataRepository.Delete(userOrg);
                 }
 
                 //If from a previous user then delete the previous user
-                CommonBusinessLogic.DataRepository.Delete(currentUser);
+                SharedBusinessLogic.DataRepository.Delete(currentUser);
             }
 
             //Save the submitted fields
@@ -168,7 +168,7 @@ namespace ModernSlavery.WebUI.Controllers
             currentUser.Firstname = model.FirstName;
             currentUser.Lastname = model.LastName;
             currentUser.JobTitle = model.JobTitle;
-            if (model.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
+            if (model.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
                 currentUser._EmailAddress = model.EmailAddress;
             }
@@ -193,8 +193,8 @@ namespace ModernSlavery.WebUI.Controllers
             currentUser.SetStatus(UserStatuses.New, OriginalUser ?? currentUser);
 
             // save the current user
-            CommonBusinessLogic.DataRepository.Insert(currentUser);
-            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+            SharedBusinessLogic.DataRepository.Insert(currentUser);
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Save pendingFasttrackCodes
             string pendingFasttrackCodes = PendingFasttrackCodes;
@@ -203,7 +203,7 @@ namespace ModernSlavery.WebUI.Controllers
                 string[] args = pendingFasttrackCodes?.SplitI(":");
                 pendingFasttrackCodes = $"{args[0]}:{args[1]}";
                 currentUser.SetSetting(UserSettingKeys.PendingFasttrackCodes, pendingFasttrackCodes);
-                await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 PendingFasttrackCodes = null;
             }
 
@@ -211,7 +211,7 @@ namespace ModernSlavery.WebUI.Controllers
             this.StashModel(model);
 
             //Ensure signup is restricted to every 10 min
-            await SetLastSignupDateAsync(model.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix) ? DateTime.MinValue : VirtualDateTime.Now);
+            await SetLastSignupDateAsync(model.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) ? DateTime.MinValue : VirtualDateTime.Now);
 
             return RedirectToAction("VerifyEmail");
         }

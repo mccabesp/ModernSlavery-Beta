@@ -28,7 +28,7 @@ namespace ModernSlavery.WebUI.Controllers
         public SubmitController(
             ISubmissionService submissionService,
             ISubmissionPresenter submissionPresenter,
-            ILogger<SubmitController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<SubmitController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             _SubmissionService = submissionService;
             _SubmissionPresenter = submissionPresenter;
@@ -37,7 +37,7 @@ namespace ModernSlavery.WebUI.Controllers
         [Route("Init")]
         public IActionResult Init()
         {
-            if (!CommonBusinessLogic.GlobalOptions.IsProduction())
+            if (!SharedBusinessLogic.SharedOptions.IsProduction())
             {
                 Logger.LogInformation("Submit Controller Initialised");
             }

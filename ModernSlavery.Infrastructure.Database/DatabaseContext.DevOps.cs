@@ -8,37 +8,37 @@ namespace ModernSlavery.Infrastructure.Database
     {
         public void DeleteAllTestRecords(DateTime? deadline = null)
         {
-            if (GlobalOptions.IsProduction())
+            if (SharedOptions.IsProduction())
                 throw new Exception("Attempt to delete all test data from production environment");
 
-            if (string.IsNullOrWhiteSpace(GlobalOptions.TestPrefix))
-                throw new ArgumentNullException(nameof(GlobalOptions.TestPrefix));
+            if (string.IsNullOrWhiteSpace(SharedOptions.TestPrefix))
+                throw new ArgumentNullException(nameof(SharedOptions.TestPrefix));
 
             if (deadline == null || deadline.Value == DateTime.MinValue)
             {
                 ExecuteSqlCommand(
-                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN organisations O ON O.OrganisationId=UO.OrganisationId where O.OrganisationName like '{GlobalOptions.TestPrefix}%'");
+                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN organisations O ON O.OrganisationId=UO.OrganisationId where O.OrganisationName like '{SharedOptions.TestPrefix}%'");
                 ExecuteSqlCommand(
-                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN Users U ON U.UserId=UO.UserId where U.Firstname like '{GlobalOptions.TestPrefix}%'");
+                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN Users U ON U.UserId=UO.UserId where U.Firstname like '{SharedOptions.TestPrefix}%'");
                 ExecuteSqlCommand(
-                    $"UPDATE Organisations WITH (ROWLOCK) SET LatestAddressId=null, LatestRegistration_OrganisationId=null,LatestRegistration_UserId=null,LatestReturnId=null,LatestScopeId=null where OrganisationName like '{GlobalOptions.TestPrefix}%'");
-                ExecuteSqlCommand($"DELETE Users WITH (ROWLOCK) where Firstname like '{GlobalOptions.TestPrefix}%'");
+                    $"UPDATE Organisations WITH (ROWLOCK) SET LatestAddressId=null, LatestRegistration_OrganisationId=null,LatestRegistration_UserId=null,LatestReturnId=null,LatestScopeId=null where OrganisationName like '{SharedOptions.TestPrefix}%'");
+                ExecuteSqlCommand($"DELETE Users WITH (ROWLOCK) where Firstname like '{SharedOptions.TestPrefix}%'");
                 ExecuteSqlCommand(
-                    $"DELETE Organisations WITH (ROWLOCK) where OrganisationName like '{GlobalOptions.TestPrefix}%'");
+                    $"DELETE Organisations WITH (ROWLOCK) where OrganisationName like '{SharedOptions.TestPrefix}%'");
             }
             else
             {
                 var dl = deadline.Value.ToString("yyyy-MM-dd HH:mm:ss");
                 ExecuteSqlCommand(
-                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN organisations O ON O.OrganisationId=UO.OrganisationId where O.OrganisationName like '{GlobalOptions.TestPrefix}%' AND UO.Created<'{dl}'");
+                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN organisations O ON O.OrganisationId=UO.OrganisationId where O.OrganisationName like '{SharedOptions.TestPrefix}%' AND UO.Created<'{dl}'");
                 ExecuteSqlCommand(
-                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN Users U ON U.UserId=UO.UserId where U.Firstname like '{GlobalOptions.TestPrefix}%' AND UO.Created<'{dl}'");
+                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN Users U ON U.UserId=UO.UserId where U.Firstname like '{SharedOptions.TestPrefix}%' AND UO.Created<'{dl}'");
                 ExecuteSqlCommand(
-                    $"UPDATE Organisations WITH (ROWLOCK) SET LatestAddressId=null, LatestRegistration_OrganisationId=null,LatestRegistration_UserId=null,LatestReturnId=null,LatestScopeId=null where OrganisationName like '{GlobalOptions.TestPrefix}%' AND Created<'{dl}'");
+                    $"UPDATE Organisations WITH (ROWLOCK) SET LatestAddressId=null, LatestRegistration_OrganisationId=null,LatestRegistration_UserId=null,LatestReturnId=null,LatestScopeId=null where OrganisationName like '{SharedOptions.TestPrefix}%' AND Created<'{dl}'");
                 ExecuteSqlCommand(
-                    $"DELETE Users WITH (ROWLOCK) where Firstname like '{GlobalOptions.TestPrefix}%' AND Created<'{dl}'");
+                    $"DELETE Users WITH (ROWLOCK) where Firstname like '{SharedOptions.TestPrefix}%' AND Created<'{dl}'");
                 ExecuteSqlCommand(
-                    $"DELETE Organisations WITH (ROWLOCK) where OrganisationName like '{GlobalOptions.TestPrefix}%' AND Created<'{dl}'");
+                    $"DELETE Organisations WITH (ROWLOCK) where OrganisationName like '{SharedOptions.TestPrefix}%' AND Created<'{dl}'");
             }
         }
 

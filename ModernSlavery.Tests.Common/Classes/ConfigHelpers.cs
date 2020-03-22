@@ -15,7 +15,7 @@ namespace ModernSlavery.Tests.Common.Classes
     {
         public static IConfiguration Config = new ConfigBuilder().Build();
 
-        public static GlobalOptions GlobalOptions = Bind<GlobalOptions>();
+        public static SharedOptions SharedOptions = Bind<SharedOptions>();
         public static SearchOptions SearchOptions = Bind<SearchOptions>();
         public static StorageOptions StorageOptions = Bind<StorageOptions>();
         public static EmailOptions EmailOptions = Bind<EmailOptions>();

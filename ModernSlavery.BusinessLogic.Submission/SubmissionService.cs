@@ -2,7 +2,7 @@
 {
     public interface ISubmissionService
     {
-        ICommonBusinessLogic CommonBusinessLogic { get; }
+        ISharedBusinessLogic SharedBusinessLogic { get; }
         ISubmissionBusinessLogic SubmissionBusinessLogic { get; }
         IScopeBusinessLogic ScopeBusinessLogic { get; }
         IDraftFileBusinessLogic DraftFileBusinessLogic { get; }
@@ -11,18 +11,18 @@
     public class SubmissionService : ISubmissionService
     {
         public SubmissionService(
-            ICommonBusinessLogic commonBusinessLogic,
+            ISharedBusinessLogic sharedBusinessLogic,
             ISubmissionBusinessLogic submissionBusinessLogic,
             IScopeBusinessLogic scopeBusinessLogic,
             IDraftFileBusinessLogic draftFileBusinessLogic)
         {
-            CommonBusinessLogic = commonBusinessLogic;
+            SharedBusinessLogic = sharedBusinessLogic;
             SubmissionBusinessLogic = submissionBusinessLogic;
             ScopeBusinessLogic = scopeBusinessLogic;
             DraftFileBusinessLogic = draftFileBusinessLogic;
         }
 
-        public ICommonBusinessLogic CommonBusinessLogic { get; }
+        public ISharedBusinessLogic SharedBusinessLogic { get; }
         public ISubmissionBusinessLogic SubmissionBusinessLogic { get; }
         public IScopeBusinessLogic ScopeBusinessLogic { get; }
         public IDraftFileBusinessLogic DraftFileBusinessLogic { get; }

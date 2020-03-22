@@ -18,11 +18,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.OrganisationLateSubmissions);
+                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.OrganisationLateSubmissions);
 
                 //Dont execute on startup if file already exists
                 if (!Functions.StartedJobs.Contains(nameof(UpdateOrganisationLateSubmissions))
-                    && await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
+                    && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -58,7 +58,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 IEnumerable<LateSubmissionsFileModel> records = _SubmissionBusinessLogic.GetLateSubmissions();
-                await Core.Classes.Extensions.SaveCSVAsync(_CommonBusinessLogic.FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
             }
             finally
             {

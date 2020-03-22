@@ -59,9 +59,9 @@ namespace ModernSlavery.Hosts.Webjob.Tests.Functions.UpdateFiles
         public async Task FunctionsUpdateFile_UpdateOrganisations_Shared_NoYears_UpdatesAllYearsAsync()
         {
             //ARRANGE
-            var filePath = Path.Combine(ConfigHelpers.GlobalOptions.DownloadsPath, Filenames.Organisations);
+            var filePath = Path.Combine(ConfigHelpers.SharedOptions.DownloadsPath, Filenames.Organisations);
             var endYear = SectorTypes.Private.GetAccountingStartDate().Year;
-            var startYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
+            var startYear = ConfigHelpers.SharedOptions.FirstReportingYear;
             var expectedFileCount = endYear - startYear + 1;
 
             //ACT
@@ -69,17 +69,17 @@ namespace ModernSlavery.Hosts.Webjob.Tests.Functions.UpdateFiles
 
             //ASSERT
             //Check each return is in the download file
-            var files = await _functions.CommonBusinessLogic.FileRepository.GetFilesAsync(ConfigHelpers.GlobalOptions
+            var files = await _functions.SharedBusinessLogic.FileRepository.GetFilesAsync(ConfigHelpers.SharedOptions
                 .DownloadsPath);
             Assert.AreEqual(expectedFileCount, files.Count(),
-                $"Expected 2 files in {ConfigHelpers.GlobalOptions.DownloadsPath}");
+                $"Expected 2 files in {ConfigHelpers.SharedOptions.DownloadsPath}");
             Assert.Multiple(
                 () =>
                 {
                     for (var year = startYear; year <= endYear; year++)
                     {
                         filePath = Path.Combine(
-                            ConfigHelpers.GlobalOptions.DownloadsPath,
+                            ConfigHelpers.SharedOptions.DownloadsPath,
                             $"{Path.GetFileNameWithoutExtension(Filenames.Organisations)}_{year}-{(year + 1).ToTwoDigitYear()}{Path.GetExtension(Filenames.Organisations)}");
                         Assert.That(files.Contains(filePath), $"Expected file for year {year}");
                     }
@@ -96,7 +96,7 @@ namespace ModernSlavery.Hosts.Webjob.Tests.Functions.UpdateFiles
 
             var year = Numeric.Rand(startYear, endYear);
             var filePath = Path.Combine(
-                ConfigHelpers.GlobalOptions.DownloadsPath,
+                ConfigHelpers.SharedOptions.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.Organisations)}_{year}-{(year + 1).ToTwoDigitYear()}{Path.GetExtension(Filenames.Organisations)}");
 
             //ACT
@@ -104,11 +104,11 @@ namespace ModernSlavery.Hosts.Webjob.Tests.Functions.UpdateFiles
 
             //ASSERT
             //Check each return is in the download file
-            var files = await _functions.CommonBusinessLogic.FileRepository.GetFilesAsync(
-                ConfigHelpers.GlobalOptions.DownloadsPath,
+            var files = await _functions.SharedBusinessLogic.FileRepository.GetFilesAsync(
+                ConfigHelpers.SharedOptions.DownloadsPath,
                 $"{Path.GetFileNameWithoutExtension(Filenames.Organisations)}_*{Path.GetExtension(Filenames.Organisations)}");
             Assert.That(files.Count() == 1,
-                $"Expected only 1 file in {ConfigHelpers.GlobalOptions.DownloadsPath} got {files.Count()}");
+                $"Expected only 1 file in {ConfigHelpers.SharedOptions.DownloadsPath} got {files.Count()}");
             Assert.That(files.Contains(filePath), $"Expected file for year {year}");
         }
 

@@ -22,17 +22,17 @@ namespace ModernSlavery.WebUI.Tests
         [Description("Ensure the Download view form is returned for the current user")]
         public async Task Download_Get_SuccessAsync()
         {
-            string originalDownloadsLocation =ConfigHelpers.GlobalOptions.DownloadsLocation; // remember so it can be reset at the end of this test
+            string originalDownloadsLocation =ConfigHelpers.SharedOptions.DownloadsLocation; // remember so it can be reset at the end of this test
 
             // Arrange
-           ConfigHelpers.GlobalOptions.DownloadsLocation = Path.Combine(ConfigHelpers.GlobalOptions.DownloadsLocation, "TestData");
+           ConfigHelpers.SharedOptions.DownloadsLocation = Path.Combine(ConfigHelpers.SharedOptions.DownloadsLocation, "TestData");
 
             var firstFileTitle = "2006-2007";
-            string firstFileLocation = Path.Combine(ConfigHelpers.GlobalOptions.DownloadsLocation, $"GPGData_{firstFileTitle}.csv");
+            string firstFileLocation = Path.Combine(ConfigHelpers.SharedOptions.DownloadsLocation, $"GPGData_{firstFileTitle}.csv");
             var secondFileTitle = "2005-2006";
-            string secondFileLocation = Path.Combine(ConfigHelpers.GlobalOptions.DownloadsLocation, $"GPGData_{secondFileTitle}.csv");
+            string secondFileLocation = Path.Combine(ConfigHelpers.SharedOptions.DownloadsLocation, $"GPGData_{secondFileTitle}.csv");
             var thirdFileTitle = "2004-2005";
-            string thirdFileLocation = Path.Combine(ConfigHelpers.GlobalOptions.DownloadsLocation, $"GPGData_{thirdFileTitle}.csv");
+            string thirdFileLocation = Path.Combine(ConfigHelpers.SharedOptions.DownloadsLocation, $"GPGData_{thirdFileTitle}.csv");
 
             ViewingController controller=null;
             try
@@ -42,9 +42,9 @@ namespace ModernSlavery.WebUI.Tests
                 routeData.Values.Add("Controller", "Viewing");
                 controller = UiTestHelper.GetController<ViewingController>(0, routeData);
 
-                await controller.CommonBusinessLogic.FileRepository.WriteAsync(firstFileLocation, Encoding.UTF8.GetBytes($"No data for {firstFileTitle}"));
-                await controller.CommonBusinessLogic.FileRepository.WriteAsync(secondFileLocation, Encoding.UTF8.GetBytes($"No data for {secondFileTitle}"));
-                await controller.CommonBusinessLogic.FileRepository.WriteAsync(thirdFileLocation, Encoding.UTF8.GetBytes($"No data for {thirdFileTitle}"));
+                await controller.SharedBusinessLogic.FileRepository.WriteAsync(firstFileLocation, Encoding.UTF8.GetBytes($"No data for {firstFileTitle}"));
+                await controller.SharedBusinessLogic.FileRepository.WriteAsync(secondFileLocation, Encoding.UTF8.GetBytes($"No data for {secondFileTitle}"));
+                await controller.SharedBusinessLogic.FileRepository.WriteAsync(thirdFileLocation, Encoding.UTF8.GetBytes($"No data for {thirdFileTitle}"));
 
                 // Act
                 var result = await controller.Download() as ViewResult;
@@ -67,12 +67,12 @@ namespace ModernSlavery.WebUI.Tests
                 // Cleanup
                 if (controller != null)
                 {
-                    await controller.CommonBusinessLogic.FileRepository.DeleteFileAsync(firstFileLocation);
-                    await controller.CommonBusinessLogic.FileRepository.DeleteFileAsync(secondFileLocation);
-                    await controller.CommonBusinessLogic.FileRepository.DeleteFileAsync(thirdFileLocation);
+                    await controller.SharedBusinessLogic.FileRepository.DeleteFileAsync(firstFileLocation);
+                    await controller.SharedBusinessLogic.FileRepository.DeleteFileAsync(secondFileLocation);
+                    await controller.SharedBusinessLogic.FileRepository.DeleteFileAsync(thirdFileLocation);
                 }
 
-               ConfigHelpers.GlobalOptions.DownloadsLocation = originalDownloadsLocation;
+               ConfigHelpers.SharedOptions.DownloadsLocation = originalDownloadsLocation;
             }
         }
 
@@ -80,13 +80,13 @@ namespace ModernSlavery.WebUI.Tests
         [Description("Ensure the Download Data view form is returned for the current user")]
         public async Task DownloadData_Get_SuccessAsync()
         {
-            string originalDownloadsLocation =ConfigHelpers.GlobalOptions.DownloadsLocation; // remember so it can be reset at the end of this test
+            string originalDownloadsLocation =ConfigHelpers.SharedOptions.DownloadsLocation; // remember so it can be reset at the end of this test
 
             // Arrange
-           ConfigHelpers.GlobalOptions.DownloadsLocation = Path.Combine(ConfigHelpers.GlobalOptions.DownloadsLocation, "TestData");
+           ConfigHelpers.SharedOptions.DownloadsLocation = Path.Combine(ConfigHelpers.SharedOptions.DownloadsLocation, "TestData");
 
             var firstFileTitle = "2001-2002";
-            string firstFileLocation = Path.Combine(ConfigHelpers.GlobalOptions.DownloadsLocation, $"GPGData_{firstFileTitle}.csv");
+            string firstFileLocation = Path.Combine(ConfigHelpers.SharedOptions.DownloadsLocation, $"GPGData_{firstFileTitle}.csv");
             string firstFileContent = $"No content available for years {firstFileTitle}.";
 
             ViewingController controller = null;
@@ -97,7 +97,7 @@ namespace ModernSlavery.WebUI.Tests
                 routeData.Values.Add("Controller", "Viewing");
 
                 controller = UiTestHelper.GetController<ViewingController>(0, routeData);
-                await controller.CommonBusinessLogic.FileRepository.WriteAsync(firstFileLocation, Encoding.UTF8.GetBytes(firstFileContent));
+                await controller.SharedBusinessLogic.FileRepository.WriteAsync(firstFileLocation, Encoding.UTF8.GetBytes(firstFileContent));
                 var year = 2001;
 
                 // Act
@@ -110,8 +110,8 @@ namespace ModernSlavery.WebUI.Tests
             finally
             {
                 // Cleanup
-                if (controller!=null)await controller.CommonBusinessLogic.FileRepository.DeleteFileAsync(firstFileLocation);
-               ConfigHelpers.GlobalOptions.DownloadsLocation = originalDownloadsLocation;
+                if (controller!=null)await controller.SharedBusinessLogic.FileRepository.DeleteFileAsync(firstFileLocation);
+               ConfigHelpers.SharedOptions.DownloadsLocation = originalDownloadsLocation;
             }
         }
 

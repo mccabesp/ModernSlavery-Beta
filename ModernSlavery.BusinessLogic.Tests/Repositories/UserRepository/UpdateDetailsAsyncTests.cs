@@ -29,7 +29,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Repositories.UserRepository
 
             // service under test
             testUserRepo = new ModernSlavery.Infrastructure.Database.Classes.UserRepository(new DatabaseOptions(),
-                new GlobalOptions(), mockDataRepo.Object, mockLogRecordLogger.Object,
+                new SharedOptions(), mockDataRepo.Object, mockLogRecordLogger.Object,
                 DependencyContainer.Resolve<IMapper>());
         }
 

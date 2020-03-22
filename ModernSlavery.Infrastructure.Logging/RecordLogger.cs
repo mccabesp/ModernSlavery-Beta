@@ -11,14 +11,14 @@ namespace ModernSlavery.Infrastructure.Logging
     public class RecordLogger : IRecordLogger
     {
         private readonly string fileName;
-        protected readonly GlobalOptions GlobalOptions;
+        protected readonly SharedOptions SharedOptions;
 
         private readonly IQueue queue;
 
-        public RecordLogger(GlobalOptions globalOptions, LogRecordQueue queue, string applicationName,
+        public RecordLogger(SharedOptions sharedOptions, LogRecordQueue queue, string applicationName,
             string fileName)
         {
-            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             if (string.IsNullOrWhiteSpace(applicationName)) throw new ArgumentNullException(nameof(applicationName));
 
             if (string.IsNullOrWhiteSpace(fileName)) throw new ArgumentNullException(nameof(fileName));

@@ -23,9 +23,9 @@ namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
 {
     public static class HtmlHelpers
     {
-        public static GlobalOptions GetGlobalOptions(this IHtmlHelper htmlHelper)
+        public static SharedOptions GetSharedOptions(this IHtmlHelper htmlHelper)
         {
-            return (GlobalOptions)htmlHelper.ViewContext.HttpContext.RequestServices.GetService(typeof(GlobalOptions));
+            return (SharedOptions)htmlHelper.ViewContext.HttpContext.RequestServices.GetService(typeof(SharedOptions));
 
         }
         public static async Task<IHtmlContent> PartialModelAsync<T>(this IHtmlHelper htmlHelper, T viewModel)
@@ -38,9 +38,9 @@ namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
 
         public static HtmlString PageIdentifier(this IHtmlHelper htmlHelper)
         {
-            var globalOptions = htmlHelper.GetGlobalOptions();
+            var sharedOptions = htmlHelper.GetSharedOptions();
             return new HtmlString(
-                $"Date:{VirtualDateTime.Now}, Version:{globalOptions.Version}, File Date:{globalOptions.AssemblyDate.ToLocalTime()}, Environment:{globalOptions.Environment}, Machine:{Environment.MachineName}, Instance:{globalOptions.WEBSITE_INSTANCE_ID}, {globalOptions.AssemblyCopyright}");
+                $"Date:{VirtualDateTime.Now}, Version:{sharedOptions.Version}, File Date:{sharedOptions.AssemblyDate.ToLocalTime()}, Environment:{sharedOptions.Environment}, Machine:{Environment.MachineName}, Instance:{sharedOptions.WEBSITE_INSTANCE_ID}, {sharedOptions.AssemblyCopyright}");
         }
 
         public static HtmlString ToHtml(this IHtmlHelper htmlHelper, string text)

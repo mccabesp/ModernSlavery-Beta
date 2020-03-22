@@ -253,7 +253,7 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
 
             // BL Services
             builder.RegisterInstance(ConfigHelpers.Config);
-            builder.RegisterType<CommonBusinessLogic>().As<ICommonBusinessLogic>().InstancePerLifetimeScope();
+            builder.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().InstancePerLifetimeScope();
             builder.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().InstancePerLifetimeScope();
             builder.RegisterType<UpdateFromCompaniesHouseService>().As<UpdateFromCompaniesHouseService>().InstancePerLifetimeScope();
             builder.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>().InstancePerLifetimeScope();
@@ -263,7 +263,7 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
             builder.Register(
                     c => c.ResolveAsMock<ScopeBusinessLogic>(
                             false,
-                            typeof(ICommonBusinessLogic),
+                            typeof(ISharedBusinessLogic),
                             typeof(IDataRepository),
                             typeof(ISearchBusinessLogic))
                         .Object)
@@ -271,7 +271,7 @@ namespace ModernSlavery.WebUI.Tests.TestHelpers
                 .InstancePerLifetimeScope();
 
             builder.Register(
-                    c => c.ResolveAsMock<SubmissionBusinessLogic>(false, typeof(ICommonBusinessLogic), typeof(IDataRepository)).Object)
+                    c => c.ResolveAsMock<SubmissionBusinessLogic>(false, typeof(ISharedBusinessLogic), typeof(IDataRepository)).Object)
                 .As<ISubmissionBusinessLogic>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>().InstancePerLifetimeScope();

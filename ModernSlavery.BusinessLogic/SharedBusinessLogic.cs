@@ -7,9 +7,9 @@ using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.BusinessLogic
 {
-    public interface ICommonBusinessLogic
+    public interface ISharedBusinessLogic
     {
-        GlobalOptions GlobalOptions { get; }
+        SharedOptions SharedOptions { get; }
         IFileRepository FileRepository { get; }
         IDataRepository DataRepository { get; }
         ISourceComparer SourceComparer { get; }
@@ -19,11 +19,11 @@ namespace ModernSlavery.BusinessLogic
         DateTime GetAccountingStartDate(SectorTypes sector, int year = 0);
     }
 
-    public class CommonBusinessLogic : ICommonBusinessLogic
+    public class SharedBusinessLogic : ISharedBusinessLogic
     {
         private readonly ISnapshotDateHelper _snapshotDateHelper;
 
-        public CommonBusinessLogic(ISnapshotDateHelper snapshotDateHelper, ISourceComparer sourceComparer,
+        public SharedBusinessLogic(ISnapshotDateHelper snapshotDateHelper, ISourceComparer sourceComparer,
             ISendEmailService sendEmailService, INotificationService notificationService,
             IFileRepository fileRepository, IDataRepository dataRepository)
         {
@@ -35,7 +35,7 @@ namespace ModernSlavery.BusinessLogic
             DataRepository = dataRepository;
         }
 
-        public GlobalOptions GlobalOptions { get; }
+        public SharedOptions SharedOptions { get; }
         public IFileRepository FileRepository { get; }
         public IDataRepository DataRepository { get; }
         public ISourceComparer SourceComparer { get; }

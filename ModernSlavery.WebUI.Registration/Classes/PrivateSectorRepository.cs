@@ -19,20 +19,20 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
         private readonly IDataRepository _DataRepository;
-        private readonly GlobalOptions GlobalOptions;
+        private readonly SharedOptions SharedOptions;
 
 
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHttpSession _Session;
 
         public PrivateSectorRepository(
-            GlobalOptions globalOptions, 
+            SharedOptions sharedOptions, 
             IHttpContextAccessor httpContextAccessor,
             IHttpSession session,
             IDataRepository dataRepository,
             ICompaniesHouseAPI companiesHouseAPI)
         {
-            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             _httpContextAccessor = httpContextAccessor;
             _Session = session;
             _DataRepository = dataRepository;
@@ -179,7 +179,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
             PagedResult<EmployerRecord> result = null;
 
-            if (!GlobalOptions.IsProduction()
+            if (!SharedOptions.IsProduction()
                 && _httpContextAccessor.HttpContext != null
                 && _httpContextAccessor.HttpContext.Request.Query["fail"].ToBoolean())
             {

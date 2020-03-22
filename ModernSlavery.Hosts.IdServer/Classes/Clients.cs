@@ -14,15 +14,15 @@ namespace ModernSlavery.IdServer.Classes
 
     public class Clients : IClients
     {
-        private readonly GlobalOptions _globalOptions;
-        public Clients(GlobalOptions globalOptions)
+        private readonly SharedOptions _sharedOptions;
+        public Clients(SharedOptions sharedOptions)
         {
-            _globalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
         }
 
         public IEnumerable<Client> Get()
         {
-            if ((_globalOptions.IsProduction() || _globalOptions.IsPreProduction()) && _globalOptions.AuthSecret.EqualsI("secret", "", null))
+            if ((_sharedOptions.IsProduction() || _sharedOptions.IsPreProduction()) && _sharedOptions.AuthSecret.EqualsI("secret", "", null))
             {
                 throw new Exception("Invalid ClientSecret for IdentityServer. You must set 'AuthSecret' to a unique key");
             }
@@ -31,26 +31,26 @@ namespace ModernSlavery.IdServer.Classes
                 new Client {
                     ClientName = "Modern Slavery reporting service",
                     ClientId = "ModernSlaveryServiceWebsite",
-                    ClientSecrets = new List<Secret> {new Secret(_globalOptions.AuthSecret.GetSHA256Checksum())},
-                    ClientUri = _globalOptions.SiteAuthority,
+                    ClientSecrets = new List<Secret> {new Secret(_sharedOptions.AuthSecret.GetSHA256Checksum())},
+                    ClientUri = _sharedOptions.SiteAuthority,
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
                     RedirectUris =
                         new List<string> {
-                            _globalOptions.SiteAuthority,
-                            _globalOptions.SiteAuthority + "signin-oidc",
-                            _globalOptions.SiteAuthority + "manage-organisations",
-                            _globalOptions.DoneUrl
+                            _sharedOptions.SiteAuthority,
+                            _sharedOptions.SiteAuthority + "signin-oidc",
+                            _sharedOptions.SiteAuthority + "manage-organisations",
+                            _sharedOptions.DoneUrl
                         },
                     PostLogoutRedirectUris =
                         new List<string> {
-                            _globalOptions.SiteAuthority,
-                            _globalOptions.SiteAuthority + "signout-callback-oidc",
-                            _globalOptions.SiteAuthority + "manage-organisations",
-                            _globalOptions.SiteAuthority + "manage-account/complete-change-email",
-                            _globalOptions.SiteAuthority + "manage-account/close-account-completed",
-                            _globalOptions.DoneUrl
+                            _sharedOptions.SiteAuthority,
+                            _sharedOptions.SiteAuthority + "signout-callback-oidc",
+                            _sharedOptions.SiteAuthority + "manage-organisations",
+                            _sharedOptions.SiteAuthority + "manage-account/complete-change-email",
+                            _sharedOptions.SiteAuthority + "manage-account/close-account-completed",
+                            _sharedOptions.DoneUrl
                         },
                     AllowedScopes =
                         new List<string> {

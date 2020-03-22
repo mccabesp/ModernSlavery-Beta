@@ -42,7 +42,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
         {
             // Arrange
             var submissionBusinessLogic = new SubmissionBusinessLogic(
-                Mock.Of<ICommonBusinessLogic>(),
+                Mock.Of<ISharedBusinessLogic>(),
                 Mock.Of<IDataRepository>(),
                 Mock.Of<IRecordLogger>());
 
@@ -173,7 +173,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
                 .Returns(listOfOrganisationScope.AsQueryable());
 
             var submissionBusinessLogic = new SubmissionBusinessLogic(
-                Mock.Of<ICommonBusinessLogic>(),
+                Mock.Of<ISharedBusinessLogic>(),
                 mockedDataRepository.Object,
                 Mock.Of<IRecordLogger>());
 

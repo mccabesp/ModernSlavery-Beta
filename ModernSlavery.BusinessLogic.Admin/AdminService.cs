@@ -21,7 +21,7 @@ namespace ModernSlavery.BusinessLogic.Admin
 
         ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; }
         ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
-        ICommonBusinessLogic CommonBusinessLogic { get; }
+        ISharedBusinessLogic SharedBusinessLogic { get; }
     }
 
     public class AdminService : IAdminService
@@ -40,7 +40,7 @@ namespace ModernSlavery.BusinessLogic.Admin
             [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
             ISearchRepository<EmployerSearchModel> employerSearchRepository,
             ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
-            ICommonBusinessLogic commonBusinessLogic
+            ISharedBusinessLogic sharedBusinessLogic
         )
         {
             ManualChangeLog = manualChangeLog;
@@ -58,7 +58,7 @@ namespace ModernSlavery.BusinessLogic.Admin
 
             EmployerSearchRepository = employerSearchRepository;
             SicCodeSearchRepository = sicCodeSearchRepository;
-            CommonBusinessLogic = commonBusinessLogic;
+            SharedBusinessLogic = sharedBusinessLogic;
         }
 
         public IRecordLogger ManualChangeLog { get; }
@@ -76,6 +76,6 @@ namespace ModernSlavery.BusinessLogic.Admin
 
         public ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; }
         public ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
-        public ICommonBusinessLogic CommonBusinessLogic { get; }
+        public ISharedBusinessLogic SharedBusinessLogic { get; }
     }
 }

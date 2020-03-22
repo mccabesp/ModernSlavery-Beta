@@ -15,14 +15,14 @@ namespace ModernSlavery.WebUI.Shared.Services
 {
     public class SendEmailService: ISendEmailService
     {
-        public SendEmailService(GlobalOptions globalOptions, EmailOptions emailOptions, ILogger<SendEmailService> logger, [KeyFilter(QueueNames.SendEmail)] IQueue sendEmailQueue)
+        public SendEmailService(SharedOptions sharedOptions, EmailOptions emailOptions, ILogger<SendEmailService> logger, [KeyFilter(QueueNames.SendEmail)] IQueue sendEmailQueue)
         {
-            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             EmailOptions = emailOptions ?? throw new ArgumentNullException(nameof(emailOptions));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             SendEmailQueue = sendEmailQueue ?? throw new ArgumentNullException(nameof(sendEmailQueue));
         }
-        private readonly GlobalOptions GlobalOptions;
+        private readonly SharedOptions SharedOptions;
         private readonly EmailOptions EmailOptions;
         private ILogger Logger { get; }
         private IQueue SendEmailQueue { get; }
@@ -55,7 +55,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         public async Task<bool> SendCreateAccountPendingVerificationAsync(string verifyUrl, string emailAddress)
         {
             var createAccountPendingTemplate = new CreateAccountPendingVerificationTemplate {
-                Url = verifyUrl, RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
+                Url = verifyUrl, RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(createAccountPendingTemplate);
@@ -64,7 +64,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         public async Task<bool> SendChangeEmailPendingVerificationAsync(string verifyUrl, string emailAddress)
         {
             var changeEmailPendingTemplate = new ChangeEmailPendingVerificationTemplate {
-                Url = verifyUrl, RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
+                Url = verifyUrl, RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changeEmailPendingTemplate);
@@ -73,7 +73,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         public async Task<bool> SendChangeEmailCompletedVerificationAsync(string emailAddress)
         {
             var changeEmailCompletedVerification = new ChangeEmailCompletedVerificationTemplate {
-                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changeEmailCompletedVerification);
@@ -82,7 +82,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         public async Task<bool> SendChangeEmailCompletedNotificationAsync(string emailAddress)
         {
             var changeEmailCompletedNotification = new ChangeEmailCompletedNotificationTemplate {
-                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changeEmailCompletedNotification);
@@ -91,7 +91,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         public async Task<bool> SendChangePasswordNotificationAsync(string emailAddress)
         {
             var changePasswordCompleted = new ChangePasswordCompletedTemplate {
-                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changePasswordCompleted);
@@ -102,8 +102,8 @@ namespace ModernSlavery.WebUI.Shared.Services
             var resetPasswordVerification = new ResetPasswordVerificationTemplate {
                 Url = resetUrl,
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
+                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(resetPasswordVerification);
@@ -113,8 +113,8 @@ namespace ModernSlavery.WebUI.Shared.Services
         {
             var resetPasswordCompleted = new ResetPasswordCompletedTemplate {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(GlobalOptions.TestPrefix)
+                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(resetPasswordCompleted);
@@ -158,8 +158,8 @@ namespace ModernSlavery.WebUI.Shared.Services
         {
             var organisationRegistrationApproved = new OrganisationRegistrationApprovedTemplate {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
+                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(SharedOptions.TestPrefix),
                 Url = returnUrl
             };
 
@@ -170,8 +170,8 @@ namespace ModernSlavery.WebUI.Shared.Services
         {
             var organisationRegistrationDeclined = new OrganisationRegistrationDeclinedTemplate {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(GlobalOptions.TestPrefix),
+                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(SharedOptions.TestPrefix),
                 Reason = reason
             };
 

@@ -1,6 +1,6 @@
 ﻿@using ModernSlavery.Core.SharedKernel.Options
 @model ModernSlavery.WebUI.Models.Register.PinFailedToSendViewModel
-@inject GlobalOptions globalOptions
+@inject SharedOptions sharedOptions
 @{
     ViewBag.Title = "Sorry, there is a problem with the service – Modern Slavery Reporting service – GOV.UK";
     Layout = "~/Views/GovUkFrontend/GovUkFrontendLayout.cshtml";
@@ -11,7 +11,7 @@
         <h1 class="govuk-heading-xl">Sorry, there is a problem with the service</h1>
         <p class="govuk-body">We saved your registration request for @(Model.OrganisationName).</p>
         <p class="govuk-body">
-            Contact <a href="mailto:@(globalOptions.GpgReportingEmail)" target="_blank">@globalOptions.GpgReportingEmail</a> to complete your registration.
+            Contact <a href="mailto:@(sharedOptions.GpgReportingEmail)" target="_blank">@sharedOptions.GpgReportingEmail</a> to complete your registration.
         </p>
     </div>
 </div>

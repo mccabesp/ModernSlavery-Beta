@@ -5,7 +5,7 @@
 @using ModernSlavery.Core.SharedKernel.Options
 @using ModernSlavery.WebUI.Shared.Classes.HtmlHelpers
 @using ModernSlavery.WebUI.Shared.Controllers
-@inject GlobalOptions globalOptions
+@inject SharedOptions sharedOptions
 @model ModernSlavery.WebUI.Models.Scope.ScopingViewModel
 @{
     ViewBag.Title = "Tell us why your organisation is not in scope - Modern Slavery reporting service";
@@ -80,7 +80,7 @@
                         <h1 class="heading-medium" style="margin-top: 15px">
                             Have you read our guidance, which explains who needs to report?
                         </h1>
-                        <p class="form-hint">If you would like to read the guidance then you can find it <a href="@globalOptions.WhoNeedsToReportGuidanceLink" target="_blank" rel="noopener noreferrer">here</a></p>
+                        <p class="form-hint">If you would like to read the guidance then you can find it <a href="@sharedOptions.WhoNeedsToReportGuidanceLink" target="_blank" rel="noopener noreferrer">here</a></p>
                         @Html.ValidationMessage(nameof(EnterAnswersViewModel.ReadGuidance), "", new { id = "ReadGuidanceError", @class = "error-message" })
                     </legend>
                     <div class="multiple-choice">

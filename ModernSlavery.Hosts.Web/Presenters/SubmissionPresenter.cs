@@ -68,16 +68,16 @@ namespace ModernSlavery.WebUI.Presenters
         public SubmissionPresenter(
             ISubmissionService submissionService,
             SubmissionOptions submissionOptions,
-            ICommonBusinessLogic commonBusinessLogic)
+            ISharedBusinessLogic sharedBusinessLogic)
         
         {
             SubmissionService=submissionService;
             SubmissionOptions = submissionOptions;
-            _commonBusinessLogic = commonBusinessLogic;
+            _sharedBusinessLogic = sharedBusinessLogic;
         }
         public ISubmissionService SubmissionService { get; }
         public SubmissionOptions SubmissionOptions { get; }
-        private ICommonBusinessLogic _commonBusinessLogic;
+        private ISharedBusinessLogic _sharedBusinessLogic;
 
         public bool IsCurrentSnapshotYear(SectorTypes sector, int snapshotYear)
         {
@@ -99,7 +99,7 @@ namespace ModernSlavery.WebUI.Presenters
 
         public virtual bool IsValidSnapshotYear(int snapshotYear)
         {
-            return snapshotYear >= _commonBusinessLogic.GlobalOptions.FirstReportingYear;
+            return snapshotYear >= _sharedBusinessLogic.SharedOptions.FirstReportingYear;
         }
 
         public Return CreateDraftSubmissionFromViewModel(ReturnViewModel stashedReturnViewModel)
@@ -110,7 +110,7 @@ namespace ModernSlavery.WebUI.Presenters
             result.AccountingDate = stashedReturnViewModel.AccountingDate;
             result.Status = ReturnStatuses.Draft;
             result.OrganisationId = stashedReturnViewModel.OrganisationId;
-            result.Organisation = SubmissionService.CommonBusinessLogic.DataRepository.Get<Organisation>(result.OrganisationId);
+            result.Organisation = SubmissionService.SharedBusinessLogic.DataRepository.Get<Organisation>(result.OrganisationId);
 
             if (stashedReturnViewModel.DiffMeanBonusPercent != null)
             {
@@ -384,7 +384,7 @@ namespace ModernSlavery.WebUI.Presenters
 
         public async Task<Return> GetSubmissionByIdAsync(long returnId)
         {
-            return await SubmissionService.CommonBusinessLogic.DataRepository.GetAll<Return>()
+            return await SubmissionService.SharedBusinessLogic.DataRepository.GetAll<Return>()
                 .FirstOrDefaultAsync(r => r.ReturnId == returnId);
         }
 
@@ -396,7 +396,7 @@ namespace ModernSlavery.WebUI.Presenters
                 return null;
             }
 
-            return await SubmissionService.CommonBusinessLogic.DataRepository.GetAll<Return>()
+            return await SubmissionService.SharedBusinessLogic.DataRepository.GetAll<Return>()
                 .Where(
                     s => s.Status == ReturnStatuses.Submitted
                          && s.AccountingDate.Year == snapshotYear
@@ -408,7 +408,7 @@ namespace ModernSlavery.WebUI.Presenters
         public async Task<ReturnViewModel> GetReturnViewModelAsync(long organisationId, int snapshotYear, long userId)
         {
             // get the user organisation
-            UserOrganisation userOrganisationFromDatabase = await SubmissionService.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
+            UserOrganisation userOrganisationFromDatabase = await SubmissionService.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == userId && uo.OrganisationId == organisationId);
 
             // throws an error when no user organisation was found
@@ -527,9 +527,9 @@ namespace ModernSlavery.WebUI.Presenters
         {
             int currentYear = currentSnapshotDate.Year;
             int startYear = currentYear - (SubmissionOptions.EditableReportCount - 1);
-            if (startYear < _commonBusinessLogic.GlobalOptions.FirstReportingYear)
+            if (startYear < _sharedBusinessLogic.SharedOptions.FirstReportingYear)
             {
-                startYear = _commonBusinessLogic.GlobalOptions.FirstReportingYear;
+                startYear = _sharedBusinessLogic.SharedOptions.FirstReportingYear;
             }
 
             var reportInfos = new List<ReportInfoModel>();
@@ -589,7 +589,7 @@ namespace ModernSlavery.WebUI.Presenters
         public virtual DateTime GetSnapshotDate(SectorTypes sector = SectorTypes.Private, int snapshotYear = 0)
         {
             // Get the reporting start date for the sector and reporting start year
-            return SubmissionService.CommonBusinessLogic.GetAccountingStartDate(sector,snapshotYear);
+            return SubmissionService.SharedBusinessLogic.GetAccountingStartDate(sector,snapshotYear);
         }
 
         #region Draft File

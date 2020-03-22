@@ -97,10 +97,10 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             var dataRepository = mockedDataRepository.Object;
 
 
-            var mockedCommonBusinessLogic = Get<ICommonBusinessLogic>();
+            var mockedSharedBusinessLogic = Get<ISharedBusinessLogic>();
 
             var submissionBusinessLogic =
-                new SubmissionBusinessLogic(mockedCommonBusinessLogic, dataRepository, Mock.Of<IRecordLogger>());
+                new SubmissionBusinessLogic(mockedSharedBusinessLogic, dataRepository, Mock.Of<IRecordLogger>());
 
             var mockedScopeBusinessLogic = Get<IScopeBusinessLogic>();
             var mockedSecurityCodeBusinessLogic = Get<ISecurityCodeBusinessLogic>();
@@ -110,7 +110,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services
             var mockedDnBRepo = Get<IDnBOrgsRepository>();
 
             var organisationBusinessLogic = new OrganisationBusinessLogic(
-                mockedCommonBusinessLogic,
+                mockedSharedBusinessLogic,
                 dataRepository,
                 submissionBusinessLogic,
                 mockedScopeBusinessLogic,

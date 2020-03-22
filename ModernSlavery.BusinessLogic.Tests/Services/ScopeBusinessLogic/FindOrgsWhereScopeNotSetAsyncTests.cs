@@ -29,12 +29,12 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
             var mockedNotificationService = Get<INotificationService>();
             var mockedFileRepository = Get<IFileRepository>();
             var mockedDataRepository = Get<IDataRepository>();
-            mockCommonBusinessLogic = new CommonBusinessLogic(mockedSnapshotDateHelper, mockedSourceComparer,
+            mockSharedBusinessLogic = new SharedBusinessLogic(mockedSnapshotDateHelper, mockedSourceComparer,
                 mockedSendEmailService, mockedNotificationService, mockedFileRepository, mockedDataRepository);
 
             // setup data
-            var currentPrivateSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(SectorTypes.Private);
-            var currentPublicSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(SectorTypes.Public);
+            var currentPrivateSnapshotDate = mockSharedBusinessLogic.GetAccountingStartDate(SectorTypes.Private);
+            var currentPublicSnapshotDate = mockSharedBusinessLogic.GetAccountingStartDate(SectorTypes.Public);
 
             testOrgs = new List<Organisation>();
             testOrgs.Add(CreateOrgWithExistingScopeForAllYears(1, SectorTypes.Private, currentPrivateSnapshotDate));
@@ -50,13 +50,13 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
 
             // sut
             scopeBusinessLogic = new BusinessLogic.ScopeBusinessLogic(
-                mockCommonBusinessLogic,
+                mockSharedBusinessLogic,
                 mockDataRepository.Object,
                 null, null);
         }
 
         private Mock<IDataRepository> mockDataRepository;
-        private ICommonBusinessLogic mockCommonBusinessLogic;
+        private ISharedBusinessLogic mockSharedBusinessLogic;
         private List<Organisation> testOrgs;
 
         // sut
@@ -92,7 +92,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
 
             Assert.IsNotNull(actualMissingEntry, "Expected to find organisations who have null scopes");
 
-            var currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSector);
+            var currentSnapshotDate = mockSharedBusinessLogic.GetAccountingStartDate(testSector);
             var testYears = GetAllSnapshotYearsForSector(currentSnapshotDate);
             foreach (var testYear in testYears)
                 Assert.IsTrue(actualMissingEntry.MissingSnapshotYears.Contains(testYear), "Expected missing year");
@@ -114,7 +114,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
 
             Assert.IsNotNull(actualMissingEntry, "Expected to find organisations who have unknown scopes");
 
-            var currentSnapshotDate = mockCommonBusinessLogic.GetAccountingStartDate(testSector);
+            var currentSnapshotDate = mockSharedBusinessLogic.GetAccountingStartDate(testSector);
             var testYears = GetAllSnapshotYearsForSector(currentSnapshotDate);
             foreach (var testYear in testYears)
                 Assert.IsTrue(actualMissingEntry.MissingSnapshotYears.Contains(testYear), "Expected missing year");
@@ -126,7 +126,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
             var mockOrg = new Organisation
                 {OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active};
 
-            for (var year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
+            for (var year = ConfigHelpers.SharedOptions.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
                 mockOrg.OrganisationScopes.Add(
                     new OrganisationScope
                     {
@@ -152,7 +152,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
             var mockOrg = new Organisation
                 {OrganisationId = testOrgId, SectorType = testSector, Status = OrganisationStatuses.Active};
 
-            for (var year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
+            for (var year = ConfigHelpers.SharedOptions.FirstReportingYear; year <= testLastSnapshotDate.Year; year++)
                 mockOrg.OrganisationScopes.Add(
                     new OrganisationScope
                     {
@@ -170,7 +170,7 @@ namespace ModernSlavery.BusinessLogic.Tests.Services.ScopeBusinessLogic
         {
             var currentYear = currentSnapshotDate.Year;
             var results = new List<int>();
-            for (var year = ConfigHelpers.GlobalOptions.FirstReportingYear; year <= currentYear; year++)
+            for (var year = ConfigHelpers.SharedOptions.FirstReportingYear; year <= currentYear; year++)
                 results.Add(year);
 
             return results;

@@ -9,11 +9,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
     {
 
         private const string pattern = @"^[0-9]{9}$";
-        private GlobalOptions _globalOptions;
+        private SharedOptions _sharedOptions;
         public DUNSNumberAttribute() : base(pattern)
         {
-            _globalOptions = Activator.CreateInstance<GlobalOptions>();
-            ErrorMessage = _globalOptions.CompanyNumberRegexError;
+            _sharedOptions = Activator.CreateInstance<SharedOptions>();
+            ErrorMessage = _sharedOptions.CompanyNumberRegexError;
         }
 
     }

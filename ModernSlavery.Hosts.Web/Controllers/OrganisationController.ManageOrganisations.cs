@@ -101,7 +101,7 @@ namespace ModernSlavery.WebUI.Controllers
             if (!IsImpersonatingUser && !base.CurrentUser.IsAdministrator())
             {
                 DateTime? hasReadPrivacy = currentUser.AcceptedPrivacyStatement;
-                if (hasReadPrivacy == null || hasReadPrivacy.Value < CommonBusinessLogic.GlobalOptions.PrivacyChangedDate)
+                if (hasReadPrivacy == null || hasReadPrivacy.Value < SharedBusinessLogic.SharedOptions.PrivacyChangedDate)
                 {
                     return RedirectToAction(nameof(HomeController.PrivacyPolicy), "Home");
                 }

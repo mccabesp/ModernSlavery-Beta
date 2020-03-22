@@ -39,7 +39,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
         [SetUp]
         public void InitialiseDbObjectsBeforeEachTest()
         {
-            int callRequiredToInitialiseVirtualDateTime = ConfigHelpers.GlobalOptions.FirstReportingYear;
+            int callRequiredToInitialiseVirtualDateTime = ConfigHelpers.SharedOptions.FirstReportingYear;
             OrganisationScope orgStatusToProveItDoesNotGetRetired =
                 OrganisationScopeHelper.GetOrganisationScope_InScope(2001, SectorTypes.Private);
             Core.Entities.Organisation org = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, TestSnapshotYear);

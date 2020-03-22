@@ -19,13 +19,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.OrganisationScopes);
+                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.OrganisationScopes);
 
                 //Dont execute on startup if file already exists
                 if (!Functions.StartedJobs.Contains(nameof(UpdateScopes)))
                 {
-                    IEnumerable<string> files = await _CommonBusinessLogic.FileRepository.GetFilesAsync(
-                        _CommonBusinessLogic.GlobalOptions.DownloadsPath,
+                    IEnumerable<string> files = await _SharedBusinessLogic.FileRepository.GetFilesAsync(
+                        _SharedBusinessLogic.SharedOptions.DownloadsPath,
                         $"{Path.GetFileNameWithoutExtension(Filenames.OrganisationScopes)}*{Path.GetExtension(Filenames.OrganisationScopes)}");
                     if (files.Any())
                     {

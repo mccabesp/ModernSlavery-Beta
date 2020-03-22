@@ -29,19 +29,19 @@ namespace ModernSlavery.BusinessLogic
     {
         #region Constructor
 
-        public DraftFileBusinessLogic(GlobalOptions globalOptions, IFileRepository fileRepository)
+        public DraftFileBusinessLogic(SharedOptions sharedOptions, IFileRepository fileRepository)
         {
-            GlobalOptions = globalOptions;
+            SharedOptions = sharedOptions;
 
             _fileRepository = fileRepository;
-            RootDraftPath = Path.Combine(globalOptions.DataPath, globalOptions.SaveDraftPath);
+            RootDraftPath = Path.Combine(sharedOptions.DataPath, sharedOptions.SaveDraftPath);
         }
 
         #endregion
 
         #region attributes
 
-        private readonly GlobalOptions GlobalOptions;
+        private readonly SharedOptions SharedOptions;
         private readonly string RootDraftPath;
         private readonly IFileRepository _fileRepository;
         private const string metaDataLastWrittenByUserId = "lastWrittenByUserId";

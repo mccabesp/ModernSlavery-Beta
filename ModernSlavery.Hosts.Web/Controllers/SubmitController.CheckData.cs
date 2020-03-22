@@ -196,12 +196,12 @@ namespace ModernSlavery.WebUI.Controllers
 
             if (databaseReturn == null || databaseReturn.Status == ReturnStatuses.Retired)
             {
-                CommonBusinessLogic.DataRepository.Insert(postedReturn);
+                SharedBusinessLogic.DataRepository.Insert(postedReturn);
             }
 
             postedReturn.SetStatus(ReturnStatuses.Submitted, OriginalUser?.UserId ?? currentUser.UserId);
 
-            Organisation organisationFromDatabase = await CommonBusinessLogic.DataRepository.GetAll<Organisation>()
+            Organisation organisationFromDatabase = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                 .FirstOrDefaultAsync(o => o.OrganisationId == postedReturnViewModel.OrganisationId);
 
             organisationFromDatabase.Returns.Add(postedReturn);
@@ -211,9 +211,9 @@ namespace ModernSlavery.WebUI.Controllers
                 organisationFromDatabase.LatestReturn = postedReturn;
             }
 
-            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            if (!currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
+            if (!currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
                 await _SubmissionPresenter.SubmissionService.SubmissionBusinessLogic.SubmissionLog.WriteAsync(
                     new SubmissionLogModel {
@@ -264,17 +264,17 @@ namespace ModernSlavery.WebUI.Controllers
             postedReturnViewModel.EncryptedOrganisationId = postedReturn.Organisation.GetEncryptedId();
             this.StashModel(postedReturnViewModel);
 
-            if (CommonBusinessLogic.GlobalOptions.EnableSubmitAlerts
+            if (SharedBusinessLogic.SharedOptions.EnableSubmitAlerts
                 && postedReturn.Organisation.Returns.Count(r => r.AccountingDate == postedReturn.AccountingDate) == 1
-                && !currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
+                && !currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
-                await _SubmissionService.CommonBusinessLogic.SendEmailService.SendGeoMessageAsync(
+                await _SubmissionService.SharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
                     "GPG Data Submission Notification",
                     $"GPG data was submitted for first time in {postedReturn.AccountingDate.Year} by '{postedReturn.Organisation.OrganisationName}' on {postedReturn.StatusDate.ToShortDateString()}\n\n See {Url.Action("Report", "Viewing", new {employerIdentifier = postedReturnViewModel.EncryptedOrganisationId, year = postedReturn.AccountingDate.Year}, "https")}",
-                    currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix));
+                    currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
             }
 
-            _SubmissionService.CommonBusinessLogic.NotificationService.SendSuccessfulSubmissionEmailToRegisteredUsers(
+            _SubmissionService.SharedBusinessLogic.NotificationService.SendSuccessfulSubmissionEmailToRegisteredUsers(
                 postedReturn,
                 GetReportLink(postedReturn),
                 GetSubmittedOrUpdated(postedReturn));

@@ -59,7 +59,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
+            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             if (userOrg == null)
@@ -70,15 +70,15 @@ namespace ModernSlavery.WebUI.Controllers
             //Ensure they havent entered wrong pin too many times
             TimeSpan remaining = userOrg.ConfirmAttemptDate == null
                 ? TimeSpan.Zero
-                : userOrg.ConfirmAttemptDate.Value.AddMinutes(CommonBusinessLogic.GlobalOptions.LockoutMinutes) - VirtualDateTime.Now;
-            if (userOrg.ConfirmAttempts >= CommonBusinessLogic.GlobalOptions.MaxPinAttempts && remaining > TimeSpan.Zero)
+                : userOrg.ConfirmAttemptDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) - VirtualDateTime.Now;
+            if (userOrg.ConfirmAttempts >= SharedBusinessLogic.SharedOptions.MaxPinAttempts && remaining > TimeSpan.Zero)
             {
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1113, new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
             }
 
             remaining = userOrg.PINSentDate == null
                 ? TimeSpan.Zero
-                : userOrg.PINSentDate.Value.AddDays(CommonBusinessLogic.GlobalOptions.PinInPostMinRepostDays) - VirtualDateTime.Now;
+                : userOrg.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostMinRepostDays) - VirtualDateTime.Now;
             var model = new CompleteViewModel();
 
             model.PIN = null;
@@ -86,7 +86,7 @@ namespace ModernSlavery.WebUI.Controllers
             model.Remaining = remaining.ToFriendly(maxParts: 2);
 
             //If the email address is a test email then simulate sending
-            if (userOrg.User.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
+            if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
                 model.PIN = "ABCDEF";
             }
@@ -117,15 +117,15 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
+            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             ActionResult result1;
 
             TimeSpan remaining = userOrg.ConfirmAttemptDate == null
                 ? TimeSpan.Zero
-                : userOrg.ConfirmAttemptDate.Value.AddMinutes(CommonBusinessLogic.GlobalOptions.LockoutMinutes) - VirtualDateTime.Now;
-            if (userOrg.ConfirmAttempts >= CommonBusinessLogic.GlobalOptions.MaxPinAttempts && remaining > TimeSpan.Zero)
+                : userOrg.ConfirmAttemptDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) - VirtualDateTime.Now;
+            if (userOrg.ConfirmAttempts >= SharedBusinessLogic.SharedOptions.MaxPinAttempts && remaining > TimeSpan.Zero)
             {
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1113, new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
             }
@@ -176,14 +176,14 @@ namespace ModernSlavery.WebUI.Controllers
                 userOrg.Organisation.LatestAddress = userOrg.Address;
                 userOrg.ConfirmAttempts = 0;
 
-                model.AccountingDate = RegistrationService.CommonBusinessLogic.GetAccountingStartDate(userOrg.Organisation.SectorType);
+                model.AccountingDate = RegistrationService.SharedBusinessLogic.GetAccountingStartDate(userOrg.Organisation.SectorType);
                 model.OrganisationId = userOrg.OrganisationId;
                 this.StashModel(model);
 
                 result1 = RedirectToAction("ServiceActivated");
 
                 //Send notification email to existing users 
-                RegistrationService.CommonBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
+                RegistrationService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
             }
             else
             {
@@ -195,10 +195,10 @@ namespace ModernSlavery.WebUI.Controllers
             userOrg.ConfirmAttemptDate = VirtualDateTime.Now;
 
             //Save the changes
-            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Log the registration
-            if (!userOrg.User.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix))
+            if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
                 await RegistrationService.RegistrationLog.WriteAsync(
                     new RegisterLogModel {

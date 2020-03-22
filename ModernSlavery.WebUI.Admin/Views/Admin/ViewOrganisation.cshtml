@@ -7,7 +7,7 @@
 @using ModernSlavery.WebUI.GDSDesignSystem
 @using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
 @model ModernSlavery.Core.Entities.Organisation
-@inject GlobalOptions globalOptions;
+@inject SharedOptions sharedOptions;
 @{
     ViewBag.Title = $"Organisation Details - {Model.OrganisationName} - Administration - Modern Slavery Reporting service";
     Layout = "~/Views/GovUkFrontend/GovUkFrontendLayout.cshtml";
@@ -346,16 +346,16 @@
                                 <br />
                                 expires on
                                 <span style="white-space: nowrap">
-                                    @(userOrganisation.PINSentDate.Value.AddDays(globalOptions.PinInPostExpiryDays).ToString("d MMM yyyy"))
+                                    @(userOrganisation.PINSentDate.Value.AddDays(sharedOptions.PinInPostExpiryDays).ToString("d MMM yyyy"))
                                 </span>
-                                @if (userOrganisation.PINSentDate.Value.AddDays(globalOptions.PinInPostExpiryDays) < VirtualDateTime.Now)
+                                @if (userOrganisation.PINSentDate.Value.AddDays(sharedOptions.PinInPostExpiryDays) < VirtualDateTime.Now)
                                 {
                                     <br />
                                     <span class="govuk-!-font-weight-bold">
                                         EXPIRED
                                     </span>
                                 }
-                                else if (userOrganisation.PINSentDate.Value.AddDays(globalOptions.PinInPostExpiryDays) < VirtualDateTime.Now.AddDays(7))
+                                else if (userOrganisation.PINSentDate.Value.AddDays(sharedOptions.PinInPostExpiryDays) < VirtualDateTime.Now.AddDays(7))
                                 {
                                     <br />
                                     <span class="govuk-!-font-weight-bold">

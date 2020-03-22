@@ -15,14 +15,14 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
     public class ChangePasswordViewService : IChangePasswordViewService
     {
 
-        public ChangePasswordViewService(IUserRepository userRepo, ICommonBusinessLogic commonBusinessLogic)
+        public ChangePasswordViewService(IUserRepository userRepo, ISharedBusinessLogic sharedBusinessLogic)
         {
             _userRepository = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
-            _commonBusinessLogic = commonBusinessLogic ?? throw new ArgumentNullException(nameof(commonBusinessLogic));
+            _sharedBusinessLogic = sharedBusinessLogic ?? throw new ArgumentNullException(nameof(sharedBusinessLogic));
         }
 
         private IUserRepository _userRepository { get; }
-        private ICommonBusinessLogic _commonBusinessLogic { get; }
+        private ISharedBusinessLogic _sharedBusinessLogic { get; }
 
         public async Task<ModelStateDictionary> ChangePasswordAsync(User currentUser, string currentPassword, string newPassword)
         {
@@ -47,7 +47,7 @@ namespace ModernSlavery.WebUI.Areas.Account.ViewServices
             await _userRepository.UpdatePasswordAsync(currentUser, newPassword);
 
             // send password change notification
-            await _commonBusinessLogic.SendEmailService.SendChangePasswordNotificationAsync(currentUser.EmailAddress);
+            await _sharedBusinessLogic.SendEmailService.SendChangePasswordNotificationAsync(currentUser.EmailAddress);
 
             return errorState;
         }

@@ -16,13 +16,13 @@ namespace ModernSlavery.Infrastructure.Database.Classes
     public class UserRepository : IUserRepository
     {
         private readonly DatabaseOptions DatabaseOptions;
-        private readonly GlobalOptions GlobalOptions;
+        private readonly SharedOptions SharedOptions;
 
-        public UserRepository(DatabaseOptions databaseOptions, GlobalOptions globalOptions,
+        public UserRepository(DatabaseOptions databaseOptions, SharedOptions sharedOptions,
             IDataRepository dataRepository, IUserLogger userRecordLog, IMapper autoMapper)
         {
             DatabaseOptions = databaseOptions ?? throw new ArgumentNullException(nameof(databaseOptions));
-            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             DataRepository = dataRepository ?? throw new ArgumentNullException(nameof(dataRepository));
             UserRecordLog = userRecordLog ?? throw new ArgumentNullException(nameof(userRecordLog));
             AutoMapper = autoMapper ?? throw new ArgumentNullException(nameof(autoMapper));
@@ -223,7 +223,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             switch (user.HashingAlgorithm)
             {
                 case HashingAlgorithm.Unhashed:
-                    if (GlobalOptions.IsProduction()) break;
+                    if (SharedOptions.IsProduction()) break;
                     return user.PasswordHash == password;
                 case HashingAlgorithm.SHA512:
                     return user.PasswordHash == Crypto.GetSHA512Checksum(password);

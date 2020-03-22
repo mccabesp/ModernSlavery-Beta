@@ -28,7 +28,7 @@ namespace ModernSlavery.WebUI.Controllers
             IEventLogger customLogger,
             IScopePresenter scopeUIService,
             IShortCodesRepository shortCodesRepository,
-            ILogger<HomeController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<HomeController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             CustomLogger = customLogger;
             ScopePresentation = scopeUIService;
@@ -121,7 +121,7 @@ namespace ModernSlavery.WebUI.Controllers
         [HttpGet("Init")]
         public IActionResult Init()
         {
-            if (!CommonBusinessLogic.GlobalOptions.IsProduction())
+            if (!SharedBusinessLogic.SharedOptions.IsProduction())
             {
                 Logger.LogInformation("Home Controller Initialised");
             }
@@ -227,10 +227,10 @@ namespace ModernSlavery.WebUI.Controllers
             {
                 // check if the user has accepted the privacy statement
                 DateTime? hasReadPrivacy = currentUser.AcceptedPrivacyStatement;
-                if (hasReadPrivacy == null || hasReadPrivacy.ToDateTime() < CommonBusinessLogic.GlobalOptions.PrivacyChangedDate)
+                if (hasReadPrivacy == null || hasReadPrivacy.ToDateTime() < SharedBusinessLogic.SharedOptions.PrivacyChangedDate)
                 {
                     currentUser.AcceptedPrivacyStatement = VirtualDateTime.Now;
-                    await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                    await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
             }
 

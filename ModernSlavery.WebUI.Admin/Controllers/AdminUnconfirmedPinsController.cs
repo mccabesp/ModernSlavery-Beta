@@ -28,7 +28,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         public AdminUnconfirmedPinsController(
             IOrganisationBusinessLogic organisationBusinessLogic,
-            ILogger<AdminUnconfirmedPinsController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<AdminUnconfirmedPinsController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             this.organisationBusinessLogic = organisationBusinessLogic;
         }
@@ -62,7 +62,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             UserOrganisation userOrganisation = await dataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == userId && uo.OrganisationId == organisationId);
 
-            if (userOrganisation.PINSentDate.Value.AddDays(CommonBusinessLogic.GlobalOptions.PinInPostExpiryDays) < VirtualDateTime.Now)
+            if (userOrganisation.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays) < VirtualDateTime.Now)
             {
                 string newPin = organisationBusinessLogic.GeneratePINCode(false);
                 userOrganisation.PIN = newPin;

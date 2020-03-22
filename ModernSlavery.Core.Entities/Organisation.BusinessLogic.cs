@@ -17,17 +17,17 @@ namespace ModernSlavery.Core.Entities
         private readonly int SecurityCodeLength;
         private IObfuscator _obfuscator;
         private ISnapshotDateHelper _snapshotDateHelper;
-        private GlobalOptions GlobalOptions;
+        private SharedOptions SharedOptions;
 
-        public Organisation(GlobalOptions globalOptions, IObfuscator obfuscator, ISnapshotDateHelper snapshotDateHelper):this()
+        public Organisation(SharedOptions sharedOptions, IObfuscator obfuscator, ISnapshotDateHelper snapshotDateHelper):this()
         {
-            GlobalOptions = globalOptions;
+            SharedOptions = sharedOptions;
             _obfuscator = obfuscator;
             _snapshotDateHelper = snapshotDateHelper;
 
-            PinInPostExpiryDays = globalOptions.PinInPostExpiryDays;
-            SecurityCodeChars = globalOptions.SecurityCodeChars;
-            SecurityCodeLength = globalOptions.SecurityCodeLength;
+            PinInPostExpiryDays = sharedOptions.PinInPostExpiryDays;
+            SecurityCodeChars = sharedOptions.SecurityCodeChars;
+            SecurityCodeLength = sharedOptions.SecurityCodeLength;
         }
 
         private DateTime PinExpiresDate => VirtualDateTime.Now.AddDays(0 - PinInPostExpiryDays);

@@ -24,13 +24,13 @@ namespace ModernSlavery.WebUI.Shared.Tests
         [SetUp]
         public void SetUp()
         {
-            _rememberGlobalTrustedIpDomainsValueBeforeEachTest = ConfigHelpers.GlobalOptions.TrustedIPDomains;
+            _rememberGlobalTrustedIpDomainsValueBeforeEachTest = ConfigHelpers.SharedOptions.TrustedIPDomains;
         }
 
         [TearDown]
         public void TearDown()
         {
-            ConfigHelpers.GlobalOptions.TrustedIPDomains = _rememberGlobalTrustedIpDomainsValueBeforeEachTest;
+            ConfigHelpers.SharedOptions.TrustedIPDomains = _rememberGlobalTrustedIpDomainsValueBeforeEachTest;
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace ModernSlavery.WebUI.Shared.Tests
 
             var context = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), null);
 
-            ConfigHelpers.GlobalOptions.TrustedIPDomains = ipToTest + ",68.91.0.0.1,47.217.217.217";
+            ConfigHelpers.SharedOptions.TrustedIPDomains = ipToTest + ",68.91.0.0.1,47.217.217.217";
 
             var AllowOnlyTrustedDomainsAttribute = new AllowOnlyTrustedDomainsAttribute();
 
@@ -114,7 +114,7 @@ namespace ModernSlavery.WebUI.Shared.Tests
 
             var context = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), null);
 
-            ConfigHelpers.GlobalOptions.TrustedIPDomains = "15.0.64.1";
+            ConfigHelpers.SharedOptions.TrustedIPDomains = "15.0.64.1";
 
             var AllowOnlyTrustedDomainsAttribute = new AllowOnlyTrustedDomainsAttribute();
 
@@ -181,7 +181,7 @@ namespace ModernSlavery.WebUI.Shared.Tests
 
             var context = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), null);
 
-            ConfigHelpers.GlobalOptions.TrustedIPDomains = "25.0.64.1,101.102.103.104";
+            ConfigHelpers.SharedOptions.TrustedIPDomains = "25.0.64.1,101.102.103.104";
 
             var AllowOnlyTrustedDomainsAttribute = new AllowOnlyTrustedDomainsAttribute();
 
@@ -252,7 +252,7 @@ namespace ModernSlavery.WebUI.Shared.Tests
                 new Dictionary<string, object>(),
                 new OnlyForTestingPleaseIgnoreThisController());
 
-            ConfigHelpers.GlobalOptions.TrustedIPDomains = "25.26.27.28,31.32.33.34";
+            ConfigHelpers.SharedOptions.TrustedIPDomains = "25.26.27.28,31.32.33.34";
 
             var AllowOnlyTrustedDomainsAttribute = new AllowOnlyTrustedDomainsAttribute();
 

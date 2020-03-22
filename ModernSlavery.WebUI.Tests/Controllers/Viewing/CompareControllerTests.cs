@@ -828,7 +828,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Viewing
             var testUri = new Uri("https://localhost/Viewing/compare-employers");
             controller.AddMockUriHelper(testUri.ToString(), "CompareEmployers");
 
-            var firstReportingYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
+            var firstReportingYear = ConfigHelpers.SharedOptions.FirstReportingYear;
             var mockOrg = OrganisationHelper.GetOrganisationInScope("MockedOrg", firstReportingYear);
             DateTime accountingDateTime = mockOrg.SectorType.GetAccountingStartDate(firstReportingYear);
 
@@ -879,7 +879,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Viewing
             controller.CompareViewService.SortColumn = "OrganisationSize";
             controller.CompareViewService.SortAscending = false;
 
-            var firstReportingYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
+            var firstReportingYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
             var mockOrg = OrganisationHelper.GetOrganisationInScope("MockedOrg", firstReportingYear);
             DateTime accountingDateTime = mockOrg.SectorType.GetAccountingStartDate(firstReportingYear);
@@ -924,7 +924,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Viewing
             routeData.Values.Add("Controller", "Viewing");
 
             var controller = UiTestHelper.GetController<CompareController>(0, routeData);
-            var firstReportingYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
+            var firstReportingYear = ConfigHelpers.SharedOptions.FirstReportingYear;
             var mockOrg = OrganisationHelper.GetOrganisationInScope("MockedOrg", firstReportingYear);
             DateTime accountingDateTime = mockOrg.SectorType.GetAccountingStartDate(firstReportingYear);
 
@@ -976,7 +976,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Viewing
             controller.CompareViewService.SortColumn = "OrganisationSize";
             controller.CompareViewService.SortAscending = false;
 
-            var firstReportingYear = ConfigHelpers.GlobalOptions.FirstReportingYear;
+            var firstReportingYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
             var mockOrg = OrganisationHelper.GetOrganisationInScope("MockedOrg", firstReportingYear);
             DateTime accountingDateTime = mockOrg.SectorType.GetAccountingStartDate(firstReportingYear);

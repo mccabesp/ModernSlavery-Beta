@@ -24,15 +24,15 @@ namespace ModernSlavery.Hosts.Webjob
 {
     public class AppDependencyModule: IDependencyModule
     {
-        private readonly GlobalOptions _globalOptions;
+        private readonly SharedOptions _sharedOptions;
         private readonly CompaniesHouseOptions _coHoOptions;
         private readonly ResponseCachingOptions _responseCachingOptions;
         private readonly DistributedCacheOptions _distributedCacheOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
 
-        public AppDependencyModule(GlobalOptions globalOptions, CompaniesHouseOptions coHoOptions, ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions, DataProtectionOptions dataProtectionOptions)
+        public AppDependencyModule(SharedOptions sharedOptions, CompaniesHouseOptions coHoOptions, ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions, DataProtectionOptions dataProtectionOptions)
         {
-            _globalOptions = globalOptions;
+            _sharedOptions = sharedOptions;
             _coHoOptions = coHoOptions;
             _responseCachingOptions = responseCachingOptions;
             _distributedCacheOptions = distributedCacheOptions;
@@ -43,7 +43,7 @@ namespace ModernSlavery.Hosts.Webjob
         {
             services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
 
-            services.AddApplicationInsightsTelemetry(_globalOptions.APPINSIGHTS_INSTRUMENTATIONKEY);
+            services.AddApplicationInsightsTelemetry(_sharedOptions.APPINSIGHTS_INSTRUMENTATIONKEY);
 
             services.AddSingleton<IJobActivator, AutofacJobActivator>();
 
@@ -70,7 +70,7 @@ namespace ModernSlavery.Hosts.Webjob
             builder.RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates"))).As<IEmailTemplateRepository>().SingleInstance();
 
             //Register some singletons
-            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance().WithParameter("seed", _globalOptions.ObfuscationSeed);
+            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance().WithParameter("seed", _sharedOptions.ObfuscationSeed);
             builder.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
 
             // Register email provider dependencies
@@ -79,7 +79,7 @@ namespace ModernSlavery.Hosts.Webjob
             builder.RegisterType<EmailProvider>().SingleInstance();
 
             #region Register the busines logic dependencies
-            builder.RegisterType<CommonBusinessLogic>().As<ICommonBusinessLogic>().SingleInstance();
+            builder.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().SingleInstance();
             builder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>().InstancePerDependency();
             builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerDependency();
             builder.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>().InstancePerDependency();

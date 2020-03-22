@@ -53,15 +53,15 @@ namespace ModernSlavery.WebUI
         public static Action<ContainerBuilder> ConfigureTestContainer;
         public static HttpMessageHandler BackChannelHandler { get; set; }
 
-        private readonly GlobalOptions _globalOptions;
+        private readonly SharedOptions _sharedOptions;
         private readonly CompaniesHouseOptions _coHoOptions;
         private readonly ResponseCachingOptions _responseCachingOptions;
         private readonly DistributedCacheOptions _distributedCacheOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
 
-        public AppDependencyModule(GlobalOptions globalOptions, CompaniesHouseOptions coHoOptions, ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions, DataProtectionOptions dataProtectionOptions)
+        public AppDependencyModule(SharedOptions sharedOptions, CompaniesHouseOptions coHoOptions, ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions, DataProtectionOptions dataProtectionOptions)
         {
-            _globalOptions = globalOptions;
+            _sharedOptions = sharedOptions;
             _coHoOptions = coHoOptions;
             _responseCachingOptions = responseCachingOptions;
             _distributedCacheOptions = distributedCacheOptions;
@@ -100,7 +100,7 @@ namespace ModernSlavery.WebUI
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
-            if (_globalOptions.IsDevelopment() || _globalOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
+            if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
 
 
             //Add antiforgery token by default to forms
@@ -113,16 +113,16 @@ namespace ModernSlavery.WebUI
                     o.Cookie.SecurePolicy = CookieSecurePolicy.Always; //Equivalent to <httpCookies requireSSL="true" /> from Web.Config
                     o.Cookie.HttpOnly = false; //Always use https cookies
                     o.Cookie.SameSite = SameSiteMode.Strict;
-                    o.Cookie.Domain = _globalOptions.EXTERNAL_HOST.BeforeFirst(":"); //Domain cannot be an authority and contain a port number
+                    o.Cookie.Domain = _sharedOptions.EXTERNAL_HOST.BeforeFirst(":"); //Domain cannot be an authority and contain a port number
                     o.IdleTimeout =
-                        TimeSpan.FromMinutes(_globalOptions.SessionTimeOutMinutes); //Equivalent to <sessionState timeout="20"> from old Web.config
+                        TimeSpan.FromMinutes(_sharedOptions.SessionTimeOutMinutes); //Equivalent to <sessionState timeout="20"> from old Web.config
                 });
 
             //Add the distributed cache and data protection
             services.AddDistributedCache(_distributedCacheOptions).AddDataProtection(_dataProtectionOptions);
 
             //Add app insights tracking
-            services.AddApplicationInsightsTelemetry(_globalOptions.APPINSIGHTS_INSTRUMENTATIONKEY);
+            services.AddApplicationInsightsTelemetry(_sharedOptions.APPINSIGHTS_INSTRUMENTATIONKEY);
 
             //This may now be required 
             services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
@@ -132,10 +132,10 @@ namespace ModernSlavery.WebUI
 
             //Configure the services required for authentication by IdentityServer
             services.AddIdentityServerClient(
-                $"{_globalOptions.SiteAuthority}account/",
-                _globalOptions.SiteAuthority,
+                $"{_sharedOptions.SiteAuthority}account/",
+                _sharedOptions.SiteAuthority,
                 "ModernSlaveryServiceWebsite",
-                _globalOptions.AuthSecret,
+                _sharedOptions.AuthSecret,
                 BackChannelHandler);
 
             //Override any test services
@@ -182,7 +182,7 @@ namespace ModernSlavery.WebUI
 
             //Register business logic and services
             // BL Services
-            builder.RegisterType<CommonBusinessLogic>().As<ICommonBusinessLogic>().SingleInstance();
+            builder.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().SingleInstance();
 
             builder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>().InstancePerLifetimeScope();
             builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerLifetimeScope();
@@ -213,7 +213,7 @@ namespace ModernSlavery.WebUI
             builder.RegisterType<AuditLogger>().As<AuditLogger>().InstancePerLifetimeScope();
 
             //Register some singletons
-            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance().WithParameter("seed", _globalOptions.ObfuscationSeed);
+            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance().WithParameter("seed", _sharedOptions.ObfuscationSeed);
             builder.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
 
             //Register factories
@@ -253,7 +253,7 @@ namespace ModernSlavery.WebUI
             });
 
             // only during development, validate your mappings; remove it before release
-            if (_globalOptions.IsDevelopment() || _globalOptions.IsLocal())
+            if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal())
                 mapperConfig.AssertConfigurationIsValid();
 
             builder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();

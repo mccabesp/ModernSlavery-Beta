@@ -36,13 +36,13 @@ namespace ModernSlavery.WebUI.Presenters
     public class ViewingPresenter : IViewingPresenter
     {
 
-        private readonly ICommonBusinessLogic _commonBusinessLogic;
+        private readonly ISharedBusinessLogic _sharedBusinessLogic;
         private readonly IViewingService _viewingService;
 
-        public ViewingPresenter(IViewingService viewingService, ICommonBusinessLogic commonBusinessLogic)
+        public ViewingPresenter(IViewingService viewingService, ISharedBusinessLogic sharedBusinessLogic)
         {
             _viewingService = viewingService;
-            _commonBusinessLogic = commonBusinessLogic;
+            _sharedBusinessLogic = sharedBusinessLogic;
         }
 
         public async Task<SearchViewModel> SearchAsync(EmployerSearchParameters searchParams)
@@ -78,7 +78,7 @@ namespace ModernSlavery.WebUI.Presenters
                         {"SampleOfResultsReturned", detailedListOfReturnedSearchTerms}
                     };
 
-                    //CommonBusinessLogic.GlobalOptions.AppInsightsClient?.TrackEvent("Gpg_SicCode_Suggest", telemetryProperties);
+                    //SharedBusinessLogic.SharedOptions.AppInsightsClient?.TrackEvent("Gpg_SicCode_Suggest", telemetryProperties);
 
                     await _viewingService.SearchBusinessLogic.SearchLog.WriteAsync(telemetryProperties);
                 }
@@ -218,7 +218,7 @@ namespace ModernSlavery.WebUI.Presenters
         public async Task<List<SearchViewModel.SicSection>> GetAllSicSectionsAsync()
         {
             var results = new List<SearchViewModel.SicSection>();
-            var sortedSics = await _commonBusinessLogic.DataRepository.ToListAscendingAsync<SicSection,string>(sic => sic.Description);
+            var sortedSics = await _sharedBusinessLogic.DataRepository.ToListAscendingAsync<SicSection,string>(sic => sic.Description);
 
             foreach (SicSection sector in sortedSics)
             {
@@ -262,8 +262,8 @@ namespace ModernSlavery.WebUI.Presenters
         public List<OptionSelect> GetReportingYearOptions(IEnumerable<int> filterSnapshotYears)
         {
             // setup the filters
-            int firstYear = _commonBusinessLogic.GlobalOptions.FirstReportingYear;
-            int currentYear = _commonBusinessLogic.GetAccountingStartDate(SectorTypes.Public).Year;
+            int firstYear = _sharedBusinessLogic.SharedOptions.FirstReportingYear;
+            int currentYear = _sharedBusinessLogic.GetAccountingStartDate(SectorTypes.Public).Year;
             var allYears = new List<int>();
             for (int year = firstYear; year <= currentYear; year++)
             {

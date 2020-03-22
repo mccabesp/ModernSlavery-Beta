@@ -56,19 +56,19 @@ namespace ModernSlavery.WebUI
         {
             var lifetime = app.ApplicationServices.GetService<IApplicationLifetime>();
             var loggerFactory = app.ApplicationServices.GetService<ILoggerFactory>();
-            var globalOptions = app.ApplicationServices.GetService<GlobalOptions>();
+            var sharedOptions = app.ApplicationServices.GetService<SharedOptions>();
             var responseCachingOptions = app.ApplicationServices.GetService<ResponseCachingOptions>();
 
             //Initialise the virtual date and time
-            VirtualDateTime.Initialise(globalOptions.DateTimeOffset);
+            VirtualDateTime.Initialise(sharedOptions.DateTimeOffset);
 
             //Set the default encryption key
-            Encryption.SetDefaultEncryptionKey(globalOptions.DefaultEncryptionKey);
+            Encryption.SetDefaultEncryptionKey(sharedOptions.DefaultEncryptionKey);
 
             loggerFactory.UseLogEventQueueLogger(app.ApplicationServices);
 
             app.UseMiddleware<ExceptionMiddleware>();
-            if (globalOptions.UseDeveloperExceptions)
+            if (sharedOptions.UseDeveloperExceptions)
             {
                 IdentityModelEventSource.ShowPII = true;
 
@@ -115,8 +115,8 @@ namespace ModernSlavery.WebUI
             app.UseAuthentication(); //Ensure the OIDC IDentity Server authentication services execute on each http request - Must be before UseMVC
             app.UseAuthorization();
             app.UseCookiePolicy();
-            app.UseMiddleware<MaintenancePageMiddleware>(globalOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
-            app.UseMiddleware<StickySessionMiddleware>(globalOptions.StickySessions); //Enable/Disable sticky sessions based on  
+            app.UseMiddleware<MaintenancePageMiddleware>(sharedOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
+            app.UseMiddleware<StickySessionMiddleware>(sharedOptions.StickySessions); //Enable/Disable sticky sessions based on  
 
             //Force basic authentication
             if (_Config.GetValue("BasicAuthentication:Enabled",false))
@@ -139,9 +139,9 @@ namespace ModernSlavery.WebUI
                     //Ensure ShortCodes, SicCodes and SicSections exist on remote 
                     var _fileRepository = app.ApplicationServices.GetService<IFileRepository>();
                     Task.WaitAll(
-                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.ShortCodes, globalOptions.DataPath),
-                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicCodes, globalOptions.DataPath),
-                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicSections, globalOptions.DataPath)
+                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.ShortCodes, sharedOptions.DataPath),
+                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicCodes, sharedOptions.DataPath),
+                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicSections, sharedOptions.DataPath)
                     );
 
 

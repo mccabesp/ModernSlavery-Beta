@@ -31,7 +31,7 @@ namespace ModernSlavery.WebUI.Tests.Services.Account
             mockSendEmailService = new Mock<ISendEmailService>();
 
             // service under test
-            testChangeEmailService = new ChangeEmailViewService(ConfigHelpers.GlobalOptions,mockUserRepo.Object, mockUrlHelper.Object, mockSendEmailService.Object);
+            testChangeEmailService = new ChangeEmailViewService(ConfigHelpers.SharedOptions,mockUserRepo.Object, mockUrlHelper.Object, mockSendEmailService.Object);
         }
 
         [Test]

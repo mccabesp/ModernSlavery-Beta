@@ -42,7 +42,7 @@ namespace ModernSlavery.WebUI.Controllers
             IViewingPresenter viewingPresenter,
             ISearchPresenter searchPresenter,
             IComparePresenter comparePresenter,
-            ILogger<ViewingController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<ViewingController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             ViewingService = viewingService;
             ViewingPresenter = viewingPresenter;
@@ -91,7 +91,7 @@ namespace ModernSlavery.WebUI.Controllers
         [HttpGet("Init")]
         public IActionResult Init()
         {
-            if (!CommonBusinessLogic.GlobalOptions.IsProduction())
+            if (!SharedBusinessLogic.SharedOptions.IsProduction())
             {
                 Logger.LogInformation("Viewing Controller Initialised");
             }
@@ -235,13 +235,13 @@ namespace ModernSlavery.WebUI.Controllers
             var model = new DownloadViewModel {Downloads = new List<DownloadViewModel.Download>()};
 
             const string filePattern = "GPGData_????-????.csv";
-            foreach (string file in await CommonBusinessLogic.FileRepository.GetFilesAsync(CommonBusinessLogic.GlobalOptions.DownloadsLocation, filePattern))
+            foreach (string file in await SharedBusinessLogic.FileRepository.GetFilesAsync(SharedBusinessLogic.SharedOptions.DownloadsLocation, filePattern))
             {
                 var download = new DownloadViewModel.Download {
                     Title = Path.GetFileNameWithoutExtension(file).AfterFirst("GPGData_"),
-                    Count = await CommonBusinessLogic.FileRepository.GetMetaDataAsync(file, "RecordCount"),
+                    Count = await SharedBusinessLogic.FileRepository.GetMetaDataAsync(file, "RecordCount"),
                     Extension = Path.GetExtension(file).TrimI("."),
-                    Size = Numeric.FormatFileSize(await CommonBusinessLogic.FileRepository.GetFileSizeAsync(file))
+                    Size = Numeric.FormatFileSize(await SharedBusinessLogic.FileRepository.GetFileSizeAsync(file))
                 };
 
                 download.Url = Url.Action("DownloadData", new {year = download.Title.BeforeFirst("-")});
@@ -261,20 +261,20 @@ namespace ModernSlavery.WebUI.Controllers
         {
             if (year == 0)
             {
-                year = ViewingService.CommonBusinessLogic.GetAccountingStartDate(SectorTypes.Private).Year;
+                year = ViewingService.SharedBusinessLogic.GetAccountingStartDate(SectorTypes.Private).Year;
             }
 
             //Ensure we have a directory
-            if (!await CommonBusinessLogic.FileRepository.GetDirectoryExistsAsync(CommonBusinessLogic.GlobalOptions.DownloadsLocation))
+            if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(SharedBusinessLogic.SharedOptions.DownloadsLocation))
             {
-                return new HttpNotFoundResult($"Directory '{CommonBusinessLogic.GlobalOptions.DownloadsLocation}' does not exist");
+                return new HttpNotFoundResult($"Directory '{SharedBusinessLogic.SharedOptions.DownloadsLocation}' does not exist");
             }
 
             //Ensure we have a file
             string filePattern = $"GPGData_{year}-{year + 1}.csv";
-            IEnumerable<string> files = await CommonBusinessLogic.FileRepository.GetFilesAsync(CommonBusinessLogic.GlobalOptions.DownloadsLocation, filePattern);
+            IEnumerable<string> files = await SharedBusinessLogic.FileRepository.GetFilesAsync(SharedBusinessLogic.SharedOptions.DownloadsLocation, filePattern);
             string file = files.FirstOrDefault();
-            if (file == null || !await CommonBusinessLogic.FileRepository.GetFileExistsAsync(file))
+            if (file == null || !await SharedBusinessLogic.FileRepository.GetFileExistsAsync(file))
             {
                 return new HttpNotFoundResult("Cannot find GPG data file for year: " + year);
             }
@@ -289,7 +289,7 @@ namespace ModernSlavery.WebUI.Controllers
             HttpContext.SetResponseHeader("Content-Disposition", contentDisposition.ToString());
 
             //cache old files for 1 day
-            DateTime lastWriteTime = await CommonBusinessLogic.FileRepository.GetLastWriteTimeAsync(file);
+            DateTime lastWriteTime = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(file);
             if (lastWriteTime.AddMonths(12) < VirtualDateTime.Now)
             {
                 Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue {MaxAge = TimeSpan.FromDays(1), Public = true};
@@ -302,7 +302,7 @@ namespace ModernSlavery.WebUI.Controllers
             await TrackPageViewAsync(contentDisposition.FileName);
 
             //Return the data
-            return Content(await CommonBusinessLogic.FileRepository.ReadAsync(file), "text/csv");
+            return Content(await SharedBusinessLogic.FileRepository.ReadAsync(file), "text/csv");
         }
 
         #endregion
@@ -414,7 +414,7 @@ namespace ModernSlavery.WebUI.Controllers
         [Obsolete("ReportDeprecated is (unsurprisingly) deprecated, please use method 'Report' instead.")] // , true)]
         public IActionResult ReportDeprecated(string employerIdentifier, int year)
         {
-            if (year < CommonBusinessLogic.GlobalOptions.FirstReportingYear || year > VirtualDateTime.Now.Year)
+            if (year < SharedBusinessLogic.SharedOptions.FirstReportingYear || year > VirtualDateTime.Now.Year)
             {
                 return new HttpBadRequestResult($"Invalid snapshot year {year}");
             }
@@ -441,7 +441,7 @@ namespace ModernSlavery.WebUI.Controllers
                 return new HttpBadRequestResult("Missing employer identifier");
             }
 
-            if (year < CommonBusinessLogic.GlobalOptions.FirstReportingYear || year > VirtualDateTime.Now.Year)
+            if (year < SharedBusinessLogic.SharedOptions.FirstReportingYear || year > VirtualDateTime.Now.Year)
             {
                 return new HttpBadRequestResult($"Invalid snapshot year {year}");
             }

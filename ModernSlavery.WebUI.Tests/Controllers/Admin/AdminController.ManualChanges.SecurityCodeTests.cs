@@ -39,7 +39,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
         [SetUp]
         public void InitialiseDbObjectsBeforeEachTest()
         {
-            Core.Entities.Organisation org = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.GlobalOptions.FirstReportingYear);
+            Core.Entities.Organisation org = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.SharedOptions.FirstReportingYear);
             org.SetSecurityCode(VirtualDateTime.Now.AddDays(90));
             _databaseAdminUser = UserHelper.GetDatabaseAdmin();
             _dbObjects = new object[] {org, _databaseAdminUser};
@@ -52,7 +52,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
             var mockedController = UiTestHelper.GetController<AdminController>(-1, null, _dbObjects);
 
             var organisationBusinessLogic = new OrganisationBusinessLogic(
-                UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>(),
+                UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>(),
                 UiTestHelper.DIContainer.Resolve<IDataRepository>(),
                 UiTestHelper.DIContainer.Resolve<ISubmissionBusinessLogic>(),
                 UiTestHelper.DIContainer.Resolve<IScopeBusinessLogic>(),
@@ -106,7 +106,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
         public async Task AdminController_ManualChanges_POST_Extend_SecurityCode_Fails_When_Applied_To_Expired_Security_CodeAsync()
         {
             // Arrange
-            Core.Entities.Organisation thisTestOrg = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.GlobalOptions.FirstReportingYear);
+            Core.Entities.Organisation thisTestOrg = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.SharedOptions.FirstReportingYear);
             thisTestOrg.SetSecurityCode(VirtualDateTime.Now.AddDays(90));
             thisTestOrg.SetSecurityCodeExpiryDate(VirtualDateTime.Now.AddDays(-5));
 
@@ -210,7 +210,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
         public async Task AdminController_ManualChanges_POST_Expire_SecurityCode_Fails_When_Applied_To_Expired_Security_CodeAsync()
         {
             // Arrange
-            Core.Entities.Organisation thisTestOrg = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.GlobalOptions.FirstReportingYear);
+            Core.Entities.Organisation thisTestOrg = OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.SharedOptions.FirstReportingYear);
             thisTestOrg.SetSecurityCode(VirtualDateTime.Now.AddDays(90));
             thisTestOrg.SetSecurityCodeExpiryDate(VirtualDateTime.Now.AddDays(-5));
 
@@ -518,7 +518,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
         {
             // Arrange (data for this test is slightly different than others in this class)
             Core.Entities.Organisation organisationWithoutSecurityCode =
-                OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.GlobalOptions.FirstReportingYear);
+                OrganisationHelper.GetOrganisationInScope(TestEmployerReference, ConfigHelpers.SharedOptions.FirstReportingYear);
             _dbObjects = new object[] {organisationWithoutSecurityCode, _databaseAdminUser};
 
             AdminController adminControllerToExtendSecurityCodeTests = GetControllerForOutOfScopeTests();
@@ -1003,7 +1003,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
             var adminController = UiTestHelper.GetController<AdminController>(_databaseAdminUser.UserId);
 
             var organisationBusinessLogic = new OrganisationBusinessLogic(
-                UiTestHelper.DIContainer.Resolve<ICommonBusinessLogic>(),
+                UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>(),
                 UiTestHelper.DIContainer.Resolve<IDataRepository>(),
                 UiTestHelper.DIContainer.Resolve<ISubmissionBusinessLogic>(),
                 UiTestHelper.DIContainer.Resolve<IScopeBusinessLogic>(),

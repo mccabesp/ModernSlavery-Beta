@@ -450,12 +450,12 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin.ManualChanges
             string[] actualResults = actualManualChangesViewModel.Results.Split(new[] {"\r\n", "\n"}, StringSplitOptions.None);
             Assert.AreEqual(3, actualResults.Length);
 
-            Core.Entities.Organisation org1 = thisTestAdminController.CommonBusinessLogic.DataRepository.GetAll<Core.Entities.Organisation>()
+            Core.Entities.Organisation org1 = thisTestAdminController.SharedBusinessLogic.DataRepository.GetAll<Core.Entities.Organisation>()
                 .SingleOrDefault(x => x.EmployerReference == "6B2LF57C");
             Assert.AreEqual("1111", org1.GetSicCodeIdsString());
             Assert.AreEqual("1: 6B2LF57C: SIC codes=1 has been set to 1111", actualResults[0]);
 
-            Core.Entities.Organisation org2 = thisTestAdminController.CommonBusinessLogic.DataRepository.GetAll<Core.Entities.Organisation>()
+            Core.Entities.Organisation org2 = thisTestAdminController.SharedBusinessLogic.DataRepository.GetAll<Core.Entities.Organisation>()
                 .SingleOrDefault(x => x.EmployerReference == "23TYLBLB");
             Assert.AreEqual("3333", org2.GetSicCodeIdsString());
             Assert.AreEqual("2: 23TYLBLB: SIC codes=3 has been set to 3333", actualResults[1]);

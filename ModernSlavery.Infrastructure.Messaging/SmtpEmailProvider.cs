@@ -17,10 +17,10 @@ namespace ModernSlavery.Infrastructure.Messaging
     {
         public SmtpEmailProvider(IEmailTemplateRepository emailTemplateRepo,
             SmtpEmailOptions smtpEmailOptions,
-            GlobalOptions globalOptions,
+            SharedOptions sharedOptions,
             ILogger<SmtpEmailProvider> logger,
             [KeyFilter(Filenames.EmailSendLog)] IRecordLogger emailSendLog)
-            : base(globalOptions, emailTemplateRepo, logger, emailSendLog)
+            : base(sharedOptions, emailTemplateRepo, logger, emailSendLog)
         {
             Options = smtpEmailOptions ?? throw new ArgumentNullException(nameof(smtpEmailOptions));
             //TODO ensure smtp config is present (when enabled)
@@ -37,7 +37,7 @@ namespace ModernSlavery.Infrastructure.Messaging
             var mergeParameters = model.GetPropertiesDictionary();
 
             // prefix subject with environment name
-            mergeParameters["Environment"] = GlobalOptions.IsProduction() ? "" : $"[{GlobalOptions.Environment}] ";
+            mergeParameters["Environment"] = SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] ";
 
             // get template
             var emailTemplateInfo = EmailTemplateRepo.GetByTemplateId(templateId);

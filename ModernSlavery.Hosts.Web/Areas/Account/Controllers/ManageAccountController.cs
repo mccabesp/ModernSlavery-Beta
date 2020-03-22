@@ -20,7 +20,7 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
     {
 
         public ManageAccountController(
-            ILogger<ManageAccountController> logger,IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<ManageAccountController> logger,IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
         }
 

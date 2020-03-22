@@ -20,10 +20,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                string filePath = Path.Combine(_CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.Users);
+                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.Users);
 
                 //Dont execute on startup if file already exists
-                if (!Functions.StartedJobs.Contains(nameof(UpdateUsers)) && await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
+                if (!Functions.StartedJobs.Contains(nameof(UpdateUsers)) && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -56,7 +56,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             Functions.RunningJobs.Add(nameof(UpdateUsers));
             try
             {
-                List<User> users = await EntityFrameworkQueryableExtensions.ToListAsync<User>(_CommonBusinessLogic.DataRepository.GetAll<User>());
+                List<User> users = await EntityFrameworkQueryableExtensions.ToListAsync<User>(_SharedBusinessLogic.DataRepository.GetAll<User>());
                 var records = users.Where(u => !u.IsAdministrator())
                     .OrderBy(u => u.Lastname)
                     .Select(
@@ -81,7 +81,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             u.Created
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(_CommonBusinessLogic.FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
             }
             finally
             {

@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Shared.Tests
             var expectedOffsetCurrentDateTimeForSite = new TimeSpan(4, 2, 0, 0, 0);
 
             // Act
-            TimeSpan actualOffsetCurrentDateTimeForSite = TimeSpan.Parse(ConfigHelpers.GlobalOptions.DateTimeOffset);
+            TimeSpan actualOffsetCurrentDateTimeForSite = TimeSpan.Parse(ConfigHelpers.SharedOptions.DateTimeOffset);
 
             // Assert
             Assert.AreEqual(

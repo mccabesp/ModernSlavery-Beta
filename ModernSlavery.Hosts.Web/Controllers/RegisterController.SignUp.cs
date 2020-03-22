@@ -54,13 +54,13 @@ namespace ModernSlavery.WebUI.Controllers
             {
                 string verifyCode = Encryption.EncryptQuerystring(currentUser.UserId + ":" + currentUser.Created.ToSmallDateTime());
                 string verifyUrl = Url.Action("VerifyEmail", "Register", new { code = verifyCode }, "https");
-                if (!await RegistrationService.CommonBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, currentUser.EmailAddress))
+                if (!await RegistrationService.SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, currentUser.EmailAddress))
                     return null;
 
                 currentUser.EmailVerifyHash = Crypto.GetSHA512Checksum(verifyCode);
                 currentUser.EmailVerifySendDate = VirtualDateTime.Now;
 
-                await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
                 Logger.LogInformation(
                     $"Email verification sent: Name {currentUser.Fullname}, Email:{currentUser.EmailAddress}, IP:{UserHostAddress}");
@@ -126,7 +126,7 @@ namespace ModernSlavery.WebUI.Controllers
 
                 //If the email address is a test email then add to viewbag
 
-                if (currentUser.EmailAddress.StartsWithI(CommonBusinessLogic.GlobalOptions.TestPrefix) || CommonBusinessLogic.GlobalOptions.ShowEmailVerifyLink)
+                if (currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) || SharedBusinessLogic.SharedOptions.ShowEmailVerifyLink)
                 {
                     ViewBag.VerifyCode = verifyCode;
                 }
@@ -137,7 +137,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //If verification code has expired
-            if (currentUser.EmailVerifySendDate.Value.AddHours(CommonBusinessLogic.GlobalOptions.EmailVerificationExpiryHours) < VirtualDateTime.Now)
+            if (currentUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours) < VirtualDateTime.Now)
             {
                 AddModelError(3016);
 
@@ -150,8 +150,8 @@ namespace ModernSlavery.WebUI.Controllers
 
             TimeSpan remainingLock = currentUser.VerifyAttemptDate == null
                 ? TimeSpan.Zero
-                : currentUser.VerifyAttemptDate.Value.AddMinutes(CommonBusinessLogic.GlobalOptions.LockoutMinutes) - VirtualDateTime.Now;
-            TimeSpan remainingResend = currentUser.EmailVerifySendDate.Value.AddHours(CommonBusinessLogic.GlobalOptions.EmailVerificationMinResendHours)
+                : currentUser.VerifyAttemptDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) - VirtualDateTime.Now;
+            TimeSpan remainingResend = currentUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationMinResendHours)
                                        - VirtualDateTime.Now;
 
             if (string.IsNullOrEmpty(code))
@@ -168,7 +168,7 @@ namespace ModernSlavery.WebUI.Controllers
             }
 
             //If too many wrong attempts
-            if (currentUser.VerifyAttempts >= CommonBusinessLogic.GlobalOptions.MaxEmailVerifyAttempts && remainingLock > TimeSpan.Zero)
+            if (currentUser.VerifyAttempts >= SharedBusinessLogic.SharedOptions.MaxEmailVerifyAttempts && remainingLock > TimeSpan.Zero)
             {
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1110, new {remainingTime = remainingLock.ToFriendly(maxParts: 2)}));
             }
@@ -188,7 +188,7 @@ namespace ModernSlavery.WebUI.Controllers
                     this.CleanModelErrors<VerifyViewModel>();
                     result = View("VerifyEmail", model);
                 }
-                else if (currentUser.VerifyAttempts >= CommonBusinessLogic.GlobalOptions.MaxEmailVerifyAttempts && remainingLock > TimeSpan.Zero)
+                else if (currentUser.VerifyAttempts >= SharedBusinessLogic.SharedOptions.MaxEmailVerifyAttempts && remainingLock > TimeSpan.Zero)
                 {
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1110, new {remainingTime = remainingLock.ToFriendly(maxParts: 2)}));
                 }
@@ -218,7 +218,7 @@ namespace ModernSlavery.WebUI.Controllers
             currentUser.VerifyAttemptDate = VirtualDateTime.Now;
 
             //Save the current user
-            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Prompt the user with confirmation
             return result;
@@ -241,7 +241,7 @@ namespace ModernSlavery.WebUI.Controllers
             //Reset the verification send date
             currentUser.EmailVerifySendDate = null;
             currentUser.EmailVerifyHash = null;
-            await CommonBusinessLogic.DataRepository.SaveChangesAsync();
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Call GET action which will automatically resend
             return await VerifyEmail();

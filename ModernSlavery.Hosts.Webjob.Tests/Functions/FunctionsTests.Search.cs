@@ -54,7 +54,7 @@ namespace ModernSlavery.Hosts.Webjob.Tests.Functions
         {
             //ARRANGE
             //Ensure all orgs are in scope for current year
-            IEnumerable<Organisation> orgs = _functions.CommonBusinessLogic.DataRepository.GetAll<Organisation>();
+            IEnumerable<Organisation> orgs = _functions.SharedBusinessLogic.DataRepository.GetAll<Organisation>();
 
             //Add a random number of in scope orgs
             var inScope = Numeric.Rand(1, orgs.Count());

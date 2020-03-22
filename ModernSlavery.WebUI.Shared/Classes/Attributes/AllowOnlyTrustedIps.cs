@@ -18,14 +18,14 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var globalOptions = (GlobalOptions)context.HttpContext.RequestServices.GetService(typeof(GlobalOptions));
-            var trustedIPDomains= globalOptions?.TrustedIPDomains.SplitI();
+            var sharedOptions = (SharedOptions)context.HttpContext.RequestServices.GetService(typeof(SharedOptions));
+            var trustedIPDomains= sharedOptions?.TrustedIPDomains.SplitI();
             if (trustedIPDomains != null && trustedIPDomains.Any())
             {
                 string userHostAddress = context.HttpContext.GetUserHostAddress();
                 if (string.IsNullOrWhiteSpace(userHostAddress) || !userHostAddress.IsTrustedAddress(trustedIPDomains))
                 {
-                    LogAttempt(context, globalOptions.TrustedIPDomains, userHostAddress);
+                    LogAttempt(context, sharedOptions.TrustedIPDomains, userHostAddress);
                     context.Result = new HttpStatusCodeResult(HttpStatusCode.Forbidden);
                     return;
                 }

@@ -20,11 +20,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                string filePath = Path.Combine(CommonBusinessLogic.GlobalOptions.DownloadsPath, Filenames.UnverifiedRegistrations);
+                string filePath = Path.Combine(SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.UnverifiedRegistrations);
 
                 //Dont execute on startup if file already exists
                 if (!Functions.StartedJobs.Contains(nameof(UpdateUnverifiedRegistrations))
-                    && await CommonBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
+                    && await SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     return;
                 }
@@ -63,7 +63,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             Functions.RunningJobs.Add(nameof(UpdateUnverifiedRegistrations));
             try
             {
-                List<UserOrganisation> userOrgs = Queryable.Where<UserOrganisation>(_CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>(), uo => uo.PINConfirmedDate == null)
+                List<UserOrganisation> userOrgs = Queryable.Where<UserOrganisation>(_SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>(), uo => uo.PINConfirmedDate == null)
                     .OrderBy(uo => uo.Organisation.OrganisationName)
                     .Include(uo => uo.Organisation.LatestScope)
                     .Include(uo => uo.User)
@@ -95,7 +95,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             Address = uo.Address?.GetAddressString()
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(_CommonBusinessLogic.FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
             }
             finally
             {

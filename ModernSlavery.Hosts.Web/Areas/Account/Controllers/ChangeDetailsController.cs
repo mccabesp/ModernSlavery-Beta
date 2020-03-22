@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Areas.Account.Controllers
 
         public ChangeDetailsController(
             IChangeDetailsViewService changeDetailsService,
-            ILogger<ChangeDetailsController> logger, IWebService webService, ICommonBusinessLogic commonBusinessLogic) : base(logger, webService, commonBusinessLogic)
+            ILogger<ChangeDetailsController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             ChangeDetailsService = changeDetailsService;
         }

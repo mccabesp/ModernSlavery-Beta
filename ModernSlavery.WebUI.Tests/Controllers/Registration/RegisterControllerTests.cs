@@ -104,7 +104,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.AreEqual(result.ControllerName, "Register", "Expected the Controller to be 'Register'");
 
             // Assert User Setting
-            UserSetting userSetting = controller.CommonBusinessLogic.DataRepository.GetAll<User>()
+            UserSetting userSetting = controller.SharedBusinessLogic.DataRepository.GetAll<User>()
                 .FirstOrDefault()
                 .UserSettings.FirstOrDefault(x => x.Key == UserSettingKeys.PendingFasttrackCodes);
             Assert.AreEqual(
@@ -162,7 +162,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             mockRouteData.Values.Add("Action", "ServiceActivated");
             mockRouteData.Values.Add("Controller", "Register");
 
-            Return mockReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockUserOrg,ConfigHelpers.GlobalOptions.FirstReportingYear);
+            Return mockReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockUserOrg,ConfigHelpers.SharedOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockOrg, mockReturn);
 
@@ -193,7 +193,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Core.Entities.Organisation mockOrg = OrganisationHelper.GetPublicOrganisation();
             UserOrganisation mockUserOrg = UserOrganisationHelper.LinkUserWithOrganisation(mockUser, mockOrg);
 
-            Return mockReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockUserOrg,ConfigHelpers.GlobalOptions.FirstReportingYear);
+            Return mockReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockUserOrg,ConfigHelpers.SharedOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockOrg, mockReturn);
 

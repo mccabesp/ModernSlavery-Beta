@@ -81,7 +81,7 @@ namespace ModernSlavery.WebUI.Tests
             var mockScopeBL = AutoFacExtensions.ResolveAsMock<IScopeBusinessLogic>(true);
             //ACT:
             var result = controller.OrganisationType() as RedirectToActionResult;
-            var userOrg = controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().FirstOrDefault(uo => uo.UserId == user.UserId && uo.OrganisationId == orgScope.OrganisationId);
+            var userOrg = controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().FirstOrDefault(uo => uo.UserId == user.UserId && uo.OrganisationId == orgScope.OrganisationId);
 
             //ASSERT:
             Assert.That(result != null, "Expected RedirectToActionResult");
@@ -321,7 +321,7 @@ namespace ModernSlavery.WebUI.Tests
             var actualModel = controller.UnstashModel<OrganisationViewModel>();
 
             //check that the search returned a match in the db
-            //var sResult     = controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationViewModel>().Where(o => o.CompanyNumber == resultModel.CompanyNumber);
+            //var sResult     = controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationViewModel>().Where(o => o.CompanyNumber == resultModel.CompanyNumber);
             //var pagedResult =  controller.PrivateSectorRepository.Search(model.SearchText, 1, Settings.Default.EmployerPageSize);
 
             //ASSERT:
@@ -818,7 +818,7 @@ namespace ModernSlavery.WebUI.Tests
             };
 
             foreach (var sicCode in sicCodes)
-                controller.CommonBusinessLogic.DataRepository.Insert(sicCode);
+                controller.SharedBusinessLogic.DataRepository.Insert(sicCode);
 
             //change recordNum to test each record: 
             var selectedEmployerIndex = 2;
@@ -938,7 +938,7 @@ namespace ModernSlavery.WebUI.Tests
             };
 
             foreach (var sicCode in sicCodes)
-                controller.CommonBusinessLogic.DataRepository.Insert(sicCode);
+                controller.SharedBusinessLogic.DataRepository.Insert(sicCode);
 
             //change recordNum to test each record: 
             var selectedEmployerIndex = 2;
@@ -1058,7 +1058,7 @@ namespace ModernSlavery.WebUI.Tests
             };
 
             foreach (var sicCode in sicCodes)
-                controller.CommonBusinessLogic.DataRepository.Insert(sicCode);
+                controller.SharedBusinessLogic.DataRepository.Insert(sicCode);
 
             //change recordNum to test each record: 
             var selectedEmployerIndex = 2;
@@ -1176,7 +1176,7 @@ namespace ModernSlavery.WebUI.Tests
             };
 
             foreach (var sicCode in sicCodes)
-                controller.CommonBusinessLogic.DataRepository.Insert(sicCode);
+                controller.SharedBusinessLogic.DataRepository.Insert(sicCode);
 
             //change recordNum to test each record: 
             var selectedEmployerIndex = 2;
@@ -1297,7 +1297,7 @@ namespace ModernSlavery.WebUI.Tests
             };
 
             foreach (var sicCode in sicCodes)
-                controller.CommonBusinessLogic.DataRepository.Insert(sicCode);
+                controller.SharedBusinessLogic.DataRepository.Insert(sicCode);
 
             //change recordNum to test each record: 
             var selectedEmployerIndex = 2;
@@ -2038,7 +2038,7 @@ namespace ModernSlavery.WebUI.Tests
             expectedModel.ManualRegistration = false;
             expectedModel.ManualAddress = false;
             expectedModel.ManualAuthorised = true;
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationId == expectedModel.GetManualEmployer().OrganisationId);
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationId == expectedModel.GetManualEmployer().OrganisationId);
             #endregion
 
 
@@ -2580,9 +2580,9 @@ namespace ModernSlavery.WebUI.Tests
             };
 
             foreach (var sicCode in sicCodes)
-                controller.CommonBusinessLogic.DataRepository.Insert(sicCode);
+                controller.SharedBusinessLogic.DataRepository.Insert(sicCode);
 
-            await controller.CommonBusinessLogic.DataRepository.SaveChangesAsync();
+            await controller.SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             var employer = new EmployerRecord() {
                 OrganisationName = "Company1",
@@ -2758,11 +2758,11 @@ namespace ModernSlavery.WebUI.Tests
             //ACT:
             var result = await controller.ConfirmOrganisation(stashedModel, "confirm") as RedirectToActionResult;
             var unstashedModel = controller.UnstashModel<OrganisationViewModel>();
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
-            var userOrgs = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var addresses = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
-            var references = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
-            var sics = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
+            var userOrgs = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var addresses = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
+            var references = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
+            var sics = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
@@ -2933,11 +2933,11 @@ namespace ModernSlavery.WebUI.Tests
             //ACT:
             var result = await controller.ConfirmOrganisation(stashedModel, "confirm") as RedirectToActionResult;
             var unstashedModel = controller.UnstashModel<OrganisationViewModel>();
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
-            var userOrgs = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var addresses = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
-            var references = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
-            var sics = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
+            var userOrgs = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var addresses = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
+            var references = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
+            var sics = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
@@ -3100,11 +3100,11 @@ namespace ModernSlavery.WebUI.Tests
 
             //ACT:
             var result = await controller.ConfirmOrganisation(stashedModel, "confirm") as RedirectToActionResult;
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
-            var userOrgs = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var addresses = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
-            var references = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
-            var sics = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
+            var userOrgs = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var addresses = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
+            var references = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
+            var sics = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
@@ -3270,11 +3270,11 @@ namespace ModernSlavery.WebUI.Tests
             //ACT:
             var result = await controller.ConfirmOrganisation(stashedModel, "confirm") as RedirectToActionResult;
             var unstashedModel = controller.UnstashModel<OrganisationViewModel>();
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
-            var userOrgs = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var addresses = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
-            var references = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
-            var sics = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
+            var userOrgs = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var addresses = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
+            var references = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
+            var sics = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
@@ -3448,11 +3448,11 @@ namespace ModernSlavery.WebUI.Tests
             //ACT:
             var result = await controller.ConfirmOrganisation(stashedModel, "confirm") as RedirectToActionResult;
             var unstashedModel = controller.UnstashModel<OrganisationViewModel>();
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
-            var userOrgs = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var addresses = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
-            var references = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
-            var sics = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
+            var userOrgs = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var addresses = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
+            var references = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
+            var sics = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
@@ -3623,11 +3623,11 @@ namespace ModernSlavery.WebUI.Tests
             //ACT:
             var result = await controller.ConfirmOrganisation(stashedModel, "confirm") as RedirectToActionResult;
 
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
-            var userOrgs = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var addresses = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
-            var references = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
-            var sics = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
+            var userOrgs = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var addresses = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
+            var references = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
+            var sics = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
@@ -3797,11 +3797,11 @@ namespace ModernSlavery.WebUI.Tests
             //ACT:
             var result = await controller.ConfirmOrganisation(stashedModel, "confirm") as RedirectToActionResult;
 
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
-            var userOrgs = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var addresses = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
-            var references = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
-            var sics = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
+            var userOrgs = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var addresses = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
+            var references = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
+            var sics = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
@@ -3964,11 +3964,11 @@ namespace ModernSlavery.WebUI.Tests
             //ACT:
             var result = await controller.ConfirmOrganisation(stashedModel, "confirm") as RedirectToActionResult;
             var unstashedModel = controller.UnstashModel<OrganisationViewModel>();
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == stashedModel.OrganisationName);
-            var userOrgs = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var addresses = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
-            var references = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
-            var sics = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == stashedModel.OrganisationName);
+            var userOrgs = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var addresses = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
+            var references = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
+            var sics = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
@@ -4135,11 +4135,11 @@ namespace ModernSlavery.WebUI.Tests
             //ACT:
             var result = await controller.ConfirmOrganisation(stashedModel, "confirm") as RedirectToActionResult;
             var unstashedModel = controller.UnstashModel<OrganisationViewModel>();
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == stashedModel.OrganisationName);
-            var userOrgs = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var addresses = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
-            var references = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
-            var sics = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == stashedModel.OrganisationName);
+            var userOrgs = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var addresses = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
+            var references = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
+            var sics = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
@@ -4305,12 +4305,12 @@ namespace ModernSlavery.WebUI.Tests
             //ACT:
             var result = await controller.ConfirmOrganisation(stashedModel, "confirm") as RedirectToActionResult;
             var unstashedModel = controller.UnstashModel<OrganisationViewModel>();
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
-            var userOrgs1 = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user1.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var userOrgs2 = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user2.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var addresses = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
-            var references = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
-            var sics = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
+            var userOrgs1 = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user1.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var userOrgs2 = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user2.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var addresses = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
+            var references = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
+            var sics = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToRouteResult");
@@ -4466,12 +4466,12 @@ namespace ModernSlavery.WebUI.Tests
             //ACT:
             var result = await controller.ConfirmOrganisation(stashedModel, "confirm") as RedirectToActionResult;
             var unstashedModel = controller.UnstashModel<OrganisationViewModel>();
-            var org = controller.CommonBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
-            var userOrgs1 = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user1.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var userOrgs2 = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user2.UserId && uo.OrganisationId == org.OrganisationId).ToList();
-            var addresses = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
-            var references = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
-            var sics = org == null ? null : controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
+            var org = controller.SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.OrganisationName == employer.OrganisationName);
+            var userOrgs1 = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user1.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var userOrgs2 = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo => uo.UserId == user2.UserId && uo.OrganisationId == org.OrganisationId).ToList();
+            var addresses = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(oa => oa.OrganisationId == org.OrganisationId).ToList();
+            var references = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>().Where(on => on.OrganisationId == org.OrganisationId).ToList();
+            var sics = org == null ? null : controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>().Where(os => os.OrganisationId == org.OrganisationId).ToList();
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToRouteResult");

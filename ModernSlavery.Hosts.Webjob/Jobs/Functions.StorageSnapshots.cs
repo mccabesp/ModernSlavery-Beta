@@ -47,7 +47,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     List<string> snapshots =
                         xml.Descendants().Where(e => e.Name.LocalName.EqualsI("Snapshot")).Select(e => e.Value).ToList();
                     //var snapshots = snapshots.Where(e => e.EqualsI("Snapshot")).Select(e=>e.Value).ToList();
-                    DateTime deadline = VirtualDateTime.Now.AddDays(0 - _CommonBusinessLogic.GlobalOptions.MaxSnapshotDays);
+                    DateTime deadline = VirtualDateTime.Now.AddDays(0 - _SharedBusinessLogic.SharedOptions.MaxSnapshotDays);
                     foreach (string snapshot in snapshots)
                     {
                         DateTime date = DateTime.Parse(snapshot);
@@ -232,35 +232,35 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             const string logZipDir = @"\Archive\";
 
             //Ensure the archive directory exists
-            if (!await _CommonBusinessLogic.FileRepository.GetDirectoryExistsAsync(logZipDir))
+            if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(logZipDir))
             {
-                await _CommonBusinessLogic.FileRepository.CreateDirectoryAsync(logZipDir);
+                await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(logZipDir);
             }
 
             //Create the zip file path using todays date
             string logZipFilePath = Path.Combine(logZipDir, $"{VirtualDateTime.Now.ToString("yyyyMMdd")}.zip");
 
             //Dont zip if we have one for today
-            if (await _CommonBusinessLogic.FileRepository.GetFileExistsAsync(logZipFilePath))
+            if (await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(logZipFilePath))
             {
                 return;
             }
 
-            string zipDir = Url.UrlToDirSeparator(Path.Combine(_CommonBusinessLogic.FileRepository.RootDir, logZipDir));
+            string zipDir = Url.UrlToDirSeparator(Path.Combine(_SharedBusinessLogic.FileRepository.RootDir, logZipDir));
 
             using (var fileStream = new MemoryStream())
             {
                 var files = 0;
                 using (var zipStream = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
                 {
-                    foreach (string dir in await _CommonBusinessLogic.FileRepository.GetDirectoriesAsync("\\", null, true))
+                    foreach (string dir in await _SharedBusinessLogic.FileRepository.GetDirectoriesAsync("\\", null, true))
                     {
                         if (Url.UrlToDirSeparator($"{dir}\\").StartsWithI(zipDir))
                         {
                             continue;
                         }
 
-                        foreach (string file in await _CommonBusinessLogic.FileRepository.GetFilesAsync(dir, "*.*"))
+                        foreach (string file in await _SharedBusinessLogic.FileRepository.GetFilesAsync(dir, "*.*"))
                         {
                             string dirFile = Url.UrlToDirSeparator(file);
 
@@ -273,7 +273,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             ZipArchiveEntry entry = zipStream.CreateEntry(dirFile);
                             using (Stream entryStream = entry.Open())
                             {
-                                await _CommonBusinessLogic.FileRepository.ReadAsync(dirFile, entryStream);
+                                await _SharedBusinessLogic.FileRepository.ReadAsync(dirFile, entryStream);
                                 files++;
                             }
                         }
@@ -286,7 +286,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 }
 
                 fileStream.Position = 0;
-                await _CommonBusinessLogic.FileRepository.WriteAsync(logZipFilePath, fileStream);
+                await _SharedBusinessLogic.FileRepository.WriteAsync(logZipFilePath, fileStream);
             }
         }
 

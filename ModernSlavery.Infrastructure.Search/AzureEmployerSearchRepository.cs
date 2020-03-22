@@ -28,11 +28,11 @@ namespace ModernSlavery.Infrastructure.Search
 
         private readonly Lazy<Task<ISearchServiceClient>> _serviceClient;
         private readonly TelemetryClient _telemetryClient;
-        private readonly GlobalOptions GlobalOptions;
+        private readonly SharedOptions SharedOptions;
         public readonly IRecordLogger SearchLog;
 
         public AzureEmployerSearchRepository(
-            GlobalOptions globalOptions,
+            SharedOptions sharedOptions,
             [KeyFilter(Filenames.SearchLog)] IRecordLogger searchLog,
             string serviceName,
             string indexName,
@@ -41,7 +41,7 @@ namespace ModernSlavery.Infrastructure.Search
             TelemetryClient telemetryClient = null,
             bool disabled = false)
         {
-            GlobalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             Disabled = disabled;
             if (disabled)
             {
@@ -128,8 +128,8 @@ namespace ModernSlavery.Infrastructure.Search
                 throw new ArgumentNullException(nameof(newRecords), "You must supply at least one record to index");
 
             //Remove all test organisations
-            if (!string.IsNullOrWhiteSpace(GlobalOptions.TestPrefix))
-                newRecords = newRecords.Where(e => !e.Name.StartsWithI(GlobalOptions.TestPrefix));
+            if (!string.IsNullOrWhiteSpace(SharedOptions.TestPrefix))
+                newRecords = newRecords.Where(e => !e.Name.StartsWithI(SharedOptions.TestPrefix));
 
             //Ensure the records are ordered by name
             newRecords = newRecords.OrderBy(o => o.Name);

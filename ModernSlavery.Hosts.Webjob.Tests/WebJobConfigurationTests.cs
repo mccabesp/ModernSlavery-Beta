@@ -11,7 +11,7 @@ namespace ModernSlavery.Hosts.Webjob.Tests
         [SetUp]
         public void Setup()
         {
-            VirtualDateTime.Initialise(ConfigHelpers.GlobalOptions.DateTimeOffset);
+            VirtualDateTime.Initialise(ConfigHelpers.SharedOptions.DateTimeOffset);
         }
 
         [Test]

@@ -416,7 +416,7 @@ namespace ModernSlavery.WebUI.Controllers
                             break;
                         }
 
-                        var sic = CommonBusinessLogic.DataRepository.Get<SicCode>(code);
+                        var sic = SharedBusinessLogic.DataRepository.Get<SicCode>(code);
                         if (sic == null || code == 1)
                         {
                             ModelState.AddModelError("", code + " is not a recognised SIC code");

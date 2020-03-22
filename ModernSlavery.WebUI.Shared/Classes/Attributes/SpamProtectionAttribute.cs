@@ -7,13 +7,13 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 {
     public class SpamProtectionAttribute : ActionFilterAttribute
     {
-        private GlobalOptions _globalOptions;
+        private SharedOptions _sharedOptions;
 
         private readonly int _minimumSeconds;
 
         public SpamProtectionAttribute(int minimumSeconds = 10)
         {
-            _globalOptions = Activator.CreateInstance<GlobalOptions>();
+            _sharedOptions = Activator.CreateInstance<SharedOptions>();
 
             _minimumSeconds = minimumSeconds;
         }
@@ -38,7 +38,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
             }
             catch { }
 
-            if (_globalOptions.SkipSpamProtection)
+            if (_sharedOptions.SkipSpamProtection)
             {
                 return;
             }

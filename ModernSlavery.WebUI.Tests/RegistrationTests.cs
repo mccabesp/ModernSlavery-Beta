@@ -324,7 +324,7 @@ namespace ModernSlavery.WebUI.Tests
                 UserId = 1,
                 Organisation = org,
                 OrganisationId = 1,
-                PINSentDate = VirtualDateTime.Now.AddDays(0 - ConfigHelpers.GlobalOptions.PinInPostExpiryDays - 1)
+                PINSentDate = VirtualDateTime.Now.AddDays(0 - ConfigHelpers.SharedOptions.PinInPostExpiryDays - 1)
             };
 
             var routeData = new RouteData();
@@ -1018,7 +1018,7 @@ namespace ModernSlavery.WebUI.Tests
             Mock<IScopeBusinessLogic> mockScopeBL = AutoFacExtensions.ResolveAsMock<IScopeBusinessLogic>(true);
             //ACT:
             var result = controller.OrganisationType() as RedirectToActionResult;
-            UserOrganisation userOrg = controller.CommonBusinessLogic.DataRepository.GetAll<UserOrganisation>()
+            UserOrganisation userOrg = controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefault(uo => uo.UserId == user.UserId && uo.OrganisationId == orgScope.OrganisationId);
 
             //ASSERT:
@@ -1287,7 +1287,7 @@ namespace ModernSlavery.WebUI.Tests
             var actualModel = controller.UnstashModel<OrganisationViewModel>();
 
             //check that the search returned a match in the db
-            //var sResult     = controller.CommonBusinessLogic.DataRepository.GetAll<OrganisationViewModel>().Where(o => o.CompanyNumber == resultModel.CompanyNumber);
+            //var sResult     = controller.SharedBusinessLogic.DataRepository.GetAll<OrganisationViewModel>().Where(o => o.CompanyNumber == resultModel.CompanyNumber);
             //var pagedResult =  controller.PrivateSectorRepository.Search(model.SearchText, 1, Settings.Default.EmployerPageSize);
 
             //ASSERT:

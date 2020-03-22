@@ -15,10 +15,10 @@ namespace ModernSlavery.IdServer.Classes
 
     public class Resources : IResources
     {
-        private readonly GlobalOptions _globalOptions;
-        public Resources(GlobalOptions globalOptions)
+        private readonly SharedOptions _sharedOptions;
+        public Resources(SharedOptions sharedOptions)
         {
-            _globalOptions = globalOptions ?? throw new ArgumentNullException(nameof(globalOptions));
+            _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
         }
         public IEnumerable<IdentityResource> GetIdentityResources()
         {
@@ -33,11 +33,11 @@ namespace ModernSlavery.IdServer.Classes
         {
             return new List<ApiResource> {
                 new ApiResource {
-                    Name = _globalOptions.IdentityApiScope,
+                    Name = _sharedOptions.IdentityApiScope,
                     DisplayName = "GPG API",
                     Description = "Access to a GPG API",
                     UserClaims = new List<string> {ClaimTypes.Role},
-                    ApiSecrets = new List<Secret> {new Secret(_globalOptions.AuthSecret.GetSHA256Checksum())},
+                    ApiSecrets = new List<Secret> {new Secret(_sharedOptions.AuthSecret.GetSHA256Checksum())},
                     Scopes = new List<Scope> {new Scope("customAPI.read"), new Scope("customAPI.write")}
                 }
             };

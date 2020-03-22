@@ -63,7 +63,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             string datePart = fileName.AfterLast("_", includeWhenNoSeparator: false);
 
             int endYear = _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private).Year;
-            int startYear = _CommonBusinessLogic.GlobalOptions.FirstReportingYear;
+            int startYear = _SharedBusinessLogic.SharedOptions.FirstReportingYear;
             if (!string.IsNullOrWhiteSpace(datePart))
             {
                 int start = datePart.BeforeFirst("-").ToInt32().ToFourDigitYear();
@@ -91,7 +91,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     filePath = Path.Combine(path, filePath);
                 }
 
-                await Core.Classes.Extensions.SaveCSVAsync(_CommonBusinessLogic.FileRepository, records, filePath);
+                await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
             }
         }
 
@@ -110,7 +110,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 filePath = Path.Combine(path, filePath);
             }
 
-            await Core.Classes.Extensions.SaveCSVAsync(_CommonBusinessLogic.FileRepository, records, filePath);
+            await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
         }
 
     }

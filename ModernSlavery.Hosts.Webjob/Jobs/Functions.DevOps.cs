@@ -23,7 +23,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 //Load all the organisation in the database
-                List<Organisation> orgs = await _CommonBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync();
+                List<Organisation> orgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync();
                 var count = 0;
 
                 //Loop through each organisation in the list
@@ -80,7 +80,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     //If there were database changes then save them
                     if (changed)
                     {
-                        await _CommonBusinessLogic.DataRepository.SaveChangesAsync();
+                        await _SharedBusinessLogic.DataRepository.SaveChangesAsync();
                     }
 
                     count++;
