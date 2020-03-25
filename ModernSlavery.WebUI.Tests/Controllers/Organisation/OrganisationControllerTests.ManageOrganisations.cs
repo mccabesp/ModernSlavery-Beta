@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using NUnit.Framework;
 
@@ -14,7 +13,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
     {
 
         [Test(Author = "Oscar Lagatta")]
-        [Description("OrganisationController.ManageOrganisations GET: When Creates New Model")]
+        [Description("ManageOrganisationsController.Home GET: When Creates New Model")]
         public void OrganisationController_Manageorganisations_GET_When_Creates_New_Model()
         {
             // ARRANGE
@@ -32,9 +31,9 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
             // route data
             var routeData = new RouteData();
             routeData.Values.Add("action", "ManageOrganisations");
-            routeData.Values.Add("Controller", "Organisation");
+            routeData.Values.Add("Controller", "Registrations");
 
-            var controller = UiTestHelper.GetController<OrganisationController>(
+            var controller = UiTestHelper.GetController<ManageOrganisationsController>(
                 -1,
                 routeData,
                 mockUser,
@@ -46,7 +45,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
                 mockUserOrg3);
 
             // Acts
-            var result = controller.ManageOrganisations() as ViewResult;
+            var result = controller.Home() as ViewResult;
 
             object actualUserOrganisationViewModel = result.Model;
 
@@ -64,7 +63,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
             // Arrange
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ManageOrganisations");
-            mockRouteData.Values.Add("Controller", "Organisation");
+            mockRouteData.Values.Add("Controller", "Registrations");
 
             var mockUser = new User {
                 UserId = 87654,
@@ -73,10 +72,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
                 UserSettings = new[] {new UserSetting(UserSettingKeys.AcceptedPrivacyStatement, VirtualDateTime.Now.ToString())}
             };
 
-            var controller = UiTestHelper.GetController<OrganisationController>(-1, mockRouteData, mockUser);
+            var controller = UiTestHelper.GetController<ManageOrganisationsController>(-1, mockRouteData, mockUser);
 
             // Acts
-            var result = controller.ManageOrganisations() as RedirectToActionResult;
+            var result = controller.Home() as RedirectToActionResult;
 
             // Assert
             Assert.IsNull(result, "RedirectToActionResult should be null");
@@ -86,22 +85,22 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
 
         [Test]
         [Description(
-            "OrganisationController.ManageOrganisations GET: When UserSettings.AcceptedPrivacyStatement is Null Then Redirect to ReadPrivacyStatement")]
+            "ManageOrganisationsController.Home GET: When UserSettings.AcceptedPrivacyStatement is Null Then Redirect to ReadPrivacyStatement")]
         public void OrganisationController_ManageOrganisations_GET_When_UserSettings_AcceptedPrivacyStatement_is_Null_Then_Return()
         {
             // Arrange
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ManageOrganisations");
-            mockRouteData.Values.Add("Controller", "Organisation");
+            mockRouteData.Values.Add("Controller", "Registrations");
 
             var mockUser = new User {
                 UserId = 87654, EmailAddress = "mock@test.com", EmailVerifiedDate = VirtualDateTime.Now, UserSettings = new UserSetting[0]
             };
 
-            var controller = UiTestHelper.GetController<OrganisationController>(-1, mockRouteData, mockUser);
+            var controller = UiTestHelper.GetController<ManageOrganisationsController>(-1, mockRouteData, mockUser);
 
             // Acts
-            var result = controller.ManageOrganisations() as RedirectToActionResult;
+            var result = controller.Home() as RedirectToActionResult;
 
             // Assert
             Assert.NotNull(result, "RedirectToActionResult should not be null");
@@ -111,13 +110,13 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
 
         [Test]
         [Description(
-            "OrganisationController.ManageOrganisations GET: When UserSettings.AcceptedPrivacyStatement is Older Then Redirect to ReadPrivacyStatement")]
+            "ManageOrganisationsController.Home GET: When UserSettings.AcceptedPrivacyStatement is Older Then Redirect to ReadPrivacyStatement")]
         public void OrganisationController_ManageOrganisations_GET_When_UserSettings_AcceptedPrivacyStatement_is_Older_Then_Return()
         {
             // Arrange
             var mockRouteData = new RouteData();
-            mockRouteData.Values.Add("Action", "ManageOrganisations");
-            mockRouteData.Values.Add("Controller", "Organisation");
+            mockRouteData.Values.Add("Action", "Home");
+            mockRouteData.Values.Add("Controller", "ManageOrganisations");
 
             var mockUser = new User {
                 UserId = 87654,
@@ -126,10 +125,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
                 UserSettings = new[] {new UserSetting(UserSettingKeys.AcceptedPrivacyStatement, VirtualDateTime.Now.AddYears(-10).ToString())}
             };
 
-            var controller = UiTestHelper.GetController<OrganisationController>(-1, mockRouteData, mockUser);
+            var controller = UiTestHelper.GetController<ManageOrganisationsController>(-1, mockRouteData, mockUser);
 
             // Acts
-            var result = controller.ManageOrganisations() as RedirectToActionResult;
+            var result = controller.Home() as RedirectToActionResult;
 
             // Assert
             Assert.NotNull(result, "RedirectToActionResult should not be null");

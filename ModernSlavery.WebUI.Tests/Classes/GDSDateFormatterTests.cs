@@ -1,5 +1,5 @@
 ﻿using System;
-using ModernSlavery.WebUI.Classes.Formatters;
+using ModernSlavery.WebUI.Shared.Classes;
 using NUnit.Framework;
 
 namespace ModernSlavery.WebUI.Tests.Classes

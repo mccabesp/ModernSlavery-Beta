@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Models.Organisation;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain.Submission.Models;
+using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Classes.Options;
-using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Submission.Classes;
 using Moq;
 using NUnit.Framework;
 

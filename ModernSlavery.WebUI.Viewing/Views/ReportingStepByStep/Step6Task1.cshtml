@@ -1,0 +1,32 @@
+﻿@using ModernSlavery.WebUI.Viewing.Models
+@{
+    ViewBag.Title = "Report your Modern Slavery statement - Modern Slavery Reporting service";
+    Layout = "~/Views/GdsLayout.cshtml";
+}
+
+@section BeforeMain {
+    @{ await Html.RenderPartialAsync("/Views/ReportingStepByStep/ReportingPageHeader.cshtml");}
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+        <h1 class="govuk-heading-xl">
+            Report your Modern Slavery statement
+        </h1>
+
+        <p class="govuk-body">
+            Report your Modern Slavery statement here
+            
+        </p>
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+        @{ await Html.RenderPartialAsync("/Views/ReportingStepByStep/ReportingSidebar.cshtml",
+               new ReportingStepsViewModel
+               {
+                   CurrentStep = 6,
+                   CurrentTask = 0
+               }); }
+    </div>
+</div>

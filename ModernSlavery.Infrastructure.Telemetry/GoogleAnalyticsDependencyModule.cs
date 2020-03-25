@@ -6,6 +6,7 @@ using System.Text;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using Polly;
@@ -21,10 +22,14 @@ namespace ModernSlavery.Infrastructure.Telemetry
             _sharedOptions = sharedOptions;
         }
 
-        public void Bind(ContainerBuilder builder, IServiceCollection services)
+        #region Interface properties
+        public bool AutoSetup { get; } = false;
+        #endregion
+
+        public void Register(DependencyBuilder builder)
         {
             //Add a dedicated httpclient for Google Analytics tracking with exponential retry policy
-            services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), client =>
+            builder.Services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), client =>
             {
                 client.BaseAddress = GoogleAnalyticsTracker.BaseUri;
                 client.DefaultRequestHeaders.Clear();
@@ -39,7 +44,7 @@ namespace ModernSlavery.Infrastructure.Telemetry
                         .WaitAndRetryAsync(6,retryAttempt =>TimeSpan.FromMilliseconds(new Random().Next(1, 1000)) + TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
             //Register WebTracker
-            builder.RegisterType<GoogleAnalyticsTracker>()
+            builder.ContainerBuilder.RegisterType<GoogleAnalyticsTracker>()
                 .As<IWebTracker>()
                 .SingleInstance()
                 .WithParameter(
@@ -48,6 +53,11 @@ namespace ModernSlavery.Infrastructure.Telemetry
                 .WithParameter("trackingId", _sharedOptions.GoogleAnalyticsAccountId);
 
 
+        }
+
+        public void Configure(IContainer container)
+        {
+            //TODO: Add configuration here
         }
     }
 }

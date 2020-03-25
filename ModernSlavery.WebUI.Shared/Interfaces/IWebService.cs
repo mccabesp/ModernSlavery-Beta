@@ -11,11 +11,12 @@ namespace ModernSlavery.WebUI.Shared.Interfaces
         IErrorViewModelFactory ErrorViewModelFactory { get; }
         FeatureSwitchOptions FeatureSwitchOptions { get; }
 
+        IWebHostEnvironment HostingEnvironment { get; }
         IMapper AutoMapper { get; }
         IHttpCache Cache { get; }
         IHttpSession Session { get; }
-        IWebHostEnvironment HostingEnvironment { get; }
         IShortCodesRepository ShortCodesRepository { get; }
         IWebTracker WebTracker { get; }
+        IEventLogger CustomLogger { get; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using ModernSlavery.BusinessLogic.Models.Account;
+using ModernSlavery.BusinessDomain.Models.Account;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Entities;

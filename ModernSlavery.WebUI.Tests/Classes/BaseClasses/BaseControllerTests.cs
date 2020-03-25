@@ -1,10 +1,11 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Scope;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.WebUI.Registration.Controllers;
+using ModernSlavery.WebUI.Submission.Controllers;
+using ModernSlavery.WebUI.Submission.Models;
 using NUnit.Framework;
 
 namespace ModernSlavery.WebUI.Tests.Classes.BaseClasses
@@ -13,7 +14,7 @@ namespace ModernSlavery.WebUI.Tests.Classes.BaseClasses
     [SetCulture("en-GB")]
     public class BaseControllerTests
     {
-        [TestCase(typeof(RegisterController), "PINSent", null, typeof(AuthorizeAttribute))]
+        [TestCase(typeof(RegistrationController), "PINSent", null, typeof(AuthorizeAttribute))]
         [TestCase(
             typeof(ScopeController),
             "EnterOutOfScopeAnswers",

@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Home;
+using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using NUnit.Framework;
 
@@ -21,9 +20,9 @@ namespace ModernSlavery.WebUI.Tests.Controllers
 
         [Test]
         [Description(
-            "RegisterController.ReadPrivacyStatement POST: When PrivacyStatementModel.Accept is Yes Then Redirect to ManageOrganisations")]
+            "RegistrationController.ReadPrivacyStatement POST: When PrivacyStatementModel.Accept is Yes Then Redirect to ManageOrganisations")]
         public async Task
-            RegisterController_ReadPrivacyStatement_POST_When_PrivacyStatementModel_Accept_is_Yes_Then_Redirect_to_ManageOrganisationsAsync()
+            RegistrationController_ReadPrivacyStatement_POST_When_PrivacyStatementModel_Accept_is_Yes_Then_Redirect_to_ManageOrganisationsAsync()
         {
             // Arrange
             var mockRouteData = new RouteData();
@@ -48,7 +47,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers
             // Assert
             Assert.NotNull(result, "RedirectToActionResult should not be null");
             Assert.AreEqual("ManageOrganisations", result.ActionName, "Expected the Action to be 'ManageOrganisations'");
-            Assert.AreEqual("Organisation", result.ControllerName, "Expected the Controller to be 'Home'");
+            Assert.AreEqual("Registrations", result.ControllerName, "Expected the Controller to be 'Home'");
 
             // Assert User Settings
             UserSetting acceptedSetting = mockUser.UserSettings.FirstOrDefault(u => u.Key == UserSettingKeys.AcceptedPrivacyStatement);

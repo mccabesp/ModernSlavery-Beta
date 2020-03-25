@@ -12,26 +12,26 @@ namespace ModernSlavery.Tests.Common.TestHelpers
         {
             // Used by WebUI
 
-            var badSicLog = new Mock<IRecordLogger>().Object;
-            var manualChangeLog = new Mock<IRecordLogger>().Object;
-            var registrationLog = new Mock<IRecordLogger>().Object;
-            var submissionLog = new Mock<IRecordLogger>().Object;
-            var searchLog = new Mock<IRecordLogger>().Object;
-            var emailSendLog = new Mock<IRecordLogger>().Object;
+            var badSicLog = new Mock<IAuditLogger>().Object;
+            var manualChangeLog = new Mock<IAuditLogger>().Object;
+            var registrationLog = new Mock<IAuditLogger>().Object;
+            var submissionLog = new Mock<IAuditLogger>().Object;
+            var searchLog = new Mock<IAuditLogger>().Object;
+            var emailSendLog = new Mock<IAuditLogger>().Object;
 
             if (builder != null)
             {
                 builder.RegisterInstance(Mock.Of<IFileRepository>()).SingleInstance();
 
-                builder.RegisterInstance(badSicLog).Keyed<IRecordLogger>(Filenames.BadSicLog).SingleInstance();
-                builder.RegisterInstance(manualChangeLog).Keyed<IRecordLogger>(Filenames.ManualChangeLog)
+                builder.RegisterInstance(badSicLog).Keyed<IAuditLogger>(Filenames.BadSicLog).SingleInstance();
+                builder.RegisterInstance(manualChangeLog).Keyed<IAuditLogger>(Filenames.ManualChangeLog)
                     .SingleInstance();
-                builder.RegisterInstance(registrationLog).Keyed<IRecordLogger>(Filenames.RegistrationLog)
+                builder.RegisterInstance(registrationLog).Keyed<IAuditLogger>(Filenames.RegistrationLog)
                     .SingleInstance();
-                builder.RegisterInstance(submissionLog).Keyed<IRecordLogger>(Filenames.SubmissionLog)
+                builder.RegisterInstance(submissionLog).Keyed<IAuditLogger>(Filenames.SubmissionLog)
                     .SingleInstance();
-                builder.RegisterInstance(searchLog).Keyed<IRecordLogger>(Filenames.SearchLog).SingleInstance();
-                builder.RegisterInstance(emailSendLog).Keyed<IRecordLogger>(Filenames.EmailSendLog).SingleInstance();
+                builder.RegisterInstance(searchLog).Keyed<IAuditLogger>(Filenames.SearchLog).SingleInstance();
+                builder.RegisterInstance(emailSendLog).Keyed<IAuditLogger>(Filenames.EmailSendLog).SingleInstance();
 
                 builder.RegisterInstance(Mock.Of<IUserLogger>()).SingleInstance();
                 builder.RegisterInstance(Mock.Of<IRegistrationLogger>()).SingleInstance();

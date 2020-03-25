@@ -12,11 +12,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
-using ModernSlavery.BusinessLogic;
+using Microsoft.AspNetCore.Routing;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.Cookies;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using Newtonsoft.Json;
 using ModernSlavery.WebUI.Shared.Models;
@@ -169,6 +173,16 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 PageHistory = history;
             }
         }
+        public IActionResult RedirectToAction<TController>(string actionName) where TController : BaseController
+        {
+            RedirectToActionResult result = RedirectToAction(actionName, Classes.Extensions.Extensions.GetControllerFriendlyName<TController>());
+
+            AreaAttribute areaAttr = Classes.Extensions.Extensions.GetControllerArea<TController>();
+            if (areaAttr != null)result.RouteValues = new RouteValueDictionary {{areaAttr.RouteKey, areaAttr.RouteValue}};
+
+            return result;
+        }
+ 
         #endregion
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -263,6 +277,178 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             return false;
         }
 
+        #region Contact Us
+
+        [HttpGet("~/contact-us")]
+        public IActionResult ContactUs()
+        {
+            return View("ContactUs");
+        }
+
+        #endregion
+
+        [HttpGet("~/ping")]
+        public IActionResult Ping()
+        {
+            return new OkResult(); // OK = 200
+        }
+
+        [HttpGet("~/Go/{shortCode?}", Order = 1)]
+        public async Task<IActionResult> Go(string shortCode)
+        {
+            if (!string.IsNullOrWhiteSpace(shortCode))
+            {
+                List<ShortCodeModel> allShortCodes = await WebService.ShortCodesRepository.GetAllShortCodesAsync();
+                ShortCodeModel code = allShortCodes?.FirstOrDefault(sc => sc.ShortCode.EqualsI(shortCode));
+
+                if (code != null && !string.IsNullOrWhiteSpace(code.Path))
+                {
+                    if (code.ExpiryDate.HasValue && code.ExpiryDate.Value < VirtualDateTime.Now)
+                    {
+                        return View(
+                            "CustomError",
+                            WebService.ErrorViewModelFactory.Create(1135, new { expiryDate = code.ExpiryDate.Value.ToString("d MMMM yyyy") }));
+                    }
+
+                    await TrackPageViewAsync();
+
+                    string url = $"{code.Path.TrimI(@" .~\")}{RequestUrl.Query}";
+                    return new RedirectResult(url);
+                }
+            }
+
+            return View("CustomError", WebService.ErrorViewModelFactory.Create(1136));
+        }
+
+
+        [HttpGet("~/session-expired")]
+        public IActionResult SessionExpired()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return View("SessionExpired");
+            }
+
+            return LogoutUser(Url.Action(nameof(SessionExpired), null, null, "https"));
+        }
+
+        [HttpGet("~/report-concerns")]
+        public IActionResult ReportConcerns()
+        {
+            return View(nameof(ReportConcerns));
+        }
+
+        #region Cookies
+
+        [HttpGet("~/cookies")]
+        public IActionResult CookieSettingsGet()
+        {
+            CookieSettings cookieSettings = CookieHelper.GetCookieSettingsCookie(Request);
+
+            var cookieSettingsViewModel = new CookieSettingsViewModel
+            {
+                GoogleAnalyticsGpg = cookieSettings.GoogleAnalyticsGpg ? "On" : "Off",
+                GoogleAnalyticsGovUk = cookieSettings.GoogleAnalyticsGovUk ? "On" : "Off",
+                ApplicationInsights = cookieSettings.ApplicationInsights ? "On" : "Off",
+                RememberSettings = cookieSettings.RememberSettings ? "On" : "Off"
+            };
+
+            return View("CookieSettings", cookieSettingsViewModel);
+        }
+
+        [HttpPost("~/cookies")]
+        public IActionResult CookieSettingsPost(CookieSettingsViewModel cookieSettingsViewModel)
+        {
+            var cookieSettings = new CookieSettings
+            {
+                GoogleAnalyticsGpg = cookieSettingsViewModel != null && cookieSettingsViewModel.GoogleAnalyticsGpg == "On",
+                GoogleAnalyticsGovUk = cookieSettingsViewModel != null && cookieSettingsViewModel.GoogleAnalyticsGovUk == "On",
+                ApplicationInsights = cookieSettingsViewModel != null && cookieSettingsViewModel.ApplicationInsights == "On",
+                RememberSettings = cookieSettingsViewModel != null && cookieSettingsViewModel.RememberSettings == "On"
+            };
+
+            CookieHelper.SetCookieSettingsCookie(Response, cookieSettings);
+            CookieHelper.SetSeenCookieMessageCookie(Response);
+
+            cookieSettingsViewModel.ChangesHaveBeenSaved = true;
+
+            WebService.CustomLogger.Information(
+                "Updated cookie settings",
+                new
+                {
+                    CookieSettings = cookieSettings,
+                    HttpRequestMethod = HttpContext.Request.Method,
+                    HttpRequestPath = HttpContext.Request.Path.Value
+                });
+
+            return View("CookieSettings", cookieSettingsViewModel);
+        }
+
+        [HttpPost("~/accept-all-cookies")]
+        public IActionResult AcceptAllCookies()
+        {
+            var cookieSettings = new CookieSettings
+            {
+                GoogleAnalyticsGpg = true,
+                GoogleAnalyticsGovUk = true,
+                ApplicationInsights = true,
+                RememberSettings = true
+            };
+
+            CookieHelper.SetCookieSettingsCookie(Response, cookieSettings);
+            CookieHelper.SetSeenCookieMessageCookie(Response);
+
+            return RedirectToAction("Index", "Viewing");
+        }
+
+        [HttpGet("~/cookie-details")]
+        public IActionResult CookieDetails()
+        {
+            return View("CookieDetails");
+        }
+        #endregion
+
+        #region PrivacyPolicy
+
+        [HttpGet("~/privacy-policy")]
+        public IActionResult PrivacyPolicy()
+        {
+            return View("PrivacyPolicy", null);
+        }
+
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        [HttpPost("~/privacy-policy")]
+        public async Task<IActionResult> PrivacyPolicy(string command)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("PrivacyPolicy");
+            }
+
+            //Ensure user has completed the registration process
+            User currentUser;
+            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            if (checkResult == null)
+            {
+                return checkResult;
+            }
+
+            if (!IsImpersonatingUser && !CurrentUser.IsAdministrator())
+            {
+                // check if the user has accepted the privacy statement
+                DateTime? hasReadPrivacy = currentUser.AcceptedPrivacyStatement;
+                if (hasReadPrivacy == null || hasReadPrivacy.ToDateTime() < SharedBusinessLogic.SharedOptions.PrivacyChangedDate)
+                {
+                    currentUser.AcceptedPrivacyStatement = VirtualDateTime.Now;
+                    await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+                }
+            }
+
+            return RedirectToAction(Url.Action(RouteHelper.Routes.SubmissionHome));
+        }
+
+        #endregion
         [NonAction]
         public IActionResult LogoutUser(string redirectUrl = null)
         {
@@ -271,7 +457,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 ImpersonatedUserId = 0;
                 OriginalUser = null;
-                return new RedirectToActionResult("ManageOrganisations", "Organisation", null);
+                return Redirect(Url.Action(RouteHelper.Routes.SubmissionHome));
             }
 
             //otherwise actually logout
@@ -619,14 +805,14 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
             //Always allow user home or remove registration page 
             if (IsAnyAction(
-                "Organisation/ManageOrganisations",
-                "Organisation/RemoveOrganisation",
-                "Organisation/RemoveOrganisationPost",
-                "Organisation/ManageOrganisation",
-                "Organisation/ChangeOrganisationScope",
-                "Organisation/ActivateOrganisation",
-                "Organisation/ReportForOrganisation",
-                "Organisation/DeclareScope"))
+                "Registration/ManageOrganisations",
+                "Registration/RemoveOrganisation",
+                "Registration/RemoveOrganisationPost",
+                "Submission/ReportForOrganisation",
+                "Submission/ManageOrganisation",
+                "Scope/ChangeOrganisationScope",
+                "Registration/ActivateOrganisation",
+                "Scope/DeclareScope"))
             {
                 return null;
             }
@@ -638,7 +824,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 Logger.LogWarning(
                     $"Cannot find UserOrganisation for user {currentUser.UserId} and organisation {ReportingOrganisationId}");
 
-                return RedirectToAction("ManageOrganisations", "Organisation");
+                return Redirect(Url.RouteUrl(RouteHelper.Routes.SubmissionHome));
             }
 
             if (userOrg.Organisation.SectorType == SectorTypes.Private)
@@ -653,7 +839,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                             return null;
                         }
 
-                        return RedirectToAction("PINSent", "Register");
+                        return RedirectToAction("PINSent", "Registration");
                     }
 
                     //If PIN sent and expired then prompt to request a new pin
@@ -685,13 +871,13 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                         return null;
                     }
 
-                    return RedirectToAction("ActivateService", "Register");
+                    return RedirectToAction("ActivateService", "Registration");
                 }
             }
 
             //Ensure user has completed the registration process
             //If user is fully registered then start submit process
-            if (ControllerName.EqualsI("Register"))
+            if (ControllerName.EqualsI("Registration"))
             {
                 if (IsAnyAction("Register/RequestReceived"))
                 {
@@ -711,7 +897,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 Logger.LogWarning(
                     $"UserOrganisation for user {userOrg.UserId} and organisation {userOrg.OrganisationId} PIN is not confirmed");
-                return RedirectToAction("ManageOrganisations", "Organisation");
+                return Redirect(Url.Action(RouteHelper.Routes.SubmissionHome));
             }
 
             return null;

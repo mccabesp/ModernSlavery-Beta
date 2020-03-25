@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessDomain.Registration;
+using ModernSlavery.BusinessDomain;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using Moq;

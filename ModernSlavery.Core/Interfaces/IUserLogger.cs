@@ -4,7 +4,7 @@ using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Core.Interfaces
 {
-    public interface IUserLogger : IRecordLogger
+    public interface IUserLogger : IAuditLogger
     {
         Task LogEmailChangedAsync(string oldEmailAddress, string newEmailAddress, User userToUpdate,
             string actionByEmailAddress);

@@ -18,7 +18,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Admin\ModernSlavery.BusinessDomain.Admin.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Registration\ModernSlavery.BusinessDomain.Registration.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Submission\ModernSlavery.BusinessDomain.Submission.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Viewing\ModernSlavery.BusinessDomain.Viewing.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Database\ModernSlavery.Infrastructure.Database.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj" />

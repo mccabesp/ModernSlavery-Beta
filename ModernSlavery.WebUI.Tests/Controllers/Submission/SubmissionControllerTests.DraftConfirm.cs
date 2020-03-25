@@ -3,9 +3,11 @@ using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.BusinessLogic.Submission;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain.Submission.Models;
+using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
@@ -13,8 +15,8 @@ using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Submission.Classes;
+using ModernSlavery.WebUI.Submission.Controllers;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
 using NUnit.Framework;
@@ -66,7 +68,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 SectorType = SectorTypes.Private
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.Bind(returnViewModel);
 
             var sharedBusinessLogic = UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>();

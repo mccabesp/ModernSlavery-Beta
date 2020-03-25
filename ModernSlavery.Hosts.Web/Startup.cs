@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.WebUI.Classes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +16,6 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.WebUI.Helpers;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Options;
@@ -46,7 +44,7 @@ namespace ModernSlavery.WebUI
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             //Load all configuration options and use them to register all dependencies
-            return services.ConfigureDependencies<AppDependencyModule>(_Config);
+            return services.SetupDependencies<DependencyModule>(_Config);
         }
 
         // Configure is where you add middleware. This is called after

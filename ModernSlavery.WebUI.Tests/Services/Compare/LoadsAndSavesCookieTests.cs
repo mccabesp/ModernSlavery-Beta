@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Classes.Options;
-using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Viewing.Classes;
+using ModernSlavery.WebUI.Viewing.Presenters;
 using Moq;
 using NUnit.Framework;
 using HttpContext = Microsoft.AspNetCore.Http.HttpContext;

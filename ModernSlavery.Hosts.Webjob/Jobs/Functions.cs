@@ -1,7 +1,12 @@
 ﻿using System;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
-using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Admin;
+using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -18,8 +23,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         public Functions(
             StorageOptions storageOptions,
             IEventLogger customLogger,
-            [KeyFilter(Filenames.BadSicLog)]IRecordLogger badSicLog,
-            [KeyFilter(Filenames.ManualChangeLog)]IRecordLogger manualChangeLog,
+            [KeyFilter(Filenames.BadSicLog)]IAuditLogger badSicLog,
+            [KeyFilter(Filenames.ManualChangeLog)]IAuditLogger manualChangeLog,
             IMessenger messenger,
             ISharedBusinessLogic sharedBusinessLogic,
             ISearchRepository<EmployerSearchModel> employerSearchRepository,
@@ -50,8 +55,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private readonly StorageOptions _StorageOptions;
 
         private readonly IEventLogger _CustomLogger;
-        private readonly IRecordLogger _BadSicLog;
-        private readonly IRecordLogger _ManualChangeLog;
+        private readonly IAuditLogger _BadSicLog;
+        private readonly IAuditLogger _ManualChangeLog;
         private readonly IMessenger _Messenger;
         public readonly ISharedBusinessLogic SharedBusinessLogic;
         private readonly ISearchRepository<EmployerSearchModel> _EmployerSearchRepository;

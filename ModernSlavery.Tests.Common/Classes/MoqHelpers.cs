@@ -2,8 +2,10 @@
 using System.Linq;
 using Microsoft.Extensions.Options;
 using MockQueryable.Moq;
-using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Submission;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain.Viewing;
+using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
@@ -34,14 +36,14 @@ namespace ModernSlavery.Tests.Common.Classes
         {
             var fakeSharedBusinessLogic = CreateFakeSharedBusinessLogic();
             var fakeSubmissionBusinessLogic = new SubmissionBusinessLogic(fakeSharedBusinessLogic,
-                fakeSharedBusinessLogic.DataRepository, Mock.Of<IRecordLogger>());
+                fakeSharedBusinessLogic.DataRepository, Mock.Of<IAuditLogger>());
             return fakeSubmissionBusinessLogic;
         }
 
         public static ISearchBusinessLogic CreateFakeSearchBusinessLogic()
         {
             var fakeSearchBusinessLogic = new SearchBusinessLogic(Mock.Of<ISearchRepository<EmployerSearchModel>>(),
-                Mock.Of<ISearchRepository<SicCodeSearchModel>>(), Mock.Of<IRecordLogger>());
+                Mock.Of<ISearchRepository<SicCodeSearchModel>>(), Mock.Of<IAuditLogger>());
             return fakeSearchBusinessLogic;
         }
 

@@ -1,0 +1,10 @@
+﻿@using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Classes.Patterns
+@model ModernSlavery.WebUI.Submission.Models.ScopingViewModel
+
+
+@await Html.PartialModelAsync(new CheckYourAnswers(
+    new CheckYourAnswer("Employer reference", Model.EnterCodes.EmployerReference.ToUpper(), "EmployerReferenceAnswer"),
+    new CheckYourAnswer("Employer name", Model.OrganisationName, "EmployerNameAnswer"),
+    new CheckYourAnswer("Address", Model.OrgAddressHtml, "OrgAddressAnswer")
+    ))

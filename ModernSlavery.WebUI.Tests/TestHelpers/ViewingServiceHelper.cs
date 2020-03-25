@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ModernSlavery.BusinessLogic.Models.Compare;
+using ModernSlavery.BusinessDomain.Viewing.Models;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 

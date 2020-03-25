@@ -4,8 +4,12 @@ using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Models.Submit;
+using ModernSlavery.BusinessDomain.Registration;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain.Submission.Models;
+using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
@@ -14,13 +18,13 @@ using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Search;
-using ModernSlavery.WebUI.Models.Viewing;
-using ModernSlavery.WebUI.Models.Viewing.EmployerDetails;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 using ModernSlavery.WebUI.Tests.TestHelpers;
+using ModernSlavery.WebUI.Viewing.Controllers;
+using ModernSlavery.WebUI.Viewing.Models;
+using ModernSlavery.WebUI.Viewing.Models.EmployerDetails;
+using ModernSlavery.WebUI.Viewing.Models.Search;
 using Moq;
 using NUnit.Framework;
 
@@ -237,7 +241,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Viewing
             var submissionBusinessLogic = new SubmissionBusinessLogic(
                 UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>(),
                 UiTestHelper.DIContainer.Resolve<IDataRepository>(),
-                Mock.Of<IRecordLogger>());
+                Mock.Of<IAuditLogger>());
 
             var organisationBusinessLogic = new OrganisationBusinessLogic(
                 UiTestHelper.DIContainer.Resolve<ISharedBusinessLogic>(),

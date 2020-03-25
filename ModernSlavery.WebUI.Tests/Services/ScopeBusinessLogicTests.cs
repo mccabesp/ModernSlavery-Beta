@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using MockQueryable.Moq;
-using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain.Viewing;
+using ModernSlavery.BusinessDomain;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -115,7 +117,7 @@ namespace ModernSlavery.WebUI.Tests.Services
         {
             mockDataRepo = new Mock<IDataRepository>();
             mockFileRepo = new Mock<IFileRepository>();
-            testSearchBL = new SearchBusinessLogic(testEmployerSearchRepo,Mock.Of<ISearchRepository<SicCodeSearchModel>>(),Mock.Of<IRecordLogger>());
+            testSearchBL = new SearchBusinessLogic(testEmployerSearchRepo,Mock.Of<ISearchRepository<SicCodeSearchModel>>(),Mock.Of<IAuditLogger>());
             testScopeBL = new ScopeBusinessLogic(testCommonBL, mockDataRepo.Object, testSearchBL,null);
             GenerateTestData();
         }

@@ -2,7 +2,12 @@
 using Microsoft.Azure.Search;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessDomain.Admin;
+using ModernSlavery.BusinessDomain.Registration;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain.Viewing;
+using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;

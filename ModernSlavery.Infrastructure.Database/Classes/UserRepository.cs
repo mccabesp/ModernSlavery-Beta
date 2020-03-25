@@ -19,12 +19,12 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         private readonly SharedOptions SharedOptions;
 
         public UserRepository(DatabaseOptions databaseOptions, SharedOptions sharedOptions,
-            IDataRepository dataRepository, IUserLogger userRecordLog, IMapper autoMapper)
+            IDataRepository dataRepository, IUserLogger userAuditLog, IMapper autoMapper)
         {
             DatabaseOptions = databaseOptions ?? throw new ArgumentNullException(nameof(databaseOptions));
             SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             DataRepository = dataRepository ?? throw new ArgumentNullException(nameof(dataRepository));
-            UserRecordLog = userRecordLog ?? throw new ArgumentNullException(nameof(userRecordLog));
+            UserAuditLog = userAuditLog ?? throw new ArgumentNullException(nameof(userAuditLog));
             AutoMapper = autoMapper ?? throw new ArgumentNullException(nameof(autoMapper));
         }
 
@@ -117,7 +117,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             await DataRepository.SaveChangesAsync();
 
             // log email change
-            await UserRecordLog.LogEmailChangedAsync(oldEmailAddress, newEmailAddress, userToUpdate,
+            await UserAuditLog.LogEmailChangedAsync(oldEmailAddress, newEmailAddress, userToUpdate,
                 userToUpdate.EmailAddress);
         }
 
@@ -139,7 +139,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             await DataRepository.SaveChangesAsync();
 
             // log password changed
-            await UserRecordLog.LogPasswordChangedAsync(userToUpdate, userToUpdate.EmailAddress);
+            await UserAuditLog.LogPasswordChangedAsync(userToUpdate, userToUpdate.EmailAddress);
         }
 
         public async Task<bool> UpdateDetailsAsync(User userToUpdate, UpdateDetailsModel changeDetails)
@@ -171,7 +171,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             await DataRepository.SaveChangesAsync();
 
             // log details changed
-            await UserRecordLog.LogDetailsChangedAsync(originalDetails, changeDetails, userToUpdate,
+            await UserAuditLog.LogDetailsChangedAsync(originalDetails, changeDetails, userToUpdate,
                 userToUpdate.EmailAddress);
 
             // success
@@ -193,7 +193,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             await DataRepository.SaveChangesAsync();
 
             // log status changed
-            await UserRecordLog.LogUserRetiredAsync(userToRetire, userToRetire.EmailAddress);
+            await UserAuditLog.LogUserRetiredAsync(userToRetire, userToRetire.EmailAddress);
         }
 
         public Task<User> AutoProvisionUserAsync(string provider, string providerUserId, List<Claim> list)
@@ -245,7 +245,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
         public IDataRepository DataRepository { get; }
 
-        public IUserLogger UserRecordLog { get; }
+        public IUserLogger UserAuditLog { get; }
         public IMapper AutoMapper { get; }
 
         #endregion

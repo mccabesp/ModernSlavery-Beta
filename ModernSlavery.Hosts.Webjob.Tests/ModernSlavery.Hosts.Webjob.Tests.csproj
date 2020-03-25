@@ -30,7 +30,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Search\ModernSlavery.Infrastructure.Search.csproj" />
     <ProjectReference Include="..\ModernSlavery.Tests.Common\ModernSlavery.Tests.Common.csproj" />

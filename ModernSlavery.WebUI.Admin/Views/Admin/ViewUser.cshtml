@@ -1,5 +1,5 @@
 @using Microsoft.AspNetCore.Http
-@using ModernSlavery.BusinessLogic
+@using ModernSlavery.BusinessDomain
 @using ModernSlavery.Core.Entities
 @using ModernSlavery.Core.Extensions
 @using ModernSlavery.Core.SharedKernel.Options
@@ -9,7 +9,7 @@
 @inject SharedOptions sharedOptions;
 @{
     ViewBag.Title = "User Details - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GovUkFrontend/GovUkFrontendLayout.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {

@@ -4,43 +4,45 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.BusinessLogic;
+using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessDomain.Admin;
+using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.CompaniesHouse;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
-    public class AdminOrganisationAddressController : Controller
+    public class AdminOrganisationAddressController : BaseController
     {
-        private readonly IDataRepository dataRepository;
-        private readonly ICompaniesHouseAPI companiesHouseApi;
         private readonly AuditLogger auditLogger;
-        private readonly IEventLogger customLogger;
         private readonly IUpdateFromCompaniesHouseService UpdateFromCompaniesHouseService;
+        private readonly ICompaniesHouseAPI CompaniesHouseApi;
 
         public AdminOrganisationAddressController(
-            IDataRepository dataRepository,
             ICompaniesHouseAPI companiesHouseApi,
             IUpdateFromCompaniesHouseService updateFromCompaniesHouseService,
-            AuditLogger auditLogger, IEventLogger customLogger)
+            AuditLogger auditLogger,
+            ILogger<AdminOrganisationAddressController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
-            this.dataRepository = dataRepository;
-            this.companiesHouseApi = companiesHouseApi;
             this.UpdateFromCompaniesHouseService = updateFromCompaniesHouseService;
             this.auditLogger = auditLogger;
-            this.customLogger = customLogger;
+            CompaniesHouseApi = companiesHouseApi;
+
         }
 
         [HttpGet("organisation/{id}/address")]
         public IActionResult ViewAddressHistory(long id)
         {
-            Organisation organisation = dataRepository.Get<Organisation>(id);
+            Organisation organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             return View("ViewOrganisationAddress", organisation);
         }
@@ -48,14 +50,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("organisation/{id}/address/change")]
         public IActionResult ChangeAddressGet(long id)
         {
-            Organisation organisation = dataRepository.Get<Organisation>(id);
+            Organisation organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
             {
                 try
                 {
                     CompaniesHouseCompany organisationFromCompaniesHouse =
-                        companiesHouseApi.GetCompanyAsync(organisation.CompanyNumber).Result;
+                        CompaniesHouseApi.GetCompanyAsync(organisation.CompanyNumber).Result;
 
                     OrganisationAddress addressFromCompaniesHouse =
                         UpdateFromCompaniesHouseService.CreateOrganisationAddressFromCompaniesHouseAddress(
@@ -70,7 +72,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 catch (Exception ex)
                 {
                     // Use Manual Change page instead
-                    customLogger.Warning("Error from Companies House API", ex);
+                    WebService.CustomLogger.Warning("Error from Companies House API", ex);
                 }
             }
 
@@ -118,7 +120,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             // https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-from-view-model
             ModelState.Clear();
 
-            Organisation organisation = dataRepository.Get<Organisation>(id);
+            Organisation organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             switch (viewModel.Action) {
                 case ManuallyChangeOrganisationAddressViewModelActions.OfferNewCompaniesHouseAddress:
@@ -212,7 +214,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             OrganisationAddress newOrganisationAddress = CreateOrganisationAddressFromViewModel(viewModel);
             AddNewAddressToOrganisation(newOrganisationAddress, organisation);
 
-            dataRepository.SaveChangesAsync().Wait();
+            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
             auditLogger.AuditChangeToOrganisation(
                 this,
@@ -269,13 +271,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             organisation.OrganisationAddresses.Add(organisationAddress);
             organisation.LatestAddress = organisationAddress;
 
-            dataRepository.Insert(organisationAddress);
+            SharedBusinessLogic.DataRepository.Insert(organisationAddress);
         }
 
         private void OptOrganisationOutOfCompaniesHouseUpdates(Organisation organisation)
         {
             organisation.OptedOutFromCompaniesHouseUpdate = true;
-            dataRepository.SaveChangesAsync().Wait();
+            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
         }
 
     }

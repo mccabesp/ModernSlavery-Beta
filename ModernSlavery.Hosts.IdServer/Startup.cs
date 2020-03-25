@@ -34,7 +34,7 @@ namespace ModernSlavery.IdServer
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             //Load all configuration options and use them to register all dependencies
-            return services.ConfigureDependencies<AppDependencyModule>(_Config);
+            return services.SetupDependencies<DependencyModule>(_Config);
         }
 
        

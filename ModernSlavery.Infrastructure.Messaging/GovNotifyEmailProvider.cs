@@ -20,7 +20,7 @@ namespace ModernSlavery.Infrastructure.Messaging
             GovNotifyOptions govNotifyOptions,
             SharedOptions sharedOptions,
             ILogger<GovNotifyEmailProvider> logger,
-            [KeyFilter(Filenames.EmailSendLog)] IRecordLogger emailSendLog)
+            [KeyFilter(Filenames.EmailSendLog)] IAuditLogger emailSendLog)
             : base(sharedOptions, emailTemplateRepo, logger, emailSendLog)
         {
             Options = govNotifyOptions

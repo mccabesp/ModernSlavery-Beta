@@ -1,10 +1,11 @@
 ﻿using System;
-using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Submission;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Submission.Classes;
 using Moq;
 using NUnit.Framework;
 

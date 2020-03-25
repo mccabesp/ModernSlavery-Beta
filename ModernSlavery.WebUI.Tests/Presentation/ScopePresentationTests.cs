@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MockQueryable.Moq;
-using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessDomain.Registration;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain.Viewing;
+using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
@@ -14,9 +18,10 @@ using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.Mocks;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebUI.Models.Scope;
-using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Submission.Classes;
+using ModernSlavery.WebUI.Submission.Models;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
 using NUnit.Framework;
@@ -47,7 +52,7 @@ namespace ModernSlavery.WebUI.Tests.Presentation
 
             mockFileRepo = new Mock<IFileRepository>();
 
-            testSearchBL = new SearchBusinessLogic(testSearchRepo,Mock.Of<ISearchRepository<SicCodeSearchModel>>(),Mock.Of<IRecordLogger>());
+            testSearchBL = new SearchBusinessLogic(testSearchRepo,Mock.Of<ISearchRepository<SicCodeSearchModel>>(),Mock.Of<IAuditLogger>());
 
             // setup mocks ans ensures they call their implementations. (We override calls per test when need be!)
             mockScopeBL = new Mock<ScopeBusinessLogic>(testCommonBL, mockDataRepo.Object, testSearchBL);

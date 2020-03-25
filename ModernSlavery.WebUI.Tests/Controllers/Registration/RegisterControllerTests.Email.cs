@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Register;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.WebUI.Registration.Controllers;
+using ModernSlavery.WebUI.Registration.Models;
 using Moq;
 using ModernSlavery.WebUI.Shared.Controllers;
 using NUnit.Framework;
@@ -21,7 +21,7 @@ using ModernSlavery.WebUI.Shared.Services;
 namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 {
     [TestFixture]
-    public partial class RegisterControllerTests
+    public partial class RegistrationControllerTests
     {
 
         public static UserOrganisation CreateUserOrganisation(Core.Entities.Organisation org, long userId, DateTime? pinConfirmedDate)
@@ -66,8 +66,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
         }
 
         [Test]
-        [Description("RegisterController POST: When User Added To Organisation Via Fast Track Then Email Existing Users")]
-        public async Task RegisterController_POST_When_User_Added_To_Organisation_Via_Fast_Track_Then_Email_Existing_Users()
+        [Description("RegistrationController POST: When User Added To Organisation Via Fast Track Then Email Existing Users")]
+        public async Task RegistrationController_POST_When_User_Added_To_Organisation_Via_Fast_Track_Then_Email_Existing_Users()
         {
             // Arrange
             var organisationId = 100;
@@ -101,9 +101,9 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var routeData = new RouteData();
             routeData.Values.Add("Action", "ConfirmOrganisation");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(
+            var controller = UiTestHelper.GetController<RegistrationController>(
                 newUser.UserId,
                 routeData,
                 organisation,
@@ -149,8 +149,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
         }
 
         [Test]
-        [Description("RegisterController POST: When User Added To Private Organisation Then Email Existing Users")]
-        public async Task RegisterController_POST_When_User_Added_To_Private_Organisation_Then_Email_Existing_Users()
+        [Description("RegistrationController POST: When User Added To Private Organisation Then Email Existing Users")]
+        public async Task RegistrationController_POST_When_User_Added_To_Private_Organisation_Then_Email_Existing_Users()
         {
             // Arrange
             var organisationId = 100;
@@ -167,11 +167,11 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var routeData = new RouteData();
             routeData.Values.Add("Action", "ActivateService");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             var testModel = new CompleteViewModel {PIN = "B5EC243", OrganisationId = organisationId};
 
-            var controller = UiTestHelper.GetController<RegisterController>(
+            var controller = UiTestHelper.GetController<RegistrationController>(
                 newUser.UserId,
                 routeData,
                 organisation,
@@ -211,7 +211,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Ensure the Step2 succeeds when all fields are good")]
-        public async Task RegisterController_VerifyEmail_GET_RedirectResult_Success() //Registration complete
+        public async Task RegistrationController_VerifyEmail_GET_RedirectResult_Success() //Registration complete
         {
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -227,12 +227,12 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             //Set the user up as if finished step1 which is email known etc but not sent
             var routeData = new RouteData();
             routeData.Values.Add("Action", "VerifyEmail");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             var model = new VerifyViewModel();
 
-            //var controller = UiTestHelper.GetController<RegisterController>();
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            //var controller = UiTestHelper.GetController<RegistrationController>();
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
             controller.AddMockQuerystringValue("code", code);
 
             //ACT:
@@ -254,7 +254,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Ensure the Step2 user verification succeeds")]
-        public async Task RegisterController_VerifyEmail_GET_Success()
+        public async Task RegistrationController_VerifyEmail_GET_Success()
         {
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -272,7 +272,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
             routeData.Values.Add("Action", "VerifyEmail");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -287,8 +287,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             // model.WrongCode = false;
 
-            //var controller = UiTestHelper.GetController<RegisterController>();
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user /*, userOrganisation*/);
+            //var controller = UiTestHelper.GetController<RegistrationController>();
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user /*, userOrganisation*/);
             controller.Bind(model);
 
             //ACT:
@@ -307,7 +307,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Ensure the Step2 succeeds when is verified and an email is sent")]
-        public async Task RegisterController_VerifyEmail_GET_ViewResult_Success()
+        public async Task RegistrationController_VerifyEmail_GET_ViewResult_Success()
         {
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -321,7 +321,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var routeData = new RouteData();
             routeData.Values.Add("Action", "VerifyEmail");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             //simulate a model to stash
             var model = new RegisterViewModel();
@@ -333,7 +333,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             model.Password = "K1ngsl3y3w3ka";
             model.ConfirmPassword = "K1ngsl3y3w3ka";
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
             controller.StashModel(model);
 
             //ACT:
@@ -363,8 +363,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Ignore("Not implemented")]
-        [Description("RegisterController.VerifyEmail GET: When PendingFastrack Setting load and clear PendingFastrack")]
-        public void RegisterController_VerifyEmail_GET_When_PendingFastrackUserSetting_Then_SetPendingFastrack()
+        [Description("RegistrationController.VerifyEmail GET: When PendingFastrack Setting load and clear PendingFastrack")]
+        public void RegistrationController_VerifyEmail_GET_When_PendingFastrackUserSetting_Then_SetPendingFastrack()
         {
             throw new NotImplementedException();
         }

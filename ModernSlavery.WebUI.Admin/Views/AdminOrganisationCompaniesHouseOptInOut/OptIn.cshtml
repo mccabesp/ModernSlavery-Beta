@@ -1,4 +1,5 @@
-@using ModernSlavery.BusinessLogic
+@using ModernSlavery.BusinessDomain.Admin
+@using ModernSlavery.BusinessDomain
 @using ModernSlavery.Core.Entities
 @using ModernSlavery.WebUI.GDSDesignSystem
 @using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
@@ -6,7 +7,7 @@
 @inject IUpdateFromCompaniesHouseService UpdateFromCompaniesHouseService
 @{
     ViewBag.Title = "Opt in - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GovUkFrontend/GovUkFrontendLayout.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {

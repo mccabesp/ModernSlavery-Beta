@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessDomain;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Models.Search;
 using MockQueryable.Moq;
-using ModernSlavery.BusinessLogic.Viewing;
+using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.WebUI.Viewing.Models.Search;
+using ModernSlavery.WebUI.Viewing.Presenters;
 using Moq;
-using ModernSlavery.WebUI.Presenters;
 using NUnit.Framework;
 
 namespace ModernSlavery.WebUI.Tests.Services

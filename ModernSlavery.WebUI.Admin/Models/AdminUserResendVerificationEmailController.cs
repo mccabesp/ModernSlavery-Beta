@@ -77,7 +77,7 @@ namespace ModernSlavery.WebUI.Admin.Models
             user.EmailVerifySendDate = VirtualDateTime.Now;
             dataRepository.SaveChangesAsync().Wait();
 
-            string verifyUrl = Url.Action("VerifyEmail", "Register", new { code = verifyCode }, "https");
+            string verifyUrl = Url.Action("VerifyEmail", "Registration", new { code = verifyCode }, "https");
 
             if (!emailSender.SendCreateAccountPendingVerificationAsync(verifyUrl, user.EmailAddress).Result)
             {

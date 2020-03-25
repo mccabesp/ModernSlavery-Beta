@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Account\ModernSlavery.BusinessDomain.Account.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Database\ModernSlavery.Infrastructure.Database.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />

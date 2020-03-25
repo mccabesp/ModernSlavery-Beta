@@ -2,35 +2,35 @@
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Controllers;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.WebUI.Registration.Controllers;
 using ModernSlavery.WebUI.Shared.Controllers;
 using NUnit.Framework;
 using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 {
-    public partial class RegisterControllerTests
+    public partial class RegistrationControllerTests
     {
 
         [Test]
         [Description("Ensure the Add Address form is returned correctly")]
-        public void RegisterController_AddAddress_GET_Success()
+        public void RegistrationController_AddAddress_GET_Success()
         {
             //ARRANGE:
             //create a user who does exist in the db
             var user = new User {UserId = 1, EmailAddress = "test@hotmail.com", EmailVerifiedDate = VirtualDateTime.Now};
 
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.AddAddress));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.AddAddress));
+            routeData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(user.UserId, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(user.UserId, routeData, user);
 
             var orgModel = new OrganisationViewModel {ManualRegistration = false, ManualAddress = true, SectorType = SectorTypes.Public};
 
@@ -43,7 +43,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //ASSERT:
             Assert.NotNull(result, "Expected ViewResult");
-            Assert.That(result.ViewName == nameof(RegisterController.AddAddress), "Expected Viewname=AddAddress");
+            Assert.That(result.ViewName == nameof(RegistrationController.AddAddress), "Expected Viewname=AddAddress");
             Assert.NotNull(model, "Expected model of OrganisationViewModel");
             Assert.NotNull(stashedModel, "Expected model saved to stash");
             Assert.That(model.ManualAddress, "Expected ManualAddress to be false");
@@ -51,7 +51,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Ensure public sector authorised with no address redirected to confirm")]
-        public void RegisterController_AddAddress_POST_AuthorisedNoAddress_ToConfirm()
+        public void RegistrationController_AddAddress_POST_AuthorisedNoAddress_ToConfirm()
         {
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -112,10 +112,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.AddAddress));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.AddAddress));
+            routeData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(user.UserId, routeData, user, org0, address0, name, sic1, sic2);
+            var controller = UiTestHelper.GetController<RegistrationController>(user.UserId, routeData, user, org0, address0, name, sic1, sic2);
 
             var employerResult = new PagedResult<EmployerRecord>();
             employerResult.Results = new List<EmployerRecord> { EmployerRecord.Create(org0)};
@@ -134,8 +134,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 Employers = employerResult, //0 record returned
                 ManualEmployers = new List<EmployerRecord>(),
                 ManualEmployerIndex = -1,
-                AddressReturnAction = nameof(RegisterController.ConfirmOrganisation),
-                ConfirmReturnAction = nameof(RegisterController.ChooseOrganisation)
+                AddressReturnAction = nameof(RegistrationController.ConfirmOrganisation),
+                ConfirmReturnAction = nameof(RegistrationController.ChooseOrganisation)
             };
 
 
@@ -152,7 +152,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             //Set the expected model
             OrganisationViewModel expectedModel = savedModel.GetClone();
             expectedModel.AddressSource = user.EmailAddress;
-            expectedModel.ConfirmReturnAction = nameof(RegisterController.AddAddress);
+            expectedModel.ConfirmReturnAction = nameof(RegistrationController.AddAddress);
 
             //ACT:
             var result = controller.AddAddress(savedModel) as RedirectToActionResult;
@@ -162,7 +162,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.NotNull(result, "Expected RedirectToActionResult");
 
             //4.Check that the redirection went to the right url step.
-            Assert.That(result.ActionName == nameof(RegisterController.ConfirmOrganisation), "Redirected to the wrong view");
+            Assert.That(result.ActionName == nameof(RegistrationController.ConfirmOrganisation), "Redirected to the wrong view");
 
             //5.If the redirection successfull retrieve the model stash sent with the redirect.
             var unstashedModel = controller.UnstashModel<OrganisationViewModel>();
@@ -176,14 +176,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Ensure Add Address redirects to AddContact during manual registration")]
-        public void RegisterController_AddAddress_POST_ManualRegistration_RedirectToAddContact()
+        public void RegistrationController_AddAddress_POST_ManualRegistration_RedirectToAddContact()
         {
             //ARRANGE:
             var user = new User {UserId = 1, EmailAddress = "test@hotmail.com", EmailVerifiedDate = VirtualDateTime.Now};
 
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.AddAddress));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.AddAddress));
+            routeData.Values.Add("Controller", "Registration");
 
             var model = new OrganisationViewModel {
                 OrganisationName = "Acme ltd",
@@ -198,7 +198,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 ManualEmployers = new List<EmployerRecord>()
             };
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
             controller.Bind(model);
             controller.StashModel(model);
 
@@ -213,7 +213,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
-            Assert.That(result.ActionName == nameof(RegisterController.AddContact), "Redirected to the wrong action");
+            Assert.That(result.ActionName == nameof(RegistrationController.AddContact), "Redirected to the wrong action");
             Assert.NotNull(unstashedModel, "Expected Stashed OrganisationViewModel");
 
             //Check result is same as expected
@@ -222,7 +222,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Public Sector Manual Journey: ensure Add Contact form is returned successfully to the user")]
-        public void RegisterController_AddContact_GET_PublicManualRegistration_Success()
+        public void RegistrationController_AddContact_GET_PublicManualRegistration_Success()
         {
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -230,15 +230,15 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.AddContact));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.AddContact));
+            routeData.Values.Add("Controller", "Registration");
 
             var employerResult = new PagedResult<EmployerRecord>();
             employerResult.Results = new List<EmployerRecord>();
 
             var model = new OrganisationViewModel {Employers = employerResult, ManualRegistration = true, SectorType = SectorTypes.Public};
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
             // controller.Bind(model);
 
             //Stash the object for the unstash to happen in code
@@ -251,7 +251,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             //ASSERT:
             Assert.NotNull(result, "Expected ViewResult");
             Assert.That(result.GetType() == typeof(ViewResult), "Incorrect resultType returned");
-            Assert.That(result.ViewName == nameof(RegisterController.AddContact), "Incorrect view returned");
+            Assert.That(result.ViewName == nameof(RegistrationController.AddContact), "Incorrect view returned");
             Assert.That(
                 result.Model != null && result.Model.GetType() == typeof(OrganisationViewModel),
                 "Expected OrganisationViewModel or Incorrect resultType returned");
@@ -259,7 +259,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Private Manual Journey: ensure Add Contact form is returned successfully to the user")]
-        public void RegisterController_AddContact_GET_Success()
+        public void RegistrationController_AddContact_GET_Success()
         {
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -267,15 +267,15 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.AddContact));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.AddContact));
+            routeData.Values.Add("Controller", "Registration");
 
             var employerResult = new PagedResult<EmployerRecord>();
             employerResult.Results = new List<EmployerRecord>();
 
             var model = new OrganisationViewModel {Employers = employerResult, ManualRegistration = true, SectorType = SectorTypes.Private};
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
             // controller.Bind(model);
 
             //Stash the object for the unstash to happen in code
@@ -288,7 +288,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             //ASSERT:
             Assert.NotNull(result, "Expected ViewResult");
             Assert.That(result.GetType() == typeof(ViewResult), "Incorrect resultType returned");
-            Assert.That(result.ViewName == nameof(RegisterController.AddContact), "Incorrect view returned");
+            Assert.That(result.ViewName == nameof(RegistrationController.AddContact), "Incorrect view returned");
             Assert.That(
                 result.Model != null && result.Model.GetType() == typeof(OrganisationViewModel),
                 "Expected OrganisationViewModel or Incorrect resultType returned");
@@ -296,16 +296,16 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Ensure AddContact redirects to ConfirmOrganisation when not manual registration")]
-        public void RegisterController_AddContact_POST_NotManualRegistration_RedirectToConfirmOrganisation()
+        public void RegistrationController_AddContact_POST_NotManualRegistration_RedirectToConfirmOrganisation()
         {
             //ARRANGE:
             var user = new User {UserId = 1, EmailAddress = "test@hotmail.com", EmailVerifiedDate = VirtualDateTime.Now};
 
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.AddContact));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.AddContact));
+            routeData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
 
             var model = new OrganisationViewModel {
                 OrganisationName = "Acme ltd",
@@ -332,7 +332,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Set the expected model
             OrganisationViewModel expectedModel = model.GetClone();
-            expectedModel.ConfirmReturnAction = nameof(RegisterController.AddContact);
+            expectedModel.ConfirmReturnAction = nameof(RegistrationController.AddContact);
 
             //ACT:
             //2.Run and get the result of the test
@@ -341,7 +341,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult", "Wrong redirect");
-            Assert.That(result.ActionName == nameof(RegisterController.ConfirmOrganisation), "Redirected to the wrong action");
+            Assert.That(result.ActionName == nameof(RegistrationController.ConfirmOrganisation), "Redirected to the wrong action");
             Assert.NotNull(unstashedModel, "Expected Stashed OrganisationViewModel");
 
             //Check result is same as expected
@@ -351,7 +351,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
         //[Ignore("This test needs fixing")]
         [Test]
         [Description("Private Manual Journey: ensure Add Contact form is filled and sent successfully")]
-        public void RegisterController_AddContact_POST_PrivateSector_ManualRegistration_Success()
+        public void RegistrationController_AddContact_POST_PrivateSector_ManualRegistration_Success()
         {
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -359,8 +359,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.AddContact));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.AddContact));
+            routeData.Values.Add("Controller", "Registration");
 
             var employerResult = new PagedResult<EmployerRecord>();
             employerResult.Results = new List<EmployerRecord>();
@@ -392,7 +392,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             };
 
 
-            var controller = UiTestHelper.GetController<RegisterController>(user.UserId, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(user.UserId, routeData, user);
             controller.Bind(expectedModel);
 
             //Stash the object for the unstash to happen in code
@@ -405,7 +405,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             //ASSERT:
             Assert.NotNull(result, "Expected ViewResult");
             //4.Check that the redirection went to the right url step.
-            Assert.That(result.ActionName == nameof(RegisterController.AddSector), "Redirected to the wrong view");
+            Assert.That(result.ActionName == nameof(RegistrationController.AddSector), "Redirected to the wrong view");
             var actualModel = controller.UnstashModel<OrganisationViewModel>();
             Assert.NotNull(expectedModel, "Expected OrganisationViewModel");
             actualModel.Compare(expectedModel);
@@ -413,7 +413,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Public Manual:ensure Add Contact form is returned successfully to the user")]
-        public void RegisterController_AddContact_POST_PublicSector_ManualRegistration_Success()
+        public void RegistrationController_AddContact_POST_PublicSector_ManualRegistration_Success()
         {
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -421,8 +421,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.AddContact));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.AddContact));
+            routeData.Values.Add("Controller", "Registration");
 
             var employerResult = new PagedResult<EmployerRecord>();
             employerResult.Results = new List<EmployerRecord>();
@@ -454,7 +454,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 SectorType = SectorTypes.Public
             };
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
             controller.Bind(expectedModel);
 
             //Stash the object for the unstash to happen in code
@@ -467,7 +467,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
             //4.Check that the redirection went to the right url step.
-            Assert.That(result.ActionName == nameof(RegisterController.AddSector), "Redirected to the wrong view");
+            Assert.That(result.ActionName == nameof(RegistrationController.AddSector), "Redirected to the wrong view");
             var actualModel = controller.UnstashModel<OrganisationViewModel>();
             Assert.NotNull(expectedModel, "Expected OrganisationViewModel");
             actualModel.Compare(expectedModel);
@@ -475,7 +475,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Ensure that the AddContact form values are saved correctly")]
-        public void RegisterController_AddContact_POST_Success()
+        public void RegistrationController_AddContact_POST_Success()
         {
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -483,8 +483,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.AddContact));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.AddContact));
+            routeData.Values.Add("Controller", "Registration");
 
             var employerResult = new PagedResult<EmployerRecord>();
             employerResult.Results = new List<EmployerRecord>();
@@ -528,11 +528,11 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 Employers = employerResult, //0 record returned
                 ManualEmployers = new List<EmployerRecord>(),
                 ManualEmployerIndex = -1,
-                AddressReturnAction = nameof(RegisterController.ConfirmOrganisation),
-                ConfirmReturnAction = nameof(RegisterController.ChooseOrganisation)
+                AddressReturnAction = nameof(RegistrationController.ConfirmOrganisation),
+                ConfirmReturnAction = nameof(RegistrationController.ChooseOrganisation)
             };
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
 
             //Stash the object for the unstash to happen in code
             controller.StashModel(model);
@@ -555,7 +555,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.NotNull(result, "Expected RedirectToActionResult");
 
             //4.Check that the redirection went to the right url step.
-            Assert.That(result.ActionName == nameof(RegisterController.AddSector), "Redirected to the wrong view");
+            Assert.That(result.ActionName == nameof(RegistrationController.AddSector), "Redirected to the wrong view");
 
             //5.If the redirection successfull retrieve the model stash sent with the redirect.
             var unstashedModel = controller.UnstashModel<OrganisationViewModel>();
@@ -569,7 +569,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Ensure Add Sector form is returned successfully to the user")]
-        public void RegisterController_AddSector_GET_Success()
+        public void RegistrationController_AddSector_GET_Success()
         {
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -577,15 +577,15 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.AddSector));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.AddSector));
+            routeData.Values.Add("Controller", "Registration");
 
             var employerResult = new PagedResult<EmployerRecord>();
             employerResult.Results = new List<EmployerRecord>();
 
             var model = new OrganisationViewModel {Employers = employerResult, ManualRegistration = true, SectorType = SectorTypes.Private};
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
             // controller.Bind(model);
 
             //Stash the object for the unstash to happen in code
@@ -598,7 +598,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             //ASSERT:
             Assert.NotNull(result, "Expected ViewResult");
             Assert.That(result.GetType() == typeof(ViewResult), "Incorrect resultType returned");
-            Assert.That(result.ViewName == nameof(RegisterController.AddSector), "Incorrect view returned");
+            Assert.That(result.ViewName == nameof(RegistrationController.AddSector), "Incorrect view returned");
             Assert.That(
                 result.Model != null && result.Model.GetType() == typeof(OrganisationViewModel),
                 "Expected OrganisationViewModel or Incorrect resultType returned");
@@ -606,7 +606,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("Ensure that the AddSector form values are saved correctly")]
-        public void RegisterController_AddSector_POST_Success()
+        public void RegistrationController_AddSector_POST_Success()
         {
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -614,8 +614,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.AddSector));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.AddSector));
+            routeData.Values.Add("Controller", "Registration");
 
             var employerResult = new PagedResult<EmployerRecord>();
             employerResult.Results = new List<EmployerRecord>();
@@ -658,8 +658,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 Employers = employerResult, //0 record returned
                 ManualEmployers = new List<EmployerRecord>(),
                 ManualEmployerIndex = -1,
-                AddressReturnAction = nameof(RegisterController.ConfirmOrganisation),
-                ConfirmReturnAction = nameof(RegisterController.ChooseOrganisation)
+                AddressReturnAction = nameof(RegistrationController.ConfirmOrganisation),
+                ConfirmReturnAction = nameof(RegistrationController.ChooseOrganisation)
             };
 
             var sic1 = new SicCode {
@@ -669,7 +669,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
                 SicCodeId = 14310, SicSectionId = "SSID1", SicSection = new SicSection {SicSectionId = "4115"}, Description = ""
             };
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user, sic1, sic2);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user, sic1, sic2);
 
             //Stash the object for the unstash to happen in code
             controller.StashModel(model);
@@ -679,7 +679,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             controller.Bind(savedModel);
             OrganisationViewModel expectedModel = savedModel.GetClone();
             expectedModel.SicSource = user.EmailAddress;
-            expectedModel.ConfirmReturnAction = nameof(RegisterController.AddSector);
+            expectedModel.ConfirmReturnAction = nameof(RegistrationController.AddSector);
 
             //ACT:
             //2.Run and get the result of the test
@@ -690,7 +690,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             Assert.NotNull(result, "Expected RedirectToActionResult");
 
             //4.Check that the redirection went to the right url step.
-            Assert.That(result.ActionName == nameof(RegisterController.ConfirmOrganisation), "Redirected to the wrong view");
+            Assert.That(result.ActionName == nameof(RegistrationController.ConfirmOrganisation), "Redirected to the wrong view");
 
             //5.If the redirection successfull retrieve the model stash sent with the redirect.
             var unstashedModel = controller.UnstashModel<OrganisationViewModel>();

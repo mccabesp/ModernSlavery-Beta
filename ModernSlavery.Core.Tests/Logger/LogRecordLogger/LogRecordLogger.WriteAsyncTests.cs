@@ -6,7 +6,7 @@ using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
-namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
+namespace ModernSlavery.Core.Tests.Logger.LogAuditLogger
 {
     [TestFixture]
     public class WriteAsyncTests
@@ -17,13 +17,13 @@ namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
             mockQueue = new Mock<Infrastructure.Storage.MessageQueues.AzureQueue>("TestConnectionString", "TestQueueName")
                 {CallBase = true};
 
-            mockLogRecordLogger =
-                new Mock<Infrastructure.Logging.RecordLogger>(mockQueue.Object, testApplicationName, testFileName)
+            mockLogAuditLogger =
+                new Mock<Infrastructure.Logging.AuditLogger>(mockQueue.Object, testApplicationName, testFileName)
                     {CallBase = true};
         }
 
         private Mock<Infrastructure.Storage.MessageQueues.AzureQueue> mockQueue;
-        private Mock<Infrastructure.Logging.RecordLogger> mockLogRecordLogger;
+        private Mock<Infrastructure.Logging.AuditLogger> mockLogAuditLogger;
 
         private readonly string testApplicationName = "LogRecordUnitTests";
         private readonly string testFileName = "LogRecordUnitTest.csv";
@@ -49,7 +49,7 @@ namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
                 .Returns(Task.CompletedTask);
 
             // Act
-            var logger = mockLogRecordLogger.Object;
+            var logger = mockLogAuditLogger.Object;
             await logger.WriteAsync(testRecordModel);
 
             // Assert
@@ -81,7 +81,7 @@ namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
                 .Returns(Task.CompletedTask);
 
             // Act
-            var logger = mockLogRecordLogger.Object;
+            var logger = mockLogAuditLogger.Object;
             await logger.WriteAsync(expectedWrapperModel.Record);
 
             // Assert
@@ -119,7 +119,7 @@ namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
                 .Returns(Task.CompletedTask);
 
             // Act
-            var logger = mockLogRecordLogger.Object;
+            var logger = mockLogAuditLogger.Object;
             await logger.WriteAsync(testRecords);
 
             // Assert

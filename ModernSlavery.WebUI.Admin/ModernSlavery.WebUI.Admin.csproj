@@ -6,13 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Abstractions\**" />
+    <Content Remove="Abstractions\**" />
+    <EmbeddedResource Remove="Abstractions\**" />
+    <None Remove="Abstractions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.WebUI.GDSDesignSystem\ModernSlavery.WebUI.GDSDesignSystem.csproj" />
-    <ProjectReference Include="..\ModernSlavery.BusinessLogic.Admin\ModernSlavery.BusinessLogic.Admin.csproj" />
-    <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Admin\ModernSlavery.BusinessDomain.Admin.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core.Entities\ModernSlavery.Core.Entities.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
@@ -213,10 +219,6 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Abstractions\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -40,64 +40,33 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.BusinessLogic.Registration\ModernSlavery.BusinessLogic.Registration.csproj" />
-    <ProjectReference Include="..\ModernSlavery.BusinessLogic.Submission\ModernSlavery.BusinessLogic.Submission.csproj" />
-    <ProjectReference Include="..\ModernSlavery.BusinessLogic.Viewing\ModernSlavery.BusinessLogic.Viewing.csproj" />
-    <ProjectReference Include="..\ModernSlavery.BusinessLogic\ModernSlavery.BusinessLogic.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Registration\ModernSlavery.BusinessDomain.Registration.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Submission\ModernSlavery.BusinessDomain.Submission.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Viewing\ModernSlavery.BusinessDomain.Viewing.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Database\ModernSlavery.Infrastructure.Database.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Logging\ModernSlavery.Infrastructure.Logging.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Telemetry\ModernSlavery.Infrastructure.Telemetry.csproj" />
-    <ProjectReference Include="..\ModernSlavery.WebUI.GDSDesignSystem\ModernSlavery.WebUI.GDSDesignSystem.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.Account\ModernSlavery.WebUI.Account.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Hosts\ModernSlavery.Infrastructure.Hosts.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Messaging\ModernSlavery.Infrastructure.Messaging.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Search\ModernSlavery.Infrastructure.Search.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Infrastructure.Shared\ModernSlavery.Infrastructure.Shared.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Storage\ModernSlavery.Infrastructure.Storage.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Admin\ModernSlavery.WebUI.Admin.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.DevOps\ModernSlavery.WebUI.DevOps.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Registration\ModernSlavery.WebUI.Registration.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Areas\Account\Resources\AccountResources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>AccountResources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Areas\Account\Resources\AccountResources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>AccountResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <ProjectReference Include="..\ModernSlavery.WebUI.StaticFiles\ModernSlavery.WebUI.StaticFiles.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.Submission\ModernSlavery.WebUI.Submission.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.Viewing\ModernSlavery.WebUI.Viewing.csproj" />
   </ItemGroup>
   
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning;</WarningsAsErrors>
   </PropertyGroup>
-
-  <ItemGroup Condition="'$(Configuration)'=='Debug'">
-    <Content Update="Content\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="Scripts\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="App_Data\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
 
   <ItemGroup>
     <Content Remove="appsettings.DEV.json" />
@@ -168,13 +137,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Areas\Admin\" />
-    <Folder Include="Classes\API\" />
-    <Folder Include="Classes\Bundle\" />
-    <Folder Include="Models\Shared\" />
   </ItemGroup>
 
   <ItemGroup>

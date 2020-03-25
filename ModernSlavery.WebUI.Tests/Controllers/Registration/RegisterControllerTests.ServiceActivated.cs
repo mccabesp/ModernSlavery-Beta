@@ -2,8 +2,6 @@
 using System.Threading.Tasks;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Register;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -12,16 +10,18 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
 using NUnit.Framework;
 using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebUI.Registration.Controllers;
+using ModernSlavery.WebUI.Registration.Models;
 
 namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 {
     [TestFixture]
-    public partial class RegisterControllerTests
+    public partial class RegistrationControllerTests
     {
 
         [Test]
         [Description("Check registration completes successfully when correct pin entered ")]
-        public async Task RegisterController_ActivateService_POST_CorrectPIN_ServiceActivated()
+        public async Task RegistrationController_ActivateService_POST_CorrectPIN_ServiceActivated()
         {
             //ARRANGE:
             //create a user who does exist in the db
@@ -49,10 +49,10 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             };
 
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.ActivateService));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.ActivateService));
+            routeData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(user.UserId, routeData, user, org, address, userOrg);
+            var controller = UiTestHelper.GetController<RegistrationController>(user.UserId, routeData, user, org, address, userOrg);
             controller.ReportingOrganisationId = org.OrganisationId;
 
             var model = new CompleteViewModel {PIN = pin};
@@ -76,13 +76,13 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Ignore("Needs fixing/deleting")]
-        [Description("RegisterController.ServiceActivated GET: When OrgScope is Not Null Then Return Expected ViewData")]
-        public void RegisterController_ServiceActivated_GET_When_OrgScope_is_Not_Null_Then_Return_Expected_ViewData()
+        [Description("RegistrationController.ServiceActivated GET: When OrgScope is Not Null Then Return Expected ViewData")]
+        public void RegistrationController_ServiceActivated_GET_When_OrgScope_is_Not_Null_Then_Return_Expected_ViewData()
         {
             // Arrange
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ServiceActivated");
-            mockRouteData.Values.Add("Controller", "Register");
+            mockRouteData.Values.Add("Controller", "Registration");
 
             var mockOrg = new Core.Entities.Organisation {
                 OrganisationId = 52425, SectorType = SectorTypes.Private, OrganisationName = "Mock Organisation Ltd"
@@ -92,7 +92,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var mockReg = new UserOrganisation {UserId = 87654, OrganisationId = 52425, PINConfirmedDate = VirtualDateTime.Now};
 
-            var controller = UiTestHelper.GetController<RegisterController>(87654, mockRouteData, mockUser, mockOrg, mockReg);
+            var controller = UiTestHelper.GetController<RegistrationController>(87654, mockRouteData, mockUser, mockOrg, mockReg);
             controller.ReportingOrganisationId = mockOrg.OrganisationId;
 
             var testUri = new Uri("https://localhost/register/activate-service");

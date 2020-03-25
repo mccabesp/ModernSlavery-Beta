@@ -4,7 +4,7 @@ using ModernSlavery.Tests.Common.Classes;
 using Moq;
 using NUnit.Framework;
 
-namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
+namespace ModernSlavery.Core.Tests.Logger.LogAuditLogger
 {
     [TestFixture]
     public class ConstrutorTests
@@ -24,7 +24,7 @@ namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Infrastructure.Logging.RecordLogger(ConfigHelpers.SharedOptions, mockQueue.Object,
+                () => new Infrastructure.Logging.AuditLogger(ConfigHelpers.SharedOptions, mockQueue.Object,
                     testAppName, "TestFilename"));
 
             // Assert
@@ -38,7 +38,7 @@ namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
         {
             // Act
             var actualExpection = Assert.Throws<ArgumentNullException>(
-                () => new Infrastructure.Logging.RecordLogger(ConfigHelpers.SharedOptions, mockQueue.Object,
+                () => new Infrastructure.Logging.AuditLogger(ConfigHelpers.SharedOptions, mockQueue.Object,
                     "TestAppName", testFilename));
 
             // Assert
@@ -51,7 +51,7 @@ namespace ModernSlavery.Core.Tests.Logger.LogRecordLogger
             // Act
             var actualExpection =
                 Assert.Throws<ArgumentNullException>(() =>
-                    new Infrastructure.Logging.RecordLogger(ConfigHelpers.SharedOptions, null, "TestAppName",
+                    new Infrastructure.Logging.AuditLogger(ConfigHelpers.SharedOptions, null, "TestAppName",
                         "TestFilename"));
 
             // Assert

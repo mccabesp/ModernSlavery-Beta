@@ -8,21 +8,21 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
-using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Classes;
-using ModernSlavery.BusinessLogic.Models.Organisation;
-using ModernSlavery.BusinessLogic.Models.Submit;
-using ModernSlavery.BusinessLogic.Submission;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain.Submission.Models;
+using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using ModernSlavery.WebUI.Submission.Classes;
+using ModernSlavery.WebUI.Submission.Controllers;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
 using NUnit.Framework;
@@ -76,7 +76,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 }
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(user.UserId, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(user.UserId, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.ReportingOrganisationStartYear = currentYearAccountingStartDate.Year; // reporting in time
             controller.StashModel(model);
@@ -135,7 +135,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 }
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(user.UserId, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(user.UserId, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.ReportingOrganisationStartYear = previousYearsAccountingStartYear; // reporting for previous year, user is late
             controller.StashModel(model);
@@ -215,7 +215,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             #endregion
 
-            var controller = UiTestHelper.GetController<SubmitController>(user.UserId, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(user.UserId, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.ReportingOrganisationStartYear = 2017;
             controller.StashModel(model);
@@ -257,7 +257,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("Action", "CheckData");
             routeData.Values.Add("Controller", "Submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(user.UserId, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(user.UserId, routeData, user, organisation, userOrganisation);
 
             //ACT:
             var result = await controller.CheckData() as ViewResult;
@@ -304,7 +304,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("Action", "CheckData");
             routeData.Values.Add("Controller", "Submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -423,7 +423,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("Action", "CheckData");
             routeData.Values.Add("Controller", "Submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(user.UserId, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(user.UserId, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             //ACT:
@@ -517,7 +517,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             #endregion
 
-            var controller = UiTestHelper.GetController<SubmitController>(
+            var controller = UiTestHelper.GetController<SubmissionController>(
                 testUserId,
                 routeData,
                 user,
@@ -626,7 +626,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             #endregion
 
-            var controller = UiTestHelper.GetController<SubmitController>(
+            var controller = UiTestHelper.GetController<SubmissionController>(
                 testUserId,
                 routeData,
                 user,
@@ -668,7 +668,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
@@ -771,7 +771,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 ReturnId = 987896
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(
+            var controller = UiTestHelper.GetController<SubmissionController>(
                 1,
                 routeData,
                 user,
@@ -803,7 +803,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("Action", "CheckData");
             routeData.Values.Add("Controller", "Submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user);
             controller.ReportingOrganisationStartYear = SectorTypes.Private.GetAccountingStartDate().Year;
 
             //ACT:
@@ -832,7 +832,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
             ;
@@ -909,7 +909,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
             ;
@@ -999,7 +999,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
             ;
@@ -1123,7 +1123,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 ReturnId = 1
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(
+            var controller = UiTestHelper.GetController<SubmissionController>(
                 1,
                 routeData,
                 user,
@@ -1186,7 +1186,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             #endregion
 
-            var controller = UiTestHelper.GetController<SubmitController>(user.UserId, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(user.UserId, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             //Stash an object to pass in for this.ClearStash()
@@ -1237,7 +1237,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             var model = new ReturnViewModel();
 
             var controller =
-                UiTestHelper.GetController<SubmitController>(
+                UiTestHelper.GetController<SubmissionController>(
                     user.UserId,
                     routeData,
                     user,
@@ -1275,7 +1275,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             var model = new ReturnViewModel();
 
             var controller =
-                UiTestHelper.GetController<SubmitController>(
+                UiTestHelper.GetController<SubmissionController>(
                     user.UserId,
                     routeData,
                     user,
@@ -1332,7 +1332,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             #endregion
 
             var controller =
-                UiTestHelper.GetController<SubmitController>(
+                UiTestHelper.GetController<SubmissionController>(
                     user.UserId,
                     routeData,
                     user,
@@ -1373,7 +1373,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("Action", "EmployerWebsite");
             routeData.Values.Add("Controller", "Submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
 
             var model = new ReturnViewModel {CompanyLinkToGPGInfo = "http:www.//google.com"};
 
@@ -1418,7 +1418,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             var returnViewModel = new ReturnViewModel {CompanyLinkToGPGInfo = "http://www.test.com", ReportInfo = new ReportInfoModel()};
 
             //added into the mock DB via mockRepository
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation, @return);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation, @return);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             #region We must load a draft if we are calling Enter calculations with a stashed model
@@ -1484,7 +1484,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             var model = new ReturnViewModel {CompanyLinkToGPGInfo = "http://www.test.com"};
 
             //added into the mock DB via mockRepository
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation, @return);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation, @return);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             //ACT:
@@ -1527,7 +1527,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
 
             //added into the mock DB via mockRepository
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation, @return);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation, @return);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             controller.ModelState.AddModelError("CompanyLinkToGPGInfo", "Error generated manually from the Test");
@@ -1611,7 +1611,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 ReportInfo = new ReportInfoModel()
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             #region We must load a draft if we are calling Enter calculations with a stashed model
@@ -1706,7 +1706,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 ReportInfo = new ReportInfoModel()
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             #region We must load a draft if we are calling Enter calculations with a stashed model
@@ -1775,7 +1775,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 }
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(user.UserId, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(user.UserId, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             controller.StashModel(returnViewModel);
@@ -1825,7 +1825,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(testUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(testUser.UserId, routeData, null);
             controller.ReportingOrganisationId = testOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -1887,7 +1887,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 AccountingDate = PublicAccountingDate
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
 
             controller.StashModel(model);
 
@@ -1929,7 +1929,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             var model = new ReturnViewModel {ReturnId = 1, SectorType = SectorTypes.Private};
 
             //Add a return to the mock repo to simulate one in the database
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation, @return);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation, @return);
             // controller.bind();
 
             controller.StashModel(model);
@@ -1948,7 +1948,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
         public async Task SubmitController_EnterCalculations_GET_UserNotLoggedIn_RedirectToLoginPage()
         {
             //Arrange
-            var controller = UiTestHelper.GetController<SubmitController>(1);
+            var controller = UiTestHelper.GetController<SubmissionController>(1);
 
             //Act
             var result = await controller.EnterCalculations() as RedirectToRouteResult;
@@ -1983,14 +1983,14 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             var routeData = new RouteData();
             routeData.Values.Add("Action", "EnterCalculations");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             string returnurl = null;
 
             //Stash an object to unStash()
             var model = new ReturnViewModel();
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation, @return);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation, @return);
 
             controller.StashModel(model);
 
@@ -1999,7 +1999,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             //Assert
             Assert.NotNull(result, "Expected RedirectToActionResult");
-            Assert.AreEqual(result.ControllerName, "Organisation", "Expected action");
+            Assert.AreEqual(result.ControllerName, "Registrations", "Expected action");
             Assert.AreEqual(result.ActionName, "ManageOrganisations", "Expected action");
 
             //TODO you arent checking the returned model at all
@@ -2051,7 +2051,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("Action", "EnterCalculations");
             routeData.Values.Add("Controller", "Submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation, @return);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation, @return);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             var model = new ReturnViewModel {
@@ -2141,7 +2141,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -2156,7 +2156,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             Return clonedReturn = mockedReturn.GetClone();
 
             ReturnViewModel expectedReturnViewModel =
-                new SubmissionBusinessLogic(null, null, Mock.Of<IRecordLogger>()).ConvertSubmissionReportToReturnViewModel(clonedReturn);
+                new SubmissionBusinessLogic(null, null, Mock.Of<IAuditLogger>()).ConvertSubmissionReportToReturnViewModel(clonedReturn);
 
             #region We must load a draft if we are calling Enter calculations with a stashed model
 
@@ -2207,7 +2207,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -2278,7 +2278,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -2292,7 +2292,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             Return clonedReturn = mockedReturn.GetClone();
             ReturnViewModel expectedReturnViewModel =
-                new SubmissionBusinessLogic(null, null, Mock.Of<IRecordLogger>()).ConvertSubmissionReportToReturnViewModel(clonedReturn);
+                new SubmissionBusinessLogic(null, null, Mock.Of<IAuditLogger>()).ConvertSubmissionReportToReturnViewModel(clonedReturn);
 
             controller.ClearStash(); // empty, so it'll search for info on DB
 
@@ -2328,7 +2328,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
         {
             // Arrange
             User mockedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, null, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, null, null);
             controller.ClearAllStashes(); // confirm nothing is stashed
 
             // Act
@@ -2370,7 +2370,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             //empty model without values
             var model = new ReturnViewModel();
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.Bind(model);
 
             //ACT:
@@ -2486,7 +2486,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 SectorType = SectorTypes.Private
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.Bind(returnViewModel);
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
@@ -2571,7 +2571,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 SectorType = SectorTypes.Private
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.Bind(returnViewModel);
 
             var testFileRepository = UiTestHelper.DIContainer.Resolve<IFileRepository>();
@@ -2622,7 +2622,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             //set mock routeData
             var routeData = new RouteData();
             routeData.Values.Add("action", "EnterCalculations");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
             var maxOutOfRangeValue = 201M;
 
@@ -2644,7 +2644,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             };
 
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.Bind(model);
 
             // Act
@@ -2783,7 +2783,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             #endregion
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.ReportingOrganisationStartYear = SectorTypes.Private.GetAccountingStartDate().Year;
             controller.ReportingOrganisation.SectorType = SectorTypes.Private;
@@ -2850,7 +2850,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             };
 
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.Bind(model);
 
             // Act
@@ -2990,7 +2990,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             #endregion
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.ReportingOrganisationStartYear = SectorTypes.Private.GetAccountingStartDate().Year;
             controller.ReportingOrganisation.SectorType = SectorTypes.Private;
@@ -3089,7 +3089,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             //TODO line above is wrong as you should be setting the fields to null not zero
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.ReportingOrganisationStartYear = SectorTypes.Private.GetAccountingStartDate().Year;
             controller.ReportingOrganisation.SectorType = SectorTypes.Private;
@@ -3226,7 +3226,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             //TODO line above is wrong as you should be setting the fields to null not zero
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.ReportingOrganisationStartYear = SectorTypes.Private.GetAccountingStartDate().Year;
             controller.ReportingOrganisation.SectorType = SectorTypes.Private;
@@ -3357,7 +3357,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             #endregion
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.ReportingOrganisationStartYear = SectorTypes.Private.GetAccountingStartDate().Year;
             controller.ReportingOrganisation.SectorType = SectorTypes.Private;
@@ -3446,7 +3446,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -3480,7 +3480,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -3537,7 +3537,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
 
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
 
@@ -3618,7 +3618,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             #endregion
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.ReportingOrganisationStartYear = SectorTypes.Private.GetAccountingStartDate().Year;
             controller.ReportingOrganisation.SectorType = SectorTypes.Private;
@@ -3700,7 +3700,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "Redirect");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>();
+            var controller = UiTestHelper.GetController<SubmissionController>();
             var result = await controller.Redirect() as RedirectToActionResult;
 
             //Test the google analytics tracker was executed once on the controller
@@ -3719,7 +3719,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "Init");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>();
+            var controller = UiTestHelper.GetController<SubmissionController>();
             var result = controller.Init() as EmptyResult;
 
             Assert.NotNull(result);
@@ -3740,7 +3740,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "organisation-size");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -3796,7 +3796,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "organisation-size");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
             Mock<IDataRepository> mockedDatabase = AutoFacExtensions.ResolveAsMock<IDataRepository>();
@@ -3833,7 +3833,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -3866,7 +3866,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -3899,7 +3899,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -3933,7 +3933,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
             ;
@@ -4019,7 +4019,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
             ;
@@ -4086,7 +4086,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "EnterCalculations");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
             ;
@@ -4126,7 +4126,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             User testUser = UserHelper.GetRegisteredUserAlreadyLinkedToAnOrganisation(testUserOrganisation);
 
-            var controller = UiTestHelper.GetController<SubmitController>(testUser.UserId, mockRouteData, testUser);
+            var controller = UiTestHelper.GetController<SubmissionController>(testUser.UserId, mockRouteData, testUser);
             controller.ReportingOrganisationId = testUserOrganisation.OrganisationId;
             // Act
             var result = await controller.LateWarning(string.Empty) as HttpStatusViewResult;
@@ -4153,7 +4153,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             User testUser = UserHelper.GetRegisteredUserAlreadyLinkedToAnOrganisation(testUserOrganisation);
 
-            var controller = UiTestHelper.GetController<SubmitController>(testUser.UserId, mockRouteData, testUser);
+            var controller = UiTestHelper.GetController<SubmissionController>(testUser.UserId, mockRouteData, testUser);
             controller.ReportingOrganisationId = testUserOrganisation.OrganisationId;
             int wrongYear = ConfigHelpers.SharedOptions.FirstReportingYear - 1;
 
@@ -4173,7 +4173,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "late-warning");
             mockRouteData.Values.Add("Controller", "Submit");
-            var controller = UiTestHelper.GetController<SubmitController>(default, mockRouteData);
+            var controller = UiTestHelper.GetController<SubmissionController>(default, mockRouteData);
 
             // Act
             var result = await controller.LateWarning(string.Empty) as ChallengeResult;
@@ -4244,7 +4244,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             #endregion
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.Bind(returnViewModel);
 
@@ -4273,7 +4273,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "organisation-size");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -4310,7 +4310,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "organisation-size");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -4362,7 +4362,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "organisation-size");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -4393,7 +4393,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "organisation-size");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -4426,7 +4426,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "organisation-size");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -4489,7 +4489,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             #endregion
 
-            var controller = UiTestHelper.GetController<SubmitController>(user.UserId, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(user.UserId, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.ReportingOrganisationStartYear = organisation.SectorType.GetAccountingStartDate().Year;
 
@@ -4538,7 +4538,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             var model = new ReturnViewModel();
 
-            var controller = UiTestHelper.GetController<SubmitController>(user.UserId, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(user.UserId, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             //Stash an object to pass in for this.ClearStash()
@@ -4573,7 +4573,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             string returnurl = null;
 
-            var controller = UiTestHelper.GetController<SubmitController>(user.UserId, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(user.UserId, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             //ACT:
@@ -4610,7 +4610,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             var command = "";
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             //controller.bind();
 
             //Act:
@@ -4669,7 +4669,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             var command = "";
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
 
             //Act:
             var result = await controller.PersonResponsible(model, command) as ViewResult;
@@ -4761,7 +4761,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             #endregion
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.Bind(returnViewModel);
 
@@ -4841,7 +4841,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 OrganisationId = organisation.OrganisationId
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             //ACT:
@@ -4873,13 +4873,13 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             var routeData = new RouteData();
             routeData.Values.Add("action", "EnterCalculations");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
             var model = new ReturnViewModel {JobTitle = "Director", FirstName = "MyFirstName", LastName = "MyLastName"};
 
             var command = "";
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             //controller.bind();
 
             //Act:
@@ -4956,7 +4956,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 OrganisationId = organisation.OrganisationId
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
             controller.Bind(model);
 
@@ -5022,7 +5022,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
                 OrganisationId = organisation.OrganisationId
             };
 
-            var controller = UiTestHelper.GetController<SubmitController>(1, routeData, user, organisation, userOrganisation);
+            var controller = UiTestHelper.GetController<SubmissionController>(1, routeData, user, organisation, userOrganisation);
             controller.ReportingOrganisationId = organisation.OrganisationId;
 
             //ACT:
@@ -5051,7 +5051,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "submission-complete");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -5081,7 +5081,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "submission-complete");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -5115,7 +5115,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             routeData.Values.Add("action", "submission-complete");
             routeData.Values.Add("controller", "submit");
 
-            var controller = UiTestHelper.GetController<SubmitController>(mockedUser.UserId, routeData, null);
+            var controller = UiTestHelper.GetController<SubmissionController>(mockedUser.UserId, routeData, null);
             controller.ReportingOrganisationId = mockedOrganisation.OrganisationId;
             controller.ReportingOrganisationStartYear = ConfigHelpers.SharedOptions.FirstReportingYear;
 
@@ -5147,7 +5147,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             var controllerContextMock = new Mock<ControllerContext>();
             controllerContextMock.Setup(con => con.HttpContext).Returns(contextMock.Object);
 
-            var controller = UiTestHelper.DIContainer.Resolve<SubmitController>();
+            var controller = UiTestHelper.DIContainer.Resolve<SubmissionController>();
             controller.ControllerContext = controllerContextMock.Object;
 
             //var contrr = UiTestHelper.GetController<SubmitController>();

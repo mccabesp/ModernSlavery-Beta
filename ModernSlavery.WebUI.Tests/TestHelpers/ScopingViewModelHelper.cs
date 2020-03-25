@@ -1,4 +1,4 @@
-﻿using ModernSlavery.WebUI.Models.Scope;
+﻿using ModernSlavery.WebUI.Submission.Models;
 using Moq;
 
 

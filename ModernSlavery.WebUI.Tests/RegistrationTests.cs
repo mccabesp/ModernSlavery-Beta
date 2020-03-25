@@ -4,7 +4,8 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
@@ -12,8 +13,8 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Register;
+using ModernSlavery.WebUI.Registration.Controllers;
+using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Tests.TestHelpers;
@@ -38,10 +39,10 @@ namespace ModernSlavery.WebUI.Tests
             var user = new User {UserId = 1, EmailAddress = "test@hotmail.com", EmailVerifiedDate = VirtualDateTime.Now};
 
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.ChooseOrganisation));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.ChooseOrganisation));
+            routeData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(user.UserId, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(user.UserId, routeData, user);
             //controller.StashModel(model);
 
             var orgModel = new OrganisationViewModel {ManualRegistration = false};
@@ -53,7 +54,7 @@ namespace ModernSlavery.WebUI.Tests
             //ASSERT:
             Assert.NotNull(result, "Expected ViewResult");
             Assert.That(result.GetType() == typeof(ViewResult), "Incorrect resultType returned");
-            Assert.That(result.ViewName == nameof(RegisterController.ChooseOrganisation), "Incorrect view returned");
+            Assert.That(result.ViewName == nameof(RegistrationController.ChooseOrganisation), "Incorrect view returned");
             Assert.NotNull(result.Model as OrganisationViewModel, "Expected OrganisationViewModel");
             Assert.That(result.Model.GetType() == typeof(OrganisationViewModel), "Incorrect resultType returned");
             Assert.That(result.ViewData.ModelState.IsValid, "Model is Invalid");
@@ -83,10 +84,10 @@ namespace ModernSlavery.WebUI.Tests
             };
 
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.ActivateService));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.ActivateService));
+            routeData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(user.UserId, routeData, user, org, address, userOrg);
+            var controller = UiTestHelper.GetController<RegistrationController>(user.UserId, routeData, user, org, address, userOrg);
             controller.ReportingOrganisationId = org.OrganisationId;
 
             var model = new CompleteViewModel {PIN = pin};
@@ -119,9 +120,9 @@ namespace ModernSlavery.WebUI.Tests
 
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ServiceActivated");
-            mockRouteData.Values.Add("Controller", "Register");
+            mockRouteData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(-1, mockRouteData, mockUser, mockOrg, UserOrg);
+            var controller = UiTestHelper.GetController<RegistrationController>(-1, mockRouteData, mockUser, mockOrg, UserOrg);
             controller.ReportingOrganisationId = mockOrg.OrganisationId;
 
             var testUri = new Uri("https://localhost/register/activate-service");
@@ -148,7 +149,7 @@ namespace ModernSlavery.WebUI.Tests
         public void AboutYou_IdentityNotMapped_ThrowException()
         {
             // Arrange
-            var controller = UiTestHelper.GetController<RegisterController>(2);
+            var controller = UiTestHelper.GetController<RegistrationController>(2);
 
             // Act
 
@@ -185,10 +186,10 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
 
             // Act
             var result = await controller.AboutYou() as ViewResult;
@@ -211,9 +212,9 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
 
             // Act
             var result = await controller.AboutYou() as ViewResult;
@@ -237,10 +238,10 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
 
             // Act
             var result = await controller.AboutYou() as ViewResult;
@@ -268,10 +269,10 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
 
             // Act
             var result = await controller.AboutYou() as RedirectToActionResult;
@@ -296,9 +297,9 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user, userOrg);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user, userOrg);
 
             // Act
             var result = await controller.AboutYou() as RedirectToActionResult;
@@ -329,9 +330,9 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, org, user, userOrg);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, org, user, userOrg);
             controller.ReportingOrganisationId = userOrg.OrganisationId;
             // Act
             var result = await controller.AboutYou() as ViewResult;
@@ -363,10 +364,10 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, org, user, userOrg);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, org, user, userOrg);
             controller.ReportingOrganisationId = userOrg.OrganisationId;
             // Act
             var result = await controller.AboutYou() as RedirectToActionResult;
@@ -398,9 +399,9 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, org, user, userOrg);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, org, user, userOrg);
 
             // Act
             var result = await controller.AboutYou() as RedirectToActionResult;
@@ -420,10 +421,10 @@ namespace ModernSlavery.WebUI.Tests
         {
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
             // Arrange
-            var controller = UiTestHelper.GetController<RegisterController>(0, routeData);
+            var controller = UiTestHelper.GetController<RegistrationController>(0, routeData);
 
             // Act
             var result = await controller.AboutYou() as ViewResult;
@@ -454,7 +455,7 @@ namespace ModernSlavery.WebUI.Tests
             model.ConfirmPassword = " ";
 
 
-            var controller = UiTestHelper.GetController<RegisterController>();
+            var controller = UiTestHelper.GetController<RegistrationController>();
             controller.Bind(model);
 
             // Act
@@ -485,7 +486,7 @@ namespace ModernSlavery.WebUI.Tests
             //ARRANGE:
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("controller", "register");
+            routeData.Values.Add("controller", "Registration");
 
             var expectedModel = new RegisterViewModel();
             expectedModel.EmailAddress = "test@hotmail.com";
@@ -496,7 +497,7 @@ namespace ModernSlavery.WebUI.Tests
             expectedModel.Password = "P@ssword1!";
             expectedModel.ConfirmPassword = "P@ssword1!";
 
-            var controller = UiTestHelper.GetController<RegisterController>(0, routeData);
+            var controller = UiTestHelper.GetController<RegistrationController>(0, routeData);
             controller.Bind(expectedModel);
 
             //ACT:
@@ -535,7 +536,7 @@ namespace ModernSlavery.WebUI.Tests
             model.Password = "P@ssword11!";
             model.ConfirmPassword = "P@ssword11!";
 
-            var controller = UiTestHelper.GetController<RegisterController>();
+            var controller = UiTestHelper.GetController<RegistrationController>();
             controller.Bind(model);
 
             // Act
@@ -559,7 +560,7 @@ namespace ModernSlavery.WebUI.Tests
             model.Password = "P@ssword1!";
             model.ConfirmPassword = "P@ssword11!";
 
-            var controller = UiTestHelper.GetController<RegisterController>();
+            var controller = UiTestHelper.GetController<RegistrationController>();
             controller.Bind(model);
 
             // Act
@@ -583,7 +584,7 @@ namespace ModernSlavery.WebUI.Tests
             model.Password = "Passwor";
             model.ConfirmPassword = "Passwor";
 
-            var controller = UiTestHelper.GetController<RegisterController>();
+            var controller = UiTestHelper.GetController<RegistrationController>();
             controller.Bind(model);
 
             // Act
@@ -607,7 +608,7 @@ namespace ModernSlavery.WebUI.Tests
             model.Password = "Password1";
             model.ConfirmPassword = "Password1";
 
-            var controller = UiTestHelper.GetController<RegisterController>();
+            var controller = UiTestHelper.GetController<RegistrationController>();
             controller.Bind(model);
 
             // Act
@@ -631,7 +632,7 @@ namespace ModernSlavery.WebUI.Tests
             model.Password = "p@ssword";
             model.ConfirmPassword = "P@ssword";
 
-            var controller = UiTestHelper.GetController<RegisterController>();
+            var controller = UiTestHelper.GetController<RegistrationController>();
             controller.Bind(model);
 
             // Act
@@ -657,17 +658,17 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("Controller", "register");
+            routeData.Values.Add("Controller", "Registration");
 
             //Stash an object to pass in for  this.ClearStash()
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
 
             //ACT:
             var result = await controller.AboutYou() as RedirectToActionResult;
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectResult");
-            Assert.AreEqual(nameof(OrganisationController.ManageOrganisations), result.ActionName);
+            Assert.AreEqual(nameof(ManageOrganisationsController.Home), result.ActionName);
         }
 
         [Test]
@@ -684,17 +685,17 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("action", "AboutYou");
-            routeData.Values.Add("Controller", "register");
+            routeData.Values.Add("Controller", "Registration");
 
             //Stash an object to pass in for  this.ClearStash()
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user, org, userOrg);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user, org, userOrg);
 
             //ACT:
             var result = await controller.AboutYou() as RedirectToActionResult;
 
             //ASSERT:
             Assert.NotNull(result, "Expected RedirectToActionResult");
-            Assert.AreEqual(result.ControllerName, "Organisation", "Expected action");
+            Assert.AreEqual(result.ControllerName, "Registrations", "Expected action");
             Assert.AreEqual(result.ActionName, "ManageOrganisations", "Expected action");
         }
 
@@ -713,11 +714,11 @@ namespace ModernSlavery.WebUI.Tests
             //set mock routeData
             var routeData = new RouteData();
             routeData.Values.Add("Action", "AboutYou");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             //Stash an object to pass in for this.ClearStash()
             //var model = new RegisterViewModel();
-            var controller = UiTestHelper.GetController<RegisterController>(0, routeData);
+            var controller = UiTestHelper.GetController<RegistrationController>(0, routeData);
 
             //controller.StashModel(model);
 
@@ -746,7 +747,7 @@ namespace ModernSlavery.WebUI.Tests
             //set mock routeData
             var routeData = new RouteData();
             routeData.Values.Add("Action", "AboutYou");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
 
             //1.Arrange the test setup variables
@@ -760,7 +761,7 @@ namespace ModernSlavery.WebUI.Tests
                 ConfirmPassword = "K1ngsl3y3w3ka"
             };
 
-            var controller = UiTestHelper.GetController<RegisterController>();
+            var controller = UiTestHelper.GetController<RegistrationController>();
             controller.Bind(expectedModel);
 
             //ACT:
@@ -804,7 +805,7 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("Action", "VerifyEmail");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             //simulate a model to stash
             var model = new RegisterViewModel();
@@ -816,7 +817,7 @@ namespace ModernSlavery.WebUI.Tests
             model.Password = "K1ngsl3y3w3ka";
             model.ConfirmPassword = "K1ngsl3y3w3ka";
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
             controller.StashModel(model);
 
             //ACT:
@@ -860,12 +861,12 @@ namespace ModernSlavery.WebUI.Tests
             //Set the user up as if finished AboutYou which is email known etc but not sent
             var routeData = new RouteData();
             routeData.Values.Add("Action", "VerifyEmail");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             var model = new VerifyViewModel();
 
-            //var controller = UiTestHelper.GetController<RegisterController>();
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            //var controller = UiTestHelper.GetController<RegistrationController>();
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
 
             //Add the code to the querystring 
             controller.AddMockQuerystringValue("code", code);
@@ -907,7 +908,7 @@ namespace ModernSlavery.WebUI.Tests
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
             routeData.Values.Add("Action", "VerifyEmail");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             //ARRANGE:
             //1.Arrange the test setup variables
@@ -922,8 +923,8 @@ namespace ModernSlavery.WebUI.Tests
 
             // model.WrongCode = false;
 
-            //var controller = UiTestHelper.GetController<RegisterController>();
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user /*, userOrganisation*/);
+            //var controller = UiTestHelper.GetController<RegistrationController>();
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user /*, userOrganisation*/);
             controller.Bind(model);
 
             //ACT:
@@ -954,9 +955,9 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("Action", "OrganisationType");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(user.UserId, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(user.UserId, routeData, user);
             //controller.StashModel(model);
 
             //ACT:
@@ -981,9 +982,9 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("Action", "OrganisationType");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(user.UserId, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(user.UserId, routeData, user);
 
             //ACT:
             var result = controller.OrganisationType() as ViewResult;
@@ -1010,10 +1011,10 @@ namespace ModernSlavery.WebUI.Tests
             };
 
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.OrganisationType));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.OrganisationType));
+            routeData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(user.UserId, routeData, user, org, address, orgScope);
+            var controller = UiTestHelper.GetController<RegistrationController>(user.UserId, routeData, user, org, address, orgScope);
 
             Mock<IScopeBusinessLogic> mockScopeBL = AutoFacExtensions.ResolveAsMock<IScopeBusinessLogic>(true);
             //ACT:
@@ -1046,11 +1047,11 @@ namespace ModernSlavery.WebUI.Tests
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
             routeData.Values.Add("Action", "OrganisationType");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             var actualModel = new OrganisationViewModel {ManualRegistration = false, SectorType = SectorTypes.Private};
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user /*, userOrganisation, organisation*/);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user /*, userOrganisation, organisation*/);
             controller.Bind(actualModel);
 
             //Stash the object for the unstash to happen in code
@@ -1091,11 +1092,11 @@ namespace ModernSlavery.WebUI.Tests
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
             routeData.Values.Add("Action", "OrganisationType");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             var actualModel = new OrganisationViewModel {ManualRegistration = false, SectorType = SectorTypes.Public};
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
             controller.Bind(actualModel);
 
             //Stash the object for the unstash to happen in code
@@ -1133,9 +1134,9 @@ namespace ModernSlavery.WebUI.Tests
 
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ServiceActivated");
-            mockRouteData.Values.Add("Controller", "Register");
+            mockRouteData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(-1, mockRouteData, mockUser, mockOrg, mockUserOrg);
+            var controller = UiTestHelper.GetController<RegistrationController>(-1, mockRouteData, mockUser, mockOrg, mockUserOrg);
             controller.ReportingOrganisationId = mockOrg.OrganisationId;
 
             var testUri = new Uri("https://localhost/register/activate-service");
@@ -1170,9 +1171,9 @@ namespace ModernSlavery.WebUI.Tests
 
             var routeData = new RouteData();
             routeData.Values.Add("Action", "OrganisationSearch");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(user.UserId, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(user.UserId, routeData, user);
             //controller.StashModel(model);
 
             var orgModel = new OrganisationViewModel {ManualRegistration = false};
@@ -1189,7 +1190,7 @@ namespace ModernSlavery.WebUI.Tests
             Assert.That(result.Model.GetType() == typeof(OrganisationViewModel), "Incorrect resultType returned");
             Assert.That(result.ViewData.ModelState.IsValid, "Model is Invalid");
 
-            // var controller = UiTestHelper.GetController<RegisterController>();
+            // var controller = UiTestHelper.GetController<RegistrationController>();
             // controller.PublicSectorRepository.Insert(new EmployerRecord());
         }
 
@@ -1207,7 +1208,7 @@ namespace ModernSlavery.WebUI.Tests
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
             routeData.Values.Add("Action", "OrganisationSearch");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             //search text in model
             var expectedModel = new OrganisationViewModel {
@@ -1221,7 +1222,7 @@ namespace ModernSlavery.WebUI.Tests
             };
 
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
             controller.Bind(expectedModel);
 
             //insert  some records into the db...
@@ -1293,7 +1294,7 @@ namespace ModernSlavery.WebUI.Tests
             //ASSERT:
             //4.Check that the result is not null
             Assert.NotNull(result, "Expected RedirectToActionResult");
-            Assert.That(result.ActionName == nameof(RegisterController.ChooseOrganisation), "Redirected to the wrong view");
+            Assert.That(result.ActionName == nameof(RegistrationController.ChooseOrganisation), "Redirected to the wrong view");
 
             //5.check that the stashed model with the redirect is not null.
             Assert.NotNull(actualModel, "Expected OrganisationViewModel");
@@ -1316,7 +1317,7 @@ namespace ModernSlavery.WebUI.Tests
             //Set user email address verified code and expired sent date
             var routeData = new RouteData();
             routeData.Values.Add("Action", "OrganisationSearch");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             var expectedModel = new OrganisationViewModel {
                 Employers = new PagedResult<EmployerRecord>(),
@@ -1326,7 +1327,7 @@ namespace ModernSlavery.WebUI.Tests
             };
 
 
-            var controller = UiTestHelper.GetController<RegisterController>(1, routeData, user);
+            var controller = UiTestHelper.GetController<RegistrationController>(1, routeData, user);
             controller.Bind(expectedModel);
 
             //insert  some records into the db...
@@ -1354,7 +1355,7 @@ namespace ModernSlavery.WebUI.Tests
             Assert.NotNull(result, "Expected RedirectToActionResult");
 
             //4.Check that the redirection went to the right url step.
-            Assert.That(result.ActionName == nameof(RegisterController.ChooseOrganisation), "Redirected to the wrong view");
+            Assert.That(result.ActionName == nameof(RegistrationController.ChooseOrganisation), "Redirected to the wrong view");
 
             //5.If the redirection successfull retrieve the model stash sent with the redirect.
             var actualModel = controller.UnstashModel<OrganisationViewModel>();

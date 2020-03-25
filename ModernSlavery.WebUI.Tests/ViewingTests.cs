@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Search;
 using ModernSlavery.WebUI.Tests.TestHelpers;
+using ModernSlavery.WebUI.Viewing.Controllers;
+using ModernSlavery.WebUI.Viewing.Models.Search;
 using NUnit.Framework;
 
 namespace ModernSlavery.WebUI.Tests

@@ -1,4 +1,4 @@
-﻿using ModernSlavery.WebUI.Models.Submit;
+﻿using ModernSlavery.WebUI.Submission.Models;
 using NUnit.Framework;
 
 namespace ModernSlavery.WebUI.Tests.Models.Submit

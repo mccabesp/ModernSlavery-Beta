@@ -46,7 +46,7 @@ namespace ModernSlavery.Core.Tests.Classes.Email.GovNotifyEmailProvider
                 mockEmailTemplateRepo.Object,
                 mockGovNotifyOptions.Object,
                 ConfigHelpers.SharedOptions,
-                mockLogger.Object, Mock.Of<IRecordLogger>());
+                mockLogger.Object, Mock.Of<IAuditLogger>());
         }
 
         [TearDown]

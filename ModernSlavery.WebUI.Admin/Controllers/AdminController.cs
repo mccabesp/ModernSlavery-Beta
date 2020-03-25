@@ -8,7 +8,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
-using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessDomain;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Admin.Models;
@@ -19,17 +19,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using CsvHelper.Configuration;
 using System.Globalization;
-using ModernSlavery.BusinessLogic.Admin;
+using ModernSlavery.BusinessDomain.Admin;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
@@ -263,7 +265,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (logRecords.Count > 0)
                 {
-                    await AdminService.SubmissionBusinessLogic.SubmissionLog.WriteAsync(logRecords.OrderBy(l => l.StatusDate));
+                    await AdminService.LogSubmission(logRecords.OrderBy(l => l.StatusDate));
                 }
 
                 //Get the files again
@@ -725,7 +727,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 : DateTime.MinValue;
             model.Uploads.Add(upload);
 
-            List<ShortCodeModel> allShortCodes = await AdminService.ShortCodesRepository.GetAllShortCodesAsync();
+            List<ShortCodeModel> allShortCodes = await WebService.ShortCodesRepository.GetAllShortCodesAsync();
             upload = new UploadViewModel.Upload {
                 Type = "ShortCodes",
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ShortCodes),
@@ -880,7 +882,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 await UpdateCompanySicCodesAsync(updateTime);
                                 break;
                             case "ShortCodes":
-                                await AdminService.ShortCodesRepository.ClearAllShortCodesAsync();
+                                await WebService.ShortCodesRepository.ClearAllShortCodesAsync();
                                 break;
                         }
                     }
@@ -1091,9 +1093,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             ImpersonatedUserId = impersonatedUser.UserId;
             OriginalUser = currentUser;
-
+            
             //Refresh page to ensure identity is passed in cookie
-            return RedirectToAction("ManageOrganisations", "Organisation");
+            return Redirect(Url.Action(RouteHelper.Routes.SubmissionHome));
         }
 
         #endregion

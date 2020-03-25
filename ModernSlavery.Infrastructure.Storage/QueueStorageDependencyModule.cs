@@ -17,13 +17,18 @@ namespace ModernSlavery.Infrastructure.Storage
         {
             _options = options;
         }
+        public bool AutoSetup { get; } = false;
 
-        public void Bind(ContainerBuilder builder, IServiceCollection services)
+        public void Register(DependencyBuilder builder)
         {
             // Register queues
-            builder.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.SendEmail);
-            builder.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.SendNotifyEmail);
-            builder.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.ExecuteWebJob);
+            builder.ContainerBuilder.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.SendEmail);
+            builder.ContainerBuilder.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.SendNotifyEmail);
+            builder.ContainerBuilder.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.ExecuteWebJob);
+        }
+        public void Configure(IContainer container)
+        {
+            //TODO: Add configuration here
         }
     }
 }

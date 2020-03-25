@@ -17,8 +17,8 @@ namespace ModernSlavery.Infrastructure.Logging
 
             var applicationName = AppDomain.CurrentDomain.FriendlyName;
 
-            builder.RegisterType<RecordLogger>()
-                .Keyed<IRecordLogger>(fileName)
+            builder.RegisterType<AuditLogger>()
+                .Keyed<IAuditLogger>(fileName)
                 .SingleInstance()
                 .WithParameter("applicationName", AppDomain.CurrentDomain.FriendlyName)
                 .WithParameter("fileName", fileName);

@@ -8,11 +8,11 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Register;
-using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Registration.Controllers;
+using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Submission.Classes;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
 using NUnit.Framework;
@@ -22,22 +22,22 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
     [TestFixture]
     [SetCulture("en-GB")]
-    public partial class RegisterControllerTests : AssertionHelper
+    public partial class RegistrationControllerTests : AssertionHelper
     {
 
         #region GET AboutYou()
 
         [Test]
-        [Description("RegisterController.AboutYou GET: When PendingFastrack Then ViewModel Should Contain Scope Contact Details")]
+        [Description("RegistrationController.AboutYou GET: When PendingFastrack Then ViewModel Should Contain Scope Contact Details")]
         public async Task
-            RegisterController_AboutYou_GET_When_PendingFastrack_Cookie_Then_ViewModel_Should_Contain_Scope_Contact_DetailsAsync()
+            RegistrationController_AboutYou_GET_When_PendingFastrack_Cookie_Then_ViewModel_Should_Contain_Scope_Contact_DetailsAsync()
         {
             // Arrange
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "AboutYou");
-            mockRouteData.Values.Add("Controller", "Register");
+            mockRouteData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(0, mockRouteData);
+            var controller = UiTestHelper.GetController<RegistrationController>(0, mockRouteData);
             await controller.Cache.RemoveAsync($"{controller.HttpContext.GetUserHostAddress()}:lastFasttrackDate");
 
             // Ensure we call the scope service GetScopeFromFastTrackCode implementation
@@ -72,19 +72,19 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Ignore("msande")]
-        [Description("RegisterController.AboutYou POST: When PendingFastrack Then Save in the user settings")]
-        public async Task RegisterController_AboutYou_POST_When_PendingFastrack_Then_SaveInUserSettingsAsync()
+        [Description("RegistrationController.AboutYou POST: When PendingFastrack Then Save in the user settings")]
+        public async Task RegistrationController_AboutYou_POST_When_PendingFastrack_Then_SaveInUserSettingsAsync()
         {
             // Arrange
             var user = new User {UserId = 0};
 
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "AboutYou");
-            mockRouteData.Values.Add("Controller", "Register");
+            mockRouteData.Values.Add("Controller", "Registration");
 
             var mockViewModel = new RegisterViewModel {EmailAddress = "mock@test.com", Password = "12345678"};
 
-            var controller = UiTestHelper.GetController<RegisterController>(0, mockRouteData);
+            var controller = UiTestHelper.GetController<RegistrationController>(0, mockRouteData);
 
             // Ensure we call the scope service GetScopeFromFastTrackCode implementation
             Mock<IScopePresenter> mockScopeBL = Mock.Get(controller.ScopePresentation);
@@ -101,7 +101,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             // Assert
             Assert.NotNull(result, "RedirectToActionResult should not be null");
             Assert.AreEqual(result.ActionName, "VerifyEmail", "Expected the Action to be 'VerifyEmail'");
-            Assert.AreEqual(result.ControllerName, "Register", "Expected the Controller to be 'Register'");
+            Assert.AreEqual(result.ControllerName, "Registration", "Expected the Controller to be 'Registration'");
 
             // Assert User Setting
             UserSetting userSetting = controller.SharedBusinessLogic.DataRepository.GetAll<User>()
@@ -119,8 +119,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Ignore("Not implemented")]
         [Test]
-        [Description("RegisterController.OrganisationType GET: When PendingFastrack Then start fasttrack registration")]
-        public void RegisterController_OrganisationType_GET_When_PendingFastrack_Then_StartFastTrackRegistration()
+        [Description("RegistrationController.OrganisationType GET: When PendingFastrack Then start fasttrack registration")]
+        public void RegistrationController_OrganisationType_GET_When_PendingFastrack_Then_StartFastTrackRegistration()
         {
             throw new NotImplementedException();
         }
@@ -131,16 +131,16 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test(Author = "Oscar Lagatta")]
         [Description("Register Controller ConfirmOrganisation When User User Not Registered")]
-        public async Task RegisterController_ConfirmOrganisation_When_User_Not_RegisteredAsync()
+        public async Task RegistrationController_ConfirmOrganisation_When_User_Not_RegisteredAsync()
         {
             // Arrange
             User mockUser = UserHelper.GetNotAdminUserWithoutVerifiedEmailAddress();
 
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ServiceActivated");
-            mockRouteData.Values.Add("Controller", "Register");
+            mockRouteData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(-1, mockRouteData, mockUser);
+            var controller = UiTestHelper.GetController<RegistrationController>(-1, mockRouteData, mockUser);
 
             var result = await controller.ConfirmOrganisation() as ViewResult;
 
@@ -150,8 +150,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test(Author = "Oscar Lagatta")]
         [Description(
-            "RegisterController.ConfirmOrganisation GET When Cannot Load Employers From Session Then Return Error View Model 1112")]
-        public async Task RegisterController_ConfirmOrganisation_When_Cannot_Load_Employers_From_Session_Then_Return_ErrorViewModelAsync()
+            "RegistrationController.ConfirmOrganisation GET When Cannot Load Employers From Session Then Return Error View Model 1112")]
+        public async Task RegistrationController_ConfirmOrganisation_When_Cannot_Load_Employers_From_Session_Then_Return_ErrorViewModelAsync()
         {
             // Arrange
             User mockUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
@@ -160,13 +160,13 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ServiceActivated");
-            mockRouteData.Values.Add("Controller", "Register");
+            mockRouteData.Values.Add("Controller", "Registration");
 
             Return mockReturn = ReturnHelper.GetNewReturnForOrganisationAndYear(mockUserOrg,ConfigHelpers.SharedOptions.FirstReportingYear);
 
             OrganisationHelper.LinkOrganisationAndReturn(mockOrg, mockReturn);
 
-            var controller = UiTestHelper.GetController<RegisterController>(-1, mockRouteData, mockUser, mockOrg, mockUserOrg, mockReturn);
+            var controller = UiTestHelper.GetController<RegistrationController>(-1, mockRouteData, mockUser, mockOrg, mockUserOrg, mockReturn);
             controller.ReportingOrganisationId = mockOrg.OrganisationId;
 
             var testUri = new Uri("https://localhost/register/activate-service");
@@ -186,7 +186,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
         [Test]
         [Description("")]
-        public async Task RegisterController_ConfirmOrganisation_Get_SuccessAsync()
+        public async Task RegistrationController_ConfirmOrganisation_Get_SuccessAsync()
         {
             // Arrange
             User mockUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
@@ -199,9 +199,9 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
 
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ServiceActivated");
-            mockRouteData.Values.Add("Controller", "Register");
+            mockRouteData.Values.Add("Controller", "Registration");
 
-            var controller = UiTestHelper.GetController<RegisterController>(-1, mockRouteData, mockUser, mockOrg, mockUserOrg, mockReturn);
+            var controller = UiTestHelper.GetController<RegistrationController>(-1, mockRouteData, mockUser, mockOrg, mockUserOrg, mockReturn);
             controller.ReportingOrganisationId = mockOrg.OrganisationId;
 
             controller.StashModel(new OrganisationViewModel());

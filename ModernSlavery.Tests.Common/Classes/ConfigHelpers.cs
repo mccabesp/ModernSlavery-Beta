@@ -7,7 +7,7 @@ using ModernSlavery.Infrastructure.Configuration;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.WebUI.Classes.Options;
+using ModernSlavery.WebUI.Submission.Classes;
 
 namespace ModernSlavery.Tests.Common.Classes
 {

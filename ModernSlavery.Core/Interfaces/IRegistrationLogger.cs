@@ -3,7 +3,7 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Core.Interfaces
 {
-    public interface IRegistrationLogger : IRecordLogger
+    public interface IRegistrationLogger : IAuditLogger
     {
         Task LogUnregisteredAsync(UserOrganisation unregisteredUserOrg, string actionByEmailAddress);
 

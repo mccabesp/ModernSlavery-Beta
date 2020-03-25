@@ -2,11 +2,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Organisation;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
@@ -25,9 +24,9 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
             // Arrange
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ManageOrganisation");
-            mockRouteData.Values.Add("Controller", "Organisation");
+            mockRouteData.Values.Add("Controller", "Submission");
 
-            var controller = UiTestHelper.GetController<OrganisationController>(
+            var controller = UiTestHelper.GetController<ManageOrganisationsController>(
                 MockUsers[0].UserId,
                 mockRouteData,
                 MockUsers,
@@ -50,12 +49,12 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
             // Arrange
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ManageOrganisation");
-            mockRouteData.Values.Add("Controller", "Organisation");
+            mockRouteData.Values.Add("Controller", "Submission");
 
             var testUserId = 2;
             var testOrgId = 123;
 
-            var controller = UiTestHelper.GetController<OrganisationController>(
+            var controller = UiTestHelper.GetController<ManageOrganisationsController>(
                 testUserId,
                 mockRouteData,
                 MockUsers,
@@ -85,12 +84,12 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
             // Arrange
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ManageOrganisation");
-            mockRouteData.Values.Add("Controller", "Organisation");
+            mockRouteData.Values.Add("Controller", "Submission");
 
             var testUserId = 2;
             var testOrgId = 123;
 
-            var controller = UiTestHelper.GetController<OrganisationController>(
+            var controller = UiTestHelper.GetController<ManageOrganisationsController>(
                 testUserId,
                 mockRouteData,
                 MockUsers,
@@ -124,12 +123,12 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Organisation
             // Arrange
             var mockRouteData = new RouteData();
             mockRouteData.Values.Add("Action", "ManageOrganisation");
-            mockRouteData.Values.Add("Controller", "Organisation");
+            mockRouteData.Values.Add("Controller", "Submission");
 
             var testUserId = 4;
             var testOrgId = 123;
 
-            var controller = UiTestHelper.GetController<OrganisationController>(
+            var controller = UiTestHelper.GetController<ManageOrganisationsController>(
                 testUserId,
                 mockRouteData,
                 MockUsers,

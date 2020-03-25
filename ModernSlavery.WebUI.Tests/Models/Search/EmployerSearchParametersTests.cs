@@ -1,4 +1,4 @@
-﻿using ModernSlavery.WebUI.Models.Search;
+﻿using ModernSlavery.WebUI.Viewing.Models.Search;
 using NUnit.Framework;
 
 namespace ModernSlavery.WebUI.Tests.Models.Search

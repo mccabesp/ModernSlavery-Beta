@@ -14,6 +14,7 @@ using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
@@ -650,7 +651,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             //Send an acceptance link to the email address
-            string returnUrl = Url.Action("ManageOrganisations", "Organisation", null, "https");
+            string returnUrl = Url.Action(RouteHelper.Routes.SubmissionHome);
             return await AdminService.SharedBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(returnUrl, emailAddress, test);
         }
 

@@ -3,40 +3,39 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.CompaniesHouse;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
-    public class AdminOrganisationNameController : Controller
+    public class AdminOrganisationNameController : BaseController
     {
-        private readonly IDataRepository dataRepository;
         private readonly ICompaniesHouseAPI companiesHouseApi;
         private readonly AuditLogger auditLogger;
-        private readonly IEventLogger customLogger;
-
 
         public AdminOrganisationNameController(
-            IDataRepository dataRepository,
             ICompaniesHouseAPI companiesHouseApi,
-            AuditLogger auditLogger, IEventLogger customLogger)
+            AuditLogger auditLogger,
+            ILogger<AdminOrganisationNameController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
-            this.dataRepository = dataRepository;
             this.companiesHouseApi = companiesHouseApi;
             this.auditLogger = auditLogger;
-            this.customLogger = customLogger;
         }
 
         [HttpGet("organisation/{id}/name")]
         public IActionResult ViewNameHistory(long id)
         {
-            Organisation organisation = dataRepository.Get<Organisation>(id);
+            Organisation organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             return View("ViewOrganisationName", organisation);
         }
@@ -44,7 +43,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("organisation/{id}/name/change")]
         public IActionResult ChangeNameGet(long id)
         {
-            Organisation organisation = dataRepository.Get<Organisation>(id);
+            Organisation organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
             {
@@ -64,7 +63,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 catch (Exception ex)
                 {
                     // Use Manual Change page instead
-                    customLogger.Warning("Error from Companies House API", ex);
+                    WebService.CustomLogger.Warning("Error from Companies House API", ex);
                 }
             }
 
@@ -108,7 +107,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             // https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-from-view-model
             ModelState.Clear();
 
-            Organisation organisation = dataRepository.Get<Organisation>(id);
+            Organisation organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             switch (viewModel.Action) {
                 case ManuallyChangeOrganisationNameViewModelActions.OfferNewCompaniesHouseName:
@@ -192,7 +191,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             OrganisationName newOrganisationName = CreateOrganisationNameFromViewModel(viewModel);
             AddNewNameToOrganisation(newOrganisationName, organisation);
 
-            dataRepository.SaveChangesAsync().Wait();
+            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
             auditLogger.AuditChangeToOrganisation(
                 this,
@@ -225,13 +224,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             organisation.OrganisationNames.Add(organisationName);
             organisation.OrganisationName = organisationName.Name;
 
-            dataRepository.Insert(organisationName);
+            SharedBusinessLogic.DataRepository.Insert(organisationName);
         }
 
         private void OptOrganisationOutOfCompaniesHouseUpdates(Organisation organisation)
         {
             organisation.OptedOutFromCompaniesHouseUpdate = true;
-            dataRepository.SaveChangesAsync().Wait();
+            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
         }
 
     }

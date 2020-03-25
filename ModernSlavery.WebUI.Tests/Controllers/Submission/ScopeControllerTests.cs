@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
-using ModernSlavery.BusinessLogic;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.BusinessDomain;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -12,11 +13,11 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebUI.Controllers;
-using ModernSlavery.WebUI.Models.Scope;
-using ModernSlavery.WebUI.Presenters;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Services;
+using ModernSlavery.WebUI.Submission.Classes;
+using ModernSlavery.WebUI.Submission.Controllers;
+using ModernSlavery.WebUI.Submission.Models;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
 using NUnit.Framework;
@@ -114,7 +115,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             Assert.NotNull(result, "RedirectToActionResult should not be null");
             Assert.AreEqual("ManageOrganisations", result.ActionName, "Expected the Action to be 'ManageOrganisations'");
-            Assert.AreEqual("Organisation", result.ControllerName, "Expected the Controller to be 'Organisation'");
+            Assert.AreEqual("Registrations", result.ControllerName, "Expected the Controller to be 'Registrations'");
         }
 
         [Test]
@@ -138,7 +139,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             Assert.NotNull(result, "RedirectToActionResult should not be null");
             Assert.AreEqual("ManageOrganisations", result.ActionName, "Expected the Action to be 'ManageOrganisations'");
-            Assert.AreEqual("Organisation", result.ControllerName, "Expected the Controller to be 'Organisation'");
+            Assert.AreEqual("Registrations", result.ControllerName, "Expected the Controller to be 'Registrations'");
         }
 
         [Test]
@@ -795,8 +796,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
 
             // Assert
             Assert.NotNull(result, "RedirectToActionResult should not be null");
-            Assert.AreEqual("Home", result.ActionName, "Expected the Action to be 'ManageOrganisations'");
-            Assert.AreEqual("Admin", result.ControllerName, "Expected the Controller to be 'Organisation'");
+            Assert.AreEqual("ManageOrganisations", result.ActionName, "Expected the Action to be 'ManageOrganisations'");
+            Assert.AreEqual("Registrations", result.ControllerName, "Expected the Controller to be 'Registrations'");
         }
 
         [Test]
@@ -901,7 +902,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             // route result
             Assert.NotNull(result, "RedirectToActionResult should not be null");
             Assert.AreEqual(result.ActionName, "ManageOrganisations", "Expected the Action to be 'ManageOrganisations'");
-            Assert.AreEqual(result.ControllerName, "Home", "Expected the Controller to be 'Home'");
+            Assert.AreEqual(result.ControllerName, "Registrations", "Expected the Controller to be 'Registrations'");
 
             // cookie
             /* Need to fix this
@@ -968,7 +969,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             // route result
             Assert.NotNull(result, "RedirectToActionResult should not be null");
             Assert.AreEqual(result.ActionName, "AboutYou", "Expected the Action to be 'AboutYou'");
-            Assert.AreEqual(result.ControllerName, "Register", "Expected the Controller to be 'Register'");
+            Assert.AreEqual(result.ControllerName, "Registration", "Expected the Controller to be 'Registration'");
         }
 
         #endregion
@@ -1365,7 +1366,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Submission
             // Assert
             Assert.NotNull(result, "RedirectToActionResult should not be null");
             Assert.AreEqual("ManageOrganisations", result.ActionName, "Expected the Action to be 'ManageOrganisation'");
-            Assert.AreEqual("Organisation", result.ControllerName, "Expected the Controller to be 'Organisation'");
+            Assert.AreEqual("Registrations", result.ControllerName, "Expected the Controller to be 'Registrations'");
             Assert.AreEqual("employerReference:securityToken:firstName:lastName:email@address.com", controller.PendingFasttrackCodes);
         }
 

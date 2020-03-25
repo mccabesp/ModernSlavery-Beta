@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Search;
-using ModernSlavery.BusinessLogic;
-using ModernSlavery.BusinessLogic.Viewing;
+using ModernSlavery.BusinessDomain.Viewing;
+using ModernSlavery.BusinessDomain;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -11,8 +11,8 @@ using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebUI.Models.Search;
-using ModernSlavery.WebUI.Presenters;
+using ModernSlavery.WebUI.Viewing.Models.Search;
+using ModernSlavery.WebUI.Viewing.Presenters;
 using Moq;
 using NUnit.Framework;
 
@@ -30,7 +30,7 @@ namespace ModernSlavery.Integration.Tests
 
             //_azureSearchRepo = new AzureSearchRepository(azureSearchServiceName, azureSearchAdminApiKey, null, SharedOptions.AppInsightsClient);
             _azureSearchRepo = new AzureEmployerSearchRepository(ConfigHelpers.SharedOptions,
-                Mock.Of<IRecordLogger>(), ConfigHelpers.SearchOptions.AzureServiceName,
+                Mock.Of<IAuditLogger>(), ConfigHelpers.SearchOptions.AzureServiceName,
                 ConfigHelpers.SearchOptions.EmployerIndexName, ConfigHelpers.SearchOptions.AzureApiAdminKey);
         }
 
@@ -248,7 +248,7 @@ namespace ModernSlavery.Integration.Tests
                 ConfigHelpers.SearchOptions.AzureServiceName,
                 new SearchCredentials(ConfigHelpers.SearchOptions.AzureApiAdminKey));
 
-            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<IRecordLogger>(),
+            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<IAuditLogger>(),
                 sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
 
             var mockViewingService = new Mock<IViewingService>();
@@ -288,7 +288,7 @@ namespace ModernSlavery.Integration.Tests
                 ConfigHelpers.SearchOptions.AzureServiceName,
                 new SearchCredentials(ConfigHelpers.SearchOptions.AzureApiAdminKey));
 
-            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<IRecordLogger>(),
+            var sicCodeSearchIndexClient = new AzureSicCodeSearchRepository(Mock.Of<IAuditLogger>(),
                 sicCodeSearchServiceClient, ConfigHelpers.SearchOptions.SicCodeIndexName);
 
             var mockDataRepo = MoqHelpers.CreateMockDataRepository();

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.WebUI.Shared.Classes.HtmlHelpers;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.IdServer.Classes
 {

@@ -3,6 +3,7 @@ using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;
 
@@ -15,13 +16,14 @@ namespace ModernSlavery.Infrastructure.Storage
         {
             _options = options;
         }
+        public bool AutoSetup { get; } = false;
 
-        public void Bind(ContainerBuilder builder, IServiceCollection services)
+        public void Register(DependencyBuilder builder)
         {
             // use the 'localStorageRoot' when hosting the storage in a local folder
             if (string.IsNullOrWhiteSpace(_options.LocalStorageRoot))
             {
-                builder.Register(
+                builder.ContainerBuilder.Register(
                         c => new AzureFileRepository(_options,
                             new ExponentialRetry(TimeSpan.FromMilliseconds(500), 10)))
                     .As<IFileRepository>()
@@ -29,8 +31,12 @@ namespace ModernSlavery.Infrastructure.Storage
             }
             else
             {
-                builder.Register(c => new SystemFileRepository(_options)).As<IFileRepository>().SingleInstance();
+                builder.ContainerBuilder.Register(c => new SystemFileRepository(_options)).As<IFileRepository>().SingleInstance();
             }
+        }
+        public void Configure(IContainer container)
+        {
+            //TODO: Add configuration here
         }
     }
 }

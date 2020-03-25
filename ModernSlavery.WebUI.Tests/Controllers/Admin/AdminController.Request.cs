@@ -10,8 +10,9 @@ using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebUI.Admin.Controllers;
-using ModernSlavery.WebUI.Controllers;
+using ModernSlavery.WebUI.Registration.Controllers;
 using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Services;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using Moq;
@@ -51,8 +52,8 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
             };
 
             var routeData = new RouteData();
-            routeData.Values.Add("Action", nameof(RegisterController.OrganisationType));
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Action", nameof(RegistrationController.OrganisationType));
+            routeData.Values.Add("Controller", "Registration");
 
             var controller = UiTestHelper.GetController<AdminController>(user.UserId, routeData, user, org, address, userOrg);
 
@@ -77,25 +78,25 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Admin
             expectedIndex.Compare(actualIndex);
         }
         [Test]
-        [Description("RegisterController POST: When User Added To Public Organisation Then Email Existing Users")]
-        public async Task RegisterController_POST_When_User_Added_To_Public_Organisation_Then_Email_Existing_Users()
+        [Description("RegistrationController POST: When User Added To Public Organisation Then Email Existing Users")]
+        public async Task RegistrationController_POST_When_User_Added_To_Public_Organisation_Then_Email_Existing_Users()
         {
             // Arrange
             var organisationId = 100;
-            Core.Entities.Organisation organisation = Registration.RegisterControllerTests.createPublicOrganisation(organisationId, "Company1", 12345678);
-            User existingUser1 = Registration.RegisterControllerTests.CreateUser(1, "user1@test.com");
-            User existingUser2 = Registration.RegisterControllerTests.CreateUser(2, "user2@test.com");
-            User newUser = Registration.RegisterControllerTests.CreateUser(3, "user3@test.com");
-            UserOrganisation existingUserOrganisation1 = Registration.RegisterControllerTests.CreateUserOrganisation(organisation, existingUser1.UserId, VirtualDateTime.Now);
-            UserOrganisation existingUserOrganisation2 = Registration.RegisterControllerTests.CreateUserOrganisation(organisation, existingUser2.UserId, VirtualDateTime.Now);
-            UserOrganisation newUserOrganisation = Registration.RegisterControllerTests.CreateUserOrganisation(organisation, newUser.UserId, VirtualDateTime.Now);
+            Core.Entities.Organisation organisation = Registration.RegistrationControllerTests.createPublicOrganisation(organisationId, "Company1", 12345678);
+            User existingUser1 = Registration.RegistrationControllerTests.CreateUser(1, "user1@test.com");
+            User existingUser2 = Registration.RegistrationControllerTests.CreateUser(2, "user2@test.com");
+            User newUser = Registration.RegistrationControllerTests.CreateUser(3, "user3@test.com");
+            UserOrganisation existingUserOrganisation1 = Registration.RegistrationControllerTests.CreateUserOrganisation(organisation, existingUser1.UserId, VirtualDateTime.Now);
+            UserOrganisation existingUserOrganisation2 = Registration.RegistrationControllerTests.CreateUserOrganisation(organisation, existingUser2.UserId, VirtualDateTime.Now);
+            UserOrganisation newUserOrganisation = Registration.RegistrationControllerTests.CreateUserOrganisation(organisation, newUser.UserId, VirtualDateTime.Now);
             newUserOrganisation.PINConfirmedDate = null;
             User govEqualitiesOfficeUser = UserHelper.GetGovEqualitiesOfficeUser();
             govEqualitiesOfficeUser.EmailVerifiedDate = VirtualDateTime.Now;
 
             var routeData = new RouteData();
             routeData.Values.Add("Action", "ReviewRequest");
-            routeData.Values.Add("Controller", "Register");
+            routeData.Values.Add("Controller", "Registration");
 
             var controller = UiTestHelper.GetController<AdminController>(
                 govEqualitiesOfficeUser.UserId,
