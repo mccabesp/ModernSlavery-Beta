@@ -34,8 +34,6 @@
     <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.10.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="3.0.4" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
   </ItemGroup>
   
@@ -56,10 +54,8 @@
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Search\ModernSlavery.Infrastructure.Search.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Storage\ModernSlavery.Infrastructure.Storage.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Admin\ModernSlavery.WebUI.Admin.csproj" />
-    <ProjectReference Include="..\ModernSlavery.WebUI.DevOps\ModernSlavery.WebUI.DevOps.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Registration\ModernSlavery.WebUI.Registration.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
-    <ProjectReference Include="..\ModernSlavery.WebUI.StaticFiles\ModernSlavery.WebUI.StaticFiles.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Submission\ModernSlavery.WebUI.Submission.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Viewing\ModernSlavery.WebUI.Viewing.csproj" />
   </ItemGroup>
