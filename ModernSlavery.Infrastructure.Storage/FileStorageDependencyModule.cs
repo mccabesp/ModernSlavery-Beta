@@ -18,7 +18,7 @@ namespace ModernSlavery.Infrastructure.Storage
         }
         public bool AutoSetup { get; } = false;
 
-        public void Register(DependencyBuilder builder)
+        public void Register(IDependencyBuilder builder)
         {
             // use the 'localStorageRoot' when hosting the storage in a local folder
             if (string.IsNullOrWhiteSpace(_options.LocalStorageRoot))
@@ -34,7 +34,7 @@ namespace ModernSlavery.Infrastructure.Storage
                 builder.ContainerBuilder.Register(c => new SystemFileRepository(_options)).As<IFileRepository>().SingleInstance();
             }
         }
-        public void Configure(IContainer container)
+        public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //TODO: Add configuration here
         }

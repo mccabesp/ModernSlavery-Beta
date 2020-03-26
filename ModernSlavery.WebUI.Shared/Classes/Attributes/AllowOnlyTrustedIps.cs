@@ -19,13 +19,13 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var sharedOptions = (SharedOptions)context.HttpContext.RequestServices.GetService(typeof(SharedOptions));
-            var trustedIPDomains= sharedOptions?.TrustedIPDomains.SplitI();
+            var trustedIPDomains= sharedOptions?.TrustedIpDomains.SplitI();
             if (trustedIPDomains != null && trustedIPDomains.Any())
             {
                 string userHostAddress = context.HttpContext.GetUserHostAddress();
                 if (string.IsNullOrWhiteSpace(userHostAddress) || !userHostAddress.IsTrustedAddress(trustedIPDomains))
                 {
-                    LogAttempt(context, sharedOptions.TrustedIPDomains, userHostAddress);
+                    LogAttempt(context, sharedOptions.TrustedIpDomains, userHostAddress);
                     context.Result = new HttpStatusCodeResult(HttpStatusCode.Forbidden);
                     return;
                 }

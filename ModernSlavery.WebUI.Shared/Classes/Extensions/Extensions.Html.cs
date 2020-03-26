@@ -42,7 +42,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
         {
             var sharedOptions = htmlHelper.GetSharedOptions();
             return new HtmlString(
-                $"Date:{VirtualDateTime.Now}, Version:{sharedOptions.Version}, File Date:{sharedOptions.AssemblyDate.ToLocalTime()}, Environment:{sharedOptions.Environment}, Machine:{Environment.MachineName}, Instance:{sharedOptions.WEBSITE_INSTANCE_ID}, {sharedOptions.AssemblyCopyright}");
+                $"Date:{VirtualDateTime.Now}, Version:{sharedOptions.Version}, File Date:{sharedOptions.AssemblyDate.ToLocalTime()}, Environment:{sharedOptions.Environment}, Machine:{Environment.MachineName}, Instance:{sharedOptions.Website_Instance_Id}, {sharedOptions.AssemblyCopyright}");
         }
 
         public static HtmlString ToHtml(this IHtmlHelper htmlHelper, string text)

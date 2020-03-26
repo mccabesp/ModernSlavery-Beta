@@ -18,10 +18,10 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
 
         public bool AutoSetup { get; } = false;
 
-        public void Register(DependencyBuilder builder)
+        public void Register(IDependencyBuilder builder)
         {
             //Add a dedicated httpclient for Companies house API with exponential retry policy
-            builder.Services.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI), (httpClient) =>
+            builder.ServiceCollection.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI), (httpClient) =>
                 {
                     CompaniesHouseAPI.SetupHttpClient(httpClient, _options.ApiServer, _options.ApiKey);
                 })
@@ -37,7 +37,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
 
         }
 
-        public void Configure(IContainer container)
+        public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //TODO: Add configuration here
         }

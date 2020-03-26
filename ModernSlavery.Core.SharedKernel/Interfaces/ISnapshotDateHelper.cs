@@ -17,7 +17,7 @@ namespace ModernSlavery.Core.SharedKernel.Interfaces
     {
         private readonly IConfiguration _configuration;
 
-        public int? _FirstReportingYear;
+        private int? _firstReportingYear;
 
         public SnapshotDateHelper(IConfiguration configuration)
         {
@@ -30,13 +30,13 @@ namespace ModernSlavery.Core.SharedKernel.Interfaces
         {
             get
             {
-                if (!_FirstReportingYear.HasValue)
-                    _FirstReportingYear = _configuration.GetValue("FirstReportingYear", 2017);
-                return _FirstReportingYear.Value;
+                if (!_firstReportingYear.HasValue)
+                    _firstReportingYear = _configuration.GetValue("FirstReportingYear", 2017);
+                return _firstReportingYear.Value;
             }
             set
             {
-                _FirstReportingYear = value;
+                _firstReportingYear = value;
                 _configuration["FirstReportingYear"] = value.ToString();
             }
         }

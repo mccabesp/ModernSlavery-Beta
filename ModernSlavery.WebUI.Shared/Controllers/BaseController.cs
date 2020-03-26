@@ -592,7 +592,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         public virtual User CurrentUser => VirtualUser;
 
         public bool IsTrustedIP =>
-            string.IsNullOrWhiteSpace(SharedBusinessLogic.SharedOptions.TrustedIPDomains) || UserHostAddress.IsTrustedAddress(SharedBusinessLogic.SharedOptions.TrustedIPDomains.SplitI());
+            string.IsNullOrWhiteSpace(SharedBusinessLogic.SharedOptions.TrustedIpDomains) || UserHostAddress.IsTrustedAddress(SharedBusinessLogic.SharedOptions.TrustedIpDomains.SplitI());
 
         public bool IsAdministrator => CurrentUser.IsAdministrator();
         public bool IsSuperAdministrator => IsTrustedIP && CurrentUser.IsSuperAdministrator();

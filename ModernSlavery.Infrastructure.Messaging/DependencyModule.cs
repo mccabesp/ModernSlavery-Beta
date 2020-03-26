@@ -9,14 +9,14 @@ namespace ModernSlavery.Infrastructure.Messaging
 {
     public class DependencyModule: IDependencyModule
     {
-        public void Register(DependencyBuilder builder) 
+        public void Register(IDependencyBuilder builder) 
         {
             builder.ContainerBuilder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
 
         }
         public bool AutoSetup { get; } = false;
 
-        public void Configure(IContainer container)
+        public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //TODO: Add configuration here
         }

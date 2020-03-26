@@ -79,15 +79,15 @@ namespace ModernSlavery.WebUI
         public static HttpMessageHandler BackChannelHandler { get; set; }
         #endregion
 
-        public void Register(DependencyBuilder builder)
+        public void Register(IDependencyBuilder builder)
         {
             //Allow handler for caching of http responses
-            builder.Services.AddResponseCaching();
+            builder.ServiceCollection.AddResponseCaching();
 
             //Allow creation of a static http context anywhere
-            builder.Services.AddHttpContextAccessor();
+            builder.ServiceCollection.AddHttpContextAccessor();
 
-            builder.Services.AddControllersWithViews(
+            builder.ServiceCollection.AddControllersWithViews(
                     options => {
                         options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
                         options.ModelMetadataDetailsProviders.Add(
@@ -107,7 +107,7 @@ namespace ModernSlavery.WebUI
                 .AddDataAnnotationsLocalization(
                     options => { options.DataAnnotationLocalizerProvider = DataAnnotationLocalizerProvider.DefaultResourceHandler; });
 
-            var mvcBuilder = builder.Services.AddRazorPages();
+            var mvcBuilder = builder.ServiceCollection.AddRazorPages();
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
@@ -115,34 +115,34 @@ namespace ModernSlavery.WebUI
 
 
             //Add antiforgery token by default to forms
-            builder.Services.AddAntiforgery();
+            builder.ServiceCollection.AddAntiforgery();
 
             //Add services needed for sessions
-            builder.Services.AddSession(
+            builder.ServiceCollection.AddSession(
                 o => {
                     o.Cookie.IsEssential = true; //This is required otherwise session will not load
                     o.Cookie.SecurePolicy = CookieSecurePolicy.Always; //Equivalent to <httpCookies requireSSL="true" /> from Web.Config
                     o.Cookie.HttpOnly = false; //Always use https cookies
                     o.Cookie.SameSite = SameSiteMode.Strict;
-                    o.Cookie.Domain = _sharedOptions.EXTERNAL_HOST.BeforeFirst(":"); //Domain cannot be an authority and contain a port number
+                    o.Cookie.Domain = _sharedOptions.ExternalHost.BeforeFirst(":"); //Domain cannot be an authority and contain a port number
                     o.IdleTimeout =
                         TimeSpan.FromMinutes(_sharedOptions.SessionTimeOutMinutes); //Equivalent to <sessionState timeout="20"> from old Web.config
                 });
 
             //Add the distributed cache and data protection
-            builder.Services.AddDistributedCache(_distributedCacheOptions).AddDataProtection(_dataProtectionOptions);
+            builder.ServiceCollection.AddDistributedCache(_distributedCacheOptions).AddDataProtection(_dataProtectionOptions);
 
             //Add app insights tracking
-            builder.Services.AddApplicationInsightsTelemetry(_sharedOptions.APPINSIGHTS_INSTRUMENTATIONKEY);
+            builder.ServiceCollection.AddApplicationInsightsTelemetry(_sharedOptions.AppinsightsInstrumentationkey);
 
             //This may now be required 
-            builder.Services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
+            builder.ServiceCollection.AddHttpsRedirection(options => { options.HttpsPort = 443; });
 
             //Register StaticAssetsVersioningHelper
-            builder.Services.AddSingleton<StaticAssetsVersioningHelper>();
+            builder.ServiceCollection.AddSingleton<StaticAssetsVersioningHelper>();
 
             //Configure the services required for authentication by IdentityServer
-            builder.Services.AddIdentityServerClient(
+            builder.ServiceCollection.AddIdentityServerClient(
                 $"{_sharedOptions.SiteAuthority}account/",
                 _sharedOptions.SiteAuthority,
                 "ModernSlaveryServiceWebsite",
@@ -150,22 +150,22 @@ namespace ModernSlavery.WebUI
                 BackChannelHandler);
 
             //Override any test services
-            ConfigureTestServices?.Invoke(builder.Services);
+            ConfigureTestServices?.Invoke(builder.ServiceCollection);
 
             //Register the database dependencies
-            builder.RegisterDependencyModule<DatabaseDependencyModule>();
+            builder.RegisterModule<DatabaseDependencyModule>();
 
             //Register the file storage dependencies
-            builder.RegisterDependencyModule<FileStorageDependencyModule>();
+            builder.RegisterModule<FileStorageDependencyModule>();
 
             //Register the queue storage dependencies
-            builder.RegisterDependencyModule<QueueStorageDependencyModule>();
+            builder.RegisterModule<QueueStorageDependencyModule>();
 
             //Register the log storage dependencies
-            builder.RegisterDependencyModule<Infrastructure.Logging.DependencyModule>();
+            builder.RegisterModule<Infrastructure.Logging.DependencyModule>();
 
             //Register the search dependencies
-            builder.RegisterDependencyModule<Infrastructure.Search.DependencyModule>();
+            builder.RegisterModule<Infrastructure.Search.DependencyModule>();
 
             //Register Email queuers
             builder.ContainerBuilder.RegisterType<SendEmailService>().As<ISendEmailService>().SingleInstance();
@@ -174,11 +174,11 @@ namespace ModernSlavery.WebUI
             builder.ContainerBuilder.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
 
             //Register the messaging dependencies
-            builder.RegisterDependencyModule<Infrastructure.Messaging.DependencyModule>();
+            builder.RegisterModule<Infrastructure.Messaging.DependencyModule>();
 
 
             //Register the companies house dependencies
-            builder.RegisterDependencyModule<Infrastructure.CompaniesHouse.DependencyModule>();
+            builder.RegisterModule<Infrastructure.CompaniesHouse.DependencyModule>();
 
             //Register public and private repositories
             builder.ContainerBuilder.RegisterType<PublicSectorRepository>()
@@ -244,7 +244,7 @@ namespace ModernSlavery.WebUI
                 });
 
             //Register google analytics tracker
-            builder.RegisterDependencyModule<GoogleAnalyticsDependencyModule>();
+            builder.RegisterModule<GoogleAnalyticsDependencyModule>();
 
             //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
             builder.ContainerBuilder.RegisterAssemblyTypes(typeof(BaseController).Assembly)
@@ -273,7 +273,7 @@ namespace ModernSlavery.WebUI
             ConfigureTestContainer?.Invoke(builder.ContainerBuilder);
         }
 
-        public void Configure(IContainer container)
+        public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //TODO: Add configuration here
         }

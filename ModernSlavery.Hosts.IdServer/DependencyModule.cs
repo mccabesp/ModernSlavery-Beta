@@ -47,16 +47,16 @@ namespace ModernSlavery.IdServer
 
         public bool AutoSetup { get; } = false;
 
-        public void Register(DependencyBuilder builder)
+        public void Register(IDependencyBuilder builder)
         {
             #region Configure identity server
 
-            builder.Services.AddSingleton<IEventSink, AuditEventSink>();
+            builder.ServiceCollection.AddSingleton<IEventSink, AuditEventSink>();
 
             var clients = new Clients(_sharedOptions);
             var resources = new Resources(_sharedOptions);
 
-            var identityServer = builder.Services.AddIdentityServer(
+            var identityServer = builder.ServiceCollection.AddIdentityServer(
                     options => {
                         options.Events.RaiseSuccessEvents = true;
                         options.Events.RaiseFailureEvents = true;
@@ -78,36 +78,36 @@ namespace ModernSlavery.IdServer
             #endregion
 
             //Allow caching of http responses
-            builder.Services.AddResponseCaching();
+            builder.ServiceCollection.AddResponseCaching();
 
             //This is to allow access to the current http context anywhere
-            builder.Services.AddHttpContextAccessor();
+            builder.ServiceCollection.AddHttpContextAccessor();
 
-            builder.Services.AddControllersWithViews();
+            builder.ServiceCollection.AddControllersWithViews();
 
-            var mvcBuilder = builder.Services.AddRazorPages();
+            var mvcBuilder = builder.ServiceCollection.AddRazorPages();
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
             if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
 
             //Add the distributed cache and data protection
-            builder.Services.AddDistributedCache(_distributedCacheOptions).AddDataProtection(_dataProtectionOptions);
+            builder.ServiceCollection.AddDistributedCache(_distributedCacheOptions).AddDataProtection(_dataProtectionOptions);
 
             //Add app insights tracking
-            builder.Services.AddApplicationInsightsTelemetry(_sharedOptions.APPINSIGHTS_INSTRUMENTATIONKEY);
+            builder.ServiceCollection.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
 
             //This may now be required 
-            builder.Services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
+            builder.ServiceCollection.AddHttpsRedirection(options => { options.HttpsPort = 443; });
 
             //Override any test services
-            ConfigureTestServices?.Invoke(builder.Services);
+            ConfigureTestServices?.Invoke(builder.ServiceCollection);
 
             //Register the database dependencies
-            builder.RegisterDependencyModule<DatabaseDependencyModule>();
+            builder.RegisterModule<DatabaseDependencyModule>();
 
             //Register the file storage dependencies
-            builder.RegisterDependencyModule<FileStorageDependencyModule>();
+            builder.RegisterModule<FileStorageDependencyModule>();
 
             // Register queues (without key filtering)
             builder.ContainerBuilder.Register(c => new LogEventQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
@@ -137,7 +137,7 @@ namespace ModernSlavery.IdServer
 
         }
 
-        public void Configure(IContainer container)
+        public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //TODO: Add configuration here
         }
@@ -146,7 +146,7 @@ namespace ModernSlavery.IdServer
         private X509Certificate2 LoadCertificate(SharedOptions sharedOptions)
         {
             //Load the site certificate
-            string certThumprint = sharedOptions.WEBSITE_LOAD_CERTIFICATES.SplitI(";").FirstOrDefault();
+            string certThumprint = sharedOptions.Website_Load_Certificates.SplitI(";").FirstOrDefault();
             if (string.IsNullOrWhiteSpace(certThumprint))
             {
                 certThumprint = _sharedOptions.CertThumprint.SplitI(";").FirstOrDefault();
@@ -173,7 +173,7 @@ namespace ModernSlavery.IdServer
                 if (expires < VirtualDateTime.UtcNow)
                 {
                     _Logger.LogError(
-                        $"The website certificate for '{sharedOptions.EXTERNAL_HOST}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
+                        $"The website certificate for '{sharedOptions.ExternalHost}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
                 }
                 else
                 {

@@ -21,12 +21,12 @@ namespace ModernSlavery.WebUI.Account
 
         public bool AutoSetup { get; } = false;
 
-        public void Register(DependencyBuilder builder)
+        public void Register(IDependencyBuilder builder)
         {
             //TODO: Register dependencies here
         }
 
-        public void Configure(IContainer container)
+        public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //Configure dependencies here
 

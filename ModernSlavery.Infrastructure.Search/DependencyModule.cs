@@ -19,7 +19,7 @@ namespace ModernSlavery.Infrastructure.Search
         
         public bool AutoSetup { get; } = false;
 
-        public void Register(DependencyBuilder builder)
+        public void Register(IDependencyBuilder builder)
         {
             // Setup azure search
             builder.ContainerBuilder.Register(c => new SearchServiceClient(_options.AzureServiceName, new SearchCredentials(_options.AzureApiAdminKey)))
@@ -43,7 +43,7 @@ namespace ModernSlavery.Infrastructure.Search
 
         }
 
-        public void Configure(IContainer container)
+        public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //TODO: Add configuration here
         }

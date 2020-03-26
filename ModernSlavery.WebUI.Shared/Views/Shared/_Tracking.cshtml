@@ -75,7 +75,7 @@
 
 @if (cookieSettings.ApplicationInsights &&
     snippet != null &&
-    !string.IsNullOrWhiteSpace(sharedOptions.APPINSIGHTS_INSTRUMENTATIONKEY))
+    !string.IsNullOrWhiteSpace(sharedOptions.AppInsights_InstrumentationKey))
 {
     @Html.Raw(snippet.FullScript)
 }

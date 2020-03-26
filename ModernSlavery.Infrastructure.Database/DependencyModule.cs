@@ -12,14 +12,14 @@ namespace ModernSlavery.Infrastructure.Database
     {
         public bool AutoSetup { get; } = false;
 
-        public void Register(DependencyBuilder builder)
+        public void Register(IDependencyBuilder builder)
         {
             builder.ContainerBuilder.RegisterType<DatabaseContext>().As<IDbContext>().InstancePerLifetimeScope();
 
             builder.ContainerBuilder.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerLifetimeScope();
         }
 
-        public void Configure(IContainer container)
+        public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //TODO: Add configuration here
         }

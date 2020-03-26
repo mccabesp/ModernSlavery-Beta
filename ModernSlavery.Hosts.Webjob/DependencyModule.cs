@@ -48,28 +48,28 @@ namespace ModernSlavery.Hosts.Webjob
 
         public bool AutoSetup { get; } = false;
 
-        public void Register(DependencyBuilder builder)
+        public void Register(IDependencyBuilder builder)
         {
-            builder.Services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
+            builder.ServiceCollection.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
 
-            builder.Services.AddApplicationInsightsTelemetry(_sharedOptions.APPINSIGHTS_INSTRUMENTATIONKEY);
+            builder.ServiceCollection.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
 
-            builder.Services.AddSingleton<IJobActivator, AutofacJobActivator>();
+            builder.ServiceCollection.AddSingleton<IJobActivator, AutofacJobActivator>();
 
             //Register the database dependencies
-            builder.RegisterDependencyModule<DatabaseDependencyModule>();
+            builder.RegisterModule<DatabaseDependencyModule>();
 
             //Register the file storage dependencies
-            builder.RegisterDependencyModule<FileStorageDependencyModule>();
+            builder.RegisterModule<FileStorageDependencyModule>();
 
             //Register the log storage dependencies
-            builder.RegisterDependencyModule<Infrastructure.Logging.DependencyModule>();
+            builder.RegisterModule<Infrastructure.Logging.DependencyModule>();
 
             //Register the search dependencies
-            builder.RegisterDependencyModule<Infrastructure.Search.DependencyModule>();
+            builder.RegisterModule<Infrastructure.Search.DependencyModule>();
 
             //Register the companies house dependencies
-            builder.RegisterDependencyModule<Infrastructure.CompaniesHouse.DependencyModule>();
+            builder.RegisterModule<Infrastructure.CompaniesHouse.DependencyModule>();
 
             //Register the messaging dependencies
             builder.ContainerBuilder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
@@ -103,7 +103,7 @@ namespace ModernSlavery.Hosts.Webjob
 
         }
 
-        public void Configure(IContainer container)
+        public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //TODO: Add configuration here
         }

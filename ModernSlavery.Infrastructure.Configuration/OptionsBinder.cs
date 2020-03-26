@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,7 @@ namespace ModernSlavery.Infrastructure.Configuration
 
         private readonly Dictionary<Type, object> _bindings = new Dictionary<Type, object>();
 
+        
         public OptionsBinder(IServiceCollection services, IConfiguration configuration)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));

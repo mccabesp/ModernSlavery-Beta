@@ -18,7 +18,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 if (_SharedBusinessLogic.SharedOptions.CertExpiresWarningDays > 0)
                 {
                     //Get the cert thumbprint
-                    string certThumprint = _SharedBusinessLogic.SharedOptions.WEBSITE_LOAD_CERTIFICATES.SplitI(";").FirstOrDefault();
+                    string certThumprint = _SharedBusinessLogic.SharedOptions.Website_Load_Certificates.SplitI(";").FirstOrDefault();
                     if (string.IsNullOrWhiteSpace(certThumprint))certThumprint = _SharedBusinessLogic.SharedOptions.CertThumprint.SplitI(";").FirstOrDefault();
 
                     if (!string.IsNullOrWhiteSpace(certThumprint))
@@ -31,7 +31,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         {
                             await _Messenger.SendGeoMessageAsync(
                                 "GPG - WEBSITE CERTIFICATE EXPIRED",
-                                $"The website certificate for '{_SharedBusinessLogic.SharedOptions.EXTERNAL_HOST}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
+                                $"The website certificate for '{_SharedBusinessLogic.SharedOptions.ExternalHost}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
                         }
                         else
                         {
@@ -41,7 +41,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             {
                                 await _Messenger.SendGeoMessageAsync(
                                     "GPG - WEBSITE CERTIFICATE EXPIRING",
-                                    $"The website certificate for '{_SharedBusinessLogic.SharedOptions.EXTERNAL_HOST}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
+                                    $"The website certificate for '{_SharedBusinessLogic.SharedOptions.ExternalHost}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
                             }
                         }
                     }

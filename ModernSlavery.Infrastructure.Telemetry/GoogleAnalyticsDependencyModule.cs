@@ -26,10 +26,10 @@ namespace ModernSlavery.Infrastructure.Telemetry
         public bool AutoSetup { get; } = false;
         #endregion
 
-        public void Register(DependencyBuilder builder)
+        public void Register(IDependencyBuilder builder)
         {
             //Add a dedicated httpclient for Google Analytics tracking with exponential retry policy
-            builder.Services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), client =>
+            builder.ServiceCollection.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), client =>
             {
                 client.BaseAddress = GoogleAnalyticsTracker.BaseUri;
                 client.DefaultRequestHeaders.Clear();
@@ -55,7 +55,7 @@ namespace ModernSlavery.Infrastructure.Telemetry
 
         }
 
-        public void Configure(IContainer container)
+        public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //TODO: Add configuration here
         }

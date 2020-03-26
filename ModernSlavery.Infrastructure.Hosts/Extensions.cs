@@ -20,7 +20,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             var config = configBuilder.Build();
             Encryption.SetDefaultEncryptionKey(config["DefaultEncryptionKey"]);
             Console.WriteLine($"AzureStorageConnectionString: {config.GetConnectionString("AzureStorage")}");
-            Console.WriteLine($"Authority: {config["EXTERNAL_HOST"]}");
+            Console.WriteLine($"Authority: {config["ExternalHost"]}");
             return config;
         }
 

@@ -2436,7 +2436,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     string hasBeenWillBe = test ? "will be" : "has been";
                     string createdOrExtended = manualAction == ManualActions.Extend ? "extended" : "created";
                     string securityCodeHiddenOrShow =
-                        test ? new string('*', SharedBusinessLogic.SharedOptions.PINLength) : $"{securityCodeWorksOutcome.Result.SecurityCode}";
+                        test ? new string('*', SharedBusinessLogic.SharedOptions.PinLength) : $"{securityCodeWorksOutcome.Result.SecurityCode}";
                     writer.WriteLine(
                         $"{i}: {securityCodeWorksOutcome.Result}: {hasBeenWillBe} {createdOrExtended} to be '{securityCodeHiddenOrShow}' and will expire on '{securityCodeWorksOutcome.Result.SecurityCodeExpiryDateTime:dd/MMMM/yyyy}'");
 

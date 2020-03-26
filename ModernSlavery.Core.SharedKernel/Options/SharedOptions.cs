@@ -20,8 +20,7 @@ namespace ModernSlavery.Core.SharedKernel.Options
         public int SessionTimeOutMinutes { get; set; } = 20;
 
         #region App Insights
-
-        public string APPINSIGHTS_INSTRUMENTATIONKEY { get; set; }
+        public string AppInsights_InstrumentationKey { get; set; }
 
         #endregion
 
@@ -29,7 +28,7 @@ namespace ModernSlavery.Core.SharedKernel.Options
 
         public int CertExpiresWarningDays { get; set; } = 30;
 
-        public string TrustedIPDomains { get; set; }
+        public string TrustedIpDomains { get; set; }
 
         public bool UseDeveloperExceptions { get; set; }
         public string StartUrl { get; set; }
@@ -47,9 +46,9 @@ namespace ModernSlavery.Core.SharedKernel.Options
         public int EmailVerificationMinResendHours { get; set; }
         public int EmployerCodeLength { get; set; }
         public int EmployerPageSize { get; set; }
-        public string EXTERNAL_HOST { get; set; }
+        public string ExternalHost { get; set; }
 
-        public string SiteAuthority => $"https://{EXTERNAL_HOST}/";
+        public string SiteAuthority => $"https://{ExternalHost}/";
 
         public int LevenshteinDistance { get; set; } = 5;
         public int LockoutMinutes { get; set; }
@@ -63,7 +62,7 @@ namespace ModernSlavery.Core.SharedKernel.Options
         public DateTime PinExpiresDate => VirtualDateTime.Now.AddDays(0 - PinInPostExpiryDays);
 
         public int PinInPostMinRepostDays { get; set; }
-        public int PINLength { get; set; }
+        public int PinLength { get; set; }
         public int PurgeRetiredReturnDays { get; set; } = 30;
         public int PurgeUnusedOrganisationDays { get; set; } = 30;
         public int PurgeUnverifiedUserDays { get; set; } = 7;
@@ -76,7 +75,7 @@ namespace ModernSlavery.Core.SharedKernel.Options
         public string EmployerCodeChars { get; set; }
         public string PasswordRegex { get; set; }
         public string PasswordRegexError { get; set; }
-        public string PINChars { get; set; }
+        public string PinChars { get; set; }
         public string PinRegex { get; set; }
         public string PinRegexError { get; set; }
         public string TestPrefix { get; set; }
@@ -100,8 +99,8 @@ namespace ModernSlavery.Core.SharedKernel.Options
 
         public bool SendGoogleAnalyticsDataToGovUk { get; set; }
 
-        public string WEBSITE_INSTANCE_ID { get; set; }
-        public string WEBSITE_LOAD_CERTIFICATES { get; set; }
+        public string Website_Instance_Id { get; set; }
+        public string Website_Load_Certificates { get; set; }
         public string CertThumprint { get; set; }
 
 

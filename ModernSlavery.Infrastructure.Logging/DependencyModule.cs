@@ -19,7 +19,7 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public bool AutoSetup { get; } = false;
 
-        public void Register(DependencyBuilder builder)
+        public void Register(IDependencyBuilder builder)
         {
             // Register queues (without key filtering)
             builder.ContainerBuilder.Register(c => new LogEventQueue(_options.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
@@ -37,7 +37,7 @@ namespace ModernSlavery.Infrastructure.Logging
             builder.ContainerBuilder.RegisterType<RegistrationAuditLogger>().As<IRegistrationLogger>().SingleInstance();
 
         }
-        public void Configure(IContainer container)
+        public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //TODO: Add configuration here
         }

@@ -23,16 +23,13 @@ namespace ModernSlavery.Infrastructure.Configuration
                 dependencyBuilder.RegisterDomainAssemblyModules("ModernSlavery");
 
                 //Register the root dependency module and descendents
-                dependencyBuilder.Register<TModule>();
+                dependencyBuilder.RegisterModule<TModule>();
 
                 //Build all the registered dependencies
                 var serviceProvider = dependencyBuilder.Build();
 
-                //Configure all the autosetup modules
-                dependencyBuilder.ConfigureAll();;
-
                 //Configure the root module and descendents
-                dependencyBuilder.Configure<TModule>(); ;
+                dependencyBuilder.ConfigureModule<TModule>(); ;
 
                 //Return the service provider
                 return serviceProvider;
@@ -50,11 +47,8 @@ namespace ModernSlavery.Infrastructure.Configuration
                 //Register all the automatic dependencies
                 dependencyBuilder.RegisterDomainAssemblyModules("ModernSlavery");
 
-                //Build all the registered dependencies
+                //Build all the registered and configure all the autosetup dependencies 
                 var serviceProvider = dependencyBuilder.Build();
-
-                //Configure all the autosetup modules
-                dependencyBuilder.ConfigureAll();
 
                 //Return the service provider
                 return serviceProvider;

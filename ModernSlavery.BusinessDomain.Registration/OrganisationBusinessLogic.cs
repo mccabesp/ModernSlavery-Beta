@@ -152,8 +152,8 @@ namespace ModernSlavery.BusinessDomain.Registration
         {
             if (isTestUser) return "ABCDEFG";
 
-            return Crypto.GeneratePasscode(_sharedBusinessLogic.SharedOptions.PINChars.ToCharArray(),
-                _sharedBusinessLogic.SharedOptions.PINLength);
+            return Crypto.GeneratePasscode(_sharedBusinessLogic.SharedOptions.PinChars.ToCharArray(),
+                _sharedBusinessLogic.SharedOptions.PinLength);
         }
 
         public virtual async Task<CustomResult<OrganisationScope>> SetAsScopeAsync(string employerRef,
