@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Options;
@@ -16,14 +15,19 @@ namespace ModernSlavery.Infrastructure.Hosts.WebHost
 {
     public static partial class Extensions
     {
-        public static (IServiceCollection, DistributedCacheOptions) AddDistributedCache(this IServiceCollection services, DistributedCacheOptions cacheOptions)
+        public static (IServiceCollection, DistributedCacheOptions) AddDistributedCache(
+            this IServiceCollection services, DistributedCacheOptions cacheOptions)
         {
             switch (cacheOptions.Type)
             {
                 case "redis":
-                    if (string.IsNullOrWhiteSpace(cacheOptions.AzureConnectionString)) throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
+                    if (string.IsNullOrWhiteSpace(cacheOptions.AzureConnectionString))
+                        throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
 
-                    services.AddStackExchangeRedisCache(options => { options.Configuration = cacheOptions.AzureConnectionString; });
+                    services.AddStackExchangeRedisCache(options =>
+                    {
+                        options.Configuration = cacheOptions.AzureConnectionString;
+                    });
                     break;
                 case "memory":
                     //Use a memory cache
@@ -36,14 +40,18 @@ namespace ModernSlavery.Infrastructure.Hosts.WebHost
             return (services, cacheOptions);
         }
 
-        public static IServiceCollection AddDataProtection(this (IServiceCollection Services, DistributedCacheOptions CacheOptions) options, DataProtectionOptions dataProtectionOptions)
+        public static IServiceCollection AddDataProtection(
+            this (IServiceCollection Services, DistributedCacheOptions CacheOptions) options,
+            DataProtectionOptions dataProtectionOptions)
         {
             switch (dataProtectionOptions.Type.ToLower())
             {
                 case "redis":
-                    if (string.IsNullOrWhiteSpace(options.CacheOptions.AzureConnectionString))throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
+                    if (string.IsNullOrWhiteSpace(options.CacheOptions.AzureConnectionString))
+                        throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
 
-                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.KeyName))throw new Exception("Invalid or missing setting 'DataProtection:KeyName'");
+                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.KeyName))
+                        throw new Exception("Invalid or missing setting 'DataProtection:KeyName'");
 
                     var redis = ConnectionMultiplexer.Connect(options.CacheOptions.AzureConnectionString);
                     options.Services.AddDataProtection(options =>
@@ -53,11 +61,14 @@ namespace ModernSlavery.Infrastructure.Hosts.WebHost
                     break;
                 case "blob":
                     //Use blob storage to persist data protection keys equivalent to old MachineKeys
-                    if (string.IsNullOrWhiteSpace(options.CacheOptions.AzureConnectionString)) throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
+                    if (string.IsNullOrWhiteSpace(options.CacheOptions.AzureConnectionString))
+                        throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
 
-                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.Container))throw new Exception("Invalid or missing setting 'DataProtection:Container'");
+                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.Container))
+                        throw new Exception("Invalid or missing setting 'DataProtection:Container'");
 
-                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.KeyFilepath))throw new Exception("Invalid or missing setting 'DataProtection:KeyFilePath'");
+                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.KeyFilepath))
+                        throw new Exception("Invalid or missing setting 'DataProtection:KeyFilePath'");
 
                     //Get or create the container automatically
                     var storageAccount = CloudStorageAccount.Parse(options.CacheOptions.AzureConnectionString);

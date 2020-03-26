@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.SharedKernel;
@@ -10,7 +8,8 @@ namespace ModernSlavery.Infrastructure.Configuration
 {
     public static class Extensions
     {
-        public static IServiceProvider SetupDependencies<TModule>(this IServiceCollection services, IConfiguration configuration) where TModule: class, IDependencyModule
+        public static IServiceProvider SetupDependencies<TModule>(this IServiceCollection services,
+            IConfiguration configuration) where TModule : class, IDependencyModule
         {
             //Load all the IOptions in the domain
             var optionsBinder = new OptionsBinder(services, configuration);
@@ -29,12 +28,14 @@ namespace ModernSlavery.Infrastructure.Configuration
                 var serviceProvider = dependencyBuilder.Build();
 
                 //Configure the root module and descendents
-                dependencyBuilder.ConfigureModule<TModule>(); ;
+                dependencyBuilder.ConfigureModule<TModule>();
+                ;
 
                 //Return the service provider
                 return serviceProvider;
             }
         }
+
         public static IServiceProvider SetupDependencies(this IServiceCollection services, IConfiguration configuration)
         {
             //Load all the IOptions in the domain

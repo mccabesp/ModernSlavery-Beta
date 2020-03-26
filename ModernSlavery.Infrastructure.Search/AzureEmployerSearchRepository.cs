@@ -28,8 +28,8 @@ namespace ModernSlavery.Infrastructure.Search
 
         private readonly Lazy<Task<ISearchServiceClient>> _serviceClient;
         private readonly TelemetryClient _telemetryClient;
-        private readonly SharedOptions SharedOptions;
         public readonly IAuditLogger SearchLog;
+        private readonly SharedOptions SharedOptions;
 
         public AzureEmployerSearchRepository(
             SharedOptions sharedOptions,

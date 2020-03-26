@@ -1,8 +1,6 @@
 ﻿using System;
 using Autofac;
-using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Database.Classes;
 

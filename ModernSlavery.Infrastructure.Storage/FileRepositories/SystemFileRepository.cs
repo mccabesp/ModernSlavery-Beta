@@ -90,7 +90,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            return await Task.Run(() => System.IO.File.ReadAllText(filePath));
+            return await Task.Run(() => File.ReadAllText(filePath));
         }
 
         public async Task ReadAsync(string filePath, Stream stream)
@@ -194,7 +194,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            return System.IO.File.Exists(filePath);
+            return File.Exists(filePath);
         }
 
         private void CreateDirectory(string directoryPath)
@@ -234,7 +234,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            return System.IO.File.GetLastWriteTime(filePath);
+            return File.GetLastWriteTime(filePath);
         }
 
         private long GetFileSize(string filePath)
@@ -256,10 +256,10 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             Retry:
             try
             {
-                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+                if (File.Exists(filePath)) File.Delete(filePath);
 
                 var metaPath = filePath + ".metadata";
-                if (System.IO.File.Exists(metaPath)) System.IO.File.Delete(metaPath);
+                if (File.Exists(metaPath)) File.Delete(metaPath);
             }
             catch (IOException)
             {
@@ -277,7 +277,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             if (!Path.IsPathRooted(sourceFilePath)) sourceFilePath = Path.Combine(_rootDir.FullName, sourceFilePath);
 
-            if (!System.IO.File.Exists(sourceFilePath))
+            if (!File.Exists(sourceFilePath))
                 throw new FileNotFoundException($"Cannot find source file '{sourceFilePath}'");
 
             if (string.IsNullOrWhiteSpace(destinationFilePath))
@@ -286,19 +286,19 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             if (!Path.IsPathRooted(destinationFilePath))
                 destinationFilePath = Path.Combine(_rootDir.FullName, destinationFilePath);
 
-            if (System.IO.File.Exists(destinationFilePath) && !overwrite)
+            if (File.Exists(destinationFilePath) && !overwrite)
                 throw new Exception($"Destination file '{destinationFilePath}' exists.");
 
             var retries = 0;
             Retry:
             try
             {
-                System.IO.File.Copy(sourceFilePath, destinationFilePath, true);
+                File.Copy(sourceFilePath, destinationFilePath, true);
                 var sourceFileMetaPath = sourceFilePath + ".metadata";
                 var destinationFileMetaPath = destinationFilePath + ".metadata";
 
-                if (System.IO.File.Exists(sourceFileMetaPath))
-                    System.IO.File.Copy(sourceFileMetaPath, destinationFileMetaPath, true);
+                if (File.Exists(sourceFileMetaPath))
+                    File.Copy(sourceFileMetaPath, destinationFileMetaPath, true);
             }
             catch (IOException)
             {
@@ -356,7 +356,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            using (Stream fs = System.IO.File.OpenRead(filePath))
+            using (Stream fs = File.OpenRead(filePath))
             {
                 fs.CopyTo(stream);
             }
@@ -368,7 +368,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            return System.IO.File.ReadAllBytes(filePath);
+            return File.ReadAllBytes(filePath);
         }
 
         private void Append(string filePath, string text)
@@ -386,7 +386,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             Retry:
             try
             {
-                System.IO.File.AppendAllText(filePath, text);
+                File.AppendAllText(filePath, text);
             }
             catch (IOException)
             {
@@ -413,7 +413,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             Retry:
             try
             {
-                System.IO.File.WriteAllBytes(filePath, bytes);
+                File.WriteAllBytes(filePath, bytes);
             }
             catch (IOException)
             {
@@ -440,7 +440,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             Retry:
             try
             {
-                using (var fs = System.IO.File.OpenWrite(filePath))
+                using (var fs = File.OpenWrite(filePath))
                 {
                     stream.CopyTo(fs);
                 }
@@ -472,7 +472,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             Retry:
             try
             {
-                System.IO.File.WriteAllText(filePath, System.IO.File.ReadAllText(uploadFile.FullName));
+                File.WriteAllText(filePath, File.ReadAllText(uploadFile.FullName));
             }
             catch (IOException)
             {
@@ -490,10 +490,10 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            if (!System.IO.File.Exists(filePath)) throw new FileNotFoundException("Cant find file", filePath);
+            if (!File.Exists(filePath)) throw new FileNotFoundException("Cant find file", filePath);
 
             var metaPath = filePath + ".metadata";
-            var metaJson = System.IO.File.Exists(metaPath) ? System.IO.File.ReadAllText(metaPath) : null;
+            var metaJson = File.Exists(metaPath) ? File.ReadAllText(metaPath) : null;
             if (!string.IsNullOrWhiteSpace(metaJson))
             {
                 var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(metaJson);
@@ -517,8 +517,8 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
                 metaJson = JsonConvert.SerializeObject(metaData);
 
             if (!string.IsNullOrWhiteSpace(metaJson))
-                System.IO.File.WriteAllText(metaPath, metaJson);
-            else if (System.IO.File.Exists(metaPath)) System.IO.File.Delete(metaPath);
+                File.WriteAllText(metaPath, metaJson);
+            else if (File.Exists(metaPath)) File.Delete(metaPath);
         }
 
         private string GetMetaData(string filePath, string key)

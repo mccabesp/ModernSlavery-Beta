@@ -1,19 +1,19 @@
-﻿using ModernSlavery.Core.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.CompaniesHouse;
+using ModernSlavery.Core.SharedKernel.Options;
 using Newtonsoft.Json;
 using Polly;
 using Polly.Extensions.Http;
-using System.Text;
-using System.Net.Http.Headers;
-using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.CompaniesHouse
 {
@@ -23,9 +23,9 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
 
         private readonly HttpClient _httpClient;
         private readonly Uri BaseUri;
-        private readonly SharedOptions SharedOptions;
 
         private readonly CompaniesHouseOptions Options;
+        private readonly SharedOptions SharedOptions;
 
         public CompaniesHouseAPI(CompaniesHouseOptions options, SharedOptions sharedOptions)
         {
@@ -257,7 +257,8 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             httpClient.BaseAddress = new Uri(apiServer);
 
             httpClient.DefaultRequestHeaders.Clear();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",Convert.ToBase64String(Encoding.ASCII.GetBytes($"{apiKey}:")));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                Convert.ToBase64String(Encoding.ASCII.GetBytes($"{apiKey}:")));
             httpClient.DefaultRequestHeaders.ConnectionClose = false;
             ServicePointManager.FindServicePoint(httpClient.BaseAddress).ConnectionLeaseTimeout = 60 * 1000;
         }

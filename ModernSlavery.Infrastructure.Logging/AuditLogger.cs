@@ -11,9 +11,9 @@ namespace ModernSlavery.Infrastructure.Logging
     public class AuditLogger : IAuditLogger
     {
         private readonly string fileName;
-        protected readonly SharedOptions SharedOptions;
 
         private readonly IQueue queue;
+        protected readonly SharedOptions SharedOptions;
 
         public AuditLogger(SharedOptions sharedOptions, LogRecordQueue queue, string applicationName,
             string fileName)

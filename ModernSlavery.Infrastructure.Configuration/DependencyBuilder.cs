@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Autofac;
-using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.SharedKernel.Interfaces;
@@ -12,14 +11,11 @@ namespace ModernSlavery.Core.SharedKernel
 {
     public class DependencyBuilder : IDisposable, IDependencyBuilder
     {
-        private Dictionary<Type, IDependencyModule> _registeredModules = null;
-        private HashSet<Type> _configuredModules = null;
-        
-        public IServiceCollection ServiceCollection { get; }
-        public ContainerBuilder ContainerBuilder { get; }
+        private HashSet<Type> _configuredModules;
+        private IContainer _container;
+        private Dictionary<Type, IDependencyModule> _registeredModules;
 
-        private IServiceProvider _serviceProvider = null;
-        private IContainer _container = null;
+        private IServiceProvider _serviceProvider;
 
         public DependencyBuilder(IServiceCollection services)
         {
@@ -27,6 +23,19 @@ namespace ModernSlavery.Core.SharedKernel
             ContainerBuilder = new ContainerBuilder();
             ContainerBuilder.Populate(services);
             _registeredModules = new Dictionary<Type, IDependencyModule>();
+        }
+
+        public IServiceCollection ServiceCollection { get; }
+        public ContainerBuilder ContainerBuilder { get; }
+
+        /// <summary>
+        ///     Registers all dependencies declared within the Bind method of the specified IDependencyModule
+        /// </summary>
+        /// <typeparam name="TModule">The IDependenciesModule class containing the dependencies</typeparam>
+        public void RegisterModule<TModule>() where TModule : class, IDependencyModule
+        {
+            //Resolve a new instance of the dependencies module
+            RegisterModule(typeof(TModule));
         }
 
         public void Dispose()
@@ -37,7 +46,7 @@ namespace ModernSlavery.Core.SharedKernel
             _container = null;
         }
 
-        private void RegisterModule(Type dependencyType, bool autoOnly=false)
+        private void RegisterModule(Type dependencyType, bool autoOnly = false)
         {
             //Check if the dependency module has already been registered
             if (_registeredModules.ContainsKey(dependencyType)) return;
@@ -62,17 +71,7 @@ namespace ModernSlavery.Core.SharedKernel
         }
 
         /// <summary>
-        ///     Registers all dependencies declared within the Bind method of the specified IDependencyModule
-        /// </summary>
-        /// <typeparam name="TModule">The IDependenciesModule class containing the dependencies</typeparam>
-        public void RegisterModule<TModule>() where TModule : class, IDependencyModule
-        {
-            //Resolve a new instance of the dependencies module
-            RegisterModule(typeof(TModule));
-        }
-
-        /// <summary>
-        ///     Build all dependencies all classes implementing IDependenciesModule in the specified assembly 
+        ///     Build all dependencies all classes implementing IDependenciesModule in the specified assembly
         /// </summary>
         /// <param name="assembly"></param>
         private void RegisterAssemblyModules(Assembly assembly)
@@ -88,7 +87,8 @@ namespace ModernSlavery.Core.SharedKernel
         }
 
         /// <summary>
-        ///     Bind all classes implementing IDependenciesModule in all assemblies of the current AppDomain who's assembly name starts with the specified prefix
+        ///     Bind all classes implementing IDependenciesModule in all assemblies of the current AppDomain who's assembly name
+        ///     starts with the specified prefix
         /// </summary>
         /// <param name="assemblyPrefix">The prefix of the assembly names to search</param>
         public void RegisterDomainAssemblyModules(string assemblyPrefix)
@@ -110,7 +110,7 @@ namespace ModernSlavery.Core.SharedKernel
 
             var module = _registeredModules[serviceType];
 
-            module.Configure(_serviceProvider,_container);
+            module.Configure(_serviceProvider, _container);
 
             _configuredModules.Add(serviceType);
         }
@@ -121,17 +121,20 @@ namespace ModernSlavery.Core.SharedKernel
         /// <typeparam name="TModule">The IDependenciesModule class containing the dependencies</typeparam>
         public void ConfigureModule<TModule>() where TModule : class, IDependencyModule
         {
-            if (_configuredModules == null) throw new Exception("Cannot configure dependency modules until after dependencies have been built");
+            if (_configuredModules == null)
+                throw new Exception("Cannot configure dependency modules until after dependencies have been built");
             //Resolve a new instance of the dependencies module
             ConfigureModule(typeof(TModule));
         }
 
         /// <summary>
-        ///     Configures all previously registered dependencies declared within the Register method of the specified IDependencyModule
+        ///     Configures all previously registered dependencies declared within the Register method of the specified
+        ///     IDependencyModule
         /// </summary>
         public void ConfigureModules()
         {
-            if (_configuredModules == null) throw new Exception("Cannot configure dependency modules until after dependencies have been built");
+            if (_configuredModules == null)
+                throw new Exception("Cannot configure dependency modules until after dependencies have been built");
             //Resolve a new instance of the dependencies module
             foreach (var moduleType in _registeredModules.Keys.Except(_configuredModules))
                 ConfigureModule(moduleType);
@@ -139,8 +142,8 @@ namespace ModernSlavery.Core.SharedKernel
 
 
         /// <summary>
-        /// Builds all the registered dependencies into the service provider and autofac container
-        /// Configure all the registered dependencies marked for autosetup
+        ///     Builds all the registered dependencies into the service provider and autofac container
+        ///     Configure all the registered dependencies marked for autosetup
         /// </summary>
         /// <returns>The system service provider</returns>
         public IServiceProvider Build()
@@ -154,21 +157,19 @@ namespace ModernSlavery.Core.SharedKernel
 
             //Register the container
             ServiceCollection.AddSingleton(_container);
-            
+
             //Create the holder for the configured modules
             _configuredModules = new HashSet<Type>();
-            
+
             //Save the service provider for later calling the configurations
             _serviceProvider = _container.Resolve<IServiceProvider>();
 
             //Configure all the autosetup modules
-            ConfigureModules(); ;
+            ConfigureModules();
+            ;
 
             //Return the service provides
             return _serviceProvider;
         }
-
-
-        
     }
 }

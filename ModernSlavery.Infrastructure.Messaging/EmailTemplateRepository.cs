@@ -35,7 +35,7 @@ namespace ModernSlavery.Infrastructure.Messaging
 
             // ensure file exists
             var filePath = Path.Combine(TemplateFolderPath, fileName);
-            var fileContent = System.IO.File.ReadAllText(filePath);
+            var fileContent = File.ReadAllText(filePath);
 
             // parse html file
             var parser = new HtmlParser();

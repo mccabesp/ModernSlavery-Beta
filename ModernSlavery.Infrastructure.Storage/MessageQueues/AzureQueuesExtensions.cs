@@ -1,7 +1,5 @@
 ﻿using System;
 using Autofac;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Storage.MessageQueues
@@ -26,7 +24,5 @@ namespace ModernSlavery.Infrastructure.Storage.MessageQueues
                 .Keyed<IQueue>(queueName)
                 .SingleInstance();
         }
-
-        
     }
 }

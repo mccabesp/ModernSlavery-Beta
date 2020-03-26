@@ -1,6 +1,5 @@
 ﻿using System;
 using Autofac;
-using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
@@ -9,9 +8,10 @@ using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
 namespace ModernSlavery.Infrastructure.Logging
 {
-    public class DependencyModule: IDependencyModule
+    public class DependencyModule : IDependencyModule
     {
         private readonly StorageOptions _options;
+
         public DependencyModule(StorageOptions options)
         {
             _options = options;
@@ -22,8 +22,12 @@ namespace ModernSlavery.Infrastructure.Logging
         public void Register(IDependencyBuilder builder)
         {
             // Register queues (without key filtering)
-            builder.ContainerBuilder.Register(c => new LogEventQueue(_options.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
-            builder.ContainerBuilder.Register(c => new LogRecordQueue(_options.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
+            builder.ContainerBuilder
+                .Register(c => new LogEventQueue(_options.AzureConnectionString, c.Resolve<IFileRepository>()))
+                .SingleInstance();
+            builder.ContainerBuilder
+                .Register(c => new LogRecordQueue(_options.AzureConnectionString, c.Resolve<IFileRepository>()))
+                .SingleInstance();
 
             // Register record loggers
             builder.ContainerBuilder.RegisterLogRecord(Filenames.BadSicLog);
@@ -35,8 +39,8 @@ namespace ModernSlavery.Infrastructure.Logging
             // Register log records (without key filtering)
             builder.ContainerBuilder.RegisterType<UserAuditLogger>().As<IUserLogger>().SingleInstance();
             builder.ContainerBuilder.RegisterType<RegistrationAuditLogger>().As<IRegistrationLogger>().SingleInstance();
-
         }
+
         public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //TODO: Add configuration here

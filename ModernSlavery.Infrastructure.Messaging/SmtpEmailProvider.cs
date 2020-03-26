@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp;
@@ -41,7 +42,7 @@ namespace ModernSlavery.Infrastructure.Messaging
 
             // get template
             var emailTemplateInfo = EmailTemplateRepo.GetByTemplateId(templateId);
-            var htmlContent = System.IO.File.ReadAllText(emailTemplateInfo.FilePath);
+            var htmlContent = File.ReadAllText(emailTemplateInfo.FilePath);
 
             // parse html
             var parser = new HtmlParser();

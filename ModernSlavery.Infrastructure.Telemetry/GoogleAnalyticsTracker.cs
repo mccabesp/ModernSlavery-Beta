@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +26,8 @@ namespace ModernSlavery.Infrastructure.Telemetry
 
         private readonly string googleVersion = "1";
 
-        public GoogleAnalyticsTracker(ILogger<GoogleAnalyticsTracker> logger, IHttpContextAccessor httpContextAccessor, HttpClient httpClient, string trackingId)
+        public GoogleAnalyticsTracker(ILogger<GoogleAnalyticsTracker> logger, IHttpContextAccessor httpContextAccessor,
+            HttpClient httpClient, string trackingId)
         {
             _Logger = logger;
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -45,22 +45,14 @@ namespace ModernSlavery.Infrastructure.Telemetry
 
         public async Task SendPageViewTrackingAsync(string title, string url)
         {
-            if (string.IsNullOrWhiteSpace(title))
-            {
-                throw new ArgumentNullException(nameof(title));
-            }
+            if (string.IsNullOrWhiteSpace(title)) throw new ArgumentNullException(nameof(title));
 
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                throw new ArgumentNullException(nameof(url));
-            }
+            if (string.IsNullOrWhiteSpace(url)) throw new ArgumentNullException(nameof(url));
 
-            if (!url.IsUrl())
-            {
-                throw new ArgumentException("Url is not absolute", nameof(url));
-            }
+            if (!url.IsUrl()) throw new ArgumentException("Url is not absolute", nameof(url));
 
-            var postData = new List<KeyValuePair<string, string>> {
+            var postData = new List<KeyValuePair<string, string>>
+            {
                 new KeyValuePair<string, string>("v", googleVersion),
                 new KeyValuePair<string, string>("tid", googleTrackingId),
                 new KeyValuePair<string, string>("cid", googleClientId),
@@ -69,17 +61,17 @@ namespace ModernSlavery.Infrastructure.Telemetry
                 new KeyValuePair<string, string>("dl", url)
             };
 
-            HttpResponseMessage response=null;
+            HttpResponseMessage response = null;
             try
             {
-                response = await _httpClient.PostAsync(endpointUri, new FormUrlEncodedContent(postData)).ConfigureAwait(false);
+                response = await _httpClient.PostAsync(endpointUri, new FormUrlEncodedContent(postData))
+                    .ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
             }
             catch (Exception ex)
             {
-                _Logger.LogError(ex,$"Could not track title:'{title}', url:'{url}'");
+                _Logger.LogError(ex, $"Could not track title:'{title}', url:'{url}'");
             }
         }
-
     }
 }

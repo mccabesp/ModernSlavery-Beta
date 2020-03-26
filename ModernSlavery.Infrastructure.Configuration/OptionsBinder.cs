@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
@@ -12,12 +11,11 @@ namespace ModernSlavery.Infrastructure.Configuration
 {
     public class OptionsBinder
     {
+        private readonly Dictionary<Type, object> _bindings = new Dictionary<Type, object>();
         public readonly IConfiguration Configuration;
         public readonly IServiceCollection Services;
 
-        private readonly Dictionary<Type, object> _bindings = new Dictionary<Type, object>();
 
-        
         public OptionsBinder(IServiceCollection services, IConfiguration configuration)
         {
             Services = services ?? throw new ArgumentNullException(nameof(services));
@@ -107,7 +105,8 @@ namespace ModernSlavery.Infrastructure.Configuration
         }
 
         /// <summary>
-        ///     Bind all classes implementing IOptions in all assemblies of the current AppDomain who's assembly name starts with the specified prefix
+        ///     Bind all classes implementing IOptions in all assemblies of the current AppDomain who's assembly name starts with
+        ///     the specified prefix
         ///     Only classes with OptionsAttribute.Key will be bound.
         /// </summary>
         /// <param name="assemblyPrefix"></param>
@@ -125,13 +124,13 @@ namespace ModernSlavery.Infrastructure.Configuration
         }
 
         /// <summary>
-        ///     Bind all classes implementing IOptions in the specified assembly 
+        ///     Bind all classes implementing IOptions in the specified assembly
         ///     Only classes with OptionsAttribute.Key will be bound.
         /// </summary>
         /// <param name="assembly"></param>
         public void BindAssembly(Assembly assembly)
         {
-            if (assembly==null) throw new ArgumentNullException(nameof(assembly));
+            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 
             var type = typeof(IOptions);
 
