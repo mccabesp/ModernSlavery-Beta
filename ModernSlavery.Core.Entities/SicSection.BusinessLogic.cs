@@ -10,7 +10,7 @@ namespace ModernSlavery.Core.Entities
             // Check for null values and compare run-time types.
             if (obj == null || GetType() != obj.GetType()) return false;
 
-            var target = (Entities.SicSection) obj;
+            var target = (SicSection) obj;
             return SicSectionId == target.SicSectionId;
         }
     }

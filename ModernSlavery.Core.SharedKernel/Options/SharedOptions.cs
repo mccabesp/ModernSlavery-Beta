@@ -7,9 +7,10 @@ namespace ModernSlavery.Core.SharedKernel.Options
 {
     public class SharedOptions : IOptions
     {
-        public string DefaultEncryptionKey { get; set; }
+        private string _IdentityIssuer;
 
         private int[] _reminderEmailDays;
+        public string DefaultEncryptionKey { get; set; }
 
         public string AuthSecret { get; set; } = "secret";
 
@@ -20,6 +21,7 @@ namespace ModernSlavery.Core.SharedKernel.Options
         public int SessionTimeOutMinutes { get; set; } = 20;
 
         #region App Insights
+
         public string AppInsights_InstrumentationKey { get; set; }
 
         #endregion
@@ -50,11 +52,9 @@ namespace ModernSlavery.Core.SharedKernel.Options
 
         public string SiteAuthority => $"https://{ExternalHost}/";
 
-        private string _IdentityIssuer = null;
-
         public string IdentityIssuer
         {
-            get => string.IsNullOrWhiteSpace(_IdentityIssuer) ? $"{SiteAuthority}/account": _IdentityIssuer;
+            get => string.IsNullOrWhiteSpace(_IdentityIssuer) ? $"{SiteAuthority}/account" : _IdentityIssuer;
             set => _IdentityIssuer = value;
         }
 

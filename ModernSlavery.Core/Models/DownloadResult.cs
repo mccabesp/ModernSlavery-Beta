@@ -59,7 +59,7 @@ namespace ModernSlavery.Core.Models
                 FemaleTopQuartile = @return.FemaleUpperQuartilePayBand,
                 CompanyLinkToGPGInfo = @return.CompanyLinkToGPGInfo,
                 ResponsiblePerson = @return.ResponsiblePerson,
-                EmployerSize = Attributes.GetAttribute<DisplayAttribute>((Enum) @return.OrganisationSize).Name,
+                EmployerSize = @return.OrganisationSize.GetAttribute<DisplayAttribute>().Name,
                 CurrentName = @return.Organisation?.OrganisationName,
                 SubmittedAfterTheDeadline = @return.IsLateSubmission,
                 DueDate = @return.AccountingDate.AddYears(1),

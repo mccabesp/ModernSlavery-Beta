@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace ModernSlavery.Core.Extensions
 {
-    public static partial class Extensions
+    public static class Extensions
     {
         public static void DisableResponseCache(this HttpContext context)
         {
@@ -17,15 +17,12 @@ namespace ModernSlavery.Core.Extensions
         public static void SetResponseCache(this HttpContext context, int maxSeconds)
         {
             if (maxSeconds > 0)
-            {
                 context.Response.Headers[HeaderNames.CacheControl] = $"public,max-age={maxSeconds}";
-            }
             else
-            {
-                context.Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue {
+                context.Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue
+                {
                     NoCache = true, NoStore = true, MaxAge = new TimeSpan(0), MustRevalidate = true
                 };
-            }
         }
 
         /// <summary>
@@ -41,10 +38,7 @@ namespace ModernSlavery.Core.Extensions
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
-                    if (context.Response.Headers.ContainsKey(key))
-                    {
-                        context.Response.Headers.Remove(key);
-                    }
+                    if (context.Response.Headers.ContainsKey(key)) context.Response.Headers.Remove(key);
                 }
                 else if (!context.Response.Headers.ContainsKey(key))
                 {
@@ -59,9 +53,8 @@ namespace ModernSlavery.Core.Extensions
             catch (Exception ex)
             {
                 if (context.Response.Headers.ContainsKey(key))
-                {
-                    throw new Exception($"Could not set header '{key}' from value '{context.Response.Headers[key]}' to '{value}' ", ex);
-                }
+                    throw new Exception(
+                        $"Could not set header '{key}' from value '{context.Response.Headers[key]}' to '{value}' ", ex);
 
                 throw new Exception($"Could not add header '{key}' to value '{value}' ", ex);
             }
@@ -74,11 +67,8 @@ namespace ModernSlavery.Core.Extensions
 
         public static string GetParams(this HttpContext context, string key)
         {
-            StringValues? param = context.Request?.Query[key];
-            if (string.IsNullOrWhiteSpace(param))
-            {
-                param = context.Request?.Form[key];
-            }
+            var param = context.Request?.Query[key];
+            if (string.IsNullOrWhiteSpace(param)) param = context.Request?.Form[key];
 
             return param;
         }
@@ -90,67 +80,52 @@ namespace ModernSlavery.Core.Extensions
 
         public static Uri GetUri(this HttpContext context)
         {
-            string host = context.Request.Scheme.EqualsI("https") && context.Request.Host.Port == 443
-                          || context.Request.Scheme.EqualsI("http") && context.Request.Host.Port == 80
+            var host = context.Request.Scheme.EqualsI("https") && context.Request.Host.Port == 443
+                       || context.Request.Scheme.EqualsI("http") && context.Request.Host.Port == 80
                 ? context.Request.Host.Host
                 : context.Request.Host.ToString();
-            string uri = $"{context.Request.Scheme}://{host}";
-            string path = context.Request.Path.ToString().TrimI("/\\ ");
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                uri += $"/{path}";
-            }
+            var uri = $"{context.Request.Scheme}://{host}";
+            var path = context.Request.Path.ToString().TrimI("/\\ ");
+            if (!string.IsNullOrWhiteSpace(path)) uri += $"/{path}";
 
-            string querystring = context.Request.QueryString.ToString().TrimI("? ");
-            if (!string.IsNullOrWhiteSpace(querystring))
-            {
-                uri += $"?{querystring}";
-            }
+            var querystring = context.Request.QueryString.ToString().TrimI("? ");
+            if (!string.IsNullOrWhiteSpace(querystring)) uri += $"?{querystring}";
 
             return new Uri(uri);
         }
 
         public static string ResolveUrl(this HttpContext context, string relativePath)
         {
-            string host = context.Request.Scheme.EqualsI("https") && context.Request.Host.Port == 443
-                          || context.Request.Scheme.EqualsI("http") && context.Request.Host.Port == 80
+            var host = context.Request.Scheme.EqualsI("https") && context.Request.Host.Port == 443
+                       || context.Request.Scheme.EqualsI("http") && context.Request.Host.Port == 80
                 ? context.Request.Host.Host
                 : context.Request.Host.ToString();
-            string uri = $"{context.Request.Scheme}://{host}";
+            var uri = $"{context.Request.Scheme}://{host}";
 
-            string path = relativePath.TrimI("~/\\ ");
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                uri += $"/{path}";
-            }
+            var path = relativePath.TrimI("~/\\ ");
+            if (!string.IsNullOrWhiteSpace(path)) uri += $"/{path}";
 
             return uri;
         }
 
         public static Uri ResolveUri(this HttpContext context, string relativePath)
         {
-            string host = context.Request.Scheme.EqualsI("https") && context.Request.Host.Port == 443
-                          || context.Request.Scheme.EqualsI("http") && context.Request.Host.Port == 80
+            var host = context.Request.Scheme.EqualsI("https") && context.Request.Host.Port == 443
+                       || context.Request.Scheme.EqualsI("http") && context.Request.Host.Port == 80
                 ? context.Request.Host.Host
                 : context.Request.Host.ToString();
-            string uri = $"{context.Request.Scheme}://{host}";
+            var uri = $"{context.Request.Scheme}://{host}";
 
-            string path = relativePath.TrimI("~/\\ ");
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                uri += $"/{path}";
-            }
+            var path = relativePath.TrimI("~/\\ ");
+            if (!string.IsNullOrWhiteSpace(path)) uri += $"/{path}";
 
             return new Uri(uri);
         }
 
         public static Uri GetUrlReferrer(this HttpContext context)
         {
-            string url = context.Request.Headers["Referer"].ToString();
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                return null;
-            }
+            var url = context.Request.Headers["Referer"].ToString();
+            if (string.IsNullOrWhiteSpace(url)) return null;
 
             try
             {
@@ -164,15 +139,10 @@ namespace ModernSlavery.Core.Extensions
 
         public static bool GetIsExternalUrl(this HttpContext context, string href)
         {
-            if (string.IsNullOrWhiteSpace(href) || href.IsRelativeUri())
-            {
-                return false;
-            }
+            if (string.IsNullOrWhiteSpace(href) || href.IsRelativeUri()) return false;
 
             if (!Uri.IsWellFormedUriString(href, UriKind.Absolute))
-            {
                 throw new ArgumentException($"Url '{href}' is not well formed", nameof(href));
-            }
 
             var uri = new Uri(href);
             return !uri.Host.EqualsI(context.Request.Host.Host, StringComparer.OrdinalIgnoreCase);
@@ -199,25 +169,21 @@ namespace ModernSlavery.Core.Extensions
             bool httpOnly = false,
             bool secure = false)
         {
-            var cookieOptions = new CookieOptions {
+            var cookieOptions = new CookieOptions
+            {
                 Expires = expires,
-                SameSite= Microsoft.AspNetCore.Http.SameSiteMode.Strict,
+                SameSite = SameSiteMode.Strict,
                 Domain = subdomain,
                 Path = path,
                 Secure = secure,
                 HttpOnly = httpOnly
             };
             if (string.IsNullOrWhiteSpace(value))
-            {
                 context.Response.Cookies.Delete(key);
-            }
             else
-            {
                 context.Response.Cookies.Append(key, value, cookieOptions);
-            }
         }
 
         #endregion
-
     }
 }

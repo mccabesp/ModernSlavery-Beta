@@ -59,7 +59,7 @@ namespace ModernSlavery.Core.Entities
             // Check for null values and compare run-time types.
             if (obj == null || GetType() != obj.GetType()) return false;
 
-            var target = (Entities.Return) obj;
+            var target = (Return) obj;
             return ReturnId == target.ReturnId;
         }
 
@@ -120,7 +120,7 @@ namespace ModernSlavery.Core.Entities
             StatusDetails = details;
         }
 
-        public bool Equals(Entities.Return model)
+        public bool Equals(Return model)
         {
             if (AccountingDate != model.AccountingDate) return false;
 

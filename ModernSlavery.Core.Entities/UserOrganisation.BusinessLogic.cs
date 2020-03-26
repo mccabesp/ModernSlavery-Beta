@@ -16,12 +16,13 @@ namespace ModernSlavery.Core.Entities
                                                  VirtualDateTime.Now.ToSmallDateTime());
         }
 
-        public IEnumerable<Entities.UserOrganisation> GetAssociatedUsers()
+        public IEnumerable<UserOrganisation> GetAssociatedUsers()
         {
-            return Enumerable.Where<UserOrganisation>(Organisation.UserOrganisations, uo => uo.OrganisationId == OrganisationId
-                                                                                                              && uo.UserId != UserId
-                                                                                                              && uo.PINConfirmedDate != null
-                                                                                                              && uo.User.Status == UserStatuses.Active);
+            return Organisation.UserOrganisations.Where(uo =>
+                uo.OrganisationId == OrganisationId
+                && uo.UserId != UserId
+                && uo.PINConfirmedDate != null
+                && uo.User.Status == UserStatuses.Active);
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace ModernSlavery.Core.Extensions
 {
@@ -38,34 +37,38 @@ namespace ModernSlavery.Core.Extensions
         }
 
         /// <summary>
-        /// Return all local classes which implement a single interface or abstraction which is also declared within the same assembly
+        ///     Return all local classes which implement a single interface or abstraction which is also declared within the same
+        ///     assembly
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns></returns>
         public static IEnumerable<Type> GetSingleImplementations(this Assembly assembly)
         {
-            var assemblyName=assembly.GetName().ToString();
+            var assemblyName = assembly.GetName().ToString();
             var types = assembly.GetTypes();
             var abstractions = types.Where(t => t.IsInterface || t.IsAbstract);
             var classes = types.Except(abstractions).Where(t => t.IsClass);
 
-            var implementations=new Dictionary<Type,int>();
+            var implementations = new Dictionary<Type, int>();
 
             foreach (var @class in classes)
             {
-                var interfaces = @class.GetInterfaces().Where(i=>i.Assembly.GetName().ToString()==assemblyName).ToArray();
-                var interfaceType=interfaces.FirstOrDefault();
-                if (interfaceType==null || interfaces.Length > 1) continue;
+                var interfaces = @class.GetInterfaces().Where(i => i.Assembly.GetName().ToString() == assemblyName)
+                    .ToArray();
+                var interfaceType = interfaces.FirstOrDefault();
+                if (interfaceType == null || interfaces.Length > 1) continue;
 
-                if (interfaceType.Assembly.GetName().ToString() == assemblyName //All interfaces are declared in the same assembly 
+                if (interfaceType.Assembly.GetName().ToString() ==
+                    assemblyName //All interfaces are declared in the same assembly 
                     && abstractions.Any(a => a.IsAssignableFrom(interfaceType)))
                     //Update the tally of implementations
-                    implementations[interfaceType] = implementations.ContainsKey(interfaceType) ? implementations[interfaceType] +1 : 1;
+                    implementations[interfaceType] = implementations.ContainsKey(interfaceType)
+                        ? implementations[interfaceType] + 1
+                        : 1;
             }
 
             //Return all classes with only one implementation
             return implementations.Where(kv => kv.Value == 1).Select(kv => kv.Key);
         }
-
     }
 }

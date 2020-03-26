@@ -13,7 +13,7 @@ namespace ModernSlavery.Core.Entities
     {
         private SharedOptions SharedOptions;
 
-        public User(SharedOptions sharedOptions):this()
+        public User(SharedOptions sharedOptions) : this()
         {
             SharedOptions = sharedOptions;
         }
@@ -63,32 +63,32 @@ namespace ModernSlavery.Core.Entities
 
         public bool IsAdministrator()
         {
-            if (!Email.IsEmailAddress(EmailAddress)) throw new ArgumentException("Bad email address");
+            if (!EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
 
             if (string.IsNullOrWhiteSpace(AdminEmails))
                 throw new ArgumentException("Missing AdminEmails from web.config");
 
-            return Text.LikeAny(EmailAddress, AdminEmails.SplitI(";"));
+            return EmailAddress.LikeAny(AdminEmails.SplitI(";"));
         }
 
         public bool IsSuperAdministrator()
         {
-            if (!Email.IsEmailAddress(EmailAddress)) throw new ArgumentException("Bad email address");
+            if (!EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
 
             if (string.IsNullOrWhiteSpace(SuperAdminEmails))
                 throw new ArgumentException("Missing SuperAdminEmails from web.config");
 
-            return Text.LikeAny(EmailAddress, SuperAdminEmails.SplitI(";"));
+            return EmailAddress.LikeAny(SuperAdminEmails.SplitI(";"));
         }
 
         public bool IsDatabaseAdministrator()
         {
-            if (!Email.IsEmailAddress(EmailAddress)) throw new ArgumentException("Bad email address");
+            if (!EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
 
             if (string.IsNullOrWhiteSpace(DatabaseAdminEmails))
                 return IsSuperAdministrator();
 
-            return Text.LikeAny(EmailAddress, DatabaseAdminEmails.SplitI(";"));
+            return EmailAddress.LikeAny(DatabaseAdminEmails.SplitI(";"));
         }
 
         /// <summary>
@@ -96,10 +96,10 @@ namespace ModernSlavery.Core.Entities
         /// </summary>
         public bool IsSoleUserOfOneOrMoreOrganisations()
         {
-            return Enumerable.Any<Entities.UserOrganisation>(UserOrganisations, uo => Enumerable.Any<Entities.UserOrganisation>(uo.GetAssociatedUsers()) == false);
+            return UserOrganisations.Any(uo => uo.GetAssociatedUsers().Any() == false);
         }
 
-        public void SetStatus(UserStatuses status, Entities.User byUser, string details = null)
+        public void SetStatus(UserStatuses status, User byUser, string details = null)
         {
             //ByUser must be an object and not the id itself otherwise a foreign key exception is thrown with EF core due to being unable to resolve the ByUserId
             if (status == Status && details == StatusDetails) return;
@@ -120,7 +120,7 @@ namespace ModernSlavery.Core.Entities
 
         public string GetSetting(UserSettingKeys key)
         {
-            var setting = Enumerable.FirstOrDefault<UserSetting>(UserSettings, s => s.Key == key);
+            var setting = UserSettings.FirstOrDefault(s => s.Key == key);
 
             if (setting != null && !string.IsNullOrWhiteSpace(setting.Value)) return setting.Value;
 
@@ -129,7 +129,7 @@ namespace ModernSlavery.Core.Entities
 
         public void SetSetting(UserSettingKeys key, string value)
         {
-            var setting = Enumerable.FirstOrDefault<UserSetting>(UserSettings, s => s.Key == key);
+            var setting = UserSettings.FirstOrDefault(s => s.Key == key);
             if (string.IsNullOrWhiteSpace(value))
             {
                 if (setting != null) UserSettings.Remove(setting);
@@ -149,7 +149,7 @@ namespace ModernSlavery.Core.Entities
         {
             if (EmailVerifiedDate != null) return null;
 
-            var verifyCode = Encryption.EncryptQuerystring(UserId + ":" + DateTimeRoutines.ToSmallDateTime(Created));
+            var verifyCode = Encryption.EncryptQuerystring(UserId + ":" + Created.ToSmallDateTime());
             var verifyUrl = $"/register/verify-email?code={verifyCode}";
             return verifyUrl;
         }
@@ -166,7 +166,7 @@ namespace ModernSlavery.Core.Entities
             // Check for null values and compare run-time types.
             if (obj == null || GetType() != obj.GetType()) return false;
 
-            var target = (Entities.User) obj;
+            var target = (User) obj;
             return UserId == target.UserId;
         }
     }

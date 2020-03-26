@@ -12,13 +12,13 @@ namespace ModernSlavery.Core.Entities
         {
             if (obj == null) return false;
 
-            var address = obj as Entities.OrganisationAddress;
+            var address = obj as OrganisationAddress;
             if (address == null) return false;
 
             return AddressId == address.AddressId;
         }
 
-        public bool AddressMatches(Entities.OrganisationAddress other)
+        public bool AddressMatches(OrganisationAddress other)
         {
             return string.Equals(Address1, other.Address1, StringComparison.Ordinal)
                    && string.Equals(Address2, other.Address2, StringComparison.Ordinal)
@@ -35,30 +35,30 @@ namespace ModernSlavery.Core.Entities
         public List<string> GetList()
         {
             var list = new List<string>();
-            if (!string.IsNullOrWhiteSpace(Address1)) list.Add(Text.TrimI(Address1));
+            if (!string.IsNullOrWhiteSpace(Address1)) list.Add(Address1.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(Address2)) list.Add(Text.TrimI(Address2));
+            if (!string.IsNullOrWhiteSpace(Address2)) list.Add(Address2.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(Address3)) list.Add(Text.TrimI(Address3));
+            if (!string.IsNullOrWhiteSpace(Address3)) list.Add(Address3.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(TownCity)) list.Add(Text.TrimI(TownCity));
+            if (!string.IsNullOrWhiteSpace(TownCity)) list.Add(TownCity.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(County)) list.Add(Text.TrimI(County));
+            if (!string.IsNullOrWhiteSpace(County)) list.Add(County.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(Country)) list.Add(Text.TrimI(Country));
+            if (!string.IsNullOrWhiteSpace(Country)) list.Add(Country.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(PostCode)) list.Add(Text.TrimI(PostCode));
+            if (!string.IsNullOrWhiteSpace(PostCode)) list.Add(PostCode.TrimI());
 
-            if (!string.IsNullOrWhiteSpace(PoBox)) list.Add(Text.TrimI(PoBox));
+            if (!string.IsNullOrWhiteSpace(PoBox)) list.Add(PoBox.TrimI());
 
             return list;
         }
 
-        public bool EqualsI(Entities.OrganisationAddress address)
+        public bool EqualsI(OrganisationAddress address)
         {
             var add1 = GetAddressString();
             var add2 = address == null ? null : address.GetAddressString();
-            return Text.EqualsI(add1, add2);
+            return add1.EqualsI(add2);
         }
 
         public string GetAddressString(string delimiter = ", ")
@@ -66,9 +66,9 @@ namespace ModernSlavery.Core.Entities
             return GetList().ToDelimitedString(delimiter);
         }
 
-        public Entities.UserOrganisation GetFirstRegistration()
+        public UserOrganisation GetFirstRegistration()
         {
-            return Enumerable.OrderBy<Entities.UserOrganisation, DateTime?>(UserOrganisations, uo => uo.PINConfirmedDate)
+            return UserOrganisations.OrderBy(uo => uo.PINConfirmedDate)
                 .FirstOrDefault(uo => uo.PINConfirmedDate > Created);
         }
 
