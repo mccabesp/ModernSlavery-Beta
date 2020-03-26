@@ -24,6 +24,10 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
     public class CompareBusinessLogic : ICompareBusinessLogic
     {
+        private readonly IDataRepository _DataRepository;
+        private readonly IObfuscator _obfuscator;
+        public readonly IDnBOrgsRepository DnBOrgsRepository;
+
         public CompareBusinessLogic(
             IObfuscator obfuscator,
             IDataRepository dataRepo,
@@ -32,23 +36,6 @@ namespace ModernSlavery.BusinessDomain.Viewing
             _obfuscator = obfuscator;
             _DataRepository = dataRepo;
             DnBOrgsRepository = dnBOrgsRepository;
-        }
-        private readonly IObfuscator _obfuscator;
-        private readonly IDataRepository _DataRepository;
-        public readonly IDnBOrgsRepository DnBOrgsRepository;
-
-        private bool isBonusColumn(string columnToCheck)
-        {
-            switch (columnToCheck)
-            {
-                case "FemaleMedianBonusPayPercent":
-                case "MaleMedianBonusPayPercent":
-                case "DiffMeanBonusPercent":
-                case "DiffMedianBonusPercent":
-                    return true;
-            }
-
-            return false;
         }
 
         public virtual DataTable GetCompareDatatable(IEnumerable<CompareReportModel> data)
@@ -137,7 +124,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
                     // outer
                     Return => Return.OrganisationId,
                     // into
-                    (Scope, Return) => new { Scope, Return = Return.LastOrDefault() })
+                    (Scope, Return) => new {Scope, Return = Return.LastOrDefault()})
                 // execute on sql server and return results into memory
                 .ToList();
 
@@ -175,6 +162,20 @@ namespace ModernSlavery.BusinessDomain.Viewing
             return compareReports;
         }
 
+        private bool isBonusColumn(string columnToCheck)
+        {
+            switch (columnToCheck)
+            {
+                case "FemaleMedianBonusPayPercent":
+                case "MaleMedianBonusPayPercent":
+                case "DiffMeanBonusPercent":
+                case "DiffMedianBonusPercent":
+                    return true;
+            }
+
+            return false;
+        }
+
 
         private IEnumerable<CompareReportModel> SortCompareReports(IEnumerable<CompareReportModel> originalList,
             string sortColumn,
@@ -196,6 +197,5 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             return listOfNotNulls.Union(listOfNulls);
         }
-
     }
 }

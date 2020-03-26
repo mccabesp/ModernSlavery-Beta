@@ -187,6 +187,44 @@ namespace ModernSlavery.BusinessDomain.Admin
             AddNewSicCodes(organisation, companySicCodes);
         }
 
+        public void UpdateAddress(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
+        {
+            var companiesHouseAddress = organisationFromCompaniesHouse.RegisteredOfficeAddress;
+            var newOrganisationAddressFromCompaniesHouse =
+                CreateOrganisationAddressFromCompaniesHouseAddress(companiesHouseAddress);
+            var oldOrganisationAddress = organisation.GetAddress();
+            if (oldOrganisationAddress.AddressMatches(newOrganisationAddressFromCompaniesHouse)
+                || IsNewOrganisationAddressNullOrEmpty(newOrganisationAddressFromCompaniesHouse))
+                return;
+
+            newOrganisationAddressFromCompaniesHouse.OrganisationId = organisation.OrganisationId;
+            organisation.OrganisationAddresses.Add(newOrganisationAddressFromCompaniesHouse);
+            organisation.LatestAddress = newOrganisationAddressFromCompaniesHouse;
+
+            oldOrganisationAddress.Status = AddressStatuses.Retired;
+            oldOrganisationAddress.StatusDate = VirtualDateTime.Now;
+            oldOrganisationAddress.Modified = VirtualDateTime.Now;
+
+            _DataRepository.Insert(newOrganisationAddressFromCompaniesHouse);
+        }
+
+        public void UpdateName(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
+        {
+            var companyNameFromCompaniesHouse = organisationFromCompaniesHouse.CompanyName;
+            companyNameFromCompaniesHouse = FirstHundredChars(companyNameFromCompaniesHouse);
+
+            if (IsCompanyNameEqual(organisation.GetName(), companyNameFromCompaniesHouse)) return;
+
+            var nameToAdd = new OrganisationName
+            {
+                Organisation = organisation, Name = companyNameFromCompaniesHouse, Source = SourceOfChange,
+                Created = VirtualDateTime.Now
+            };
+            organisation.OrganisationNames.Add(nameToAdd);
+            organisation.OrganisationName = companyNameFromCompaniesHouse;
+            _DataRepository.Insert(nameToAdd);
+        }
+
         private void RetireExtraSicCodes(Organisation organisation, List<string> companySicCodes)
         {
             var sicCodeIds = organisation.GetSicCodes().Select(sicCode => sicCode.SicCodeId);
@@ -219,27 +257,6 @@ namespace ModernSlavery.BusinessDomain.Admin
                 }
         }
 
-        public void UpdateAddress(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
-        {
-            var companiesHouseAddress = organisationFromCompaniesHouse.RegisteredOfficeAddress;
-            var newOrganisationAddressFromCompaniesHouse =
-                CreateOrganisationAddressFromCompaniesHouseAddress(companiesHouseAddress);
-            var oldOrganisationAddress = organisation.GetAddress();
-            if (oldOrganisationAddress.AddressMatches(newOrganisationAddressFromCompaniesHouse)
-                || IsNewOrganisationAddressNullOrEmpty(newOrganisationAddressFromCompaniesHouse))
-                return;
-
-            newOrganisationAddressFromCompaniesHouse.OrganisationId = organisation.OrganisationId;
-            organisation.OrganisationAddresses.Add(newOrganisationAddressFromCompaniesHouse);
-            organisation.LatestAddress = newOrganisationAddressFromCompaniesHouse;
-
-            oldOrganisationAddress.Status = AddressStatuses.Retired;
-            oldOrganisationAddress.StatusDate = VirtualDateTime.Now;
-            oldOrganisationAddress.Modified = VirtualDateTime.Now;
-
-            _DataRepository.Insert(newOrganisationAddressFromCompaniesHouse);
-        }
-
         private bool IsNewOrganisationAddressNullOrEmpty(OrganisationAddress address)
         {
             // Some organisations are not required to provide information to Companies House, and so we might get an empty
@@ -265,23 +282,6 @@ namespace ModernSlavery.BusinessDomain.Admin
             return companiesHouseAddress?.Premises == null
                 ? companiesHouseAddress?.AddressLine1
                 : companiesHouseAddress?.Premises + "," + companiesHouseAddress?.AddressLine1;
-        }
-
-        public void UpdateName(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
-        {
-            var companyNameFromCompaniesHouse = organisationFromCompaniesHouse.CompanyName;
-            companyNameFromCompaniesHouse = FirstHundredChars(companyNameFromCompaniesHouse);
-
-            if (IsCompanyNameEqual(organisation.GetName(), companyNameFromCompaniesHouse)) return;
-
-            var nameToAdd = new OrganisationName
-            {
-                Organisation = organisation, Name = companyNameFromCompaniesHouse, Source = SourceOfChange,
-                Created = VirtualDateTime.Now
-            };
-            organisation.OrganisationNames.Add(nameToAdd);
-            organisation.OrganisationName = companyNameFromCompaniesHouse;
-            _DataRepository.Insert(nameToAdd);
         }
 
         private string FirstHundredChars(string str)

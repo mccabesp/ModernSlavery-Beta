@@ -19,8 +19,5 @@ namespace ModernSlavery.BusinessDomain.Account
 
         public IUserRepository UserRepository { get; }
         public IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
-
-
-
     }
 }

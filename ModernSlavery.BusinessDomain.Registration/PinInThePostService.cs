@@ -12,9 +12,9 @@ namespace ModernSlavery.BusinessDomain.Registration
     {
         private const int NotifyAddressLineLength = 35;
         private readonly IEventLogger CustomLogger;
+        private readonly IGovNotifyAPI govNotifyApi;
 
         private readonly SharedOptions SharedOptions;
-        private readonly IGovNotifyAPI govNotifyApi;
 
         public PinInThePostService(SharedOptions sharedOptions, IEventLogger customLogger, IGovNotifyAPI govNotifyApi)
         {

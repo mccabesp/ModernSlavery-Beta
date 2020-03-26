@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +18,14 @@ namespace ModernSlavery.BusinessDomain.Registration
 {
     public class OrganisationBusinessLogic : IOrganisationBusinessLogic
     {
+        private readonly IDataRepository _DataRepository;
+        private readonly IEncryptionHandler _encryptionHandler;
+        private readonly IObfuscator _obfuscator;
+        private readonly IScopeBusinessLogic _scopeLogic;
+        private readonly ISecurityCodeBusinessLogic _securityCodeLogic;
+        private readonly ISharedBusinessLogic _sharedBusinessLogic;
+        private readonly ISubmissionBusinessLogic _submissionLogic;
+
         public OrganisationBusinessLogic(
             ISharedBusinessLogic sharedBusinessLogic,
             IDataRepository dataRepo,
@@ -38,13 +45,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             _encryptionHandler = encryptionHandler;
             DnBOrgsRepository = dnBOrgsRepository;
         }
-        private readonly IEncryptionHandler _encryptionHandler;
-        private readonly IObfuscator _obfuscator;
-        private readonly IScopeBusinessLogic _scopeLogic;
-        private readonly ISecurityCodeBusinessLogic _securityCodeLogic;
-        private readonly ISubmissionBusinessLogic _submissionLogic;
-        private readonly ISharedBusinessLogic _sharedBusinessLogic;
-        private readonly IDataRepository _DataRepository;
+
         public IDnBOrgsRepository DnBOrgsRepository { get; }
 
         /// <summary>
@@ -110,7 +111,6 @@ namespace ModernSlavery.BusinessDomain.Registration
         public virtual async Task SetUniqueEmployerReferenceAsync(Organisation organisation)
         {
             //Get the unique reference
-            retry:
             do
             {
                 organisation.EmployerReference = GenerateEmployerReference();
@@ -208,8 +208,6 @@ namespace ModernSlavery.BusinessDomain.Registration
 
             return orgList;
         }
-
-        
 
 
         #region Entity

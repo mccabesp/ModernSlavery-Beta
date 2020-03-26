@@ -16,6 +16,7 @@ namespace ModernSlavery.BusinessDomain.Shared
         ISendEmailService SendEmailService { get; }
         INotificationService NotificationService { get; }
         IObfuscator Obfuscator { get; }
+
         /// <summary>
         ///     Returns the accounting start date for the specified sector and year
         /// </summary>
@@ -29,7 +30,8 @@ namespace ModernSlavery.BusinessDomain.Shared
     {
         private readonly ISnapshotDateHelper _snapshotDateHelper;
 
-        public SharedBusinessLogic(SharedOptions sharedOptions, ISnapshotDateHelper snapshotDateHelper, ISourceComparer sourceComparer,
+        public SharedBusinessLogic(SharedOptions sharedOptions, ISnapshotDateHelper snapshotDateHelper,
+            ISourceComparer sourceComparer,
             ISendEmailService sendEmailService, INotificationService notificationService,
             IFileRepository fileRepository, IDataRepository dataRepository, IObfuscator obfuscator)
         {
@@ -42,6 +44,7 @@ namespace ModernSlavery.BusinessDomain.Shared
             DataRepository = dataRepository;
             Obfuscator = obfuscator;
         }
+
         public IObfuscator Obfuscator { get; }
         public SharedOptions SharedOptions { get; }
         public IFileRepository FileRepository { get; }

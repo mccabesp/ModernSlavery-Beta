@@ -7,17 +7,17 @@ using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Registration
 {
-    public class RegistrationBusinessLogic: IRegistrationBusinessLogic
+    public class RegistrationBusinessLogic : IRegistrationBusinessLogic
     {
+        private readonly IDataRepository DataRepository;
+
+        private readonly IRegistrationLogger RegistrationLog;
+
         public RegistrationBusinessLogic(IDataRepository dataRepository, IRegistrationLogger registrationLog)
         {
             DataRepository = dataRepository ?? throw new ArgumentNullException(nameof(dataRepository));
             RegistrationLog = registrationLog ?? throw new ArgumentNullException(nameof(registrationLog));
         }
-
-        private readonly IDataRepository DataRepository;
-
-        private readonly IRegistrationLogger RegistrationLog;
 
         public async Task RemoveRetiredUserRegistrationsAsync(User userToRetire, User actionByUser)
         {
@@ -84,6 +84,5 @@ namespace ModernSlavery.BusinessDomain.Registration
             // Save changes to database
             await DataRepository.SaveChangesAsync();
         }
-
     }
 }

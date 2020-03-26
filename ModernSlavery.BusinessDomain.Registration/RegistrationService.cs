@@ -55,8 +55,9 @@ namespace ModernSlavery.BusinessDomain.Registration
             PinInThePostService = pinInThePostService;
             PostcodeChecker = postcodeChecker;
         }
+
         public IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
-        
+
         public IAuditLogger BadSicLog { get; }
         public IAuditLogger RegistrationLog { get; }
 

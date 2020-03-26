@@ -10,6 +10,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
     public interface IOrganisationBusinessLogic
     {
+        public delegate CustomResult<Organisation> ActionSecurityCodeDelegate(Organisation organisation,
+            DateTime securityCodeExpiryDateTime);
+
         // Organisation repo
         IDnBOrgsRepository DnBOrgsRepository { get; }
 
@@ -70,9 +73,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
             string securityCode);
 
         Task<Organisation> GetOrganisationByEmployerReferenceOrThrowAsync(string employerReference);
-
-        public delegate CustomResult<Organisation> ActionSecurityCodeDelegate(Organisation organisation,
-            DateTime securityCodeExpiryDateTime);
 
         Task<CustomResult<Organisation>> CreateSecurityCodeAsync(string employerRef,
             DateTime securityCodeExpiryDateTime);

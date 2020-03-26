@@ -1,6 +1,5 @@
 ﻿using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Viewing
 {
@@ -15,12 +14,9 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
     public class ViewingService : IViewingService
     {
-        public ISharedBusinessLogic SharedBusinessLogic { get; }
-        public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
-        public ISearchBusinessLogic SearchBusinessLogic { get; set; }
-        public ISubmissionBusinessLogic SubmissionBusinessLogic { get; set; }
-
-        public ViewingService(ISharedBusinessLogic sharedBusinessLogic, IOrganisationBusinessLogic organisationBusinessLogic, ISearchBusinessLogic searchBusinessLogic, ISubmissionBusinessLogic submissionBusinessLogic)
+        public ViewingService(ISharedBusinessLogic sharedBusinessLogic,
+            IOrganisationBusinessLogic organisationBusinessLogic, ISearchBusinessLogic searchBusinessLogic,
+            ISubmissionBusinessLogic submissionBusinessLogic)
         {
             SharedBusinessLogic = sharedBusinessLogic;
             OrganisationBusinessLogic = organisationBusinessLogic;
@@ -28,5 +24,9 @@ namespace ModernSlavery.BusinessDomain.Viewing
             SubmissionBusinessLogic = submissionBusinessLogic;
         }
 
+        public ISharedBusinessLogic SharedBusinessLogic { get; }
+        public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
+        public ISearchBusinessLogic SearchBusinessLogic { get; set; }
+        public ISubmissionBusinessLogic SubmissionBusinessLogic { get; set; }
     }
 }

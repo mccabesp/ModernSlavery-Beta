@@ -1,14 +1,13 @@
-﻿using Autofac.Features.AttributeFilters;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Autofac.Features.AttributeFilters;
+using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Core.SharedKernel;
-using System.Linq;
-using System.Threading.Tasks;
-using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using IOrganisationBusinessLogic = ModernSlavery.BusinessDomain.Shared.Interfaces.IOrganisationBusinessLogic;
-using ISharedBusinessLogic = ModernSlavery.BusinessDomain.Shared.ISharedBusinessLogic;
 
 namespace ModernSlavery.BusinessDomain.Admin
 {
@@ -84,6 +83,7 @@ namespace ModernSlavery.BusinessDomain.Admin
         public ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; }
         public ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
         public ISharedBusinessLogic SharedBusinessLogic { get; }
+
         public async Task LogSubmission(IOrderedEnumerable<SubmissionLogModel> logRecords)
         {
             await SubmissionBusinessLogic.SubmissionLog.WriteAsync(logRecords);

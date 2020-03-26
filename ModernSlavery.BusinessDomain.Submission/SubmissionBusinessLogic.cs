@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
@@ -121,7 +120,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                         MaleUpperQuartilePayBand = j.r.MaleUpperQuartilePayBand,
                         CompanyLink = j.r.CompanyLinkToGPGInfo,
                         ResponsiblePerson = j.r.ResponsiblePerson,
-                        OrganisationSize = Attributes.GetAttribute<DisplayAttribute>((Enum) j.r.OrganisationSize).Name,
+                        OrganisationSize = j.r.OrganisationSize.GetAttribute<DisplayAttribute>().Name,
                         Modifications = j.r.Modifications,
                         EHRCResponse = j.r.EHRCResponse
                     });

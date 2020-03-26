@@ -17,8 +17,8 @@ namespace ModernSlavery.BusinessDomain.Submission
 {
     public class ScopeBusinessLogic : IScopeBusinessLogic
     {
-        private readonly ISharedBusinessLogic _sharedBusinessLogic;
         private readonly ISearchBusinessLogic _searchBusinessLogic;
+        private readonly ISharedBusinessLogic _sharedBusinessLogic;
         private readonly SharedOptions SharedOptions;
 
         public ScopeBusinessLogic(ISharedBusinessLogic sharedBusinessLogic,
