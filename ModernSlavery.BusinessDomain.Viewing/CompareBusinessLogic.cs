@@ -3,7 +3,8 @@ using System.Data;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessDomain.Viewing.Models;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -11,17 +12,6 @@ using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Viewing
 {
-    public interface ICompareBusinessLogic
-    {
-        DataTable GetCompareDatatable(IEnumerable<CompareReportModel> data);
-
-        Task<IEnumerable<CompareReportModel>> GetCompareDataAsync(
-            IEnumerable<string> encBasketOrgIds,
-            int year,
-            string sortColumn,
-            bool sortAscending);
-    }
-
     public class CompareBusinessLogic : ICompareBusinessLogic
     {
         private readonly IDataRepository _DataRepository;

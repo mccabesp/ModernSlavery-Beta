@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Search;
 using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;

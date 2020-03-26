@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModernSlavery.BusinessLogic.Account.Models
+namespace ModernSlavery.BusinessDomain.Shared.Models
 {
     public class ChangeEmailVerificationToken
     {

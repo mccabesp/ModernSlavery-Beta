@@ -9,6 +9,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Tests.Common.Classes;
 using MockQueryable.Moq;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;

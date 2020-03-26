@@ -4,7 +4,7 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 
-namespace ModernSlavery.BusinessDomain.Viewing
+namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
     public interface ISearchBusinessLogic
     {

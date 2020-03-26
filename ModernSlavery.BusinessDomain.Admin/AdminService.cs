@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
@@ -11,25 +10,6 @@ using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.BusinessDomain.Admin
 {
-    public interface IAdminService
-    {
-        IAuditLogger ManualChangeLog { get; }
-        IAuditLogger BadSicLog { get; }
-        IAuditLogger RegistrationLog { get; }
-        IShortCodesRepository ShortCodesRepository { get; }
-        IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
-        ISearchBusinessLogic SearchBusinessLogic { get; set; }
-        ISubmissionBusinessLogic SubmissionBusinessLogic { get; }
-        IUserRepository UserRepository { get; }
-        IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
-        IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
-        IQueue ExecuteWebjobQueue { get; }
-        ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; }
-        ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
-        ISharedBusinessLogic SharedBusinessLogic { get; }
-        Task LogSubmission(IOrderedEnumerable<SubmissionLogModel> logRecords);
-    }
-
     public class AdminService : IAdminService
     {
         public AdminService(

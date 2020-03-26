@@ -1,21 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using ModernSlavery.BusinessDomain.Admin.Models;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.BusinessDomain.Admin
 {
-    public interface IDownloadableFileBusinessLogic
-    {
-        Task<DownloadableFileModel> GetFileRemovingSensitiveInformationAsync(string filePath);
-
-        Task<IEnumerable<IDownloadableItem>> GetListOfDownloadableItemsFromPathAsync(
-            string processedLogsPath);
-    }
-
     public class DownloadableFileBusinessLogic : IDownloadableFileBusinessLogic
     {
         private readonly IFileRepository _fileRepository;

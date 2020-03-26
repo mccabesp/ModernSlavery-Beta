@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;

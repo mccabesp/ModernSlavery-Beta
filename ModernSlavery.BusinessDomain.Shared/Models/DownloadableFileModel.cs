@@ -4,7 +4,7 @@ using System.Text;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.BusinessDomain.Admin.Models
+namespace ModernSlavery.BusinessDomain.Shared.Models
 {
     public class DownloadableFileModel
     {

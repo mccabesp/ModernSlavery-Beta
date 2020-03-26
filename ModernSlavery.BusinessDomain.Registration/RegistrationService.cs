@@ -1,29 +1,12 @@
 ﻿using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.BusinessDomain.Registration
 {
-    public interface IRegistrationService
-    {
-        IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
-        IAuditLogger BadSicLog { get; }
-        IAuditLogger RegistrationLog { get; }
-        IPinInThePostService PinInThePostService { get; }
-        IPostcodeChecker PostcodeChecker { get; }
-        ISharedBusinessLogic SharedBusinessLogic { get; }
-        IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
-        IScopeBusinessLogic ScopeBusinessLogic { get; }
-        ISearchBusinessLogic SearchBusinessLogic { get; }
-        IUserRepository UserRepository { get; }
-        IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
-        IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
-    }
-
     public class RegistrationService : IRegistrationService
     {
         public RegistrationService(

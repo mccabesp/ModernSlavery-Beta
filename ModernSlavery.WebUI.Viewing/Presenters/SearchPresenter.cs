@@ -1,7 +1,6 @@
 ﻿using System.Collections.Specialized;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Viewing.Controllers;
 using ModernSlavery.WebUI.Viewing.Models.Search;
@@ -22,14 +21,11 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
     public class SearchPresenter : ISearchPresenter
     {
 
-        public SearchPresenter(IHttpSession session, IUrlHelper urlHelper, SearchOptions searchOptions)
+        public SearchPresenter(IHttpSession session, IUrlHelper urlHelper)
         {
             Session = session;
             UrlHelper = urlHelper;
-            _searchOptions = searchOptions;
         }
-
-        private readonly SearchOptions _searchOptions;
 
         /// <summary>
         ///     Returns the relative Url of the last search including querystring

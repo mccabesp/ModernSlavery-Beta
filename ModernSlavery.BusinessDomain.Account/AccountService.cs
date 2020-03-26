@@ -1,14 +1,9 @@
-﻿using ModernSlavery.BusinessDomain.Registration;
+﻿using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
+using IRegistrationBusinessLogic = ModernSlavery.BusinessDomain.Registration.IRegistrationBusinessLogic;
 
 namespace ModernSlavery.BusinessDomain.Account
 {
-    public interface IAccountService
-    {
-        IUserRepository UserRepository { get; }
-        IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
-    }
-
     public class AccountService : IAccountService
     {
         public AccountService(IUserRepository userRepository, IRegistrationBusinessLogic registrationBusinessLogic)

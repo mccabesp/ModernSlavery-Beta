@@ -6,15 +6,6 @@ using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.BusinessDomain.Submission
 {
-    public interface ISubmissionService
-    {
-        ISharedBusinessLogic SharedBusinessLogic { get; }
-        ISubmissionBusinessLogic SubmissionBusinessLogic { get; }
-        IScopeBusinessLogic ScopeBusinessLogic { get; }
-        IDraftFileBusinessLogic DraftFileBusinessLogic { get; }
-        IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
-    }
-
     public class SubmissionService : ISubmissionService
     {
         public SubmissionService(

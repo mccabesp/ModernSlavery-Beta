@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.BusinessDomain.Viewing.Models
+namespace ModernSlavery.BusinessDomain.Shared.Models
 {
     [Serializable]
     public sealed class CompareReportModel
