@@ -15,6 +15,7 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Options;
 using ModernSlavery.WebUI.Submission.Classes;
 using ModernSlavery.WebUI.Submission.Models;
 
@@ -54,7 +55,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             var currentStateModel = this.UnstashModel<ScopingViewModel>();
@@ -81,7 +82,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             // When Spamlocked then return a CustomError view
@@ -159,7 +160,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             return RedirectToAction(Url.Action(nameof(SubmissionController.ManageOrganisations)));
@@ -167,12 +168,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         [Authorize]
         [HttpGet("in/confirm")]
-        public IActionResult ConfirmInScope()
+        public async Task<IActionResult> ConfirmInScope()
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -195,7 +196,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>(true);
@@ -223,20 +224,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
 
             //Start new user registration
-            return RedirectToAction(
-                "ManageOrganisation",
-                "Organisation",
-                new {id = Encryption.EncryptQuerystring(stateModel.OrganisationId.ToString())});
+            return RedirectToAction("ManageOrganisation","Submission",new {id = Encryption.EncryptQuerystring(stateModel.OrganisationId.ToString())});
         }
 
 
         [HttpGet("out/confirm-employer")]
-        public IActionResult ConfirmOutOfScopeDetails()
+        public async Task<IActionResult> ConfirmOutOfScopeDetails()
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -251,12 +249,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         [HttpGet("out/questions")]
-        public IActionResult EnterOutOfScopeAnswers()
+        public async Task<IActionResult> EnterOutOfScopeAnswers()
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -272,12 +270,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [HttpPost("out/questions")]
-        public IActionResult EnterOutOfScopeAnswers(EnterAnswersViewModel enterAnswersModel)
+        public async Task<IActionResult> EnterOutOfScopeAnswers(EnterAnswersViewModel enterAnswersModel)
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             // update the state model
@@ -332,12 +330,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         [HttpGet("out/confirm-answers")]
-        public IActionResult ConfirmOutOfScopeAnswers()
+        public async Task<IActionResult> ConfirmOutOfScopeAnswers()
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -358,7 +356,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -397,12 +395,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         [HttpGet("out/finish")]
-        public IActionResult FinishOutOfScope()
+        public async Task<IActionResult> FinishOutOfScope()
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>();
@@ -419,12 +417,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         [HttpGet("register")]
-        public IActionResult RegisterOrManage()
+        public async Task<IActionResult> RegisterOrManage()
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && CurrentUser.IsAdministrator())
             {
-                return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
             }
 
             var stateModel = this.UnstashModel<ScopingViewModel>(true);
@@ -439,7 +437,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             {
                 return RedirectToAction(
                     "ManageOrganisation",
-                    "Organisation",
+                    "Submission",
                     new {id = Encryption.EncryptQuerystring(stateModel.OrganisationId.ToString())});
             }
 

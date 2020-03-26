@@ -386,7 +386,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         }
 
         [HttpPost("~/accept-all-cookies")]
-        public IActionResult AcceptAllCookies()
+        public async Task<IActionResult> AcceptAllCookies()
         {
             var cookieSettings = new CookieSettings
             {
@@ -399,7 +399,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             CookieHelper.SetCookieSettingsCookie(Response, cookieSettings);
             CookieHelper.SetSeenCookieMessageCookie(Response);
 
-            return RedirectToAction("Index", "Viewing");
+            return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingHome));
         }
 
         [HttpGet("~/cookie-details")]
@@ -654,13 +654,13 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (!User.Identity.IsAuthenticated)
             {
                 //Allow anonymous users when starting registration
-                if (IsAnyAction("Register/AboutYou", "Register/VerifyEmail"))
+                if (IsAnyAction("SignUp/AboutYou", "SignUp/VerifyEmail"))
                 {
                     return null;
                 }
 
                 //Allow anonymous users when resetting password
-                if (IsAnyAction("Register/PasswordReset", "Register/NewPassword"))
+                if (IsAnyAction("Account/PasswordReset", "Account/NewPassword"))
                 {
                     return null;
                 }
@@ -690,7 +690,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 //If email not sent
                 if (VirtualUser.EmailVerifySendDate.EqualsI(null, DateTime.MinValue))
                 {
-                    if (IsAnyAction("Register/VerifyEmail"))
+                    if (IsAnyAction("SignUp/VerifyEmail"))
                     {
                         return null;
                     }
@@ -702,7 +702,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 //If verification code has expired
                 if (VirtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours) < VirtualDateTime.Now)
                 {
-                    if (IsAnyAction("Register/VerifyEmail"))
+                    if (IsAnyAction("SignUp/VerifyEmail"))
                     {
                         return null;
                     }
@@ -717,7 +717,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 if (remainingTime > TimeSpan.Zero)
                 {
                     //Process the code if there is one
-                    if (IsAnyAction("Register/VerifyEmail") && !string.IsNullOrWhiteSpace(Request.Query["code"]))
+                    if (IsAnyAction("SignUp/VerifyEmail") && !string.IsNullOrWhiteSpace(Request.Query["code"]))
                     {
                         return null;
                     }
@@ -727,7 +727,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 //if the code is still valid but min sent time has elapsed
-                if (IsAnyAction("Register/VerifyEmail", "Register/EmailConfirmed"))
+                if (IsAnyAction("SignUp/VerifyEmail", "SignUp/EmailConfirmed"))
                 {
                     return null;
                 }
@@ -740,13 +740,13 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (VirtualUser.IsAdministrator())
             {
                 if (IsAnyAction(
-                    "Register/VerifyEmail",
-                    "Register/EmailConfirmed",
-                    "Register/ReviewRequest",
-                    "Register/ConfirmCancellation",
-                    "Register/RequestAccepted",
-                    "Register/RequestCancelled",
-                    "Register/ReviewDUNSNumber"))
+                    "SignUp/VerifyEmail",
+                    "Registration/EmailConfirmed",
+                    "Registration/ReviewRequest",
+                    "Registration/ConfirmCancellation",
+                    "Registration/RequestAccepted",
+                    "Registration/RequestCancelled",
+                    "Registration/ReviewDUNSNumber"))
                 {
                     return null;
                 }
@@ -759,29 +759,29 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
             if (ControllerName.EqualsI("admin")
                 || IsAnyAction(
-                    "Register/ReviewRequest",
-                    "Register/ReviewDUNSNumber",
-                    "Register /ConfirmCancellation",
-                    "Register/RequestAccepted",
-                    "Register/RequestCancelled"))
+                    "Registration/ReviewRequest",
+                    "Registration/ReviewDUNSNumber",
+                    "Registration /ConfirmCancellation",
+                    "Registration/RequestAccepted",
+                    "Registration/RequestCancelled"))
             {
                 return new HttpForbiddenResult($"User {CurrentUser?.EmailAddress} is not an administrator");
             }
 
             //Allow all steps from email confirmed to organisation chosen
             if (IsAnyAction(
-                "Register/EmailConfirmed",
-                "Register/OrganisationType",
-                "Register/OrganisationSearch",
-                "Register/ChooseOrganisation",
-                "Register/AddOrganisation",
-                "Register/SelectOrganisation",
-                "Register/AddAddress",
-                "Register/AddSector",
-                "Register/AddContact",
-                "Register/ConfirmOrganisation",
-                "Register/RequestReceived",
-                "Register/EnterFasttrackCodes"))
+                "SignUp/EmailConfirmed",
+                "Registration/OrganisationType",
+                "Registration/OrganisationSearch",
+                "Registration/ChooseOrganisation",
+                "Registration/AddOrganisation",
+                "Registration/SelectOrganisation",
+                "Registration/AddAddress",
+                "Registration/AddSector",
+                "Registration/AddContact",
+                "Registration/ConfirmOrganisation",
+                "Registration/RequestReceived",
+                "Registration/EnterFasttrackCodes"))
             {
                 return null;
             }
@@ -803,13 +803,13 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
             //Always allow user home or remove registration page 
             if (IsAnyAction(
-                "Registration/ManageOrganisations",
+                "Submission/ManageOrganisations",
                 "Registration/RemoveOrganisation",
                 "Registration/RemoveOrganisationPost",
                 "Submission/ReportForOrganisation",
                 "Submission/ManageOrganisation",
                 "Scope/ChangeOrganisationScope",
-                "Registration/ActivateOrganisation",
+                "Registration/ActivateService",
                 "Scope/DeclareScope"))
             {
                 return null;
@@ -832,18 +832,18 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     //If pin never sent then go to resend point
                     if (userOrg.PINSentDate.EqualsI(null, DateTime.MinValue))
                     {
-                        if (IsAnyAction("Register/PINSent", "Register/RequestPIN"))
+                        if (IsAnyAction("Registration/PINSent", "Registration/RequestPIN"))
                         {
                             return null;
                         }
 
-                        return RedirectToAction("PINSent", "Registration");
+                        return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationPINSent));
                     }
 
                     //If PIN sent and expired then prompt to request a new pin
                     if (userOrg.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays) < VirtualDateTime.Now)
                     {
-                        if (IsAnyAction("Register/PINSent", "Register/RequestPIN"))
+                        if (IsAnyAction("Registration/PINSent", "Registration/RequestPIN"))
                         {
                             return null;
                         }
@@ -853,23 +853,23 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
                     //If PIN resends are allowed and currently on PIN send page then allow it to continue
                     TimeSpan remainingTime = userOrg.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostMinRepostDays) - VirtualDateTime.Now;
-                    if (remainingTime <= TimeSpan.Zero && IsAnyAction("Register/PINSent", "Register/RequestPIN"))
+                    if (remainingTime <= TimeSpan.Zero && IsAnyAction("Registration/PINSent", "Registration/RequestPIN"))
                     {
                         return null;
                     }
 
                     //If PIN Not expired redirect to ActivateService where they can either enter the same pin or request a new one 
-                    if (IsAnyAction("Register/RequestPIN"))
+                    if (IsAnyAction("Registration/RequestPIN"))
                     {
                         return View("CustomError", WebService.ErrorViewModelFactory.Create(1120, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
                     }
 
-                    if (IsAnyAction("Register/ActivateService"))
+                    if (IsAnyAction("Registration/ActivateService"))
                     {
                         return null;
                     }
 
-                    return RedirectToAction("ActivateService", "Registration");
+                    return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationActivate));
                 }
             }
 
@@ -877,12 +877,12 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             //If user is fully registered then start submit process
             if (ControllerName.EqualsI("Registration"))
             {
-                if (IsAnyAction("Register/RequestReceived"))
+                if (IsAnyAction("Registration/RequestReceived"))
                 {
                     return null;
                 }
 
-                if (IsAnyAction("Register/ServiceActivated") && WasAnyAction("Register/ActivateService", "Register/ConfirmOrganisation"))
+                if (IsAnyAction("Registration/ServiceActivated") && WasAnyAction("Registration/ActivateService", "Registration/ConfirmOrganisation"))
                 {
                     return null;
                 }

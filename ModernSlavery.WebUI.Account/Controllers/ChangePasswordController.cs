@@ -14,7 +14,6 @@ using ModernSlavery.WebUI.Shared.Resources;
 namespace ModernSlavery.WebUI.Account.Controllers
 {
 
-    [Area("Account")]
     [Route("manage-account")]
     public class ChangePasswordController : BaseController
     {
@@ -40,7 +39,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             // prevent impersonation
             if (IsImpersonatingUser)
             {
-                this.RedirectToAction<ManageAccountController>(nameof(ManageAccountController.ManageAccount));
+                this.RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
             }
 
             return View(new ChangePasswordViewModel());
@@ -79,7 +78,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             TempData.Add(nameof(AccountResources.ChangePasswordSuccessAlert), true);
 
             // go to manage account page
-            return this.RedirectToAction<ManageAccountController>(nameof(ManageAccountController.ManageAccount));
+            return this.RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
         }
 
     }

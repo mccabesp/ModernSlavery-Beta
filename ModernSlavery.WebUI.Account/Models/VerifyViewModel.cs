@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModernSlavery.WebUI.Registration.Models
+namespace ModernSlavery.WebUI.Account.Models
 {
     [Serializable]
     public class VerifyViewModel

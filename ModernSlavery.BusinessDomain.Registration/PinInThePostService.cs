@@ -36,7 +36,6 @@ namespace ModernSlavery.BusinessDomain.Registration
                 .FirstOrDefault()
                 .PostCode;
 
-            //string returnUrl = controller.Url.Action(nameof(ManageOrganisationsController.Home), "Organisation", null, "https");
             var pinExpiryDate = VirtualDateTime.Now.AddDays(SharedOptions.PinInPostExpiryDays);
 
             var templateId = SharedOptions.GovUkNotifyPinInThePostTemplateId;

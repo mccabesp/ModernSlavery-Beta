@@ -7,12 +7,6 @@ using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Registration
 {
-    public interface IRegistrationBusinessLogic
-    {
-        Task RemoveRetiredUserRegistrationsAsync(User userToRetire, User actionByUser);
-        Task RemoveRegistrationAsync(UserOrganisation userOrgToUnregister, User actionByUser);
-    }
-
     public class RegistrationBusinessLogic: IRegistrationBusinessLogic
     {
         public RegistrationBusinessLogic(IDataRepository dataRepository, IRegistrationLogger registrationLog)

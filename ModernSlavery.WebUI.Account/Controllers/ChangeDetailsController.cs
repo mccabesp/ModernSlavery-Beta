@@ -13,7 +13,6 @@ using ModernSlavery.WebUI.Shared.Resources;
 namespace ModernSlavery.WebUI.Account.Controllers
 {
 
-    [Area("Account")]
     [Route("manage-account")]
     public class ChangeDetailsController : BaseController
     {
@@ -39,7 +38,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             // prevent impersonation
             if (IsImpersonatingUser)
             {
-                this.RedirectToAction<ManageAccountController>(nameof(ManageAccountController.ManageAccount));
+                this.RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
             }
 
             // map the user to the edit view model
@@ -75,7 +74,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             }
 
             // go to manage account page
-            return this.RedirectToAction<ManageAccountController>(nameof(ManageAccountController.ManageAccount));
+            return this.RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
         }
 
     }

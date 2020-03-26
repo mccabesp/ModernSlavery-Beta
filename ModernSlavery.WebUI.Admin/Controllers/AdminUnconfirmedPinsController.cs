@@ -19,7 +19,6 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
-    [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
     public class AdminUnconfirmedPinsController : BaseController

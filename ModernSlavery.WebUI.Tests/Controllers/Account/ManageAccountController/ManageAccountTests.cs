@@ -7,7 +7,7 @@ using ModernSlavery.WebUI.Areas.Account.ViewModels.ManageAccount;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using NUnit.Framework;
 
-namespace ModernSlavery.WebUI.Tests.Controllers.Account.ManageAccountController
+namespace ModernSlavery.WebUI.Tests.Controllers.Account.AccountController
 {
 
     public class ManageAccountTests
@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Account.ManageAccountController
         public void BeforeEach()
         {
             mockRouteData = new RouteData();
-            mockRouteData.Values.Add("Action", nameof(ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController.ManageAccount));
+            mockRouteData.Values.Add("Action", nameof(ModernSlavery.WebUI.Areas.Account.Controllers.AccountController.ManageAccount));
             mockRouteData.Values.Add("Controller", "ManageAccount");
         }
 
@@ -34,7 +34,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Account.ManageAccountController
             // Arrange
             User unverifiedUser = UserHelper.GetNotAdminUserWithoutVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.AccountController>(
                     0,
                     mockRouteData,
                     unverifiedUser);
@@ -53,7 +53,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Account.ManageAccountController
             // Arrange
             User verifiedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.AccountController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);
@@ -75,7 +75,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Account.ManageAccountController
             // Arrange
             User verifiedUser = UserHelper.GetNotAdminUserWithVerifiedEmailAddress();
             var controller =
-                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController>(
+                UiTestHelper.GetController<ModernSlavery.WebUI.Areas.Account.Controllers.AccountController>(
                     verifiedUser.UserId,
                     mockRouteData,
                     verifiedUser);

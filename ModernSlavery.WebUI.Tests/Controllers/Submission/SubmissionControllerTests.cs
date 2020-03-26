@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using ModernSlavery.BusinessDomain.Submission;
-using ModernSlavery.BusinessDomain.Submission.Models;
 using ModernSlavery.BusinessDomain;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;

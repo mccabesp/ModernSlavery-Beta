@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.BusinessDomain.Submission.Models;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Submission.Controllers
 {
@@ -45,9 +45,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         [HttpPost("draft-complete")]
         [PreventDuplicatePost]
-        public IActionResult DraftCompletePost(string command)
+        public async Task<IActionResult> DraftCompletePost(string command)
         {
-            string doneUrl = SharedBusinessLogic.SharedOptions.DoneUrl ?? Url.Action("Index", "Viewing", null, "https");
+            string doneUrl = SharedBusinessLogic.SharedOptions.DoneUrl ?? await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingHome);
 
             return Redirect(doneUrl);
         }

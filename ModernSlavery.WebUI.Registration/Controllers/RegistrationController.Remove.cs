@@ -19,7 +19,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
     {
 
         [Authorize]
-        [HttpGet("~/remove-organisation")]
+        [HttpGet("~/remove-organisation/{orgId}/{userId}")]
         public async Task<IActionResult> RemoveOrganisation(string orgId, string userId)
         {
             //Ensure user has completed the registration process

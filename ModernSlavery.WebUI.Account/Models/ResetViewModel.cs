@@ -1,27 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using ModernSlavery.WebUI.Shared.Resources;
 
-namespace ModernSlavery.WebUI.Registration.Models
+namespace ModernSlavery.WebUI.Account.Models
 {
     [Serializable]
-    [DefaultResource(typeof(AccountResources))]
-    public class RegisterViewModel
+    public class ResetViewModel
     {
-
-        [Required(AllowEmptyStrings = false)]
-        [Display(Name = "First name")]
-        public string FirstName { get; set; }
-
-        [Required(AllowEmptyStrings = false)]
-        [Display(Name = "Last name")]
-        public string LastName { get; set; }
-
-        [Required(AllowEmptyStrings = false)]
-        [Display(Name = "Job title")]
-        [StringLength(50, ErrorMessage = "Your job title cannot be longer than {1} characters.")]
-        public string JobTitle { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [EmailAddress]
@@ -40,18 +25,13 @@ namespace ModernSlavery.WebUI.Registration.Models
         [Password]
         public string Password { get; set; }
 
-        [Display(Name = nameof(SendUpdates))]
-        public bool SendUpdates { get; set; }
-
-        [Display(Name = nameof(AllowContact))]
-        public bool AllowContact { get; set; }
-
         [Required(AllowEmptyStrings = false)]
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
-    }
+        public string Resetcode { get; set; }
 
+    }
 }

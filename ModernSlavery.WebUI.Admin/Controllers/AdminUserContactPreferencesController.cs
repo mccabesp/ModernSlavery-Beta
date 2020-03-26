@@ -8,7 +8,6 @@ using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
-    [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
     public class AdminUserContactPreferencesController : Controller

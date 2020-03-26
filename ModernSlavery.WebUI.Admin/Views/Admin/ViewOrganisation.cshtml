@@ -6,7 +6,10 @@
 @using ModernSlavery.WebUI.Admin.Classes
 @using ModernSlavery.WebUI.GDSDesignSystem
 @using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
 @model ModernSlavery.Core.Entities.Organisation
+@inject IWebService WebService
 @inject SharedOptions sharedOptions;
 @{
     ViewBag.Title = $"Organisation Details - {Model.OrganisationName} - Administration - Modern Slavery Reporting service";
@@ -56,7 +59,7 @@
 </h1>
 
 <p class="govuk-body">
-    <a href="@Url.Action("Employer", "Viewing", new {employerIdentifier = Model.GetEncryptedId()})"
+    <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingEmployer, new {employerIdentifier = Model.GetEncryptedId()}))"
        class="govuk-link">
         '@(Model.OrganisationName)' on viewing service
     </a>
@@ -254,7 +257,7 @@
                         @(returnForYear.AccountingDate.ToString("d MMM yyyy"))
                     </th>
                     <td class="govuk-table__cell" rowspan="@(Model.Returns.Count(s => s.AccountingDate == returnForYear.AccountingDate))">
-                        <a href="@Url.Action("Report", "Viewing", new {employerIdentifier = Model.GetEncryptedId(), year = returnForYear.AccountingDate.Year})"
+                        <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingReport, new {employerIdentifier = Model.GetEncryptedId(), year = returnForYear.AccountingDate.Year}))"
                            class="govuk-link">
                             @(returnForYear.AccountingDate.Year)
                         </a>

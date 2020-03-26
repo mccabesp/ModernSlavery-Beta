@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Tests.Common.Classes;
-using ModernSlavery.WebUI.Areas.Account.Resources;
-using ModernSlavery.WebUI.Areas.Account.ViewModels.ChangeDetails;
+using ModernSlavery.WebUI.Account.Resources;
+using ModernSlavery.WebUI.Account.ViewModels.ChangeDetails;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using NUnit.Framework;
 
@@ -116,7 +116,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Account.ChangeDetailsController
             // Assert
             Assert.NotNull(redirectToActionResult);
             Assert.AreEqual(
-                nameof(ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController.ManageAccount),
+                nameof(ModernSlavery.WebUI.Areas.Account.Controllers.AccountController.ManageAccount),
                 redirectToActionResult.ActionName);
 
             // Assert success flag

@@ -8,6 +8,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebUI.Account.Models;
 using ModernSlavery.WebUI.Registration.Controllers;
 using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -57,7 +58,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             var viewResult = actionResult as ViewResult;
             Assert.AreEqual(viewResult.ViewName, "AboutYou", "Expected the ViewName to be 'AboutYou'");
 
-            var viewModel = (RegisterViewModel) viewResult.Model;
+            var viewModel = (SignUpViewModel) viewResult.Model;
             Assert.AreEqual(viewModel.FirstName, "ExpectedContactFirstname", "Expected the FirstName to be 'ExpectedContactFirstname'");
             Assert.AreEqual(viewModel.LastName, "ExpectedContactLastname", "Expected the LastName to be 'ExpectedContactLastname'");
             Assert.AreEqual(
@@ -82,7 +83,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             mockRouteData.Values.Add("Action", "AboutYou");
             mockRouteData.Values.Add("Controller", "Registration");
 
-            var mockViewModel = new RegisterViewModel {EmailAddress = "mock@test.com", Password = "12345678"};
+            var mockViewModel = new SignUpViewModel {EmailAddress = "mock@test.com", Password = "12345678"};
 
             var controller = UiTestHelper.GetController<RegistrationController>(0, mockRouteData);
 

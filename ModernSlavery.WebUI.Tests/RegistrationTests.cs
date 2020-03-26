@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
@@ -13,6 +14,7 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
+using ModernSlavery.WebUI.Account.Models;
 using ModernSlavery.WebUI.Registration.Controllers;
 using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -428,7 +430,7 @@ namespace ModernSlavery.WebUI.Tests
 
             // Act
             var result = await controller.AboutYou() as ViewResult;
-            var model = result.Model as RegisterViewModel;
+            var model = result.Model as SignUpViewModel;
 
             // Assert
             Assert.NotNull(result, "Expected ViewResult");
@@ -445,7 +447,7 @@ namespace ModernSlavery.WebUI.Tests
         public async Task AboutYou_EmptyFields_ShowAllErrorsAsync()
         {
             // Arrange
-            var model = new RegisterViewModel();
+            var model = new SignUpViewModel();
             model.EmailAddress = "";
             model.ConfirmEmailAddress = " ";
             model.FirstName = "";
@@ -465,7 +467,7 @@ namespace ModernSlavery.WebUI.Tests
                 () => {
                     Assert.NotNull(result, "Expected ViewResult");
                     Assert.That(result.ViewName == "AboutYou", "Incorrect view returned");
-                    Assert.NotNull(result.Model as RegisterViewModel, "Expected RegisterViewModel");
+                    Assert.NotNull(result.Model as SignUpViewModel, "Expected RegisterViewModel");
                     Assert.AreEqual(result.ViewData.ModelState.IsValidField("EmailAddress"), false, "Expected email failure");
                     Assert.AreEqual(
                         result.ViewData.ModelState.IsValidField("ConfirmEmailAddress"),
@@ -488,7 +490,7 @@ namespace ModernSlavery.WebUI.Tests
             routeData.Values.Add("action", "AboutYou");
             routeData.Values.Add("controller", "Registration");
 
-            var expectedModel = new RegisterViewModel();
+            var expectedModel = new SignUpViewModel();
             expectedModel.EmailAddress = "test@hotmail.com";
             expectedModel.ConfirmEmailAddress = "test@hotmail.com";
             expectedModel.FirstName = "TestFirstName";
@@ -512,7 +514,7 @@ namespace ModernSlavery.WebUI.Tests
 
             //check that the model stashed preserved with the redirect is equal to what is expected the Arrange values here
             //Retreive the model stashed preserved with the redirect.
-            var actualModel = controller.UnstashModel<RegisterViewModel>();
+            var actualModel = controller.UnstashModel<SignUpViewModel>();
 
             //Check that the unstashed model is not null
             Assert.NotNull(expectedModel, "Expected RegisterViewModel");
@@ -527,7 +529,7 @@ namespace ModernSlavery.WebUI.Tests
         public async Task AboutYou_EmailMismatch_ShowErrorAsync()
         {
             // Arrange
-            var model = new RegisterViewModel();
+            var model = new SignUpViewModel();
             model.EmailAddress = "test@hotmail.com";
             model.ConfirmEmailAddress = "test1@hotmail.com";
             model.FirstName = "TestFirstName";
@@ -551,7 +553,7 @@ namespace ModernSlavery.WebUI.Tests
         public async Task AboutYou_PasswordMismatch_ShowErrorAsync()
         {
             // Arrange
-            var model = new RegisterViewModel();
+            var model = new SignUpViewModel();
             model.EmailAddress = "test@hotmail.com";
             model.ConfirmEmailAddress = "test@hotmail.com";
             model.FirstName = "TestFirstName";
@@ -575,7 +577,7 @@ namespace ModernSlavery.WebUI.Tests
         public async Task AboutYou_ShortPassword_ShowErrorAsync()
         {
             // Arrange
-            var model = new RegisterViewModel();
+            var model = new SignUpViewModel();
             model.EmailAddress = "test@hotmail.com";
             model.ConfirmEmailAddress = "test@hotmail.com";
             model.FirstName = "TestFirstName";
@@ -599,7 +601,7 @@ namespace ModernSlavery.WebUI.Tests
         public async Task AboutYou_PasswordContainsPassword_ShowErrorAsync()
         {
             // Arrange
-            var model = new RegisterViewModel();
+            var model = new SignUpViewModel();
             model.EmailAddress = "test@hotmail.com";
             model.ConfirmEmailAddress = "test@hotmail.com";
             model.FirstName = "TestFirstName";
@@ -623,7 +625,7 @@ namespace ModernSlavery.WebUI.Tests
         public async Task AboutYou_BadPasswordExpression_ShowErrorAsync()
         {
             // Arrange
-            var model = new RegisterViewModel();
+            var model = new SignUpViewModel();
             model.EmailAddress = "test@hotmail.com";
             model.ConfirmEmailAddress = "test@hotmail.com";
             model.FirstName = "TestFirstName";
@@ -730,7 +732,7 @@ namespace ModernSlavery.WebUI.Tests
             Assert.That(result.GetType() == typeof(ViewResult), "Incorrect resultType returned");
             Assert.That(result.ViewName == "AboutYou", "Incorrect view returned");
             Assert.That(
-                result.Model != null && result.Model.GetType() == typeof(RegisterViewModel),
+                result.Model != null && result.Model.GetType() == typeof(SignUpViewModel),
                 "Expected RegisterViewModel or Incorrect resultType returned");
             Assert.That(result.ViewData.ModelState.IsValid, "Model is Invalid");
         }
@@ -751,7 +753,7 @@ namespace ModernSlavery.WebUI.Tests
 
 
             //1.Arrange the test setup variables
-            var expectedModel = new RegisterViewModel {
+            var expectedModel = new SignUpViewModel {
                 EmailAddress = "test@hotmail.com",
                 ConfirmEmailAddress = "test@hotmail.com",
                 FirstName = "Kingsley",
@@ -776,7 +778,7 @@ namespace ModernSlavery.WebUI.Tests
             Assert.That(result.ActionName == "VerifyEmail", "Expected a RedirectToActionResult to VerifyEmail");
 
             //5.If the redirection successfull retrieve the model stash sent with the redirect.
-            var actualModel = controller.UnstashModel<RegisterViewModel>();
+            var actualModel = controller.UnstashModel<SignUpViewModel>();
 
             //6.Check that the unstashed model is not null
             Assert.NotNull(expectedModel, "Expected RegisterViewModel");
@@ -808,7 +810,7 @@ namespace ModernSlavery.WebUI.Tests
             routeData.Values.Add("Controller", "Registration");
 
             //simulate a model to stash
-            var model = new RegisterViewModel();
+            var model = new SignUpViewModel();
             model.EmailAddress = "test@hotmail.com";
             model.ConfirmEmailAddress = "test@hotmail.com";
             model.FirstName = "Kingsley";

@@ -228,7 +228,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
         #region Downloads
 
-        [HttpGet("download")]
+        [HttpGet("~/download")]
         public async Task<IActionResult> Download()
         {
             var model = new DownloadViewModel {Downloads = new List<DownloadViewModel.Download>()};
@@ -527,7 +527,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             // save the results to the cookie
             ComparePresenter.SaveComparedEmployersToCookie(Request);
 
-            return RedirectToAction(nameof(SearchResults), "Viewing", searchQuery);
+            return RedirectToAction(nameof(SearchResults), searchQuery);
         }
 
         #endregion

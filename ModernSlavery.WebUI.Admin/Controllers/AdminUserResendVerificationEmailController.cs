@@ -1,25 +1,34 @@
-﻿using ModernSlavery.Core.Interfaces;
+﻿using System.Threading.Tasks;
+using ModernSlavery.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.WebUI.Admin.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Options;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
-    public class AdminUserResendVerificationEmailController : Controller
+    public class AdminUserResendVerificationEmailController : BaseController
     {
 
-        private readonly IDataRepository dataRepository;
         private readonly AuditLogger auditLogger;
         private readonly ISendEmailService emailSender;
 
-        public AdminUserResendVerificationEmailController(IDataRepository dataRepository, AuditLogger auditLogger, ISendEmailService emailSender)
+        public AdminUserResendVerificationEmailController(
+            ISendEmailService emailSender, AuditLogger auditLogger,
+            ILogger<AdminUserResendVerificationEmailController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
-            this.dataRepository = dataRepository;
             this.auditLogger = auditLogger;
             this.emailSender = emailSender;
         }
@@ -27,7 +36,7 @@ namespace ModernSlavery.WebUI.Admin.Models
         [HttpGet("user/{id}/resend-verification-email")]
         public IActionResult ResendVerificationEmailGet(long id)
         {
-            User user = dataRepository.Get<User>(id);
+            User user = SharedBusinessLogic.DataRepository.Get<User>(id);
 
             var viewModel = new AdminResendVerificationEmailViewModel { User = user };
 
@@ -42,9 +51,9 @@ namespace ModernSlavery.WebUI.Admin.Models
         }
 
         [HttpPost("user/{id}/resend-verification-email")]
-        public IActionResult ResendVerificationEmailPost(long id, AdminResendVerificationEmailViewModel viewModel)
+        public async Task<IActionResult> ResendVerificationEmailPost(long id, AdminResendVerificationEmailViewModel viewModel)
         {
-            User user = dataRepository.Get<User>(id);
+            User user = SharedBusinessLogic.DataRepository.Get<User>(id);
             viewModel.User = user;
 
             if (user.EmailVerifiedDate != null)
@@ -75,9 +84,9 @@ namespace ModernSlavery.WebUI.Admin.Models
 
             user.EmailVerifyHash = Crypto.GetSHA512Checksum(verifyCode);
             user.EmailVerifySendDate = VirtualDateTime.Now;
-            dataRepository.SaveChangesAsync().Wait();
+            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
-            string verifyUrl = Url.Action("VerifyEmail", "Registration", new { code = verifyCode }, "https");
+            string verifyUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountVerifyEmail,new { vcode=verifyCode });
 
             if (!emailSender.SendCreateAccountPendingVerificationAsync(verifyUrl, user.EmailAddress).Result)
             {

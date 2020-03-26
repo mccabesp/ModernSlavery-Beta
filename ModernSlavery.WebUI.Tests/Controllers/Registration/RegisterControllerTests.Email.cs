@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.WebUI.Account.Models;
 using ModernSlavery.WebUI.Registration.Controllers;
 using ModernSlavery.WebUI.Registration.Models;
 using Moq;
@@ -324,7 +325,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Registration
             routeData.Values.Add("Controller", "Registration");
 
             //simulate a model to stash
-            var model = new RegisterViewModel();
+            var model = new SignUpViewModel();
             model.EmailAddress = "test@hotmail.com";
             model.ConfirmEmailAddress = "test@hotmail.com";
             model.FirstName = "Kingsley";

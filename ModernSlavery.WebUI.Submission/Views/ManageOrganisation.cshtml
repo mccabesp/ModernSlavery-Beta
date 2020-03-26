@@ -1,13 +1,16 @@
 ﻿@inject SubmissionOptions SubmissionOptions
 @inject SharedOptions sharedOptions
 @using ModernSlavery.BusinessDomain.Shared.Models
-@using ModernSlavery.BusinessDomain.Submission.Models
 @using ModernSlavery.Core.Entities
 @using ModernSlavery.Core.Extensions
 @using ModernSlavery.Core.SharedKernel.Options
+@using ModernSlavery.WebUI.Shared.Classes
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
 @using ModernSlavery.WebUI.Submission.Classes
 @using ModernSlavery.WebUI.Submission.Controllers
 @using ModernSlavery.WebUI.Submission.Models
+@inject IWebService WebService
 @model ModernSlavery.WebUI.Submission.Models.ManageOrganisationModel
 @{
     var controller = ViewData["Controller"] as SubmissionController;
@@ -134,7 +137,7 @@
                         <tr>
                             <td style="border: none;" class="org-name">@userFullname</td>
                             <td style="border: none;">
-                                <a href="@(Url.Action("RemoveOrganisation", new {orgId = Model.EncCurrentOrgId, userId = encUserId}))">
+                                <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationRemove, new {orgId = Model.EncCurrentOrgId, userId = encUserId}))">
                                     Remove user from reporting
                                 </a>
                             </td>
@@ -146,7 +149,7 @@
                             @controller.CurrentUser.Fullname <span>(You)</span>
                         </td>
                         <td style="border: none;">
-                            <a href="@(Url.Action("RemoveOrganisation", new {orgId = Model.EncCurrentOrgId, userId = Encryption.EncryptQuerystring(controller.CurrentUser.UserId.ToString())}))">
+                            <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationRemove, new {orgId = Model.EncCurrentOrgId, userId = Encryption.EncryptQuerystring(controller.CurrentUser.UserId.ToString())}))">
                                 Remove user from reporting
                             </a>
                         </td>

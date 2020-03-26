@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.BusinessDomain.Submission.Models;
 using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Submission.Models

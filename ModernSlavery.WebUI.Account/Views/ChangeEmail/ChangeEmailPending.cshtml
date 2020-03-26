@@ -45,11 +45,11 @@
         <h2 class="heading-medium">More Options</h2>
         <ul class="list">
             <li>
-                <a href="@(Url.Action<ManageAccountController>(nameof(ManageAccountController.ManageAccount)))">Manage account</a>
+                <a href="@(Url.Action<AccountController>(nameof(AccountController.ManageAccount)))">Manage account</a>
             </li>
 
             <li>
-                <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationHome))>Manage organisations</a>
+                <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountHome))>Manage organisations</a>
             </li>
         </ul>
 

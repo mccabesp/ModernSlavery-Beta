@@ -1,6 +1,5 @@
 ﻿using System;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.BusinessDomain.Submission.Models;
 
 namespace ModernSlavery.WebUI.Submission.Models
 {

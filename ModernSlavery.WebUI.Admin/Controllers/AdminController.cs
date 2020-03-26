@@ -36,7 +36,6 @@ using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
-    [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
     public partial class AdminController : BaseController

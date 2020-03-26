@@ -47,24 +47,38 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         }
 
         [Authorize]
-        [HttpGet("activate-service")]
-        public async Task<IActionResult> ActivateService()
+        [HttpGet("~/activate-service/{id}")]
+        public async Task<IActionResult> ActivateService(string id)
         {
             //Ensure user has completed the registration process
-            
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
             }
 
-            //Get the user organisation
-            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
+            // Decrypt org id
+            if (!id.DecryptToId(out long organisationId))
+            {
+                return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
+            }
 
+            // Check the user has permission for this organisation
+            UserOrganisation userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
             if (userOrg == null)
             {
-                throw new AuthenticationException();
+                return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
             }
+
+            // Ensure this organisation needs activation on the users account
+            if (userOrg.PINConfirmedDate != null)
+            {
+                throw new Exception(
+                    $"Attempt to activate organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}' for {VirtualUser.EmailAddress} by '{(OriginalUser == null ? VirtualUser.EmailAddress : OriginalUser.EmailAddress)}' which has already been activated");
+            }
+
+            // begin ActivateService journey
+            ReportingOrganisationId = organisationId;
 
             //Ensure they havent entered wrong pin too many times
             TimeSpan remaining = userOrg.ConfirmAttemptDate == null
@@ -253,40 +267,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             return false;
         }
 
-        [Authorize]
-        [HttpGet("~/activate-organisation/{id}")]
-        public async Task<IActionResult> ActivateOrganisation(string id)
-        {
-            //Ensure user has completed the registration process
-            var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
-
-            // Decrypt org id
-            if (!id.DecryptToId(out long organisationId))
-            {
-                return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
-            }
-
-            // Check the user has permission for this organisation
-            UserOrganisation userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
-            if (userOrg == null)
-            {
-                return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
-            }
-
-            // Ensure this organisation needs activation on the users account
-            if (userOrg.PINConfirmedDate != null)
-            {
-                throw new Exception(
-                    $"Attempt to activate organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}' for {VirtualUser.EmailAddress} by '{(OriginalUser == null ? VirtualUser.EmailAddress : OriginalUser.EmailAddress)}' which has already been activated");
-            }
-
-            // begin ActivateService journey
-            ReportingOrganisationId = organisationId;
-            return RedirectToAction("ActivateService", "Registration");
-        }
+      
     }
 }

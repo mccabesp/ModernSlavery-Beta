@@ -106,7 +106,7 @@ namespace ModernSlavery.WebUI.Tests.Controllers.Account.ChangePasswordController
 
             Assert.NotNull(redirectToActionResult);
             Assert.AreEqual(
-                nameof(ModernSlavery.WebUI.Areas.Account.Controllers.ManageAccountController.ManageAccount),
+                nameof(ModernSlavery.WebUI.Areas.Account.Controllers.AccountController.ManageAccount),
                 redirectToActionResult.ActionName);
 
             Assert.AreEqual(controller.CurrentUser.PasswordHash, Crypto.GetPBKDF2(testNewPassword, Convert.FromBase64String(controller.CurrentUser.Salt)), "Expected password to be updated");

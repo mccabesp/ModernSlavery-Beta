@@ -26,17 +26,18 @@ namespace ModernSlavery.WebUI.Shared.Classes
             _httpContextAccessor=httpContextAccessor;
         }
 
-        public async Task<string> Get(string routeName)
+        public async Task<string> Get(string routeName, object values=null)
         {
             var route = _routeOptions.ContainsKey(routeName) ? _routeOptions[routeName] : null;
             if (string.IsNullOrWhiteSpace(route))route = await _cache.GetStringAsync($"UrlRoutes:{routeName}");
+            if (values != null) route=values.Resolve(route);
             if (route.IsRelativeUri())route= _httpContextAccessor.HttpContext.ResolveUrl(route);
             return route;
         }
 
-        public async Task<string> Get(UrlRouteOptions.Routes routeType)
+        public async Task<string> Get(UrlRouteOptions.Routes routeType, object values = null)
         {
-            return await Get(routeType.GetAttribute<EnumMemberAttribute>().Value);
+            return await Get(routeType.GetAttribute<EnumMemberAttribute>().Value,values);
         }
 
         public async Task Set(string routeName, string url)

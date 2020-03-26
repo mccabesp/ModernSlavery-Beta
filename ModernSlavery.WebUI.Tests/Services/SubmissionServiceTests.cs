@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Autofac;
 using MockQueryable.Moq;
 using ModernSlavery.BusinessDomain.Submission;
-using ModernSlavery.BusinessDomain.Submission.Models;
 using ModernSlavery.BusinessDomain;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;

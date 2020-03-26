@@ -1351,7 +1351,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
                 if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
                 {
-                    TempData["TestUrl"] = Url.Action("ReviewRequest", "Admin", new { area = "Admin", code = reviewCode });
+                    TempData["TestUrl"] = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminReviewRequest, new { code = reviewCode });
                 }
 
                 return RedirectToAction("RequestReceived");
@@ -1906,7 +1906,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Send a verification link to the email address
             string reviewCode = userOrg.GetReviewCode();
-            string reviewUrl = Url.Action("ReviewRequest", "Admin", new { area = "Admin", code = reviewCode }, "https");
+            string reviewUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminReviewRequest, new { code = reviewCode });
 
             //If the email address is a test email then simulate sending
             if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))

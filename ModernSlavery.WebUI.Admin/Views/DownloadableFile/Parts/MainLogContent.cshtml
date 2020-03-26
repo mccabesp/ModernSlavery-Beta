@@ -1,5 +1,8 @@
 ﻿@using ModernSlavery.Core.Extensions
 @using ModernSlavery.Core.Interfaces.Downloadable
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
+@inject IWebService WebService
 @model IEnumerable<ModernSlavery.Core.Interfaces.Downloadable.IDownloadableItem>
 @{
     object logType = ViewData["logType"];
@@ -16,7 +19,7 @@
     <ol>
         <li style="display: block; padding-top: 0.75em; padding-bottom: 0;">
             &lt;
-            @Html.ActionLink("Back to Administration home", "Home", "Admin", new { area = "Admin" })
+            @Html.ActionLink("Back to Administration home", await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome))
         </li>
     </ol>
 </div>

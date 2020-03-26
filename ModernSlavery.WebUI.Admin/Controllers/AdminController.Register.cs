@@ -154,7 +154,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         #region ReviewRequest
 
-        [HttpGet("review-request")]
+        [HttpGet("review-request/{code}")]
         public async Task<IActionResult> ReviewRequest(string code)
         {
             //Ensure user has completed the registration process

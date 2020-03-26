@@ -72,11 +72,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 // Change an existing late submission
                 if (change)
                 {
-                    return RedirectToAction("LateWarning", "Submit", new { request, returnUrl = "CheckData" });
+                    return RedirectToAction("LateWarning", new { request, returnUrl = "CheckData" });
                 }
 
                 // Create new a late submission
-                return RedirectToAction("LateWarning", "Submit", new { request });
+                return RedirectToAction("LateWarning", new { request });
             }
 
             /*
@@ -87,11 +87,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // Change an existing submission
             if (change)
             {
-                return RedirectToAction("CheckData", "Submit");
+                return RedirectToAction("CheckData");
             }
 
             // Create new a submission
-            return RedirectToAction("EnterCalculations", "Submit");
+            return RedirectToAction("EnterCalculations");
         }
     }
 }

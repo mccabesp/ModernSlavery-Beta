@@ -2,7 +2,7 @@
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.BusinessDomain.Submission.Models
+namespace ModernSlavery.BusinessDomain.Shared.Models
 {
     [Serializable]
     public class ScopesFileModel

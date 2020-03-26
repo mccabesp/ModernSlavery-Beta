@@ -2,7 +2,7 @@
     ViewBag.Title = "Verify your email address - Modern Slavery reporting service";
 }
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
-@model ModernSlavery.WebUI.Registration.Models.VerifyViewModel
+@model VerifyViewModel
 
 <div id="verify-email-content" class="grid-row">
     <div class="column-two-thirds">
@@ -29,7 +29,7 @@
                         <b id="SavedEmailAddress">@Model.EmailAddress</b>
                     }
                 </p>
-                <p>Follow the instructions in the email to continue your registration.</p>
+                <p>Follow the instructions in the email to continue your sign up.</p>
                 <h2 class="heading-small">No email yet?</h2>
                 <p>Our email can take a few minutes to arrive. If you can’t see it in your inbox, check your junk mail folder.</p>
             }

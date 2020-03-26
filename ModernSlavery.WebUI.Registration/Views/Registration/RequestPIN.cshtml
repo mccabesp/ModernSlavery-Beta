@@ -1,7 +1,7 @@
 ﻿@{
     ViewBag.Title = "PIN confirmation - Modern Slavery reporting service";
 }
-
+@model string
 <main id="content" role="main">
     @await Html.PartialAsync("_ServiceInfo")
 
@@ -20,7 +20,7 @@
                     <button type="submit" class="button" name="command" value="Resend">Request a new pin</button>
                 </p>
                 <p>
-                    @Html.ActionLink("Cancel", "ActivateService")
+                    @Html.ActionLink("Cancel", "ActivateService", new { id = Model })
                 </p>
             </div>
         </div>

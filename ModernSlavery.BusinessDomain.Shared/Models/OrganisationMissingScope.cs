@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ModernSlavery.BusinessDomain.Submission.Models
+namespace ModernSlavery.BusinessDomain.Shared.Models
 {
     public class OrganisationMissingScope
     {

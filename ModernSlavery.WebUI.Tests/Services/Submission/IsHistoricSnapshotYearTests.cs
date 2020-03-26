@@ -1,6 +1,7 @@
 ﻿using System;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;

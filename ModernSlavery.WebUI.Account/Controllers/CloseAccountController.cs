@@ -15,7 +15,6 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Account.Controllers
 {
 
-    [Area("Account")]
     [Route("manage-account")]
     public class CloseAccountController : BaseController
     {
@@ -55,7 +54,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             // prevent impersonation
             if (IsImpersonatingUser)
             {
-                this.RedirectToAction<ManageAccountController>(nameof(ManageAccountController.ManageAccount));
+                this.RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
             }
 
             // return to page if there are errors
