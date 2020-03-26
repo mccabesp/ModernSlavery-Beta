@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Infrastructure.Logging;
-using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
 namespace ModernSlavery.Infrastructure.Hosts.WebjobHost
 {

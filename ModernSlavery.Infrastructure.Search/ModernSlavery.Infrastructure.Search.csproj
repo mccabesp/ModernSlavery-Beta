@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="5.0.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.12.1" />
     <PackageReference Include="Microsoft.Azure.Search" Version="10.1.0" />
   </ItemGroup>
 
