@@ -16,7 +16,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             #region Check user, then retrieve model from Session
 
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -31,7 +31,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 stashedReturnViewModel = await _SubmissionPresenter.GetReturnViewModelAsync(
                     ReportingOrganisationId,
                     ReportingOrganisationStartYear.Value,
-                    currentUser.UserId);
+                    VirtualUser.UserId);
             }
 
             EmployerBackUrl = RequestUrl.PathAndQuery;
@@ -44,11 +44,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         [HttpPost("submission-complete")]
         [PreventDuplicatePost]
-        public IActionResult SubmissionCompletePost(string command)
+        public async Task<IActionResult> SubmissionCompletePost(string command)
         {
             string doneUrl = SharedBusinessLogic.SharedOptions.DoneUrl ?? Url.Action("Index", "Viewing", null, "https");
 
-            return LogoutUser(doneUrl);
+            return await LogoutUser(doneUrl);
         }
 
     }

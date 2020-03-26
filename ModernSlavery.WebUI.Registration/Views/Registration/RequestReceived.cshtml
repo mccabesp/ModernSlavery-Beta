@@ -1,6 +1,9 @@
 ﻿@using ModernSlavery.Core.SharedKernel.Options
 @using ModernSlavery.WebUI.Shared.Classes
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
+@inject IWebService WebService
 @inject SharedOptions sharedOptions
 @{
     ViewBag.Title = "Registration request received - Modern Slavery reporting service";
@@ -45,7 +48,7 @@
                     <a href="@Url.Action("OrganisationType")">Add another organisation</a>
                 </p>
                 <p>
-                    <a href="@Url.Action(RouteHelper.Routes.SubmissionHome)">Manage Organisations</a>
+                    <a href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)">Manage Organisations</a>
                 </p>
             </div>
         </div>

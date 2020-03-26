@@ -27,13 +27,7 @@ namespace ModernSlavery.WebUI.Account
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
-            //Set the search home url   
-            var urlHelper = container.Resolve<IUrlHelper>();
-            urlHelper.SetRoute(RouteHelper.Routes.ViewingHome, nameof(ViewingController.Index));
-            urlHelper.SetRoute(RouteHelper.Routes.SearchHome, nameof(ViewingController.SearchResults));
-            urlHelper.SetRoute(RouteHelper.Routes.ViewingDownloads, nameof(ViewingController.Download)); 
-            urlHelper.SetRoute(RouteHelper.Routes.ViewingGuidance, nameof(ReportingStepByStepController.StepByStepStandalone));
-            urlHelper.SetRoute(RouteHelper.Routes.ViewingActionHub, nameof(ActionHubController.Overview));
+            //TODO: Configure dependencies here
         }
     }
 }

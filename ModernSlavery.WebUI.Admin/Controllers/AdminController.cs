@@ -32,6 +32,7 @@ using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
@@ -1095,7 +1096,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             OriginalUser = currentUser;
             
             //Refresh page to ensure identity is passed in cookie
-            return Redirect(Url.Action(RouteHelper.Routes.SubmissionHome));
+            return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
         }
 
         #endregion

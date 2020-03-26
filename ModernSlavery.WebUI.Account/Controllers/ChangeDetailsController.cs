@@ -28,9 +28,9 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public IChangeDetailsViewService ChangeDetailsService { get; }
 
         [HttpGet("change-details")]
-        public IActionResult ChangeDetails()
+        public async Task<IActionResult> ChangeDetailsAsync()
         {
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -43,7 +43,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             }
 
             // map the user to the edit view model
-            var model = AutoMapper.Map<ChangeDetailsViewModel>(currentUser);
+            var model = AutoMapper.Map<ChangeDetailsViewModel>(VirtualUser);
 
             return View(model);
         }
@@ -53,7 +53,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangeDetails([FromForm] ChangeDetailsViewModel formData)
         {
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -66,7 +66,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             }
 
             // Execute change details
-            bool success = await ChangeDetailsService.ChangeDetailsAsync(formData, currentUser);
+            bool success = await ChangeDetailsService.ChangeDetailsAsync(formData, VirtualUser);
 
             // set success alert flag
             if (success)

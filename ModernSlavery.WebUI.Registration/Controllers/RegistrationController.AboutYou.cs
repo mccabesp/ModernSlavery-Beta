@@ -47,9 +47,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
             }
 
-            User currentUser;
             //Ensure user has not completed the registration process
-            IActionResult result = CheckUserRegisteredOk(out currentUser);
+            var result = await CheckUserRegisteredOkAsync();
             if (result != null)
             {
                 return result;
@@ -125,12 +124,12 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             model.EmailAddress = model.EmailAddress.ToLower();
 
             //Check this email address isn't already assigned to another user
-            User currentUser = await RegistrationService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.New, UserStatuses.Active);
-            if (currentUser != null)
+            User VirtualUser = await RegistrationService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.New, UserStatuses.Active);
+            if (VirtualUser != null)
             {
-                if (currentUser.EmailVerifySendDate != null)
+                if (VirtualUser.EmailVerifySendDate != null)
                 {
-                    if (currentUser.EmailVerifiedDate != null)
+                    if (VirtualUser.EmailVerifiedDate != null)
                     {
                         //A registered user with this email already exists.
                         AddModelError(3001, "EmailAddress");
@@ -138,7 +137,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         return View("AboutYou", model);
                     }
 
-                    remainingTime = currentUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours)
+                    remainingTime = VirtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours)
                                     - VirtualDateTime.Now;
                     if (remainingTime > TimeSpan.Zero)
                     {
@@ -149,49 +148,49 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 }
 
                 //Delete the previous user org if there is one
-                UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == currentUser.UserId);
+                UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == VirtualUser.UserId);
                 if (userOrg != null)
                 {
                     SharedBusinessLogic.DataRepository.Delete(userOrg);
                 }
 
                 //If from a previous user then delete the previous user
-                SharedBusinessLogic.DataRepository.Delete(currentUser);
+                SharedBusinessLogic.DataRepository.Delete(VirtualUser);
             }
 
             //Save the submitted fields
-            currentUser = new User();
-            currentUser.Created = VirtualDateTime.Now;
-            currentUser.Modified = currentUser.Created;
-            currentUser.Firstname = model.FirstName;
-            currentUser.Lastname = model.LastName;
-            currentUser.JobTitle = model.JobTitle;
+            VirtualUser = new User();
+            VirtualUser.Created = VirtualDateTime.Now;
+            VirtualUser.Modified = VirtualUser.Created;
+            VirtualUser.Firstname = model.FirstName;
+            VirtualUser.Lastname = model.LastName;
+            VirtualUser.JobTitle = model.JobTitle;
             if (model.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
-                currentUser._EmailAddress = model.EmailAddress;
+                VirtualUser._EmailAddress = model.EmailAddress;
             }
             else
             {
-                currentUser.EmailAddress = model.EmailAddress;
+                VirtualUser.EmailAddress = model.EmailAddress;
             }
 
-            if (!currentUser.IsAdministrator())
+            if (!VirtualUser.IsAdministrator())
             {
-                currentUser.SetSetting(UserSettingKeys.AllowContact, model.AllowContact.ToString());
-                currentUser.SetSetting(UserSettingKeys.SendUpdates, model.SendUpdates.ToString());
+                VirtualUser.SetSetting(UserSettingKeys.AllowContact, model.AllowContact.ToString());
+                VirtualUser.SetSetting(UserSettingKeys.SendUpdates, model.SendUpdates.ToString());
             }
 
-            RegistrationService.UserRepository.UpdateUserPasswordUsingPBKDF2(currentUser, model.Password);
+            RegistrationService.UserRepository.UpdateUserPasswordUsingPBKDF2(VirtualUser, model.Password);
 
-            currentUser.EmailVerifySendDate = null;
-            currentUser.EmailVerifiedDate = null;
-            currentUser.EmailVerifyHash = null;
+            VirtualUser.EmailVerifySendDate = null;
+            VirtualUser.EmailVerifiedDate = null;
+            VirtualUser.EmailVerifyHash = null;
 
             //Save the user with new status
-            currentUser.SetStatus(UserStatuses.New, OriginalUser ?? currentUser);
+            VirtualUser.SetStatus(UserStatuses.New, OriginalUser ?? VirtualUser);
 
             // save the current user
-            SharedBusinessLogic.DataRepository.Insert(currentUser);
+            SharedBusinessLogic.DataRepository.Insert(VirtualUser);
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Save pendingFasttrackCodes
@@ -200,7 +199,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             {
                 string[] args = pendingFasttrackCodes?.SplitI(":");
                 pendingFasttrackCodes = $"{args[0]}:{args[1]}";
-                currentUser.SetSetting(UserSettingKeys.PendingFasttrackCodes, pendingFasttrackCodes);
+                VirtualUser.SetSetting(UserSettingKeys.PendingFasttrackCodes, pendingFasttrackCodes);
                 await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 PendingFasttrackCodes = null;
             }

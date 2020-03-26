@@ -20,10 +20,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
         [Authorize]
         [HttpGet("~/remove-organisation")]
-        public IActionResult RemoveOrganisation(string orgId, string userId)
+        public async Task<IActionResult> RemoveOrganisation(string orgId, string userId)
         {
             //Ensure user has completed the registration process
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -36,10 +36,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             // Check the current user has remove permission for this organisation
-            UserOrganisation userOrg = currentUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            UserOrganisation userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
             if (userOrg == null)
             {
-                return new HttpForbiddenResult($"User {currentUser?.EmailAddress} is not registered for organisation id {organisationId}");
+                return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
             }
 
             // Decrypt user id
@@ -48,8 +48,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 return new HttpBadRequestResult($"Cannot decrypt user id {userId}");
             }
 
-            User userToRemove = currentUser;
-            if (currentUser.UserId != userIdToRemove)
+            User userToRemove = VirtualUser;
+            if (VirtualUser.UserId != userIdToRemove)
             {
                 // Check the other user has permission to see this organisation
                 UserOrganisation otherUserOrg =
@@ -94,7 +94,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         public async Task<IActionResult> RemoveOrganisation(RemoveOrganisationModel model)
         {
             // Ensure user has completed the registration process
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -107,10 +107,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             // Check the current user has permission for this organisation
-            UserOrganisation userOrgToUnregister = currentUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            UserOrganisation userOrgToUnregister = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
             if (userOrgToUnregister == null)
             {
-                return new HttpForbiddenResult($"User {currentUser?.EmailAddress} is not registered for organisation id {organisationId}");
+                return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
             }
 
             // Decrypt user id
@@ -120,8 +120,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             Organisation sourceOrg = userOrgToUnregister.Organisation;
-            User userToUnregister = currentUser;
-            if (currentUser.UserId != userIdToRemove)
+            User userToUnregister = VirtualUser;
+            if (VirtualUser.UserId != userIdToRemove)
             {
                 // Ensure the other user has registered this organisation
                 UserOrganisation otherUserOrg =
@@ -136,7 +136,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             // Remove the registration
-            User actionByUser = IsImpersonatingUser == false ? currentUser : OriginalUser;
+            User actionByUser = IsImpersonatingUser == false ? VirtualUser : OriginalUser;
             Organisation orgToRemove = userOrgToUnregister.Organisation;
             await RegistrationService.RegistrationBusinessLogic.RemoveRegistrationAsync(userOrgToUnregister, actionByUser);
 

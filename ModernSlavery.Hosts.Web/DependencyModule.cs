@@ -50,7 +50,7 @@ using AuditLogger = ModernSlavery.WebUI.Shared.Classes.AuditLogger;
 
 namespace ModernSlavery.WebUI
 {
-    public class DependencyModule: IDependencyModule
+    public class DependencyModule : IDependencyModule
     {
         public DependencyModule(SharedOptions sharedOptions, CompaniesHouseOptions coHoOptions, ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions, DataProtectionOptions dataProtectionOptions)
         {
@@ -133,7 +133,7 @@ namespace ModernSlavery.WebUI
             builder.ServiceCollection.AddDistributedCache(_distributedCacheOptions).AddDataProtection(_dataProtectionOptions);
 
             //Add app insights tracking
-            builder.ServiceCollection.AddApplicationInsightsTelemetry(_sharedOptions.AppinsightsInstrumentationkey);
+            builder.ServiceCollection.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
 
             //This may now be required 
             builder.ServiceCollection.AddHttpsRedirection(options => { options.HttpsPort = 443; });
@@ -143,7 +143,7 @@ namespace ModernSlavery.WebUI
 
             //Configure the services required for authentication by IdentityServer
             builder.ServiceCollection.AddIdentityServerClient(
-                $"{_sharedOptions.SiteAuthority}account/",
+                _sharedOptions.IdentityIssuer,
                 _sharedOptions.SiteAuthority,
                 "ModernSlaveryServiceWebsite",
                 _sharedOptions.AuthSecret,
@@ -230,9 +230,6 @@ namespace ModernSlavery.WebUI
             //Register factories
             builder.ContainerBuilder.RegisterType<ErrorViewModelFactory>().As<IErrorViewModelFactory>().SingleInstance();
 
-            //Register HttpCache and HttpSession
-            builder.ContainerBuilder.RegisterType<HttpSession>().As<IHttpSession>().InstancePerLifetimeScope();
-            builder.ContainerBuilder.RegisterType<HttpCache>().As<IHttpCache>().SingleInstance();
 
             // Register Action helpers
             builder.ContainerBuilder.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>().SingleInstance();

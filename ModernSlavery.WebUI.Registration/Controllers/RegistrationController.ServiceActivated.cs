@@ -21,11 +21,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
         [Authorize]
         [HttpGet("service-activated")]
-        public IActionResult ServiceActivated()
+        public async Task<IActionResult> ServiceActivated()
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -52,15 +51,15 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         public async Task<IActionResult> ActivateService()
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
+            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             if (userOrg == null)
             {
@@ -102,8 +101,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         public async Task<IActionResult> ActivateService(CompleteViewModel model)
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -117,7 +116,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
+            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             ActionResult result1;
 
@@ -142,7 +141,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 {
                     userOrg.Organisation.SetStatus(
                         OrganisationStatuses.Active,
-                        OriginalUser == null ? currentUser.UserId : OriginalUser.UserId,
+                        OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,
                         "PIN Confirmed");
                     updateSearchIndex = true;
                 }
@@ -150,7 +149,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 {
                     Logger.LogWarning(
                         $"Attempt to PIN activate a {userOrg.Organisation.Status} organisation",
-                        $"Organisation: '{userOrg.Organisation.OrganisationName}' Reference: '{userOrg.Organisation.EmployerReference}' User: '{currentUser.EmailAddress}'");
+                        $"Organisation: '{userOrg.Organisation.OrganisationName}' Reference: '{userOrg.Organisation.EmployerReference}' User: '{VirtualUser.EmailAddress}'");
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1149));
                 }
 
@@ -162,7 +161,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 {
                     userOrg.Organisation.LatestAddress.SetStatus(
                         AddressStatuses.Retired,
-                        OriginalUser == null ? currentUser.UserId : OriginalUser.UserId,
+                        OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,
                         "Replaced by PIN in post");
                     updateSearchIndex = true;
                 }
@@ -170,7 +169,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 //Activate the address the pin was sent to
                 userOrg.Address.SetStatus(
                     AddressStatuses.Active,
-                    OriginalUser == null ? currentUser.UserId : OriginalUser.UserId,
+                    OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,
                     "PIN Confirmed");
                 userOrg.Organisation.LatestAddress = userOrg.Address;
                 userOrg.ConfirmAttempts = 0;
@@ -203,7 +202,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     new RegisterLogModel {
                         StatusDate = VirtualDateTime.Now,
                         Status = "PIN Confirmed",
-                        ActionBy = currentUser.EmailAddress,
+                        ActionBy = VirtualUser.EmailAddress,
                         Details = "",
                         Sector = userOrg.Organisation.SectorType,
                         Organisation = userOrg.Organisation.OrganisationName,
@@ -256,10 +255,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
         [Authorize]
         [HttpGet("~/activate-organisation/{id}")]
-        public IActionResult ActivateOrganisation(string id)
+        public async Task<IActionResult> ActivateOrganisation(string id)
         {
             //Ensure user has completed the registration process
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -272,17 +271,17 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             // Check the user has permission for this organisation
-            UserOrganisation userOrg = currentUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            UserOrganisation userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
             if (userOrg == null)
             {
-                return new HttpForbiddenResult($"User {currentUser?.EmailAddress} is not registered for organisation id {organisationId}");
+                return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
             }
 
             // Ensure this organisation needs activation on the users account
             if (userOrg.PINConfirmedDate != null)
             {
                 throw new Exception(
-                    $"Attempt to activate organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}' for {currentUser.EmailAddress} by '{(OriginalUser == null ? currentUser.EmailAddress : OriginalUser.EmailAddress)}' which has already been activated");
+                    $"Attempt to activate organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}' for {VirtualUser.EmailAddress} by '{(OriginalUser == null ? VirtualUser.EmailAddress : OriginalUser.EmailAddress)}' which has already been activated");
             }
 
             // begin ActivateService journey

@@ -50,7 +50,7 @@ namespace ModernSlavery.WebUI.Tests
             //controller.StashModel(model);
 
             //ACT:
-            var result = controller.OrganisationType() as ViewResult;
+            var result = controller.OrganisationTypeAsync() as ViewResult;
 
             //ASSERT:
             Assert.NotNull(result, "Expected ViewResult");
@@ -81,7 +81,7 @@ namespace ModernSlavery.WebUI.Tests
 
             var mockScopeBL = AutoFacExtensions.ResolveAsMock<IScopeBusinessLogic>(true);
             //ACT:
-            var result = controller.OrganisationType() as RedirectToActionResult;
+            var result = controller.OrganisationTypeAsync() as RedirectToActionResult;
             var userOrg = controller.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().FirstOrDefault(uo => uo.UserId == user.UserId && uo.OrganisationId == orgScope.OrganisationId);
 
             //ASSERT:

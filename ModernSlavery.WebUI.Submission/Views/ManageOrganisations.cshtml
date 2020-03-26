@@ -4,7 +4,10 @@
 @using ModernSlavery.Core.SharedKernel.Interfaces
 @using ModernSlavery.WebUI.Shared.Classes
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
 @using ModernSlavery.WebUI.Submission.Controllers
+@inject IWebService WebService
 @model IEnumerable<ModernSlavery.Core.Entities.UserOrganisation>
 @{
     ViewBag.Title = "Manage your organisation - Modern Slavery reporting service";
@@ -102,7 +105,7 @@
     <div class="column-two-thirds">
 
         <p>
-            <a class="button" href="@Url.Action(RouteHelper.Routes.RegistrationHome)">Register an organisation</a>
+            <a class="button" href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationHome)">Register an organisation</a>
         </p>
 
         @if (hasRegisteredOrgs == false)
@@ -110,7 +113,7 @@
             <h2 class="heading-small">Need to close your account?</h2>
             <p>
                 If you created an account by mistake or no longer responsible
-                for reporting Modern Slavery statement you can close your account in <a href="@(Url.Action(RouteHelper.Routes.AccountHome))">manage account</a>.
+                for reporting Modern Slavery statement you can close your account in <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountHome))">manage account</a>.
             </p>
         }
 

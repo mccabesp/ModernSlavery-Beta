@@ -1,4 +1,7 @@
 ﻿@using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
+@inject IWebService WebService
 @{
     var ClientName = "Modern Slavery reporting service";
     ViewBag.Title = $"Session expired - {ClientName} - GOV.UK";
@@ -17,7 +20,7 @@
             </div>
 
             <p></p>
-            <a class="button" href="@Url.Action(RouteHelper.Routes.SubmissionHome)" role="button">Sign In</a>
+            <a class="button" href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)" role="button">Sign In</a>
         </div>
     </div>
 </div>

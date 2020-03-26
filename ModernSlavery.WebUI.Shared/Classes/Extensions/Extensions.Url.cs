@@ -19,6 +19,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Options;
 using CompareAttribute = System.ComponentModel.DataAnnotations.CompareAttribute;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Extensions
@@ -59,35 +60,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             }
 
             return helper.Action(actionName) + "?" + querystring;
-        }
-
-        public static void SetRoute(this IUrlHelper helper, RouteHelper.Routes route, string action, object values = null, string protocol = "https")
-        {
-            var routeValues = new RouteValueDictionary(values);
-            helper.ActionContext.RouteData.Values.ForEach(rv => routeValues.Add(rv.Key, rv.Value));
-
-            var controller =routeValues["Controller"].ToString();
-
-            RouteHelper[route] = helper.Action(action, controller, values, protocol);
-        }
-
-        public static string Action(this IUrlHelper helper, RouteHelper.Routes route, object values=null, string protocol="https")
-        {
-            var routeValues = new RouteValueDictionary(values);
-            helper.ActionContext.RouteData.Values.ForEach(rv=>routeValues.Add(rv.Key,rv.Value));
-
-            var routeValue = RouteHelper.ContainsKey(route) ? RouteHelper[route] : null;
-            if (string.IsNullOrWhiteSpace(routeValue)) throw new ArgumentException(nameof(route), "No route called '{route}' has not been declared. Use Url.SetRoute() to specify the route.");
-
-            if (routeValue.StartsWithI("http:", "https:")) return routeValue;
-
-            var routeInfo = RouteHelper.ResolveRoute(routeValue);
-            if (!string.IsNullOrWhiteSpace(routeInfo.Area))routeValues.Add("Area",routeInfo.Area);
-
-            if (string.IsNullOrWhiteSpace(routeInfo.Controller))
-                return helper.Action(routeInfo.Action, routeValues["Controller"].ToString(), routeValues, protocol);
-
-            return helper.Action(routeInfo.Action, GetControllerFriendlyName(routeInfo.Controller), routeValues, protocol);
         }
 
         public static string Action<TDestController>(this IUrlHelper helper, string action, object values, string protocol)

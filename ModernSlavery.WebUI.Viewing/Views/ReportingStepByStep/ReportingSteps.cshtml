@@ -1,8 +1,11 @@
 ﻿@using ModernSlavery.Core.SharedKernel.Options
 @using ModernSlavery.WebUI.Shared.Classes
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
 @using ModernSlavery.WebUI.Viewing.Views.Components.StepByStep
 @model ModernSlavery.WebUI.Viewing.Models.ReportingStepsViewModel
+@inject IWebService WebService
 @inject SharedOptions sharedOptions
 @{
     var steps = new List<StepViewModel>
@@ -17,7 +20,7 @@
                 Text = "A number of factors contribute to Modern Slavery.",
             },
             StepTasks = new List<StepTask>
-    {
+{
                 new StepTask {
                     TaskText = "Learn about Modern Slavery and what contributes to it",
                     TaskUrl = "/reporting-step-by-step/find-out-what-the-gender-pay-gap-is"
@@ -39,7 +42,7 @@
                 Text = "There are different regulations for public and private organisations.",
             },
             StepTasks = new List<StepTask>
-    {
+{
 
                 new StepTask {TaskText = "Find out if you need to report", TaskUrl = "/reporting-step-by-step"},
                 new StepTask {TaskText = "Find out when you need to report", TaskUrl = "/reporting-step-by-step"}
@@ -56,7 +59,7 @@
                 Text = "You will need to gather and calculate a range of data."
             },
             StepTasks = new List<StepTask>
-    {
+{
                 new StepTask {TaskText = "Find out when your 'snapshot' date is",
                     TaskUrl = "/reporting-step-by-step"
                 },
@@ -75,7 +78,7 @@
                 Text = "All users must create an account, even if your organisation is already registered."
             },
             StepTasks = new List<StepTask>
-    {
+{
                 new StepTask {TaskText = "Create an account", TaskUrl = "/Register"},
                 new StepTask {TaskText = "Sign in to your account", TaskUrl = "/Register"},
             }
@@ -89,8 +92,8 @@
                 Text = "This can take up to three weeks to verify. Your must create an account before registering an organisation."
             },
             StepTasks = new List<StepTask>
-    {
-                new StepTask {TaskText = "Register an organisation", TaskUrl = @Url.Action(RouteHelper.Routes.RegistrationHome)},
+{
+                new StepTask {TaskText = "Register an organisation", TaskUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationHome)},
             }
         },
         new StepViewModel
@@ -99,7 +102,7 @@
             StepType = StepType.Number,
             StepNumber = 5,
             StepTasks = new List<StepTask>
-    {
+{
                 new StepTask {
                     TaskText = "Find out how to calculate your data",
                     TaskUrl = "/reporting-step-by-step",
@@ -117,7 +120,7 @@
                 Text = "There are many contributing factors to Modern Slavery, and effective actions you can take to help close it."
             },
             StepTasks = new List<StepTask>
-    {
+{
                 new StepTask {TaskText = "Find out what actions you can take to eliminate Modern Slavery", TaskUrl = "/reporting-step-by-step"},
                 new StepTask {
                     TaskText = "Create a Modern Slavery action plan",
@@ -131,10 +134,10 @@
             StepType = StepType.Number,
             StepNumber = 7,
             StepTasks = new List<StepTask>
-    {
+{
                 new StepTask {
                     TaskText = "Submit your Modern Slavery statement",
-                    TaskUrl = @sharedOptions.StartUrl ?? Url.Action(RouteHelper.Routes.SubmissionHome) },
+                    TaskUrl = @sharedOptions.StartUrl ?? await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome) },
             }
         },
         new StepViewModel
@@ -147,7 +150,7 @@
                 Text = "The statement must be published on your website, and on the Modern Slavery Reporting service."
             },
             StepTasks = new List<StepTask>
-    {
+{
                 new StepTask {
                     TaskText = "Find out what information you must publish",
                     TaskUrl = "/reporting-step-by-step",

@@ -29,7 +29,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             #region Check user, then retrieve model from Session
 
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -44,7 +44,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return SessionExpiredView();
             }
 
-            stashedReturnViewModel = await LoadReturnViewModelFromDBorFromDraftFileAsync(stashedReturnViewModel, currentUser.UserId);
+            stashedReturnViewModel = await LoadReturnViewModelFromDBorFromDraftFileAsync(stashedReturnViewModel, VirtualUser.UserId);
 
             if (!stashedReturnViewModel.ReportInfo.Draft.IsUserAllowedAccess)
             {
@@ -64,7 +64,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             #region Check user, then retrieve model from Session
 
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;

@@ -1,9 +1,13 @@
 ﻿@using ModernSlavery.WebUI.Account.Controllers
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
+@inject IWebService WebService
 @{
+    var manageOrgsPath = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
     var navEntries = new[]
     {
-        new {Text = "Manage Organisations", UrlPath = Url.Action(RouteHelper.Routes.SubmissionHome)},
+        new {Text = "Manage Organisations", UrlPath=manageOrgsPath},
         new {Text = "Manage Account", UrlPath = Url.Action<ManageAccountController>(nameof(ManageAccountController.ManageAccount))}
     };
 }

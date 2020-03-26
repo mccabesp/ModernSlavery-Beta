@@ -458,7 +458,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> DeclareScope(string id)
         {
             //Ensure user has completed the registration process
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -471,17 +471,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
 
             // Check the user has permission for this organisation
-            UserOrganisation userOrg = currentUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            UserOrganisation userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
             if (userOrg == null)
             {
-                return new HttpForbiddenResult($"User {currentUser?.EmailAddress} is not registered for organisation id {organisationId}");
+                return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
             }
 
             // Ensure this user is registered fully for this organisation
             if (userOrg.PINConfirmedDate == null)
             {
                 return new HttpForbiddenResult(
-                    $"User {currentUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.EmployerReference}");
+                    $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.EmployerReference}");
             }
 
             //Get the current snapshot date
@@ -511,7 +511,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> DeclareScope(DeclareScopeModel model, string id)
         {
             // Ensure user has completed the registration process
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -525,17 +525,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
 
             // Check the user has permission for this organisation
-            UserOrganisation userOrg = currentUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            UserOrganisation userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
             if (userOrg == null)
             {
-                return new HttpForbiddenResult($"User {currentUser?.EmailAddress} is not registered for organisation id {organisationId}");
+                return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
             }
 
             // Ensure this user is registered fully for this organisation
             if (userOrg.PINConfirmedDate == null)
             {
                 return new HttpForbiddenResult(
-                    $"User {currentUser?.EmailAddress} has not completed registeration for organisation {userOrg.Organisation.EmployerReference}");
+                    $"User {VirtualUser?.EmailAddress} has not completed registeration for organisation {userOrg.Organisation.EmployerReference}");
             }
 
             //Check the year parameters
@@ -571,9 +571,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             {
                 OrganisationId = userOrg.OrganisationId,
                 Organisation = userOrg.Organisation,
-                ContactEmailAddress = currentUser.EmailAddress,
-                ContactFirstname = currentUser.Firstname,
-                ContactLastname = currentUser.Lastname,
+                ContactEmailAddress = VirtualUser.EmailAddress,
+                ContactFirstname = VirtualUser.Firstname,
+                ContactLastname = VirtualUser.Lastname,
                 ScopeStatus = model.ScopeStatus.Value,
                 Status = ScopeRowStatuses.Active,
                 ScopeStatusDate = VirtualDateTime.Now,
@@ -587,10 +587,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         [Authorize]
         [HttpGet("~/change-organisation-scope/{request}")]
-        public IActionResult ChangeOrganisationScope(string request)
+        public async Task<IActionResult> ChangeOrganisationScope(string request)
         {
             // Ensure user has completed the registration process
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -607,10 +607,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             int reportingStartYear = requestParams[1].ToInt32();
 
             // Check the user has permission for this organisation
-            UserOrganisation userOrg = currentUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            UserOrganisation userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
             if (userOrg == null)
             {
-                return new HttpForbiddenResult($"User {currentUser?.EmailAddress} is not registered for organisation id {organisationId}");
+                return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
             }
 
             // Generate the scope state model
@@ -639,14 +639,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             return RedirectToAction("ConfirmInScope", "Scope");
         }
 
-        private void ApplyUserContactDetails(User currentUser, ScopingViewModel model)
+        private void ApplyUserContactDetails(User VirtualUser, ScopingViewModel model)
         {
             // when logged in then override contact details
-            if (currentUser != null)
+            if (VirtualUser != null)
             {
-                model.EnterAnswers.FirstName = currentUser.Firstname;
-                model.EnterAnswers.LastName = currentUser.Lastname;
-                model.EnterAnswers.EmailAddress = currentUser.EmailAddress;
+                model.EnterAnswers.FirstName = VirtualUser.Firstname;
+                model.EnterAnswers.LastName = VirtualUser.Lastname;
+                model.EnterAnswers.EmailAddress = VirtualUser.EmailAddress;
             }
         }
 

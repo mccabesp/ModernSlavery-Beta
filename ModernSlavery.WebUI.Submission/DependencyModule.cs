@@ -29,13 +29,6 @@ namespace ModernSlavery.WebUI.Account
         public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //Configure dependencies here
-
-            //Set the submission home url 
-            var urlHelper = container.Resolve<IUrlHelper>();
-            urlHelper.SetRoute(RouteHelper.Routes.SubmissionHome, nameof(SubmissionController.ManageOrganisations));
-
-            //Set the scope home url            
-            urlHelper.SetRoute(RouteHelper.Routes.ScopeHome, nameof(ScopeController.DeclareScope));
         }
     }
 }

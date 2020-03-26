@@ -9,6 +9,7 @@ using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Registration.Controllers
 {
@@ -19,18 +20,17 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
         [Authorize]
         [HttpGet("email-confirmed")]
-        public IActionResult EmailConfirmed()
+        public async Task<IActionResult> EmailConfirmed()
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
             }
 
             //If its an administrator go to admin home
-            if (currentUser.IsAdministrator())
+            if (VirtualUser.IsAdministrator())
             {
                 return RedirectToAction("Home", "Admin", new { area = "Admin" });
             }
@@ -47,23 +47,23 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         #region Verify email
 
         //Send the verification code and show confirmation
-        private async Task<string> SendVerifyCodeAsync(User currentUser)
+        private async Task<string> SendVerifyCodeAsync(User VirtualUser)
         {
             //Send a verification link to the email address
             try
             {
-                string verifyCode = Encryption.EncryptQuerystring(currentUser.UserId + ":" + currentUser.Created.ToSmallDateTime());
+                string verifyCode = Encryption.EncryptQuerystring(VirtualUser.UserId + ":" + VirtualUser.Created.ToSmallDateTime());
                 string verifyUrl = Url.Action("VerifyEmail",null, new { code = verifyCode }, "https");
-                if (!await RegistrationService.SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, currentUser.EmailAddress))
+                if (!await RegistrationService.SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, VirtualUser.EmailAddress))
                     return null;
 
-                currentUser.EmailVerifyHash = Crypto.GetSHA512Checksum(verifyCode);
-                currentUser.EmailVerifySendDate = VirtualDateTime.Now;
+                VirtualUser.EmailVerifyHash = Crypto.GetSHA512Checksum(verifyCode);
+                VirtualUser.EmailVerifySendDate = VirtualDateTime.Now;
 
                 await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
                 Logger.LogInformation(
-                    $"Email verification sent: Name {currentUser.Fullname}, Email:{currentUser.EmailAddress}, IP:{UserHostAddress}");
+                    $"Email verification sent: Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}");
                 return verifyCode;
             }
             catch (Exception ex)
@@ -80,18 +80,17 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         public async Task<IActionResult> VerifyEmail(string code = null)
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
             }
 
-            if (currentUser != null && !currentUser.EmailVerifiedDate.EqualsI(null, DateTime.MinValue))
+            if (VirtualUser != null && !VirtualUser.EmailVerifiedDate.EqualsI(null, DateTime.MinValue))
             {
-                if (currentUser.IsAdministrator())
+                if (VirtualUser.IsAdministrator())
                 {
-                    return RedirectToAction("Home", "Admin", new { area = "Admin" });
+                    return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
                 }
 
                 return RedirectToAction("EmailConfirmed");
@@ -99,22 +98,17 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //Make sure we are coming from EnterCalculations or the user is logged in
             var m = this.UnstashModel<RegisterViewModel>();
-            if (m == null && currentUser == null)
+            if (m == null && VirtualUser == null)
             {
                 return new ChallengeResult();
             }
 
-            if (currentUser == null)
-            {
-                currentUser = await RegistrationService.UserRepository.FindByEmailAsync(m.EmailAddress, UserStatuses.New, UserStatuses.Active);
-            }
-
-            var model = new VerifyViewModel {EmailAddress = currentUser.EmailAddress};
+            var model = new VerifyViewModel {EmailAddress = VirtualUser.EmailAddress};
 
             //If email not sent
-            if (currentUser.EmailVerifySendDate.EqualsI(null, DateTime.MinValue))
+            if (VirtualUser.EmailVerifySendDate.EqualsI(null, DateTime.MinValue))
             {
-                string verifyCode = await SendVerifyCodeAsync(currentUser);
+                string verifyCode = await SendVerifyCodeAsync(VirtualUser);
                 if (string.IsNullOrWhiteSpace(verifyCode))
                 {
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1004));
@@ -126,7 +120,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
                 //If the email address is a test email then add to viewbag
 
-                if (currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) || SharedBusinessLogic.SharedOptions.ShowEmailVerifyLink)
+                if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) || SharedBusinessLogic.SharedOptions.ShowEmailVerifyLink)
                 {
                     ViewBag.VerifyCode = verifyCode;
                 }
@@ -137,7 +131,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             //If verification code has expired
-            if (currentUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours) < VirtualDateTime.Now)
+            if (VirtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours) < VirtualDateTime.Now)
             {
                 AddModelError(3016);
 
@@ -148,10 +142,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 return View("VerifyEmail", model);
             }
 
-            TimeSpan remainingLock = currentUser.VerifyAttemptDate == null
+            TimeSpan remainingLock = VirtualUser.VerifyAttemptDate == null
                 ? TimeSpan.Zero
-                : currentUser.VerifyAttemptDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) - VirtualDateTime.Now;
-            TimeSpan remainingResend = currentUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationMinResendHours)
+                : VirtualUser.VerifyAttemptDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) - VirtualDateTime.Now;
+            TimeSpan remainingResend = VirtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationMinResendHours)
                                        - VirtualDateTime.Now;
 
             if (string.IsNullOrEmpty(code))
@@ -168,15 +162,15 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             //If too many wrong attempts
-            if (currentUser.VerifyAttempts >= SharedBusinessLogic.SharedOptions.MaxEmailVerifyAttempts && remainingLock > TimeSpan.Zero)
+            if (VirtualUser.VerifyAttempts >= SharedBusinessLogic.SharedOptions.MaxEmailVerifyAttempts && remainingLock > TimeSpan.Zero)
             {
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1110, new {remainingTime = remainingLock.ToFriendly(maxParts: 2)}));
             }
 
             ActionResult result;
-            if (currentUser.EmailVerifyHash != Crypto.GetSHA512Checksum(code))
+            if (VirtualUser.EmailVerifyHash != Crypto.GetSHA512Checksum(code))
             {
-                currentUser.VerifyAttempts++;
+                VirtualUser.VerifyAttempts++;
 
                 //If code min time has elapsed 
                 if (remainingResend <= TimeSpan.Zero)
@@ -188,7 +182,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     this.CleanModelErrors<VerifyViewModel>();
                     result = View("VerifyEmail", model);
                 }
-                else if (currentUser.VerifyAttempts >= SharedBusinessLogic.SharedOptions.MaxEmailVerifyAttempts && remainingLock > TimeSpan.Zero)
+                else if (VirtualUser.VerifyAttempts >= SharedBusinessLogic.SharedOptions.MaxEmailVerifyAttempts && remainingLock > TimeSpan.Zero)
                 {
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1110, new {remainingTime = remainingLock.ToFriendly(maxParts: 2)}));
                 }
@@ -200,22 +194,22 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             else
             {
                 //Set the user as verified
-                currentUser.EmailVerifiedDate = VirtualDateTime.Now;
+                VirtualUser.EmailVerifiedDate = VirtualDateTime.Now;
 
                 //Mark the user as active
-                currentUser.SetStatus(UserStatuses.Active, OriginalUser ?? currentUser, "Email verified");
+                VirtualUser.SetStatus(UserStatuses.Active, OriginalUser ?? VirtualUser, "Email verified");
 
                 //Get any saved fasttrack codes
-                PendingFasttrackCodes = currentUser.GetSetting(UserSettingKeys.PendingFasttrackCodes);
-                currentUser.SetSetting(UserSettingKeys.PendingFasttrackCodes, null);
+                PendingFasttrackCodes = VirtualUser.GetSetting(UserSettingKeys.PendingFasttrackCodes);
+                VirtualUser.SetSetting(UserSettingKeys.PendingFasttrackCodes, null);
 
-                currentUser.VerifyAttempts = 0;
+                VirtualUser.VerifyAttempts = 0;
 
                 //If not an administrator show confirmation action to choose next step
                 result = RedirectToAction("EmailConfirmed");
             }
 
-            currentUser.VerifyAttemptDate = VirtualDateTime.Now;
+            VirtualUser.VerifyAttemptDate = VirtualDateTime.Now;
 
             //Save the current user
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
@@ -231,16 +225,15 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         public async Task<IActionResult> VerifyEmail(VerifyViewModel model)
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
             }
 
             //Reset the verification send date
-            currentUser.EmailVerifySendDate = null;
-            currentUser.EmailVerifyHash = null;
+            VirtualUser.EmailVerifySendDate = null;
+            VirtualUser.EmailVerifyHash = null;
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Call GET action which will automatically resend

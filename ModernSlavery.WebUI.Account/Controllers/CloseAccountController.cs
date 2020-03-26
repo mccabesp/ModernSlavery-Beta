@@ -30,15 +30,15 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public ICloseAccountViewService CloseAccountService { get; }
 
         [HttpGet("close-account")]
-        public IActionResult CloseAccount()
+        public async Task<IActionResult> CloseAccount()
         {
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
             }
 
-            return View(new CloseAccountViewModel {IsSoleUserOfOneOrMoreOrganisations = currentUser.IsSoleUserOfOneOrMoreOrganisations()});
+            return View(new CloseAccountViewModel {IsSoleUserOfOneOrMoreOrganisations = VirtualUser.IsSoleUserOfOneOrMoreOrganisations()});
         }
 
         [HttpPost("close-account")]
@@ -46,7 +46,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CloseAccount([FromForm] CloseAccountViewModel formData)
         {
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -65,7 +65,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             }
 
             // execute change password process
-            ModelStateDictionary errors = await CloseAccountService.CloseAccountAsync(currentUser, formData.EnterPassword, currentUser);
+            ModelStateDictionary errors = await CloseAccountService.CloseAccountAsync(VirtualUser, formData.EnterPassword, VirtualUser);
             if (errors.ErrorCount > 0)
             {
                 ModelState.Merge(errors);
@@ -76,7 +76,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             string redirectUrl = Url.Action<CloseAccountController>(nameof(CloseAccountCompleted));
 
             // logout the
-            return LogoutUser(redirectUrl);
+            return await LogoutUser(redirectUrl);
         }
 
         [AllowAnonymous]

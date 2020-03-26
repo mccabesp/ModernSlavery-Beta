@@ -21,7 +21,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> ReportForOrganisation(string request)
         {
             //Ensure user has completed the registration process
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -45,10 +45,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
 
             // Check the user has permission for this organisation
-            UserOrganisation userOrg = currentUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            UserOrganisation userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
             if (userOrg == null)
             {
-                return new HttpForbiddenResult($"User {currentUser?.EmailAddress} is not registered for organisation id {organisationId}");
+                return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
             }
 
             // get the sector
@@ -64,7 +64,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // Clear the SubmitController stash
             this.ClearAllStashes();
 
-            await _SubmissionPresenter.RestartDraftFileAsync(organisationId, reportingStartYear, currentUser.UserId);
+            await _SubmissionPresenter.RestartDraftFileAsync(organisationId, reportingStartYear, VirtualUser.UserId);
 
             // When previous reporting year then do late submission flow
             if (isPrevReportingYear)

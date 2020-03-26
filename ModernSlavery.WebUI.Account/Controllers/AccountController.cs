@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
@@ -21,7 +22,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         }
 
         [HttpGet("~/sign-out")]
-        public IActionResult SignOut()
+        public async Task<IActionResult> SignOut()
         {
             if (!User.Identity.IsAuthenticated)
             {
@@ -30,7 +31,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             string returnUrl = Url.Action("SignOut", "Account", null, "https");
 
-            return LogoutUser(returnUrl);
+            return await LogoutUser(returnUrl);
         }
 
     }

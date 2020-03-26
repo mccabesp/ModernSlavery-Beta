@@ -50,6 +50,14 @@ namespace ModernSlavery.Core.SharedKernel.Options
 
         public string SiteAuthority => $"https://{ExternalHost}/";
 
+        private string _IdentityIssuer = null;
+
+        public string IdentityIssuer
+        {
+            get => string.IsNullOrWhiteSpace(_IdentityIssuer) ? $"{SiteAuthority}/account": _IdentityIssuer;
+            set => _IdentityIssuer = value;
+        }
+
         public int LevenshteinDistance { get; set; } = 5;
         public int LockoutMinutes { get; set; }
         public int MaxEmailVerifyAttempts { get; set; }

@@ -19,7 +19,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             #region Check user, then retrieve model from session
 
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -42,7 +42,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return new HttpBadRequestResult($"Invalid snapshot year {reportingYear}");
             }
 
-            stashedReturnViewModel = await LoadReturnViewModelFromDBorFromDraftFileAsync(stashedReturnViewModel, currentUser.UserId);
+            stashedReturnViewModel = await LoadReturnViewModelFromDBorFromDraftFileAsync(stashedReturnViewModel, VirtualUser.UserId);
 
             if (stashedReturnViewModel?.ReportInfo != null
                 && !stashedReturnViewModel.ReportInfo.Draft.IsUserAllowedAccess)

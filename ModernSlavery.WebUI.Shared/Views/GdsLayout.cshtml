@@ -3,10 +3,12 @@
 @using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
 @using ModernSlavery.WebUI.Shared.Classes.Cookies
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Interfaces
 @using ModernSlavery.WebUI.Shared.Options
 @inject SharedOptions sharedOptions
 @inject FeatureSwitchOptions featureSwitchOptions
 @inject StaticAssetsVersioningHelper staticAssetsVersioningHelper
+@inject IWebService WebService
 @{
     string assetsPath = "/assets/images";
 }
@@ -56,42 +58,42 @@
         if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
         {
             headerNavigationLinks = new List<HeaderNavigationViewModel>
-    {
+{
                 new HeaderNavigationViewModel
                 {
                     Text = "Search",
-                    Href = Url.Action(RouteHelper.Routes.SearchHome)
+                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
                 },
                 new HeaderNavigationViewModel
                 {
                     Text = "Guidance",
-                    Href = Url.Action(RouteHelper.Routes.ViewingGuidance)
+                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingGuidance)
                 },
                 new HeaderNavigationViewModel
                 {
                     Text = "Submit",
-                    Href = Url.Action(RouteHelper.Routes.SubmissionHome)
+                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)
                 }
             };
         }
         else
         {
             headerNavigationLinks = new List<HeaderNavigationViewModel>
-    {
+{
                 new HeaderNavigationViewModel
                 {
                     Text = "Search and compare",
-                    Href = Url.Action(RouteHelper.Routes.SearchHome)
+                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
                 },
                 new HeaderNavigationViewModel
                 {
                     Text = "Download",
-                    Href = Url.Action(RouteHelper.Routes.ViewingDownloads)
+                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingDownloads)
                 },
                 new HeaderNavigationViewModel
                 {
                     Text = "Close the gap",
-                    Href = Url.Action(RouteHelper.Routes.ViewingActionHub)
+                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingActionHub)
                 }
             };
         }
@@ -102,7 +104,7 @@
             headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
                 Text = "Admin",
-                Href = Url.Action(RouteHelper.Routes.AdminHome)
+                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome)
             });
         }
 
@@ -111,7 +113,7 @@
             headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
                 Text = "Sign out",
-                Href = Url.Action(RouteHelper.Routes.AccountSignOut),
+                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut),
                 Classes = "sign-out-link"
             });
         }
@@ -120,7 +122,7 @@
             headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
                 Text = "Sign in",
-                Href = Url.Action(RouteHelper.Routes.SubmissionHome),
+                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome),
                 Classes = "sign-out-link"
             });
         }

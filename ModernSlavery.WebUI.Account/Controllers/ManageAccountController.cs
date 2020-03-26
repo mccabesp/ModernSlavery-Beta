@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.Core.Entities;
@@ -7,6 +8,7 @@ using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Options;
 using ModernSlavery.WebUI.Shared.Resources;
 
 namespace ModernSlavery.WebUI.Account.Controllers
@@ -20,21 +22,19 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public ManageAccountController(
             ILogger<ManageAccountController> logger,IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
-            //Set the account home url            
-            Url.SetRoute(RouteHelper.Routes.AccountHome, nameof(ManageAccount));
         }
 
         [HttpGet]
-        public IActionResult ManageAccount()
+        public async Task<IActionResult> ManageAccount()
         {
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null && IsImpersonatingUser == false)
             {
                 return checkResult;
             }
 
             // map the user to the view model
-            var model = AutoMapper.Map<ManageAccountViewModel>(currentUser);
+            var model = AutoMapper.Map<ManageAccountViewModel>(VirtualUser);
 
             // check if we have any successful changes
             if (TempData.ContainsKey(nameof(AccountResources.ChangeDetailsSuccessAlert)))

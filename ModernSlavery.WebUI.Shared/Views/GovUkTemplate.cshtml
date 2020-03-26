@@ -2,10 +2,12 @@
 @using ModernSlavery.Core.SharedKernel.Options
 @using ModernSlavery.WebUI.Shared.Classes.Cookies
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Interfaces
 @using ModernSlavery.WebUI.Shared.Options
 @inject SharedOptions sharedOptions
 @inject StaticAssetsVersioningHelper staticAssetsVersioningHelper
 @inject FeatureSwitchOptions featureSwitchOptions
+@inject IWebService WebService
 @{
     string assetsPath = "/assets/images";
 
@@ -119,22 +121,22 @@
                             @if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
                             {
                                 <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action(RouteHelper.Routes.SearchHome))">Search</a>
+                                    <a rel="track" data-track-category="Header Link Clicked" href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome))">Search</a>
                                 </li>
                                 <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action(RouteHelper.Routes.ViewingGuidance))">Guidance</a>
+                                    <a rel="track" data-track-category="Header Link Clicked" href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingGuidance))">Guidance</a>
                                 </li>
                                 <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href=@Url.Action(RouteHelper.Routes.SubmissionHome)>Submit</a>
+                                    <a rel="track" data-track-category="Header Link Clicked" href=@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)>Submit</a>
                                 </li>
                             }
                             else
                             {
                                 <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action(RouteHelper.Routes.SearchHome))">Search and compare</a>
+                                    <a rel="track" data-track-category="Header Link Clicked" href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome))">Search and compare</a>
                                 </li>
                                 <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action(RouteHelper.Routes.ViewingDownloads))">Download</a>
+                                    <a rel="track" data-track-category="Header Link Clicked" href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingDownloads))">Download</a>
                                 </li>
                                 <li>
                                     <a rel="track" data-track-category="Header Link Clicked" href="/actions-to-close-the-gap">Close the gap</a>
@@ -144,13 +146,13 @@
                             @if (User.Identity.IsAuthenticated)
                             {
                                 <li id="login-links" class="nowrap">
-                                    <a href="@Url.Action(RouteHelper.Routes.AccountSignOut)">"Sign out"</a>
+                                    <a href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut)">"Sign out"</a>
                                 </li>
                             }
                             else
                             {
                                 <li id="login-links" class="nowrap">
-                                    <a href="@Url.Action(RouteHelper.Routes.SubmissionHome)">"Sign in"</a>
+                                    <a href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)">"Sign in"</a>
                                 </li>
                             }
                         </ul>

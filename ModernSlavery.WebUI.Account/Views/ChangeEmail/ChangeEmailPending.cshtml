@@ -1,5 +1,8 @@
 ﻿@using ModernSlavery.WebUI.Account.Controllers
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
+@inject IWebService WebService
 @model ModernSlavery.WebUI.Account.Models.ChangeEmail.ChangeEmailStatusViewModel
 <div class="grid-row">
 
@@ -46,7 +49,7 @@
             </li>
 
             <li>
-                <a href="@(Url.Action(RouteHelper.Routes.RegistrationHome))>Manage organisations</a>
+                <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationHome))>Manage organisations</a>
             </li>
         </ul>
 

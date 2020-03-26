@@ -1,6 +1,9 @@
 @using ModernSlavery.Core.SharedKernel.Options
 @using ModernSlavery.WebUI.Shared.Classes
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
+@inject IWebService WebService
 @inject SharedOptions sharedOptions
 @{
     ViewBag.Title = "Modern Slavery statement";
@@ -52,7 +55,7 @@
     <div class="govuk-grid-column-one-third">
         <h3 class="govuk-heading-m">Report your Modern Slavery statement</h3>
         <p class="govuk-body">
-            <a href="@(sharedOptions.StartUrl ?? Url.Action(RouteHelper.Routes.SubmissionHome))"
+            <a href="@(sharedOptions.StartUrl ?? await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome))"
                class="govuk-link govuk-!-font-weight-bold">
                 Submit Modern Slavery statement
             </a>

@@ -110,6 +110,40 @@ namespace ModernSlavery.Core.Extensions
             return new Uri(uri);
         }
 
+        public static string ResolveUrl(this HttpContext context, string relativePath)
+        {
+            string host = context.Request.Scheme.EqualsI("https") && context.Request.Host.Port == 443
+                          || context.Request.Scheme.EqualsI("http") && context.Request.Host.Port == 80
+                ? context.Request.Host.Host
+                : context.Request.Host.ToString();
+            string uri = $"{context.Request.Scheme}://{host}";
+
+            string path = relativePath.TrimI("~/\\ ");
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                uri += $"/{path}";
+            }
+
+            return uri;
+        }
+
+        public static Uri ResolveUri(this HttpContext context, string relativePath)
+        {
+            string host = context.Request.Scheme.EqualsI("https") && context.Request.Host.Port == 443
+                          || context.Request.Scheme.EqualsI("http") && context.Request.Host.Port == 80
+                ? context.Request.Host.Host
+                : context.Request.Host.ToString();
+            string uri = $"{context.Request.Scheme}://{host}";
+
+            string path = relativePath.TrimI("~/\\ ");
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                uri += $"/{path}";
+            }
+
+            return new Uri(uri);
+        }
+
         public static Uri GetUrlReferrer(this HttpContext context)
         {
             string url = context.Request.Headers["Referer"].ToString();

@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Mvc;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.Core.Extensions;
+using Controller = Microsoft.AspNetCore.Mvc.Controller;
+using IModelBinderProvider = Microsoft.AspNetCore.Mvc.ModelBinding.IModelBinderProvider;
+using TagBuilder = Microsoft.AspNetCore.Mvc.Rendering.TagBuilder;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 {
     public static partial class Extensions
     {
-        public static RouteHelper RouteHelper=new RouteHelper();
+        public static IUrlRouteHelper RouteHelper;
 
         public static void AddStringTrimmingProvider(this MvcOptions option)
         {

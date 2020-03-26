@@ -28,10 +28,6 @@ namespace ModernSlavery.WebUI.Account
         public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //Configure dependencies here
-
-            //Set the registration home url            
-            var urlHelper = container.Resolve<IUrlHelper>();
-            urlHelper.SetRoute(RouteHelper.Routes.RegistrationHome, nameof(RegistrationController.OrganisationType));
         }
     }
 }

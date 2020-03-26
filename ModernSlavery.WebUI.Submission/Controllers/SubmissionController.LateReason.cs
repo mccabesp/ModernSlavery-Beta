@@ -15,11 +15,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         #region public methods
 
         [HttpGet("late-reason")]
-        public IActionResult LateReason()
+        public async Task<IActionResult> LateReason()
         {
             #region Check user, then retrieve model from Session
 
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -46,7 +46,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             #region Check user, then retrieve model from Session
 
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;

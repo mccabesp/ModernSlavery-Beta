@@ -53,7 +53,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         [Authorize]
         [HttpGet("~/manage-organisations")]
-        public IActionResult ManageOrganisations()
+        public async Task<IActionResult> ManageOrganisations()
         {
             //Clear all the stashes
             this.ClearAllStashes();
@@ -65,7 +65,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             ReportingOrganisation = null;
 
             //Ensure user has completed the registration process
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null && IsImpersonatingUser == false)
             {
                 return checkResult;
@@ -74,7 +74,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // check if the user has accepted the privacy statement (unless admin or impersonating)
             if (!IsImpersonatingUser && !base.CurrentUser.IsAdministrator())
             {
-                DateTime? hasReadPrivacy = currentUser.AcceptedPrivacyStatement;
+                DateTime? hasReadPrivacy = VirtualUser.AcceptedPrivacyStatement;
                 if (hasReadPrivacy == null || hasReadPrivacy.Value < SharedBusinessLogic.SharedOptions.PrivacyChangedDate)
                 {
                     return RedirectToAction(nameof(PrivacyPolicy), "Home");
@@ -82,7 +82,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
 
             //create the new view model 
-            IOrderedEnumerable<UserOrganisation> model = currentUser.UserOrganisations.OrderBy(uo => uo.Organisation.OrganisationName);
+            IOrderedEnumerable<UserOrganisation> model = VirtualUser.UserOrganisations.OrderBy(uo => uo.Organisation.OrganisationName);
             return View(nameof(ManageOrganisations), model);
         }
 
@@ -91,7 +91,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> ManageOrganisation(string id)
         {
             //Ensure user has completed the registration process
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -104,10 +104,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
 
             // Check the user has permission for this organisation
-            UserOrganisation userOrg = currentUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            UserOrganisation userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
             if (userOrg == null)
             {
-                return new HttpForbiddenResult($"User {currentUser?.EmailAddress} is not registered for organisation id {organisationId}");
+                return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
             }
 
             // clear the stash

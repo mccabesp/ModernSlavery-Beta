@@ -2,6 +2,9 @@
 @using ModernSlavery.WebUI.Shared.Classes
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
 @using ModernSlavery.WebUI.Shared.Controllers
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
+@inject IWebService WebService
 @model ModernSlavery.WebUI.Registration.Models.RemoveOrganisationModel
 @{
     ViewBag.Title = "Remove organisation reason - Modern Slavery reporting service";
@@ -34,7 +37,7 @@
                 More options
             </div>
             <p>
-                <a href="@Url.Action(RouteHelper.Routes.SubmissionHome)">Manage Organisations</a>
+                <a href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)">Manage Organisations</a>
             </p>
         </div>
     </div>

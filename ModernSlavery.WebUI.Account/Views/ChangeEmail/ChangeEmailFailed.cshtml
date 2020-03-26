@@ -1,5 +1,8 @@
 ﻿@using ModernSlavery.WebUI.Account.Controllers
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
+@inject IWebService WebService
 @if (ViewContext.ModelState.ErrorCount > 0)
 {
     @await Html.PartialAsync("Patterns/ErrorSummary", ViewContext.ModelState)
@@ -26,7 +29,7 @@
             </li>
 
             <li>
-                <a href="@(Url.Action(RouteHelper.Routes.RegistrationHome))>Manage organisations</a>
+                <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationHome))>Manage organisations</a>
             </li>
         </ul>
     </div>

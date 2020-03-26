@@ -16,6 +16,7 @@ using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Options;
 using ModernSlavery.WebUI.Submission.Classes;
 
 namespace ModernSlavery.WebUI.Registration.Controllers
@@ -93,15 +94,14 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         private async Task<IActionResult> GetSendPINAsync()
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
+            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             //If a pin has never been sent or resend button submitted then send one immediately
             if (string.IsNullOrWhiteSpace(userOrg.PIN) && string.IsNullOrWhiteSpace(userOrg.PINHash)
@@ -133,7 +133,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     else 
                     {
                         // Try and send the PIN in post
-                        string returnUrl = Url.Action(RouteHelper.Routes.SubmissionHome);
+                        string returnUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
                         if (RegistrationService.PinInThePostService.SendPinInThePost(userOrg, pin,returnUrl, out string letterId))
                         {
                             userOrg.PITPNotifyLetterId = letterId;
@@ -150,7 +150,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
                     Logger.LogInformation(
                         "Send Pin-in-post",
-                        $"Name {currentUser.Fullname}, Email:{currentUser.EmailAddress}, IP:{UserHostAddress}, Address:{userOrg?.Address.GetAddressString()}");
+                        $"Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}, Address:{userOrg?.Address.GetAddressString()}");
                 }
                 catch (Exception ex)
                 {
@@ -161,8 +161,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             //Prepare view parameters
-            ViewBag.UserFullName = currentUser.Fullname;
-            ViewBag.UserJobTitle = currentUser.JobTitle;
+            ViewBag.UserFullName = VirtualUser.Fullname;
+            ViewBag.UserJobTitle = VirtualUser.JobTitle;
             ViewBag.Organisation = userOrg.Organisation.OrganisationName;
             ViewBag.Address = userOrg?.Address.GetAddressString(",<br/>");
             return View("PINSent");
@@ -187,19 +187,18 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         public async Task<IActionResult> RequestPIN()
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
+            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             //Prepare view parameters
-            ViewBag.UserFullName = currentUser.Fullname;
-            ViewBag.UserJobTitle = currentUser.JobTitle;
+            ViewBag.UserFullName = VirtualUser.Fullname;
+            ViewBag.UserJobTitle = VirtualUser.JobTitle;
             ViewBag.Organisation = userOrg.Organisation.OrganisationName;
             ViewBag.Address = userOrg?.Address.GetAddressString(",<br/>");
             //Show the PIN textbox and button
@@ -213,15 +212,14 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         public async Task<IActionResult> RequestPIN(CompleteViewModel model)
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == currentUser.UserId && uo.OrganisationId == ReportingOrganisationId);
+            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             //Mark the user org as ready to send a pin
             userOrg.PIN = null;
@@ -249,12 +247,11 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1133, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
             }
 
-            User currentUser;
             //Ensure user has not completed the registration process
-            IActionResult result = CheckUserRegisteredOk(out currentUser);
-            if (result != null)
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null)
             {
-                return result;
+                return checkResult;
             }
 
             //Clear the stash
@@ -290,10 +287,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             //Ensure user has not completed the registration process
-            IActionResult result = CheckUserRegisteredOk(out User currentUser);
-            if (result != null)
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null)
             {
-                return result;
+                return checkResult;
             }
 
             //Validate the submitted fields
@@ -312,8 +309,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 model.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) ? DateTime.MinValue : VirtualDateTime.Now);
 
             // find the latest active user by email
-            currentUser = await RegistrationService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.Active);
-            if (currentUser == null)
+            var user= await RegistrationService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.Active);
+            if (user == null)
             {
                 Logger.LogWarning(
                     "Password reset requested for unknown email address",
@@ -321,45 +318,45 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 return View("PasswordResetSent");
             }
 
-            if (!await ResendPasswordResetAsync(currentUser))
+            if (!await ResendPasswordResetAsync(user))
             {
                 AddModelError(1122);
                 this.CleanModelErrors<ResetViewModel>();
                 return View("PasswordReset", model);
             }
 
-            currentUser.ResetAttempts = 0;
-            currentUser.ResetSendDate = VirtualDateTime.Now;
+            VirtualUser.ResetAttempts = 0;
+            VirtualUser.ResetSendDate = VirtualDateTime.Now;
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //show confirmation
-            ViewBag.EmailAddress = currentUser.EmailAddress;
-            if (currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            ViewBag.EmailAddress = VirtualUser.EmailAddress;
+            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
                 ViewBag.TestUrl = Url.Action(
                     "NewPassword",
                     "Registration",
-                    new {code = Encryption.EncryptQuerystring(currentUser.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime())},
+                    new {code = Encryption.EncryptQuerystring(VirtualUser.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime())},
                     "https");
             }
 
             return View("PasswordResetSent");
         }
 
-        private async Task<bool> ResendPasswordResetAsync(User currentUser)
+        private async Task<bool> ResendPasswordResetAsync(User VirtualUser)
         {
             //Send a password reset link to the email address
             string resetCode = null;
             try
             {
-                resetCode = Encryption.EncryptQuerystring(currentUser.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime());
+                resetCode = Encryption.EncryptQuerystring(VirtualUser.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime());
                 string resetUrl = Url.Action("NewPassword", "Account", new { code = resetCode }, "https");
-                if (!await RegistrationService.SharedBusinessLogic.SendEmailService.SendResetPasswordNotificationAsync(resetUrl, currentUser.EmailAddress))
+                if (!await RegistrationService.SharedBusinessLogic.SendEmailService.SendResetPasswordNotificationAsync(resetUrl, VirtualUser.EmailAddress))
                     return false;
 
                 Logger.LogInformation(
                     "Password reset sent",
-                    $"Name {currentUser.Fullname}, Email:{currentUser.EmailAddress}, IP:{UserHostAddress}");
+                    $"Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}");
             }
             catch (Exception ex)
             {
@@ -372,21 +369,17 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         }
 
         [HttpGet("enter-new-password")]
-        public IActionResult NewPassword(string code = null)
+        public async Task<IActionResult> NewPassword(string code = null)
         {
-            User currentUser;
             //Ensure user has not completed the registration process
-            IActionResult result = CheckUserRegisteredOk(out currentUser);
+            var result = await CheckUserRegisteredOkAsync();
             if (result != null)
             {
                 return result;
             }
 
-            result = UnwrapPasswordReset(code, out currentUser);
-            if (result != null)
-            {
-                return result;
-            }
+            var passwordResult = UnwrapPasswordReset(code);
+            if (passwordResult.Result != null)return passwordResult.Result;
 
             var model = new ResetViewModel();
             model.Resetcode = code;
@@ -396,10 +389,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             return View("NewPassword", model);
         }
 
-        private ActionResult UnwrapPasswordReset(string code, out User user)
+        private (ActionResult Result, User User) UnwrapPasswordReset(string code)
         {
-            user = null;
-
+            User user = null;
+            ActionResult result = null;
             long userId = 0;
             DateTime resetDate;
             try
@@ -426,7 +419,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
             catch
             {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1123));
+                return (View("CustomError", WebService.ErrorViewModelFactory.Create(1123)),null);
             }
 
             //Get the user oganisation
@@ -434,15 +427,15 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             if (user == null)
             {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1124));
+                return (View("CustomError", WebService.ErrorViewModelFactory.Create(1124)),null);
             }
 
             if (resetDate.AddDays(1) < VirtualDateTime.Now)
             {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1126));
+                return (View("CustomError", WebService.ErrorViewModelFactory.Create(1126)),null);
             }
 
-            return null;
+            return (null,user);
         }
 
         [PreventDuplicatePost]
@@ -450,9 +443,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [HttpPost("enter-new-password")]
         public async Task<IActionResult> NewPassword(ResetViewModel model)
         {
-            User currentUser;
             //Ensure user has not completed the registration process
-            IActionResult result = CheckUserRegisteredOk(out currentUser);
+            var result = await CheckUserRegisteredOkAsync();
             if (result != null)
             {
                 return result;
@@ -469,28 +461,22 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             var m = this.UnstashModel<ResetViewModel>();
-            if (m == null || string.IsNullOrWhiteSpace(m.Resetcode))
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(0));
-            }
+            if (m == null || string.IsNullOrWhiteSpace(m.Resetcode))return View("CustomError", WebService.ErrorViewModelFactory.Create(0));
 
-            result = UnwrapPasswordReset(m.Resetcode, out currentUser);
-            if (result != null)
-            {
-                return result;
-            }
+            var passwordResult = UnwrapPasswordReset(m.Resetcode);
+            if (passwordResult.Result != null)return passwordResult.Result;
 
             this.ClearStash();
 
             //Save the user to ensure UserId>0 for new status
-            RegistrationService.UserRepository.UpdateUserPasswordUsingPBKDF2(currentUser, model.Password);
+            RegistrationService.UserRepository.UpdateUserPasswordUsingPBKDF2(passwordResult.User, model.Password);
 
-            currentUser.ResetAttempts = 0;
-            currentUser.ResetSendDate = null;
+            VirtualUser.ResetAttempts = 0;
+            VirtualUser.ResetSendDate = null;
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Send completed notification email
-            await RegistrationService.SharedBusinessLogic.SendEmailService.SendResetPasswordCompletedAsync(currentUser.EmailAddress);
+            await RegistrationService.SharedBusinessLogic.SendEmailService.SendResetPasswordCompletedAsync(passwordResult.User.EmailAddress);
 
             //Send the verification code and showconfirmation
             return View("CustomError", WebService.ErrorViewModelFactory.Create(1127));

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web;
 using ModernSlavery.Core.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Entities;
@@ -17,6 +18,7 @@ using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
@@ -156,8 +158,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public async Task<IActionResult> ReviewRequest(string code)
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -347,8 +348,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public async Task<IActionResult> ReviewRequest(OrganisationViewModel model, string command)
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -519,7 +519,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 //Activate the organisation
                 userOrg.Organisation.SetStatus(
                     OrganisationStatuses.Active,
-                    OriginalUser == null ? currentUser.UserId : OriginalUser.UserId,
+                    OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,
                     "Manually registered");
 
                 // Save the DUNS Number
@@ -560,14 +560,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     userOrg.Organisation.LatestAddress.SetStatus(
                         AddressStatuses.Retired,
-                        OriginalUser == null ? currentUser.UserId : OriginalUser.UserId,
+                        OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,
                         "Replaced by Manual registration");
                 }
 
                 //Activate the address
                 userOrg.Address.SetStatus(
                     AddressStatuses.Active,
-                    OriginalUser == null ? currentUser.UserId : OriginalUser.UserId,
+                    OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,
                     "Manually registered");
                 userOrg.Organisation.LatestAddress = userOrg.Address;
 
@@ -588,7 +588,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         new RegisterLogModel {
                             StatusDate = VirtualDateTime.Now,
                             Status = "Manually registered",
-                            ActionBy = currentUser.EmailAddress,
+                            ActionBy = VirtualUser.EmailAddress,
                             Details = "",
                             Sector = userOrg.Organisation.SectorType,
                             Organisation = userOrg.Organisation.OrganisationName,
@@ -608,7 +608,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 //Show confirmation
-                if (currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+                if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
                 {
                     TempData["TestUrl"] = Url.Action("Impersonate", "Admin", new {area="Admin",emailAddress = userOrg.User.EmailAddress});
                 }
@@ -651,7 +651,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             //Send an acceptance link to the email address
-            string returnUrl = Url.Action(RouteHelper.Routes.SubmissionHome);
+            string returnUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
             return await AdminService.SharedBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(returnUrl, emailAddress, test);
         }
 
@@ -660,11 +660,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("confirm-cancellation")]
-        public IActionResult ConfirmCancellation()
+        public async Task<IActionResult> ConfirmCancellation()
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -690,8 +689,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public async Task<IActionResult> ConfirmCancellation(OrganisationViewModel model, string command)
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -725,7 +723,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     new RegisterLogModel {
                         StatusDate = VirtualDateTime.Now,
                         Status = "Manually Rejected",
-                        ActionBy = currentUser.EmailAddress,
+                        ActionBy = VirtualUser.EmailAddress,
                         Details = "",
                         Sector = userOrg.Organisation.SectorType,
                         Organisation = userOrg.Organisation.OrganisationName,
@@ -766,7 +764,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     .AnyAsync(uo => uo.OrganisationId == userOrg.Organisation.OrganisationId && uo.UserId != userOrg.UserId))
             {
                 Logger.LogInformation(
-                    $"Unused organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}'(DUNS:{userOrg.Organisation.DUNSNumber}) deleted by {(OriginalUser == null ? currentUser.EmailAddress : OriginalUser.EmailAddress)} when declining manual registration for {userOrg.User.EmailAddress}");
+                    $"Unused organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}'(DUNS:{userOrg.Organisation.DUNSNumber}) deleted by {(OriginalUser == null ? VirtualUser.EmailAddress : OriginalUser.EmailAddress)} when declining manual registration for {userOrg.User.EmailAddress}");
                 SharedBusinessLogic.DataRepository.Delete(userOrg.Organisation);
             }
 
@@ -816,11 +814,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         ///     Show review accepted confirmation
         ///     <returns></returns>
         [HttpGet("request-accepted")]
-        public IActionResult RequestAccepted()
+        public async Task<IActionResult> RequestAccepted()
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -836,7 +833,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //Clear the stash
             this.ClearStash();
 
-            if (currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) && TempData.ContainsKey("TestUrl"))
+            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) && TempData.ContainsKey("TestUrl"))
             {
                 ViewBag.TestUrl = TempData["TestUrl"];
             }
@@ -848,11 +845,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         ///     Show review cancel confirmation
         ///     <returns></returns>
         [HttpGet("request-cancelled")]
-        public IActionResult RequestCancelled()
+        public async Task<IActionResult> RequestCancelled()
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -868,7 +864,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //Clear the stash
             this.ClearStash();
 
-            if (currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
                 UserOrganisation userOrg;
                 ActionResult result = UnwrapRegistrationRequest(model, out userOrg, true);

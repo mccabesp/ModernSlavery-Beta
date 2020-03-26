@@ -9,7 +9,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
 {
     public class WebService : IWebService
     {
-        public WebService(IErrorViewModelFactory errorViewModelFactory, FeatureSwitchOptions featureSwitchOptions, IMapper autoMapper, IHttpCache cache, IHttpSession session, IWebHostEnvironment hostingEnvironment, IShortCodesRepository shortCodesRepository, IWebTracker webTracker, IEventLogger eventLogger)
+        public WebService(IErrorViewModelFactory errorViewModelFactory, FeatureSwitchOptions featureSwitchOptions, IMapper autoMapper, IHttpCache cache, IHttpSession session, IWebHostEnvironment hostingEnvironment, IShortCodesRepository shortCodesRepository, IUrlRouteHelper urlHelper, IWebTracker webTracker, IEventLogger eventLogger)
         {
             ErrorViewModelFactory = errorViewModelFactory;
             FeatureSwitchOptions = featureSwitchOptions;
@@ -18,6 +18,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
             Session = session;
             HostingEnvironment = hostingEnvironment;
             ShortCodesRepository = shortCodesRepository;
+            RouteHelper = urlHelper;
             CustomLogger = eventLogger;
         }
 
@@ -30,6 +31,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
         public IShortCodesRepository ShortCodesRepository { get; }
         public IWebTracker WebTracker { get; }
         public IEventLogger CustomLogger { get; }
+        public IUrlRouteHelper RouteHelper { get; }
 
     }
 }

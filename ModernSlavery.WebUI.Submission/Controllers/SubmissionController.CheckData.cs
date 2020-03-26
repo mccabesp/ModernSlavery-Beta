@@ -63,7 +63,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             #region Check user, then retrieve model from Session
 
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -73,7 +73,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             #endregion
 
-            stashedReturnViewModel = await LoadReturnViewModelFromDBorFromDraftFileAsync(stashedReturnViewModel, currentUser.UserId);
+            stashedReturnViewModel = await LoadReturnViewModelFromDBorFromDraftFileAsync(stashedReturnViewModel, VirtualUser.UserId);
 
             if (stashedReturnViewModel.ReportInfo.Draft != null && !stashedReturnViewModel.ReportInfo.Draft.IsUserAllowedAccess)
             {
@@ -126,7 +126,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             #region Check user, then retrieve model from Session
 
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -176,7 +176,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                 postedReturn.Modifications = changeSummary.Modifications;
 
-                databaseReturn.SetStatus(ReturnStatuses.Retired, OriginalUser == null ? currentUser.UserId : OriginalUser.UserId);
+                databaseReturn.SetStatus(ReturnStatuses.Retired, OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId);
             }
 
             if (databaseReturn == null || !changeSummary.ShouldProvideLateReason)
@@ -198,7 +198,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 SharedBusinessLogic.DataRepository.Insert(postedReturn);
             }
 
-            postedReturn.SetStatus(ReturnStatuses.Submitted, OriginalUser?.UserId ?? currentUser.UserId);
+            postedReturn.SetStatus(ReturnStatuses.Submitted, OriginalUser?.UserId ?? VirtualUser.UserId);
 
             Organisation organisationFromDatabase = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == postedReturnViewModel.OrganisationId);
 
@@ -211,7 +211,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            if (!currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            if (!VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
                 await _SubmissionPresenter.SubmissionService.SubmissionBusinessLogic.SubmissionLog.WriteAsync(
                     new SubmissionLogModel {
@@ -242,15 +242,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                         FemaleUpperQuartilePayBand = postedReturn.FemaleUpperQuartilePayBand,
                         CompanyLinkToGPGInfo = postedReturn.CompanyLinkToGPGInfo,
                         ResponsiblePerson = postedReturn.ResponsiblePerson,
-                        UserFirstname = currentUser.Firstname,
-                        UserLastname = currentUser.Lastname,
-                        UserJobtitle = currentUser.JobTitle,
-                        UserEmail = currentUser.EmailAddress,
-                        ContactFirstName = currentUser.ContactFirstName,
-                        ContactLastName = currentUser.ContactLastName,
-                        ContactJobTitle = currentUser.ContactJobTitle,
-                        ContactOrganisation = currentUser.ContactOrganisation,
-                        ContactPhoneNumber = currentUser.ContactPhoneNumber,
+                        UserFirstname = VirtualUser.Firstname,
+                        UserLastname = VirtualUser.Lastname,
+                        UserJobtitle = VirtualUser.JobTitle,
+                        UserEmail = VirtualUser.EmailAddress,
+                        ContactFirstName = VirtualUser.ContactFirstName,
+                        ContactLastName = VirtualUser.ContactLastName,
+                        ContactJobTitle = VirtualUser.ContactJobTitle,
+                        ContactOrganisation = VirtualUser.ContactOrganisation,
+                        ContactPhoneNumber = VirtualUser.ContactPhoneNumber,
                         Created = postedReturn.Created,
                         Modified = postedReturn.Modified,
                         Browser = HttpContext.GetBrowser() ?? "No browser in the request",
@@ -264,12 +264,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             if (SharedBusinessLogic.SharedOptions.EnableSubmitAlerts
                 && postedReturn.Organisation.Returns.Count(r => r.AccountingDate == postedReturn.AccountingDate) == 1
-                && !currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+                && !VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
                 await _SubmissionService.SharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
                     "GPG Data Submission Notification",
                     $"GPG data was submitted for first time in {postedReturn.AccountingDate.Year} by '{postedReturn.Organisation.OrganisationName}' on {postedReturn.StatusDate.ToShortDateString()}\n\n See {Url.Action("Report", "Viewing", new {employerIdentifier = postedReturnViewModel.EncryptedOrganisationId, year = postedReturn.AccountingDate.Year}, "https")}",
-                    currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
+                    VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
             }
 
             _SubmissionService.SharedBusinessLogic.NotificationService.SendSuccessfulSubmissionEmailToRegisteredUsers(
@@ -287,7 +287,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             #region Check user, then retrieve model from Session
 
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;

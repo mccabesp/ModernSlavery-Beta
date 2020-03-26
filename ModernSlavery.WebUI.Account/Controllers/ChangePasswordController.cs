@@ -29,9 +29,9 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public IChangePasswordViewService ChangePasswordService { get; }
 
         [HttpGet("change-password")]
-        public IActionResult ChangePassword()
+        public async Task<IActionResult> ChangePassword()
         {
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -51,7 +51,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordViewModel formData)
         {
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -65,7 +65,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             // execute change password process
             ModelStateDictionary errors = await ChangePasswordService.ChangePasswordAsync(
-                currentUser,
+                VirtualUser,
                 formData.CurrentPassword,
                 formData.NewPassword);
 

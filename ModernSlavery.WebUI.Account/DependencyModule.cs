@@ -27,9 +27,6 @@ namespace ModernSlavery.WebUI.Account
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
-            //Set the sign out url
-            var urlHelper = container.Resolve<IUrlHelper>();
-            urlHelper.SetRoute(RouteHelper.Routes.AccountSignOut, nameof(AccountController.SignOut));
         }
     }
 }

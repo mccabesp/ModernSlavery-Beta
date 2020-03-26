@@ -31,9 +31,9 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public IChangeEmailViewService ChangeEmailService { get; }
 
         [HttpGet("change-email")]
-        public IActionResult ChangeEmail()
+        public async Task<IActionResult> ChangeEmail()
         {
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -53,7 +53,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangeEmail([FromForm] ChangeEmailViewModel formData)
         {
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -66,7 +66,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             }
 
             // initialize change email process
-            ModelStateDictionary errors = await ChangeEmailService.InitiateChangeEmailAsync(formData.EmailAddress, currentUser);
+            ModelStateDictionary errors = await ChangeEmailService.InitiateChangeEmailAsync(formData.EmailAddress, VirtualUser);
             if (errors.ErrorCount > 0)
             {
                 ModelState.Merge(errors);
@@ -74,16 +74,16 @@ namespace ModernSlavery.WebUI.Account.Controllers
             }
 
             // confirm email change link sent
-            var changeEmailModel = new ChangeEmailStatusViewModel {OldEmail = currentUser.EmailAddress, NewEmail = formData.EmailAddress};
+            var changeEmailModel = new ChangeEmailStatusViewModel {OldEmail = VirtualUser.EmailAddress, NewEmail = formData.EmailAddress};
 
             // go to pending page
             return RedirectToAction(nameof(ChangeEmailPending), new {data = Encryption.EncryptModel(changeEmailModel)});
         }
 
         [HttpGet("change-email-pending")]
-        public IActionResult ChangeEmailPending(string data)
+        public async Task<IActionResult> ChangeEmailPending(string data)
         {
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -97,10 +97,10 @@ namespace ModernSlavery.WebUI.Account.Controllers
         [AllowAnonymous]
         [Route("verify-change-email")]
         [HttpGet]
-        public IActionResult VerifyChangeEmail(string code)
+        public async Task<IActionResult> VerifyChangeEmail(string code)
         {
             // if not logged in go straight to CompleteChangeEmailAsync
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null && checkResult is ChallengeResult)
             {
                 return base.RedirectToAction(
@@ -114,21 +114,21 @@ namespace ModernSlavery.WebUI.Account.Controllers
                 new {code},
                 "https");
 
-            return LogoutUser(redirectUrl);
+            return await LogoutUser(redirectUrl);
         }
 
         [Route("complete-change-email")]
         [HttpGet]
         public async Task<IActionResult> CompleteChangeEmailAsync(string code)
         {
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
             }
 
             // complete email change
-            ModelStateDictionary errors = await ChangeEmailService.CompleteChangeEmailAsync(code, currentUser);
+            ModelStateDictionary errors = await ChangeEmailService.CompleteChangeEmailAsync(code, VirtualUser);
             if (errors.ErrorCount > 0)
             {
                 // show failed reason
@@ -137,7 +137,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             }
 
             // show success
-            var changeEmailCompletedModel = new ChangeEmailStatusViewModel {NewEmail = currentUser.EmailAddress};
+            var changeEmailCompletedModel = new ChangeEmailStatusViewModel {NewEmail = VirtualUser.EmailAddress};
 
             return View("ChangeEmailCompleted", changeEmailCompletedModel);
         }

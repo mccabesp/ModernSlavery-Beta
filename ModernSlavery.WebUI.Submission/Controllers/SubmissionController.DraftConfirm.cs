@@ -18,7 +18,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             #region Check user, then retrieve model from Session
 
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -45,7 +45,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             #region Check user, then retrieve model from Session
 
-            IActionResult checkResult = CheckUserRegisteredOk(out User currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -69,7 +69,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return View(postedReturnViewModel.OriginatingAction, postedReturnViewModel);
             }
 
-            await _SubmissionPresenter.UpdateDraftFileAsync(currentUser.UserId, postedReturnViewModel);
+            await _SubmissionPresenter.UpdateDraftFileAsync(VirtualUser.UserId, postedReturnViewModel);
             await _SubmissionPresenter.CommitDraftFileAsync(postedReturnViewModel);
 
             return View("DraftComplete", postedReturnViewModel);

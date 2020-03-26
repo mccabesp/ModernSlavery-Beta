@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Entities;
@@ -21,11 +22,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
         [Authorize]
         [HttpGet("add-address")]
-        public IActionResult AddAddress()
+        public async Task<IActionResult> AddAddress()
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -60,11 +60,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("add-address")]
-        public IActionResult AddAddress(OrganisationViewModel model)
+        public async Task<IActionResult> AddAddress(OrganisationViewModel model)
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -140,7 +139,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
             else
             {
-                model.AddressSource = currentUser.EmailAddress;
+                model.AddressSource = VirtualUser.EmailAddress;
             }
 
             if (model.WrongAddress)
@@ -168,11 +167,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
         [Authorize]
         [HttpGet("add-contact")]
-        public IActionResult AddContact()
+        public async Task<IActionResult> AddContact()
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -188,35 +186,35 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             //Pre-load contact details
             if (string.IsNullOrWhiteSpace(model.ContactFirstName))
             {
-                model.ContactFirstName = string.IsNullOrWhiteSpace(currentUser.ContactFirstName)
-                    ? currentUser.Firstname
-                    : currentUser.ContactFirstName;
+                model.ContactFirstName = string.IsNullOrWhiteSpace(VirtualUser.ContactFirstName)
+                    ? VirtualUser.Firstname
+                    : VirtualUser.ContactFirstName;
             }
 
             if (string.IsNullOrWhiteSpace(model.ContactLastName))
             {
-                model.ContactLastName = string.IsNullOrWhiteSpace(currentUser.ContactLastName)
-                    ? currentUser.Lastname
-                    : currentUser.ContactLastName;
+                model.ContactLastName = string.IsNullOrWhiteSpace(VirtualUser.ContactLastName)
+                    ? VirtualUser.Lastname
+                    : VirtualUser.ContactLastName;
             }
 
             if (string.IsNullOrWhiteSpace(model.ContactJobTitle))
             {
-                model.ContactJobTitle = string.IsNullOrWhiteSpace(currentUser.ContactJobTitle)
-                    ? currentUser.JobTitle
-                    : currentUser.ContactJobTitle;
+                model.ContactJobTitle = string.IsNullOrWhiteSpace(VirtualUser.ContactJobTitle)
+                    ? VirtualUser.JobTitle
+                    : VirtualUser.ContactJobTitle;
             }
 
             if (string.IsNullOrWhiteSpace(model.ContactEmailAddress))
             {
-                model.ContactEmailAddress = string.IsNullOrWhiteSpace(currentUser.ContactEmailAddress)
-                    ? currentUser.EmailAddress
-                    : currentUser.ContactEmailAddress;
+                model.ContactEmailAddress = string.IsNullOrWhiteSpace(VirtualUser.ContactEmailAddress)
+                    ? VirtualUser.EmailAddress
+                    : VirtualUser.ContactEmailAddress;
             }
 
             if (string.IsNullOrWhiteSpace(model.ContactPhoneNumber))
             {
-                model.ContactPhoneNumber = currentUser.ContactPhoneNumber;
+                model.ContactPhoneNumber = VirtualUser.ContactPhoneNumber;
             }
 
             return View("AddContact", model);
@@ -226,11 +224,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("add-contact")]
-        public IActionResult AddContact(OrganisationViewModel model)
+        public async Task<IActionResult> AddContact(OrganisationViewModel model)
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -306,11 +303,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
         [Authorize]
         [HttpGet("add-sector")]
-        public IActionResult AddSector()
+        public async Task<IActionResult> AddSector()
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -330,11 +326,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("add-sector")]
-        public IActionResult AddSector(OrganisationViewModel model)
+        public async Task<IActionResult> AddSector(OrganisationViewModel model)
         {
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null)
             {
                 return checkResult;
@@ -435,7 +430,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
 
-            model.SicSource = currentUser.EmailAddress;
+            model.SicSource = VirtualUser.EmailAddress;
 
             model.ConfirmReturnAction = nameof(AddSector);
             this.StashModel(model);

@@ -26,6 +26,7 @@ using Newtonsoft.Json;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 using Extensions = ModernSlavery.Core.Extensions.Extensions;
+using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Shared.Controllers
 {
@@ -322,14 +323,14 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
 
         [HttpGet("~/session-expired")]
-        public IActionResult SessionExpired()
+        public async Task<IActionResult> SessionExpired()
         {
             if (!User.Identity.IsAuthenticated)
             {
                 return View("SessionExpired");
             }
 
-            return LogoutUser(Url.Action(nameof(SessionExpired), null, null, "https"));
+            return await LogoutUser(Url.Action(nameof(SessionExpired), null, null, "https"));
         }
 
         [HttpGet("~/report-concerns")]
@@ -427,8 +428,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             }
 
             //Ensure user has completed the registration process
-            User currentUser;
-            IActionResult checkResult = CheckUserRegisteredOk(out currentUser);
+            
+            var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult == null)
             {
                 return checkResult;
@@ -437,27 +438,27 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (!IsImpersonatingUser && !CurrentUser.IsAdministrator())
             {
                 // check if the user has accepted the privacy statement
-                DateTime? hasReadPrivacy = currentUser.AcceptedPrivacyStatement;
+                DateTime? hasReadPrivacy = VirtualUser.AcceptedPrivacyStatement;
                 if (hasReadPrivacy == null || hasReadPrivacy.ToDateTime() < SharedBusinessLogic.SharedOptions.PrivacyChangedDate)
                 {
-                    currentUser.AcceptedPrivacyStatement = VirtualDateTime.Now;
+                    VirtualUser.AcceptedPrivacyStatement = VirtualDateTime.Now;
                     await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
             }
 
-            return RedirectToAction(Url.Action(RouteHelper.Routes.SubmissionHome));
+            return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
         }
 
         #endregion
         [NonAction]
-        public IActionResult LogoutUser(string redirectUrl = null)
+        public async Task<IActionResult> LogoutUser(string redirectUrl = null)
         {
             //If impersonating then stop
             if (ImpersonatedUserId > 0)
             {
                 ImpersonatedUserId = 0;
                 OriginalUser = null;
-                return Redirect(Url.Action(RouteHelper.Routes.SubmissionHome));
+                return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
             }
 
             //otherwise actually logout
@@ -647,10 +648,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         }
 
 
-        protected IActionResult CheckUserRegisteredOk(out User currentUser)
+        protected async Task<IActionResult> CheckUserRegisteredOkAsync()
         {
-            currentUser = null;
-
             //Ensure user is logged in submit or rest of registration
             if (!User.Identity.IsAuthenticated)
             {
@@ -674,23 +673,22 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (this.ControllerName.EqualsI("Viewing"))return null;
 
             //Ensure we get a valid user from the database
-            currentUser = VirtualUser;
-            if (currentUser == null)
+            if (VirtualUser == null)
             {
                 throw new IdentityNotMappedException();
             }
 
             // When user status is retired
-            if (currentUser.Status == UserStatuses.Retired)
+            if (VirtualUser.Status == UserStatuses.Retired)
             {
                 return new ChallengeResult();
             }
 
             //When email not verified
-            if (currentUser.EmailVerifiedDate.EqualsI(null, DateTime.MinValue))
+            if (VirtualUser.EmailVerifiedDate.EqualsI(null, DateTime.MinValue))
             {
                 //If email not sent
-                if (currentUser.EmailVerifySendDate.EqualsI(null, DateTime.MinValue))
+                if (VirtualUser.EmailVerifySendDate.EqualsI(null, DateTime.MinValue))
                 {
                     if (IsAnyAction("Register/VerifyEmail"))
                     {
@@ -702,7 +700,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 //If verification code has expired
-                if (currentUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours) < VirtualDateTime.Now)
+                if (VirtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours) < VirtualDateTime.Now)
                 {
                     if (IsAnyAction("Register/VerifyEmail"))
                     {
@@ -714,7 +712,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 //If code min time hasnt elapsed 
-                TimeSpan remainingTime = currentUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationMinResendHours)
+                TimeSpan remainingTime = VirtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationMinResendHours)
                                          - VirtualDateTime.Now;
                 if (remainingTime > TimeSpan.Zero)
                 {
@@ -739,7 +737,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             }
 
             //Ensure admins always routed to their home page
-            if (currentUser.IsAdministrator())
+            if (VirtualUser.IsAdministrator())
             {
                 if (IsAnyAction(
                     "Register/VerifyEmail",
@@ -818,13 +816,13 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             }
 
             // if the user doesn't have a selected an organisation then go to the ManageOrgs page
-            UserOrganisation userOrg = currentUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == ReportingOrganisationId);
+            UserOrganisation userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == ReportingOrganisationId);
             if (userOrg == null)
             {
                 Logger.LogWarning(
-                    $"Cannot find UserOrganisation for user {currentUser.UserId} and organisation {ReportingOrganisationId}");
+                    $"Cannot find UserOrganisation for user {VirtualUser.UserId} and organisation {ReportingOrganisationId}");
 
-                return Redirect(Url.RouteUrl(RouteHelper.Routes.SubmissionHome));
+                return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
             }
 
             if (userOrg.Organisation.SectorType == SectorTypes.Private)
@@ -897,7 +895,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 Logger.LogWarning(
                     $"UserOrganisation for user {userOrg.UserId} and organisation {userOrg.OrganisationId} PIN is not confirmed");
-                return Redirect(Url.Action(RouteHelper.Routes.SubmissionHome));
+                return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
             }
 
             return null;
