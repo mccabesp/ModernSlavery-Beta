@@ -1,7 +1,6 @@
 ﻿using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;

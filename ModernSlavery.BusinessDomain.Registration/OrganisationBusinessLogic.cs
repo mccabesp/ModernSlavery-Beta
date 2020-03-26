@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
@@ -119,27 +118,8 @@ namespace ModernSlavery.BusinessDomain.Registration
                 o.OrganisationId != organisation.OrganisationId &&
                 o.EmployerReference == organisation.EmployerReference));
 
-            try
-            {
-                //Save the organisation
-                await _DataRepository.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                var bex = ex.GetBaseException() as SqlException;
-                if (bex != null)
-                    switch (bex.Number)
-                    {
-                        case 2601: // Duplicated key row error
-                            goto retry;
-                        case 2627: // Unique constraint error
-                        case 547: // Constraint check violation
-                        default:
-                            break;
-                    }
-
-                throw;
-            }
+            //Save the organisation
+            await _DataRepository.SaveChangesAsync();
         }
 
         public virtual string GenerateEmployerReference()
