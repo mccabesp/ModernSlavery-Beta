@@ -1,5 +1,4 @@
-﻿@using ModernSlavery.IdServer.Models.Consent
-@model ModernSlavery.IdServer.Models.Consent.ConsentViewModel
+﻿@model ModernSlavery.IdServer.Models.Consent.ConsentViewModel
 
 <div class="page-consent">
     <div class="row page-header">
@@ -34,7 +33,7 @@
                             Personal Information
                         </div>
                         <ul class="list-group">
-                            @foreach (ScopeViewModel scope in Model.IdentityScopes)
+                            @foreach (var scope in Model.IdentityScopes)
                             {
                                 @await Html.PartialAsync("_ScopeListItem", scope)
                             }
@@ -50,7 +49,7 @@
                             Application Access
                         </div>
                         <ul class="list-group">
-                            @foreach (ScopeViewModel scope in Model.ResourceScopes)
+                            @foreach (var scope in Model.ResourceScopes)
                             {
                                 @await Html.PartialAsync("_ScopeListItem", scope)
                             }

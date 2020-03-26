@@ -1,38 +1,30 @@
 ﻿using System;
 using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Autofac;
-using ModernSlavery.Core.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Options;
-using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.WebUI.Shared.Classes.Middleware;
-using ModernSlavery.WebUI.Shared.Interfaces;
-using ModernSlavery.WebUI.Shared.Options;
-using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Configuration;
-using ModernSlavery.Infrastructure.Hosts.WebHost;
 using ModernSlavery.Infrastructure.Logging;
-using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.Infrastructure.Storage.MessageQueues;
-using ModernSlavery.Infrastructure.Telemetry;
+using ModernSlavery.WebUI.Shared.Classes.Middleware;
+using ModernSlavery.WebUI.Shared.Options;
+using Extensions = ModernSlavery.Core.Classes.Extensions;
 
 namespace ModernSlavery.WebUI
 {
-    public class Startup:IStartup
+    public class Startup : IStartup
     {
         private readonly IConfiguration _Config;
         private readonly ILogger _Logger;
+
         public Startup(IConfiguration config)
         {
             _Config = config;
@@ -82,29 +74,30 @@ namespace ModernSlavery.WebUI
             app.UseHttpsRedirection();
             //app.UseResponseCompression(); //Disabled to use IIS compression which has better performance (see https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-2.1)
             app.UseStaticFiles(
-                new StaticFileOptions {
-                    OnPrepareResponse = ctx => {
+                new StaticFileOptions
+                {
+                    OnPrepareResponse = ctx =>
+                    {
                         //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
-                        if (responseCachingOptions.StaticCacheSeconds > 0)ctx.Context.SetResponseCache(responseCachingOptions.StaticCacheSeconds);
+                        if (responseCachingOptions.StaticCacheSeconds > 0)
+                            ctx.Context.SetResponseCache(responseCachingOptions.StaticCacheSeconds);
                     }
                 }); //For the wwwroot folder
 
             // Include un-bundled js + css folders to serve the source files in dev environment
             if (_Config["Environment"].EqualsI("Local"))
-            {
                 app.UseStaticFiles(
-                    new StaticFileOptions {
+                    new StaticFileOptions
+                    {
                         FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()),
                         RequestPath = "",
-                        OnPrepareResponse = ctx => {
+                        OnPrepareResponse = ctx =>
+                        {
                             //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
                             if (responseCachingOptions.StaticCacheSeconds > 0)
-                            {
                                 ctx.Context.SetResponseCache(responseCachingOptions.StaticCacheSeconds);
-                            }
                         }
                     });
-            }
 
             app.UseRouting();
             app.UseResponseCaching();
@@ -113,22 +106,23 @@ namespace ModernSlavery.WebUI
             app.UseAuthentication(); //Ensure the OIDC IDentity Server authentication services execute on each http request - Must be before UseMVC
             app.UseAuthorization();
             app.UseCookiePolicy();
-            app.UseMiddleware<MaintenancePageMiddleware>(sharedOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
-            app.UseMiddleware<StickySessionMiddleware>(sharedOptions.StickySessions); //Enable/Disable sticky sessions based on  
+            app.UseMiddleware<MaintenancePageMiddleware>(sharedOptions
+                .MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
+            app.UseMiddleware<StickySessionMiddleware>(sharedOptions
+                .StickySessions); //Enable/Disable sticky sessions based on  
 
             //Force basic authentication
-            if (_Config.GetValue("BasicAuthentication:Enabled",false))
-                app.UseMiddleware<BasicAuthenticationMiddleware>(_Config.GetValue("BasicAuthentication:Username", _Config["BasicAuthentication:Password"])); 
+            if (_Config.GetValue("BasicAuthentication:Enabled", false))
+                app.UseMiddleware<BasicAuthenticationMiddleware>(_Config.GetValue("BasicAuthentication:Username",
+                    _Config["BasicAuthentication:Password"]));
 
             app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses
 
             //app.UseMvcWithDefaultRoute();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             lifetime.ApplicationStarted.Register(
-                () => {
+                () =>
+                {
                     // Summary:
                     //     Triggered when the application host has fully started and is about to wait for
                     //     a graceful shutdown.
@@ -137,22 +131,22 @@ namespace ModernSlavery.WebUI
                     //Ensure ShortCodes, SicCodes and SicSections exist on remote 
                     var _fileRepository = app.ApplicationServices.GetService<IFileRepository>();
                     Task.WaitAll(
-                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.ShortCodes, sharedOptions.DataPath),
-                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicCodes, sharedOptions.DataPath),
-                        Core.Classes.Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicSections, sharedOptions.DataPath)
+                        Extensions.PushRemoteFileAsync(_fileRepository, Filenames.ShortCodes, sharedOptions.DataPath),
+                        Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicCodes, sharedOptions.DataPath),
+                        Extensions.PushRemoteFileAsync(_fileRepository, Filenames.SicSections, sharedOptions.DataPath)
                     );
 
 
                     _Logger.LogInformation("Application Started");
                 });
             lifetime.ApplicationStopping.Register(
-                () => {
+                () =>
+                {
                     // Summary:
                     //     Triggered when the application host is performing a graceful shutdown. Requests
                     //     may still be in flight. Shutdown will block until this event completes.
                     _Logger.LogInformation("Application Stopping");
                 });
         }
-
     }
 }

@@ -14,7 +14,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
         /// <summary>
         ///     Handling healthy queued Stannp messages. After 5 failed attempts message is added to poisoned queue.
         /// </summary>
@@ -25,16 +24,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             var wrapper = JsonConvert.DeserializeObject<QueueWrapper>(queueMessage);
             wrapper.Message = Regex.Unescape(wrapper.Message).TrimI("\"");
-            Type messageType = typeof(SendGeoMessageModel).Assembly.GetType(wrapper.Type, true);
-            object parameters = JsonConvert.DeserializeObject(wrapper.Message, messageType);
+            var messageType = typeof(SendGeoMessageModel).Assembly.GetType(wrapper.Type, true);
+            var parameters = JsonConvert.DeserializeObject(wrapper.Message, messageType);
 
             if (parameters is SendGeoMessageModel)
             {
                 var pars = (SendGeoMessageModel) parameters;
                 if (!await _Messenger.SendGeoMessageAsync(pars.subject, pars.message, pars.test))
-                {
                     throw new Exception("Could not send email message to GEO for queued message:" + queueMessage);
-                }
             }
             else
             {
@@ -44,7 +41,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 }
                 catch
                 {
-                    throw new Exception($"Could not send email for unknown type '{wrapper.Type}'. Queued message:" + queueMessage);
+                    throw new Exception($"Could not send email for unknown type '{wrapper.Type}'. Queued message:" +
+                                        queueMessage);
                 }
             }
 
@@ -64,8 +62,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             log.LogError($"Could not send email for queued message, Details:{queueMessage}");
 
             //Send Email to GEO reporting errors
-            await _Messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not send email for queued message:" + queueMessage);
+            await _Messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR",
+                "Could not send email for queued message:" + queueMessage);
         }
-
     }
 }

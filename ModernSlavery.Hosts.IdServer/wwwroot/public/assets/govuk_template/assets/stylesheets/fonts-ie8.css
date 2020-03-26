@@ -4,27 +4,27 @@
 
 
 @font-face {
-  font-family: 'nta';
-  src: url(fonts/GDSTransportWebsite.eot?0.23.0#) format('embedded-opentype');
-  font-weight: normal;
-  font-style: normal;
+    font-family: 'nta';
+    font-style: normal;
+    font-weight: normal;
+    src: url(fonts/GDSTransportWebsite.eot?0.23.0#) format('embedded-opentype');
 }
 
 @font-face {
-  font-family: 'nta';
-  src: url(fonts/GDSTransportWebsite-Bold.eot?0.23.0#) format('embedded-opentype');
-  font-weight: bold;
+    font-family: 'nta';
+    font-weight: bold;
+    src: url(fonts/GDSTransportWebsite-Bold.eot?0.23.0#) format('embedded-opentype');
 }
 
 @font-face {
-  font-family: 'ntatabularnumbers';
-  src: url(fonts/GDSTransportTabular-Light.eot?0.23.0#) format('embedded-opentype');
-  font-weight: normal;
-  font-style: normal;
+    font-family: 'ntatabularnumbers';
+    font-style: normal;
+    font-weight: normal;
+    src: url(fonts/GDSTransportTabular-Light.eot?0.23.0#) format('embedded-opentype');
 }
 
 @font-face {
-  font-family: 'ntatabularnumbers';
-  src: url(fonts/GDSTransportTabular-Bold.eot?0.23.0#) format('embedded-opentype');
-  font-weight: bold;
+    font-family: 'ntatabularnumbers';
+    font-weight: bold;
+    src: url(fonts/GDSTransportTabular-Bold.eot?0.23.0#) format('embedded-opentype');
 }

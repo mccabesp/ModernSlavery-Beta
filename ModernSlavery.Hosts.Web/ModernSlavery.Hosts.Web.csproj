@@ -36,10 +36,12 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Registration\ModernSlavery.BusinessDomain.Registration.csproj" />
-    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Submission\ModernSlavery.BusinessDomain.Submission.csproj" />
+    <ProjectReference
+      Include="..\ModernSlavery.BusinessDomain.Registration\ModernSlavery.BusinessDomain.Registration.csproj" />
+    <ProjectReference
+      Include="..\ModernSlavery.BusinessDomain.Submission\ModernSlavery.BusinessDomain.Submission.csproj" />
     <ProjectReference Include="..\ModernSlavery.BusinessDomain.Viewing\ModernSlavery.BusinessDomain.Viewing.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Database\ModernSlavery.Infrastructure.Database.csproj" />
@@ -47,8 +49,10 @@
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Logging\ModernSlavery.Infrastructure.Logging.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Telemetry\ModernSlavery.Infrastructure.Telemetry.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Account\ModernSlavery.WebUI.Account.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj" />
+    <ProjectReference
+      Include="..\ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj" />
+    <ProjectReference
+      Include="..\ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Hosts\ModernSlavery.Infrastructure.Hosts.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Messaging\ModernSlavery.Infrastructure.Messaging.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Search\ModernSlavery.Infrastructure.Search.csproj" />
@@ -59,8 +63,8 @@
     <ProjectReference Include="..\ModernSlavery.WebUI.Submission\ModernSlavery.WebUI.Submission.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Viewing\ModernSlavery.WebUI.Viewing.csproj" />
   </ItemGroup>
-  
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning;</WarningsAsErrors>
   </PropertyGroup>
 
@@ -136,13 +140,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram" Link="DependencyValidation1.layerdiagram">
+    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram"
+                     Link="DependencyValidation1.layerdiagram">
       <Visible>False</Visible>
     </AdditionalFiles>
-    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
-    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
+    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout"
+          Link="DependencyValidation1.layerdiagram.layout" />
+    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions"
+          Link="DependencyValidation1.layerdiagram.suppressions" />
   </ItemGroup>
-  
+
   <!-- *** THIS IS REQUIRED TO DEPLY WebjobS WITH WEBUI ON AZURE *** -->
   <PropertyGroup>
     <MSDeployPackagePublishDependsOn>
@@ -158,7 +165,9 @@
   </PropertyGroup>
 
   <Target Name="CopyWebjobs">
-    <MSBuild Projects="$(WebjobProjects)" Targets="Restore;Build;Publish;" Properties="DeployOnBuild=true;Configuration=$(Configuration);WebPublishMethod=FileSystem;PublishUrl=$(PublishIntermediateOutputPath)" RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+    <MSBuild Projects="$(WebjobProjects)" Targets="Restore;Build;Publish;"
+             Properties="DeployOnBuild=true;Configuration=$(Configuration);WebPublishMethod=FileSystem;PublishUrl=$(PublishIntermediateOutputPath)"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
   </Target>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

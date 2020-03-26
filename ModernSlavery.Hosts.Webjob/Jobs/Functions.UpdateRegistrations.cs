@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.SharedKernel;
 
@@ -13,20 +13,17 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
-        public async Task UpdateRegistrations([TimerTrigger(typeof(Functions.EveryWorkingHourSchedule), RunOnStartup = true)]
+        public async Task UpdateRegistrations([TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {
             try
             {
-                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.Registrations);
+                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.Registrations);
 
                 //Dont execute on startup if file already exists
-                if (!Functions.StartedJobs.Contains(nameof(UpdateRegistrations)) && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
-                {
-                    return;
-                }
+                if (!StartedJobs.Contains(nameof(UpdateRegistrations)) &&
+                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath)) return;
 
                 await UpdateRegistrationsAsync(log, filePath);
 
@@ -34,7 +31,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             catch (Exception ex)
             {
-                string message = $"Failed {nameof(UpdateRegistrations)}:{ex.Message}";
+                var message = $"Failed {nameof(UpdateRegistrations)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
                 await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
@@ -43,28 +40,30 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             finally
             {
-                Functions.StartedJobs.Add(nameof(UpdateRegistrations));
+                StartedJobs.Add(nameof(UpdateRegistrations));
             }
         }
 
         public async Task UpdateRegistrationsAsync(ILogger log, string filePath)
         {
-            if (Functions.RunningJobs.Contains(nameof(UpdateRegistrations)))
+            if (RunningJobs.Contains(nameof(UpdateRegistrations)))
             {
                 log.LogDebug($"'{nameof(UpdateRegistrations)}' is already running.");
                 return;
             }
 
-            Functions.RunningJobs.Add(nameof(UpdateRegistrations));
+            RunningJobs.Add(nameof(UpdateRegistrations));
             try
             {
-                List<UserOrganisation> userOrgs = Queryable.Where<UserOrganisation>(_SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>(), uo => uo.User.Status == UserStatuses.Active && uo.PINConfirmedDate != null)
+                var userOrgs = _SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo =>
+                        uo.User.Status == UserStatuses.Active && uo.PINConfirmedDate != null)
                     .OrderBy(uo => uo.Organisation.OrganisationName)
                     .Include(uo => uo.Organisation.LatestScope)
                     .Include(uo => uo.User)
                     .ToList();
                 var records = userOrgs.Select(
-                        uo => new {
+                        uo => new
+                        {
                             uo.Organisation.OrganisationId,
                             uo.Organisation.DUNSNumber,
                             uo.Organisation.EmployerReference,
@@ -90,13 +89,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             Address = uo.Address?.GetAddressString()
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
+                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
             }
             finally
             {
-                Functions.RunningJobs.Remove(nameof(UpdateRegistrations));
+                RunningJobs.Remove(nameof(UpdateRegistrations));
             }
         }
-
     }
 }

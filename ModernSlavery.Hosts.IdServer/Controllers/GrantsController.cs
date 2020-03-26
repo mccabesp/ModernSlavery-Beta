@@ -5,7 +5,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authorization;
@@ -20,7 +19,6 @@ namespace ModernSlavery.IdServer.Controllers
     [Authorize]
     public class GrantsController : Controller
     {
-
         private readonly IClientStore _clients;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IResourceStore _resources;
@@ -56,17 +54,18 @@ namespace ModernSlavery.IdServer.Controllers
 
         private async Task<GrantsViewModel> BuildViewModelAsync()
         {
-            IEnumerable<Consent> grants = await _interaction.GetAllUserConsentsAsync();
+            var grants = await _interaction.GetAllUserConsentsAsync();
 
             var list = new List<GrantViewModel>();
-            foreach (Consent grant in grants)
+            foreach (var grant in grants)
             {
-                Client client = await _clients.FindClientByIdAsync(grant.ClientId);
+                var client = await _clients.FindClientByIdAsync(grant.ClientId);
                 if (client != null)
                 {
-                    Resources resources = await _resources.FindResourcesByScopeAsync(grant.Scopes);
+                    var resources = await _resources.FindResourcesByScopeAsync(grant.Scopes);
 
-                    var item = new GrantViewModel {
+                    var item = new GrantViewModel
+                    {
                         ClientId = client.ClientId,
                         ClientName = client.ClientName ?? client.ClientId,
                         ClientLogoUrl = client.LogoUri,
@@ -83,6 +82,5 @@ namespace ModernSlavery.IdServer.Controllers
 
             return new GrantsViewModel {Grants = list};
         }
-
     }
 }

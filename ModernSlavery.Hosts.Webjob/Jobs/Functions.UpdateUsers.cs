@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.SharedKernel;
 
@@ -13,27 +13,24 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
-        public async Task UpdateUsers([TimerTrigger(typeof(Functions.EveryWorkingHourSchedule), RunOnStartup = true)]
+        public async Task UpdateUsers([TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {
             try
             {
-                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.Users);
+                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.Users);
 
                 //Dont execute on startup if file already exists
-                if (!Functions.StartedJobs.Contains(nameof(UpdateUsers)) && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
-                {
-                    return;
-                }
+                if (!StartedJobs.Contains(nameof(UpdateUsers)) &&
+                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath)) return;
 
                 await UpdateUsersAsync(filePath);
                 log.LogDebug($"Executed {nameof(UpdateUsers)}:successfully");
             }
             catch (Exception ex)
             {
-                string message = $"Failed {nameof(UpdateUsers)}:{ex.Message}";
+                var message = $"Failed {nameof(UpdateUsers)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
                 await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
@@ -42,25 +39,23 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             finally
             {
-                Functions.StartedJobs.Add(nameof(UpdateUsers));
+                StartedJobs.Add(nameof(UpdateUsers));
             }
         }
 
         public async Task UpdateUsersAsync(string filePath)
         {
-            if (Functions.RunningJobs.Contains(nameof(UpdateUsers)))
-            {
-                return;
-            }
+            if (RunningJobs.Contains(nameof(UpdateUsers))) return;
 
-            Functions.RunningJobs.Add(nameof(UpdateUsers));
+            RunningJobs.Add(nameof(UpdateUsers));
             try
             {
-                List<User> users = await EntityFrameworkQueryableExtensions.ToListAsync<User>(_SharedBusinessLogic.DataRepository.GetAll<User>());
+                var users = await _SharedBusinessLogic.DataRepository.GetAll<User>().ToListAsync();
                 var records = users.Where(u => !u.IsAdministrator())
                     .OrderBy(u => u.Lastname)
                     .Select(
-                        u => new {
+                        u => new
+                        {
                             u.Firstname,
                             u.Lastname,
                             u.JobTitle,
@@ -81,13 +76,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             u.Created
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
+                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
             }
             finally
             {
-                Functions.RunningJobs.Remove(nameof(UpdateUsers));
+                RunningJobs.Remove(nameof(UpdateUsers));
             }
         }
-
     }
 }

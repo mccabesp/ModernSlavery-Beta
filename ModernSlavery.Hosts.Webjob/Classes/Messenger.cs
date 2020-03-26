@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -12,22 +11,21 @@ namespace ModernSlavery.Hosts.Webjob.Classes
 {
     public interface IMessenger
     {
-
         Task<bool> SendGeoMessageAsync(string subject, string message, bool test = false);
 
         Task<bool> SendMessageAsync(string subject, string recipients, string message, bool test = false);
 
         Task SendEmailTemplateAsync<TTemplate>(TTemplate parameters) where TTemplate : EmailTemplate;
-
     }
 
     public class Messenger : IMessenger
     {
+        private readonly EmailProvider GpgEmailProvider;
 
         private readonly ILogger<Messenger> log;
-        private readonly EmailProvider GpgEmailProvider;
         private readonly SmtpEmailOptions SmtpOptions;
-        public Messenger(ILogger<Messenger> logger, SmtpEmailOptions smtpOptions,  EmailProvider gpgEmailProvider)
+
+        public Messenger(ILogger<Messenger> logger, SmtpEmailOptions smtpOptions, EmailProvider gpgEmailProvider)
         {
             log = logger ?? throw new ArgumentNullException(nameof(logger));
             SmtpOptions = smtpOptions ?? throw new ArgumentNullException(nameof(smtpOptions));
@@ -43,21 +41,18 @@ namespace ModernSlavery.Hosts.Webjob.Classes
         /// <param name="message"></param>
         public async Task<bool> SendGeoMessageAsync(string subject, string message, bool test = false)
         {
-            List<string> emailAddresses = GpgEmailProvider.EmailOptions.GEODistributionList.SplitI(";").ToList();
+            var emailAddresses = GpgEmailProvider.EmailOptions.GEODistributionList.SplitI(";").ToList();
             emailAddresses = emailAddresses.RemoveI("sender", "recipient");
             if (emailAddresses.Count == 0)
-            {
                 throw new ArgumentNullException(nameof(GpgEmailProvider.EmailOptions.GEODistributionList));
-            }
 
             if (!emailAddresses.ContainsAllEmails())
-            {
-                throw new ArgumentException($"{GpgEmailProvider.EmailOptions.GEODistributionList} contains an invalid email address", nameof(GpgEmailProvider.EmailOptions.GEODistributionList));
-            }
+                throw new ArgumentException(
+                    $"{GpgEmailProvider.EmailOptions.GEODistributionList} contains an invalid email address",
+                    nameof(GpgEmailProvider.EmailOptions.GEODistributionList));
 
             var successCount = 0;
-            foreach (string emailAddress in emailAddresses)
-            {
+            foreach (var emailAddress in emailAddresses)
                 try
                 {
                     await Email.QuickSendAsync(
@@ -73,7 +68,8 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                         SmtpOptions.Port2,
                         test: test);
                     await GpgEmailProvider.EmailSendLog.WriteAsync(
-                        new EmailSendLogModel {
+                        new EmailSendLogModel
+                        {
                             Message = "Email successfully sent via SMTP",
                             Subject = subject,
                             Recipients = emailAddress,
@@ -87,28 +83,21 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                 {
                     log.LogError(ex1, $"Cant send message '{subject}' '{message}' directly to {emailAddress}:");
                 }
-            }
 
             return successCount == emailAddresses.Count;
         }
 
         public async Task<bool> SendMessageAsync(string subject, string recipients, string message, bool test = false)
         {
-            List<string> emailAddresses = recipients.SplitI(";").ToList();
+            var emailAddresses = recipients.SplitI(";").ToList();
             emailAddresses = emailAddresses.RemoveI("sender", "recipient");
-            if (emailAddresses.Count == 0)
-            {
-                throw new ArgumentNullException(nameof(recipients));
-            }
+            if (emailAddresses.Count == 0) throw new ArgumentNullException(nameof(recipients));
 
             if (!emailAddresses.ContainsAllEmails())
-            {
                 throw new ArgumentException($"{recipients} contains an invalid email address", nameof(recipients));
-            }
 
             var successCount = 0;
-            foreach (string emailAddress in emailAddresses)
-            {
+            foreach (var emailAddress in emailAddresses)
                 try
                 {
                     await Email.QuickSendAsync(
@@ -124,7 +113,8 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                         SmtpOptions.Port2,
                         test: test);
                     await GpgEmailProvider.EmailSendLog.WriteAsync(
-                        new EmailSendLogModel {
+                        new EmailSendLogModel
+                        {
                             Message = "Email successfully sent via SMTP",
                             Subject = subject,
                             Recipients = emailAddress,
@@ -138,7 +128,6 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                 {
                     log.LogError(ex1, $"Cant send message '{subject}' '{message}' directly to {emailAddress}:");
                 }
-            }
 
             return successCount == emailAddresses.Count;
         }
@@ -149,6 +138,5 @@ namespace ModernSlavery.Hosts.Webjob.Classes
         }
 
         #endregion
-
     }
 }

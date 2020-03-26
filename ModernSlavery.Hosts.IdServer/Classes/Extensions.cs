@@ -6,7 +6,6 @@ namespace ModernSlavery.IdServer.Classes
 {
     public static class CustomIdentityServerBuilderExtensions
     {
-
         public static IIdentityServerBuilder AddCustomUserStore(this IIdentityServerBuilder builder)
         {
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -15,6 +14,5 @@ namespace ModernSlavery.IdServer.Classes
 
             return builder;
         }
-
     }
 }

@@ -12,7 +12,6 @@ namespace ModernSlavery.IdServer.Classes
 {
     public class CustomProfileService : IProfileService
     {
-
         protected readonly IUserRepository _userRepository;
         protected readonly ILogger Logger;
 
@@ -32,7 +31,8 @@ namespace ModernSlavery.IdServer.Classes
                 context.Caller);
 
             //Issue the requested claims for the user
-            context.IssuedClaims = context.Subject.Claims.Where(x => context.RequestedClaimTypes.Contains(x.Type)).ToList();
+            context.IssuedClaims =
+                context.Subject.Claims.Where(x => context.RequestedClaimTypes.Contains(x.Type)).ToList();
 
             return Task.CompletedTask;
         }
@@ -40,13 +40,12 @@ namespace ModernSlavery.IdServer.Classes
         public async Task IsActiveAsync(IsActiveContext context)
         {
             //Ensure the user is new, active or retired (retired needed for logout redirect otherwise will fail)
-            User user = await _userRepository.FindBySubjectIdAsync(
+            var user = await _userRepository.FindBySubjectIdAsync(
                 context.Subject.GetSubjectId(),
                 UserStatuses.New,
                 UserStatuses.Active,
                 UserStatuses.Retired);
             context.IsActive = user != null;
         }
-
     }
 }

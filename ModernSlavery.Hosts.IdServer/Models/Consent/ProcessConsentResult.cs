@@ -6,7 +6,6 @@ namespace ModernSlavery.IdServer.Models.Consent
 {
     public class ProcessConsentResult
     {
-
         public bool IsRedirect => RedirectUri != null;
         public string RedirectUri { get; set; }
 
@@ -15,6 +14,5 @@ namespace ModernSlavery.IdServer.Models.Consent
 
         public bool HasValidationError => ValidationError != null;
         public string ValidationError { get; set; }
-
     }
 }

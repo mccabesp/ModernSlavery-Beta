@@ -16,13 +16,16 @@ namespace ModernSlavery.IdServer.Classes
     public class Resources : IResources
     {
         private readonly SharedOptions _sharedOptions;
+
         public Resources(SharedOptions sharedOptions)
         {
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
         }
+
         public IEnumerable<IdentityResource> GetIdentityResources()
         {
-            return new List<IdentityResource> {
+            return new List<IdentityResource>
+            {
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile(),
                 new IdentityResource {Name = "roles", UserClaims = new List<string> {ClaimTypes.Role}}
@@ -31,8 +34,10 @@ namespace ModernSlavery.IdServer.Classes
 
         public IEnumerable<ApiResource> GetApiResources()
         {
-            return new List<ApiResource> {
-                new ApiResource {
+            return new List<ApiResource>
+            {
+                new ApiResource
+                {
                     Name = _sharedOptions.IdentityApiScope,
                     DisplayName = "GPG API",
                     Description = "Access to a GPG API",
@@ -42,6 +47,5 @@ namespace ModernSlavery.IdServer.Classes
                 }
             };
         }
-
     }
 }

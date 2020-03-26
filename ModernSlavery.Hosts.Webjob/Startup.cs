@@ -12,10 +12,11 @@ using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Infrastructure.Configuration;
 using ModernSlavery.Infrastructure.Messaging;
+using Extensions = ModernSlavery.Core.Classes.Extensions;
 
 namespace ModernSlavery.Hosts.Webjob
 {
-    public class Startup:IStartup
+    public class Startup : IStartup
     {
         private readonly IConfiguration _Config;
         private readonly ILogger _Logger;
@@ -35,7 +36,7 @@ namespace ModernSlavery.Hosts.Webjob
             return services.SetupDependencies<DependencyModule>(_Config);
         }
 
-        public void Configure(IApplicationBuilder app=null)
+        public void Configure(IApplicationBuilder app = null)
         {
             var fileRepository = _ServiceProvider.GetService<IFileRepository>();
             var sharedOptions = _ServiceProvider.GetService<SharedOptions>();
@@ -52,7 +53,8 @@ namespace ModernSlavery.Hosts.Webjob
             //Initialise the virtual date and time
             VirtualDateTime.Initialise(sharedOptions.DateTimeOffset);
 
-            Task.WaitAll(Core.Classes.Extensions.PushRemoteFileAsync(fileRepository, Filenames.SicSectorSynonyms, sharedOptions.DataPath));
+            Task.WaitAll(Extensions.PushRemoteFileAsync(fileRepository, Filenames.SicSectorSynonyms,
+                sharedOptions.DataPath));
 
             // Register email templates
             var emailTemplatesConfigPath = "Email:Templates";
@@ -103,7 +105,7 @@ namespace ModernSlavery.Hosts.Webjob
             var repo = _ServiceProvider.GetService<IEmailTemplateRepository>();
 
             // get the template id using the type name
-            string templateConfigKey = typeof(TTemplate).Name;
+            var templateConfigKey = typeof(TTemplate).Name;
             var templateId = _Config.GetValue<string>($"{templatesConfigPath}:{templateConfigKey}");
 
             // add this template to the repository

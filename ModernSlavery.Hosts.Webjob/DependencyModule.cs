@@ -2,7 +2,6 @@
 using Autofac;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.DependencyInjection;
-using ModernSlavery.BusinessDomain;
 using ModernSlavery.BusinessDomain.Admin;
 using ModernSlavery.BusinessDomain.Registration;
 using ModernSlavery.BusinessDomain.Shared;
@@ -12,16 +11,13 @@ using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Hosts.Webjob.Classes;
 using ModernSlavery.Hosts.Webjob.Jobs;
 using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Database;
-using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Messaging;
-using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.WebUI.Shared.Options;
 using DataProtectionOptions = Microsoft.AspNetCore.DataProtection.DataProtectionOptions;
@@ -29,15 +25,17 @@ using ResponseCachingOptions = Microsoft.AspNetCore.ResponseCaching.ResponseCach
 
 namespace ModernSlavery.Hosts.Webjob
 {
-    public class DependencyModule: IDependencyModule
+    public class DependencyModule : IDependencyModule
     {
-        private readonly SharedOptions _sharedOptions;
         private readonly CompaniesHouseOptions _coHoOptions;
-        private readonly ResponseCachingOptions _responseCachingOptions;
-        private readonly DistributedCacheOptions _distributedCacheOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
+        private readonly DistributedCacheOptions _distributedCacheOptions;
+        private readonly ResponseCachingOptions _responseCachingOptions;
+        private readonly SharedOptions _sharedOptions;
 
-        public DependencyModule(SharedOptions sharedOptions, CompaniesHouseOptions coHoOptions, ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions, DataProtectionOptions dataProtectionOptions)
+        public DependencyModule(SharedOptions sharedOptions, CompaniesHouseOptions coHoOptions,
+            ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions,
+            DataProtectionOptions dataProtectionOptions)
         {
             _sharedOptions = sharedOptions;
             _coHoOptions = coHoOptions;
@@ -76,10 +74,13 @@ namespace ModernSlavery.Hosts.Webjob
             builder.ContainerBuilder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
 
             // Register the email template dependencies
-            builder.ContainerBuilder.RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates"))).As<IEmailTemplateRepository>().SingleInstance();
+            builder.ContainerBuilder
+                .RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates")))
+                .As<IEmailTemplateRepository>().SingleInstance();
 
             //Register some singletons
-            builder.ContainerBuilder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance().WithParameter("seed", _sharedOptions.ObfuscationSeed);
+            builder.ContainerBuilder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
+                .WithParameter("seed", _sharedOptions.ObfuscationSeed);
             builder.ContainerBuilder.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
 
             // Register email provider dependencies
@@ -88,19 +89,25 @@ namespace ModernSlavery.Hosts.Webjob
             builder.ContainerBuilder.RegisterType<EmailProvider>().SingleInstance();
 
             #region Register the busines logic dependencies
+
             builder.ContainerBuilder.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().SingleInstance();
-            builder.ContainerBuilder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>().InstancePerDependency();
-            builder.ContainerBuilder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerDependency();
-            builder.ContainerBuilder.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>().InstancePerDependency();
-            builder.ContainerBuilder.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>().InstancePerDependency();
+            builder.ContainerBuilder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>()
+                .InstancePerDependency();
+            builder.ContainerBuilder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>()
+                .InstancePerDependency();
+            builder.ContainerBuilder.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>()
+                .InstancePerDependency();
+            builder.ContainerBuilder.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>()
+                .InstancePerDependency();
             builder.ContainerBuilder.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance();
-            builder.ContainerBuilder.RegisterType<UpdateFromCompaniesHouseService>().As<UpdateFromCompaniesHouseService>().InstancePerDependency();
+            builder.ContainerBuilder.RegisterType<UpdateFromCompaniesHouseService>()
+                .As<UpdateFromCompaniesHouseService>().InstancePerDependency();
+
             #endregion
 
             // Need to register webJob class in Autofac as well
             builder.ContainerBuilder.RegisterType<Functions>().InstancePerDependency();
             builder.ContainerBuilder.RegisterType<DisableWebjobProvider>().SingleInstance();
-
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)

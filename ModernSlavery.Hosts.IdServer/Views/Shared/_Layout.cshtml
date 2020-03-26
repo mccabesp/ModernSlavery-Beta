@@ -1,9 +1,9 @@
 ﻿@using ModernSlavery.IdServer.Classes
 @{
     Layout = "_GovTemplate";
-    string govukToolkitAssetPath = Url.Content("~/public/assets/govuk_frontend_toolkit");
-    string govukAppAssetPath = Url.Content("~/public/assets/application");
-    object cacheBreaker = ViewData["cacheBreaker"] = "0.0.0";
+    var govukToolkitAssetPath = Url.Content("~/public/assets/govuk_frontend_toolkit");
+    var govukAppAssetPath = Url.Content("~/public/assets/application");
+    var cacheBreaker = ViewData["cacheBreaker"] = "0.0.0";
 }
 
 @section PageTop{
@@ -62,17 +62,18 @@
 @section BodyEnd {
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script type="text/javascript">
-        $('form').on('submit', function (e) {
-            var $form = $(this);
+        $('form').on('submit',
+            function(e) {
+                var $form = $(this);
 
-            if ($form.data('submitted') === true) {
-                // Previously submitted - don't submit again
-                e.preventDefault();
-            } else {
-                // Mark it so that the next submit can be ignored
-                $form.data('submitted', true);
-            }
-        });
+                if ($form.data('submitted') === true) {
+                    // Previously submitted - don't submit again
+                    e.preventDefault();
+                } else {
+                    // Mark it so that the next submit can be ignored
+                    $form.data('submitted', true);
+                }
+            });
     </script>
     <script src="@(govukToolkitAssetPath)/javascripts/govuk_toolkit.js?@(cacheBreaker)"></script>
 

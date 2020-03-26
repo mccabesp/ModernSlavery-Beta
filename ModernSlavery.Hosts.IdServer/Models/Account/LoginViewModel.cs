@@ -9,7 +9,6 @@ namespace ModernSlavery.IdServer.Models.Account
 {
     public class LoginViewModel : LoginInputModel
     {
-
         public bool AllowRememberLogin { get; set; }
         public bool EnableLocalLogin { get; set; }
 
@@ -19,7 +18,8 @@ namespace ModernSlavery.IdServer.Models.Account
             ExternalProviders.Where(x => !string.IsNullOrWhiteSpace(x.DisplayName));
 
         public bool IsExternalLoginOnly => EnableLocalLogin == false && ExternalProviders?.Count() == 1;
-        public string ExternalLoginScheme => IsExternalLoginOnly ? ExternalProviders?.SingleOrDefault()?.AuthenticationScheme : null;
 
+        public string ExternalLoginScheme =>
+            IsExternalLoginOnly ? ExternalProviders?.SingleOrDefault()?.AuthenticationScheme : null;
     }
 }

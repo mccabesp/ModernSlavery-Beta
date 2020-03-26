@@ -6,12 +6,10 @@ namespace ModernSlavery.IdServer.Models.Account
 {
     public class LogoutViewModel : LogoutInputModel
     {
-
         public bool ShowLogoutPrompt { get; set; }
         public bool AutomaticRedirectAfterSignOut { get; set; }
         public string PostLogoutRedirectUri { get; set; }
         public string ClientName { get; set; }
         public string ClientId { get; set; }
-
     }
 }

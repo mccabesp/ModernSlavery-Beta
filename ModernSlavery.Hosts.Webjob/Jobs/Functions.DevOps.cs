@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
@@ -12,7 +11,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
         /// <summary>
         ///     Ensures only latest organisation address is active one
         /// </summary>
@@ -23,14 +21,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 //Load all the organisation in the database
-                List<Organisation> orgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync();
+                var orgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync();
                 var count = 0;
 
                 //Loop through each organisation in the list
-                foreach (Organisation org in orgs)
+                foreach (var org in orgs)
                 {
                     //Get all the active or retired addresses for this organisation sorted by when they are thoughted to have been first activated
-                    List<OrganisationAddress> addresses = org.OrganisationAddresses
+                    var addresses = org.OrganisationAddresses
                         .Where(a => a.Status == AddressStatuses.Active || a.Status == AddressStatuses.Retired)
                         .OrderBy(a => a.GetFirstRegisteredDate())
                         .ToList();
@@ -39,10 +37,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     for (var i = 0; i < addresses.Count; i++)
                     {
                         //Get the current address
-                        OrganisationAddress address = addresses[i];
+                        var address = addresses[i];
 
                         //Get the next address if there is one
-                        OrganisationAddress nextAddress = i + 1 < addresses.Count ? addresses[i + 1] : null;
+                        var nextAddress = i + 1 < addresses.Count ? addresses[i + 1] : null;
 
                         //If current address is a previous address and its status is active
                         if (nextAddress != null && address.Status == AddressStatuses.Active)
@@ -51,7 +49,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             if (nextAddress.CreatedByUserId < 1)
                             {
                                 //Lookup the status when the replacement address was last activated
-                                AddressStatus activeStatus = nextAddress.AddressStatuses.OrderByDescending(st => st.StatusDate)
+                                var activeStatus = nextAddress.AddressStatuses.OrderByDescending(st => st.StatusDate)
                                     .FirstOrDefault(st => st.Status == AddressStatuses.Active);
                                 //Set the creator id of the replacement address to that saved with its activation status
                                 nextAddress.CreatedByUserId = activeStatus.ByUserId;
@@ -68,27 +66,25 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     }
 
                     //Get the actual latest active address
-                    OrganisationAddress latestAddress = addresses.LastOrDefault(a => a.Status == AddressStatuses.Active);
+                    var latestAddress = addresses.LastOrDefault(a => a.Status == AddressStatuses.Active);
 
                     //If the LatestAddress of the organisation is wrong then fix it
-                    if (latestAddress != null && (org.LatestAddress == null || org.LatestAddress.AddressId != latestAddress.AddressId))
+                    if (latestAddress != null &&
+                        (org.LatestAddress == null || org.LatestAddress.AddressId != latestAddress.AddressId))
                     {
                         org.LatestAddress = latestAddress;
                         changed = true;
                     }
 
                     //If there were database changes then save them
-                    if (changed)
-                    {
-                        await _SharedBusinessLogic.DataRepository.SaveChangesAsync();
-                    }
+                    if (changed) await _SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
                     count++;
                 }
             }
             catch (Exception ex)
             {
-                string message = $"Failed webjob ({nameof(OrganisationAddresses_Fix)}):{ex.Message}:{ex.GetDetailsText()}";
+                var message = $"Failed webjob ({nameof(OrganisationAddresses_Fix)}):{ex.Message}:{ex.GetDetailsText()}";
                 log.LogError(ex, $"Failed webjob ({nameof(OrganisationAddresses_Fix)})");
 
                 //Send Email to GEO reporting errors
@@ -159,7 +155,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             catch (Exception ex)
             {
-                string message = $"Failed webjob ({nameof(Storage_HealthCheck)}):{ex.Message}:{ex.GetDetailsText()}";
+                var message = $"Failed webjob ({nameof(Storage_HealthCheck)}):{ex.Message}:{ex.GetDetailsText()}";
                 log.LogError(ex, $"Failed webjob ({nameof(Storage_HealthCheck)})");
 
                 //Send Email to GEO reporting errors
@@ -168,6 +164,5 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 throw;
             }
         }
-
     }
 }

@@ -12,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.IdServer.Classes;
@@ -25,18 +24,20 @@ using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.IdServer
 {
-    public class DependencyModule: IDependencyModule
+    public class DependencyModule : IDependencyModule
     {
         public static Action<IServiceCollection> ConfigureTestServices;
         public static Action<ContainerBuilder> ConfigureTestContainer;
+        private readonly DataProtectionOptions _dataProtectionOptions;
+        private readonly DistributedCacheOptions _distributedCacheOptions;
 
         private readonly ILogger _Logger;
         private readonly SharedOptions _sharedOptions;
         private readonly StorageOptions _storageOptions;
-        private readonly DistributedCacheOptions _distributedCacheOptions;
-        private readonly DataProtectionOptions _dataProtectionOptions;
 
-        public DependencyModule(ILogger<DependencyModule> logger, SharedOptions sharedOptions, StorageOptions storageOptions, DistributedCacheOptions distributedCacheOptions, DataProtectionOptions dataProtectionOptions)
+        public DependencyModule(ILogger<DependencyModule> logger, SharedOptions sharedOptions,
+            StorageOptions storageOptions, DistributedCacheOptions distributedCacheOptions,
+            DataProtectionOptions dataProtectionOptions)
         {
             _Logger = logger;
             _sharedOptions = sharedOptions;
@@ -57,7 +58,8 @@ namespace ModernSlavery.IdServer
             var resources = new Resources(_sharedOptions);
 
             var identityServer = builder.ServiceCollection.AddIdentityServer(
-                    options => {
+                    options =>
+                    {
                         options.Events.RaiseSuccessEvents = true;
                         options.Events.RaiseFailureEvents = true;
                         options.Events.RaiseErrorEvents = true;
@@ -92,7 +94,8 @@ namespace ModernSlavery.IdServer
             if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
 
             //Add the distributed cache and data protection
-            builder.ServiceCollection.AddDistributedCache(_distributedCacheOptions).AddDataProtection(_dataProtectionOptions);
+            builder.ServiceCollection.AddDistributedCache(_distributedCacheOptions)
+                .AddDataProtection(_dataProtectionOptions);
 
             //Add app insights tracking
             builder.ServiceCollection.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
@@ -110,17 +113,23 @@ namespace ModernSlavery.IdServer
             builder.RegisterModule<FileStorageDependencyModule>();
 
             // Register queues (without key filtering)
-            builder.ContainerBuilder.Register(c => new LogEventQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
-            builder.ContainerBuilder.Register(c => new LogRecordQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>())).SingleInstance();
+            builder.ContainerBuilder
+                .Register(c => new LogEventQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>()))
+                .SingleInstance();
+            builder.ContainerBuilder
+                .Register(c => new LogRecordQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>()))
+                .SingleInstance();
 
             // Register log records (without key filtering)
             builder.ContainerBuilder.RegisterType<UserAuditLogger>().As<IUserLogger>().SingleInstance();
 
             // Register Action helpers
-            builder.ContainerBuilder.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>().SingleInstance();
+            builder.ContainerBuilder.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
+                .SingleInstance();
 
             // Initialise AutoMapper
-            MapperConfiguration mapperConfig = new MapperConfiguration(config => {
+            var mapperConfig = new MapperConfiguration(config =>
+            {
                 // register all out mapper profiles (classes/mappers/*)
                 // config.AddMaps(typeof(MvcApplication));
                 // allows auto mapper to inject our dependencies
@@ -134,7 +143,6 @@ namespace ModernSlavery.IdServer
 
             //Override any test services
             ConfigureTestContainer?.Invoke(builder.ContainerBuilder);
-
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)
@@ -146,11 +154,9 @@ namespace ModernSlavery.IdServer
         private X509Certificate2 LoadCertificate(SharedOptions sharedOptions)
         {
             //Load the site certificate
-            string certThumprint = sharedOptions.Website_Load_Certificates.SplitI(";").FirstOrDefault();
+            var certThumprint = sharedOptions.Website_Load_Certificates.SplitI(";").FirstOrDefault();
             if (string.IsNullOrWhiteSpace(certThumprint))
-            {
                 certThumprint = _sharedOptions.CertThumprint.SplitI(";").FirstOrDefault();
-            }
 
             X509Certificate2 cert = null;
             if (!string.IsNullOrWhiteSpace(certThumprint))
@@ -161,7 +167,7 @@ namespace ModernSlavery.IdServer
             }
             else
             {
-                string certPath = Path.Combine(Directory.GetCurrentDirectory(), @"LocalHost.pfx");
+                var certPath = Path.Combine(Directory.GetCurrentDirectory(), @"LocalHost.pfx");
                 cert = HttpsCertificate.LoadCertificateFromFile(certPath, "LocalHost");
                 _Logger.LogInformation(
                     $"Successfully loaded certificate '{cert.FriendlyName}' expiring '{cert.GetExpirationDateString()}' from file '{certPath}'");
@@ -169,7 +175,7 @@ namespace ModernSlavery.IdServer
 
             if (sharedOptions.CertExpiresWarningDays > 0)
             {
-                DateTime expires = cert.GetExpirationDateString().ToDateTime();
+                var expires = cert.GetExpirationDateString().ToDateTime();
                 if (expires < VirtualDateTime.UtcNow)
                 {
                     _Logger.LogError(
@@ -177,18 +183,15 @@ namespace ModernSlavery.IdServer
                 }
                 else
                 {
-                    TimeSpan remainingTime = expires - VirtualDateTime.Now;
+                    var remainingTime = expires - VirtualDateTime.Now;
 
                     if (expires < VirtualDateTime.UtcNow.AddDays(sharedOptions.CertExpiresWarningDays))
-                    {
                         _Logger.LogWarning(
                             $"The website certificate for '{sharedOptions.SiteAuthority}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
-                    }
                 }
             }
 
             return cert;
         }
-
     }
 }

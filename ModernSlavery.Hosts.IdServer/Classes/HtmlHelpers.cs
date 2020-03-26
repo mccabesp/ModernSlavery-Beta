@@ -5,24 +5,22 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.IdServer.Classes
 {
     public static class HtmlHelpers
     {
-
         public static HtmlString PageIdentifier(this IHtmlHelper htmlHelper)
         {
-            var sharedOptions=htmlHelper.GetSharedOptions();
+            var sharedOptions = htmlHelper.GetSharedOptions();
             return new HtmlString(
                 $"Date:{VirtualDateTime.Now}, Version:{sharedOptions.Version}, File Date:{sharedOptions.AssemblyDate.ToLocalTime()}, Environment:{sharedOptions.Environment}, Machine:{Environment.MachineName}, Instance:{sharedOptions.Website_Instance_Id}, {sharedOptions.AssemblyCopyright}");
         }
 
         public static string CurrentView(this IHtmlHelper html)
         {
-            string path = ((RazorView) html.ViewContext.View).Path;
+            var path = ((RazorView) html.ViewContext.View).Path;
             path = path.RemoveStartI("~/Views/").TrimStartI(@"~/\").RemoveEndI(Path.GetExtension(path));
             return path;
         }
@@ -41,6 +39,5 @@ namespace ModernSlavery.IdServer.Classes
         }
 
         #endregion
-
     }
 }

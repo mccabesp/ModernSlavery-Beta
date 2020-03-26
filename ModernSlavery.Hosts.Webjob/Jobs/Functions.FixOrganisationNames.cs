@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,29 +12,26 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
         private async Task FixOrganisationsNamesAsync(ILogger log, string userEmail, string comment)
         {
-            if (RunningJobs.Contains(nameof(FixOrganisationsNamesAsync)))
-            {
-                return;
-            }
+            if (RunningJobs.Contains(nameof(FixOrganisationsNamesAsync))) return;
 
             RunningJobs.Add(nameof(FixOrganisationsNamesAsync));
             try
             {
-                List<Organisation> orgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync();
+                var orgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync();
 
                 var count = 0;
                 var i = 0;
-                foreach (Organisation org in orgs)
+                foreach (var org in orgs)
                 {
                     i++;
-                    List<OrganisationName> names = org.OrganisationNames.OrderBy(n => n.Created).ToList();
+                    var names = org.OrganisationNames.OrderBy(n => n.Created).ToList();
 
                     var changed = false;
                     ;
-                    while (names.Count > 1 && names[1].Name.EqualsI(names[0].Name.Replace(" LTD.", " LIMITED").Replace(" Ltd", " Limited")))
+                    while (names.Count > 1 && names[1].Name
+                        .EqualsI(names[0].Name.Replace(" LTD.", " LIMITED").Replace(" Ltd", " Limited")))
                     {
                         await _ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
@@ -59,7 +55,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     ;
                     if (names.Count > 0)
                     {
-                        string newValue = names[names.Count - 1].Name;
+                        var newValue = names[names.Count - 1].Name;
                         if (org.OrganisationName != newValue)
                         {
                             org.OrganisationName = newValue;
@@ -92,6 +88,5 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 RunningJobs.Remove(nameof(FixOrganisationsNamesAsync));
             }
         }
-
     }
 }

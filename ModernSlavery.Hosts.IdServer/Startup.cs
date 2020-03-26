@@ -17,7 +17,7 @@ using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.IdServer
 {
-    public class Startup:IStartup
+    public class Startup : IStartup
     {
         private readonly IConfiguration _Config;
         private readonly ILogger _Logger;
@@ -37,7 +37,7 @@ namespace ModernSlavery.IdServer
             return services.SetupDependencies<DependencyModule>(_Config);
         }
 
-       
+
         public void Configure(IApplicationBuilder app)
         {
             //Set the default encryption key
@@ -51,7 +51,7 @@ namespace ModernSlavery.IdServer
             loggerFactory.UseLogEventQueueLogger(app.ApplicationServices);
 
             app.UseMiddleware<ExceptionMiddleware>();
-            if (Debugger.IsAttached || _Config["Environment"].EqualsI("Development","Local"))
+            if (Debugger.IsAttached || _Config["Environment"].EqualsI("Development", "Local"))
             {
                 IdentityModelEventSource.ShowPII = true;
 
@@ -66,53 +66,57 @@ namespace ModernSlavery.IdServer
 
             app.UseIdentityServer();
             app.UseStaticFiles(
-                new StaticFileOptions {
-                    OnPrepareResponse = ctx => {
+                new StaticFileOptions
+                {
+                    OnPrepareResponse = ctx =>
+                    {
                         //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
-                        if (responseCachingOptions.StaticCacheSeconds > 0)ctx.Context.SetResponseCache(responseCachingOptions.StaticCacheSeconds);
+                        if (responseCachingOptions.StaticCacheSeconds > 0)
+                            ctx.Context.SetResponseCache(responseCachingOptions.StaticCacheSeconds);
                     }
                 }); //For the wwwroot folder
 
             // Include un-bundled js + css folders to serve the source files in dev environment
             if (_Config["Environment"].EqualsI("Local"))
-            {
                 app.UseStaticFiles(
-                    new StaticFileOptions {
+                    new StaticFileOptions
+                    {
                         FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()),
                         RequestPath = "",
-                        OnPrepareResponse = ctx => {
+                        OnPrepareResponse = ctx =>
+                        {
                             //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
-                            if (responseCachingOptions.StaticCacheSeconds > 0)ctx.Context.SetResponseCache(responseCachingOptions.StaticCacheSeconds);
+                            if (responseCachingOptions.StaticCacheSeconds > 0)
+                                ctx.Context.SetResponseCache(responseCachingOptions.StaticCacheSeconds);
                         }
                     });
-            }
 
             app.UseRouting();
-            app.UseMiddleware<MaintenancePageMiddleware>(sharedOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
-            app.UseMiddleware<StickySessionMiddleware>(sharedOptions.StickySessions); //Enable/Disable sticky sessions based on  
+            app.UseMiddleware<MaintenancePageMiddleware>(sharedOptions
+                .MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
+            app.UseMiddleware<StickySessionMiddleware>(sharedOptions
+                .StickySessions); //Enable/Disable sticky sessions based on  
             app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses
 
             //app.UseMvcWithDefaultRoute();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
             lifetime.ApplicationStarted.Register(
-                () => {
+                () =>
+                {
                     // Summary:
                     //     Triggered when the application host has fully started and is about to wait for
                     //     a graceful shutdown.
                     _Logger.LogInformation("Application Started");
                 });
             lifetime.ApplicationStopping.Register(
-                () => {
+                () =>
+                {
                     // Summary:
                     //     Triggered when the application host is performing a graceful shutdown. Requests
                     //     may still be in flight. Shutdown will block until this event completes.
                     _Logger.LogInformation("Application Stopping");
                 });
         }
-
     }
 }

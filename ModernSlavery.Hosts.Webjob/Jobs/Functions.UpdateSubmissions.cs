@@ -4,31 +4,28 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
-        public async Task UpdateSubmissions([TimerTrigger(typeof(Functions.EveryWorkingHourSchedule), RunOnStartup = true)]
+        public async Task UpdateSubmissions([TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {
             try
             {
-                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.OrganisationSubmissions);
+                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath,
+                    Filenames.OrganisationSubmissions);
 
                 //Dont execute on startup if file already exists
-                if (!Functions.StartedJobs.Contains(nameof(UpdateSubmissions))
+                if (!StartedJobs.Contains(nameof(UpdateSubmissions))
                     && await _SharedBusinessLogic.FileRepository.GetAnyFileExistsAsync(
                         _SharedBusinessLogic.SharedOptions.DownloadsPath,
                         $"{Path.GetFileNameWithoutExtension(Filenames.OrganisationSubmissions)}*{Path.GetExtension(Filenames.OrganisationSubmissions)}")
                 )
-                {
                     return;
-                }
 
                 await UpdateSubmissionsAsync(filePath);
 
@@ -36,7 +33,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             catch (Exception ex)
             {
-                string message = $"Failed {nameof(UpdateSubmissions)}:{ex.Message}";
+                var message = $"Failed {nameof(UpdateSubmissions)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
                 await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
@@ -45,30 +42,26 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             finally
             {
-                Functions.StartedJobs.Add(nameof(UpdateSubmissions));
+                StartedJobs.Add(nameof(UpdateSubmissions));
             }
         }
 
         public async Task UpdateSubmissionsAsync(string filePath)
         {
-            if (Functions.RunningJobs.Contains(nameof(UpdateSubmissions)))
-            {
-                return;
-            }
+            if (RunningJobs.Contains(nameof(UpdateSubmissions))) return;
 
-            Functions.RunningJobs.Add(nameof(UpdateSubmissions));
+            RunningJobs.Add(nameof(UpdateSubmissions));
             try
             {
                 await WriteRecordsPerYearAsync(
                         filePath,
-                        year => Task.FromResult(Enumerable.ToList<SubmissionsFileModel>(_SubmissionBusinessLogic.GetSubmissionsFileModelByYear(year))))
+                        year => Task.FromResult(_SubmissionBusinessLogic.GetSubmissionsFileModelByYear(year).ToList()))
                     .ConfigureAwait(false);
             }
             finally
             {
-                Functions.RunningJobs.Remove(nameof(UpdateSubmissions));
+                RunningJobs.Remove(nameof(UpdateSubmissions));
             }
         }
-
     }
 }

@@ -8,23 +8,19 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
         //Ensure all organisations have a unique employer reference
         public async Task ReferenceEmployers([TimerTrigger("01:00:00:00")] TimerInfo timer, ILogger log)
         {
             try
             {
-                if (RunningJobs.Contains(nameof(DnBImportAsync)))
-                {
-                    return;
-                }
+                if (RunningJobs.Contains(nameof(DnBImportAsync))) return;
 
                 await ReferenceEmployersAsync();
                 log.LogDebug($"Executed {nameof(ReferenceEmployers)} successfully");
             }
             catch (Exception ex)
             {
-                string message = $"Failed webjob ({nameof(ReferenceEmployers)}):{ex.Message}:{ex.GetDetailsText()}";
+                var message = $"Failed webjob ({nameof(ReferenceEmployers)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
                 await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
@@ -35,10 +31,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         private async Task ReferenceEmployersAsync()
         {
-            if (RunningJobs.Contains(nameof(ReferenceEmployers)))
-            {
-                return;
-            }
+            if (RunningJobs.Contains(nameof(ReferenceEmployers))) return;
 
             RunningJobs.Add(nameof(ReferenceEmployers));
 
@@ -51,6 +44,5 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 RunningJobs.Remove(nameof(ReferenceEmployers));
             }
         }
-
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
         public async Task CheckSiteCertAsync([TimerTrigger("01:00:00:00")] TimerInfo timer, ILogger log)
         {
             try
@@ -18,15 +16,17 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 if (_SharedBusinessLogic.SharedOptions.CertExpiresWarningDays > 0)
                 {
                     //Get the cert thumbprint
-                    string certThumprint = _SharedBusinessLogic.SharedOptions.Website_Load_Certificates.SplitI(";").FirstOrDefault();
-                    if (string.IsNullOrWhiteSpace(certThumprint))certThumprint = _SharedBusinessLogic.SharedOptions.CertThumprint.SplitI(";").FirstOrDefault();
+                    var certThumprint = _SharedBusinessLogic.SharedOptions.Website_Load_Certificates.SplitI(";")
+                        .FirstOrDefault();
+                    if (string.IsNullOrWhiteSpace(certThumprint))
+                        certThumprint = _SharedBusinessLogic.SharedOptions.CertThumprint.SplitI(";").FirstOrDefault();
 
                     if (!string.IsNullOrWhiteSpace(certThumprint))
                     {
                         //Load the cert from the thumprint
-                        X509Certificate2 cert = HttpsCertificate.LoadCertificateFromThumbprint(certThumprint);
+                        var cert = HttpsCertificate.LoadCertificateFromThumbprint(certThumprint);
 
-                        DateTime expires = cert.GetExpirationDateString().ToDateTime();
+                        var expires = cert.GetExpirationDateString().ToDateTime();
                         if (expires < VirtualDateTime.UtcNow)
                         {
                             await _Messenger.SendGeoMessageAsync(
@@ -35,14 +35,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         }
                         else
                         {
-                            TimeSpan remainingTime = expires - VirtualDateTime.Now;
+                            var remainingTime = expires - VirtualDateTime.Now;
 
-                            if (expires < VirtualDateTime.UtcNow.AddDays(_SharedBusinessLogic.SharedOptions.CertExpiresWarningDays))
-                            {
+                            if (expires < VirtualDateTime.UtcNow.AddDays(_SharedBusinessLogic.SharedOptions
+                                .CertExpiresWarningDays))
                                 await _Messenger.SendGeoMessageAsync(
                                     "GPG - WEBSITE CERTIFICATE EXPIRING",
                                     $"The website certificate for '{_SharedBusinessLogic.SharedOptions.ExternalHost}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
-                            }
                         }
                     }
                 }
@@ -51,7 +50,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             catch (Exception ex)
             {
-                string message = $"Failed webjob ({nameof(CheckSiteCertAsync)}):{ex.Message}:{ex.GetDetailsText()}";
+                var message = $"Failed webjob ({nameof(CheckSiteCertAsync)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
                 await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
@@ -59,6 +58,5 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 throw;
             }
         }
-
     }
 }

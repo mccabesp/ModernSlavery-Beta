@@ -1,27 +1,22 @@
-﻿.validation-summary-valid {
-    display: none;
-}
+﻿.validation-summary-valid { display: none; }
 
-.customvalidation-summary-valid {
-    display: none;
-}
+.customvalidation-summary-valid { display: none; }
 
-.customvalidation-summary-errors {
-    display: block;
-}
+.customvalidation-summary-errors { display: block; }
+
 .error-summary li {
     color: #b10e1e !important;
     font-weight: bold;
-    text-decoration: underline;
     list-style: none;
+    text-decoration: underline;
 }
 
 .error-summary span {
+    display: block;
     font-family: "nta", Arial, sans-serif;
-    font-weight: 700;
-    text-transform: none;
     font-size: 24px;
+    font-weight: 700;
     line-height: 1.25;
     margin-bottom: 0.8333333333em;
-    display: block;
+    text-transform: none;
 }

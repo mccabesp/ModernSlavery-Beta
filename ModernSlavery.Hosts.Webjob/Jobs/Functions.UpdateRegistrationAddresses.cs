@@ -16,26 +16,28 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
-        public async Task UpdateRegistrationAddressesAsync([TimerTrigger(typeof(Functions.EveryWorkingHourSchedule), RunOnStartup = true)]
+        public async Task UpdateRegistrationAddressesAsync(
+            [TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {
-            string funcName = nameof(UpdateRegistrationAddressesAsync);
+            var funcName = nameof(UpdateRegistrationAddressesAsync);
 
             try
             {
-                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.RegistrationAddresses);
+                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath,
+                    Filenames.RegistrationAddresses);
 
                 //Dont execute on startup if file already exists
-                if (!Functions.StartedJobs.Contains(funcName) && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
+                if (!StartedJobs.Contains(funcName) &&
+                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                 {
                     log.LogDebug($"Skipped {funcName} at start up.");
                     return;
                 }
 
                 // Flag the UpdateRegistrationAddresses web job as started
-                Functions.StartedJobs.Add(funcName);
+                StartedJobs.Add(funcName);
 
                 await UpdateRegistrationAddressesAsync(filePath, log);
 
@@ -43,7 +45,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             catch (Exception ex)
             {
-                string message = $"Failed {funcName}:{ex.Message}";
+                var message = $"Failed {funcName}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
                 await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
@@ -54,10 +56,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         public async Task UpdateRegistrationAddressesAsync(string filePath, ILogger log)
         {
-            string funcName = nameof(UpdateRegistrationAddressesAsync);
+            var funcName = nameof(UpdateRegistrationAddressesAsync);
 
             // Ensure the UpdateRegistrationAddresses web job is not already running
-            if (Functions.RunningJobs.Contains(funcName))
+            if (RunningJobs.Contains(funcName))
             {
                 log.LogDebug($"Skipped {funcName} because already running.");
                 return;
@@ -66,20 +68,24 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 // Flag the UpdateRegistrationAddresses web job as running
-                Functions.RunningJobs.Add(funcName);
+                RunningJobs.Add(funcName);
 
                 // Cache the latest registration addresses
-                List<RegistrationAddressesFileModel> latestRegistrationAddresses = await GetLatestRegistrationAddressesAsync();
+                var latestRegistrationAddresses = await GetLatestRegistrationAddressesAsync();
 
                 // Write yearly records to csv files
                 await WriteRecordsPerYearAsync(
                     filePath,
-                    async year => {
-                        foreach (RegistrationAddressesFileModel model in latestRegistrationAddresses)
+                    async year =>
+                    {
+                        foreach (var model in latestRegistrationAddresses)
                         {
                             // get organisation scope and submission per year
-                            Return returnByYear = await _SubmissionBusinessLogic.GetLatestSubmissionBySnapshotYearAsync(model.OrganisationId, year);
-                            OrganisationScope scopeByYear = await _ScopeBusinessLogic.GetLatestScopeBySnapshotYearAsync(model.OrganisationId, year);
+                            var returnByYear =
+                                await _SubmissionBusinessLogic.GetLatestSubmissionBySnapshotYearAsync(
+                                    model.OrganisationId, year);
+                            var scopeByYear =
+                                await _ScopeBusinessLogic.GetLatestScopeBySnapshotYearAsync(model.OrganisationId, year);
 
                             // update file model with year data
                             model.HasSubmitted = returnByYear == null ? "False" : "True";
@@ -91,26 +97,28 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             finally
             {
-                Functions.RunningJobs.Remove(funcName);
+                RunningJobs.Remove(funcName);
             }
         }
 
         public async Task<List<RegistrationAddressesFileModel>> GetLatestRegistrationAddressesAsync()
         {
             // Load the DnBOrgs file from storage"
-            string dnbOrgsPath = Path.Combine(_SharedBusinessLogic.SharedOptions.DataPath, Filenames.DnBOrganisations());
-            List<DnBOrgsModel> AllDnBOrgs = await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(dnbOrgsPath)
-                ? await Core.Classes.Extensions.ReadCSVAsync<DnBOrgsModel>(_SharedBusinessLogic.FileRepository, dnbOrgsPath)
+            var dnbOrgsPath = Path.Combine(_SharedBusinessLogic.SharedOptions.DataPath, Filenames.DnBOrganisations());
+            var AllDnBOrgs = await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(dnbOrgsPath)
+                ? await _SharedBusinessLogic.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath)
                 : new List<DnBOrgsModel>();
             AllDnBOrgs = AllDnBOrgs.OrderBy(o => o.OrganisationName).ToList();
 
             // Extract the DUNSNumber, JobTitle and FullName from the DnBOrgs
             var dnbUserOrgs = AllDnBOrgs
-                .Select(dnbOrg => new {dnbOrg.DUNSNumber, DnBJobTitle = dnbOrg.ContactJobtitle, DnBFullName = dnbOrg.GetContactName()})
+                .Select(dnbOrg => new
+                    {dnbOrg.DUNSNumber, DnBJobTitle = dnbOrg.ContactJobtitle, DnBFullName = dnbOrg.GetContactName()})
                 .ToList();
 
             // Get all the latest verified organisation registrations
-            List<Organisation> verifiedOrgs = await Queryable.Where<Organisation>(_SharedBusinessLogic.DataRepository.GetAll<Organisation>(), uo => uo.LatestRegistration != null)
+            var verifiedOrgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                .Where(uo => uo.LatestRegistration != null)
                 .Include(uo => uo.LatestRegistration)
                 .Include(uo => uo.LatestAddress)
                 .Include(uo => uo.LatestReturn)
@@ -118,67 +126,55 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 .ToListAsync();
 
             return verifiedOrgs.Select(
-                    vo => {
+                    vo =>
+                    {
                         // Read the latest address for the organisation
-                        OrganisationAddress latestAddress = vo.LatestAddress;
+                        var latestAddress = vo.LatestAddress;
                         if (latestAddress == null)
-                        {
                             throw new Exception(
                                 $"Organisation {vo.OrganisationId} has a latest registration with no Organisation Address associated");
-                        }
 
                         // Get the latest user for the organisation
-                        User latestRegistrationUser = vo.LatestRegistration?.User;
+                        var latestRegistrationUser = vo.LatestRegistration?.User;
                         if (latestAddress == null)
-                        {
-                            throw new Exception($"Organisation {vo.OrganisationId} has a latest registration with no User associated");
-                        }
+                            throw new Exception(
+                                $"Organisation {vo.OrganisationId} has a latest registration with no User associated");
 
                         // Ensure the address lines don't start with null or whitespaces
                         var addressLines = new List<string>();
-                        foreach (string line in new[] {latestAddress.Address1, latestAddress.Address2, latestAddress.Address3})
-                        {
+                        foreach (var line in new[]
+                            {latestAddress.Address1, latestAddress.Address2, latestAddress.Address3})
                             if (string.IsNullOrWhiteSpace(line) == false)
-                            {
                                 addressLines.Add(line);
-                            }
-                        }
 
-                        for (int i = addressLines.Count; i < 3; i++)
-                        {
-                            addressLines.Add(string.Empty);
-                        }
+                        for (var i = addressLines.Count; i < 3; i++) addressLines.Add(string.Empty);
 
                         // Format post code with the po boxes
-                        string postCode = latestAddress.PostCode;
+                        var postCode = latestAddress.PostCode;
                         if (!string.IsNullOrWhiteSpace(postCode) && !string.IsNullOrWhiteSpace(latestAddress.PoBox))
-                        {
                             postCode = latestAddress.PoBox + ", " + postCode;
-                        }
                         else if (!string.IsNullOrWhiteSpace(latestAddress.PoBox) && string.IsNullOrWhiteSpace(postCode))
-                        {
                             postCode = latestAddress.PoBox;
-                        }
 
                         // Convert two letter country codes to full country names
-                        string countryCode = Country.FindTwoLetterCode(latestAddress.Country);
+                        var countryCode = Country.FindTwoLetterCode(latestAddress.Country);
 
                         // Get the linked dnb record using the DUNSNumber
                         var dnbOrg = dnbUserOrgs.FirstOrDefault(dnbo => dnbo.DUNSNumber == vo.DUNSNumber);
 
                         // If (DnBJobTile and DnBFullName) is null or empty then DnbFullName = "Chief Executive"
-                        string dnbJobTitle = dnbOrg?.DnBJobTitle;
-                        string dnbFullName = dnbOrg?.DnBFullName;
+                        var dnbJobTitle = dnbOrg?.DnBJobTitle;
+                        var dnbFullName = dnbOrg?.DnBFullName;
                         if (string.IsNullOrWhiteSpace(dnbJobTitle) && string.IsNullOrWhiteSpace(dnbFullName))
-                        {
                             dnbFullName = "Chief Executive";
-                        }
 
                         // Retrieve the SectorType reporting snapshot date (d MMMM yyyy)
-                        string expires = _snapshotDateHelper.GetSnapshotDate(vo.SectorType).AddYears(1).AddDays(-1).ToString("d MMMM yyyy");
+                        var expires = _snapshotDateHelper.GetSnapshotDate(vo.SectorType).AddYears(1).AddDays(-1)
+                            .ToString("d MMMM yyyy");
 
                         // Generate csv row
-                        return new RegistrationAddressesFileModel {
+                        return new RegistrationAddressesFileModel
+                        {
                             OrganisationId = vo.OrganisationId,
                             DUNSNumber = vo.DUNSNumber,
                             EmployerReference = vo.EmployerReference,
@@ -195,7 +191,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             City = latestAddress.TownCity,
                             Postcode = postCode,
                             County = latestAddress.County,
-                            Country = string.IsNullOrWhiteSpace(countryCode) || countryCode.EqualsI("GB") ? latestAddress.Country : null,
+                            Country = string.IsNullOrWhiteSpace(countryCode) || countryCode.EqualsI("GB")
+                                ? latestAddress.Country
+                                : null,
                             CreatedByUserId = latestAddress.CreatedByUserId,
                             Expires = expires
                         };
@@ -203,7 +201,5 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 .OrderBy(model => model.Company)
                 .ToList();
         }
-
     }
-
 }

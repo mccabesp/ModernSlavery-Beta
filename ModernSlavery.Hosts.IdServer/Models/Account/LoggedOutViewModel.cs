@@ -6,7 +6,6 @@ namespace ModernSlavery.IdServer.Models.Account
 {
     public class LoggedOutViewModel
     {
-
         public string PostLogoutRedirectUri { get; set; }
         public string ClientId { get; set; }
         public string ClientName { get; set; }

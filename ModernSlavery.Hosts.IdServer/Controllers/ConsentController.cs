@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer4;
@@ -22,7 +21,6 @@ namespace ModernSlavery.IdServer.Controllers
     [Authorize]
     public class ConsentController : Controller
     {
-
         private readonly IClientStore _clientStore;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly ILogger<ConsentController> _logger;
@@ -48,11 +46,8 @@ namespace ModernSlavery.IdServer.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string returnUrl)
         {
-            ConsentViewModel vm = await BuildViewModelAsync(returnUrl);
-            if (vm != null)
-            {
-                return View("Index", vm);
-            }
+            var vm = await BuildViewModelAsync(returnUrl);
+            if (vm != null) return View("Index", vm);
 
             return View("Error");
         }
@@ -64,22 +59,13 @@ namespace ModernSlavery.IdServer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(ConsentInputModel model)
         {
-            ProcessConsentResult result = await ProcessConsent(model);
+            var result = await ProcessConsent(model);
 
-            if (result.IsRedirect)
-            {
-                return Redirect(result.RedirectUri);
-            }
+            if (result.IsRedirect) return Redirect(result.RedirectUri);
 
-            if (result.HasValidationError)
-            {
-                ModelState.AddModelError("", result.ValidationError);
-            }
+            if (result.HasValidationError) ModelState.AddModelError("", result.ValidationError);
 
-            if (result.ShowView)
-            {
-                return View("Index", result.ViewModel);
-            }
+            if (result.ShowView) return View("Index", result.ViewModel);
 
             return View("Error");
         }
@@ -104,13 +90,12 @@ namespace ModernSlavery.IdServer.Controllers
                 // if the user consented to some scope, build the response model
                 if (model.ScopesConsented != null && model.ScopesConsented.Any())
                 {
-                    IEnumerable<string> scopes = model.ScopesConsented;
+                    var scopes = model.ScopesConsented;
                     if (ConsentOptions.EnableOfflineAccess == false)
-                    {
                         scopes = scopes.Where(x => x != IdentityServerConstants.StandardScopes.OfflineAccess);
-                    }
 
-                    grantedConsent = new ConsentResponse {RememberConsent = model.RememberConsent, ScopesConsented = scopes.ToArray()};
+                    grantedConsent = new ConsentResponse
+                        {RememberConsent = model.RememberConsent, ScopesConsented = scopes.ToArray()};
                 }
                 else
                 {
@@ -125,11 +110,8 @@ namespace ModernSlavery.IdServer.Controllers
             if (grantedConsent != null)
             {
                 // validate return url is still valid
-                AuthorizationRequest request = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
-                if (request == null)
-                {
-                    return result;
-                }
+                var request = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
+                if (request == null) return result;
 
                 // communicate outcome of consent back to identityserver
                 await _interaction.GrantConsentAsync(request, grantedConsent);
@@ -148,19 +130,18 @@ namespace ModernSlavery.IdServer.Controllers
 
         private async Task<ConsentViewModel> BuildViewModelAsync(string returnUrl, ConsentInputModel model = null)
         {
-            AuthorizationRequest request = await _interaction.GetAuthorizationContextAsync(returnUrl);
+            var request = await _interaction.GetAuthorizationContextAsync(returnUrl);
             if (request != null)
             {
-                Client client = await _clientStore.FindEnabledClientByIdAsync(request.ClientId);
+                var client = await _clientStore.FindEnabledClientByIdAsync(request.ClientId);
                 if (client != null)
                 {
-                    Resources resources = await _resourceStore.FindEnabledResourcesByScopeAsync(request.ScopesRequested);
+                    var resources = await _resourceStore.FindEnabledResourcesByScopeAsync(request.ScopesRequested);
                     if (resources != null && (resources.IdentityResources.Any() || resources.ApiResources.Any()))
-                    {
                         return CreateConsentViewModel(model, returnUrl, request, client, resources);
-                    }
 
-                    _logger.LogError("No scopes matching: {0}", request.ScopesRequested.Aggregate((x, y) => x + ", " + y));
+                    _logger.LogError("No scopes matching: {0}",
+                        request.ScopesRequested.Aggregate((x, y) => x + ", " + y));
                 }
                 else
                 {
@@ -200,20 +181,21 @@ namespace ModernSlavery.IdServer.Controllers
                 .Select(x => CreateScopeViewModel(x, vm.ScopesConsented.Contains(x.Name) || model == null))
                 .ToArray();
             if (ConsentOptions.EnableOfflineAccess && resources.OfflineAccess)
-            {
                 vm.ResourceScopes = vm.ResourceScopes.Union(
-                    new[] {
+                    new[]
+                    {
                         GetOfflineAccessScope(
-                            vm.ScopesConsented.Contains(IdentityServerConstants.StandardScopes.OfflineAccess) || model == null)
+                            vm.ScopesConsented.Contains(IdentityServerConstants.StandardScopes.OfflineAccess) ||
+                            model == null)
                     });
-            }
 
             return vm;
         }
 
         private ScopeViewModel CreateScopeViewModel(IdentityResource identity, bool check)
         {
-            return new ScopeViewModel {
+            return new ScopeViewModel
+            {
                 Name = identity.Name,
                 DisplayName = identity.DisplayName,
                 Description = identity.Description,
@@ -225,7 +207,8 @@ namespace ModernSlavery.IdServer.Controllers
 
         public ScopeViewModel CreateScopeViewModel(Scope scope, bool check)
         {
-            return new ScopeViewModel {
+            return new ScopeViewModel
+            {
                 Name = scope.Name,
                 DisplayName = scope.DisplayName,
                 Description = scope.Description,
@@ -237,7 +220,8 @@ namespace ModernSlavery.IdServer.Controllers
 
         private ScopeViewModel GetOfflineAccessScope(bool check)
         {
-            return new ScopeViewModel {
+            return new ScopeViewModel
+            {
                 Name = IdentityServerConstants.StandardScopes.OfflineAccess,
                 DisplayName = ConsentOptions.OfflineAccessDisplayName,
                 Description = ConsentOptions.OfflineAccessDescription,
@@ -245,6 +229,5 @@ namespace ModernSlavery.IdServer.Controllers
                 Checked = check
             };
         }
-
     }
 }

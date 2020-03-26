@@ -1,11 +1,9 @@
 ﻿using System;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
-using ModernSlavery.BusinessDomain;
 using ModernSlavery.BusinessDomain.Admin;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -19,12 +17,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
         public Functions(
             StorageOptions storageOptions,
             IEventLogger customLogger,
-            [KeyFilter(Filenames.BadSicLog)]IAuditLogger badSicLog,
-            [KeyFilter(Filenames.ManualChangeLog)]IAuditLogger manualChangeLog,
+            [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog,
+            [KeyFilter(Filenames.ManualChangeLog)] IAuditLogger manualChangeLog,
             IMessenger messenger,
             ISharedBusinessLogic sharedBusinessLogic,
             ISearchRepository<EmployerSearchModel> employerSearchRepository,
@@ -79,7 +76,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         public class EveryWorkingHourSchedule : WeeklySchedule
         {
-
             public EveryWorkingHourSchedule()
             {
                 // Every hour on Monday 8am-7pm
@@ -152,12 +148,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 Add(DayOfWeek.Friday, new TimeSpan(18, 0, 0));
                 Add(DayOfWeek.Friday, new TimeSpan(19, 0, 0));
             }
-
         }
 
         public class OncePerWeekendRandomSchedule : WeeklySchedule
         {
-
             public OncePerWeekendRandomSchedule()
             {
                 switch (Numeric.Rand(0, 59))
@@ -344,18 +338,16 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         break;
                 }
             }
-
         }
 
 
         public class MidnightSchedule : DailySchedule
         {
-
-            public MidnightSchedule() : base("00:00:00") { }
-
+            public MidnightSchedule() : base("00:00:00")
+            {
+            }
         }
 
         #endregion
-
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.SharedKernel;
 
@@ -13,28 +13,26 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
-        public async Task UpdateUsersToContactForFeedback([TimerTrigger(typeof(Functions.EveryWorkingHourSchedule), RunOnStartup = true)]
+        public async Task UpdateUsersToContactForFeedback(
+            [TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {
             try
             {
-                string filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.AllowFeedback);
+                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.AllowFeedback);
 
                 //Dont execute on startup if file already exists
-                if (!Functions.StartedJobs.Contains(nameof(UpdateUsersToContactForFeedback))
+                if (!StartedJobs.Contains(nameof(UpdateUsersToContactForFeedback))
                     && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
-                {
                     return;
-                }
 
                 await UpdateUsersToContactForFeedbackAsync(filePath);
                 log.LogDebug($"Executed {nameof(UpdateUsersToContactForFeedback)}:successfully");
             }
             catch (Exception ex)
             {
-                string message = $"Failed {nameof(UpdateUsersToContactForFeedback)}:{ex.Message}";
+                var message = $"Failed {nameof(UpdateUsersToContactForFeedback)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
                 await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
@@ -43,25 +41,25 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             finally
             {
-                Functions.StartedJobs.Add(nameof(UpdateUsersToContactForFeedback));
+                StartedJobs.Add(nameof(UpdateUsersToContactForFeedback));
             }
         }
 
         public async Task UpdateUsersToContactForFeedbackAsync(string filePath)
         {
-            if (Functions.RunningJobs.Contains(nameof(UpdateUsersToContactForFeedback)))
-            {
-                return;
-            }
+            if (RunningJobs.Contains(nameof(UpdateUsersToContactForFeedback))) return;
 
-            Functions.RunningJobs.Add(nameof(UpdateUsersToContactForFeedback));
+            RunningJobs.Add(nameof(UpdateUsersToContactForFeedback));
             try
             {
-                List<User> users = await Queryable.Where<User>(_SharedBusinessLogic.DataRepository.GetAll<User>(), user => user.Status == UserStatuses.Active
-                                                                                                                        && Enumerable.Any<UserSetting>(user.UserSettings, us => us.Key == UserSettingKeys.AllowContact && us.Value.ToLower() == "true"))
+                var users = await _SharedBusinessLogic.DataRepository.GetAll<User>().Where(user =>
+                        user.Status == UserStatuses.Active
+                        && user.UserSettings.Any(us =>
+                            us.Key == UserSettingKeys.AllowContact && us.Value.ToLower() == "true"))
                     .ToListAsync();
                 var records = users.Select(
-                        u => new {
+                        u => new
+                        {
                             u.Firstname,
                             u.Lastname,
                             u.JobTitle,
@@ -74,13 +72,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             u.ContactOrganisation
                         })
                     .ToList();
-                await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
+                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
             }
             finally
             {
-                Functions.RunningJobs.Remove(nameof(UpdateUsersToContactForFeedback));
+                RunningJobs.Remove(nameof(UpdateUsersToContactForFeedback));
             }
         }
-
     }
 }

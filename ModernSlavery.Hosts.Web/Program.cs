@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Infrastructure.Hosts.WebHost;
+using Extensions = ModernSlavery.Infrastructure.Hosts.Extensions;
 
 namespace ModernSlavery.WebUI
 {
@@ -18,10 +19,10 @@ namespace ModernSlavery.WebUI
 
             //Create the web host
             var hostBuilder = Host.CreateDefaultBuilder(args).ConfigureWebHostBuilder<Startup>();
-            var host=hostBuilder.Build();
+            var host = hostBuilder.Build();
 
             //Show thread availability
-            Console.WriteLine(Infrastructure.Hosts.Extensions.GetThreadCount());
+            Console.WriteLine(Extensions.GetThreadCount());
 
             //Run the host
             await host.RunAsync();
@@ -31,14 +32,15 @@ namespace ModernSlavery.WebUI
         {
             var ex = e.ExceptionObject as Exception;
 
-            Console.WriteLine($"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
-            Debug.WriteLine($"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
+            Console.WriteLine(
+                $"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
+            Debug.WriteLine(
+                $"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
 
             //Show thread availability
-            Console.WriteLine(Infrastructure.Hosts.Extensions.GetThreadCount());
+            Console.WriteLine(Extensions.GetThreadCount());
 
             throw ex;
         }
-
     }
 }

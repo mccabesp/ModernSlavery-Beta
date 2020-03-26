@@ -15,6 +15,7 @@ namespace ModernSlavery.IdServer.Classes
     public class Clients : IClients
     {
         private readonly SharedOptions _sharedOptions;
+
         public Clients(SharedOptions sharedOptions)
         {
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
@@ -22,13 +23,15 @@ namespace ModernSlavery.IdServer.Classes
 
         public IEnumerable<Client> Get()
         {
-            if ((_sharedOptions.IsProduction() || _sharedOptions.IsPreProduction()) && _sharedOptions.AuthSecret.EqualsI("secret", "", null))
-            {
-                throw new Exception("Invalid ClientSecret for IdentityServer. You must set 'AuthSecret' to a unique key");
-            }
+            if ((_sharedOptions.IsProduction() || _sharedOptions.IsPreProduction()) &&
+                _sharedOptions.AuthSecret.EqualsI("secret", "", null))
+                throw new Exception(
+                    "Invalid ClientSecret for IdentityServer. You must set 'AuthSecret' to a unique key");
 
-            return new[] {
-                new Client {
+            return new[]
+            {
+                new Client
+                {
                     ClientName = "Modern Slavery reporting service",
                     ClientId = "ModernSlaveryServiceWebsite",
                     ClientSecrets = new List<Secret> {new Secret(_sharedOptions.AuthSecret.GetSHA256Checksum())},
@@ -37,14 +40,16 @@ namespace ModernSlavery.IdServer.Classes
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
                     RedirectUris =
-                        new List<string> {
+                        new List<string>
+                        {
                             _sharedOptions.SiteAuthority,
                             _sharedOptions.SiteAuthority + "signin-oidc",
                             _sharedOptions.SiteAuthority + "manage-organisations",
                             _sharedOptions.DoneUrl
                         },
                     PostLogoutRedirectUris =
-                        new List<string> {
+                        new List<string>
+                        {
                             _sharedOptions.SiteAuthority,
                             _sharedOptions.SiteAuthority + "signout-callback-oidc",
                             _sharedOptions.SiteAuthority + "manage-organisations",
@@ -53,8 +58,10 @@ namespace ModernSlavery.IdServer.Classes
                             _sharedOptions.DoneUrl
                         },
                     AllowedScopes =
-                        new List<string> {
-                            IdentityServerConstants.StandardScopes.OpenId, IdentityServerConstants.StandardScopes.Profile, "roles"
+                        new List<string>
+                        {
+                            IdentityServerConstants.StandardScopes.OpenId,
+                            IdentityServerConstants.StandardScopes.Profile, "roles"
                         },
                     Properties = new Dictionary<string, string> {{"AutomaticRedirectAfterSignOut", "true"}}
                 }

@@ -7,7 +7,6 @@ namespace ModernSlavery.IdServer.Classes
 {
     public class AuditEventSink : IEventSink
     {
-
         private readonly ILogger Logger;
 
         public AuditEventSink(ILogger<AuditEventSink> logger)
@@ -22,22 +21,15 @@ namespace ModernSlavery.IdServer.Classes
             var loginFailureEvent = evt as UserLoginFailureEvent;
 
             if (loginSuccessEvent != null)
-            {
                 Logger.LogInformation(
                     $"{loginSuccessEvent.Name}:{loginSuccessEvent.Message}: Name:{loginSuccessEvent.DisplayName}; Username:{loginSuccessEvent.Username}; IPAddress:{loginSuccessEvent.RemoteIpAddress};");
-            }
             else if (loginFailureEvent != null)
-            {
                 Logger.LogWarning(
                     $"{loginFailureEvent.Name}:{loginFailureEvent.Message}: Username:{loginFailureEvent.Username}; IPAddress:{loginFailureEvent.RemoteIpAddress};");
-            }
             else if (logoutSuccessEvent != null)
-            {
                 Logger.LogInformation(
                     $"{logoutSuccessEvent.Name}:{logoutSuccessEvent.Message}: Username:{logoutSuccessEvent.DisplayName}; IPAddress:{logoutSuccessEvent.RemoteIpAddress};");
-            }
             else
-            {
                 switch (evt.EventType)
                 {
                     case EventTypes.Error:
@@ -49,10 +41,8 @@ namespace ModernSlavery.IdServer.Classes
                     case EventTypes.Success:
                         break;
                 }
-            }
 
             return Task.CompletedTask;
         }
-
     }
 }

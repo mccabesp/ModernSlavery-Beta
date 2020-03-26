@@ -3,12 +3,10 @@
 
 
 using System.Threading.Tasks;
-using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.BusinessDomain;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -19,14 +17,14 @@ namespace ModernSlavery.IdServer.Controllers
     [Route("Home")]
     public class HomeController : BaseController
     {
-
         private readonly IEventService _events;
         private readonly IIdentityServerInteractionService _interaction;
 
         public HomeController(
             IIdentityServerInteractionService interaction,
             IEventService events,
-            ILogger<HomeController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
+            ILogger<HomeController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(
+            logger, webService, sharedBusinessLogic)
         {
             _interaction = interaction;
             _events = events;
@@ -55,23 +53,19 @@ namespace ModernSlavery.IdServer.Controllers
         [Route("~/error/{errorId?}")]
         public async Task<IActionResult> Error(string errorId = null)
         {
-            int errorCode = errorId.ToInt32();
+            var errorCode = errorId.ToInt32();
 
             if (errorCode == 0)
             {
                 if (Response.StatusCode.Between(400, 599))
-                {
                     errorCode = Response.StatusCode;
-                }
                 else
-                {
                     errorCode = 500;
-                }
             }
 
 
             // retrieve error details from identityserver
-            ErrorMessage message = await _interaction.GetErrorContextAsync(errorId);
+            var message = await _interaction.GetErrorContextAsync(errorId);
             if (message != null)
             {
                 Logger.LogError($"{message.Error}: {message.ErrorDescription}");
@@ -85,13 +79,9 @@ namespace ModernSlavery.IdServer.Controllers
                     //Log non-exception events
                     var statusCodeData = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
                     if (statusCodeData != null)
-                    {
                         Logger.LogError($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
-                    }
                     else
-                    {
                         Logger.LogError($"HttpStatusCode {errorCode}, Path: Unknown");
-                    }
                 }
             }
 
@@ -99,6 +89,5 @@ namespace ModernSlavery.IdServer.Controllers
             var model = WebService.ErrorViewModelFactory.Create(message.Error, message.ErrorDescription);
             return View("Error", model);
         }
-
     }
 }

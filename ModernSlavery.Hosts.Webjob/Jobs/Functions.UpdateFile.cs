@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
+using Extensions = ModernSlavery.Core.Classes.Extensions;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
         public async Task UpdateFileAsync(ILogger log, string filePath, string action)
         {
-            string fileName = Path.GetFileName(filePath);
+            var fileName = Path.GetFileName(filePath);
 
             switch (Filenames.GetRootFilename(fileName))
             {
@@ -56,62 +56,49 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         public async Task WriteRecordsPerYearAsync<T>(string filePath, Func<int, Task<List<T>>> fillRecordsAsync)
         {
-            string path = Path.GetDirectoryName(filePath);
-            string fileName = Path.GetFileNameWithoutExtension(filePath);
-            string extension = Path.GetExtension(filePath);
-            string prefix = fileName.BeforeFirst("_");
-            string datePart = fileName.AfterLast("_", includeWhenNoSeparator: false);
+            var path = Path.GetDirectoryName(filePath);
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
+            var extension = Path.GetExtension(filePath);
+            var prefix = fileName.BeforeFirst("_");
+            var datePart = fileName.AfterLast("_", includeWhenNoSeparator: false);
 
-            int endYear = _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private).Year;
-            int startYear = _SharedBusinessLogic.SharedOptions.FirstReportingYear;
+            var endYear = _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private).Year;
+            var startYear = _SharedBusinessLogic.SharedOptions.FirstReportingYear;
             if (!string.IsNullOrWhiteSpace(datePart))
             {
-                int start = datePart.BeforeFirst("-").ToInt32().ToFourDigitYear();
-                if (start > startYear && start <= endYear)
-                {
-                    startYear = start;
-                }
+                var start = datePart.BeforeFirst("-").ToInt32().ToFourDigitYear();
+                if (start > startYear && start <= endYear) startYear = start;
 
                 endYear = startYear;
             }
 
             //Make sure start and end are in correct order
-            if (startYear > endYear)
-            {
-                (startYear, endYear) = (endYear, startYear);
-            }
+            if (startYear > endYear) (startYear, endYear) = (endYear, startYear);
 
-            for (int year = endYear; year >= startYear; year--)
+            for (var year = endYear; year >= startYear; year--)
             {
-                List<T> records = await fillRecordsAsync(year);
+                var records = await fillRecordsAsync(year);
 
                 filePath = $"{prefix}_{year}-{(year + 1).ToTwoDigitYear()}{extension}";
-                if (!string.IsNullOrWhiteSpace(path))
-                {
-                    filePath = Path.Combine(path, filePath);
-                }
+                if (!string.IsNullOrWhiteSpace(path)) filePath = Path.Combine(path, filePath);
 
-                await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
+                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
             }
         }
 
         public async Task WriteRecordsForYearAsync<T>(string filePath, int year, Func<Task<List<T>>> fillRecordsAsync)
         {
-            string path = Path.GetDirectoryName(filePath);
-            string fileName = Path.GetFileNameWithoutExtension(filePath);
-            string extension = Path.GetExtension(filePath);
-            string prefix = fileName.BeforeFirst("_");
+            var path = Path.GetDirectoryName(filePath);
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
+            var extension = Path.GetExtension(filePath);
+            var prefix = fileName.BeforeFirst("_");
 
-            List<T> records = await fillRecordsAsync();
+            var records = await fillRecordsAsync();
 
             filePath = $"{prefix}_{year}-{(year + 1).ToTwoDigitYear()}{extension}";
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                filePath = Path.Combine(path, filePath);
-            }
+            if (!string.IsNullOrWhiteSpace(path)) filePath = Path.Combine(path, filePath);
 
-            await Core.Classes.Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
+            await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
         }
-
     }
 }

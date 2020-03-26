@@ -13,10 +13,8 @@ using Newtonsoft.Json;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
 {
-
     public partial class Functions
     {
-
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> FileLocks =
             new ConcurrentDictionary<string, SemaphoreSlim>(StringComparer.OrdinalIgnoreCase);
 
@@ -24,16 +22,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         public async Task LogEvent([QueueTrigger(QueueNames.LogEvent)] string queueMessage, ILogger log)
         {
             //Retrieve long messages from file storage
-            string filepath = GetLargeQueueFilepath(queueMessage);
+            var filepath = GetLargeQueueFilepath(queueMessage);
             if (!string.IsNullOrWhiteSpace(filepath))
-            {
                 queueMessage = await _SharedBusinessLogic.FileRepository.ReadAsync(filepath);
-            }
 
             var wrapper = JsonConvert.DeserializeObject<LogEventWrapperModel>(queueMessage);
 
             //Calculate the daily log file path
-            string LogRoot = _SharedBusinessLogic.SharedOptions.LogPath;
+            var LogRoot = _SharedBusinessLogic.SharedOptions.LogPath;
             string FilePath;
             switch (wrapper.LogLevel)
             {
@@ -57,17 +53,15 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     throw new ArgumentException("Invalid Log Level", nameof(LogLevel));
             }
 
-            string DailyPath = Path.Combine(
+            var DailyPath = Path.Combine(
                 Path.GetPathRoot(FilePath),
                 Path.GetDirectoryName(FilePath),
-                Path.GetFileNameWithoutExtension(FilePath) + "_" + VirtualDateTime.Now.ToString("yyMMdd") + Path.GetExtension(FilePath));
+                Path.GetFileNameWithoutExtension(FilePath) + "_" + VirtualDateTime.Now.ToString("yyMMdd") +
+                Path.GetExtension(FilePath));
 
-            if (!FileLocks.ContainsKey(DailyPath))
-            {
-                FileLocks[DailyPath] = new SemaphoreSlim(1, 1);
-            }
+            if (!FileLocks.ContainsKey(DailyPath)) FileLocks[DailyPath] = new SemaphoreSlim(1, 1);
 
-            SemaphoreSlim fileLock = FileLocks[DailyPath];
+            var fileLock = FileLocks[DailyPath];
 
             //Asynchronously wait to enter the Semaphore. If no-one has been granted access to the Semaphore, code execution will proceed, otherwise this thread waits here until the semaphore is released 
             await fileLock.WaitAsync();
@@ -86,9 +80,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             //Delete the large file
             if (!string.IsNullOrWhiteSpace(filepath))
-            {
                 await _SharedBusinessLogic.FileRepository.DeleteFileAsync(filepath);
-            }
 
             log.LogDebug($"Executed {nameof(LogEvent)}:{queueMessage} successfully");
         }
@@ -98,7 +90,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             ILogger log)
         {
             //Retrieve long messages from file storage
-            string filepath = GetLargeQueueFilepath(queueMessage);
+            var filepath = GetLargeQueueFilepath(queueMessage);
             if (!string.IsNullOrWhiteSpace(filepath))
             {
                 //Get the large file
@@ -117,29 +109,25 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         public async Task LogRecord([QueueTrigger(QueueNames.LogRecord)] string queueMessage, ILogger log)
         {
             //Retrieve long messages from file storage
-            string filepath = GetLargeQueueFilepath(queueMessage);
+            var filepath = GetLargeQueueFilepath(queueMessage);
             if (!string.IsNullOrWhiteSpace(filepath))
-            {
                 queueMessage = await _SharedBusinessLogic.FileRepository.ReadAsync(filepath);
-            }
 
             //Get the log event details
             var wrapper = JsonConvert.DeserializeObject<LogRecordWrapperModel>(queueMessage);
 
             //Calculate the daily log file path
-            string LogRoot = _SharedBusinessLogic.SharedOptions.LogPath;
-            string FilePath = Path.Combine(LogRoot, wrapper.ApplicationName, wrapper.FileName);
-            string DailyPath = Path.Combine(
+            var LogRoot = _SharedBusinessLogic.SharedOptions.LogPath;
+            var FilePath = Path.Combine(LogRoot, wrapper.ApplicationName, wrapper.FileName);
+            var DailyPath = Path.Combine(
                 Path.GetPathRoot(FilePath),
                 Path.GetDirectoryName(FilePath),
-                Path.GetFileNameWithoutExtension(FilePath) + "_" + VirtualDateTime.Now.ToString("yyMMdd") + Path.GetExtension(FilePath));
+                Path.GetFileNameWithoutExtension(FilePath) + "_" + VirtualDateTime.Now.ToString("yyMMdd") +
+                Path.GetExtension(FilePath));
 
-            if (!FileLocks.ContainsKey(DailyPath))
-            {
-                FileLocks[DailyPath] = new SemaphoreSlim(1, 1);
-            }
+            if (!FileLocks.ContainsKey(DailyPath)) FileLocks[DailyPath] = new SemaphoreSlim(1, 1);
 
-            SemaphoreSlim fileLock = FileLocks[DailyPath];
+            var fileLock = FileLocks[DailyPath];
 
             //Asynchronously wait to enter the Semaphore. If no-one has been granted access to the Semaphore, code execution will proceed, otherwise this thread waits here until the semaphore is released 
             await fileLock.WaitAsync();
@@ -159,9 +147,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             //Delete the large file
             if (!string.IsNullOrWhiteSpace(filepath))
-            {
                 await _SharedBusinessLogic.FileRepository.DeleteFileAsync(filepath);
-            }
 
             log.LogDebug($"Executed {nameof(LogRecord)}:{queueMessage} successfully");
         }
@@ -171,7 +157,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             ILogger log)
         {
             //Retrieve long messages from file storage
-            string filepath = GetLargeQueueFilepath(queueMessage);
+            var filepath = GetLargeQueueFilepath(queueMessage);
             if (!string.IsNullOrWhiteSpace(filepath))
             {
                 //Get the large file
@@ -188,15 +174,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         private static string GetLargeQueueFilepath(string queueMessage)
         {
-            if (!queueMessage.StartsWith("file:"))
-            {
-                return null;
-            }
+            if (!queueMessage.StartsWith("file:")) return null;
 
-            string filepath = queueMessage.AfterFirst("file:", includeWhenNoSeparator: false);
+            var filepath = queueMessage.AfterFirst("file:", includeWhenNoSeparator: false);
             return filepath;
         }
-
     }
-
 }

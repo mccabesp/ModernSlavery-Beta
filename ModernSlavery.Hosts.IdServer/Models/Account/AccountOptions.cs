@@ -9,7 +9,6 @@ namespace ModernSlavery.IdServer.Models.Account
 {
     public class AccountOptions
     {
-
         public static bool AllowLocalLogin = true;
         public static bool AllowRememberLogin = false;
         public static TimeSpan RememberMeLoginDuration = TimeSpan.FromDays(7);
@@ -25,7 +24,8 @@ namespace ModernSlavery.IdServer.Models.Account
 
         public static string TooManySigninAttemptsErrorMessage = "Too many failed sign in attempts.";
         public static string InvalidCredentialsErrorMessage = "Please enter your email address and password again.";
-        public static string CannotVerifyEmailUsingDifferentAccount = "You cannot verify an email using a different account.";
 
+        public static string CannotVerifyEmailUsingDifferentAccount =
+            "You cannot verify an email using a different account.";
     }
 }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Infrastructure.Hosts.WebHost;
+using Extensions = ModernSlavery.Infrastructure.Hosts.Extensions;
 
 namespace ModernSlavery.IdServer
 {
@@ -21,7 +22,7 @@ namespace ModernSlavery.IdServer
             var host = hostBuilder.Build();
 
             //Show thread availability
-            Console.WriteLine(Infrastructure.Hosts.Extensions.GetThreadCount());
+            Console.WriteLine(Extensions.GetThreadCount());
 
             //Run the host
             await host.RunAsync();
@@ -31,14 +32,15 @@ namespace ModernSlavery.IdServer
         {
             var ex = e.ExceptionObject as Exception;
 
-            Console.WriteLine($"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
-            Debug.WriteLine($"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
+            Console.WriteLine(
+                $"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
+            Debug.WriteLine(
+                $"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
 
             //Show thread availability
-            Console.WriteLine(Infrastructure.Hosts.Extensions.GetThreadCount());
+            Console.WriteLine(Extensions.GetThreadCount());
 
             throw ex;
         }
-
     }
 }

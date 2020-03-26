@@ -13,7 +13,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
         //Merge all event log files from all instances into 1 single file per month
         public async Task MergeLogs([TimerTrigger("01:00:00:00", RunOnStartup = true)]
             TimerInfo timer,
@@ -28,7 +27,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 #region WebServer Logs
 
-                string webServerlogPath = Path.Combine(_SharedBusinessLogic.SharedOptions.LogPath, "ModernSlavery.WebUI");
+                var webServerlogPath = Path.Combine(_SharedBusinessLogic.SharedOptions.LogPath, "ModernSlavery.WebUI");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "WarningLog"));
@@ -43,7 +42,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 #region IdentityServer Logs
 
-                string identityServerlogPath = Path.Combine(_SharedBusinessLogic.SharedOptions.LogPath, "ModernSlavery.IdentityServer4");
+                var identityServerlogPath = Path.Combine(_SharedBusinessLogic.SharedOptions.LogPath,
+                    "ModernSlavery.IdentityServer4");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "WarningLog"));
@@ -53,7 +53,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 #region Webjob Logs
 
-                string webJoblogPath = Path.Combine(_SharedBusinessLogic.SharedOptions.LogPath, "ModernSlavery.WebJob");
+                var webJoblogPath = Path.Combine(_SharedBusinessLogic.SharedOptions.LogPath, "ModernSlavery.WebJob");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "WarningLog"));
@@ -70,7 +70,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             catch (Exception ex)
             {
-                string message = $"Failed webjob ({nameof(MergeLogs)}):{ex.Message}:{ex.GetDetailsText()}";
+                var message = $"Failed webjob ({nameof(MergeLogs)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
                 await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
@@ -82,42 +82,32 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private async Task MergeCsvLogsAsync<T>(ILogger log, string logPath, string prefix, string extension = ".csv")
         {
             //Get all the daily log files
-            IEnumerable<string> files = await _SharedBusinessLogic.FileRepository.GetFilesAsync(logPath, $"{prefix}_*{extension}");
-            List<string> fileList = files.OrderBy(o => o).ToList();
+            var files = await _SharedBusinessLogic.FileRepository.GetFilesAsync(logPath, $"{prefix}_*{extension}");
+            var fileList = files.OrderBy(o => o).ToList();
 
             //Get all files before today
-            DateTime startDate = VirtualDateTime.Now.Date;
+            var startDate = VirtualDateTime.Now.Date;
 
-            foreach (string file in fileList)
-            {
+            foreach (var file in fileList)
                 try
                 {
                     //Get the date from this daily log filename
-                    string dateSuffix = Path.GetFileNameWithoutExtension(file).AfterFirst("_");
-                    if (string.IsNullOrWhiteSpace(dateSuffix) || dateSuffix.Length < 6)
-                    {
-                        continue;
-                    }
+                    var dateSuffix = Path.GetFileNameWithoutExtension(file).AfterFirst("_");
+                    if (string.IsNullOrWhiteSpace(dateSuffix) || dateSuffix.Length < 6) continue;
 
-                    DateTime date = dateSuffix.FromShortestDateTime();
+                    var date = dateSuffix.FromShortestDateTime();
 
                     //Ignore log files with no date in the filename
-                    if (date == DateTime.MinValue)
-                    {
-                        continue;
-                    }
+                    if (date == DateTime.MinValue) continue;
 
                     //Ignore todays daily log file 
-                    if (date.Date >= startDate)
-                    {
-                        continue;
-                    }
+                    if (date.Date >= startDate) continue;
 
                     //Get the monthly log file for this files date
-                    string monthLog = Path.Combine(logPath, $"{prefix}_{date:yyMM}{extension}");
+                    var monthLog = Path.Combine(logPath, $"{prefix}_{date:yyMM}{extension}");
 
                     //Read all the records from this daily log file
-                    List<T> records = await _SharedBusinessLogic.FileRepository.ReadCSVAsync<T>(file);
+                    var records = await _SharedBusinessLogic.FileRepository.ReadCSVAsync<T>(file);
 
                     //Add the records to its monthly log file
                     await _SharedBusinessLogic.FileRepository.AppendCsvRecordsAsync(monthLog, records);
@@ -127,51 +117,38 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 }
                 catch (Exception ex)
                 {
-                    string message =
+                    var message =
                         $"ERROR: Webjob ({nameof(MergeLogs)}) could not merge file '{file}':{ex.Message}:{ex.GetDetailsText()}";
                     log.LogError(ex, message);
                 }
-            }
 
-            DateTime archiveDeadline = VirtualDateTime.Now.AddYears(-1).Date;
+            var archiveDeadline = VirtualDateTime.Now.AddYears(-1).Date;
 
-            foreach (string file in fileList)
-            {
+            foreach (var file in fileList)
                 try
                 {
                     //Get the date from this daily log filename
-                    string fileName = Path.GetFileNameWithoutExtension(file);
-                    string dateSuffix = fileName.AfterFirst("_");
-                    if (string.IsNullOrWhiteSpace(dateSuffix))
-                    {
-                        continue;
-                    }
+                    var fileName = Path.GetFileNameWithoutExtension(file);
+                    var dateSuffix = fileName.AfterFirst("_");
+                    if (string.IsNullOrWhiteSpace(dateSuffix)) continue;
 
-                    if (dateSuffix.Length != 4)
-                    {
-                        continue;
-                    }
+                    if (dateSuffix.Length != 4) continue;
 
                     //Get the date of this log from the filename
-                    int year = dateSuffix.Substring(0, 2).ToInt32().ToFourDigitYear();
-                    int month = dateSuffix.Substring(2, 2).ToInt32();
+                    var year = dateSuffix.Substring(0, 2).ToInt32().ToFourDigitYear();
+                    var month = dateSuffix.Substring(2, 2).ToInt32();
                     var logDate = new DateTime(year, month, 1);
 
                     //Dont archive logs newer than 1 year
-                    if (logDate >= archiveDeadline)
-                    {
-                        continue;
-                    }
+                    if (logDate >= archiveDeadline) continue;
 
-                    string archivePath = Path.Combine(logPath, year.ToString());
+                    var archivePath = Path.Combine(logPath, year.ToString());
                     if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(archivePath))
-                    {
                         await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(archivePath);
-                    }
 
                     //Ensure we have a unique filename
-                    string ext = Path.GetExtension(file);
-                    string archiveFilePath = Path.Combine(archivePath, fileName) + ext;
+                    var ext = Path.GetExtension(file);
+                    var archiveFilePath = Path.Combine(archivePath, fileName) + ext;
 
                     var c = 0;
                     while (await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(archiveFilePath))
@@ -185,18 +162,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                     //Delete the old file
                     if (await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(archiveFilePath))
-                    {
                         await _SharedBusinessLogic.FileRepository.DeleteFileAsync(file);
-                    }
                 }
                 catch (Exception ex)
                 {
-                    string message =
+                    var message =
                         $"ERROR: Webjob ({nameof(MergeLogs)}) could not archive file '{file}':{ex.Message}:{ex.GetDetailsText()}";
                     log.LogError(ex, message);
                 }
-            }
         }
-
     }
 }

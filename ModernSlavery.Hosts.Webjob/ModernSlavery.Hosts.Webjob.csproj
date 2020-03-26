@@ -12,20 +12,24 @@
     <ProjectGuid>1DF71C5E-2C26-43ED-80EA-79317303909F</ProjectGuid>
   </PropertyGroup>
 
-  
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning;</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.BusinessDomain.Admin\ModernSlavery.BusinessDomain.Admin.csproj" />
-    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Registration\ModernSlavery.BusinessDomain.Registration.csproj" />
-    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Submission\ModernSlavery.BusinessDomain.Submission.csproj" />
+    <ProjectReference
+      Include="..\ModernSlavery.BusinessDomain.Registration\ModernSlavery.BusinessDomain.Registration.csproj" />
+    <ProjectReference
+      Include="..\ModernSlavery.BusinessDomain.Submission\ModernSlavery.BusinessDomain.Submission.csproj" />
     <ProjectReference Include="..\ModernSlavery.BusinessDomain.Viewing\ModernSlavery.BusinessDomain.Viewing.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Database\ModernSlavery.Infrastructure.Database.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj" />
+    <ProjectReference
+      Include="..\ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj" />
+    <ProjectReference
+      Include="..\ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Hosts\ModernSlavery.Infrastructure.Hosts.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Logging\ModernSlavery.Infrastructure.Logging.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Messaging\ModernSlavery.Infrastructure.Messaging.csproj" />
@@ -104,10 +108,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram" Link="DependencyValidation1.layerdiagram">
+    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram"
+                     Link="DependencyValidation1.layerdiagram">
       <Visible>False</Visible>
     </AdditionalFiles>
   </ItemGroup>
 
-</Project> 
-
+</Project>

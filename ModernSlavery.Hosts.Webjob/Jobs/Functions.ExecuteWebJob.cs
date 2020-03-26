@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
@@ -13,7 +12,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-
         [Singleton(Mode = SingletonMode.Listener)] //Ensures execution on only one instance with one listener
         public async Task ExecuteWebjob([QueueTrigger(QueueNames.ExecuteWebJob)]
             string queueMessage,
@@ -23,12 +21,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             wrapper.Message = JsonConvert.DeserializeObject<string>(wrapper.Message);
             wrapper.Message = Regex.Unescape(wrapper.Message).TrimI("\"");
 
-            NameValueCollection parameters = wrapper.Message.FromQueryString();
-            string command = parameters["command"];
-            if (string.IsNullOrWhiteSpace(command))
-            {
-                command = wrapper.Message;
-            }
+            var parameters = wrapper.Message.FromQueryString();
+            var command = parameters["command"];
+            if (string.IsNullOrWhiteSpace(command)) command = wrapper.Message;
 
             switch (command)
             {
@@ -69,6 +64,5 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             //Send Email to GEO reporting errors
             await _Messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not execute Webjob:" + queueMessage);
         }
-
     }
 }
