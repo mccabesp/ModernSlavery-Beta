@@ -1,2 +1,22 @@
-﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@addTagHelper  *, ModernSlavery.Sitemap
+﻿@using ModernSlavery.WebUI.Account
+
+@using ModernSlavery.WebUI.Shared.Classes
+@using ModernSlavery.WebUI.Shared.Classes.Patterns
+@using ModernSlavery.WebUI.Shared.Models
+@using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Controllers
+@using ModernSlavery.WebUI.Shared.Interfaces
+@using ModernSlavery.WebUI.Shared.Options
+
+@using ModernSlavery.WebUI.GDSDesignSystem
+@using ModernSlavery.WebUI.GDSDesignSystem.Models
+@using ModernSlavery.WebUI.GDSDesignSystem.Partials
+
+@using ModernSlavery.Core.Extensions
+@using ModernSlavery.Core.Entities
+@using ModernSlavery.Core.SharedKernel.Options
+
+@Layout ="DfeTemplate.cshtml"
+
+@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+@addTagHelper "*, ModernSlavery.WebUI.Shared.Classes.TagHelpers"

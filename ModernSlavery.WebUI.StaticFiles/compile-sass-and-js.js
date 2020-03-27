@@ -1,17 +1,17 @@
-var fs = require('fs');
-var path = require('path');
-var crypto = require('crypto');
+var fs = require("fs");
+var path = require("path");
+var crypto = require("crypto");
 
-var sass = require('node-sass');
+var sass = require("node-sass");
 var UglifyJS = require("uglify-js");
 
 
-var pathToCurrentDirectory = './';
-var pathToVisualStudioDebugDirectory = './bin/Debug/netcoreapp3.1/';
+var pathToCurrentDirectory = "./";
+var pathToVisualStudioDebugDirectory = "./bin/Debug/netcoreapp3.1/";
 
-var inputDirectory = './wwwroot';
-var inputJsDirectory = './wwwroot/scripts';
-var outputDirectory = './wwwroot/compiled';
+var inputDirectory = "./wwwroot";
+var inputJsDirectory = "./wwwroot/scripts";
+var outputDirectory = "./wwwroot/compiled";
 
 
 function makeOutputDirectoryIfItDoesNotExist(options) {
@@ -31,10 +31,11 @@ function makeOutputDirectoryIfItDoesNotExist(options) {
 
 function deleteExistingCompiledCssAndJsFiles(options) {
     function action(directory) {
-        console.log(`Deleting existing compiled CSS and JS files from output directory [${directory + outputDirectory}]`);
+        console.log(
+            `Deleting existing compiled CSS and JS files from output directory [${directory + outputDirectory}]`);
         var files = fs.readdirSync(directory + outputDirectory);
 
-        files.forEach(function (fileName) {
+        files.forEach(function(fileName) {
             if (/app-.*.css/.test(fileName) || /app-.*.js/.test(fileName)) {
                 var filePath = path.join(directory + outputDirectory, fileName);
                 console.log(`Deleting file [${filePath}]`);
@@ -68,9 +69,9 @@ function compileSass(inputFile, outputFileNamePrefix, options) {
 
     if (renderResult) {
         // Compute the hash of the compiled SASS
-        var hash = crypto.createHash('sha256');
+        var hash = crypto.createHash("sha256");
         hash.update(renderResult.css);
-        var hashResult = hash.digest('hex');
+        var hashResult = hash.digest("hex");
 
         saveAction(pathToCurrentDirectory);
         if (options.runningLocally) {
@@ -95,10 +96,10 @@ function compileJs(options) {
 
     var code = {};
 
-    files.forEach(function (fileName) {
-        if (fileName.endsWith('.js')) {
+    files.forEach(function(fileName) {
+        if (fileName.endsWith(".js")) {
             var filePath = path.join(inputJsDirectory, fileName);
-            var fileContents = fs.readFileSync(filePath, { encoding: 'utf8' });
+            var fileContents = fs.readFileSync(filePath, { encoding: "utf8" });
             code[fileName] = fileContents;
         }
     });
@@ -106,14 +107,15 @@ function compileJs(options) {
     var minifyOptions = {
         //keep_fnames: false,    // This seems to work with keep_fnames and mangle turned on.
         //mangle: false          // But it might be useful to disable these if we see any errors.
+    
     };
     var minifyResult = UglifyJS.minify(code, minifyOptions);
 
     if (minifyResult.code) {
         // Compute the hash of the compiled JS
-        var hash = crypto.createHash('sha256');
+        var hash = crypto.createHash("sha256");
         hash.update(minifyResult.code);
-        var hashResult = hash.digest('hex');
+        var hashResult = hash.digest("hex");
 
         saveAction(pathToCurrentDirectory);
         if (options.runningLocally) {
@@ -126,8 +128,8 @@ async function fullRecompile(options) {
     makeOutputDirectoryIfItDoesNotExist(options);
     deleteExistingCompiledCssAndJsFiles(options);
 
-    compileSass('./wwwroot/styles/app.scss', 'app', options);
-    compileSass('./wwwroot/styles/app-ie8.scss', 'app-ie8', options);
+    compileSass("./wwwroot/styles/app.scss", "app", options);
+    compileSass("./wwwroot/styles/app-ie8.scss", "app-ie8", options);
 
     compileJs(options);
 }
@@ -140,13 +142,13 @@ function stopOnCtrlC() {
         });
 
         rl.on("SIGINT",
-            function () {
+            function() {
                 process.emit("SIGINT");
             });
     }
 
     process.on("SIGINT",
-        function () {
+        function() {
             //graceful shutdown
             process.exit();
         });
@@ -169,7 +171,7 @@ async function recompileWhenNeeded() {
 
 function watchAndAskForRecompile() {
     function fileChanged(eventType, filename) {
-        if (filename && filename.indexOf('compiled') === -1) {
+        if (filename && filename.indexOf("compiled") === -1) {
             needsRecompile = true;
         }
     }
@@ -184,19 +186,17 @@ function watchAndAskForRecompile() {
 }
 
 
-if (process.argv.includes('--watch')) {
+if (process.argv.includes("--watch")) {
     fullRecompile({ runningLocally: true });
 
-    console.log('');
-    console.log('Watching for changes');
-    console.log('Press Ctrl+C to exit');
-    console.log('');
+    console.log("");
+    console.log("Watching for changes");
+    console.log("Press Ctrl+C to exit");
+    console.log("");
 
     stopOnCtrlC();
     recompileWhenNeeded();
     watchAndAskForRecompile();
-}
-else
-{
+} else {
     fullRecompile({});
 }

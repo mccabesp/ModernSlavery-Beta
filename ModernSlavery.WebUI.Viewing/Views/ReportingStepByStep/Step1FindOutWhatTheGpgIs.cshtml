@@ -1,8 +1,8 @@
 ﻿@using ModernSlavery.WebUI.Shared.Views.Components
 @using ModernSlavery.WebUI.Viewing.Models
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = "Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
@@ -106,26 +106,26 @@
 
         <div class="govuk-inset-text">
             Modern Slavery is not the same as equal pay, which is paying men and women differently for performing
-            the same (or similar) work. 
-This has been unlawful in the UK since 1970.
+            the same (or similar) work.
+            This has been unlawful in the UK since 1970.
         </div>
-        
+
         @{ await Html.RenderPartialAsync("/Views/Components/PaginationLink.cshtml",
-               new PaginationLinkViewModel
-               {
-                   ArrowDirection = ArrowDirection.Right,
-                   Title = "Next",
-                   Text = "What contributes to Modern Slavery",
-                   Url = "/"
-               }); }
+                new PaginationLinkViewModel
+                {
+                    ArrowDirection = ArrowDirection.Right,
+                    Title = "Next",
+                    Text = "What contributes to Modern Slavery",
+                    Url = "/"
+                }); }
 
     </div>
     <div class="govuk-grid-column-one-third">
         @{ await Html.RenderPartialAsync("/Views/ReportingStepByStep/ReportingSidebar.cshtml",
-               new ReportingStepsViewModel
-               {
-                   CurrentStep = 0,
-                   CurrentTask = 0
-               }); }
+                new ReportingStepsViewModel
+                {
+                    CurrentStep = 0,
+                    CurrentTask = 0
+                }); }
     </div>
 </div>

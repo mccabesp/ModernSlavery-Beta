@@ -2,10 +2,10 @@
 using ModernSlavery.WebUI.GDSDesignSystem;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.Shared.Models
 {
-
     public class FeedbackViewModel : GovUkViewModel
     {
         [GovUkDisplayNameForErrors(
@@ -18,15 +18,15 @@ namespace ModernSlavery.WebUI.Shared.Models
         public HowEasyIsThisServiceToUse? HowEasyIsThisServiceToUse { get; set; }
 
         public List<HowDidYouHearAboutGpg> HowDidYouHearAboutGpg { get; set; }
-        
+
         public string OtherSourceText { get; set; }
 
         public List<WhyVisitGpgSite> WhyVisitGpgSite { get; set; }
-        
+
         public string OtherReasonText { get; set; }
 
         public List<WhoAreYou> WhoAreYou { get; set; }
-        
+
         public string OtherPersonText { get; set; }
 
         [GovUkDisplayNameForErrors(
@@ -105,7 +105,8 @@ namespace ModernSlavery.WebUI.Shared.Models
         [GovUkRadioCheckboxLabelText(Text = "I viewed a specific organisation's Modern Slavery")]
         ViewSpecificOrganisationGpg,
 
-        [GovUkRadioCheckboxLabelText(Text = "I wanted to know what action other organisations are taking to eliminate Modern Slavery")]
+        [GovUkRadioCheckboxLabelText(Text =
+            "I wanted to know what action other organisations are taking to eliminate Modern Slavery")]
         ActionsToCloseGpg,
 
         [GovUkRadioCheckboxLabelText(Text = "Other")]
@@ -117,7 +118,8 @@ namespace ModernSlavery.WebUI.Shared.Models
         [GovUkRadioCheckboxLabelText(Text = "An employee interested in your organisation’s Modern Slavery statement?")]
         EmployeeInterestedInOrganisationData,
 
-        [GovUkRadioCheckboxLabelText(Text = "A manager involved in Modern Slavery reporting or diversity and inclusion?")]
+        [GovUkRadioCheckboxLabelText(Text =
+            "A manager involved in Modern Slavery reporting or diversity and inclusion?")]
         ManagerInvolvedInGpgReport,
 
         [GovUkRadioCheckboxLabelText(Text = "A person responsible for reporting your organisation’s Modern Slavery?")]
@@ -132,5 +134,4 @@ namespace ModernSlavery.WebUI.Shared.Models
         [GovUkRadioCheckboxLabelText(Text = "Other")]
         Other
     }
-
 }

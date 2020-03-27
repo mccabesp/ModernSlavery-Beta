@@ -9,24 +9,21 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
         {
             var underlyingType = Nullable.GetUnderlyingType(type);
 
-            bool isNullableType = underlyingType != null;
+            var isNullableType = underlyingType != null;
 
-            bool isNullableEnum = isNullableType && underlyingType.IsEnum;
+            var isNullableEnum = isNullableType && underlyingType.IsEnum;
 
             return isNullableEnum;
         }
 
         public static bool IsListOfEnums(Type type)
         {
-            bool isGenericList = type.IsGenericType &&
-                                 type.GetGenericTypeDefinition() == typeof(List<>);
+            var isGenericList = type.IsGenericType &&
+                                type.GetGenericTypeDefinition() == typeof(List<>);
 
-            if (!isGenericList)
-            {
-                return false;
-            }
+            if (!isGenericList) return false;
 
-            Type genericType = type.GetGenericArguments()[0];
+            var genericType = type.GetGenericArguments()[0];
             return genericType.IsEnum;
         }
 
@@ -37,10 +34,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
 
         public static object GetDefaultValue(Type type)
         {
-            if (type.IsValueType)
-            {
-                return Activator.CreateInstance(type);
-            }
+            if (type.IsValueType) return Activator.CreateInstance(type);
 
             return null;
         }

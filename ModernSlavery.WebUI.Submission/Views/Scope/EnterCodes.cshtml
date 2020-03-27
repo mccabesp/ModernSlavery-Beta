@@ -1,11 +1,7 @@
 ﻿@{
     ViewBag.Title = "Identifying your organisation - Modern Slavery reporting service";
 }
-@using ModernSlavery.WebUI.Shared.Classes
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@using ModernSlavery.WebUI.Submission.Controllers
-@using ModernSlavery.WebUI.Submission.Models
-@model ModernSlavery.WebUI.Submission.Models.EnterCodesViewModel
+@model EnterCodesViewModel
 <div class="grid-row">
     <div class="column-two-thirds">
         @using (Html.BeginForm(null, null, FormMethod.Post, new {@class = "form", autocomplete = "off"}))

@@ -1,7 +1,7 @@
-﻿using ModernSlavery.WebUI.Admin.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.WebUI.Admin.Classes;
+using ModernSlavery.WebUI.Admin.Models;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
@@ -9,7 +9,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminSearchController : Controller
     {
-
         private readonly AdminSearchService adminSearchService;
 
         public AdminSearchController(AdminSearchService adminSearchService)
@@ -20,10 +19,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("search")]
         public IActionResult SearchGet(string query)
         {
-            if (query == null)
-            {
-                return View("../Admin/Search", new AdminSearchViewModel());
-            }
+            if (query == null) return View("../Admin/Search", new AdminSearchViewModel());
 
             var viewModel = new AdminSearchViewModel {SearchQuery = query};
 
@@ -33,13 +29,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
             else
             {
-                AdminSearchResultsViewModel results = adminSearchService.Search(query);
+                var results = adminSearchService.Search(query);
 
                 viewModel.SearchResults = results;
             }
 
             return View("../Admin/Search", viewModel);
         }
-
     }
 }

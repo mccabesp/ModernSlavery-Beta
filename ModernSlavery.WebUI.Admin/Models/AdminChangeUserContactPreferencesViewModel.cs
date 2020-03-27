@@ -1,11 +1,11 @@
 ﻿using ModernSlavery.WebUI.GDSDesignSystem;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
     public class AdminChangeUserContactPreferencesViewModel : GovUkViewModel
     {
-
         public long UserId { get; set; }
         public string FullName { get; set; }
 
@@ -14,6 +14,5 @@ namespace ModernSlavery.WebUI.Admin.Models
 
         [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a reason for this change.")]
         public string Reason { get; set; }
-
     }
 }

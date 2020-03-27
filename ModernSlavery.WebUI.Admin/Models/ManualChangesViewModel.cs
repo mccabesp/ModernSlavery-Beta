@@ -5,7 +5,6 @@ namespace ModernSlavery.WebUI.Admin.Models
     [Serializable]
     public class ManualChangesViewModel
     {
-
         public string LastTestedInput { get; set; }
         public string LastTestedCommand { get; set; }
         public string Command { get; set; }
@@ -14,6 +13,5 @@ namespace ModernSlavery.WebUI.Admin.Models
         public string Comment { get; set; }
         public bool Tested { get; set; }
         public string SuccessMessage { get; set; }
-
     }
 }

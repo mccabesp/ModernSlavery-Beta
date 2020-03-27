@@ -17,7 +17,7 @@ using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
 using ModernSlavery.WebUI.Registration.Models;
-using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Services;
 using ModernSlavery.WebUI.Submission.Models;
 using ModernSlavery.WebUI.Tests.TestHelpers;

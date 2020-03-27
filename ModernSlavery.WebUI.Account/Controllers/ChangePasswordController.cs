@@ -1,11 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
-using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.Account.Interfaces;
-using ModernSlavery.WebUI.Account.Models.ChangePassword;
+using ModernSlavery.WebUI.Account.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
@@ -13,14 +11,13 @@ using ModernSlavery.WebUI.Shared.Resources;
 
 namespace ModernSlavery.WebUI.Account.Controllers
 {
-
     [Route("manage-account")]
     public class ChangePasswordController : BaseController
     {
-
         public ChangePasswordController(
             IChangePasswordViewService changePasswordService,
-            ILogger<ChangePasswordController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
+            ILogger<ChangePasswordController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic)
+            : base(logger, webService, sharedBusinessLogic)
         {
             ChangePasswordService = changePasswordService;
         }
@@ -31,16 +28,10 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public async Task<IActionResult> ChangePassword()
         {
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             // prevent impersonation
-            if (IsImpersonatingUser)
-            {
-                this.RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
-            }
+            if (IsImpersonatingUser) RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
 
             return View(new ChangePasswordViewModel());
         }
@@ -51,19 +42,13 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordViewModel formData)
         {
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             // return to page if there are errors
-            if (ModelState.IsValid == false)
-            {
-                return View(nameof(ChangePassword), formData);
-            }
+            if (ModelState.IsValid == false) return View(nameof(ChangePassword), formData);
 
             // execute change password process
-            ModelStateDictionary errors = await ChangePasswordService.ChangePasswordAsync(
+            var errors = await ChangePasswordService.ChangePasswordAsync(
                 VirtualUser,
                 formData.CurrentPassword,
                 formData.NewPassword);
@@ -78,9 +63,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             TempData.Add(nameof(AccountResources.ChangePasswordSuccessAlert), true);
 
             // go to manage account page
-            return this.RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
+            return RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
         }
-
     }
-
 }

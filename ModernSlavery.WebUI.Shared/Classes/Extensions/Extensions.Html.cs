@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel.Options;
@@ -25,16 +20,14 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
     {
         public static SharedOptions GetSharedOptions(this IHtmlHelper htmlHelper)
         {
-            return (SharedOptions)htmlHelper.ViewContext.HttpContext.RequestServices.GetService(typeof(SharedOptions));
-
+            return (SharedOptions) htmlHelper.ViewContext.HttpContext.RequestServices.GetService(typeof(SharedOptions));
         }
 
 
         public static async Task<IHtmlContent> PartialModelAsync<T>(this IHtmlHelper htmlHelper, T viewModel)
         {
-
             // extract the parial path from the model class attr
-            string partialPath = viewModel.GetAttribute<PartialAttribute>().PartialPath;
+            var partialPath = viewModel.GetAttribute<PartialAttribute>().PartialPath;
             return await htmlHelper.PartialAsync(partialPath, viewModel);
         }
 
@@ -58,8 +51,8 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             string errorClassName,
             string noErrorClassName = null)
         {
-            string expressionText = ExpressionHelper.GetExpressionText(expression);
-            string fullHtmlFieldName = htmlHelper.ViewContext.ViewData
+            var expressionText = ExpressionHelper.GetExpressionText(expression);
+            var fullHtmlFieldName = htmlHelper.ViewContext.ViewData
                 .TemplateInfo.GetFullHtmlFieldName(expressionText);
 
             return SetErrorClass(htmlHelper, fullHtmlFieldName, errorClassName, noErrorClassName);
@@ -71,12 +64,12 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             string errorClassName,
             string noErrorClassName = null)
         {
-            ModelStateEntry state = htmlHelper.ViewData.ModelState[fullHtmlFieldName];
+            var state = htmlHelper.ViewData.ModelState[fullHtmlFieldName];
 
             if (!string.IsNullOrWhiteSpace(noErrorClassName))
-            {
-                return state == null || state.Errors.Count == 0 ? new HtmlString(noErrorClassName) : new HtmlString(errorClassName);
-            }
+                return state == null || state.Errors.Count == 0
+                    ? new HtmlString(noErrorClassName)
+                    : new HtmlString(errorClassName);
 
             return state == null || state.Errors.Count == 0 ? HtmlString.Empty : new HtmlString(errorClassName);
         }
@@ -85,8 +78,8 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
         public static HtmlString HiddenFor<TModel>(this IHtmlHelper<TModel> helper, params string[] propertyNames)
         {
             var hidden = new List<string>();
-            TModel model = helper.ViewData.Model;
-            foreach (string propertyName in propertyNames)
+            var model = helper.ViewData.Model;
+            foreach (var propertyName in propertyNames)
             {
                 var propertyValue = model.GetProperty<string>(propertyName);
                 hidden.Add(helper.Hidden(propertyName, propertyValue).ToString());
@@ -99,15 +92,13 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 
         public static HtmlString UnpackBundle(this IHtmlHelper htmlHelper, string bundlePath, string media = "")
         {
-            Bundle bundle = Bundle.ReadBundleFile("bundleconfig.json", bundlePath);
-            if (bundle == null)
-            {
-                return null;
-            }
+            var bundle = Bundle.ReadBundleFile("bundleconfig.json", bundlePath);
+            if (bundle == null) return null;
 
-            IEnumerable<string> outputString = bundlePath.EndsWith(".js")
+            var outputString = bundlePath.EndsWith(".js")
                 ? bundle.InputFiles.Select(inputFile => $"<script src='/{inputFile}' type='text/javascript'></script>")
-                : bundle.InputFiles.Select(inputFile => $"<link rel='stylesheet' type='text/css' media='{media}' href='/{inputFile}' />");
+                : bundle.InputFiles.Select(inputFile =>
+                    $"<link rel='stylesheet' type='text/css' media='{media}' href='/{inputFile}' />");
 
             return new HtmlString(string.Join("\n", outputString));
         }
@@ -127,61 +118,52 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             return await helper.PartialAsync("_ValidationSummary");
         }
 
-        private static Dictionary<string, object> CustomAttributesFor<TModel, TProperty>(Expression<Func<TModel, TProperty>> expression,
+        private static Dictionary<string, object> CustomAttributesFor<TModel, TProperty>(
+            Expression<Func<TModel, TProperty>> expression,
             object htmlAttributes = null)
         {
-            Type containerType = typeof(TModel);
+            var containerType = typeof(TModel);
 
-            string propertyName = ExpressionHelper.GetExpressionText(expression);
-            PropertyInfo propertyInfo = containerType.GetPropertyInfo(propertyName);
+            var propertyName = ExpressionHelper.GetExpressionText(expression);
+            var propertyInfo = containerType.GetPropertyInfo(propertyName);
 
             var displayNameAttribute =
-                propertyInfo?.GetCustomAttributes(typeof(DisplayNameAttribute), false).FirstOrDefault() as DisplayNameAttribute;
-            var displayAttribute = propertyInfo?.GetCustomAttributes(typeof(DisplayAttribute), false).FirstOrDefault() as DisplayAttribute;
-            string displayName = displayNameAttribute != null ? displayNameAttribute.DisplayName :
+                propertyInfo?.GetCustomAttributes(typeof(DisplayNameAttribute), false).FirstOrDefault() as
+                    DisplayNameAttribute;
+            var displayAttribute =
+                propertyInfo?.GetCustomAttributes(typeof(DisplayAttribute), false).FirstOrDefault() as DisplayAttribute;
+            var displayName = displayNameAttribute != null ? displayNameAttribute.DisplayName :
                 displayAttribute != null ? displayAttribute.Name : propertyName;
 
             string par1 = null;
             string par2 = null;
 
-            Dictionary<string, object> htmlAttr = htmlAttributes.ToPropertyDictionary();
+            var htmlAttr = htmlAttributes.ToPropertyDictionary();
             if (propertyInfo != null)
-            {
-                foreach (ValidationAttribute attribute in propertyInfo.GetCustomAttributes(typeof(ValidationAttribute), false))
+                foreach (ValidationAttribute attribute in propertyInfo.GetCustomAttributes(typeof(ValidationAttribute),
+                    false))
                 {
-                    string validatorKey = $"{containerType.Name}.{propertyName}:{attribute.GetType().Name.TrimSuffix("Attribute")}";
-                    CustomErrorMessage customError = CustomErrorMessages.GetValidationError(validatorKey);
-                    if (customError == null)
-                    {
-                        continue;
-                    }
+                    var validatorKey =
+                        $"{containerType.Name}.{propertyName}:{attribute.GetType().Name.TrimSuffix("Attribute")}";
+                    var customError = CustomErrorMessages.GetValidationError(validatorKey);
+                    if (customError == null) continue;
 
                     //Set the message from the description
                     if (attribute.ErrorMessage != customError.Description)
-                    {
                         attribute.ErrorMessage = customError.Description;
-                    }
 
                     //Set the inline error message
                     var errorMessageString = Misc.GetPropertyValue(attribute, "ErrorMessageString") as string;
-                    if (string.IsNullOrWhiteSpace(errorMessageString))
-                    {
-                        errorMessageString = attribute.ErrorMessage;
-                    }
+                    if (string.IsNullOrWhiteSpace(errorMessageString)) errorMessageString = attribute.ErrorMessage;
 
                     //Set the summary error message
-                    if (customError.Title != errorMessageString)
-                    {
-                        errorMessageString = customError.Title;
-                    }
+                    if (customError.Title != errorMessageString) errorMessageString = customError.Title;
 
                     //Set the display name
                     if (!string.IsNullOrWhiteSpace(customError.DisplayName) && customError.DisplayName != displayName)
                     {
                         if (displayAttribute != null)
-                        {
                             Misc.SetPropertyValue(displayAttribute, "Name", customError.DisplayName);
-                        }
 
                         displayName = customError.DisplayName;
                     }
@@ -207,7 +189,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                     }
                     else if (attribute is DataTypeAttribute)
                     {
-                        string type = ((DataTypeAttribute) attribute).DataType.ToString().ToLower();
+                        var type = ((DataTypeAttribute) attribute).DataType.ToString().ToLower();
                         switch (type)
                         {
                             case "password":
@@ -239,10 +221,10 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                         par2 = ((StringLengthAttribute) attribute).MaximumLength.ToString();
                     }
 
-                    htmlAttr[altAttr.TrimSuffix("-alt")] = string.Format(attribute.ErrorMessage, displayName, par1, par2);
+                    htmlAttr[altAttr.TrimSuffix("-alt")] =
+                        string.Format(attribute.ErrorMessage, displayName, par1, par2);
                     htmlAttr[altAttr] = string.Format(errorMessageString, displayName, par1, par2);
                 }
-            }
 
             return htmlAttr;
         }
@@ -251,7 +233,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             Expression<Func<TModel, TProperty>> expression,
             object htmlAttributes = null)
         {
-            Dictionary<string, object> htmlAttr = CustomAttributesFor(expression, htmlAttributes);
+            var htmlAttr = CustomAttributesFor(expression, htmlAttributes);
 
             return helper.EditorFor(expression, null, new {htmlAttributes = htmlAttr});
         }
@@ -261,12 +243,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             object value,
             object htmlAttributes = null)
         {
-            Dictionary<string, object> htmlAttr = CustomAttributesFor(expression, htmlAttributes);
+            var htmlAttr = CustomAttributesFor(expression, htmlAttributes);
 
             return helper.RadioButtonFor(expression, value, htmlAttr);
         }
 
         #endregion
-
     }
 }

@@ -12,7 +12,7 @@ using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebUI.Viewing.Models.Search;
+using ModernSlavery.WebUI.Viewing.Models;
 using ModernSlavery.WebUI.Viewing.Presenters;
 using Moq;
 using NUnit.Framework;

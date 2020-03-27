@@ -1,8 +1,3 @@
-@using ModernSlavery.Core.SharedKernel.Options
-@using ModernSlavery.WebUI.Shared.Classes
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@using ModernSlavery.WebUI.Shared.Interfaces
-@using ModernSlavery.WebUI.Shared.Options
 @inject IWebService WebService
 @inject SharedOptions sharedOptions
 @{
@@ -17,24 +12,24 @@
             <div class="grid-row">
                 <div class="column-two-thirds">
                     <h1 class="heading-xlarge">
-                        Search and compare<br />Modern Slavery statements
+                        Search and compare<br/>Modern Slavery statements
                     </h1>
                     <p>
                         Employers with 250 or more employees have published their figures comparing men and women&rsquo;s average pay across the organisation.
                     </p>
-                    <partial name="Launchpad/Parts/SearchByEmployer" />
+                    <partial name="Launchpad/Parts/SearchByEmployer"/>
                 </div>
             </div>
             <div class="grid-row related">
                 <div class="column-two-thirds">
-                    <partial name="Launchpad/Parts/RelatedContent" />
+                    <partial name="Launchpad/Parts/RelatedContent"/>
                 </div>
             </div>
         </div>
     </div>
 }
 
-<partial name="Launchpad/Parts/ServiceSurveyIntroAndLink" />
+<partial name="Launchpad/Parts/ServiceSurveyIntroAndLink"/>
 
 <div class="heading-medium" style="margin-bottom: 0.12em;">
     Report your Modern Slavery statement

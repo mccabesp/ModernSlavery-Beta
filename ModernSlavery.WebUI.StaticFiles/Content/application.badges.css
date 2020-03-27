@@ -5,28 +5,26 @@
 */
 
 .govuk-tag {
-    font-family: nta,Arial,sans-serif;
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-weight: 700;
-    font-size: 14px;
-    line-height: 1.25;
-    display: inline-block;
-    padding: 5px 8px 0;
-    color: #fff;
+    -webkit-font-smoothing: antialiased;
     background-color: #005ea5;
+    color: #fff;
+    display: inline-block;
+    font-family: nta, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
     letter-spacing: 1px;
+    line-height: 1.25;
+    padding: 5px 8px 0;
     text-decoration: none;
     text-transform: uppercase
 }
 
 @media print {
-    .govuk-tag {
-        font-family: sans-serif
-    }
+    .govuk-tag { font-family: sans-serif }
 }
 
-@media (min-width:40.0625em) {
+@media (min-width: 40.0625em) {
     .govuk-tag {
         font-size: 16px;
         line-height: 1.25
@@ -40,6 +38,4 @@
     }
 }
 
-.govuk-tag--inactive {
-    background-color: #6f777b
-}
+.govuk-tag--inactive { background-color: #6f777b }

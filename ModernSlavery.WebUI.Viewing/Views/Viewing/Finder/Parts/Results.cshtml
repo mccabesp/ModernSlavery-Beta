@@ -1,12 +1,9 @@
-﻿@using ModernSlavery.Core.Extensions
-@using ModernSlavery.Core.Models
-@using ModernSlavery.WebUI.Viewing.Models
-@model ModernSlavery.WebUI.Viewing.Models.Search.SearchViewModel
+﻿@model SearchViewModel
 
 <ul id="SearchResults" class="results">
-    @foreach (EmployerSearchModel employer in Model.Employers.Results)
+    @foreach (var employer in Model.Employers.Results)
     {
-        string encOrgId = employer.OrganisationIdEncrypted;
+        var encOrgId = employer.OrganisationIdEncrypted;
         <li class="document">
             <div class="comparison-table">
                 <div class="comparison-employer-container">

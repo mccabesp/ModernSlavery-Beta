@@ -7,7 +7,6 @@ namespace ModernSlavery.WebUI.Account.Models
     [Serializable]
     public class ResetViewModel
     {
-
         [Required(AllowEmptyStrings = false)]
         [EmailAddress]
         [Display(Name = "Email address")]
@@ -32,6 +31,5 @@ namespace ModernSlavery.WebUI.Account.Models
         public string ConfirmPassword { get; set; }
 
         public string Resetcode { get; set; }
-
     }
 }

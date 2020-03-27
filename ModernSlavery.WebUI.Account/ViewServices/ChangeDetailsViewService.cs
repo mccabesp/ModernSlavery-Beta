@@ -5,15 +5,13 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Account.Interfaces;
-using ModernSlavery.WebUI.Account.Models.ChangeDetails;
+using ModernSlavery.WebUI.Account.Models;
 
 namespace ModernSlavery.WebUI.Account.ViewServices
 {
-
     public class ChangeDetailsViewService : IChangeDetailsViewService
     {
-
-        public ChangeDetailsViewService(IUserRepository userRepo,IMapper autoMapper)
+        public ChangeDetailsViewService(IUserRepository userRepo, IMapper autoMapper)
         {
             UserRepository = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
             AutoMapper = autoMapper ?? throw new ArgumentNullException(nameof(autoMapper));
@@ -30,7 +28,5 @@ namespace ModernSlavery.WebUI.Account.ViewServices
             // execute update details
             return await UserRepository.UpdateDetailsAsync(currentUser, mappedDetails);
         }
-
     }
-
 }

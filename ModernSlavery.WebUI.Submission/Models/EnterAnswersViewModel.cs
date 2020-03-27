@@ -4,11 +4,9 @@ using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
-
     [Serializable]
     public class EnterAnswersViewModel
     {
-
         [Required(AllowEmptyStrings = false, ErrorMessage = "You must provide a reason for being out of scope")]
         public string Reason { get; set; }
 
@@ -16,7 +14,8 @@ namespace ModernSlavery.WebUI.Submission.Models
         public string ReadGuidance { get; set; }
 
         [Display(Name = "Please give a brief explanation in 200 characters or less")]
-        [Required(AllowEmptyStrings = false, ErrorMessage = "You must provide your other reason for being out of scope")]
+        [Required(AllowEmptyStrings = false,
+            ErrorMessage = "You must provide your other reason for being out of scope")]
         [MaxLength(200, ErrorMessage = "Your reason can only be 200 characters or less")]
         public string OtherReason { get; set; }
 
@@ -44,14 +43,9 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public bool? HasReadGuidance()
         {
-            if (!string.IsNullOrWhiteSpace(ReadGuidance))
-            {
-                return ReadGuidance.ToBoolean();
-            }
+            if (!string.IsNullOrWhiteSpace(ReadGuidance)) return ReadGuidance.ToBoolean();
 
             return null;
         }
-
     }
-
 }

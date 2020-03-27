@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ModernSlavery.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Models;
 
 namespace ModernSlavery.WebUI.Admin.Classes
@@ -27,20 +27,24 @@ namespace ModernSlavery.WebUI.Admin.Classes
 
     public class AdminSearchService
     {
+        private readonly IEventLogger CustomLogger;
+
+        private readonly IDataRepository dataRepository;
+
+        private List<AdminSearchServiceOrganisation> _cachedOrganisations;
+
+        private List<AdminSearchServiceUser> _cachedUsers;
+        private DateTime cacheLastUpdated = DateTime.MinValue;
+
+        private readonly object cacheLock = new object();
+
         public AdminSearchService(IEventLogger customLogger, IDataRepository dataRepository)
         {
-            this.CustomLogger = customLogger;
+            CustomLogger = customLogger;
             this.dataRepository = dataRepository;
             EnsureCacheUpdated();
         }
 
-        private readonly IDataRepository dataRepository;
-        private readonly IEventLogger CustomLogger;
-
-        private object cacheLock=new object();
-        private DateTime cacheLastUpdated = DateTime.MinValue;
-
-        private List<AdminSearchServiceOrganisation> _cachedOrganisations;
         internal List<AdminSearchServiceOrganisation> cachedOrganisations
         {
             get
@@ -50,7 +54,6 @@ namespace ModernSlavery.WebUI.Admin.Classes
             }
         }
 
-        private List<AdminSearchServiceUser> _cachedUsers;
         internal List<AdminSearchServiceUser> cachedUsers
         {
             get
@@ -68,8 +71,8 @@ namespace ModernSlavery.WebUI.Admin.Classes
 
                 CustomLogger.Information("Starting cache update (AdminSearchService.StartCacheUpdateThread)");
 
-                _cachedOrganisations = AdminSearchService.LoadAllOrganisations(dataRepository);
-                _cachedUsers = AdminSearchService.LoadAllUsers(dataRepository);
+                _cachedOrganisations = LoadAllOrganisations(dataRepository);
+                _cachedUsers = LoadAllUsers(dataRepository);
 
                 cacheLastUpdated = VirtualDateTime.Now;
 
@@ -79,14 +82,14 @@ namespace ModernSlavery.WebUI.Admin.Classes
 
         public AdminSearchResultsViewModel Search(string query)
         {
-            List<string> searchTerms = ExtractSearchTermsFromQuery(query);
+            var searchTerms = ExtractSearchTermsFromQuery(query);
 
             List<AdminSearchServiceOrganisation> allOrganisations;
             List<AdminSearchServiceUser> allUsers;
             DateTime timeDetailsLoaded;
             bool usedCache;
 
-            DateTime loadingStart = VirtualDateTime.Now;
+            var loadingStart = VirtualDateTime.Now;
             if (cacheLastUpdated < VirtualDateTime.Now.AddSeconds(-70))
             {
                 allOrganisations = LoadAllOrganisations(dataRepository);
@@ -101,28 +104,30 @@ namespace ModernSlavery.WebUI.Admin.Classes
                 timeDetailsLoaded = cacheLastUpdated;
                 usedCache = true;
             }
-            DateTime loadingEnd = VirtualDateTime.Now;
 
-            DateTime filteringStart = VirtualDateTime.Now;
-            List<AdminSearchServiceOrganisation> matchingOrganisations = GetMatchingOrganisations(allOrganisations, searchTerms, query);
-            List<AdminSearchServiceUser> matchingUsers = GetMatchingUsers(allUsers, searchTerms);
-            DateTime filteringEnd = VirtualDateTime.Now;
+            var loadingEnd = VirtualDateTime.Now;
 
-            DateTime orderingStart = VirtualDateTime.Now;
-            List<AdminSearchServiceOrganisation> matchingOrganisationsOrderedByName =
+            var filteringStart = VirtualDateTime.Now;
+            var matchingOrganisations = GetMatchingOrganisations(allOrganisations, searchTerms, query);
+            var matchingUsers = GetMatchingUsers(allUsers, searchTerms);
+            var filteringEnd = VirtualDateTime.Now;
+
+            var orderingStart = VirtualDateTime.Now;
+            var matchingOrganisationsOrderedByName =
                 matchingOrganisations.OrderBy(o => o.OrganisationName.ToLower()).ToList();
-            List<AdminSearchServiceUser> matchingUsersOrderedByName =
+            var matchingUsersOrderedByName =
                 matchingUsers.OrderBy(u => u.FullName).ToList();
-            DateTime orderingEnd = VirtualDateTime.Now;
+            var orderingEnd = VirtualDateTime.Now;
 
-            DateTime highlightingStart = VirtualDateTime.Now;
-            List<AdminSearchResultOrganisationViewModel> matchingOrganisationsWithHighlightedMatches =
+            var highlightingStart = VirtualDateTime.Now;
+            var matchingOrganisationsWithHighlightedMatches =
                 HighlightOrganisationMatches(matchingOrganisationsOrderedByName, searchTerms, query);
-            List<AdminSearchResultUserViewModel> matchingUsersWithHighlightedMatches =
+            var matchingUsersWithHighlightedMatches =
                 HighlightUserMatches(matchingUsersOrderedByName, searchTerms);
-            DateTime highlightingEnd = VirtualDateTime.Now;
+            var highlightingEnd = VirtualDateTime.Now;
 
-            var results = new AdminSearchResultsViewModel {
+            var results = new AdminSearchResultsViewModel
+            {
                 OrganisationResults = matchingOrganisationsWithHighlightedMatches,
                 UserResults = matchingUsersWithHighlightedMatches,
 
@@ -131,7 +136,7 @@ namespace ModernSlavery.WebUI.Admin.Classes
                 OrderingMilliSeconds = orderingEnd.Subtract(orderingStart).TotalMilliseconds,
                 HighlightingMilliSeconds = highlightingEnd.Subtract(highlightingStart).TotalMilliseconds,
 
-                SearchCacheUpdatedSecondsAgo = (int)VirtualDateTime.Now.Subtract(timeDetailsLoaded).TotalSeconds,
+                SearchCacheUpdatedSecondsAgo = (int) VirtualDateTime.Now.Subtract(timeDetailsLoaded).TotalSeconds,
                 UsedCache = usedCache
             };
             return results;
@@ -180,23 +185,29 @@ namespace ModernSlavery.WebUI.Admin.Classes
         {
             return allOrganisations
                 .Where(
-                    organisation => {
-                        bool nameMatches = CurrentOrPreviousOrganisationNameMatchesSearchTerms(organisation, searchTerms);
-                        bool employerRefMatches = organisation.EmployerReference?.Trim() == query.Trim();
-                        bool companyNumberMatches = organisation.CompanyNumber?.Trim() == query.Trim();
+                    organisation =>
+                    {
+                        var nameMatches =
+                            CurrentOrPreviousOrganisationNameMatchesSearchTerms(organisation, searchTerms);
+                        var employerRefMatches = organisation.EmployerReference?.Trim() == query.Trim();
+                        var companyNumberMatches = organisation.CompanyNumber?.Trim() == query.Trim();
                         return nameMatches || employerRefMatches || companyNumberMatches;
                     })
                 .ToList();
         }
 
-        private List<AdminSearchServiceUser> GetMatchingUsers(List<AdminSearchServiceUser> allUsers, List<string> searchTerms)
+        private List<AdminSearchServiceUser> GetMatchingUsers(List<AdminSearchServiceUser> allUsers,
+            List<string> searchTerms)
         {
             return allUsers
-                .Where(user => NameMatchesSearchTerms(user.FullName, searchTerms) || NameMatchesSearchTerms(user.EmailAddress, searchTerms))
+                .Where(user =>
+                    NameMatchesSearchTerms(user.FullName, searchTerms) ||
+                    NameMatchesSearchTerms(user.EmailAddress, searchTerms))
                 .ToList();
         }
 
-        private bool CurrentOrPreviousOrganisationNameMatchesSearchTerms(AdminSearchServiceOrganisation organisation, List<string> searchTerms)
+        private bool CurrentOrPreviousOrganisationNameMatchesSearchTerms(AdminSearchServiceOrganisation organisation,
+            List<string> searchTerms)
         {
             return organisation.OrganisationNames.Any(on => NameMatchesSearchTerms(on, searchTerms));
         }
@@ -213,26 +224,28 @@ namespace ModernSlavery.WebUI.Admin.Classes
         {
             return organisations
                 .Select(
-                    organisation => {
-                        AdminSearchMatchViewModel matchGroupsForCurrentName = GetMatchGroups(organisation.OrganisationName, searchTerms);
+                    organisation =>
+                    {
+                        var matchGroupsForCurrentName = GetMatchGroups(organisation.OrganisationName, searchTerms);
 
-                        IEnumerable<string> previousNames = organisation.OrganisationNames
+                        var previousNames = organisation.OrganisationNames
                             .Except(new[] {organisation.OrganisationName});
 
-                        List<AdminSearchMatchViewModel> matchGroupsForPreviousNames = previousNames
+                        var matchGroupsForPreviousNames = previousNames
                             .Where(on => NameMatchesSearchTerms(on, searchTerms))
                             .Select(on => GetMatchGroups(on, searchTerms))
                             .ToList();
 
-                        string employerRefMatch = organisation.EmployerReference?.Trim() == query.Trim()
+                        var employerRefMatch = organisation.EmployerReference?.Trim() == query.Trim()
                             ? organisation.EmployerReference
                             : null;
 
-                        string companyNumberMatch = organisation.CompanyNumber?.Trim() == query.Trim()
+                        var companyNumberMatch = organisation.CompanyNumber?.Trim() == query.Trim()
                             ? organisation.CompanyNumber
                             : null;
 
-                        return new AdminSearchResultOrganisationViewModel {
+                        return new AdminSearchResultOrganisationViewModel
+                        {
                             OrganisationName = matchGroupsForCurrentName,
                             OrganisationPreviousNames = matchGroupsForPreviousNames,
                             EmployerRef = employerRefMatch,
@@ -250,12 +263,15 @@ namespace ModernSlavery.WebUI.Admin.Classes
         {
             return users
                 .Select(
-                    user => {
-                        AdminSearchMatchViewModel matchGroupsForFullName = GetMatchGroups(user.FullName, searchTerms);
-                        AdminSearchMatchViewModel matchGroupsForEmailAddress = GetMatchGroups(user.EmailAddress, searchTerms);
+                    user =>
+                    {
+                        var matchGroupsForFullName = GetMatchGroups(user.FullName, searchTerms);
+                        var matchGroupsForEmailAddress = GetMatchGroups(user.EmailAddress, searchTerms);
 
-                        return new AdminSearchResultUserViewModel {
-                            UserFullName = matchGroupsForFullName, UserEmailAddress = matchGroupsForEmailAddress, UserId = user.UserId
+                        return new AdminSearchResultUserViewModel
+                        {
+                            UserFullName = matchGroupsForFullName, UserEmailAddress = matchGroupsForEmailAddress,
+                            UserId = user.UserId
                         };
                     })
                 .ToList();
@@ -269,15 +285,12 @@ namespace ModernSlavery.WebUI.Admin.Classes
             var searchStart = 0;
             while (stillSearching)
             {
-                AdminSearchMatchGroupViewModel nextMatch = GetNextMatch(organisationName, searchTerms, searchStart);
+                var nextMatch = GetNextMatch(organisationName, searchTerms, searchStart);
                 if (nextMatch != null)
                 {
                     matchGroups.Add(nextMatch);
                     searchStart = nextMatch.Start + nextMatch.Length;
-                    if (searchStart >= organisationName.Length)
-                    {
-                        stillSearching = false;
-                    }
+                    if (searchStart >= organisationName.Length) stillSearching = false;
                 }
                 else
                 {
@@ -288,17 +301,18 @@ namespace ModernSlavery.WebUI.Admin.Classes
             return new AdminSearchMatchViewModel {Text = organisationName, MatchGroups = matchGroups};
         }
 
-        private static AdminSearchMatchGroupViewModel GetNextMatch(string organisationName, List<string> searchTerms, int searchStart)
+        private static AdminSearchMatchGroupViewModel GetNextMatch(string organisationName, List<string> searchTerms,
+            int searchStart)
         {
             var possibleMatches = new List<AdminSearchMatchGroupViewModel>();
 
-            foreach (string searchTerm in searchTerms)
+            foreach (var searchTerm in searchTerms)
             {
-                int matchStart = organisationName.IndexOf(searchTerm, searchStart, StringComparison.InvariantCultureIgnoreCase);
+                var matchStart = organisationName.IndexOf(searchTerm, searchStart,
+                    StringComparison.InvariantCultureIgnoreCase);
                 if (matchStart != -1)
-                {
-                    possibleMatches.Add(new AdminSearchMatchGroupViewModel {Start = matchStart, Length = searchTerm.Length});
-                }
+                    possibleMatches.Add(new AdminSearchMatchGroupViewModel
+                        {Start = matchStart, Length = searchTerm.Length});
             }
 
             return possibleMatches
@@ -306,6 +320,5 @@ namespace ModernSlavery.WebUI.Admin.Classes
                 .ThenByDescending(m => m.Length)
                 .FirstOrDefault();
         }
-
     }
 }

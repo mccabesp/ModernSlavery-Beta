@@ -6,7 +6,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.Cookies
 {
     public class CookieHelper
     {
-
         public const string CookieSettingsCookieName = "cookie_settings";
         public const string SeenCookieMessageCookieName = "seen_cookie_message";
         public const int CurrentCookieMessageVersion = 1;
@@ -15,8 +14,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Cookies
 
         public static CookieSettings GetCookieSettingsCookie(HttpRequest request)
         {
-            if (request.Cookies.TryGetValue(CookieSettingsCookieName, out string cookieSettingsString))
-            {
+            if (request.Cookies.TryGetValue(CookieSettingsCookieName, out var cookieSettingsString))
                 try
                 {
                     return JsonConvert.DeserializeObject<CookieSettings>(cookieSettingsString);
@@ -25,16 +23,17 @@ namespace ModernSlavery.WebUI.Shared.Classes.Cookies
                 {
                     /* If we can't deserialize the JSON, just return false for everything */
                 }
-            }
 
-            return new CookieSettings {
-                GoogleAnalyticsGpg = false, GoogleAnalyticsGovUk = false, ApplicationInsights = false, RememberSettings = false
+            return new CookieSettings
+            {
+                GoogleAnalyticsGpg = false, GoogleAnalyticsGovUk = false, ApplicationInsights = false,
+                RememberSettings = false
             };
         }
 
         public static void SetCookieSettingsCookie(HttpResponse response, CookieSettings cookieSettings)
         {
-            string cookieSettingsString = JsonConvert.SerializeObject(cookieSettings);
+            var cookieSettingsString = JsonConvert.SerializeObject(cookieSettings);
 
             response.Cookies.Append(
                 CookieSettingsCookieName,
@@ -48,20 +47,19 @@ namespace ModernSlavery.WebUI.Shared.Classes.Cookies
 
         public static bool HasSeenLatestCookieMessage(HttpRequest request)
         {
-            if (request.Cookies.TryGetValue(SeenCookieMessageCookieName, out string seenCookieMessageString))
-            {
+            if (request.Cookies.TryGetValue(SeenCookieMessageCookieName, out var seenCookieMessageString))
                 try
                 {
                     var seenCookieMessage = JsonConvert.DeserializeObject<SeenCookieMessage>(seenCookieMessageString);
-                    int latestVersionOfCookieMessageTheUserHasSeen = seenCookieMessage.Version;
-                    bool hasSeenLatestCookieMessage = latestVersionOfCookieMessageTheUserHasSeen >= CurrentCookieMessageVersion;
+                    var latestVersionOfCookieMessageTheUserHasSeen = seenCookieMessage.Version;
+                    var hasSeenLatestCookieMessage =
+                        latestVersionOfCookieMessageTheUserHasSeen >= CurrentCookieMessageVersion;
                     return hasSeenLatestCookieMessage;
                 }
                 catch (JsonException)
                 {
                     /* If we can't deserialize the JSON, assume they haven't seen the message (i.e. return false) */
                 }
-            }
 
             return false;
         }
@@ -70,7 +68,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Cookies
         {
             var seenCookieMessage = new SeenCookieMessage {Version = 1};
 
-            string seenCookieMessageString = JsonConvert.SerializeObject(seenCookieMessage);
+            var seenCookieMessageString = JsonConvert.SerializeObject(seenCookieMessage);
 
             response.Cookies.Append(
                 SeenCookieMessageCookieName,
@@ -79,6 +77,5 @@ namespace ModernSlavery.WebUI.Shared.Classes.Cookies
         }
 
         #endregion
-
     }
 }

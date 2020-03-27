@@ -1,10 +1,10 @@
-﻿using ModernSlavery.Core.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
+using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
@@ -12,9 +12,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminUserContactPreferencesController : Controller
     {
+        private readonly AuditLogger auditLogger;
 
         private readonly IDataRepository dataRepository;
-        private readonly AuditLogger auditLogger;
 
         public AdminUserContactPreferencesController(IDataRepository dataRepository, AuditLogger auditLogger)
         {
@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("user/{id}/change-contact-preferences")]
         public IActionResult ChangeContactPreferencesGet(long id)
         {
-            User user = dataRepository.Get<User>(id);
+            var user = dataRepository.Get<User>(id);
 
             var viewModel = new AdminChangeUserContactPreferencesViewModel
             {
@@ -41,7 +41,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpPost("user/{id}/change-contact-preferences")]
         public IActionResult ChangeContactPreferencesPost(long id, AdminChangeUserContactPreferencesViewModel viewModel)
         {
-            User user = dataRepository.Get<User>(id);
+            var user = dataRepository.Get<User>(id);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
 
@@ -63,7 +63,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     AllowContact_New = viewModel.AllowContact ? "Yes" : "No",
                     SendUpdates_Old = user.SendUpdates ? "Yes" : "No",
                     SendUpdates_New = viewModel.SendUpdates ? "Yes" : "No",
-                    Reason = viewModel.Reason
+                    viewModel.Reason
                 });
 
             user.AllowContact = viewModel.AllowContact;
@@ -73,6 +73,5 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             return RedirectToAction("ViewUser", "AdminViewUser", new {id = user.UserId});
         }
-
     }
 }

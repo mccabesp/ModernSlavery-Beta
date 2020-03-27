@@ -1,12 +1,12 @@
 ﻿.button-comparison {
-    font-family: "nta",Arial,sans-serif;
-    font-weight: 400;
-    text-transform: none;
-    font-size: 14px;
-    line-height: 1.1428571429;
     color: black;
+    font-family: "nta", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.1428571429;
     margin-top: 15px;
-    text-decoration: none
+    text-decoration: none;
+    text-transform: none;
 }
 
 @media only screen and (min-width: 641px) {
@@ -18,32 +18,26 @@
 
 @media only screen and (min-width: 769px) {
     .button-comparison {
-        margin: 0 0 0 0;
         float: none;
+        margin: 0 0 0 0;
         text-align: right
     }
 }
 
 #comparison-basket {
-    z-index: 10000;
-    font-size: 16px;
     background-color: #d9ece2;
     border-bottom: solid 2px #ffffff;
-    display:table;
-    width:100%;
+    display: table;
+    font-size: 16px;
+    width: 100%;
+    z-index: 10000;
 }
 
-.content-fixed#comparison-basket {
-    margin-top: 0;
-}
+.content-fixed#comparison-basket { margin-top: 0; }
 
-.comparison-basket-row {
-    padding: 0.75em;
-}
+.comparison-basket-row { padding: 0.75em; }
 
-.comparison-basket-row .list {
-    margin: 0;
-}
+.comparison-basket-row .list { margin: 0; }
 
 
 .comparison-table {
@@ -51,20 +45,15 @@
     width: 100%;
 }
 
-.comparison-button-container {
-    display: block;
-}
+.comparison-button-container { display: block; }
 
 @media (min-width: 769px) {
-
     .comparison-table {
         display: table;
-        width:100%;
+        width: 100%;
     }
 
-    .comparison-employer-container {
-        display: table-cell;
-    }
+    .comparison-employer-container { display: table-cell; }
 
     .comparison-button-container {
         display: table-cell;
@@ -77,13 +66,13 @@
 .comparison-button-container > .button-comparison-list-remove:focus,
 .comparison-button-container > .button-comparison-list-remove:visited,
 .comparison-button-container > .button-comparison-list-remove:hover {
-    text-align: center;
-    white-space: nowrap;
-    background-color: #ccc;
-    color: black !important;
     -moz-box-shadow: 0 2px 0 #a6a6a6;
     -webkit-box-shadow: 0 2px 0 #a6a6a6;
+    background-color: #ccc;
     box-shadow: 0 2px 0 #a6a6a6;
+    color: black !important;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .comparison-button-container .button-comparison-list-add {
@@ -93,17 +82,11 @@
 }
 
 @media only screen and (min-width: 769px) {
-
-    .comparison-button-container .button-comparison-list-add {
-        width: 160px;
-    }
-
+    .comparison-button-container .button-comparison-list-add { width: 160px; }
 }
 
 @media only screen and (max-width: 640px) {
-    #comparison-basket .comparison-basket-container .comparison-basket-button {
-        float: none
-    }
+    #comparison-basket .comparison-basket-container .comparison-basket-button { float: none }
 }
 
 #AddAllOrgsToCompare {
@@ -111,55 +94,41 @@
     margin-bottom: 15px;
 }
 
-table th .js-sort-container {
-    position: relative
-}
+table th .js-sort-container { position: relative }
 
 table th a.js-sort {
+    color: #005EA5;
     display: inline-block;
     padding-right: 11px;
-    color: #005EA5
 }
 
-table th a.js-sort:visited, table th a.js-sort:link {
-    color: #005EA5
-}
+table th a.js-sort:visited, table th a.js-sort:link { color: #005EA5 }
 
 table th a.js-sort:after {
+    background-image: url("/public/assets/images/icons/sort-glyph.png");
+    background-position: 0 0;
+    background-repeat: no-repeat;
     content: '';
+    height: 9px;
     position: absolute;
     right: 0;
     top: 0;
     width: 8px;
-    height: 9px;
-    background-image: url("/public/assets/images/icons/sort-glyph.png");
-    background-position: 0 0;
-    background-repeat: no-repeat
 }
 
-@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20 / 10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20/10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
     table th a.js-sort:after {
         background-image: url("/public/assets/images/icons/sort-glyph@2x.png");
         background-size: 100%
     }
 }
 
-table th.ascending a.js-sort:after {
-    background-position: 0 -9px
-}
+table th.ascending a.js-sort:after { background-position: 0 -9px }
 
-table th.descending a.js-sort:after {
-    background-position: 0 -18px
-}
+table th.descending a.js-sort:after { background-position: 0 -18px }
 
-table th.sort-column a.js-sort:after {
-    background-position: 0 -54px
-}
+table th.sort-column a.js-sort:after { background-position: 0 -54px }
 
-table th.sort-column.ascending a.js-sort:after {
-    background-position: 0 -36px
-}
+table th.sort-column.ascending a.js-sort:after { background-position: 0 -36px }
 
-table th.sort-column.descending a.js-sort:after {
-    background-position: 0 -45px
-}
+table th.sort-column.descending a.js-sort:after { background-position: 0 -45px }

@@ -7,9 +7,8 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 {
     public class SpamProtectionAttribute : ActionFilterAttribute
     {
-        private SharedOptions _sharedOptions;
-
         private readonly int _minimumSeconds;
+        private readonly SharedOptions _sharedOptions;
 
         public SpamProtectionAttribute(int minimumSeconds = 10)
         {
@@ -21,30 +20,23 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             //If the model state isnt valid then return
-            if (!filterContext.ModelState.IsValid)
-            {
-                return;
-            }
+            if (!filterContext.ModelState.IsValid) return;
 
-            DateTime remoteTime = DateTime.MinValue;
+            var remoteTime = DateTime.MinValue;
 
             try
             {
-                remoteTime = Encryption.DecryptData(filterContext.HttpContext.GetParams("SpamProtectionTimeStamp")).FromSmallDateTime(true);
-                if (remoteTime.AddSeconds(_minimumSeconds) < VirtualDateTime.Now)
-                {
-                    return;
-                }
+                remoteTime = Encryption.DecryptData(filterContext.HttpContext.GetParams("SpamProtectionTimeStamp"))
+                    .FromSmallDateTime(true);
+                if (remoteTime.AddSeconds(_minimumSeconds) < VirtualDateTime.Now) return;
             }
-            catch { }
-
-            if (_sharedOptions.SkipSpamProtection)
+            catch
             {
-                return;
             }
+
+            if (_sharedOptions.SkipSpamProtection) return;
 
             throw new HttpException(429, "Too Many Requests");
         }
-
     }
 }

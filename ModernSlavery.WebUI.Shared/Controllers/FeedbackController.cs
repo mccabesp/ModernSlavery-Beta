@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
@@ -17,7 +16,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
     [Route("send-feedback")]
     public class FeedbackController : BaseController
     {
-        public FeedbackController(ILogger<FeedbackController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
+        public FeedbackController(ILogger<FeedbackController> logger, IWebService webService,
+            ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
         }
 
@@ -35,7 +35,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                User user = SharedBusinessLogic.DataRepository.FindUser(User);
+                var user = SharedBusinessLogic.DataRepository.FindUser(User);
 
                 model.EmailAddress =
                     !string.IsNullOrWhiteSpace(user.ContactEmailAddress)
@@ -59,14 +59,12 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             viewModel.ParseAndValidateParameters(Request, m => m.Details);
 
             if (viewModel.HasAnyErrors())
-            {
                 // If there are any errors, return the user back to the same page to correct the mistakes
                 return View("SendFeedback", viewModel);
-            }
 
             WebService.CustomLogger.Information("Feedback has been received", viewModel);
 
-            Feedback feedbackDatabaseModel = ConvertFeedbackViewModelIntoFeedbackDatabaseModel(viewModel);
+            var feedbackDatabaseModel = ConvertFeedbackViewModelIntoFeedbackDatabaseModel(viewModel);
 
             SharedBusinessLogic.DataRepository.Insert(feedbackDatabaseModel);
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
@@ -76,16 +74,19 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         private Feedback ConvertFeedbackViewModelIntoFeedbackDatabaseModel(FeedbackViewModel feedbackViewModel)
         {
-            return new Feedback {
+            return new Feedback
+            {
                 Difficulty = feedbackViewModel.HowEasyIsThisServiceToUse.HasValue
-                    ? (DifficultyTypes)(int) feedbackViewModel.HowEasyIsThisServiceToUse.Value
+                    ? (DifficultyTypes) (int) feedbackViewModel.HowEasyIsThisServiceToUse.Value
                     : (DifficultyTypes?) null,
-                
+
                 NewsArticle = feedbackViewModel.HowDidYouHearAboutGpg?.Contains(HowDidYouHearAboutGpg.NewsArticle),
                 SocialMedia = feedbackViewModel.HowDidYouHearAboutGpg?.Contains(HowDidYouHearAboutGpg.SocialMedia),
-                CompanyIntranet = feedbackViewModel.HowDidYouHearAboutGpg?.Contains(HowDidYouHearAboutGpg.CompanyIntranet),
+                CompanyIntranet =
+                    feedbackViewModel.HowDidYouHearAboutGpg?.Contains(HowDidYouHearAboutGpg.CompanyIntranet),
                 EmployerUnion = feedbackViewModel.HowDidYouHearAboutGpg?.Contains(HowDidYouHearAboutGpg.EmployerUnion),
-                InternetSearch = feedbackViewModel.HowDidYouHearAboutGpg?.Contains(HowDidYouHearAboutGpg.InternetSearch),
+                InternetSearch =
+                    feedbackViewModel.HowDidYouHearAboutGpg?.Contains(HowDidYouHearAboutGpg.InternetSearch),
                 Charity = feedbackViewModel.HowDidYouHearAboutGpg?.Contains(HowDidYouHearAboutGpg.SocialMedia),
                 LobbyGroup = feedbackViewModel.HowDidYouHearAboutGpg?.Contains(HowDidYouHearAboutGpg.LobbyGroup),
                 Report = feedbackViewModel.HowDidYouHearAboutGpg?.Contains(HowDidYouHearAboutGpg.Report),
@@ -93,18 +94,26 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 OtherSourceText = feedbackViewModel.OtherSourceText,
 
                 FindOutAboutGpg = feedbackViewModel.WhyVisitGpgSite?.Contains(WhyVisitGpgSite.FindOutAboutGpg),
-                ReportOrganisationGpgData = feedbackViewModel.WhyVisitGpgSite?.Contains(WhyVisitGpgSite.ReportOrganisationGpgData),
-                CloseOrganisationGpg = feedbackViewModel.WhyVisitGpgSite?.Contains(WhyVisitGpgSite.CloseOrganisationGpg),
-                ViewSpecificOrganisationGpg = feedbackViewModel.WhyVisitGpgSite?.Contains(WhyVisitGpgSite.ViewSpecificOrganisationGpg),
+                ReportOrganisationGpgData =
+                    feedbackViewModel.WhyVisitGpgSite?.Contains(WhyVisitGpgSite.ReportOrganisationGpgData),
+                CloseOrganisationGpg =
+                    feedbackViewModel.WhyVisitGpgSite?.Contains(WhyVisitGpgSite.CloseOrganisationGpg),
+                ViewSpecificOrganisationGpg =
+                    feedbackViewModel.WhyVisitGpgSite?.Contains(WhyVisitGpgSite.ViewSpecificOrganisationGpg),
                 ActionsToCloseGpg = feedbackViewModel.WhyVisitGpgSite?.Contains(WhyVisitGpgSite.ActionsToCloseGpg),
                 OtherReason = feedbackViewModel.WhyVisitGpgSite?.Contains(WhyVisitGpgSite.Other),
                 OtherReasonText = feedbackViewModel.OtherReasonText,
 
-                EmployeeInterestedInOrganisationData = feedbackViewModel.WhoAreYou?.Contains(WhoAreYou.EmployeeInterestedInOrganisationData),
-                ManagerInvolvedInGpgReport = feedbackViewModel.WhoAreYou?.Contains(WhoAreYou.ManagerInvolvedInGpgReport),
-                ResponsibleForReportingGpg = feedbackViewModel.WhoAreYou?.Contains(WhoAreYou.ResponsibleForReportingGpg),
-                PersonInterestedInGeneralGpg = feedbackViewModel.WhoAreYou?.Contains(WhoAreYou.PersonInterestedInGeneralGpg),
-                PersonInterestedInSpecificOrganisationGpg = feedbackViewModel.WhoAreYou?.Contains(WhoAreYou.PersonInterestedInSpecificOrganisationGpg),
+                EmployeeInterestedInOrganisationData =
+                    feedbackViewModel.WhoAreYou?.Contains(WhoAreYou.EmployeeInterestedInOrganisationData),
+                ManagerInvolvedInGpgReport =
+                    feedbackViewModel.WhoAreYou?.Contains(WhoAreYou.ManagerInvolvedInGpgReport),
+                ResponsibleForReportingGpg =
+                    feedbackViewModel.WhoAreYou?.Contains(WhoAreYou.ResponsibleForReportingGpg),
+                PersonInterestedInGeneralGpg =
+                    feedbackViewModel.WhoAreYou?.Contains(WhoAreYou.PersonInterestedInGeneralGpg),
+                PersonInterestedInSpecificOrganisationGpg =
+                    feedbackViewModel.WhoAreYou?.Contains(WhoAreYou.PersonInterestedInSpecificOrganisationGpg),
                 OtherPerson = feedbackViewModel.WhoAreYou?.Contains(WhoAreYou.Other),
                 OtherPersonText = feedbackViewModel.OtherPersonText,
 
@@ -116,7 +125,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         private string TruncateDetails(string details)
         {
-            int? truncatingLength = typeof(Feedback)
+            var truncatingLength = typeof(Feedback)
                 .GetProperty(nameof(Feedback.Details))
                 ?.GetCustomAttributes<MaxLengthAttribute>()
                 .FirstOrDefault()
@@ -126,7 +135,5 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 ? details.Substring(0, truncatingLength ?? 2000)
                 : details;
         }
-
     }
-
 }

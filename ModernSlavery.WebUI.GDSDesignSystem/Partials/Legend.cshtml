@@ -1,0 +1,19 @@
+﻿@model LegendViewModel
+
+@{
+    Func<object, object> componentAsHtml =
+        @<text>
+            <legend class="govuk-fieldset__legend @(Model.Classes)">
+                @{ await Html.RenderPartialAsync("/Components/SubComponents/HtmlText.cshtml", Model); }
+            </legend>
+         </text>;
+}
+
+@{ await Html.RenderPartialAsync(
+       "/Components/SubComponents/PageHeadingHtml.cshtml",
+       new PageHeadingModel
+       {
+           ComponentAsHtml = componentAsHtml,
+           IsPageHeading = Model.IsPageHeading
+       }
+       ); }

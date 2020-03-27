@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -19,14 +17,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class DownloadableFileController : BaseController
     {
-
         private readonly IDownloadableFileBusinessLogic _downloadableFileBusinessLogic;
 
         #region Constructors
 
         public DownloadableFileController(
             IDownloadableFileBusinessLogic downloadableFileBusinessLogic,
-            ILogger<DownloadableFileController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
+            ILogger<DownloadableFileController> logger, IWebService webService,
+            ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             _downloadableFileBusinessLogic = downloadableFileBusinessLogic;
         }
@@ -44,8 +42,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             try
             {
-                DownloadableFileModel downloadableFile = await _downloadableFileBusinessLogic.GetFileRemovingSensitiveInformationAsync(p);
-                result = File(downloadableFile.ByteArrayContent, downloadableFile.ContentType, downloadableFile.Filename);
+                var downloadableFile = await _downloadableFileBusinessLogic.GetFileRemovingSensitiveInformationAsync(p);
+                result = File(downloadableFile.ByteArrayContent, downloadableFile.ContentType,
+                    downloadableFile.Filename);
             }
             catch (ArgumentException argumentException)
             {
@@ -71,14 +70,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("admin/WebsiteLogs")]
         public async Task<IActionResult> WebsiteLogs(string fp)
         {
-            IEnumerable<IDownloadableItem> downloadViewModelToReturn = await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.WebUI");
+            var downloadViewModelToReturn = await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.WebUI");
             return View("WebsiteLogs", downloadViewModelToReturn);
         }
 
         [HttpGet("admin/WebjobLogs")]
         public async Task<IActionResult> WebjobLogs(string fp)
         {
-            IEnumerable<IDownloadableItem> downloadViewModelToReturn =
+            var downloadViewModelToReturn =
                 await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.WebJob");
             return View("WebjobLogs", downloadViewModelToReturn);
         }
@@ -86,26 +85,26 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("admin/IdentityLogs")]
         public async Task<IActionResult> IdentityLogs(string fp)
         {
-            IEnumerable<IDownloadableItem> downloadViewModelToReturn =
+            var downloadViewModelToReturn =
                 await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.IdentityServer4");
             return View("IdentityLogs", downloadViewModelToReturn);
         }
 
-        private async Task<IEnumerable<IDownloadableItem>> FetchDownloadablesFromSubfolderAsync(string fp, string subfolderName)
+        private async Task<IEnumerable<IDownloadableItem>> FetchDownloadablesFromSubfolderAsync(string fp,
+            string subfolderName)
         {
             //var logsPathToProcess = string.IsNullOrEmpty(fp)
             //    ? Path.Combine(SharedBusinessLogic.SharedOptions.LogPath, subfolderName)
             //    : fp;
 
             // Storage explorer, we DO want to change
-            string logsPathToProcess = string.IsNullOrWhiteSpace(fp)
+            var logsPathToProcess = string.IsNullOrWhiteSpace(fp)
                 ? Path.Combine(SharedBusinessLogic.SharedOptions.LogPath, subfolderName).Replace("\\", "/")
                 : fp;
 
-            IEnumerable<IDownloadableItem> listOfDownloadableItems =
+            var listOfDownloadableItems =
                 await _downloadableFileBusinessLogic.GetListOfDownloadableItemsFromPathAsync(logsPathToProcess);
             return listOfDownloadableItems;
         }
-
     }
 }

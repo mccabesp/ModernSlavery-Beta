@@ -1,6 +1,7 @@
 ﻿using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.GDSDesignSystem;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {

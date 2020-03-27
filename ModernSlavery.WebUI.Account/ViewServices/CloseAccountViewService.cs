@@ -10,13 +10,13 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Account.Interfaces;
-using ModernSlavery.WebUI.Account.Models.ChangePassword;
+using ModernSlavery.WebUI.Account.Models;
 
 namespace ModernSlavery.WebUI.Account.ViewServices
 {
-
     public class CloseAccountViewService : ICloseAccountViewService
     {
+        private readonly ISharedBusinessLogic _sharedBusinessLogic;
 
         public CloseAccountViewService(
             IUserRepository userRepository,
@@ -26,7 +26,8 @@ namespace ModernSlavery.WebUI.Account.ViewServices
             ISharedBusinessLogic sharedBusinessLogic)
         {
             UserRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-            RegistrationBusinessLogic = registrationBusinessLogic ?? throw new ArgumentNullException(nameof(registrationBusinessLogic));
+            RegistrationBusinessLogic = registrationBusinessLogic ??
+                                        throw new ArgumentNullException(nameof(registrationBusinessLogic));
             Logger = logger;
             SendEmailService = sendEmailService;
         }
@@ -36,26 +37,28 @@ namespace ModernSlavery.WebUI.Account.ViewServices
         private IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
         private ILogger<CloseAccountViewService> Logger { get; }
         private ISendEmailService SendEmailService { get; }
-        private readonly ISharedBusinessLogic _sharedBusinessLogic;
 
-        public async Task<ModelStateDictionary> CloseAccountAsync(User userToRetire, string currentPassword, User actionByUser)
+        public async Task<ModelStateDictionary> CloseAccountAsync(User userToRetire, string currentPassword,
+            User actionByUser)
         {
             var errorState = new ModelStateDictionary();
 
             // ensure the user has entered their password
-            bool checkPasswordResult = await UserRepository.CheckPasswordAsync(userToRetire, currentPassword);
+            var checkPasswordResult = await UserRepository.CheckPasswordAsync(userToRetire, currentPassword);
             if (checkPasswordResult == false)
             {
-                errorState.AddModelError(nameof(ChangePasswordViewModel.CurrentPassword), "Could not verify your current password");
+                errorState.AddModelError(nameof(ChangePasswordViewModel.CurrentPassword),
+                    "Could not verify your current password");
                 return errorState;
             }
 
             //Save the list of registered organisations
-            List<Organisation> userOrgs = userToRetire.UserOrganisations.Select(uo => uo.Organisation).Distinct().ToList();
+            var userOrgs = userToRetire.UserOrganisations.Select(uo => uo.Organisation).Distinct().ToList();
 
             // aggregated save
             await UserRepository.BeginTransactionAsync(
-                async () => {
+                async () =>
+                {
                     try
                     {
                         // update retired user registrations 
@@ -83,12 +86,16 @@ namespace ModernSlavery.WebUI.Account.ViewServices
             {
                 // Create the close account notification to user
                 var sendEmails = new List<Task>();
-                bool testEmail = !_sharedBusinessLogic.SharedOptions.IsProduction();
-                sendEmails.Add(SendEmailService.SendAccountClosedNotificationAsync(userToRetire.EmailAddress, testEmail));
+                var testEmail = !_sharedBusinessLogic.SharedOptions.IsProduction();
+                sendEmails.Add(
+                    SendEmailService.SendAccountClosedNotificationAsync(userToRetire.EmailAddress, testEmail));
 
                 //Create the notification to GEO for each newly orphaned organisation
                 userOrgs.Where(org => org.GetIsOrphan())
-                    .ForEach(org => sendEmails.Add(SendEmailService.SendGEOOrphanOrganisationNotificationAsync(org.OrganisationName, testEmail)));
+                    .ForEach(org =>
+                        sendEmails.Add(
+                            SendEmailService.SendGEOOrphanOrganisationNotificationAsync(org.OrganisationName,
+                                testEmail)));
 
                 //Send all the notifications in parallel
                 await Task.WhenAll(sendEmails);
@@ -96,7 +103,5 @@ namespace ModernSlavery.WebUI.Account.ViewServices
 
             return errorState;
         }
-
     }
-
 }

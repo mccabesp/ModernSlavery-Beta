@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Reflection;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.Attributes
 {
     /// <summary>
     ///     Label text for Radio buttons and Checkboxes
-    ///     <br/> Note: this attribute should only be applied to Enum values
+    ///     <br /> Note: this attribute should only be applied to Enum values
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
     public class GovUkRadioCheckboxLabelTextAttribute : Attribute
@@ -17,9 +16,10 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Attributes
             Type enumType,
             object enumValue)
         {
-            MemberInfo memberInfo = enumType.GetMember(enumValue.ToString())[0];
+            var memberInfo = enumType.GetMember(enumValue.ToString())[0];
 
-            var govUkRadioCheckboxLabelTextAttribute = memberInfo.GetSingleCustomAttribute<GovUkRadioCheckboxLabelTextAttribute>();
+            var govUkRadioCheckboxLabelTextAttribute =
+                memberInfo.GetSingleCustomAttribute<GovUkRadioCheckboxLabelTextAttribute>();
 
             return govUkRadioCheckboxLabelTextAttribute?.Text;
         }

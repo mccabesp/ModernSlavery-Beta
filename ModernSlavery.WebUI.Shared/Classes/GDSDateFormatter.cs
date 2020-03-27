@@ -2,11 +2,9 @@
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {
-
     [Serializable]
     public class GDSDateFormatter
     {
-
         public GDSDateFormatter(DateTime startDate)
         {
             StartDate = startDate;
@@ -31,7 +29,5 @@ namespace ModernSlavery.WebUI.Shared.Classes
         public string FullDateRange => $"{FullStartDate} to {FullEndDate}";
 
         public string FullYearRange => $"{StartYear} to {EndYear}";
-
     }
-
 }

@@ -2,8 +2,7 @@
     ViewBag.Title = "Choose your organisation - Modern Slavery reporting service";
 }
 @using ModernSlavery.Core.SharedKernel
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@model ModernSlavery.WebUI.Shared.Models.OrganisationViewModel
+@model OrganisationViewModel
 
 <div id="choose-organisation-content">
     <div class="grid-row">
@@ -16,7 +15,7 @@
         @Html.AntiForgeryToken()
         @Html.HiddenFor(m => m.SectorType)
 
-        <input type="submit" style="display:none" name="command" value="search">
+        <input type="submit" style="display: none" name="command" value="search">
         <div class="grid-row">
             <div class="column-two-thirds">
                 @await Html.CustomValidationSummaryAsync()
@@ -57,7 +56,7 @@
                             if (Model.LastPrivateSearchRemoteTotal == -1)
                             {
                                 <div class="subsection panel-indent">
-                                    <div class="bold-small"><span class="error-message" style="display:inline">There was a problem searching the Companies&nbsp;House service. </span><br/>If you cant find your organisation below, please use the search button to try again.</div>
+                                    <div class="bold-small"><span class="error-message" style="display: inline">There was a problem searching the Companies&nbsp;House service. </span><br/>If you cant find your organisation below, please use the search button to try again.</div>
                                 </div>
                             }
                             else if (Model.Employers.VirtualRecordTotal != Model.Employers.ActualRecordTotal)
@@ -85,7 +84,7 @@
                             <tbody>
                             @for (var i = 0; i < Model.Employers.Results.Count; i++)
                             {
-                                <tr style="background-color:@(Model.Employers.Results[i].OrganisationId > 0 ? "inherit" : "#d2e5f5")">
+                                <tr style="background-color: @(Model.Employers.Results[i].OrganisationId > 0 ? "inherit" : "#d2e5f5")">
                                     <td>
                                         @Model.Employers.Results[i].OrganisationName <span>@Model.Employers.Results[i].GetFullAddress()</span>
                                     </td>
@@ -114,7 +113,7 @@
                                     @if (Model.Employers.PageCount > 1)
                                     {
                                         <ul class="pager-items">
-                                            @for (int i = Model.PagerStartIndex; i <= Model.PagerEndIndex; i++)
+                                            @for (var i = Model.PagerStartIndex; i <= Model.PagerEndIndex; i++)
                                             {
                                                 if (i == Model.Employers.CurrentPage)
                                                 {

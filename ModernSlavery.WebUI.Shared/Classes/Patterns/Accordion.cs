@@ -1,26 +1,22 @@
 ﻿using System.Linq;
-using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using Microsoft.AspNetCore.Html;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Patterns
 {
-
     [Partial("Patterns/Accordion")]
     public class Accordion
     {
-
         public Accordion(params AccordionSection[] sections)
         {
             Sections = sections.Where(x => x != null).ToArray();
         }
 
         public AccordionSection[] Sections { get; set; }
-
     }
 
     public class AccordionSection
     {
-
         public AccordionSection(string title, string desc, string contentPartial, string id)
         {
             Title = title;
@@ -34,7 +30,5 @@ namespace ModernSlavery.WebUI.Shared.Classes.Patterns
         public string Description { get; set; }
         public string Partial { get; set; }
         public IHtmlContent HtmlContent { get; set; }
-
     }
-
 }

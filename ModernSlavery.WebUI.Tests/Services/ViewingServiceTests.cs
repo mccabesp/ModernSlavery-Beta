@@ -14,7 +14,7 @@ using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.WebUI.Viewing.Models.Search;
+using ModernSlavery.WebUI.Viewing.Models;
 using ModernSlavery.WebUI.Viewing.Presenters;
 using Moq;
 using NUnit.Framework;

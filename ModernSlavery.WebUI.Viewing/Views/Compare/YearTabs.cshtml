@@ -4,7 +4,7 @@
 @using ModernSlavery.Core.SharedKernel.Interfaces
 @using ModernSlavery.WebUI.Viewing.Classes
 @using ModernSlavery.WebUI.Viewing.Controllers
-@model ModernSlavery.WebUI.Viewing.Models.Compare.CompareViewModel
+@model CompareViewModel
 @{
     int endYear = SnapshotDateHelper.CurrentSnapshotYear;
     int startYear = endYear - (ViewingOptions.ShowReportYearCount - 1);

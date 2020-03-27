@@ -8,29 +8,26 @@ using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Account.Models;
-using ModernSlavery.WebUI.Account.Models.ManageAccount;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
-using ModernSlavery.WebUI.Shared.Options;
 using ModernSlavery.WebUI.Shared.Resources;
 
 namespace ModernSlavery.WebUI.Account.Controllers
 {
-
     [Route("manage-account")]
     public class AccountController : BaseController
     {
+        private readonly IAccountService _accountService;
+
         public AccountController(
             IAccountService accountService,
-            ILogger<AccountController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
+            ILogger<AccountController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(
+            logger, webService, sharedBusinessLogic)
         {
             _accountService = accountService;
         }
-
-        private readonly IAccountService _accountService;
 
         protected async Task<DateTime> GetLastPasswordResetDateAsync()
         {
@@ -41,20 +38,16 @@ namespace ModernSlavery.WebUI.Account.Controllers
         {
             await Cache.RemoveAsync($"{UserHostAddress}:LastPasswordResetDate");
             if (value > DateTime.MinValue)
-            {
-                await Cache.AddAsync($"{UserHostAddress}:LastPasswordResetDate", value, value.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes));
-            }
+                await Cache.AddAsync($"{UserHostAddress}:LastPasswordResetDate", value,
+                    value.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes));
         }
 
         [HttpGet("~/sign-out")]
         public async Task<IActionResult> SignOut()
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return View("SignOut");
-            }
+            if (!User.Identity.IsAuthenticated) return View("SignOut");
 
-            string returnUrl = Url.Action("SignOut", "Account", null, "https");
+            var returnUrl = Url.Action("SignOut", "Account", null, "https");
 
             return await LogoutUser(returnUrl);
         }
@@ -64,23 +57,16 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public async Task<IActionResult> ManageAccount()
         {
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null && IsImpersonatingUser == false)
-            {
-                return checkResult;
-            }
+            if (checkResult != null && IsImpersonatingUser == false) return checkResult;
 
             // map the user to the view model
             var model = AutoMapper.Map<ManageAccountViewModel>(VirtualUser);
 
             // check if we have any successful changes
             if (TempData.ContainsKey(nameof(AccountResources.ChangeDetailsSuccessAlert)))
-            {
                 ViewBag.ChangeSuccessMessage = AccountResources.ChangeDetailsSuccessAlert;
-            }
             else if (TempData.ContainsKey(nameof(AccountResources.ChangePasswordSuccessAlert)))
-            {
                 ViewBag.ChangeSuccessMessage = AccountResources.ChangePasswordSuccessAlert;
-            }
 
             // generate flow urls
             ViewBag.CloseAccountUrl = "";
@@ -90,10 +76,13 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             if (IsImpersonatingUser == false)
             {
-                ViewBag.CloseAccountUrl = Url.Action<CloseAccountController>(nameof(CloseAccountController.CloseAccount));
+                ViewBag.CloseAccountUrl =
+                    Url.Action<CloseAccountController>(nameof(CloseAccountController.CloseAccount));
                 ViewBag.ChangeEmailUrl = Url.Action<ChangeEmailController>(nameof(ChangeEmailController.ChangeEmail));
-                ViewBag.ChangePasswordUrl = Url.Action<ChangePasswordController>(nameof(ChangePasswordController.ChangePassword));
-                ViewBag.ChangeDetailsUrl = Url.Action<ChangeDetailsController>(nameof(ChangeDetailsController.ChangeDetails));
+                ViewBag.ChangePasswordUrl =
+                    Url.Action<ChangePasswordController>(nameof(ChangePasswordController.ChangePassword));
+                ViewBag.ChangeDetailsUrl =
+                    Url.Action<ChangeDetailsController>(nameof(ChangeDetailsController.ChangeDetails));
             }
 
             // remove any change updates
@@ -102,24 +91,26 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             return View(model);
         }
+
         #region password-reset
 
         [HttpGet("password-reset")]
         public async Task<IActionResult> PasswordReset()
         {
             //Ensure IP address hasnt signed up recently
-            DateTime lastPasswordResetDate = await GetLastPasswordResetDateAsync();
-            TimeSpan remainingTime = lastPasswordResetDate == DateTime.MinValue
+            var lastPasswordResetDate = await GetLastPasswordResetDateAsync();
+            var remainingTime = lastPasswordResetDate == DateTime.MinValue
                 ? TimeSpan.Zero
-                : lastPasswordResetDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes) - VirtualDateTime.Now;
+                : lastPasswordResetDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes) -
+                  VirtualDateTime.Now;
             if (!SharedBusinessLogic.SharedOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1133, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
-            }
+                return View("CustomError",
+                    WebService.ErrorViewModelFactory.Create(1133,
+                        new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
 
             //Ensure user has not completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)return checkResult;
+            if (checkResult != null) return checkResult;
 
             //Clear the stash
             ClearStash();
@@ -138,14 +129,13 @@ namespace ModernSlavery.WebUI.Account.Controllers
             ModelState.Remove(nameof(model.ConfirmPassword));
 
             //Ensure IP address hasnt signed up recently
-            DateTime lastPasswordResetDate = await GetLastPasswordResetDateAsync();
-            TimeSpan remainingTime = lastPasswordResetDate == DateTime.MinValue
+            var lastPasswordResetDate = await GetLastPasswordResetDateAsync();
+            var remainingTime = lastPasswordResetDate == DateTime.MinValue
                 ? TimeSpan.Zero
-                : lastPasswordResetDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes) - VirtualDateTime.Now;
+                : lastPasswordResetDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes) -
+                  VirtualDateTime.Now;
             if (!SharedBusinessLogic.SharedOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
-            {
-                ModelState.AddModelError(3026, null, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) });
-            }
+                ModelState.AddModelError(3026, null, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)});
 
             if (!ModelState.IsValid)
             {
@@ -155,10 +145,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             //Ensure user has not completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Validate the submitted fields
             if (!ModelState.IsValid)
@@ -173,7 +160,9 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             //Ensure signup is restricted to every 10 mins
             await SetLastPasswordResetDateAsync(
-                model.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) ? DateTime.MinValue : VirtualDateTime.Now);
+                model.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)
+                    ? DateTime.MinValue
+                    : VirtualDateTime.Now);
 
             // find the latest active user by email
             var user = await _accountService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.Active);
@@ -199,13 +188,15 @@ namespace ModernSlavery.WebUI.Account.Controllers
             //show confirmation
             ViewBag.EmailAddress = VirtualUser.EmailAddress;
             if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-            {
                 ViewBag.TestUrl = Url.Action(
                     "NewPassword",
                     "Account",
-                    new { code = Encryption.EncryptQuerystring(VirtualUser.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime()) },
+                    new
+                    {
+                        code = Encryption.EncryptQuerystring(
+                            VirtualUser.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime())
+                    },
                     "https");
-            }
 
             return View("PasswordResetSent");
         }
@@ -216,9 +207,11 @@ namespace ModernSlavery.WebUI.Account.Controllers
             string resetCode = null;
             try
             {
-                resetCode = Encryption.EncryptQuerystring(VirtualUser.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime());
-                string resetUrl = Url.Action("NewPassword", "Account", new { code = resetCode }, "https");
-                if (!await SharedBusinessLogic.SendEmailService.SendResetPasswordNotificationAsync(resetUrl, VirtualUser.EmailAddress))
+                resetCode = Encryption.EncryptQuerystring(VirtualUser.UserId + ":" +
+                                                          VirtualDateTime.Now.ToSmallDateTime());
+                var resetUrl = Url.Action("NewPassword", "Account", new {code = resetCode}, "https");
+                if (!await SharedBusinessLogic.SendEmailService.SendResetPasswordNotificationAsync(resetUrl,
+                    VirtualUser.EmailAddress))
                     return false;
 
                 Logger.LogInformation(
@@ -240,17 +233,14 @@ namespace ModernSlavery.WebUI.Account.Controllers
         {
             //Ensure user has not completed the registration process
             var result = await CheckUserRegisteredOkAsync();
-            if (result != null)
-            {
-                return result;
-            }
+            if (result != null) return result;
 
             var passwordResult = UnwrapPasswordReset(code);
             if (passwordResult.Result != null) return passwordResult.Result;
 
             var model = new ResetViewModel();
             model.Resetcode = code;
-            this.StashModel(model);
+            StashModel(model);
 
             //Start new user registration
             return View("NewPassword", model);
@@ -264,23 +254,15 @@ namespace ModernSlavery.WebUI.Account.Controllers
             {
                 code = Encryption.DecryptQuerystring(code);
                 code = HttpUtility.UrlDecode(code);
-                string[] args = code.SplitI(":");
-                if (args.Length != 2)
-                {
-                    throw new ArgumentException("Too few parameters in password reset code");
-                }
+                var args = code.SplitI(":");
+                if (args.Length != 2) throw new ArgumentException("Too few parameters in password reset code");
 
                 userId = args[0].ToLong();
-                if (userId == 0)
-                {
-                    throw new ArgumentException("Invalid user id in password reset code");
-                }
+                if (userId == 0) throw new ArgumentException("Invalid user id in password reset code");
 
                 resetDate = args[1].FromSmallDateTime();
                 if (resetDate == DateTime.MinValue)
-                {
                     throw new ArgumentException("Invalid password reset date in password reset code");
-                }
             }
             catch
             {
@@ -290,15 +272,10 @@ namespace ModernSlavery.WebUI.Account.Controllers
             //Get the user oganisation
             var user = SharedBusinessLogic.DataRepository.Get<User>(userId);
 
-            if (user == null)
-            {
-                return (View("CustomError", WebService.ErrorViewModelFactory.Create(1124)), null);
-            }
+            if (user == null) return (View("CustomError", WebService.ErrorViewModelFactory.Create(1124)), null);
 
             if (resetDate.AddDays(1) < VirtualDateTime.Now)
-            {
                 return (View("CustomError", WebService.ErrorViewModelFactory.Create(1126)), null);
-            }
 
             return (null, user);
         }
@@ -310,10 +287,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         {
             //Ensure user has not completed the registration process
             var result = await CheckUserRegisteredOkAsync();
-            if (result != null)
-            {
-                return result;
-            }
+            if (result != null) return result;
 
             ModelState.Remove(nameof(model.EmailAddress));
             ModelState.Remove(nameof(model.ConfirmEmailAddress));
@@ -325,13 +299,14 @@ namespace ModernSlavery.WebUI.Account.Controllers
                 return View("NewPassword", model);
             }
 
-            var m = this.UnstashModel<ResetViewModel>();
-            if (m == null || string.IsNullOrWhiteSpace(m.Resetcode)) return View("CustomError", WebService.ErrorViewModelFactory.Create(0));
+            var m = UnstashModel<ResetViewModel>();
+            if (m == null || string.IsNullOrWhiteSpace(m.Resetcode))
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(0));
 
             var passwordResult = UnwrapPasswordReset(m.Resetcode);
             if (passwordResult.Result != null) return passwordResult.Result;
 
-            this.ClearStash();
+            ClearStash();
 
             //Save the user to ensure UserId>0 for new status
             _accountService.UserRepository.UpdateUserPasswordUsingPBKDF2(passwordResult.User, model.Password);
@@ -341,7 +316,8 @@ namespace ModernSlavery.WebUI.Account.Controllers
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Send completed notification email
-            await SharedBusinessLogic.SendEmailService.SendResetPasswordCompletedAsync(passwordResult.User.EmailAddress);
+            await SharedBusinessLogic.SendEmailService.SendResetPasswordCompletedAsync(passwordResult.User
+                .EmailAddress);
 
             //Send the verification code and showconfirmation
             return View("CustomError", WebService.ErrorViewModelFactory.Create(1127));
@@ -349,5 +325,4 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
         #endregion
     }
-
 }

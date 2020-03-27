@@ -1,5 +1,4 @@
-﻿@using ModernSlavery.Core.Extensions
-@model ModernSlavery.WebUI.Viewing.Models.Search.SearchViewModel
+﻿@model SearchViewModel
 @{
     ViewBag.Title = "Modern Slavery search results";
     ViewBag.pageDescription = "Employers that have published their Modern Slavery statement.";
@@ -37,7 +36,7 @@
 @section Scripts {
     <script src="~/assets/javascripts/typeahead.bundle.min.js" type="text/javascript"></script>
     <script>
-        (function () {
+        (function() {
             "use strict";
 
             new GOVUK.SuggestEmployer({
@@ -53,7 +52,7 @@
             GOVUK.stickAtTopWhenScrolling.init();
 
             // Instantiate an option select for each one found on the page
-            var filters = $('#FinderForm .govuk-option-select').map(function () {
+            var filters = $('#FinderForm .govuk-option-select').map(function() {
                 return new GOVUK.OptionSelect({ $el: $(this) });
             });
 
@@ -61,16 +60,16 @@
                 formId: "FinderForm",
                 $results: $('.js-live-search-results-block'),
                 //$atomAutodiscoveryLink: $atomAutodiscoveryLink,
-                onRefresh: function () {
+                onRefresh: function() {
                     $("#AddAllOrgsToCompare").toggle();
                 }
             });
 
             new GOVUK.Ajaxify({
-                onRefresh: function () {
+                onRefresh: function() {
                     GOVUK.stickAtTopWhenScrolling.init();
                 },
-                onError: function (errorCode, error, errorThrown) {
+                onError: function(errorCode, error, errorThrown) {
                     window.location.href = '/error/1146';
                 }
             });

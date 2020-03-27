@@ -1,11 +1,11 @@
 ﻿using System;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.WebUI.Admin.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
+using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
@@ -14,7 +14,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminReturnLateFlagController : Controller
     {
-
         private readonly AuditLogger auditLogger;
         private readonly IDataRepository dataRepository;
 
@@ -29,7 +28,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             var specifiedReturn = dataRepository.Get<Return>(id);
 
-            var viewModel = new AdminReturnLateFlagViewModel {Return = specifiedReturn, NewLateFlag = !specifiedReturn.IsLateSubmission};
+            var viewModel = new AdminReturnLateFlagViewModel
+                {Return = specifiedReturn, NewLateFlag = !specifiedReturn.IsLateSubmission};
 
             return View("ChangeLateFlag", viewModel);
         }
@@ -51,10 +51,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 return View("ChangeLateFlag", viewModel);
             }
 
-            if (viewModel.NewLateFlag is null)
-            {
-                throw new ArgumentNullException(nameof(viewModel.NewLateFlag));
-            }
+            if (viewModel.NewLateFlag is null) throw new ArgumentNullException(nameof(viewModel.NewLateFlag));
 
             specifiedReturn.IsLateSubmission = viewModel.NewLateFlag.Value;
 
@@ -68,11 +65,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     ReturnId = id,
                     LateFlagChangedTo = viewModel.NewLateFlag,
-                    Reason = viewModel.Reason
+                    viewModel.Reason
                 });
 
-            return RedirectToAction("ViewOrganisation", "AdminViewOrganisation", new {id = specifiedReturn.OrganisationId});
+            return RedirectToAction("ViewOrganisation", "AdminViewOrganisation",
+                new {id = specifiedReturn.OrganisationId});
         }
-
     }
 }

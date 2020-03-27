@@ -1,9 +1,7 @@
-﻿@using Microsoft.Extensions.Primitives
-@using ModernSlavery.WebUI.Viewing.Models.Search
-@model ModernSlavery.WebUI.Viewing.Models.Search.FilterGroup
+﻿@model FilterGroup
 @{
-    string maxHeight = string.IsNullOrWhiteSpace(Model.MaxHeight) ? "100%" : Model.MaxHeight;
-    StringValues queryLookup = Context.Request.Query[Model.Group];
+    var maxHeight = string.IsNullOrWhiteSpace(Model.MaxHeight) ? "100%" : Model.MaxHeight;
+    var queryLookup = Context.Request.Query[Model.Group];
 }
 <div class="govuk-option-select js-collapsible" data-closed-on-load="@(Model.Expanded ? "false" : "true")">
     <div class="container-head js-container-head">
@@ -13,7 +11,7 @@
         <div class="js-auto-height-inner">
             <fieldset>
                 <legend>@(Model.Label)</legend>
-                @foreach (OptionSelect item in Model.Metadata)
+                @foreach (var item in Model.Metadata)
                 {
                     <label for="@(item.Id)" @(item.Disabled ? "disabled" : string.Empty)>
                         <input name="@(Model.Group)" @(item.Disabled ? "disabled" : string.Empty) value="@(item.Value)" id="@(item.Id)" type="checkbox" @(queryLookup.Contains(item.Value) ? "checked" : "") aria-label="@(item.Id)"/>

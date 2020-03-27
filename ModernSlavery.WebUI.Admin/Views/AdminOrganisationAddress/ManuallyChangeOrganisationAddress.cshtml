@@ -1,10 +1,7 @@
-﻿@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model ModernSlavery.WebUI.Admin.Models.ChangeOrganisationAddressViewModel
-
+﻿@model ChangeOrganisationAddressViewModel
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = $"Change address - {Model.Organisation.OrganisationName} - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
@@ -19,13 +16,13 @@
         crumbs.Add(new CrumbViewModel
         {
             Text = Model.Organisation.OrganisationName,
-            Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new { id = Model.Organisation.OrganisationId })
+            Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Organisation.OrganisationId})
         });
 
         crumbs.Add(new CrumbViewModel
         {
             Text = "Address history",
-            Href = Url.Action("ViewAddressHistory", "AdminOrganisationAddress", new { id = Model.Organisation.OrganisationId })
+            Href = Url.Action("ViewAddressHistory", "AdminOrganisationAddress", new {id = Model.Organisation.OrganisationId})
         });
 
         crumbs.Add(new CrumbViewModel
@@ -46,20 +43,19 @@
         <span class="govuk-caption-xl">Administration</span>
         <h1 class="govuk-heading-xl">
             Change address
-            <br />
+            <br/>
             <span class="govuk-!-font-size-27">
                 for @(Model.Organisation.OrganisationName)
             </span>
         </h1>
 
-        <form method="post" action="@Url.Action("ChangeAddressPost", "AdminOrganisationAddress", new { id = Model.Organisation.OrganisationId })">
+        <form method="post" action="@Url.Action("ChangeAddressPost", "AdminOrganisationAddress", new {id = Model.Organisation.OrganisationId})">
             @(Html.AntiForgeryToken())
             @(Html.HiddenFor(m => m.Action))
-
             @(Html.GovUkErrorSummary(new[]
             {
                 nameof(ChangeOrganisationAddressViewModel.IsUkAddress),
-                nameof(ChangeOrganisationAddressViewModel.Reason),
+                nameof(ChangeOrganisationAddressViewModel.Reason)
             }))
 
             <fieldset class="govuk-fieldset">
@@ -72,54 +68,54 @@
 
                 @(Html.GovUkTextInputFor(
                     m => m.PoBox,
-                    labelOptions: new LabelViewModel { Text = "PO Box" },
+                    new LabelViewModel {Text = "PO Box"},
                     classes: "govuk-input--width-10",
-                    formGroupOptions: new FormGroupViewModel { Classes = "govuk-!-margin-bottom-3" }
-                ))
+                    formGroupOptions: new FormGroupViewModel {Classes = "govuk-!-margin-bottom-3"}
+                    ))
                 @(Html.GovUkTextInputFor(
                     m => m.Address1,
-                    labelOptions: new LabelViewModel { Text = "Address line 1" },
-                    formGroupOptions: new FormGroupViewModel { Classes = "govuk-!-margin-bottom-3" }
-                ))
+                    new LabelViewModel {Text = "Address line 1"},
+                    formGroupOptions: new FormGroupViewModel {Classes = "govuk-!-margin-bottom-3"}
+                    ))
                 @(Html.GovUkTextInputFor(
                     m => m.Address2,
-                    labelOptions: new LabelViewModel { Text = "Address line 2" },
-                    formGroupOptions: new FormGroupViewModel { Classes = "govuk-!-margin-bottom-3" }
-                ))
+                    new LabelViewModel {Text = "Address line 2"},
+                    formGroupOptions: new FormGroupViewModel {Classes = "govuk-!-margin-bottom-3"}
+                    ))
                 @(Html.GovUkTextInputFor(
                     m => m.Address3,
-                    labelOptions: new LabelViewModel { Text = "Address line 3" },
-                    formGroupOptions: new FormGroupViewModel { Classes = "govuk-!-margin-bottom-3" }
-                ))
+                    new LabelViewModel {Text = "Address line 3"},
+                    formGroupOptions: new FormGroupViewModel {Classes = "govuk-!-margin-bottom-3"}
+                    ))
                 @(Html.GovUkTextInputFor(
                     m => m.TownCity,
-                    labelOptions: new LabelViewModel { Text = "Town / city" },
+                    new LabelViewModel {Text = "Town / city"},
                     classes: "govuk-input--width-20",
-                    formGroupOptions: new FormGroupViewModel { Classes = "govuk-!-margin-bottom-3" }
-                ))
+                    formGroupOptions: new FormGroupViewModel {Classes = "govuk-!-margin-bottom-3"}
+                    ))
                 @(Html.GovUkTextInputFor(
                     m => m.County,
-                    labelOptions: new LabelViewModel { Text = "County" },
+                    new LabelViewModel {Text = "County"},
                     classes: "govuk-input--width-20",
-                    formGroupOptions: new FormGroupViewModel { Classes = "govuk-!-margin-bottom-3" }
-                ))
+                    formGroupOptions: new FormGroupViewModel {Classes = "govuk-!-margin-bottom-3"}
+                    ))
                 @(Html.GovUkTextInputFor(
                     m => m.Country,
-                    labelOptions: new LabelViewModel { Text = "Country" },
+                    new LabelViewModel {Text = "Country"},
                     classes: "govuk-input--width-20",
-                    formGroupOptions: new FormGroupViewModel { Classes = "govuk-!-margin-bottom-3" }
-                ))
+                    formGroupOptions: new FormGroupViewModel {Classes = "govuk-!-margin-bottom-3"}
+                    ))
                 @(Html.GovUkTextInputFor(
                     m => m.PostCode,
-                    labelOptions: new LabelViewModel { Text = "Post code" },
+                    new LabelViewModel {Text = "Post code"},
                     classes: "govuk-input--width-10",
-                    formGroupOptions: new FormGroupViewModel { Classes = "govuk-!-margin-bottom-3" }
-                ))
+                    formGroupOptions: new FormGroupViewModel {Classes = "govuk-!-margin-bottom-3"}
+                    ))
             </fieldset>
 
             @(Html.GovUkRadiosFor(
                 m => m.IsUkAddress,
-                fieldsetOptions: new FieldsetViewModel
+                new FieldsetViewModel
                 {
                     Legend = new LegendViewModel
                     {
@@ -128,8 +124,7 @@
                     },
                     Classes = "govuk-!-margin-top-4"
                 }
-            ))
-
+                ))
             @(Html.GovUkTextAreaFor(
                 m => m.Reason,
                 labelOptions: new LabelViewModel
@@ -137,8 +132,7 @@
                     Text = "What is the reason for this change?",
                     Classes = "govuk-label--m"
                 }
-            ))
-
+                ))
             @(Html.GovUkButton(new ButtonViewModel
             {
                 Text = "Continue",
@@ -146,7 +140,7 @@
             }))
 
             <p class="govuk-body">
-                <a href="@Url.Action("ViewOrganisation", "AdminViewOrganisation", new { id = Model.Organisation.OrganisationId })"
+                <a href="@Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Organisation.OrganisationId})"
                    class="govuk-link">
                     Cancel and return to organisation page
                 </a>
@@ -156,4 +150,3 @@
 
     </div>
 </div>
-

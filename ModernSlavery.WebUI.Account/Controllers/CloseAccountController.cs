@@ -1,12 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
-using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.Account.Interfaces;
-using ModernSlavery.WebUI.Account.Models.CloseAccount;
+using ModernSlavery.WebUI.Account.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -14,14 +12,13 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Account.Controllers
 {
-
     [Route("manage-account")]
     public class CloseAccountController : BaseController
     {
-
         public CloseAccountController(
             ICloseAccountViewService closeAccountService,
-            ILogger<CloseAccountController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
+            ILogger<CloseAccountController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) :
+            base(logger, webService, sharedBusinessLogic)
         {
             CloseAccountService = closeAccountService;
         }
@@ -32,12 +29,10 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public async Task<IActionResult> CloseAccount()
         {
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
-            return View(new CloseAccountViewModel {IsSoleUserOfOneOrMoreOrganisations = VirtualUser.IsSoleUserOfOneOrMoreOrganisations()});
+            return View(new CloseAccountViewModel
+                {IsSoleUserOfOneOrMoreOrganisations = VirtualUser.IsSoleUserOfOneOrMoreOrganisations()});
         }
 
         [HttpPost("close-account")]
@@ -46,25 +41,16 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public async Task<IActionResult> CloseAccount([FromForm] CloseAccountViewModel formData)
         {
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             // prevent impersonation
-            if (IsImpersonatingUser)
-            {
-                this.RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
-            }
+            if (IsImpersonatingUser) RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
 
             // return to page if there are errors
-            if (ModelState.IsValid == false)
-            {
-                return View(nameof(CloseAccount), formData);
-            }
+            if (ModelState.IsValid == false) return View(nameof(CloseAccount), formData);
 
             // execute change password process
-            ModelStateDictionary errors = await CloseAccountService.CloseAccountAsync(VirtualUser, formData.EnterPassword, VirtualUser);
+            var errors = await CloseAccountService.CloseAccountAsync(VirtualUser, formData.EnterPassword, VirtualUser);
             if (errors.ErrorCount > 0)
             {
                 ModelState.Merge(errors);
@@ -72,7 +58,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             }
 
             // force sign-out then redirect to completed page
-            string redirectUrl = Url.Action<CloseAccountController>(nameof(CloseAccountCompleted));
+            var redirectUrl = Url.Action<CloseAccountController>(nameof(CloseAccountCompleted));
 
             // logout the
             return await LogoutUser(redirectUrl);
@@ -84,7 +70,5 @@ namespace ModernSlavery.WebUI.Account.Controllers
         {
             return View("CloseAccountCompleted");
         }
-
     }
-
 }

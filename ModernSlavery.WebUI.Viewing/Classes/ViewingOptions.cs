@@ -1,13 +1,10 @@
-﻿using Microsoft.Extensions.Options;
-using ModernSlavery.Core.SharedKernel.Options;
+﻿using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Viewing.Classes
 {
-
     [Options("Web:Viewing")]
-    public class ViewingOptions: IOptions
+    public class ViewingOptions : IOptions
     {
-
         /// <summary>
         ///     Specifies how many reporting years the public can view or compare.
         /// </summary>
@@ -23,7 +20,5 @@ namespace ModernSlavery.WebUI.Viewing.Classes
         ///     Maximum number of employers you can share in a mailto: protocol.
         /// </summary>
         public int MaxCompareBasketShareCount { get; set; } = 195;
-
     }
-
 }

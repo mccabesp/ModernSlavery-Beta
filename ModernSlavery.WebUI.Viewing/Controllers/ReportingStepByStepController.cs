@@ -5,7 +5,6 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 {
     public class ReportingStepByStepController : Controller
     {
-
         [HttpGet("reporting-step-by-step")]
         [FeatureSwitch("ReportingStepByStep")]
         public IActionResult StepByStepStandalone()
@@ -19,7 +18,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         {
             return View("../ReportingStepByStep/Step1FindOutWhatTheGpgIs");
         }
-        
+
         [HttpGet("reporting-step-by-step/report")]
         [FeatureSwitch("ReportingStepByStep")]
         public IActionResult Step6Task1()

@@ -1,10 +1,9 @@
 ﻿@using Microsoft.ApplicationInsights.AspNetCore
-@using ModernSlavery.Core.SharedKernel.Options
 @using ModernSlavery.WebUI.Shared.Classes.Cookies
 @inject JavaScriptSnippet snippet
 @inject SharedOptions sharedOptions
 @{
-    CookieSettings cookieSettings = CookieHelper.GetCookieSettingsCookie(Context.Request);
+    var cookieSettings = CookieHelper.GetCookieSettingsCookie(Context.Request);
 }
 
 <script type="text/javascript">
@@ -13,13 +12,13 @@
             i['GoogleAnalyticsObject'] = r;
             i[r] = i[r] ||
                 function() {
-                    (i[r].q = i[r].q || []).push(arguments)
+                    (i[r].q = i[r].q || []).push(arguments);
                 }, i[r].l = 1 * new Date();
             a = s.createElement(o),
                 m = s.getElementsByTagName(o)[0];
             a.async = 1;
             a.src = g;
-            m.parentNode.insertBefore(a, m)
+            m.parentNode.insertBefore(a, m);
         })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
         ga('set', 'anonymizeIp', true);
@@ -74,8 +73,8 @@
 </script>
 
 @if (cookieSettings.ApplicationInsights &&
-    snippet != null &&
-    !string.IsNullOrWhiteSpace(sharedOptions.AppInsights_InstrumentationKey))
+     snippet != null &&
+     !string.IsNullOrWhiteSpace(sharedOptions.AppInsights_InstrumentationKey))
 {
     @Html.Raw(snippet.FullScript)
 }

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -13,17 +12,21 @@ using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Shared.Services
 {
-    public class NotificationService: INotificationService
+    public class NotificationService : INotificationService
     {
-        public NotificationService(SharedOptions sharedOptions, ILogger<NotificationService> logger, IEventLogger customLogger, [KeyFilter(QueueNames.SendNotifyEmail)]IQueue sendNotifyEmailQueue)
+        private readonly SharedOptions SharedOptions;
+
+        public NotificationService(SharedOptions sharedOptions, ILogger<NotificationService> logger,
+            IEventLogger customLogger, [KeyFilter(QueueNames.SendNotifyEmail)]
+            IQueue sendNotifyEmailQueue)
         {
             SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             CustomLogger = customLogger ?? throw new ArgumentNullException(nameof(customLogger));
-            SendNotifyEmailQueue = sendNotifyEmailQueue ?? throw new ArgumentNullException(nameof(sendNotifyEmailQueue));
+            SendNotifyEmailQueue =
+                sendNotifyEmailQueue ?? throw new ArgumentNullException(nameof(sendNotifyEmailQueue));
         }
 
-        private readonly SharedOptions SharedOptions;
         private ILogger Logger { get; }
         private IEventLogger CustomLogger { get; }
         public IQueue SendNotifyEmailQueue { get; }
@@ -34,7 +37,8 @@ namespace ModernSlavery.WebUI.Shared.Services
             string reportingPeriod,
             string reportLink)
         {
-            var personalisation = new Dictionary<string, dynamic> {
+            var personalisation = new Dictionary<string, dynamic>
+            {
                 {"OrganisationName", organisationName},
                 {"SubmittedOrUpdated", submittedOrUpdated},
                 {"ReportingPeriod", reportingPeriod},
@@ -44,7 +48,8 @@ namespace ModernSlavery.WebUI.Shared.Services
 
             var notifyEmail = new SendEmailRequest
             {
-                EmailAddress = emailAddress, TemplateId = EmailTemplates.SendSuccessfulSubmissionEmail, Personalisation = personalisation
+                EmailAddress = emailAddress, TemplateId = EmailTemplates.SendSuccessfulSubmissionEmail,
+                Personalisation = personalisation
             };
 
             await AddEmailToQueue(notifyEmail);
@@ -52,7 +57,8 @@ namespace ModernSlavery.WebUI.Shared.Services
 
         public async void SendPinEmail(string emailAddress, string pin, string organisationName)
         {
-            var personalisation = new Dictionary<string, dynamic> {
+            var personalisation = new Dictionary<string, dynamic>
+            {
                 {"PIN", pin},
                 {"OrganisationName", organisationName},
                 {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
@@ -66,9 +72,11 @@ namespace ModernSlavery.WebUI.Shared.Services
             await AddEmailToQueue(notifyEmail);
         }
 
-        public async void SendUserAddedToOrganisationEmail(string emailAddress, string organisationName, string username)
+        public async void SendUserAddedToOrganisationEmail(string emailAddress, string organisationName,
+            string username)
         {
-            var personalisation = new Dictionary<string, dynamic> {
+            var personalisation = new Dictionary<string, dynamic>
+            {
                 {"OrganisationName", organisationName},
                 {"Username", username},
                 {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
@@ -76,15 +84,18 @@ namespace ModernSlavery.WebUI.Shared.Services
 
             var notifyEmail = new SendEmailRequest
             {
-                EmailAddress = emailAddress, TemplateId = EmailTemplates.UserAddedToOrganisationEmail, Personalisation = personalisation
+                EmailAddress = emailAddress, TemplateId = EmailTemplates.UserAddedToOrganisationEmail,
+                Personalisation = personalisation
             };
 
             await AddEmailToQueue(notifyEmail);
         }
 
-        public async void SendRemovedUserFromOrganisationEmail(string emailAddress, string organisationName, string removedUserName)
+        public async void SendRemovedUserFromOrganisationEmail(string emailAddress, string organisationName,
+            string removedUserName)
         {
-            var personalisation = new Dictionary<string, dynamic> {
+            var personalisation = new Dictionary<string, dynamic>
+            {
                 {"OrganisationName", organisationName},
                 {"RemovedUser", removedUserName},
                 {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
@@ -92,7 +103,8 @@ namespace ModernSlavery.WebUI.Shared.Services
 
             var notifyEmail = new SendEmailRequest
             {
-                EmailAddress = emailAddress, TemplateId = EmailTemplates.RemovedUserFromOrganisationEmail, Personalisation = personalisation
+                EmailAddress = emailAddress, TemplateId = EmailTemplates.RemovedUserFromOrganisationEmail,
+                Personalisation = personalisation
             };
 
             await AddEmailToQueue(notifyEmail);
@@ -100,13 +112,16 @@ namespace ModernSlavery.WebUI.Shared.Services
 
         public async void SendScopeChangeInEmail(string emailAddress, string organisationName)
         {
-            var personalisation = new Dictionary<string, dynamic> {
-                {"OrganisationName", organisationName}, {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
+            var personalisation = new Dictionary<string, dynamic>
+            {
+                {"OrganisationName", organisationName},
+                {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
             {
-                EmailAddress = emailAddress, TemplateId = EmailTemplates.ScopeChangeInEmail, Personalisation = personalisation
+                EmailAddress = emailAddress, TemplateId = EmailTemplates.ScopeChangeInEmail,
+                Personalisation = personalisation
             };
 
             await AddEmailToQueue(notifyEmail);
@@ -114,13 +129,16 @@ namespace ModernSlavery.WebUI.Shared.Services
 
         public async void SendScopeChangeOutEmail(string emailAddress, string organisationName)
         {
-            var personalisation = new Dictionary<string, dynamic> {
-                {"OrganisationName", organisationName}, {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
+            var personalisation = new Dictionary<string, dynamic>
+            {
+                {"OrganisationName", organisationName},
+                {"Environment", SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] "}
             };
 
             var notifyEmail = new SendEmailRequest
             {
-                EmailAddress = emailAddress, TemplateId = EmailTemplates.ScopeChangeOutEmail, Personalisation = personalisation
+                EmailAddress = emailAddress, TemplateId = EmailTemplates.ScopeChangeOutEmail,
+                Personalisation = personalisation
             };
 
             await AddEmailToQueue(notifyEmail);
@@ -128,30 +146,27 @@ namespace ModernSlavery.WebUI.Shared.Services
 
         public void SendUserAddedEmailToExistingUsers(Organisation organisation, User addedUser)
         {
-            IEnumerable<string> emailAddressesForOrganisation = organisation.UserOrganisations
+            var emailAddressesForOrganisation = organisation.UserOrganisations
                 .Select(uo => uo.User.EmailAddress)
                 .Where(ea => ea != addedUser.EmailAddress);
 
-            foreach (string emailAddress in emailAddressesForOrganisation)
-            {
+            foreach (var emailAddress in emailAddressesForOrganisation)
                 SendUserAddedToOrganisationEmail(emailAddress, organisation.OrganisationName, addedUser.Fullname);
-            }
         }
 
-        public void SendSuccessfulSubmissionEmailToRegisteredUsers(Return postedReturn, string reportLink, string submittedOrUpdated)
+        public void SendSuccessfulSubmissionEmailToRegisteredUsers(Return postedReturn, string reportLink,
+            string submittedOrUpdated)
         {
-            IEnumerable<string> emailAddressesForOrganisation = postedReturn.Organisation.UserOrganisations
+            var emailAddressesForOrganisation = postedReturn.Organisation.UserOrganisations
                 .Select(uo => uo.User.EmailAddress);
 
-            foreach (string emailAddress in emailAddressesForOrganisation)
-            {
+            foreach (var emailAddress in emailAddressesForOrganisation)
                 SendSuccessfulSubmissionEmail(
                     emailAddress,
                     postedReturn.Organisation.OrganisationName,
                     submittedOrUpdated,
                     postedReturn.GetReportingPeriod(),
                     reportLink);
-            }
         }
 
         private async Task<bool> AddEmailToQueue(SendEmailRequest notifyEmail)
@@ -170,19 +185,15 @@ namespace ModernSlavery.WebUI.Shared.Services
 
             return false;
         }
-
     }
 
     public static class EmailTemplates
     {
-
         public const string ScopeChangeOutEmail = "a5e14ca4-9fe7-484d-a239-fc57f0324c19";
         public const string ScopeChangeInEmail = "a54efa64-33d6-4150-9484-669ff8a6c764";
         public const string RemovedUserFromOrganisationEmail = "65ecaa57-e794-4075-9c00-f13b3cb33446";
         public const string UserAddedToOrganisationEmail = "8513d426-1881-49db-92c2-11dd1fd7a30f";
         public const string SendPinEmail = "c320cf3e-d5a1-434e-95c6-84933063be8a";
         public const string SendSuccessfulSubmissionEmail = "9f690ae4-2913-4e98-b9c9-427080f210de";
-
     }
-
 }

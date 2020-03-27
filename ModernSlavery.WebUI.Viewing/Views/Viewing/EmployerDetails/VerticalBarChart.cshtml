@@ -1,7 +1,7 @@
-﻿@model ModernSlavery.WebUI.Viewing.Models.VerticalBarChartModel
+﻿@model VerticalBarChartModel
 @{
-    decimal femalePercentage = Math.Max(Math.Round(Math.Min(Model.Female, 100m)), 1m);
-    decimal malePercentage = Math.Max(Math.Round(Math.Min(Model.Male, 100m)), 1m);
+    var femalePercentage = Math.Max(Math.Round(Math.Min(Model.Female, 100m)), 1m);
+    var malePercentage = Math.Max(Math.Round(Math.Min(Model.Male, 100m)), 1m);
 }
 
 <figure id="@Model.Id" class="govuk-chart-vert">

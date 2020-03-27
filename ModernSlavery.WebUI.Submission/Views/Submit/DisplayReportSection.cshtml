@@ -1,13 +1,10 @@
-﻿@using ModernSlavery.BusinessDomain.Shared.Models
-@using ModernSlavery.Core.Extensions
-@using ModernSlavery.WebUI.Shared.Classes
-@model ModernSlavery.WebUI.Submission.Models.DisplayReportModel
+﻿@model DisplayReportModel
 @{
-    ReportInfoModel reportInfoModel = Model.Report;
+    var reportInfoModel = Model.Report;
     var reportDateFormatter = new GDSDateFormatter(reportInfoModel.ReportingStartDate);
-    int linkId = reportDateFormatter.StartYear;
-    long organisationId = Model.OrganisationId;
-    string scopeRequest = Encryption.EncryptAsParams(organisationId.ToString(), reportDateFormatter.StartYear.ToString());
+    var linkId = reportDateFormatter.StartYear;
+    var organisationId = Model.OrganisationId;
+    var scopeRequest = Encryption.EncryptAsParams(organisationId.ToString(), reportDateFormatter.StartYear.ToString());
 }
 <div class="gpg-manage-reports__row">
 
@@ -36,11 +33,11 @@
 
     <div class="gpg-manage-reports__cell gpg-manage-reports__cell--action">
         @{
-            bool isReportAvailable = reportInfoModel.ReportModifiedDate != null;
-            bool isDraftAvailable = reportInfoModel.HasDraftContent();
+            var isReportAvailable = reportInfoModel.ReportModifiedDate != null;
+            var isDraftAvailable = reportInfoModel.HasDraftContent();
 
-            string returnOrDraftInfoIsAvailable = Encryption.EncryptAsParams(organisationId.ToString(), reportDateFormatter.StartYear.ToString(), true.ToString());
-            string returnOrDraftInfoIsNotAvailable = Encryption.EncryptAsParams(organisationId.ToString(), reportDateFormatter.StartYear.ToString(), false.ToString());
+            var returnOrDraftInfoIsAvailable = Encryption.EncryptAsParams(organisationId.ToString(), reportDateFormatter.StartYear.ToString(), true.ToString());
+            var returnOrDraftInfoIsNotAvailable = Encryption.EncryptAsParams(organisationId.ToString(), reportDateFormatter.StartYear.ToString(), false.ToString());
         }
 
         <div>

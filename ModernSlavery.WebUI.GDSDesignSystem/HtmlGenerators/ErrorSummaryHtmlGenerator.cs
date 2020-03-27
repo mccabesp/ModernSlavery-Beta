@@ -2,7 +2,8 @@
 using System.Linq;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.GDSDesignSystem.Partials;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 {
@@ -13,14 +14,11 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             string[] orderOfPropertyNamesInTheView)
             where TModel : GovUkViewModel
         {
-            TModel model = htmlHelper.ViewData.Model;
+            var model = htmlHelper.ViewData.Model;
 
-            if (!model.HasAnyErrors())
-            {
-                return null;
-            }
+            if (!model.HasAnyErrors()) return null;
 
-            Dictionary<string, string> errors = model.GetAllErrors();
+            var errors = model.GetAllErrors();
 
             var orderedPropertyNames = GetErroredPropertyNamesInSpecifiedOrder(errors, orderOfPropertyNamesInTheView);
 
@@ -42,22 +40,22 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
                 Errors = errorSummaryItems
             };
 
-            return htmlHelper.Partial("/GovUkDesignSystemComponents/ErrorSummary.cshtml", errorSummaryViewModel);
+            return htmlHelper.Partial("/Components/ErrorSummary.cshtml", errorSummaryViewModel);
         }
 
         private static List<string> GetErroredPropertyNamesInSpecifiedOrder(
             Dictionary<string, string> errors,
             string[] orderOfPropertyNamesInTheView)
         {
-            List<string> erroredPropertyNames = errors.Keys.ToList();
+            var erroredPropertyNames = errors.Keys.ToList();
 
-            List<string> erroredPropertyNamesWithSpecifiedOrder =
+            var erroredPropertyNamesWithSpecifiedOrder =
                 orderOfPropertyNamesInTheView.Where(p => erroredPropertyNames.Contains(p)).ToList();
 
-            List<string> erroredPropertyNamesWithoutSpecifiedOrder =
+            var erroredPropertyNamesWithoutSpecifiedOrder =
                 erroredPropertyNames.Except(erroredPropertyNamesWithSpecifiedOrder).ToList();
 
-            List<string> orderedPropertyNames =
+            var orderedPropertyNames =
                 erroredPropertyNamesWithSpecifiedOrder.Concat(erroredPropertyNamesWithoutSpecifiedOrder).ToList();
 
             return orderedPropertyNames;

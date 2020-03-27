@@ -7,13 +7,11 @@ namespace ModernSlavery.WebUI.Admin.Models
     [Serializable]
     public class UploadViewModel
     {
-
         public List<Upload> Uploads { get; set; } = new List<Upload>();
 
         [Serializable]
         public class Upload
         {
-
             public string Type { get; set; }
             public string Title { get; set; }
             public string Description { get; set; }
@@ -24,8 +22,6 @@ namespace ModernSlavery.WebUI.Admin.Models
             public DateTime Modified { get; set; }
 
             public string Count { get; set; }
-
         }
-
     }
 }

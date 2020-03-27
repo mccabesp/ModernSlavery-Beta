@@ -9,7 +9,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
         internal static PropertyInfo GetPropertyFromExpression<TModel, TProperty>(
             Expression<Func<TModel, TProperty>> propertyLambdaExpression)
         {
-            MemberExpression memberExpression = propertyLambdaExpression.Body as MemberExpression;
+            var memberExpression = propertyLambdaExpression.Body as MemberExpression;
             return memberExpression.Member as PropertyInfo;
         }
 
@@ -17,8 +17,8 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
             TModel model,
             Expression<Func<TModel, TProperty>> propertyLambdaExpression)
         {
-            Func<TModel, TProperty> compiledExpression = propertyLambdaExpression.Compile();
-            TProperty currentPropertyValue = compiledExpression(model);
+            var compiledExpression = propertyLambdaExpression.Compile();
+            var currentPropertyValue = compiledExpression(model);
             return currentPropertyValue;
         }
     }

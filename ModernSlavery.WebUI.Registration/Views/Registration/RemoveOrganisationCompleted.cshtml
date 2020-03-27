@@ -1,15 +1,9 @@
-﻿@using ModernSlavery.Core.Extensions
-@using ModernSlavery.WebUI.Shared.Classes
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@using ModernSlavery.WebUI.Shared.Controllers
-@using ModernSlavery.WebUI.Shared.Interfaces
-@using ModernSlavery.WebUI.Shared.Options
-@inject IWebService WebService
-@model ModernSlavery.WebUI.Registration.Models.RemoveOrganisationModel
+﻿@inject IWebService WebService
+@model RemoveOrganisationModel
 @{
     ViewBag.Title = "Remove organisation reason - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
-    long userId = Encryption.DecryptQuerystring(Model.EncUserId).ToInt64();
+    var userId = Encryption.DecryptQuerystring(Model.EncUserId).ToInt64();
 }
 <div class="grid-row">
     <div class="column-two-thirds">

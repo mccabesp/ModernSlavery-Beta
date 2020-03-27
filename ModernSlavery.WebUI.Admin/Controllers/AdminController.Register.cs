@@ -3,28 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using ModernSlavery.Core.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.WebUI.Shared.Models;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
-using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     public partial class AdminController
     {
-        private ActionResult UnwrapRegistrationRequest(OrganisationViewModel model, out UserOrganisation userOrg, bool ignoreDUNS)
+        private ActionResult UnwrapRegistrationRequest(OrganisationViewModel model, out UserOrganisation userOrg,
+            bool ignoreDUNS)
         {
             userOrg = null;
 
@@ -32,25 +30,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             long orgId = 0;
             try
             {
-                string code = Encryption.DecryptQuerystring(model.ReviewCode);
+                var code = Encryption.DecryptQuerystring(model.ReviewCode);
                 code = HttpUtility.UrlDecode(code);
-                string[] args = code.SplitI(":");
-                if (args.Length != 3)
-                {
-                    throw new ArgumentException("Too few parameters in registration review code");
-                }
+                var args = code.SplitI(":");
+                if (args.Length != 3) throw new ArgumentException("Too few parameters in registration review code");
 
                 userId = args[0].ToLong();
-                if (userId == 0)
-                {
-                    throw new ArgumentException("Invalid user id in registration review code");
-                }
+                if (userId == 0) throw new ArgumentException("Invalid user id in registration review code");
 
                 orgId = args[1].ToLong();
-                if (orgId == 0)
-                {
-                    throw new ArgumentException("Invalid organisation id in registration review code");
-                }
+                if (orgId == 0) throw new ArgumentException("Invalid organisation id in registration review code");
             }
             catch
             {
@@ -58,18 +47,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             //Get the user oganisation
-            userOrg = SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().FirstOrDefault(uo => uo.UserId == userId && uo.OrganisationId == orgId);
+            userOrg = SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
+                .FirstOrDefault(uo => uo.UserId == userId && uo.OrganisationId == orgId);
 
-            if (userOrg == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1115));
-            }
+            if (userOrg == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1115));
 
             //Check this registrations hasnt already completed
             if (userOrg.PINConfirmedDate != null)
-            {
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1145));
-            }
 
             switch (userOrg.Organisation.Status)
             {
@@ -82,9 +67,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             if (userOrg.Address == null)
-            {
-                throw new Exception($"Cannot find address for user {userId} and organisation {orgId} for reviewing registration request");
-            }
+                throw new Exception(
+                    $"Cannot find address for user {userId} and organisation {orgId} for reviewing registration request");
 
             //Load view model
             model.ContactFirstName = userOrg.User.ContactFirstName;
@@ -106,10 +90,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             model.SicCodes = userOrg.Organisation.GetSicCodes().Select(o => o.SicCode.SicCodeId).ToList();
 
             // pre populate the DUNSNumber text box
-            if (!ignoreDUNS)
-            {
-                model.DUNSNumber = userOrg.Organisation.DUNSNumber;
-            }
+            if (!ignoreDUNS) model.DUNSNumber = userOrg.Organisation.DUNSNumber;
 
             ViewBag.NoDUNS = string.IsNullOrWhiteSpace(userOrg.Organisation.DUNSNumber);
 
@@ -142,12 +123,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 .FirstOrDefault();
 
             if (!string.IsNullOrWhiteSpace(model.OtherName))
-            {
                 model.OtherValue = userOrg.Organisation.OrganisationReferences
                     .Where(o => o.ReferenceName == model.OtherName)
                     .Select(or => or.ReferenceValue)
                     .FirstOrDefault();
-            }
 
             return null;
         }
@@ -159,21 +138,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             var model = new OrganisationViewModel();
 
             if (string.IsNullOrWhiteSpace(code))
             {
                 //Load the employers from session
-                model = this.UnstashModel<OrganisationViewModel>();
-                if (model == null)
-                {
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1114));
-                }
+                model = UnstashModel<OrganisationViewModel>();
+                if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1114));
             }
             else
             {
@@ -182,38 +155,32 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             //Unwrap code
             UserOrganisation userOrg;
-            ActionResult result = UnwrapRegistrationRequest(model, out userOrg, false);
-            if (result != null)
-            {
-                return result;
-            }
+            var result = UnwrapRegistrationRequest(model, out userOrg, false);
+            if (result != null) return result;
 
             //Tell reviewer if this org has already been approved
             if (model.ManualRegistration)
             {
-                UserOrganisation firstRegistered = userOrg.Organisation.UserOrganisations.OrderByDescending(uo => uo.PINConfirmedDate)
+                var firstRegistered = userOrg.Organisation.UserOrganisations
+                    .OrderByDescending(uo => uo.PINConfirmedDate)
                     .FirstOrDefault(uo => uo.PINConfirmedDate != null);
                 if (firstRegistered != null)
-                {
                     AddModelError(
                         3017,
-                        parameters: new {
+                        parameters: new
+                        {
                             approvedUser = firstRegistered.User.EmailAddress,
                             approvedDate = firstRegistered.PINConfirmedDate.Value.ToShortDateString(),
                             approvedAddress = firstRegistered.Address?.GetAddressString()
                         });
-                }
 
                 //Tell reviewer how many other open regitrations for same organisation
-                int requestCount = await SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
+                var requestCount = await SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                     .CountAsync(
                         uo => uo.UserId != userOrg.UserId
                               && uo.OrganisationId == userOrg.OrganisationId
                               && uo.Organisation.Status == OrganisationStatuses.Pending);
-                if (requestCount > 0)
-                {
-                    AddModelError(3018, parameters: new {requestCount});
-                }
+                if (requestCount > 0) AddModelError(3018, parameters: new {requestCount});
             }
 
             //Get any conflicting or similar organisations
@@ -228,10 +195,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                              && o.SectorType == SectorTypes.Private
                              && o.CompanyNumber == model.CompanyNumber)
                     .Select(o => o.OrganisationId);
-                if (results.Any())
-                {
-                    orgIds.AddRange(results);
-                }
+                if (results.Any()) orgIds.AddRange(results);
             }
 
             if (!string.IsNullOrWhiteSpace(model.CharityNumber))
@@ -242,10 +206,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                              && r.ReferenceName.ToLower() == "charity number"
                              && r.ReferenceValue.ToLower() == model.CharityNumber.ToLower())
                     .Select(r => r.OrganisationId);
-                if (results.Any())
-                {
-                    orgIds.AddRange(results);
-                }
+                if (results.Any()) orgIds.AddRange(results);
             }
 
             if (!string.IsNullOrWhiteSpace(model.MutualNumber))
@@ -256,10 +217,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                              && r.ReferenceName.ToLower() == "mutual number"
                              && r.ReferenceValue.ToLower() == model.MutualNumber.ToLower())
                     .Select(r => r.OrganisationId);
-                if (results.Any())
-                {
-                    orgIds.AddRange(results);
-                }
+                if (results.Any()) orgIds.AddRange(results);
             }
 
             if (!string.IsNullOrWhiteSpace(model.OtherName) && !string.IsNullOrWhiteSpace(model.OtherValue))
@@ -267,12 +225,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (model.IsDUNS)
                 {
                     results = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                        .Where(r => r.OrganisationId != userOrg.OrganisationId && r.DUNSNumber.ToLower() == model.OtherValue.ToLower())
+                        .Where(r => r.OrganisationId != userOrg.OrganisationId &&
+                                    r.DUNSNumber.ToLower() == model.OtherValue.ToLower())
                         .Select(r => r.OrganisationId);
-                    if (results.Any())
-                    {
-                        orgIds.AddRange(results);
-                    }
+                    if (results.Any()) orgIds.AddRange(results);
                 }
 
                 results = SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>()
@@ -281,10 +237,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                              && r.ReferenceName.ToLower() == model.OtherName.ToLower()
                              && r.ReferenceValue.ToLower() == model.OtherValue.ToLower())
                     .Select(r => r.OrganisationId);
-                if (results.Any())
-                {
-                    orgIds.AddRange(results);
-                }
+                if (results.Any()) orgIds.AddRange(results);
             }
 
             model.MatchedReferenceCount = orgIds.Count;
@@ -292,32 +245,29 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //Only show orgs matching names when none matching references
             if (model.MatchedReferenceCount == 0)
             {
-                string orgName = model.OrganisationName.ToLower().ReplaceI("limited", "").ReplaceI("ltd", "");
+                var orgName = model.OrganisationName.ToLower().ReplaceI("limited", "").ReplaceI("ltd", "");
                 results = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .Where(o => o.OrganisationId != userOrg.OrganisationId && o.OrganisationName.ToLower().Contains(orgName))
+                    .Where(o => o.OrganisationId != userOrg.OrganisationId &&
+                                o.OrganisationName.ToLower().Contains(orgName))
                     .Select(o => o.OrganisationId);
-                if (results.Any())
-                {
-                    orgIds.AddRange(results);
-                }
+                if (results.Any()) orgIds.AddRange(results);
 
                 results = Organisation.Search(
-                        SharedBusinessLogic.DataRepository.GetAll<Organisation>().Where(o => o.OrganisationId != userOrg.OrganisationId),
+                        SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                            .Where(o => o.OrganisationId != userOrg.OrganisationId),
                         model.OrganisationName,
                         50 - results.Count(),
                         SharedBusinessLogic.SharedOptions.LevenshteinDistance)
                     .Select(o => o.OrganisationId);
-                if (results.Any())
-                {
-                    orgIds.AddRange(results);
-                }
+                if (results.Any()) orgIds.AddRange(results);
             }
 
             if (orgIds.Any())
             {
                 //Add the registrations
-                List<Organisation> orgs =
-                    await SharedBusinessLogic.DataRepository.GetAll<Organisation>().Where(o => orgIds.Contains(o.OrganisationId)).ToListAsync();
+                var orgs =
+                    await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                        .Where(o => orgIds.Contains(o.OrganisationId)).ToListAsync();
                 model.ManualEmployers = orgs.Select(o => EmployerRecord.Create(o)).ToList();
             }
 
@@ -326,7 +276,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             {
                 if (model.ManualEmployers.Count > 1)
                 {
-                    int index = model.ManualEmployers.FindIndex(e => e.OrganisationName.EqualsI(model.OrganisationName));
+                    var index = model.ManualEmployers.FindIndex(e =>
+                        e.OrganisationName.EqualsI(model.OrganisationName));
                     if (index > 0)
                     {
                         model.ManualEmployers.Insert(0, model.ManualEmployers[index]);
@@ -338,7 +289,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 model.ManualEmployers = model.ManualEmployers.OrderBy(o => o.OrganisationName).ToList();
             }
 
-            this.StashModel(model);
+            StashModel(model);
             return View("ReviewRequest", model);
         }
 
@@ -349,27 +300,18 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Make sure we can load employers from session
-            var m = this.UnstashModel<OrganisationViewModel>();
-            if (m == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-            }
+            var m = UnstashModel<OrganisationViewModel>();
+            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             model.ManualEmployers = m.ManualEmployers;
 
             //Unwrap code
             UserOrganisation userOrg;
-            ActionResult result = UnwrapRegistrationRequest(model, out userOrg, true);
-            if (result != null)
-            {
-                return result;
-            }
+            var result = UnwrapRegistrationRequest(model, out userOrg, true);
+            if (result != null) return result;
 
             //Check model is valid
 
@@ -406,10 +348,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 nameof(model.OtherValue));
 
             //Exclude the DUNS number when declining
-            if (command.EqualsI("decline"))
-            {
-                excludes.Add(nameof(model.DUNSNumber));
-            }
+            if (command.EqualsI("decline")) excludes.Add(nameof(model.DUNSNumber));
 
             ModelState.Exclude(excludes.ToArray());
 
@@ -431,11 +370,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     conflictOrg = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                         .FirstOrDefaultAsync(
-                            o => userOrg.OrganisationId != o.OrganisationId && o.DUNSNumber.ToLower() == model.DUNSNumber.ToLower());
-                    if (conflictOrg != null)
-                    {
-                        ModelState.AddModelError(3030, nameof(model.DUNSNumber));
-                    }
+                            o => userOrg.OrganisationId != o.OrganisationId &&
+                                 o.DUNSNumber.ToLower() == model.DUNSNumber.ToLower());
+                    if (conflictOrg != null) ModelState.AddModelError(3030, nameof(model.DUNSNumber));
                 }
 
                 //Check for company number conflicts
@@ -443,68 +380,65 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     conflictOrg = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                         .FirstOrDefaultAsync(
-                            o => userOrg.OrganisationId != o.OrganisationId && o.CompanyNumber.ToLower() == model.CompanyNumber.ToLower());
+                            o => userOrg.OrganisationId != o.OrganisationId &&
+                                 o.CompanyNumber.ToLower() == model.CompanyNumber.ToLower());
                     if (conflictOrg != null)
-                    {
                         ModelState.AddModelError(
                             3031,
                             nameof(model.CompanyNumber),
                             new {organisationName = conflictOrg.OrganisationName, referenceName = "Company number"});
-                    }
                 }
 
                 //Check for charity number conflicts
                 if (!string.IsNullOrWhiteSpace(model.CharityNumber))
                 {
-                    OrganisationReference orgRef = await SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>()
+                    var orgRef = await SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>()
                         .FirstOrDefaultAsync(
                             o => userOrg.OrganisationId != o.OrganisationId
                                  && o.ReferenceName.ToLower() == nameof(model.CharityNumber).ToLower()
                                  && o.ReferenceValue.ToLower() == model.CharityNumber.ToLower());
                     conflictOrg = orgRef?.Organisation;
                     if (conflictOrg != null)
-                    {
                         ModelState.AddModelError(
                             3031,
                             nameof(model.CharityNumber),
                             new {organisationName = conflictOrg.OrganisationName, referenceName = "Charity number"});
-                    }
                 }
 
                 //Check for mutual number conflicts
                 if (!string.IsNullOrWhiteSpace(model.MutualNumber))
                 {
-                    OrganisationReference orgRef = await SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>()
+                    var orgRef = await SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>()
                         .FirstOrDefaultAsync(
                             o => userOrg.OrganisationId != o.OrganisationId
                                  && o.ReferenceName.ToLower() == nameof(model.MutualNumber).ToLower()
                                  && o.ReferenceValue.ToLower() == model.MutualNumber.ToLower());
                     conflictOrg = orgRef?.Organisation;
                     if (conflictOrg != null)
-                    {
                         ModelState.AddModelError(
                             3031,
                             nameof(model.MutualNumber),
-                            new {organisationName = conflictOrg.OrganisationName, referenceName = "Mutual partnership number"});
-                    }
+                            new
+                            {
+                                organisationName = conflictOrg.OrganisationName,
+                                referenceName = "Mutual partnership number"
+                            });
                 }
 
                 //Check for other reference conflicts
                 if (!string.IsNullOrWhiteSpace(model.OtherValue))
                 {
-                    OrganisationReference orgRef = await SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>()
+                    var orgRef = await SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>()
                         .FirstOrDefaultAsync(
                             o => userOrg.OrganisationId != o.OrganisationId
                                  && o.ReferenceName.ToLower() == model.OtherName.ToLower()
                                  && o.ReferenceValue.ToLower() == model.OtherValue.ToLower());
                     conflictOrg = orgRef?.Organisation;
                     if (conflictOrg != null)
-                    {
                         ModelState.AddModelError(
                             3031,
                             nameof(model.OtherValue),
                             new {organisationName = conflictOrg.OrganisationName, referenceName = model.OtherValue});
-                    }
                 }
 
                 if (!ModelState.IsValid)
@@ -523,20 +457,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     "Manually registered");
 
                 // Save the DUNS Number
-                if (string.IsNullOrWhiteSpace(userOrg.Organisation.DUNSNumber) && !string.IsNullOrWhiteSpace(model.DUNSNumber))
-                {
-                    userOrg.Organisation.DUNSNumber = model.DUNSNumber;
-                }
+                if (string.IsNullOrWhiteSpace(userOrg.Organisation.DUNSNumber) &&
+                    !string.IsNullOrWhiteSpace(model.DUNSNumber)) userOrg.Organisation.DUNSNumber = model.DUNSNumber;
 
                 //Delete the DUNS reference
                 if (model.IsDUNS && userOrg.Organisation.DUNSNumber == model.OtherValue)
                 {
-                    OrganisationReference dunsRef =
-                        userOrg.Organisation.OrganisationReferences.FirstOrDefault(r => r.ReferenceName == nameof(model.OtherName));
-                    if (dunsRef != null)
-                    {
-                        userOrg.Organisation.OrganisationReferences.Remove(dunsRef);
-                    }
+                    var dunsRef =
+                        userOrg.Organisation.OrganisationReferences.FirstOrDefault(r =>
+                            r.ReferenceName == nameof(model.OtherName));
+                    if (dunsRef != null) userOrg.Organisation.OrganisationReferences.Remove(dunsRef);
                 }
 
                 //Set the latest registration
@@ -545,24 +475,22 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 // save any sic codes
                 if (!string.IsNullOrEmpty(model.SicCodeIds))
                 {
-                    IOrderedEnumerable<int> newSicCodes = model.SicCodeIds.Split(',').Cast<int>().OrderBy(sc => sc);
-                    foreach (int sc in newSicCodes)
-                    {
+                    var newSicCodes = model.SicCodeIds.Split(',').Cast<int>().OrderBy(sc => sc);
+                    foreach (var sc in newSicCodes)
                         userOrg.Organisation.OrganisationSicCodes.Add(
-                            new OrganisationSicCode {
+                            new OrganisationSicCode
+                            {
                                 SicCodeId = sc, OrganisationId = userOrg.OrganisationId, Created = VirtualDateTime.Now
                             });
-                    }
                 }
 
                 //Retire the old address 
-                if (userOrg.Organisation.LatestAddress != null && userOrg.Organisation.LatestAddress.AddressId != userOrg.Address.AddressId)
-                {
+                if (userOrg.Organisation.LatestAddress != null &&
+                    userOrg.Organisation.LatestAddress.AddressId != userOrg.Address.AddressId)
                     userOrg.Organisation.LatestAddress.SetStatus(
                         AddressStatuses.Retired,
                         OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,
                         "Replaced by Manual registration");
-                }
 
                 //Activate the address
                 userOrg.Address.SetStatus(
@@ -583,9 +511,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 //Log the approval
                 if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-                {
-                     await AdminService.RegistrationLog.WriteAsync(
-                        new RegisterLogModel {
+                    await AdminService.RegistrationLog.WriteAsync(
+                        new RegisterLogModel
+                        {
                             StatusDate = VirtualDateTime.Now,
                             Status = "Manually registered",
                             ActionBy = VirtualUser.EmailAddress,
@@ -605,13 +533,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             ContactOrganisation = userOrg.User.ContactOrganisation,
                             ContactPhoneNumber = userOrg.User.ContactPhoneNumber
                         });
-                }
 
                 //Show confirmation
                 if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-                {
-                    TempData["TestUrl"] = Url.Action("Impersonate", "Admin", new {area="Admin",emailAddress = userOrg.User.EmailAddress});
-                }
+                    TempData["TestUrl"] = Url.Action("Impersonate", "Admin",
+                        new {area = "Admin", emailAddress = userOrg.User.EmailAddress});
 
                 result = RedirectToAction("RequestAccepted");
             }
@@ -624,19 +550,18 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Send notification email to existing users 
-            AdminService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
+            AdminService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation,
+                userOrg.User);
 
             //Ensure the organisation has an employer reference
             if (userOrg.PINConfirmedDate.HasValue && string.IsNullOrWhiteSpace(userOrg.Organisation.EmployerReference))
-            {
                 await AdminService.OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(userOrg.Organisation);
-            }
 
             //Add or remove this organisation to/from the search index
             await AdminService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
 
             //Save the model for the redirect
-            this.StashModel(model);
+            StashModel(model);
 
             return result;
         }
@@ -645,14 +570,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         protected async Task<bool> SendRegistrationAcceptedAsync(string emailAddress, bool test = false)
         {
             //Always use the administrators email when not on production
-            if (!SharedBusinessLogic.SharedOptions.IsProduction())
-            {
-                emailAddress = CurrentUser.EmailAddress;
-            }
+            if (!SharedBusinessLogic.SharedOptions.IsProduction()) emailAddress = CurrentUser.EmailAddress;
 
             //Send an acceptance link to the email address
-            string returnUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
-            return await AdminService.SharedBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(returnUrl, emailAddress, test);
+            var returnUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
+            return await AdminService.SharedBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(returnUrl,
+                emailAddress, test);
         }
 
         /// <summary>
@@ -664,17 +587,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Make sure we can load employers from session
-            var model = this.UnstashModel<OrganisationViewModel>();
-            if (model == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-            }
+            var model = UnstashModel<OrganisationViewModel>();
+            if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             return View("ConfirmCancellation", model);
         }
@@ -690,37 +607,25 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Load the employers from session
-            var m = this.UnstashModel<OrganisationViewModel>();
-            if (m == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-            }
+            var m = UnstashModel<OrganisationViewModel>();
+            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             //If cancel button clicked the n return to review page
-            if (command.EqualsI("Cancel"))
-            {
-                return RedirectToAction("ReviewRequest");
-            }
+            if (command.EqualsI("Cancel")) return RedirectToAction("ReviewRequest");
 
             //Unwrap code
             UserOrganisation userOrg;
-            ActionResult result = UnwrapRegistrationRequest(model, out userOrg, true);
-            if (result != null)
-            {
-                return result;
-            }
+            var result = UnwrapRegistrationRequest(model, out userOrg, true);
+            if (result != null) return result;
 
             //Log the rejection
             if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-            {
                 await AdminService.RegistrationLog.WriteAsync(
-                    new RegisterLogModel {
+                    new RegisterLogModel
+                    {
                         StatusDate = VirtualDateTime.Now,
                         Status = "Manually Rejected",
                         ActionBy = VirtualUser.EmailAddress,
@@ -740,19 +645,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         ContactOrganisation = userOrg.User.ContactOrganisation,
                         ContactPhoneNumber = userOrg.User.ContactPhoneNumber
                     });
-            }
 
             //Delete address for this user and organisation
             if (userOrg.Address.Status != AddressStatuses.Active && userOrg.Address.CreatedByUserId == userOrg.UserId)
-            {
                 SharedBusinessLogic.DataRepository.Delete(userOrg.Address);
-            }
 
             //Delete the org user
-            long orgId = userOrg.OrganisationId;
-            string emailAddress = userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress);
+            var orgId = userOrg.OrganisationId;
+            var emailAddress = userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress);
 
-            List<DnBOrgsModel> allDnBOrgs = await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
+            var allDnBOrgs = await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
 
             //Delete the organisation if it has no returns, no D&B addresses, is not in D&B, is not in scopes table, and is not registered to another user
             if (userOrg.Organisation != null
@@ -761,14 +663,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 && (allDnBOrgs == null || !allDnBOrgs.Any(o => userOrg.Organisation.DUNSNumber == o.DUNSNumber))
                 && !userOrg.Organisation.OrganisationScopes.Any()
                 && !await SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
-                    .AnyAsync(uo => uo.OrganisationId == userOrg.Organisation.OrganisationId && uo.UserId != userOrg.UserId))
+                    .AnyAsync(uo =>
+                        uo.OrganisationId == userOrg.Organisation.OrganisationId && uo.UserId != userOrg.UserId))
             {
                 Logger.LogInformation(
                     $"Unused organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}'(DUNS:{userOrg.Organisation.DUNSNumber}) deleted by {(OriginalUser == null ? VirtualUser.EmailAddress : OriginalUser.EmailAddress)} when declining manual registration for {userOrg.User.EmailAddress}");
                 SharedBusinessLogic.DataRepository.Delete(userOrg.Organisation);
             }
 
-            EmployerSearchModel searchRecord = EmployerSearchModel.Create(userOrg.Organisation,true);
+            var searchRecord = EmployerSearchModel.Create(userOrg.Organisation, true);
             SharedBusinessLogic.DataRepository.Delete(userOrg);
 
             //Send the declined email to the applicant
@@ -790,7 +693,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await AdminService.SearchBusinessLogic.EmployerSearchRepository.RemoveFromIndexAsync(new[] {searchRecord});
 
             //Save the model for the redirect
-            this.StashModel(model);
+            StashModel(model);
 
             //If private sector then send the pin
             return RedirectToAction("RequestCancelled");
@@ -801,13 +704,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         protected async Task<bool> SendRegistrationDeclinedAsync(string emailAddress, string reason)
         {
             //Always use the administrators email when not on production
-            if (!SharedBusinessLogic.SharedOptions.IsProduction())
-            {
-                emailAddress = CurrentUser.EmailAddress;
-            }
+            if (!SharedBusinessLogic.SharedOptions.IsProduction()) emailAddress = CurrentUser.EmailAddress;
 
             //Send a verification link to the email address
-            return await AdminService.SharedBusinessLogic.SendEmailService.SendRegistrationDeclinedAsync(emailAddress, reason);
+            return await AdminService.SharedBusinessLogic.SendEmailService.SendRegistrationDeclinedAsync(emailAddress,
+                reason);
         }
 
         /// <summary>
@@ -818,25 +719,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Make sure we can load model from session
-            var model = this.UnstashModel<OrganisationViewModel>();
-            if (model == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-            }
+            var model = UnstashModel<OrganisationViewModel>();
+            if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             //Clear the stash
-            this.ClearStash();
+            ClearStash();
 
-            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) && TempData.ContainsKey("TestUrl"))
-            {
-                ViewBag.TestUrl = TempData["TestUrl"];
-            }
+            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) &&
+                TempData.ContainsKey("TestUrl")) ViewBag.TestUrl = TempData["TestUrl"];
 
             return View("RequestAccepted", model);
         }
@@ -849,33 +742,27 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Make sure we can load model from session
-            var model = this.UnstashModel<OrganisationViewModel>();
-            if (model == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-            }
+            var model = UnstashModel<OrganisationViewModel>();
+            if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             //Clear the stash
-            this.ClearStash();
+            ClearStash();
 
             if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
             {
                 UserOrganisation userOrg;
-                ActionResult result = UnwrapRegistrationRequest(model, out userOrg, true);
+                var result = UnwrapRegistrationRequest(model, out userOrg, true);
 
-                ViewBag.TestUrl = Url.Action("Impersonate", "Admin", new {area= "Admin", emailAddress = userOrg.User.EmailAddress});
+                ViewBag.TestUrl = Url.Action("Impersonate", "Admin",
+                    new {area = "Admin", emailAddress = userOrg.User.EmailAddress});
             }
 
             return View("RequestCancelled", model);
         }
 
         #endregion
-
     }
 }

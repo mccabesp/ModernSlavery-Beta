@@ -1,17 +1,10 @@
 ﻿@inject ISnapshotDateHelper SnapshotDateHelper
-@using ModernSlavery.Core.Entities
-@using ModernSlavery.Core.Extensions
-@using ModernSlavery.Core.SharedKernel.Interfaces
-@using ModernSlavery.WebUI.Shared.Classes
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@using ModernSlavery.WebUI.Shared.Interfaces
-@using ModernSlavery.WebUI.Shared.Options
-@using ModernSlavery.WebUI.Submission.Controllers
 @inject IWebService WebService
-@model IEnumerable<ModernSlavery.Core.Entities.UserOrganisation>
+@using ModernSlavery.Core.SharedKernel.Interfaces
+@model IEnumerable<UserOrganisation>
 @{
     ViewBag.Title = "Manage your organisation - Modern Slavery reporting service";
-    bool hasRegisteredOrgs = Model.Any();
+    var hasRegisteredOrgs = Model.Any();
 }
 
 @await Html.PartialAsync("~/Areas/Account/Views/Shared/AccountNavigation.cshtml")
@@ -32,66 +25,66 @@
 
         <table class="organisations-table" summary="A list of organisations registered to your account" style="margin-top: 30px">
             <thead>
-                <tr>
-                    <th class="org-name" scope="col">Organisation name</th>
-                    <th scope="col">Registration Status</th>
-                </tr>
+            <tr>
+                <th class="org-name" scope="col">Organisation name</th>
+                <th scope="col">Registration Status</th>
+            </tr>
             </thead>
             <tbody>
-                @foreach (UserOrganisation userOrg in Model)
-                {
-                    // include the currrent user in the count but dont show a count to pending users
-                    int assocUserCount = userOrg.GetAssociatedUsers().Count();
-                    DateTime accountingDate = SnapshotDateHelper.GetSnapshotDate(userOrg.Organisation.SectorType);
-                    int accountingStartYear = accountingDate.Year;
-                    string accountingEndYear = (accountingDate.Year + 1).ToString();
+            @foreach (var userOrg in Model)
+            {
+                // include the currrent user in the count but dont show a count to pending users
+                var assocUserCount = userOrg.GetAssociatedUsers().Count();
+                var accountingDate = SnapshotDateHelper.GetSnapshotDate(userOrg.Organisation.SectorType);
+                var accountingStartYear = accountingDate.Year;
+                var accountingEndYear = (accountingDate.Year + 1).ToString();
 
-                    string encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
-                    Return latestReturn = userOrg.Organisation.LatestReturn;
-                    ScopeStatuses scopeStatus = userOrg.Organisation.GetScopeStatus(accountingDate);
-                    string address = userOrg.Organisation.GetAddressString();
+                var encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
+                var latestReturn = userOrg.Organisation.LatestReturn;
+                var scopeStatus = userOrg.Organisation.GetScopeStatus(accountingDate);
+                var address = userOrg.Organisation.GetAddressString();
 
-                    <tr>
-                        @if (userOrg.PINSentDate != null && userOrg.PINConfirmedDate == null)
-                        {
-                            <th scope="row">
-                                <a id="ActivateOrg-@(encOrgId)" href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationActivate, new {id = encOrgId}))">
-                                    <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
-                                </a>
-                            </th>
-                            <td data-prefix="Status">
-                                Awaiting activation PIN
-                            </td>
-                        }
-                        else if (userOrg.PINSentDate == null && userOrg.PINConfirmedDate == null)
-                        {
-                            <th scope="row">
+                <tr>
+                    @if (userOrg.PINSentDate != null && userOrg.PINConfirmedDate == null)
+                    {
+                        <th scope="row">
+                            <a id="ActivateOrg-@(encOrgId)" href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationActivate, new {id = encOrgId}))">
                                 <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
-                            </th>
-                            <td data-prefix="Status">
-                                Awaiting registration approval
-                            </td>
-                        }
-                        else
-                        {
-                            <th scope="row">
-                                <a id="ManageOrg-@(encOrgId)" href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationActivate, new {id = encOrgId})">
-                                    <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
-                                </a>
-                            </th>
-                            <td data-prefix="Status">
-                                <span>Registration complete</span>
-                            </td>
-                        }
-                    </tr>
-                }
+                            </a>
+                        </th>
+                        <td data-prefix="Status">
+                            Awaiting activation PIN
+                        </td>
+                    }
+                    else if (userOrg.PINSentDate == null && userOrg.PINConfirmedDate == null)
+                    {
+                        <th scope="row">
+                            <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
+                        </th>
+                        <td data-prefix="Status">
+                            Awaiting registration approval
+                        </td>
+                    }
+                    else
+                    {
+                        <th scope="row">
+                            <a id="ManageOrg-@(encOrgId)" href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationActivate, new {id = encOrgId})">
+                                <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
+                            </a>
+                        </th>
+                        <td data-prefix="Status">
+                            <span>Registration complete</span>
+                        </td>
+                    }
+                </tr>
+            }
 
-                @if (hasRegisteredOrgs == false)
-                {
-                    <tr>
-                        <td colspan="2" style="border-bottom : none">There are no organisations registered to your account.</td>
-                    </tr>
-                }
+            @if (hasRegisteredOrgs == false)
+            {
+                <tr>
+                    <td colspan="2" style="border-bottom: none">There are no organisations registered to your account.</td>
+                </tr>
+            }
 
             </tbody>
         </table>
@@ -120,5 +113,5 @@
     </div>
 
 </div>
-<hr style="border: 1px solid black; background: black;" />
-<partial name="~/Views/Viewing/Launchpad/Parts/ServiceSurveyIntroAndLink.cshtml" />
+<hr style="background: black; border: 1px solid black;"/>
+<partial name="~/Views/Viewing/Launchpad/Parts/ServiceSurveyIntroAndLink.cshtml"/>

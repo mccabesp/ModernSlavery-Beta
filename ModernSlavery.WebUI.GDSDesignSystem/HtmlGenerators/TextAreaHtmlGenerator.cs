@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Linq.Expressions;
-using System.Reflection;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.GDSDesignSystem.Partials;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 {
     internal static class TextAreaHtmlGenerator
     {
-
         internal static IHtmlContent GenerateHtml<TModel>(
             IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, string>> propertyLambdaExpression,
@@ -21,16 +20,17 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
         )
             where TModel : GovUkViewModel
         {
-            PropertyInfo property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
+            var property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
 
-            string propertyName = property.Name;
+            var propertyName = property.Name;
 
-            TModel model = htmlHelper.ViewData.Model;
+            var model = htmlHelper.ViewData.Model;
 
-            string currentValue = ExtensionHelpers.GetCurrentValue(model, property, propertyLambdaExpression);
+            var currentValue = ExtensionHelpers.GetCurrentValue(model, property, propertyLambdaExpression);
 
 
-            var textAreaViewModel = new TextAreaViewModel {
+            var textAreaViewModel = new TextAreaViewModel
+            {
                 Name = $"GovUk_Text_{propertyName}",
                 Id = $"GovUk_{propertyName}",
                 Value = currentValue,
@@ -41,12 +41,9 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             };
 
             if (model.HasErrorFor(property))
-            {
                 textAreaViewModel.ErrorMessage = new ErrorMessageViewModel {Text = model.GetErrorFor(property)};
-            }
 
-            return htmlHelper.Partial("/GovUkDesignSystemComponents/Textarea.cshtml", textAreaViewModel);
+            return htmlHelper.Partial("/Components/Textarea.cshtml", textAreaViewModel);
         }
-
     }
 }

@@ -1,23 +1,22 @@
 ﻿using System.Reflection;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
 {
     public class TextParser
     {
-
         public static void ParseAndValidate(
             GovUkViewModel model,
             PropertyInfo property,
             HttpRequest httpRequest)
         {
-            string parameterName = $"GovUk_Text_{property.Name}";
+            var parameterName = $"GovUk_Text_{property.Name}";
 
-            StringValues parameterValues = httpRequest.Form[parameterName];
+            var parameterValues = httpRequest.Form[parameterName];
 
             ParserHelpers.ThrowIfMoreThanOneValue(parameterValues, property);
             ParserHelpers.SaveUnparsedValueFromRequestToModel(model, httpRequest, parameterName);
@@ -30,7 +29,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
 
             if (parameterValues.Count > 0)
             {
-                string parameterValue = parameterValues[0];
+                var parameterValue = parameterValues[0];
 
                 if (ExceedsCharacterCount(property, parameterValue))
                 {
@@ -51,13 +50,10 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
 
             string errorMessage;
             if (displayNameForErrorsAttribute != null)
-            {
-                errorMessage = $"{displayNameForErrorsAttribute.NameAtStartOfSentence} must be {characterCountAttribute.MaxCharacters} characters or fewer";
-            }
+                errorMessage =
+                    $"{displayNameForErrorsAttribute.NameAtStartOfSentence} must be {characterCountAttribute.MaxCharacters} characters or fewer";
             else
-            {
                 errorMessage = $"{property.Name} must be {characterCountAttribute.MaxCharacters} characters or fewer";
-            }
 
             model.AddErrorFor(property, errorMessage);
         }
@@ -66,26 +62,18 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
         {
             var characterCountAttribute = property.GetSingleCustomAttribute<GovUkValidateCharacterCountAttribute>();
 
-            bool characterCountInForce = characterCountAttribute != null;
+            var characterCountInForce = characterCountAttribute != null;
 
             if (characterCountInForce)
             {
-                int parameterLength = parameterValue.Length;
-                int maximumLength = characterCountAttribute.MaxCharacters;
+                var parameterLength = parameterValue.Length;
+                var maximumLength = characterCountAttribute.MaxCharacters;
 
-                bool exceedsCharacterCount = parameterLength > maximumLength;
+                var exceedsCharacterCount = parameterLength > maximumLength;
                 return exceedsCharacterCount;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
-
-        
-
-        
-
-
     }
 }

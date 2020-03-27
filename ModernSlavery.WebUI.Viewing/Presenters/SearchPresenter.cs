@@ -1,13 +1,11 @@
-﻿using System.Collections.Specialized;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Viewing.Controllers;
-using ModernSlavery.WebUI.Viewing.Models.Search;
+using ModernSlavery.WebUI.Viewing.Models;
 
 namespace ModernSlavery.WebUI.Viewing.Presenters
 {
-
     public interface ISearchPresenter
     {
         SearchViewModel LastSearchResults { get; set; }
@@ -15,12 +13,10 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         string LastSearchParameters { get; }
 
         string GetLastSearchUrl();
-
     }
 
     public class SearchPresenter : ISearchPresenter
     {
-
         public SearchPresenter(IHttpSession session, IUrlHelper urlHelper)
         {
             Session = session;
@@ -32,9 +28,9 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         /// </summary>
         public string GetLastSearchUrl()
         {
-            NameValueCollection routeValues = LastSearchParameters?.FromQueryString();
-            string actionUrl = UrlHelper.Action(nameof(ViewingController.SearchResults), "Viewing");
-            string routeQuery = routeValues?.ToQueryString(true);
+            var routeValues = LastSearchParameters?.FromQueryString();
+            var actionUrl = UrlHelper.Action(nameof(ViewingController.SearchResults), "Viewing");
+            var routeQuery = routeValues?.ToQueryString(true);
             return $"{actionUrl}?{routeQuery}";
         }
 
@@ -57,14 +53,11 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             {
                 if (CacheSearchResults)
                 {
-                    if (value == null || value.Employers == null || value.Employers.Results == null || value.Employers.Results.Count == 0)
-                    {
+                    if (value == null || value.Employers == null || value.Employers.Results == null ||
+                        value.Employers.Results.Count == 0)
                         Session.Remove("LastSearchResults");
-                    }
                     else
-                    {
                         Session["LastSearchResults"] = value;
-                    }
                 }
             }
         }
@@ -78,19 +71,12 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
-                {
                     Session.Remove("LastSearchParameters");
-                }
                 else
-                {
                     Session["LastSearchParameters"] = value;
-                }
             }
         }
 
         #endregion
-
     }
-
-
 }

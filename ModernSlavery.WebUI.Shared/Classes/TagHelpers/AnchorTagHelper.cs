@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -13,24 +12,19 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
     [HtmlTargetElement("a", TagStructure = TagStructure.NormalOrSelfClosing)]
     public class AnchorTagHelper : TagHelper
     {
-
-        [ViewContext]
-        [HtmlAttributeNotBound]
-        public ViewContext ViewContext { get; set; }
+        [ViewContext] [HtmlAttributeNotBound] public ViewContext ViewContext { get; set; }
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             //Load the relationship attribute
             var rels = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
             if (output.Attributes.ContainsName("rel"))
-            {
                 rels.AddRange(output.Attributes["rel"].Value.ToStringOrEmpty().SplitI(";, "));
-            }
 
             var isDownload = false;
             if (output.Attributes.ContainsName("download"))
             {
-                string download = output.Attributes["download"].Value.ToString();
+                var download = output.Attributes["download"].Value.ToString();
                 if (download.EqualsI("false"))
                 {
                     output.Attributes.RemoveAll("download");
@@ -39,15 +33,17 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
                 {
                     isDownload = true;
                     output.Attributes.RemoveAll("download");
-                    output.Attributes.Insert(0, new TagHelperAttribute("download", null, HtmlAttributeValueStyle.Minimized));
+                    output.Attributes.Insert(0,
+                        new TagHelperAttribute("download", null, HtmlAttributeValueStyle.Minimized));
                 }
             }
 
             var isExternal = false;
             if (output.Attributes.ContainsName("href"))
             {
-                string href = output.Attributes["href"].Value.ToStringOrEmpty().TrimI(" \\/.");
-                if (!string.IsNullOrWhiteSpace(href) && !href.StartsWithI("mailto:", "javascript:", "ftp:", "file:", "#"))
+                var href = output.Attributes["href"].Value.ToStringOrEmpty().TrimI(" \\/.");
+                if (!string.IsNullOrWhiteSpace(href) &&
+                    !href.StartsWithI("mailto:", "javascript:", "ftp:", "file:", "#"))
                 {
                     //Check if the link is external
                     isExternal = ViewContext.HttpContext.GetIsExternalUrl(href);
@@ -76,16 +72,15 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
             {
                 Parallel.ForEach(
                     fieldNames,
-                    fieldName => {
-                        foreach (string fn in new[] {$"track-{fieldName}", fieldName})
+                    fieldName =>
+                    {
+                        foreach (var fn in new[] {$"track-{fieldName}", fieldName})
                         {
-                            int i = output.Attributes.IndexOfName(fn);
+                            var i = output.Attributes.IndexOfName(fn);
                             if (i > -1)
                             {
                                 if (output.Attributes.ContainsName($"data-track-{fieldName}"))
-                                {
                                     throw new ArgumentException($"data-track-{fieldName}", "Duplicate tracking field");
-                                }
 
                                 var newAttribute = new TagHelperAttribute(
                                     $"data-track-{fieldName}",
@@ -100,41 +95,28 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
 
             //Check if link should be tracked
             //TODO check what these fields mean
-            bool isTracked = output.Attributes.ContainsName("data-track-category")
-                             || output.Attributes.ContainsName("data-track-action")
-                             || output.Attributes.ContainsName("data-track-label")
-                             || output.Attributes.ContainsName("data-track-options");
+            var isTracked = output.Attributes.ContainsName("data-track-category")
+                            || output.Attributes.ContainsName("data-track-action")
+                            || output.Attributes.ContainsName("data-track-label")
+                            || output.Attributes.ContainsName("data-track-options");
 
             //Add the track relationship
-            if (isTracked)
-            {
-                rels.Add("track");
-            }
+            if (isTracked) rels.Add("track");
 
             //Ensure we have at least a category when tracking
             if (!output.Attributes.ContainsName("data-track-category") && rels.Contains("track"))
-            {
                 throw new ArgumentNullException("data-track-category", "You must specify a category for tracking");
-            }
 
             #endregion
 
             //Make sure we open in new tab unless otherwise stated
             if ((isDownload || isExternal) && !output.Attributes.ContainsName("target"))
-            {
                 output.Attributes.SetAttribute("target", "_blank");
-            }
 
             //Save the relationship attribute changes
             if (rels.Any())
-            {
                 output.Attributes.SetAttribute("rel", rels.ToDelimitedString(" "));
-            }
-            else if (output.Attributes.ContainsName("rel"))
-            {
-                output.Attributes.RemoveAll("rel");
-            }
+            else if (output.Attributes.ContainsName("rel")) output.Attributes.RemoveAll("rel");
         }
-
     }
 }

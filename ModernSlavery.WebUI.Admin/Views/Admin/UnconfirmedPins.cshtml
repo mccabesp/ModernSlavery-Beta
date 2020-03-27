@@ -1,13 +1,8 @@
-@using ModernSlavery.BusinessDomain
-@using ModernSlavery.Core.Entities
-@using ModernSlavery.Core.SharedKernel.Options
-@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model List<ModernSlavery.Core.Entities.UserOrganisation>
+@model List<UserOrganisation>
+@Layout = "~/Views/GdsLayout.cshtml"
 @inject SharedOptions sharedOptions;
 @{
     ViewBag.Title = "Unconfirmed PINs in the Post - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
@@ -54,7 +49,7 @@
         </tr>
         </thead>
         <tbody class="govuk-table__body" id="pitp-data-rows">
-        @foreach (UserOrganisation userOrganisation in Model)
+        @foreach (var userOrganisation in Model)
         {
             <tr class="govuk-table__row">
                 <td class="govuk-table__cell">
@@ -79,7 +74,7 @@
                 </td>
                 <td class="govuk-table__cell">
                     <a href="@(Url.Action("SendPinWarning", "AdminUnconfirmedPins",
-                                 new { userId = userOrganisation.User.UserId, organisationId = userOrganisation.Organisation.OrganisationId }))"
+                                 new {userId = userOrganisation.User.UserId, organisationId = userOrganisation.Organisation.OrganisationId}))"
                        class="govuk-link">
                         Send PIN <span class="govuk-visually-hidden"> to @(userOrganisation.User.Fullname) at @(userOrganisation.Organisation.OrganisationName)</span>
                     </a>
@@ -90,7 +85,7 @@
     </table>
 
     <script>
-        (function () {
+        (function() {
             var searchBox = document.getElementById('search-pitp');
 
             function showRow(rowTrElement, searchText) {
@@ -110,7 +105,7 @@
             function filterResults() {
                 var searchText = searchBox.value.toLowerCase();
 
-                document.querySelectorAll('#pitp-data-rows tr').forEach(function (trElement) {
+                document.querySelectorAll('#pitp-data-rows tr').forEach(function(trElement) {
                     trElement.style.display = (showRow(trElement, searchText)
                         ? ''
                         : 'none');

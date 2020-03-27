@@ -1,16 +1,13 @@
-﻿@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model AdminChangeUserContactPreferencesViewModel
-
+﻿@model AdminChangeUserContactPreferencesViewModel
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = $"Change contact preferences - {Model.FullName} - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
     @{
         var crumbs = new List<CrumbViewModel>
-{
+        {
             new CrumbViewModel
             {
                 Text = "Admin",
@@ -40,31 +37,28 @@
         <span class="govuk-caption-xl">Administration</span>
         <h1 class="govuk-heading-xl">
             Change contact preferences
-            <br />
+            <br/>
             <span class="govuk-!-font-size-27">
                 for @(Model.FullName)
             </span>
         </h1>
 
-        <form method="post" action="@Url.Action("ChangeContactPreferencesPost", "AdminUserContactPreferences", new { id = Model.UserId })">
+        <form method="post" action="@Url.Action("ChangeContactPreferencesPost", "AdminUserContactPreferences", new {id = Model.UserId})">
             @(Html.AntiForgeryToken())
-            
             @(Html.GovUkCheckboxItemFor(
                 m => m.AllowContact,
-                labelOptions: new LabelViewModel
+                new LabelViewModel
                 {
                     Text = "Happy to be contacted"
                 }
-            ))
-            
+                ))
             @(Html.GovUkCheckboxItemFor(
                 m => m.SendUpdates,
-                labelOptions: new LabelViewModel
+                new LabelViewModel
                 {
                     Text = "Would like to receive updates"
                 }
-            ))
-            
+                ))
             @(Html.GovUkTextAreaFor(
                 m => m.Reason,
                 labelOptions: new LabelViewModel
@@ -76,8 +70,7 @@
                 {
                     Classes = "govuk-!-margin-top-6"
                 }
-            ))
-
+                ))
             @(Html.GovUkButton(new ButtonViewModel
             {
                 Text = "Confirm and save",
@@ -85,7 +78,7 @@
             }))
 
             <p class="govuk-body">
-                <a href="@Url.Action("ViewUser", "AdminViewUser", new { id = Model.UserId })"
+                <a href="@Url.Action("ViewUser", "AdminViewUser", new {id = Model.UserId})"
                    class="govuk-link">
                     Cancel and return to user page
                 </a>

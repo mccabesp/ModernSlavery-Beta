@@ -1,12 +1,12 @@
 using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.GDSDesignSystem;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
     public class AdminChangeScopeViewModel : GovUkViewModel
     {
-
         public long OrganisationId { get; set; }
 
         public string OrganisationName { get; set; }
@@ -19,15 +19,11 @@ namespace ModernSlavery.WebUI.Admin.Models
         public NewScopeStatus? NewScopeStatus { get; set; }
 
         public int ReportingYear { get; set; }
-
     }
 
     public enum NewScopeStatus
     {
-
         InScope = 0,
         OutOfScope = 1
-
     }
-
 }

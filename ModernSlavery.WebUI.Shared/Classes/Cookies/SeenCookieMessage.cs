@@ -2,8 +2,6 @@
 {
     public class SeenCookieMessage
     {
-
         public int Version { get; set; }
-
     }
 }

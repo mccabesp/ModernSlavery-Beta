@@ -5,15 +5,13 @@ using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Account.Interfaces;
-using ModernSlavery.WebUI.Account.Models.ChangePassword;
+using ModernSlavery.WebUI.Account.Models;
 using ModernSlavery.WebUI.Shared.Resources;
 
 namespace ModernSlavery.WebUI.Account.ViewServices
 {
-
     public class ChangePasswordViewService : IChangePasswordViewService
     {
-
         public ChangePasswordViewService(IUserRepository userRepo, ISharedBusinessLogic sharedBusinessLogic)
         {
             _userRepository = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
@@ -23,22 +21,25 @@ namespace ModernSlavery.WebUI.Account.ViewServices
         private IUserRepository _userRepository { get; }
         private ISharedBusinessLogic _sharedBusinessLogic { get; }
 
-        public async Task<ModelStateDictionary> ChangePasswordAsync(User currentUser, string currentPassword, string newPassword)
+        public async Task<ModelStateDictionary> ChangePasswordAsync(User currentUser, string currentPassword,
+            string newPassword)
         {
             var errorState = new ModelStateDictionary();
 
             // check users current password
-            bool checkPasswordResult = await _userRepository.CheckPasswordAsync(currentUser, currentPassword);
+            var checkPasswordResult = await _userRepository.CheckPasswordAsync(currentUser, currentPassword);
             if (checkPasswordResult == false)
             {
-                errorState.AddModelError(nameof(ChangePasswordViewModel.CurrentPassword), "Could not verify your current password");
+                errorState.AddModelError(nameof(ChangePasswordViewModel.CurrentPassword),
+                    "Could not verify your current password");
                 return errorState;
             }
 
             // prevent a user from re-using the same password
             if (currentPassword.ToLower() == newPassword.ToLower())
             {
-                errorState.AddModelError(nameof(ChangePasswordViewModel.NewPassword), AccountResources.ChangePasswordMustBeDifferent);
+                errorState.AddModelError(nameof(ChangePasswordViewModel.NewPassword),
+                    AccountResources.ChangePasswordMustBeDifferent);
                 return errorState;
             }
 
@@ -50,7 +51,5 @@ namespace ModernSlavery.WebUI.Account.ViewServices
 
             return errorState;
         }
-
     }
-
 }

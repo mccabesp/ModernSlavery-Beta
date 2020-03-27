@@ -25,14 +25,14 @@ HTML arguments:
 Errors:
       
  */
-(function () {
-    'use strict';
+(function() {
+    "use strict";
 
     window.GOVUK = window.GOVUK || {};
 
     function Ajaxify(options) {
 
-   
+
         //dont Ajaxify mobile safari 
         if (isAppleMobileSafari()) return;
 
@@ -40,28 +40,28 @@ Errors:
         this.onRefresh = options.onRefresh;
         this.onError = options.onError;
 
-        if (selectors == null || selectors == 'undefined') selectors = ["[data-js-url]"];
+        if (selectors == null || selectors == "undefined") selectors = ["[data-js-url]"];
         this.bindEvents(selectors, this);
     }
 
     Ajaxify.prototype.bindEvents = function bindEvents(selectors, root) {
         for (var i = 0; i < selectors.length; i++) {
             var selector = selectors[i];
-            $(document).on('click', selector, this.callAjaxClickHandler.bind(root));
+            $(document).on("click", selector, this.callAjaxClickHandler.bind(root));
         }
     };
 
-    Ajaxify.prototype.callAjaxClickHandler = function (e) {
+    Ajaxify.prototype.callAjaxClickHandler = function(e) {
         //Disable the default click event
         e.preventDefault();
         //Disable to prevent double click
-        $(e).prop('disabled', true);
-        var sourceSelector = '#' + escape(e.currentTarget.id);
+        $(e).prop("disabled", true);
+        var sourceSelector = "#" + escape(e.currentTarget.id);
         //Get the url to call
         var partialUrl = $(e.target).attr("data-js-url");
 
         //Get the list of selectors to replace
-        var targetSelectors = $(e.target).attr("data-js-targets").split(';');
+        var targetSelectors = $(e.target).attr("data-js-targets").split(";");
 
         var onRefresh = this.onRefresh;
         var onError = this.onError;
@@ -72,18 +72,19 @@ Errors:
         $.ajax({
             cache: false,
             url: partialUrl
-        }).done(function (htmlContent) {
+        }).done(function(htmlContent) {
 
             var div = document.createElement("div");
             div.innerHTML = htmlContent;
             var $htmlContent = $(div);
 
             //Replace the source html
-            var $partialContent = sourceSelector == '#' ? null : $htmlContent.find(sourceSelector);
+            var $partialContent = sourceSelector == "#" ? null : $htmlContent.find(sourceSelector);
 
             //Replace the target html
-            var $target = sourceSelector == '#' ? null : $(document).find(sourceSelector);
-            if ($partialContent != null && $partialContent.length > 0 && $target.length > 0) $target[0].outerHTML = $partialContent[0].outerHTML;
+            var $target = sourceSelector == "#" ? null : $(document).find(sourceSelector);
+            if ($partialContent != null && $partialContent.length > 0 && $target.length > 0)
+                $target[0].outerHTML = $partialContent[0].outerHTML;
 
             for (var i = 0; i < targetSelectors.length; i++) {
                 var targetSelector = targetSelectors[i];
@@ -94,11 +95,12 @@ Errors:
                 for (var elementIndex = 0; elementIndex < $partialContent.length; elementIndex++) {
                     var $elementContent = $($partialContent[elementIndex]);
                     if ($elementContent.length > 0) {
-                        targetSelector = '#' + $elementContent.attr('id');
-                        if (targetSelector != '#') {
+                        targetSelector = "#" + $elementContent.attr("id");
+                        if (targetSelector != "#") {
                             //Replace the target html
                             $target = $(document).find(targetSelector);
-                            if ($elementContent.length > 0 && $target.length > 0) $target[0].outerHTML = $elementContent[0].outerHTML;
+                            if ($elementContent.length > 0 && $target.length > 0)
+                                $target[0].outerHTML = $elementContent[0].outerHTML;
                         }
                     }
                 }
@@ -112,15 +114,14 @@ Errors:
             //Set focus back to original clicked element
             $(sourceSelector).focus();
 
-        }).error(function (requestObject, error, errorThrown) {
+        }).error(function(requestObject, error, errorThrown) {
             //Call any onError functions
             if (onError) {
                 onError(requestObject, error, errorThrown);
+            } else {
+                window.location = "/error/1146";
             }
-            else {
-                window.location = '/error/1146';
-            }
-        }).complete(function () {
+        }).complete(function() {
             //Ensable all other ajaxified buttons
             $("[data-js-url]").removeAttr("disabled");
         });

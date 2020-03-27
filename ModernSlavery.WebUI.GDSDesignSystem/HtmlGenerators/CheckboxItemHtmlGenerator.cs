@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Linq.Expressions;
-using System.Reflection;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.GDSDesignSystem.Partials;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 {
     public class CheckboxItemHtmlGenerator
     {
-
         public static IHtmlContent GenerateHtml<TModel>(
             IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, bool>> propertyLambdaExpression,
@@ -19,16 +18,13 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             Conditional conditional = null,
             bool disabled = false)
         {
-            PropertyInfo property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
-            string propertyName = property.Name;
+            var property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
+            var propertyName = property.Name;
 
-            TModel model = htmlHelper.ViewData.Model;
-            bool isChecked = ExpressionHelpers.GetPropertyValueFromModelAndExpression(model, propertyLambdaExpression);
+            var model = htmlHelper.ViewData.Model;
+            var isChecked = ExpressionHelpers.GetPropertyValueFromModelAndExpression(model, propertyLambdaExpression);
 
-            if (labelOptions != null)
-            {
-                labelOptions.For = propertyName;
-            }
+            if (labelOptions != null) labelOptions.For = propertyName;
 
             var checkboxItemViewModel = new CheckboxItemViewModel
             {
@@ -42,8 +38,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
                 Checked = isChecked
             };
 
-            return htmlHelper.Partial("/GovUkDesignSystemComponents/CheckboxItem.cshtml", checkboxItemViewModel);
+            return htmlHelper.Partial("/Components/CheckboxItem.cshtml", checkboxItemViewModel);
         }
-
     }
 }

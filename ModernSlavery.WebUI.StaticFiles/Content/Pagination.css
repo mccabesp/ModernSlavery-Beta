@@ -11,19 +11,17 @@
 }
 
 .gem-c-pagination__item {
-    font-family: "GDS Transport", Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    font-family: "GDS Transport", Arial, sans-serif;
     font-size: 14px;
+    font-weight: 400;
     line-height: 1.25;
     list-style: none;
 }
 
 @media print {
-    .gem-c-pagination__item {
-        font-family: sans-serif;
-    }
+    .gem-c-pagination__item { font-family: sans-serif; }
 }
 
 @media (min-width: 40.0625em) {
@@ -46,54 +44,46 @@
     text-decoration: none;
 }
 
-    .gem-c-pagination__link:hover, .gem-c-pagination__link:active, .gem-c-pagination__link:visited {
-        color: #1d70b8;
-    }
+.gem-c-pagination__link:hover, .gem-c-pagination__link:active, .gem-c-pagination__link:visited { color: #1d70b8; }
 
-    .gem-c-pagination__link:hover, .gem-c-pagination__link:active {
-        background-color: #f3f2f1;
-    }
+.gem-c-pagination__link:hover, .gem-c-pagination__link:active { background-color: #f3f2f1; }
 
-    .gem-c-pagination__link:focus {
-        outline: 3px solid transparent;
-        color: #0b0c0c;
-        background-color: #ffdd00;
-        box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
-        text-decoration: none;
-    }
-
-.gem-c-pagination__link-title {
-    display: block;
+.gem-c-pagination__link:focus {
+    background-color: #ffdd00;
+    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+    color: #0b0c0c;
+    outline: 3px solid transparent;
+    text-decoration: none;
 }
 
+.gem-c-pagination__link-title { display: block; }
+
 .gem-c-pagination__link-divider {
-    position: absolute !important;
-    width: 1px !important;
+    -webkit-clip-path: inset(50%) !important;
+    border: 0 !important;
+    clip: rect(0 0 0 0) !important;
+    clip-path: inset(50%) !important;
     height: 1px !important;
     margin: 0 !important;
-    padding: 0 !important;
     overflow: hidden !important;
-    clip: rect(0 0 0 0) !important;
-    -webkit-clip-path: inset(50%) !important;
-    clip-path: inset(50%) !important;
-    border: 0 !important;
+    padding: 0 !important;
+    position: absolute !important;
     white-space: nowrap !important;
+    width: 1px !important;
 }
 
 .gem-c-pagination__link-text {
-    font-family: "GDS Transport", Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    font-family: "GDS Transport", Arial, sans-serif;
     font-size: 16px;
+    font-weight: 700;
     line-height: 1.25;
     margin-left: 10px;
 }
 
 @media print {
-    .gem-c-pagination__link-text {
-        font-family: sans-serif;
-    }
+    .gem-c-pagination__link-text { font-family: sans-serif; }
 }
 
 @media (min-width: 40.0625em) {
@@ -111,22 +101,20 @@
 }
 
 .gem-c-pagination__link-icon {
-    font-family: "GDS Transport", Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 1.25;
+    -webkit-font-smoothing: antialiased;
     display: inline-block;
-    margin-bottom: 1px;
+    font-family: "GDS Transport", Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 400;
     height: .482em;
+    line-height: 1.25;
+    margin-bottom: 1px;
     width: .63em;
 }
 
 @media print {
-    .gem-c-pagination__link-icon {
-        font-family: sans-serif;
-    }
+    .gem-c-pagination__link-icon { font-family: sans-serif; }
 }
 
 @media (min-width: 40.0625em) {
@@ -145,13 +133,11 @@
 
 .gem-c-pagination__link-label {
     display: inline-block;
+    margin-left: 25px;
     margin-top: .1em;
     text-decoration: underline;
-    margin-left: 25px;
 }
 
 @media (min-width: 40.0625em) {
-    .gem-c-pagination__link-label {
-        margin-left: 30px;
-    }
+    .gem-c-pagination__link-label { margin-left: 30px; }
 }

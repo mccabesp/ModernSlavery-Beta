@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
 {
@@ -13,8 +13,8 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
             PropertyInfo property,
             HttpRequest httpRequest)
         {
-            string propertyName = $"GovUk_Radio_{property.Name}";
-            StringValues parameterValues = httpRequest.Form[propertyName];
+            var propertyName = $"GovUk_Radio_{property.Name}";
+            var parameterValues = httpRequest.Form[propertyName];
 
             ThrowIfPropertyTypeIsNotNullableEnum(property);
             ParserHelpers.ThrowIfMoreThanOneValue(parameterValues, property);
@@ -27,9 +27,9 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
 
             if (parameterValues.Count > 0)
             {
-                string parameterValueAsString = parameterValues[0];
+                var parameterValueAsString = parameterValues[0];
 
-                object parameterAsEnum = ParseParameterAsEnum(parameterValueAsString, property);
+                var parameterAsEnum = ParseParameterAsEnum(parameterValueAsString, property);
 
                 property.SetValue(model, parameterAsEnum);
             }
@@ -40,17 +40,15 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
         private static void ThrowIfPropertyTypeIsNotNullableEnum(PropertyInfo property)
         {
             if (!TypeHelpers.IsNullableEnum(property.PropertyType))
-            {
                 throw new ArgumentException(
                     "RadioToNullableEnumParser can only be used on Nullable Enum properties, " +
                     $"but was actually used on property [{property.Name}] of type [{property.PropertyType.FullName}] "
                 );
-            }
         }
 
         private static object ParseParameterAsEnum(string parameterValueAsString, PropertyInfo property)
         {
-            Type underlyingType = Nullable.GetUnderlyingType(property.PropertyType);
+            var underlyingType = Nullable.GetUnderlyingType(property.PropertyType);
             object parameterAsEnum;
             try
             {
@@ -58,7 +56,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
             }
             catch (Exception ex)
             {
-                string allowedValues = string.Join(",", Enum.GetNames(underlyingType));
+                var allowedValues = string.Join(",", Enum.GetNames(underlyingType));
                 throw new ArgumentException(
                     $"User sent invalid value for Enum type [{property.Name}] " +
                     $"sent value [{parameterValueAsString}] allowed values are [{allowedValues}]",
@@ -68,6 +66,5 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
 
             return parameterAsEnum;
         }
-
     }
 }

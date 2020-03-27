@@ -1,14 +1,13 @@
 ﻿using System;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.WebUI.Admin.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.BusinessDomain;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models.CompaniesHouse;
-using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
+using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
@@ -37,7 +36,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("organisation/{id}/coho-sync/opt-in")]
         public IActionResult OptIn(long id)
         {
-            Organisation organisation = dataRepository.Get<Organisation>(id);
+            var organisation = dataRepository.Get<Organisation>(id);
 
             var model = new AdminChangeCompaniesHouseOptInOutViewModel();
             model.Organisation = organisation;
@@ -73,15 +72,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 this,
                 AuditedAction.AdminChangeCompaniesHouseOpting,
                 organisation,
-                new {
-                    Opt = "In",
-                    Reason = viewModel.Reason
+                new
+                {
+                    Opt = "In", viewModel.Reason
                 });
 
-            return RedirectToAction("ViewOrganisation", "AdminViewOrganisation", new {id = organisation.OrganisationId});
+            return RedirectToAction("ViewOrganisation", "AdminViewOrganisation",
+                new {id = organisation.OrganisationId});
         }
 
-        private void PopulateViewModelWithCompanyFromCompaniesHouse(AdminChangeCompaniesHouseOptInOutViewModel viewModel, Organisation organisation)
+        private void PopulateViewModelWithCompanyFromCompaniesHouse(
+            AdminChangeCompaniesHouseOptInOutViewModel viewModel, Organisation organisation)
         {
             CompaniesHouseCompany companiesHouseCompany;
             try
@@ -132,13 +133,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 this,
                 AuditedAction.AdminChangeCompaniesHouseOpting,
                 organisation,
-                new {
-                    Opt = "Out",
-                    Reason = viewModel.Reason
+                new
+                {
+                    Opt = "Out", viewModel.Reason
                 });
 
-            return RedirectToAction("ViewOrganisation", "AdminViewOrganisation", new {id = organisation.OrganisationId});
+            return RedirectToAction("ViewOrganisation", "AdminViewOrganisation",
+                new {id = organisation.OrganisationId});
         }
-
     }
 }

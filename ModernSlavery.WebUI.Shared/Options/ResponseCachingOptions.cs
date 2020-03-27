@@ -9,6 +9,8 @@ namespace ModernSlavery.WebUI.Shared.Options
     public class ResponseCachingOptions : IOptions
     {
         public int StaticCacheSeconds { get; set; } = 86400;
-        public Dictionary<string, CacheProfile> CacheProfiles { get; set; } = new Dictionary<string, CacheProfile>(StringComparer.OrdinalIgnoreCase);
+
+        public Dictionary<string, CacheProfile> CacheProfiles { get; set; } =
+            new Dictionary<string, CacheProfile>(StringComparer.OrdinalIgnoreCase);
     }
 }

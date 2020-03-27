@@ -1,10 +1,10 @@
 ﻿// SuggestEmployer
-(function (GOVUK, $) {
-    'use strict';
+(function(GOVUK, $) {
+    "use strict";
 
     function SuggestEmployer(options) {
-        this.formId = '#' + options.formId;
-        this.keywordsId = '#' + options.keywordsId;
+        this.formId = "#" + options.formId;
+        this.keywordsId = "#" + options.keywordsId;
         this.employerType = options.employerType;
         this.onEmployerTypeChanged = options.onEmployerTypeChanged;
         this.searchTypeActions = [
@@ -15,12 +15,12 @@
                  */
 
                 // relative url to retrieve employer name suggestions from server
-                suggestUrl: '/viewing/suggest-employer-name-js?search=',
+                suggestUrl: "/viewing/suggest-employer-name-js?search=",
 
                 // template used for drop down employer name entry
-                suggestionTemplate: function (suggestion) {
+                suggestionTemplate: function(suggestion) {
                     // direct link to employer page
-                    var url = '/employer/' + suggestion.Id;
+                    var url = "/employer/" + suggestion.Id;
 
                     // build the html for drop down entry
                     var text = ['<a href="' + url + '">' + suggestion.Text];
@@ -28,12 +28,12 @@
                         text.push([
                             '<div class="suggest-prev-entry">',
                             '<span class="suggest-prevmatching">previously </span>',
-                            '<span class= "suggest-prevname">' + suggestion.PreviousName + '</span>',
-                            '</div>'
-                        ].join(''));
+                            '<span class= "suggest-prevname">' + suggestion.PreviousName + "</span>",
+                            "</div>"
+                        ].join(""));
                     }
-                    text.push('</a>');
-                    return '<div>' + text.join('') + '</div>';
+                    text.push("</a>");
+                    return "<div>" + text.join("") + "</div>";
                 }
             }, {
                 /*
@@ -41,23 +41,31 @@
                  */
 
                 // relative url to retrieve employer type and sic code suggestions from server
-                suggestUrl: '/viewing/suggest-sic-code-js?search=',
+                suggestUrl: "/viewing/suggest-sic-code-js?search=",
 
                 // template used for drop down employer type and sic code entry
-                suggestionTemplate: function (suggestion) {
+                suggestionTemplate: function(suggestion) {
                     // link to search by sic codes
-                    var url = '/search-results?t=2&search=' + suggestion.SicCodeDescription;
-                    var text = ['<a href="' + url + '">' + suggestion.SicCodeDescription + ' (SIC CODE ' + suggestion.SicCodeId + ')'];
+                    var url = "/search-results?t=2&search=" + suggestion.SicCodeDescription;
+                    var text = [
+                        '<a href="' +
+                        url +
+                        '">' +
+                        suggestion.SicCodeDescription +
+                        " (SIC CODE " +
+                        suggestion.SicCodeId +
+                        ")"
+                    ];
                     if (suggestion.SicCodeMatchingSynonyms.length > 0) {
                         text.push([
                             '<div class="suggest-prev-entry">',
                             '<span class="suggest-prevmatching">-- </span>',
-                            '<span class= "suggest-prevname">' + suggestion.SicCodeMatchingSynonyms + '</span>',
-                            '</div>'
-                        ].join(''));
+                            '<span class= "suggest-prevname">' + suggestion.SicCodeMatchingSynonyms + "</span>",
+                            "</div>"
+                        ].join(""));
                     }
-                    text.push('</a>');
-                    return '<div>' + text.join('') + '</div>';
+                    text.push("</a>");
+                    return "<div>" + text.join("") + "</div>";
                 }
             }
         ];
@@ -66,12 +74,11 @@
     }
 
     SuggestEmployer.prototype = {
-
-        bindEvents: function () {
+        bindEvents: function() {
             if (this.formId && this.formId.length > 0) {
                 // bind search type
                 var $form = $(this.formId);
-                $form.on('change', 'input[name=t]', this.onSearchTypeChanged.bind(this));
+                $form.on("change", "input[name=t]", this.onSearchTypeChanged.bind(this));
             }
 
             if (this.employerType) {
@@ -84,7 +91,7 @@
             if (this.onEmployerTypeChanged) this.onEmployerTypeChanged(this.employerType);
         },
 
-        onSearchTypeChanged: function (e) {
+        onSearchTypeChanged: function(e) {
             var employerTypeIndex = e.currentTarget.value;
             var action = this.searchTypeActions[employerTypeIndex];
             this.bindSuggestInput(action);
@@ -92,13 +99,14 @@
             if (e && e.preventDefault) e.preventDefault();
         },
 
-        getEmployerNameSuggestionHandler: function (url, keywords, callback) {
-            return $.get(encodeURI(url + keywords), function (response) {
-                return callback(response.Matches);
-            });
+        getEmployerNameSuggestionHandler: function(url, keywords, callback) {
+            return $.get(encodeURI(url + keywords),
+                function(response) {
+                    return callback(response.Matches);
+                });
         },
 
-        bindSuggestInput: function (action) {
+        bindSuggestInput: function(action) {
             var self = this;
 
             // calls server to get matches
@@ -106,18 +114,19 @@
 
             $(this.keywordsId).unbind();
             $(this.keywordsId).typeahead({
-                hint: false,
-                highlight: true,
-                minLength: 2,
-                classNames: {
-                    menu: 'tt-menu form-control form-control-1',
-                    highlight: 'bold-small'
+                    hint: false,
+                    highlight: true,
+                    minLength: 2,
+                    classNames: {
+                        menu: "tt-menu form-control form-control-1",
+                        highlight: "bold-small"
+                    },
+                    ariaOwnsId: "arialist_" + Math.random()
                 },
-                ariaOwnsId: "arialist_" + Math.random()
-            }, {
+                {
                     limit: 10,
-                    display: 'Text',
-                    source: function (query, syncResultsFn, asyncResultsFn) {
+                    display: "Text",
+                    source: function(query, syncResultsFn, asyncResultsFn) {
                         return suggestionHandler.call(self, action.suggestUrl, query, asyncResultsFn);
                     },
                     // template for each suggestion in the autocomplete list

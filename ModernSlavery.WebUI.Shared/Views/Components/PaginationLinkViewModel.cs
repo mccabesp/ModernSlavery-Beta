@@ -2,7 +2,6 @@ namespace ModernSlavery.WebUI.Shared.Views.Components
 {
     public class PaginationLinkViewModel
     {
-
         /// <summary>
         ///     The direction of the arrow.
         /// </summary>
@@ -22,13 +21,11 @@ namespace ModernSlavery.WebUI.Shared.Views.Components
         ///     The url for the pagination link.
         /// </summary>
         public string Url { get; set; }
-
     }
-    
+
     public enum ArrowDirection
     {
         Left = 0,
-        Right = 1,
+        Right = 1
     }
 }
-

@@ -1,8 +1,7 @@
 ﻿@{
     ViewBag.Title = "Add your organisation - Modern Slavery reporting service";
 }
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@model ModernSlavery.WebUI.Shared.Models.OrganisationViewModel
+@model OrganisationViewModel
 <div id="add-organisation-content">
     <div class="grid-row">
         <div class="column-full">
@@ -86,7 +85,7 @@
                         <details role="group" @(!string.IsNullOrWhiteSpace(Model.OtherName) || !string.IsNullOrWhiteSpace(Model.OtherValue) ? "open" : "")>
                             <summary role="button" aria-controls="details-content-0" aria-expanded="true">Other reference?</summary>
                             <div class="panel panel-border-narrow" id="details-content-0" aria-hidden="false">
-                                <div id="divNameOrType" class="form-group @Html.SetErrorClass(model => model.OtherName, "error")" style="margin-bottom:5px;">
+                                <div id="divNameOrType" class="form-group @Html.SetErrorClass(model => model.OtherName, "error")" style="margin-bottom: 5px;">
                                     <label class="form-label" for="OtherName">Name or type <span class="optional">(e.g., 'DUNS ')</span></label>
                                     @Html.ValidationMessageFor(model => model.OtherName, "", new {@class = "error-danger"})
                                     <div class="col-md-10">
@@ -105,7 +104,7 @@
                         </details>
                     </div>
                     <br/>
-                    <label for="NoReference" style="white-space:nowrap">
+                    <label for="NoReference" style="white-space: nowrap">
                         @Html.CheckBoxFor(m => m.NoReference)
                         I don't have a reference for this organisation
                     </label>

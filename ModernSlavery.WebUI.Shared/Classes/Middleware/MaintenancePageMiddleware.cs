@@ -6,7 +6,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
 {
     public class MaintenancePageMiddleware
     {
-
         private readonly bool _enabled;
         private readonly RequestDelegate _next;
 
@@ -17,16 +16,13 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
         }
 
 
-        public async Task Invoke(Microsoft.AspNetCore.Http.HttpContext httpContext)
+        public async Task Invoke(HttpContext httpContext)
         {
             //Redirect to holding mage if in maintenance mode
             if (_enabled && !httpContext.GetUri().PathAndQuery.StartsWithI(@"/error/service-unavailable"))
-            {
                 httpContext.Response.Redirect(@"/error/service-unavailable", true);
-            }
 
             await _next.Invoke(httpContext);
         }
-
     }
 }

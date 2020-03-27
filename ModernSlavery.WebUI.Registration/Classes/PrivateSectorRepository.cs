@@ -16,17 +16,16 @@ namespace ModernSlavery.WebUI.Registration.Classes
 {
     public class PrivateSectorRepository : IPagedRepository<EmployerRecord>
     {
-
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
         private readonly IDataRepository _DataRepository;
-        private readonly SharedOptions SharedOptions;
 
 
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHttpSession _Session;
+        private readonly SharedOptions SharedOptions;
 
         public PrivateSectorRepository(
-            SharedOptions sharedOptions, 
+            SharedOptions sharedOptions,
             IHttpContextAccessor httpContextAccessor,
             IHttpSession session,
             IDataRepository dataRepository,
@@ -49,16 +48,14 @@ namespace ModernSlavery.WebUI.Registration.Classes
             throw new NotImplementedException();
         }
 
-        public async Task<PagedResult<EmployerRecord>> SearchAsync(string searchText, int page, int pageSize, bool test = false)
+        public async Task<PagedResult<EmployerRecord>> SearchAsync(string searchText, int page, int pageSize,
+            bool test = false)
         {
-            if (searchText.IsNumber())
-            {
-                searchText = searchText.PadLeft(8, '0');
-            }
+            if (searchText.IsNumber()) searchText = searchText.PadLeft(8, '0');
 
 
             var remoteTotal = 0;
-            PagedResult<EmployerRecord> searchResults = test ? null : LoadSearch(searchText);
+            var searchResults = test ? null : LoadSearch(searchText);
 
             if (searchResults == null)
             {
@@ -69,22 +66,23 @@ namespace ModernSlavery.WebUI.Registration.Classes
                 {
                     orgs = _DataRepository.GetAll<Organisation>()
                         .Where(
-                            o => o.SectorType == SectorTypes.Private && o.Status == OrganisationStatuses.Active && o.LatestAddress != null)
+                            o => o.SectorType == SectorTypes.Private && o.Status == OrganisationStatuses.Active &&
+                                 o.LatestAddress != null)
                         .ToList();
 
                     if (searchText.IsCompanyNumber())
-                    {
-                        localResults = orgs.Where(o => o.CompanyNumber.EqualsI(searchText)).OrderBy(o => o.OrganisationName).ToList();
-                    }
+                        localResults = orgs.Where(o => o.CompanyNumber.EqualsI(searchText))
+                            .OrderBy(o => o.OrganisationName).ToList();
                     else
-                    {
-                        localResults = orgs.Where(o => o.OrganisationName.ContainsI(searchText)).OrderBy(o => o.OrganisationName).ToList();
-                    }
+                        localResults = orgs.Where(o => o.OrganisationName.ContainsI(searchText))
+                            .OrderBy(o => o.OrganisationName).ToList();
                 }
 
                 try
                 {
-                    searchResults = await _CompaniesHouseAPI.SearchEmployersAsync(searchText, 1, _CompaniesHouseAPI.MaxRecords, test);
+                    searchResults =
+                        await _CompaniesHouseAPI.SearchEmployersAsync(searchText, 1, _CompaniesHouseAPI.MaxRecords,
+                            test);
                     remoteTotal = searchResults.Results.Count;
                 }
                 catch (Exception ex)
@@ -95,13 +93,9 @@ namespace ModernSlavery.WebUI.Registration.Classes
                             "Bad Gateway",
                             "the connected party did not properly respond after a period of time")
                         && localResults.Count > 0)
-                    {
                         searchResults = new PagedResult<EmployerRecord>();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
 
                 if (!searchText.IsCompanyNumber() && remoteTotal > 0)
@@ -110,36 +104,30 @@ namespace ModernSlavery.WebUI.Registration.Classes
                     var companyNumbers = new SortedSet<string>(
                         searchResults.Results.Select(s => s.CompanyNumber),
                         StringComparer.OrdinalIgnoreCase);
-                    List<Organisation> existingResults = orgs.Where(o => companyNumbers.Contains(o.CompanyNumber)).ToList();
+                    var existingResults = orgs.Where(o => companyNumbers.Contains(o.CompanyNumber)).ToList();
                     localResults = localResults.Union(existingResults).ToList();
                 }
 
-                int localTotal = localResults.Count;
+                var localTotal = localResults.Count;
 
                 //Remove any coho results found in DB
                 if (localTotal > 0)
                 {
-                    localTotal -= searchResults.Results.RemoveAll(r => localResults.Any(l => l.CompanyNumber == r.CompanyNumber));
+                    localTotal -=
+                        searchResults.Results.RemoveAll(r => localResults.Any(l => l.CompanyNumber == r.CompanyNumber));
 
                     if (localResults.Count > 0)
                     {
                         if (test) //Make sure test employer is first
-                        {
                             searchResults.Results.AddRange(localResults.Select(o => EmployerRecord.Create(o)));
-                        }
                         else
-                        {
                             searchResults.Results.InsertRange(0, localResults.Select(o => EmployerRecord.Create(o)));
-                        }
 
                         searchResults.ActualRecordTotal += localTotal;
                     }
                 }
 
-                if (!test)
-                {
-                    SaveSearch(searchText, searchResults, remoteTotal);
-                }
+                if (!test) SaveSearch(searchText, searchResults, remoteTotal);
             }
 
             var result = new PagedResult<EmployerRecord>();
@@ -175,7 +163,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
         public PagedResult<EmployerRecord> LoadSearch(string searchText)
         {
             var lastSearchText = _Session["LastPrivateSearchText"] as string;
-            int remoteTotal = _Session["LastPrivateSearchRemoteTotal"].ToInt32();
+            var remoteTotal = _Session["LastPrivateSearchRemoteTotal"].ToInt32();
 
             PagedResult<EmployerRecord> result = null;
 
@@ -192,14 +180,10 @@ namespace ModernSlavery.WebUI.Registration.Classes
             else
             {
                 result = _Session.Get<PagedResult<EmployerRecord>>("LastPrivateSearchResults");
-                if (result == null)
-                {
-                    result = new PagedResult<EmployerRecord>();
-                }
+                if (result == null) result = new PagedResult<EmployerRecord>();
             }
 
             return result;
         }
-
     }
 }

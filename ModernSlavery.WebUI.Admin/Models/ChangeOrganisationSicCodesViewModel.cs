@@ -3,27 +3,12 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.GDSDesignSystem;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
     public class ChangeOrganisationSicCodesViewModel : GovUkViewModel
     {
-
-        #region Not mapped, only used for displaying information in the views
-        public Organisation Organisation { get; set; }
-        public List<SicCode> SicCodesToAdd { get; set; }
-        public List<SicCode> SicCodesToKeep { get; set; }
-        public List<SicCode> SicCodesToRemove { get; set; }
-        public Dictionary<string, SicCode> SicCodesFromCoHo { get; set; }
-        public ChangeOrganisationSicCodesConfirmationType? ConfirmationType { get; set; }
-        #endregion
-
-        #region Used for hidden inputs - to keep track of the current state
-        public List<string> SicCodeIdsFromCoHo { get; set; }
-        public List<int> SicCodeIdsToAdd { get; set; }
-        public List<int> SicCodeIdsToRemove { get; set; }
-        #endregion
-
         // "Action" should probably never be set in code
         // It should be mapped from a hidden input and is used to tell the controller what action we want to take
         public ManuallyChangeOrganisationSicCodesActions Action { get; set; }
@@ -39,6 +24,24 @@ namespace ModernSlavery.WebUI.Admin.Models
         [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a reason for this change")]
         public string Reason { get; set; }
 
+        #region Not mapped, only used for displaying information in the views
+
+        public Organisation Organisation { get; set; }
+        public List<SicCode> SicCodesToAdd { get; set; }
+        public List<SicCode> SicCodesToKeep { get; set; }
+        public List<SicCode> SicCodesToRemove { get; set; }
+        public Dictionary<string, SicCode> SicCodesFromCoHo { get; set; }
+        public ChangeOrganisationSicCodesConfirmationType? ConfirmationType { get; set; }
+
+        #endregion
+
+        #region Used for hidden inputs - to keep track of the current state
+
+        public List<string> SicCodeIdsFromCoHo { get; set; }
+        public List<int> SicCodeIdsToAdd { get; set; }
+        public List<int> SicCodeIdsToRemove { get; set; }
+
+        #endregion
     }
 
     public enum AcceptCompaniesHouseSicCodes
@@ -74,5 +77,4 @@ namespace ModernSlavery.WebUI.Admin.Models
         Manual,
         CoHo
     }
-
 }

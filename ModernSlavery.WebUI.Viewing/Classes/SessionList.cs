@@ -9,10 +9,10 @@ namespace ModernSlavery.WebUI.Viewing.Classes
 {
     public class SessionList<T> : IHashSet<T>
     {
-
-        private HashSet<T> _items;
         private readonly IHttpSession _session;
         private readonly string _sessionName;
+
+        private HashSet<T> _items;
 
         public SessionList(IHttpSession session, string contextName, string variableName)
         {
@@ -58,17 +58,11 @@ namespace ModernSlavery.WebUI.Viewing.Classes
 
         private void LoadItems()
         {
-            string json = _session[_sessionName].ToStringOrNull();
+            var json = _session[_sessionName].ToStringOrNull();
 
-            if (!string.IsNullOrWhiteSpace(json))
-            {
-                _items = JsonConvert.DeserializeObject<HashSet<T>>(json);
-            }
+            if (!string.IsNullOrWhiteSpace(json)) _items = JsonConvert.DeserializeObject<HashSet<T>>(json);
 
-            if (_items == null)
-            {
-                _items = new HashSet<T>();
-            }
+            if (_items == null) _items = new HashSet<T>();
         }
 
         private void SaveItems()
@@ -79,11 +73,10 @@ namespace ModernSlavery.WebUI.Viewing.Classes
             }
             else
             {
-                string json = JsonConvert.SerializeObject(_items);
+                var json = JsonConvert.SerializeObject(_items);
 
                 _session[_sessionName] = json;
             }
         }
-
     }
 }

@@ -11,7 +11,6 @@ namespace ModernSlavery.WebUI.Shared.Classes
 {
     public class HttpSession : IHttpSession
     {
-
         private readonly IHttpContextAccessor _httpContextAccessor;
         private bool Dirty;
 
@@ -34,10 +33,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
         public async Task SaveAsync()
         {
-            if (Dirty)
-            {
-                await _httpContextAccessor.HttpContext.Session.CommitAsync().ConfigureAwait(false);
-            }
+            if (Dirty) await _httpContextAccessor.HttpContext.Session.CommitAsync().ConfigureAwait(false);
 
             Dirty = false;
         }
@@ -47,19 +43,12 @@ namespace ModernSlavery.WebUI.Shared.Classes
             get => Get<string>(key);
             set
             {
-                if (string.IsNullOrWhiteSpace(key))
-                {
-                    throw new ArgumentNullException(nameof(key));
-                }
+                if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
 
                 if (value == null)
-                {
                     Remove(key);
-                }
                 else
-                {
                     Add(key, value);
-                }
             }
         }
 
@@ -67,36 +56,21 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
         public T Get<T>(string key)
         {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
 
             //Get value from session
-            byte[] bytes = _httpContextAccessor.HttpContext.Session.Get(key);
-            if (bytes == null || bytes.Length == 0)
-            {
-                return default;
-            }
+            var bytes = _httpContextAccessor.HttpContext.Session.Get(key);
+            if (bytes == null || bytes.Length == 0) return default;
 
             bytes = Encryption.Decompress(bytes);
 
-            if (bytes == null || bytes.Length == 0)
-            {
-                return default;
-            }
+            if (bytes == null || bytes.Length == 0) return default;
 
-            string value = Encoding.UTF8.GetString(bytes);
+            var value = Encoding.UTF8.GetString(bytes);
 
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return default;
-            }
+            if (string.IsNullOrWhiteSpace(value)) return default;
 
-            if (typeof(T).IsSimpleType())
-            {
-                return (T) Convert.ChangeType(value, typeof(T));
-            }
+            if (typeof(T).IsSimpleType()) return (T) Convert.ChangeType(value, typeof(T));
 
             return JsonConvert.DeserializeObject<T>(value);
         }
@@ -113,7 +87,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
                 str = JsonConvert.SerializeObject(value);
                 if (str.Length > 250)
                 {
-                    byte[] bytes = Encoding.UTF8.GetBytes(str);
+                    var bytes = Encoding.UTF8.GetBytes(str);
                     bytes = Encryption.Compress(bytes);
                     _httpContextAccessor.HttpContext.Session.Set(key, bytes);
                     Dirty = true;
@@ -127,14 +101,10 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
         public void Remove(string key)
         {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
+            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
 
             _httpContextAccessor.HttpContext.Session.Remove(key);
             Dirty = true;
         }
-
     }
 }

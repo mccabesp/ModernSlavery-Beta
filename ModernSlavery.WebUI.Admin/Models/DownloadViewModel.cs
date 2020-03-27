@@ -11,13 +11,11 @@ namespace ModernSlavery.WebUI.Admin.Models
     [Serializable]
     public class DownloadViewModel
     {
-
         public List<Download> Downloads { get; set; } = new List<Download>();
 
         [Serializable]
         public class Download
         {
-
             public string Type { get; set; }
             public string Title { get; set; }
             public string Description { get; set; }
@@ -34,15 +32,9 @@ namespace ModernSlavery.WebUI.Admin.Models
             {
                 get
                 {
-                    if (Filepath.EndsWithI(".csv"))
-                    {
-                        return "text/csv";
-                    }
+                    if (Filepath.EndsWithI(".csv")) return "text/csv";
 
-                    if (Filepath.EndsWithI(".txt", ".log"))
-                    {
-                        return "text/plain";
-                    }
+                    if (Filepath.EndsWithI(".txt", ".log")) return "text/plain";
 
                     return FileSystem.GetMimeMapping(Filename);
                 }
@@ -50,13 +42,9 @@ namespace ModernSlavery.WebUI.Admin.Models
 
             public string Content { get; set; }
 
-            [XmlIgnore]
-            [JsonIgnore]
-            public DataTable Datatable { get; set; }
+            [XmlIgnore] [JsonIgnore] public DataTable Datatable { get; set; }
 
             public bool ShowUpdateButton { get; set; }
-
         }
-
     }
 }

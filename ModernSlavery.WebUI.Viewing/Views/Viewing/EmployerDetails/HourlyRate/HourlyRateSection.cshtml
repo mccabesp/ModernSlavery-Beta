@@ -1,9 +1,5 @@
-﻿@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@using ModernSlavery.WebUI.Shared.Classes.Patterns
-@using ModernSlavery.WebUI.Viewing.Models
-@model ModernSlavery.BusinessDomain.Shared.Models.ReturnViewModel
+﻿@model ModernSlavery.BusinessDomain.Shared.Models.ReturnViewModel
 @{
-
     var medianHourlyRateChartModel = new VerticalBarChartModel
     {
         Id = "MedianHourlyDiffChart",
@@ -15,14 +11,14 @@
     };
 
     // calculates the median hourly rate text to display
-    string medianMonetisation = $"<strong>women earn {Model.FemaleMedianHourlyRateMonitised}</strong> for every <strong>{Model.MaleMedianHourlyRateMonitised}</strong> that men earn when comparing median hourly wages.";
+    var medianMonetisation = $"<strong>women earn {Model.FemaleMedianHourlyRateMonitised}</strong> for every <strong>{Model.MaleMedianHourlyRateMonitised}</strong> that men earn when comparing median hourly wages.";
 
-    string medianLoHiStatement = Model.FemaleHasLowerMedianHourlyPercent ?
+    var medianLoHiStatement = Model.FemaleHasLowerMedianHourlyPercent ?
         "<strong>lower</strong> than men&rsquo;s." :
         "<strong>higher</strong> than men&rsquo;s.";
 
     // calculates the mean hourly rate text to display
-    string meanLoHiStatement = Model.FemaleHasLowerMeanHourlyPercent ?
+    var meanLoHiStatement = Model.FemaleHasLowerMeanHourlyPercent ?
         "<strong>lower</strong> than men&rsquo;s." :
         "<strong>higher</strong> than men&rsquo;s.";
 }

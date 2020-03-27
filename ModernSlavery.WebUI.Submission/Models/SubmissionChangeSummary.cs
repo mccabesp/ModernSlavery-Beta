@@ -1,9 +1,7 @@
 ﻿namespace ModernSlavery.WebUI.Submission.Models
 {
-
     public class SubmissionChangeSummary
     {
-
         public bool FiguresChanged { get; set; }
         public bool PersonResonsibleChanged { get; set; }
         public bool OrganisationSizeChanged { get; set; }
@@ -22,7 +20,5 @@
         public bool ShouldProvideLateReason => (FiguresChanged || PersonResonsibleChanged) && IsPrevReportingStartYear;
 
         public string Modifications { get; set; }
-
     }
-
 }

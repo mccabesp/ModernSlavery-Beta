@@ -1,43 +1,39 @@
-@using Microsoft.AspNetCore.Html
-@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model ModernSlavery.WebUI.Admin.Models.AdminSearchViewModel
-
+@model AdminSearchViewModel
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = "Search - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @{
-
     object HighlightMatches(AdminSearchMatchViewModel searchMatch)
     {
-        IHtmlContent startComment = Html.Raw("<!--");
-        IHtmlContent endComment = Html.Raw("-->");
+        var startComment = Html.Raw("<!--");
+        var endComment = Html.Raw("-->");
 
         Func<object, object> html =
             @<text>
                 <span class="admin-search-highlighted">
                     @(startComment)
                     @{
-                        string name = searchMatch.Text;
-                        List<AdminSearchMatchGroupViewModel> matchGroups = searchMatch.MatchGroups;
+                        var name = searchMatch.Text;
+                        var matchGroups = searchMatch.MatchGroups;
 
                         var previousMatchEnd = 0;
-                        foreach (AdminSearchMatchGroupViewModel matchGroup in matchGroups)
+                        foreach (var matchGroup in matchGroups)
                         {
-                            string nonBoldText = name.Substring(previousMatchEnd, matchGroup.Start - previousMatchEnd);
-                            string boldText = name.Substring(matchGroup.Start, matchGroup.Length);
+                            var nonBoldText = name.Substring(previousMatchEnd, matchGroup.Start - previousMatchEnd);
+                            var boldText = name.Substring(matchGroup.Start, matchGroup.Length);
 
                             // The HTML / C# below looks a bit odd and oddly-formatted
                             // This is deliberate
                             // We do this because we want to avoid spaces between the text
-                            @(endComment)@(nonBoldText)<b>@(boldText)</b>@(startComment)
+                            @(endComment)@(nonBoldText)<b>@(boldText)</b>
+                            @(startComment)
 
                             previousMatchEnd = matchGroup.Start + matchGroup.Length;
                         }
 
-                        string finalNonBoldText = name.Substring(previousMatchEnd, name.Length - previousMatchEnd);
+                        var finalNonBoldText = name.Substring(previousMatchEnd, name.Length - previousMatchEnd);
                     }
                     @(endComment)@(finalNonBoldText)
                 </span>
@@ -125,7 +121,7 @@
                 <div class="govuk-details__text">
                     <table class="govuk-table">
                         <tbody class="govuk-table__body">
-                        @foreach (AdminSearchResultOrganisationViewModel organisation in Model.SearchResults.OrganisationResults)
+                        @foreach (var organisation in Model.SearchResults.OrganisationResults)
                         {
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell">
@@ -134,7 +130,7 @@
                                         @(HighlightMatches(organisation.OrganisationName))
                                     </a>
 
-                                    @foreach (AdminSearchMatchViewModel previousName in organisation.OrganisationPreviousNames)
+                                    @foreach (var previousName in organisation.OrganisationPreviousNames)
                                     {
                                         <br/>
                                         @:previously @(HighlightMatches(previousName))
@@ -173,7 +169,7 @@
                 <div class="govuk-details__text">
                     <table class="govuk-table">
                         <tbody class="govuk-table__body">
-                        @foreach (AdminSearchResultUserViewModel user in Model.SearchResults.UserResults)
+                        @foreach (var user in Model.SearchResults.UserResults)
                         {
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell">

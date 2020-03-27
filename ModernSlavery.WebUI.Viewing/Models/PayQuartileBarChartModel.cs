@@ -2,7 +2,6 @@
 {
     public class PayQuartileBarChartModel
     {
-
         public string Id { get; set; }
         public string Title { get; set; }
         public string SecondaryTitle { get; set; }
@@ -10,6 +9,5 @@
         public decimal Female { get; set; }
         public string MaleFormatted => string.Format("{0:0.#}", Male);
         public string FemaleFormatted => string.Format("{0:0.#}", Female);
-
     }
 }

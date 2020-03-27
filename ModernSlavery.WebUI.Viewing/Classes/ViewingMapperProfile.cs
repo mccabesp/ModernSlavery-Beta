@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using ModernSlavery.WebUI.Viewing.Models;
-using ModernSlavery.WebUI.Viewing.Models.Search;
 
 namespace ModernSlavery.WebUI.Viewing.Classes
 {
-
     public class ViewingMapperProfile : Profile
     {
         public ViewingMapperProfile()
@@ -21,9 +19,6 @@ namespace ModernSlavery.WebUI.Viewing.Classes
                 .ForMember(dest => dest.SearchMode, opt => opt.Ignore())
                 .ForMember(dest => dest.PageSize, opt => opt.Ignore())
                 .ForMember(dest => dest.SearchType, opt => opt.MapFrom(src => src.t));
-
         }
-
     }
-
 }

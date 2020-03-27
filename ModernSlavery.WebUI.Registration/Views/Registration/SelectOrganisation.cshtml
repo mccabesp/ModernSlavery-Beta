@@ -1,8 +1,7 @@
 ﻿@{
     ViewBag.Title = "Select your organisation - Modern Slavery reporting service";
 }
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@model ModernSlavery.WebUI.Shared.Models.OrganisationViewModel
+@model OrganisationViewModel
 
 <main id="content" role="main">
     <div class="grid-row">
@@ -49,10 +48,10 @@
                                 @Model.ManualEmployers[i].OrganisationName <span>@Model.ManualEmployers[i].GetFullAddress()</span>
                             </td>
                             <td>
-                                @{ Dictionary<string, string> references = Model.GetReferences(i); }
-                                @foreach (string key in references.Keys)
+                                @{ var references = Model.GetReferences(i); }
+                                @foreach (var key in references.Keys)
                                 {
-                                    <span style="white-space:nowrap;display:block;">@key: @(references[key])</span>
+                                    <span style="display: block; white-space: nowrap;">@key: @(references[key])</span>
                                 }
                             </td>
                             <td>

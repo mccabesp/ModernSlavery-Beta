@@ -1,8 +1,4 @@
-﻿@using ModernSlavery.WebUI.Shared.Classes
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@using ModernSlavery.WebUI.Shared.Interfaces
-@using ModernSlavery.WebUI.Shared.Options
-@inject IWebService WebService
+﻿@inject IWebService WebService
 @{
     ViewBag.Title = "Service activated - Modern Slavery reporting service";
 }
@@ -24,7 +20,7 @@
             </dl>
         </div>
         <p>You can also specify whether this employer is in scope of the reporting regulations.</p>
-        <br />
+        <br/>
         <p>
             <a class="button" href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)">Continue</a>
         </p>

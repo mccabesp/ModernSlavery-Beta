@@ -1,14 +1,11 @@
-﻿@using ModernSlavery.Core.Extensions
+﻿@inject IWebService WebService
 @using ModernSlavery.Core.Interfaces.Downloadable
-@using ModernSlavery.WebUI.Shared.Interfaces
-@using ModernSlavery.WebUI.Shared.Options
-@inject IWebService WebService
 @model IEnumerable<ModernSlavery.Core.Interfaces.Downloadable.IDownloadableItem>
 @{
-    object logType = ViewData["logType"];
-    string actionName = ViewData["actionName"].ToString();
+    var logType = ViewData["logType"];
+    var actionName = ViewData["actionName"].ToString();
 
-    List<string> types = Model
+    var types = Model
         .Where(d => d.GetType() == typeof(IDownloadableFile))
         .Select(x => ((IDownloadableFile) x).Type)
         .Distinct()
@@ -17,7 +14,7 @@
 
 <div class="breadcrumbs dynamic-content default-content" style="display: block;">
     <ol>
-        <li style="display: block; padding-top: 0.75em; padding-bottom: 0;">
+        <li style="display: block; padding-bottom: 0; padding-top: 0.75em;">
             &lt;
             @Html.ActionLink("Back to Administration home", await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome))
         </li>
@@ -26,7 +23,7 @@
 
 <div class="grid-row">
     <div class="column-full">
-        <div style="float:right;font-size:smaller;">
+        <div style="float: right; font-size: smaller;">
             <span>
                 <a href="@Url.Action(actionName, new {v = Guid.NewGuid().ToShortString()})" title="Show more recent content">@VirtualDateTime.Now.ToString("d MMM HH:mm")</a>
             </span>
@@ -36,7 +33,7 @@
             <span class="heading-secondary">@logType Logs</span>
         </h1>
 
-        @foreach (IDownloadableItem directoryInfo in Model
+        @foreach (var directoryInfo in Model
             .Where(d => d.GetType() == typeof(IDownloadableDirectory)))
         {
             @if (directoryInfo.Filepath.ToLower() == "logs")
@@ -64,9 +61,9 @@
                 </tr>
             }
 
-            @foreach (string type in types)
+            @foreach (var type in types)
             {
-                IOrderedEnumerable<IDownloadableItem> downloads = Model
+                var downloads = Model
                     .Where(d => d.GetType() == typeof(IDownloadableFile))
                     .Where(f => ((IDownloadableFile) f).Type.EqualsI(type))
                     .OrderByDescending(x => ((IDownloadableFile) x).Modified);
@@ -88,11 +85,11 @@
                     {
                         <tr>
                             <td>
-                                <a href="@Url.Action("Read", "Admin", new { area = "Admin" , filePath = download.Filepath})">
+                                <a href="@Url.Action("Read", "Admin", new {area = "Admin", filePath = download.Filepath})">
                                     <b>@download.Title</b>
                                 </a><br/>@download.Description</td>
                             <td>
-                                <a download="true" href="@Url.Action("Download", "Admin", new { area = "Admin" , filePath = download.Filepath})" target="_blank">@download.Name</a>
+                                <a download="true" href="@Url.Action("Download", "Admin", new {area = "Admin", filePath = download.Filepath})" target="_blank">@download.Name</a>
                             </td>
                         </tr>
                     }

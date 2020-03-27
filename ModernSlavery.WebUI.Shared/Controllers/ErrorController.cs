@@ -10,12 +10,13 @@ namespace ModernSlavery.WebUI.Shared.Controllers
     [Route("Error")]
     public class ErrorController : BaseController
     {
-
         #region Constructors
 
         public ErrorController(
-        ILogger<ErrorController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
-        { }
+            ILogger<ErrorController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(
+            logger, webService, sharedBusinessLogic)
+        {
+        }
 
         #endregion
 
@@ -26,13 +27,9 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (errorCode == 0)
             {
                 if (Response.StatusCode.Between(400, 599))
-                {
                     errorCode = Response.StatusCode;
-                }
                 else
-                {
                     errorCode = 500;
-                }
             }
 
             var model = WebService.ErrorViewModelFactory.Create(errorCode);
@@ -47,13 +44,9 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
                 {
                     if (errorCode == 404 || errorCode == 405)
-                    {
                         Logger.LogWarning($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
-                    }
                     else if (errorCode >= 400)
-                    {
                         Logger.LogError($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
-                    }
                 }
             }
 
@@ -68,6 +61,5 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             Response.StatusCode = 503;
             return View("CustomError", model);
         }
-
     }
 }

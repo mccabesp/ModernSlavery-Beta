@@ -1,11 +1,10 @@
-﻿@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@model ModernSlavery.WebUI.Viewing.Models.Search.SearchViewModel
+﻿@model SearchViewModel
 @{
-    bool showPrev = Model.Employers.CurrentPage > 1;
-    bool showNext = Model.Employers.CurrentPage < Model.Employers.PageCount;
+    var showPrev = Model.Employers.CurrentPage > 1;
+    var showNext = Model.Employers.CurrentPage < Model.Employers.PageCount;
 
-    int prevPage = showPrev ? Model.Employers.CurrentPage - 1 : -1;
-    int nextPage = showNext ? Model.Employers.CurrentPage + 1 : -1;
+    var prevPage = showPrev ? Model.Employers.CurrentPage - 1 : -1;
+    var nextPage = showNext ? Model.Employers.CurrentPage + 1 : -1;
 }
 @if (Model.Employers.Results.Count > 0)
 {

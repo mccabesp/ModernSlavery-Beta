@@ -1,5 +1,4 @@
-﻿@using ModernSlavery.Core.SharedKernel.Options
-@model ModernSlavery.WebUI.Shared.Models.PrivacyStatementModel
+﻿@model PrivacyStatementModel
 @inject SharedOptions sharedOptions
 @{
     ViewBag.Title = "Privacy Policy - Modern Slavery reporting service";
@@ -84,14 +83,14 @@
             <h2 class="heading-medium">How to make a complaint</h2>
             <p>If you're unhappy with the way GEO handled your personal information, you can write to:</p>
             <p>
-                <a href="mailto:@(sharedOptions.GpgReportingEmail)" target="_blank">@sharedOptions.GpgReportingEmail</a> or in writing to:<br />
+                <a href="mailto:@(sharedOptions.GpgReportingEmail)" target="_blank">@sharedOptions.GpgReportingEmail</a> or in writing to:<br/>
             </p>
             <div class="panel">
                 <address style="font-style: normal">
-                    Government Equalities Office<br />
-                    6th Floor, Sanctuary Buildings,<br />
-                    Great Smith Street,<br />
-                    London,<br />
+                    Government Equalities Office<br/>
+                    6th Floor, Sanctuary Buildings,<br/>
+                    Great Smith Street,<br/>
+                    London,<br/>
                     SW1P 3BT.
                 </address>
             </div>
@@ -100,7 +99,7 @@
             @if (User.Identity.IsAuthenticated)
             {
                 <div class="form-group">
-                    <input name="command" type="submit" class="button" value="Continue" />
+                    <input name="command" type="submit" class="button" value="Continue"/>
                 </div>
             }
         </div>

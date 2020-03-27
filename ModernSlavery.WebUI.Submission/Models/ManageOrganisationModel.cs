@@ -5,11 +5,9 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
-
     [Serializable]
     public class ManageOrganisationModel
     {
-
         public List<ReportInfoModel> ReportInfoModels;
         public UserOrganisation CurrentUserOrg { get; set; }
 
@@ -17,8 +15,6 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public string EncCurrentOrgId { get; set; }
 
-        public Core.Entities.Organisation Organisation => CurrentUserOrg.Organisation;
-
+        public Organisation Organisation => CurrentUserOrg.Organisation;
     }
-
 }

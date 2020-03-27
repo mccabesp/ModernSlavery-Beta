@@ -3,7 +3,7 @@
 namespace ModernSlavery.WebUI.Shared.Options
 {
     [Options("DataProtection")]
-    public class DataProtectionOptions:IOptions
+    public class DataProtectionOptions : IOptions
     {
         public string Type { get; set; }
         public string AzureConnectionString { get; set; }

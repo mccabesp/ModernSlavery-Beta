@@ -1,0 +1,21 @@
+﻿@model LabelViewModel
+
+@{
+    Func<object, object> componentAsHtml =
+        @<text>
+            <label class="govuk-label @(Model.Classes)"
+                   @(Html.Raw(Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : ""))
+                   for=@(Model.For)>
+                @{ await Html.RenderPartialAsync("/Components/SubComponents/HtmlText.cshtml", Model); }
+            </label>
+         </text>;
+}
+
+@{ await Html.RenderPartialAsync(
+       "/Components/SubComponents/PageHeadingHtml.cshtml",
+       new PageHeadingModel
+       {
+           ComponentAsHtml = componentAsHtml,
+           IsPageHeading = Model.IsPageHeading
+       }
+       ); }

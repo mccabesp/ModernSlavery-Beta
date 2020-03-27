@@ -1,13 +1,11 @@
-﻿@using ModernSlavery.Core.Extensions
-@using ModernSlavery.WebUI.Shared.Controllers
-@model ModernSlavery.WebUI.Registration.Models.RemoveOrganisationModel
+﻿@model RemoveOrganisationModel
 @{
     ViewBag.Title = "Confirm removal of organisation - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
 
-    long userId = Encryption.DecryptQuerystring(Model.EncUserId).ToInt64();
-    bool userRemovingSelf = controller.CurrentUser.UserId == userId && controller.IsImpersonatingUser == false;
-    string userNamePostFix = userRemovingSelf ? "You" : "";
+    var userId = Encryption.DecryptQuerystring(Model.EncUserId).ToInt64();
+    var userRemovingSelf = controller.CurrentUser.UserId == userId && controller.IsImpersonatingUser == false;
+    var userNamePostFix = userRemovingSelf ? "You" : "";
 }
 <main id="content" role="main">
     @using (Html.BeginForm())
@@ -54,7 +52,7 @@
                         </dd>
                     </div>
                 </dl>
-                <br />
+                <br/>
                 <div class="form-group">
                     <p>
                         <button type="submit" class="button button-warning" name="id">Remove user</button>

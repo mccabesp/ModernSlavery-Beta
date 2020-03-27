@@ -1,6 +1,4 @@
-﻿@using ModernSlavery.Core.Entities
-@using ModernSlavery.Core.Extensions
-@model List<ModernSlavery.Core.Entities.UserOrganisation>
+﻿@model List<UserOrganisation>
 
 <table class="govuk-table">
     <thead class="govuk-table__head">
@@ -13,7 +11,7 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    @foreach (UserOrganisation userOrg in Model)
+    @foreach (var userOrg in Model)
     {
         <tr class="govuk-table__row">
             <td class="govuk-table__cell" style="white-space: nowrap;">
@@ -28,7 +26,7 @@
                 @(userOrg.Organisation.SectorType)
             </td>
             <td class="govuk-table__cell">
-                @(Text.Coalesce(userOrg.User.ContactFullname, userOrg.User.Fullname)) (@(userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress)))
+                @userOrg.User.ContactFullname.Coalesce(userOrg.User.Fullname) (@(userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress)))
             </td>
             <td class="govuk-table__cell">
                 <a href="@(Url.Action("ReviewRequest", new {code = userOrg.GetReviewCode()}))"

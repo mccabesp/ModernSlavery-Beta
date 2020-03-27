@@ -3,7 +3,6 @@ using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.WebUI.Shared.Models
 {
@@ -14,9 +13,10 @@ namespace ModernSlavery.WebUI.Shared.Models
         ErrorViewModel Create(int errorCode, object parameters = null);
     }
 
-    public class ErrorViewModelFactory: IErrorViewModelFactory
+    public class ErrorViewModelFactory : IErrorViewModelFactory
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+
         public ErrorViewModelFactory(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -32,7 +32,8 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         public ErrorViewModel Create(int errorCode, object parameters = null)
         {
-            CustomErrorMessage customErrorMessage = CustomErrorMessages.GetPageError(errorCode) ?? CustomErrorMessages.DefaultPageError;
+            var customErrorMessage =
+                CustomErrorMessages.GetPageError(errorCode) ?? CustomErrorMessages.DefaultPageError;
 
             var errorViewModel = new ErrorViewModel();
 
@@ -42,21 +43,19 @@ namespace ModernSlavery.WebUI.Shared.Models
             errorViewModel.Description = customErrorMessage.Description;
             errorViewModel.CallToAction = customErrorMessage.CallToAction;
 
-            
-            Uri uri = _httpContextAccessor?.HttpContext?.GetUri();
-            errorViewModel.ActionUrl = customErrorMessage.ActionUrl == "#" && uri != null ? uri.PathAndQuery : customErrorMessage.ActionUrl;
+
+            var uri = _httpContextAccessor?.HttpContext?.GetUri();
+            errorViewModel.ActionUrl = customErrorMessage.ActionUrl == "#" && uri != null
+                ? uri.PathAndQuery
+                : customErrorMessage.ActionUrl;
             errorViewModel.ActionText = customErrorMessage.ActionText;
 
             //Assign any values to variables
             if (parameters != null)
-            {
-                foreach (PropertyInfo prop in parameters.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+                foreach (var prop in parameters.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
                 {
                     var value = prop.GetValue(parameters, null) as string;
-                    if (string.IsNullOrWhiteSpace(prop.Name) || string.IsNullOrWhiteSpace(value))
-                    {
-                        continue;
-                    }
+                    if (string.IsNullOrWhiteSpace(prop.Name) || string.IsNullOrWhiteSpace(value)) continue;
 
                     errorViewModel.Title = errorViewModel.Title.ReplaceI("{" + prop.Name + "}", value);
                     errorViewModel.Subtitle = errorViewModel.Subtitle.ReplaceI("{" + prop.Name + "}", value);
@@ -65,7 +64,6 @@ namespace ModernSlavery.WebUI.Shared.Models
                     errorViewModel.ActionUrl = errorViewModel.ActionUrl.ReplaceI("{" + prop.Name + "}", value);
                     errorViewModel.ActionText = errorViewModel.ActionText.ReplaceI("{" + prop.Name + "}", value);
                 }
-            }
 
             return errorViewModel;
         }

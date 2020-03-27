@@ -2,13 +2,12 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Microsoft.Extensions.Primitives;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
 {
     public static class ExtensionHelpers
     {
-
         public static TAttributeType GetSingleCustomAttribute<TAttributeType>(this MemberInfo property)
             where TAttributeType : Attribute
         {
@@ -21,22 +20,17 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
             Expression<Func<TModel, TProperty>> propertyLambdaExpression)
             where TModel : GovUkViewModel
         {
-            TProperty propertyValue = ExpressionHelpers.GetPropertyValueFromModelAndExpression(model, propertyLambdaExpression);
+            var propertyValue =
+                ExpressionHelpers.GetPropertyValueFromModelAndExpression(model, propertyLambdaExpression);
             if (model.HasSuccessfullyParsedValue(property))
-            {
                 return propertyValue.ToString();
-            }
-            else if (propertyValue != null)
-            {
-                return propertyValue.ToString();
-            }
+            if (propertyValue != null) return propertyValue.ToString();
 
-            string parameterName = $"GovUk_Text_{property.Name}";
-            StringValues unparsedValues = model.GetUnparsedValues(parameterName);
+            var parameterName = $"GovUk_Text_{property.Name}";
+            var unparsedValues = model.GetUnparsedValues(parameterName);
 
-            string unparsedValueOrNull = unparsedValues.Count > 0 ? unparsedValues[0] : null;
+            var unparsedValueOrNull = unparsedValues.Count > 0 ? unparsedValues[0] : null;
             return unparsedValueOrNull;
         }
-
     }
 }

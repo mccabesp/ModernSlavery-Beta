@@ -1,4 +1,4 @@
-﻿@model ModernSlavery.WebUI.Shared.Models.ErrorViewModel
+﻿@model ErrorViewModel
 @{
     ViewBag.Title = "ERROR: " + Model.Title;
     ViewData["Sitemap:Route"] = "error/{errorCode?}";
@@ -11,8 +11,7 @@
             </div>
             @if (!string.IsNullOrWhiteSpace(Model.Description))
             {
-                
-            <p>@Html.Raw(Model.Description)</p>
+                <p>@Html.Raw(Model.Description)</p>
             }
 
             @if (!string.IsNullOrWhiteSpace(Model.CallToAction))

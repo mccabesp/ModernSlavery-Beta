@@ -3,7 +3,7 @@
 @using ModernSlavery.Core.Extensions
 @using ModernSlavery.WebUI.Viewing.Controllers
 @using ModernSlavery.WebUI.Viewing.Presenters
-@model ModernSlavery.WebUI.Viewing.Models.Compare.CompareBasketViewModel
+@model CompareBasketViewModel
 @{
     int compareCount = CompareViewService.BasketItemCount;
     bool hasMaximumItemsInBasket = compareCount >= CompareViewService.MaxCompareBasketCount;

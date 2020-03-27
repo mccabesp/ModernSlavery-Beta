@@ -13,7 +13,6 @@ namespace ModernSlavery.WebUI.Shared.Models
     [Serializable]
     public class OrganisationViewModel
     {
-
         public bool PINExpired;
         public bool PINSent;
 
@@ -36,19 +35,17 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         public SortedSet<int> GetSicCodeIds()
         {
-            string separators = ";,: \n\r" + Environment.NewLine;
+            var separators = ";,: \n\r" + Environment.NewLine;
             var codes = new SortedSet<int>();
-            foreach (string sicCode in SicCodeIds.SplitI(separators))
-            {
-                codes.Add(sicCode.ToInt32());
-            }
+            foreach (var sicCode in SicCodeIds.SplitI(separators)) codes.Add(sicCode.ToInt32());
 
             return codes;
         }
 
         public AddressModel GetAddressModel()
         {
-            return new AddressModel {
+            return new AddressModel
+            {
                 Address1 = Address1,
                 Address2 = Address2,
                 Address3 = Address3,
@@ -62,8 +59,7 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         #region Search details
 
-        [Required(AllowEmptyStrings = false)]
-        public SectorTypes? SectorType { get; set; }
+        [Required(AllowEmptyStrings = false)] public SectorTypes? SectorType { get; set; }
 
         [Required]
         [StringLength(
@@ -101,8 +97,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         [StringLength(100, MinimumLength = 3)]
         public string MutualNumber { get; set; }
 
-        [DUNSNumber]
-        public string DUNSNumber { get; set; }
+        [DUNSNumber] public string DUNSNumber { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [StringLength(100, MinimumLength = 3)]
@@ -133,8 +128,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         [MaxLength(100)]
         public string Address1 { get; set; }
 
-        [MaxLength(100)]
-        public string Address2 { get; set; }
+        [MaxLength(100)] public string Address2 { get; set; }
 
         public string Address3 { get; set; }
         public string City { get; set; }
@@ -195,8 +189,7 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         #region SIC code details
 
-        [Required(AllowEmptyStrings = false)]
-        public string SicCodeIds { get; set; }
+        [Required(AllowEmptyStrings = false)] public string SicCodeIds { get; set; }
 
         public List<int> SicCodes { get; set; }
         public string SicSource { get; set; }
@@ -213,48 +206,29 @@ namespace ModernSlavery.WebUI.Shared.Models
         public EmployerRecord GetManualEmployer()
         {
             if (ManualEmployerIndex > -1 && ManualEmployers != null && ManualEmployerIndex < ManualEmployers.Count)
-            {
                 return ManualEmployers[ManualEmployerIndex];
-            }
 
             return null;
         }
 
         public Dictionary<string, string> GetReferences(int i)
         {
-            if (ManualEmployers == null || i >= ManualEmployers.Count)
-            {
-                return null;
-            }
+            if (ManualEmployers == null || i >= ManualEmployers.Count) return null;
 
-            EmployerRecord employer = ManualEmployers[i];
+            var employer = ManualEmployers[i];
             var results = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            if (!string.IsNullOrWhiteSpace(employer.DUNSNumber))
-            {
-                results["DUNS No"] = employer.DUNSNumber;
-            }
+            if (!string.IsNullOrWhiteSpace(employer.DUNSNumber)) results["DUNS No"] = employer.DUNSNumber;
 
-            if (!string.IsNullOrWhiteSpace(employer.CompanyNumber))
-            {
-                results["Company No"] = employer.CompanyNumber;
-            }
+            if (!string.IsNullOrWhiteSpace(employer.CompanyNumber)) results["Company No"] = employer.CompanyNumber;
 
-            foreach (string key in employer.References.Keys)
-            {
+            foreach (var key in employer.References.Keys)
                 if (key.EqualsI(nameof(CharityNumber)))
-                {
                     results["Charity No"] = employer.References[nameof(CharityNumber)];
-                }
                 else if (key.EqualsI(nameof(MutualNumber)))
-                {
                     results["Mutual No"] = employer.References[nameof(MutualNumber)];
-                }
                 else
-                {
                     results[key] = employer.References[key];
-                }
-            }
 
             return results;
         }
@@ -273,9 +247,7 @@ namespace ModernSlavery.WebUI.Shared.Models
                 && Employers != null
                 && Employers.Results != null
                 && SelectedEmployerIndex < Employers.Results.Count)
-            {
                 return Employers.Results[SelectedEmployerIndex];
-            }
 
             return null;
         }
@@ -284,12 +256,9 @@ namespace ModernSlavery.WebUI.Shared.Models
         {
             get
             {
-                if (Employers == null || Employers.Results == null || Employers.Results.Count < 1)
-                {
-                    return 1;
-                }
+                if (Employers == null || Employers.Results == null || Employers.Results.Count < 1) return 1;
 
-                return ((Employers.CurrentPage * Employers.PageSize) - Employers.PageSize) + 1;
+                return Employers.CurrentPage * Employers.PageSize - Employers.PageSize + 1;
             }
         }
 
@@ -297,12 +266,9 @@ namespace ModernSlavery.WebUI.Shared.Models
         {
             get
             {
-                if (Employers == null || Employers.Results == null || Employers.Results.Count < 1)
-                {
-                    return 1;
-                }
+                if (Employers == null || Employers.Results == null || Employers.Results.Count < 1) return 1;
 
-                return (EmployerStartIndex + Employers.Results.Count) - 1;
+                return EmployerStartIndex + Employers.Results.Count - 1;
             }
         }
 
@@ -310,20 +276,11 @@ namespace ModernSlavery.WebUI.Shared.Models
         {
             get
             {
-                if (Employers == null || Employers.PageCount <= 5)
-                {
-                    return 1;
-                }
+                if (Employers == null || Employers.PageCount <= 5) return 1;
 
-                if (Employers.CurrentPage < 4)
-                {
-                    return 1;
-                }
+                if (Employers.CurrentPage < 4) return 1;
 
-                if (Employers.CurrentPage + 2 > Employers.PageCount)
-                {
-                    return Employers.PageCount - 4;
-                }
+                if (Employers.CurrentPage + 2 > Employers.PageCount) return Employers.PageCount - 4;
 
                 return Employers.CurrentPage - 2;
             }
@@ -333,26 +290,16 @@ namespace ModernSlavery.WebUI.Shared.Models
         {
             get
             {
-                if (Employers == null)
-                {
-                    return 1;
-                }
+                if (Employers == null) return 1;
 
-                if (Employers.PageCount <= 5)
-                {
-                    return Employers.PageCount;
-                }
+                if (Employers.PageCount <= 5) return Employers.PageCount;
 
-                if (PagerStartIndex + 4 > Employers.PageCount)
-                {
-                    return Employers.PageCount;
-                }
+                if (PagerStartIndex + 4 > Employers.PageCount) return Employers.PageCount;
 
                 return PagerStartIndex + 4;
             }
         }
 
         #endregion
-
     }
 }

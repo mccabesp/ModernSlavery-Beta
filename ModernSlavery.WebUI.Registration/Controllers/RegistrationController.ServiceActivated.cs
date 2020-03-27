@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Authentication;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,33 +10,26 @@ using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Registration.Controllers
 {
     public partial class RegistrationController : BaseController
     {
-
         [Authorize]
         [HttpGet("service-activated")]
         public async Task<IActionResult> ServiceActivated()
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
-            var model = this.UnstashModel<CompleteViewModel>(true);
-            if (model == null)
-            {
-                return SessionExpiredView();
-            }
+            var model = UnstashModel<CompleteViewModel>(true);
+            if (model == null) return SessionExpiredView();
 
             //Ensure the stash is cleared
-            this.ClearStash();
+            ClearStash();
 
             ReportingOrganisationId = model.OrganisationId;
             ViewBag.OrganisationName = ReportingOrganisation.OrganisationName;
@@ -52,46 +44,41 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             // Decrypt org id
-            if (!id.DecryptToId(out long organisationId))
-            {
+            if (!id.DecryptToId(out var organisationId))
                 return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
-            }
 
             // Check the user has permission for this organisation
-            UserOrganisation userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
             if (userOrg == null)
-            {
-                return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
-            }
+                return new HttpForbiddenResult(
+                    $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
 
             // Ensure this organisation needs activation on the users account
             if (userOrg.PINConfirmedDate != null)
-            {
                 throw new Exception(
                     $"Attempt to activate organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}' for {VirtualUser.EmailAddress} by '{(OriginalUser == null ? VirtualUser.EmailAddress : OriginalUser.EmailAddress)}' which has already been activated");
-            }
 
             // begin ActivateService journey
             ReportingOrganisationId = organisationId;
 
             //Ensure they havent entered wrong pin too many times
-            TimeSpan remaining = userOrg.ConfirmAttemptDate == null
+            var remaining = userOrg.ConfirmAttemptDate == null
                 ? TimeSpan.Zero
-                : userOrg.ConfirmAttemptDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) - VirtualDateTime.Now;
-            if (userOrg.ConfirmAttempts >= SharedBusinessLogic.SharedOptions.MaxPinAttempts && remaining > TimeSpan.Zero)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1113, new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
-            }
+                : userOrg.ConfirmAttemptDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) -
+                  VirtualDateTime.Now;
+            if (userOrg.ConfirmAttempts >= SharedBusinessLogic.SharedOptions.MaxPinAttempts && remaining > TimeSpan.Zero
+            )
+                return View("CustomError",
+                    WebService.ErrorViewModelFactory.Create(1113,
+                        new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
 
             remaining = userOrg.PINSentDate == null
                 ? TimeSpan.Zero
-                : userOrg.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostMinRepostDays) - VirtualDateTime.Now;
+                : userOrg.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostMinRepostDays) -
+                  VirtualDateTime.Now;
             var model = new CompleteViewModel();
 
             model.PIN = null;
@@ -100,9 +87,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //If the email address is a test email then simulate sending
             if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-            {
                 model.PIN = "ABCDEF";
-            }
 
             //Show the PIN textbox and button
             return View("ActivateService", model);
@@ -115,12 +100,9 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         public async Task<IActionResult> ActivateService(CompleteViewModel model)
         {
             //Ensure user has completed the registration process
-            
+
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Ensure they have entered a PIN
             if (!ModelState.IsValid)
@@ -130,17 +112,20 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             //Get the user organisation
-            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
+            var userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo =>
+                uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             ActionResult result1;
 
-            TimeSpan remaining = userOrg.ConfirmAttemptDate == null
+            var remaining = userOrg.ConfirmAttemptDate == null
                 ? TimeSpan.Zero
-                : userOrg.ConfirmAttemptDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) - VirtualDateTime.Now;
-            if (userOrg.ConfirmAttempts >= SharedBusinessLogic.SharedOptions.MaxPinAttempts && remaining > TimeSpan.Zero)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1113, new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
-            }
+                : userOrg.ConfirmAttemptDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) -
+                  VirtualDateTime.Now;
+            if (userOrg.ConfirmAttempts >= SharedBusinessLogic.SharedOptions.MaxPinAttempts && remaining > TimeSpan.Zero
+            )
+                return View("CustomError",
+                    WebService.ErrorViewModelFactory.Create(1113,
+                        new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
 
             var updateSearchIndex = false;
             if (PinMatchesPinInDatabase(userOrg, model.PIN))
@@ -171,7 +156,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 userOrg.Organisation.LatestRegistration = userOrg;
 
                 //Retire the old address 
-                if (userOrg.Organisation.LatestAddress != null && userOrg.Organisation.LatestAddress.AddressId != userOrg.Address.AddressId)
+                if (userOrg.Organisation.LatestAddress != null &&
+                    userOrg.Organisation.LatestAddress.AddressId != userOrg.Address.AddressId)
                 {
                     userOrg.Organisation.LatestAddress.SetStatus(
                         AddressStatuses.Retired,
@@ -188,14 +174,16 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 userOrg.Organisation.LatestAddress = userOrg.Address;
                 userOrg.ConfirmAttempts = 0;
 
-                model.AccountingDate = RegistrationService.SharedBusinessLogic.GetAccountingStartDate(userOrg.Organisation.SectorType);
+                model.AccountingDate =
+                    RegistrationService.SharedBusinessLogic.GetAccountingStartDate(userOrg.Organisation.SectorType);
                 model.OrganisationId = userOrg.OrganisationId;
-                this.StashModel(model);
+                StashModel(model);
 
                 result1 = RedirectToAction("ServiceActivated");
 
                 //Send notification email to existing users 
-                RegistrationService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation, userOrg.User);
+                RegistrationService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(
+                    userOrg.Organisation, userOrg.User);
             }
             else
             {
@@ -211,9 +199,9 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //Log the registration
             if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-            {
                 await RegistrationService.RegistrationLog.WriteAsync(
-                    new RegisterLogModel {
+                    new RegisterLogModel
+                    {
                         StatusDate = VirtualDateTime.Now,
                         Status = "PIN Confirmed",
                         ActionBy = VirtualUser.EmailAddress,
@@ -233,13 +221,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         ContactOrganisation = userOrg.User.ContactOrganisation,
                         ContactPhoneNumber = userOrg.User.ContactPhoneNumber
                     });
-            }
 
             //Add this organisation to the search index
             if (updateSearchIndex)
-            {
                 await RegistrationService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
-            }
 
             //Prompt the user with confirmation
             return result1;
@@ -247,26 +232,15 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
         private static bool PinMatchesPinInDatabase(UserOrganisation userOrg, string modelPin)
         {
-            if (modelPin == null)
-            {
-                return false;
-            }
+            if (modelPin == null) return false;
 
-            string normalisedPin = modelPin.Trim().ToUpper();
-            if (!string.IsNullOrWhiteSpace(userOrg.PIN) && userOrg.PIN == normalisedPin)
-            {
-                return true;
-            }
+            var normalisedPin = modelPin.Trim().ToUpper();
+            if (!string.IsNullOrWhiteSpace(userOrg.PIN) && userOrg.PIN == normalisedPin) return true;
 
-            string hashedPin = Crypto.GetSHA512Checksum(normalisedPin);
-            if (userOrg.PINHash == hashedPin)
-            {
-                return true;
-            }
+            var hashedPin = Crypto.GetSHA512Checksum(normalisedPin);
+            if (userOrg.PINHash == hashedPin) return true;
 
             return false;
         }
-
-      
     }
 }

@@ -4,14 +4,14 @@ using System.Reflection;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
-using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.GDSDesignSystem.Partials;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 {
     internal static class CharacterCountHtmlGenerator
     {
-
         internal static IHtmlContent GenerateHtml<TModel>(
             IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, string>> propertyLambdaExpression,
@@ -22,18 +22,19 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
         )
             where TModel : GovUkViewModel
         {
-            PropertyInfo property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
+            var property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
             ThrowIfPropertyDoesNotHaveCharacterCountAttribute(property);
 
-            string propertyName = property.Name;
+            var propertyName = property.Name;
 
-            TModel model = htmlHelper.ViewData.Model;
+            var model = htmlHelper.ViewData.Model;
 
-            string currentValue = ExtensionHelpers.GetCurrentValue(model, property, propertyLambdaExpression);
+            var currentValue = ExtensionHelpers.GetCurrentValue(model, property, propertyLambdaExpression);
 
-            int maximumCharacters = GetMaximumCharacters(property);
+            var maximumCharacters = GetMaximumCharacters(property);
 
-            var characterCountViewModel = new CharacterCountViewModel {
+            var characterCountViewModel = new CharacterCountViewModel
+            {
                 Name = $"GovUk_Text_{propertyName}",
                 Id = $"GovUk_{propertyName}",
                 MaxLength = maximumCharacters,
@@ -45,11 +46,9 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             };
 
             if (model.HasErrorFor(property))
-            {
                 characterCountViewModel.ErrorMessage = new ErrorMessageViewModel {Text = model.GetErrorFor(property)};
-            }
 
-            return htmlHelper.Partial("/GovUkDesignSystemComponents/CharacterCount.cshtml", characterCountViewModel);
+            return htmlHelper.Partial("/Components/CharacterCount.cshtml", characterCountViewModel);
         }
 
         private static void ThrowIfPropertyDoesNotHaveCharacterCountAttribute(PropertyInfo property)
@@ -57,11 +56,9 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             var attribute = property.GetSingleCustomAttribute<GovUkValidateCharacterCountAttribute>();
 
             if (attribute == null)
-            {
                 throw new ArgumentException(
                     "GovUkCharacterCountFor can only be used on properties that are decorated with a GovUkValidateCharacterCount attribute. "
                     + $"Property [{property.Name}] on type [{property.DeclaringType.FullName}] does not have this attribute");
-            }
         }
 
         private static int GetMaximumCharacters(PropertyInfo property)
@@ -69,6 +66,5 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             var attribute = property.GetSingleCustomAttribute<GovUkValidateCharacterCountAttribute>();
             return attribute.MaxCharacters;
         }
-
     }
 }

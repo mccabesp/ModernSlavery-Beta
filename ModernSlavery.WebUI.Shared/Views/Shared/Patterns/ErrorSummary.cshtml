@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Mvc.ModelBinding
-@model Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary
+﻿@model Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary
 <div class="grid-row">
 
     <div class="column-two-thirds">
@@ -11,9 +10,9 @@
             </h2>
 
             <ul class="error-summary-list">
-                @foreach (KeyValuePair<string, ModelStateEntry> state in Model)
+                @foreach (var state in Model)
                 {
-                    @foreach (ModelError error in state.Value.Errors)
+                    @foreach (var error in state.Value.Errors)
                     {
                         <li>
                             <a href="#@(state.Key)">@Html.Raw(error.ErrorMessage)</a>

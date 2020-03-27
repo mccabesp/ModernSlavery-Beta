@@ -1,16 +1,13 @@
-﻿@using ModernSlavery.Core.Extensions
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@using ModernSlavery.WebUI.Shared.Controllers
-@model UploadViewModel
+﻿@model UploadViewModel
 @{
     ViewBag.Title = "Administration: Uploads";
-    string infoNotification = TempData["uploadinfo"].ToStringOrEmpty();
+    var infoNotification = TempData["uploadinfo"].ToStringOrEmpty();
     var controller = ViewData["Controller"] as BaseController;
 }
 <main id="content" role="main">
     <div class="breadcrumbs dynamic-content default-content" style="display: block;">
         <ol>
-            <li style="display: block; padding-top: 0.75em; padding-bottom: 0;">
+            <li style="display: block; padding-bottom: 0; padding-top: 0.75em;">
                 &lt;
                 @Html.ActionLink("Back to administration home", "Home")
             </li>
@@ -58,7 +55,7 @@
                     }
                     else
                     {
-                        foreach (UploadViewModel.Upload upload in Model.Uploads)
+                        foreach (var upload in Model.Uploads)
                         {
                             <tr>
                                 <td>
@@ -86,15 +83,15 @@
                                         <span title="@upload.Modified.ToShortTimeString()">@upload.Modified.ToString("d MMM yy HH:mm")</span>
                                     }
                                 </td>
-                                <td style="vertical-align:top">
+                                <td style="vertical-align: top">
                                     @if (controller.IsSuperAdministrator)
                                     {
                                         <input type="file" name="files" style="display: none" onchange="$('#btnUpload').click()"/>
-                                        <a onclick="$(this).prevAll(':file').click()" style="font-size: small; cursor: pointer;" class="link-button" title="click here to select a local file to upload and replace this content">Upload</a>
+                                        <a onclick="$(this).prevAll(':file').click()" style="cursor: pointer; font-size: small;" class="link-button" title="click here to select a local file to upload and replace this content">Upload</a>
                                         if (upload.Count != "0" && upload.Type.EqualsI("DnBOrgs"))
                                         {
                                             <br/>
-                                            <button type="submit" style="font-size: small; cursor: pointer;" class="link-button" id="btnImport" name="Command" value="Import" title="Imports these records into the database">Import</button>
+                                            <button type="submit" style="cursor: pointer; font-size: small;" class="link-button" id="btnImport" name="Command" value="Import" title="Imports these records into the database">Import</button>
                                         }
                                     }
                                 </td>

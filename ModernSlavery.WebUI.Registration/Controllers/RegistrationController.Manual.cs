@@ -17,7 +17,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 {
     public partial class RegistrationController : BaseController
     {
-
         #region AddAddress
 
         [Authorize]
@@ -26,24 +25,18 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Get the model from the stash
-            var model = this.UnstashModel<OrganisationViewModel>();
-            if (model == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-            }
+            var model = UnstashModel<OrganisationViewModel>();
+            if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             //Pre-populate address from selected employer
-            EmployerRecord employer = model.ManualRegistration ? null : model.GetManualEmployer() ?? model.GetSelectedEmployer();
+            var employer = model.ManualRegistration ? null : model.GetManualEmployer() ?? model.GetSelectedEmployer();
 
             if (employer != null)
             {
-                List<string> list = employer.GetAddressList();
+                var list = employer.GetAddressList();
                 model.Address1 = list.Count > 0 ? list[0] : null;
                 model.Address2 = list.Count > 1 ? list[1] : null;
                 model.Address3 = list.Count > 2 ? list[2] : null;
@@ -64,17 +57,11 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Make sure we can load employers from session
-            var m = this.UnstashModel<OrganisationViewModel>();
-            if (m == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-            }
+            var m = UnstashModel<OrganisationViewModel>();
+            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             model.Employers = m.Employers;
             model.ManualEmployers = m.ManualEmployers;
@@ -114,7 +101,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 return View(nameof(AddAddress), model);
             }
 
-            SectorTypes? sector = model.SectorType;
+            var sector = model.SectorType;
             var authorised = false;
             EmployerRecord employer = null;
             if (!model.ManualRegistration)
@@ -134,30 +121,23 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //Set the address source to the user or original source if unchanged
             if (employer != null && model.GetAddressModel().Equals(employer.GetAddressModel()))
-            {
                 model.AddressSource = employer.AddressSource;
-            }
             else
-            {
                 model.AddressSource = VirtualUser.EmailAddress;
-            }
 
-            if (model.WrongAddress)
-            {
-                model.ManualAddress = true;
-            }
+            if (model.WrongAddress) model.ManualAddress = true;
 
             //When doing manual address only and user is already authorised redirect to confirm page
             if (model.ManualAddress && sector == SectorTypes.Public && authorised && !employer.HasAnyAddress())
             {
                 //We don't need contact info if there is no address only when there is an address
                 model.ConfirmReturnAction = nameof(AddAddress);
-                this.StashModel(model);
+                StashModel(model);
                 return RedirectToAction(nameof(ConfirmOrganisation));
             }
 
             //When manual registration
-            this.StashModel(model);
+            StashModel(model);
             return RedirectToAction("AddContact");
         }
 
@@ -171,51 +151,35 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Get the model from the stash
-            var model = this.UnstashModel<OrganisationViewModel>();
-            if (model == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-            }
+            var model = UnstashModel<OrganisationViewModel>();
+            if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             //Pre-load contact details
             if (string.IsNullOrWhiteSpace(model.ContactFirstName))
-            {
                 model.ContactFirstName = string.IsNullOrWhiteSpace(VirtualUser.ContactFirstName)
                     ? VirtualUser.Firstname
                     : VirtualUser.ContactFirstName;
-            }
 
             if (string.IsNullOrWhiteSpace(model.ContactLastName))
-            {
                 model.ContactLastName = string.IsNullOrWhiteSpace(VirtualUser.ContactLastName)
                     ? VirtualUser.Lastname
                     : VirtualUser.ContactLastName;
-            }
 
             if (string.IsNullOrWhiteSpace(model.ContactJobTitle))
-            {
                 model.ContactJobTitle = string.IsNullOrWhiteSpace(VirtualUser.ContactJobTitle)
                     ? VirtualUser.JobTitle
                     : VirtualUser.ContactJobTitle;
-            }
 
             if (string.IsNullOrWhiteSpace(model.ContactEmailAddress))
-            {
                 model.ContactEmailAddress = string.IsNullOrWhiteSpace(VirtualUser.ContactEmailAddress)
                     ? VirtualUser.EmailAddress
                     : VirtualUser.ContactEmailAddress;
-            }
 
             if (string.IsNullOrWhiteSpace(model.ContactPhoneNumber))
-            {
                 model.ContactPhoneNumber = VirtualUser.ContactPhoneNumber;
-            }
 
             return View("AddContact", model);
         }
@@ -228,17 +192,11 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Make sure we can load employers from session
-            var m = this.UnstashModel<OrganisationViewModel>();
-            if (m == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-            }
+            var m = UnstashModel<OrganisationViewModel>();
+            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             model.Employers = m.Employers;
             model.ManualEmployers = m.ManualEmployers;
@@ -285,15 +243,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (model.ManualAddress)
             {
                 if (string.IsNullOrWhiteSpace(model.ConfirmReturnAction))
-                {
                     model.ConfirmReturnAction = nameof(AddContact);
-                }
 
-                this.StashModel(model);
+                StashModel(model);
                 return RedirectToAction(nameof(ConfirmOrganisation));
             }
 
-            this.StashModel(model);
+            StashModel(model);
             return RedirectToAction("AddSector");
         }
 
@@ -307,17 +263,11 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Get the model from the stash
-            var model = this.UnstashModel<OrganisationViewModel>();
-            if (model == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-            }
+            var model = UnstashModel<OrganisationViewModel>();
+            if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             return View("AddSector", model);
         }
@@ -330,17 +280,11 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Make sure we can load employers from session
-            var m = this.UnstashModel<OrganisationViewModel>();
-            if (m == null)
-            {
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-            }
+            var m = UnstashModel<OrganisationViewModel>();
+            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             model.Employers = m.Employers;
             model.ManualEmployers = m.ManualEmployers;
@@ -375,10 +319,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 nameof(model.ContactPhoneNumber));
 
             //Exclude the SIC codes when public sector
-            if (model.SectorType != SectorTypes.Private)
-            {
-                excludes.Add(nameof(model.SicCodeIds));
-            }
+            if (model.SectorType != SectorTypes.Private) excludes.Add(nameof(model.SicCodeIds));
 
             //Exclude the SIC Codes
             excludes.Add(nameof(model.DUNSNumber));
@@ -389,16 +330,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var codes = new SortedSet<int>();
             if (!string.IsNullOrWhiteSpace(model.SicCodeIds))
             {
-                string separators = ";,: \n\r" + Environment.NewLine;
+                var separators = ";,: \n\r" + Environment.NewLine;
                 if (!model.SicCodeIds.ContainsAll(Text.NumberChars + separators))
-                {
                     ModelState.AddModelError("", "You have entered an invalid SIC code");
-                }
                 else
-                {
-                    foreach (string codeStr in model.SicCodeIds.SplitI(separators))
+                    foreach (var codeStr in model.SicCodeIds.SplitI(separators))
                     {
-                        int code = codeStr.ToInt32();
+                        var code = codeStr.ToInt32();
                         if (code == 0)
                         {
                             ModelState.AddModelError("", codeStr + " is not a recognised SIC code");
@@ -420,7 +358,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
                         codes.Add(code);
                     }
-                }
             }
 
             if (!ModelState.IsValid)
@@ -433,11 +370,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             model.SicSource = VirtualUser.EmailAddress;
 
             model.ConfirmReturnAction = nameof(AddSector);
-            this.StashModel(model);
+            StashModel(model);
             return RedirectToAction(nameof(ConfirmOrganisation));
         }
 
         #endregion
-
     }
 }

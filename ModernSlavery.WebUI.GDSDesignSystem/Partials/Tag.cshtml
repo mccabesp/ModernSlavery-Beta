@@ -1,0 +1,7 @@
+﻿@model TagViewModel
+
+<strong class="govuk-tag @(Model.Classes)"
+        @(Html.Raw(Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : ""))>
+
+    @{ await Html.RenderPartialAsync("/Components/SubComponents/HtmlText.cshtml", Model); }
+</strong>

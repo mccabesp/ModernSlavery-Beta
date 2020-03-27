@@ -1,18 +1,17 @@
 ﻿@inject SharedOptions sharedOptions
+@using System.Net;
 @{
     ViewBag.Title = "Confirm In Scope - Modern Slavery reporting service";
-    string emailAdd = sharedOptions.GpgReportingEmail;
-    string emailSubject = System.Net.WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));
+    var emailAdd = sharedOptions.GpgReportingEmail;
+    var emailSubject =  WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));
 
     // c# 6 doesnt compile with razor in mvc5 so cant use string templates here :( need to update to MVC 6
-    string mailto = string.Join("", "mailto:", emailAdd, "?subject=", emailSubject);
+    var mailto = string.Join("", "mailto:", emailAdd, "?subject=", emailSubject);
 }
-@using ModernSlavery.Core.SharedKernel.Options
-@using ModernSlavery.WebUI.Shared.Classes
-@model ModernSlavery.WebUI.Submission.Models.ScopingViewModel
+@model ScopingViewModel
 <div class="grid-row">
     <div class="column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off" }))
+        @using (Html.BeginForm(null, null, FormMethod.Post, new {@class = "form", autocomplete = "off"}))
         {
             @Html.AntiForgeryToken()
 
@@ -27,14 +26,14 @@
 
             @await Html.PartialAsync("Parts/EmployerDetailsPart", Model)
 
-            <br />
+            <br/>
 
             <p class="text">
                 <span>Please confirm your organisation is in scope to report Modern Slavery statement for snapshot date @(reportDateFormatter.FullStartDate)</span>
             </p>
 
             <div class="form-group">
-                <input id="NextStep" type="submit" class="button" name="command" value="Confirm" />
+                <input id="NextStep" type="submit" class="button" name="command" value="Confirm"/>
             </div>
 
             <p class="text">

@@ -6,7 +6,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
 {
     public class StickySessionMiddleware
     {
-
         private readonly bool _disable;
         private readonly RequestDelegate _next;
 
@@ -16,10 +15,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             _disable = !enable;
         }
 
-        public async Task Invoke(Microsoft.AspNetCore.Http.HttpContext httpContext)
+        public async Task Invoke(HttpContext httpContext)
         {
             httpContext.Response.OnStarting(
-                () => {
+                () =>
+                {
                     //Disable sticky sessions
                     httpContext.SetResponseHeader("Arr-Disable-Session-Affinity", _disable.ToString());
 
@@ -28,6 +28,5 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
 
             await _next.Invoke(httpContext);
         }
-
     }
 }

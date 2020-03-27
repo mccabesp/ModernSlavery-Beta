@@ -4,7 +4,6 @@ namespace ModernSlavery.WebUI.Viewing.Models
 {
     public class VerticalBarChartModel
     {
-
         public string Id { get; set; }
         public decimal Male { get; set; }
         public decimal Female { get; set; }
@@ -14,16 +13,10 @@ namespace ModernSlavery.WebUI.Viewing.Models
         {
             get
             {
-                decimal deltaRounded = Math.Round(Delta);
-                if (Female == Male)
-                {
-                    return "0p";
-                }
+                var deltaRounded = Math.Round(Delta);
+                if (Female == Male) return "0p";
 
-                if (deltaRounded < 100)
-                {
-                    return $"{deltaRounded}p";
-                }
+                if (deltaRounded < 100) return $"{deltaRounded}p";
 
                 return $"£{string.Format("{0:#.00}", deltaRounded / 100)}";
             }
@@ -32,6 +25,5 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public bool FemaleIsLower { get; set; }
         public string MaleMonetisation { get; set; }
         public string FemaleMonetisation { get; set; }
-
     }
 }

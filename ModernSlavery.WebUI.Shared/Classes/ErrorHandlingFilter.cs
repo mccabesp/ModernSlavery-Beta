@@ -10,7 +10,6 @@ namespace ModernSlavery.WebUI.Shared.Classes
 {
     public class ErrorHandlingFilter : ExceptionFilterAttribute
     {
-
         private readonly ILogger _logger;
 
         public ErrorHandlingFilter(ILogger<ErrorHandlingFilter> logger)
@@ -24,10 +23,12 @@ namespace ModernSlavery.WebUI.Shared.Classes
             if (hex != null)
             {
                 _logger.LogWarning(hex, hex.Message);
-                var webService=(IWebService)context.HttpContext.RequestServices.GetService(typeof(IWebService));
-                context.Result = new ViewResult {
+                var webService = (IWebService) context.HttpContext.RequestServices.GetService(typeof(IWebService));
+                context.Result = new ViewResult
+                {
                     ViewName = "CustomError",
-                    ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), context.ModelState) {
+                    ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), context.ModelState)
+                    {
                         Model = webService.ErrorViewModelFactory.Create(hex.StatusCode) // set the model
                     }
                 };
@@ -35,6 +36,5 @@ namespace ModernSlavery.WebUI.Shared.Classes
                 context.ExceptionHandled = true;
             }
         }
-
     }
 }

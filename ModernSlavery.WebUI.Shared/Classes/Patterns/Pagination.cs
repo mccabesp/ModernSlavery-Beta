@@ -3,40 +3,30 @@ using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Patterns
 {
-
     [Partial("Patterns/Pagination")]
     public class Pagination
     {
-
         public Pagination(params PaginationLink[] items)
         {
             Items = items.Where(x => x != null).ToArray();
         }
 
         public PaginationLink[] Items { get; set; }
-
     }
 
     public class PaginationLink
     {
-
         public PaginationLink(string url, string title, string label, bool isPrev = false)
         {
             Url = url;
             Label = label;
             IsPrevious = isPrev;
             if (!string.IsNullOrWhiteSpace(title))
-            {
                 Title = title;
-            }
             else if (isPrev)
-            {
                 Title = "Previous";
-            }
             else
-            {
                 Title = "Next";
-            }
         }
 
         public bool IsPrevious { get; set; }
@@ -45,7 +35,5 @@ namespace ModernSlavery.WebUI.Shared.Classes.Patterns
 
         public string Title { get; set; }
         public string Label { get; set; }
-
     }
-
 }

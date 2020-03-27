@@ -1,8 +1,18 @@
-﻿@using ModernSlavery.WebUI
-@using ModernSlavery.WebUI.Shared.Classes
+﻿@using ModernSlavery.WebUI.Shared.Classes
 @using ModernSlavery.WebUI.Shared.Classes.Patterns
-@using System.Web;
-@using Microsoft.Extensions.Options;
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@addTagHelper *, ModernSlavery.Sitemap
-@addTagHelper *, ModernSlavery.WebUI
+@using ModernSlavery.WebUI.Shared.Models
+@using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Controllers
+
+@using ModernSlavery.WebUI.GDSDesignSystem
+@using ModernSlavery.WebUI.GDSDesignSystem.Models
+@using ModernSlavery.WebUI.GDSDesignSystem.Partials
+
+@using ModernSlavery.Core.Extensions
+@using ModernSlavery.Core.Entities
+@using ModernSlavery.Core.SharedKernel.Options
+
+@Layout = "DfeTemplate.cshtml"
+
+@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+@addTagHelper "*, ModernSlavery.WebUI.Shared.Classes.TagHelpers"

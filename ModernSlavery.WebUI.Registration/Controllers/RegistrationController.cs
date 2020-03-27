@@ -1,20 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.BusinessDomain.Registration;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.Registration.Classes;
 using ModernSlavery.WebUI.Registration.Models;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Options;
@@ -24,14 +18,14 @@ namespace ModernSlavery.WebUI.Registration.Controllers
     [Route("Register")]
     public partial class RegistrationController : BaseController
     {
-
         public readonly IRegistrationService RegistrationService;
 
         #region Constructors
 
         public RegistrationController(
             IRegistrationService registrationService,
-            ILogger<RegistrationController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
+            ILogger<RegistrationController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) :
+            base(logger, webService, sharedBusinessLogic)
         {
             RegistrationService = registrationService;
         }
@@ -53,8 +47,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
         #region Session & Cache Properties
 
-     
-
         private int LastPrivateSearchRemoteTotal => Session["LastPrivateSearchRemoteTotal"].ToInt32();
 
         private int CompaniesHouseFailures
@@ -63,10 +55,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             set
             {
                 Session.Remove("CompaniesHouseFailures");
-                if (value > 0)
-                {
-                    Session["CompaniesHouseFailures"] = value;
-                }
+                if (value > 0) Session["CompaniesHouseFailures"] = value;
             }
         }
 
@@ -74,7 +63,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
         #region Home
 
-        #endregion 
+        #endregion
 
         #region PINSent
 
@@ -82,29 +71,28 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Get the user organisation
-            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
+            var userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo =>
+                uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             //If a pin has never been sent or resend button submitted then send one immediately
             if (string.IsNullOrWhiteSpace(userOrg.PIN) && string.IsNullOrWhiteSpace(userOrg.PINHash)
                 || userOrg.PINSentDate.EqualsI(null, DateTime.MinValue)
-                || userOrg.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays) < VirtualDateTime.Now)
-            {
+                || userOrg.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays) <
+                VirtualDateTime.Now)
                 try
                 {
-                    DateTime now = VirtualDateTime.Now;
+                    var now = VirtualDateTime.Now;
 
                     // Check if we are a test user (for load testing)
-                    bool thisIsATestUser = userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix);
-                    bool pinInPostTestMode = SharedBusinessLogic.SharedOptions.PinInPostTestMode;
+                    var thisIsATestUser =
+                        userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix);
+                    var pinInPostTestMode = SharedBusinessLogic.SharedOptions.PinInPostTestMode;
 
                     // Generate a new pin
-                    string pin = RegistrationService.OrganisationBusinessLogic.GeneratePINCode(thisIsATestUser);
+                    var pin = RegistrationService.OrganisationBusinessLogic.GeneratePINCode(thisIsATestUser);
 
                     // Save the PIN and confirm code
                     userOrg.PIN = pin;
@@ -117,11 +105,12 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     {
                         ViewBag.PinCode = pin;
                     }
-                    else 
+                    else
                     {
                         // Try and send the PIN in post
-                        string returnUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
-                        if (RegistrationService.PinInThePostService.SendPinInThePost(userOrg, pin,returnUrl, out string letterId))
+                        var returnUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
+                        if (RegistrationService.PinInThePostService.SendPinInThePost(userOrg, pin, returnUrl,
+                            out var letterId))
                         {
                             userOrg.PITPNotifyLetterId = letterId;
                             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
@@ -131,7 +120,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             // Show "Notify is down" error message
                             return View(
                                 "PinFailedToSend",
-                                new PinFailedToSendViewModel {OrganisationName = userOrg.Organisation.OrganisationName});
+                                new PinFailedToSendViewModel
+                                    {OrganisationName = userOrg.Organisation.OrganisationName});
                         }
                     }
 
@@ -145,7 +135,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     // TODO: maybe change this?
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(3014));
                 }
-            }
 
             //Prepare view parameters
             ViewBag.UserFullName = VirtualUser.Fullname;
@@ -160,7 +149,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         public async Task<IActionResult> PINSent()
         {
             //Clear the stash
-            this.ClearStash();
+            ClearStash();
 
             return await GetSendPINAsync();
         }
@@ -175,13 +164,11 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Get the user organisation
-            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
+            var userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo =>
+                uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             //Prepare view parameters
             ViewBag.UserFullName = VirtualUser.Fullname;
@@ -189,7 +176,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             ViewBag.Organisation = userOrg.Organisation.OrganisationName;
             ViewBag.Address = userOrg?.Address.GetAddressString(",<br/>");
 
-            string encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
+            var encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
             //Show the PIN textbox and button
             return View("RequestPIN", encOrgId);
         }
@@ -202,13 +189,11 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             //Get the user organisation
-            UserOrganisation userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
+            var userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo =>
+                uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
 
             //Mark the user org as ready to send a pin
             userOrg.PIN = null;
@@ -216,11 +201,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             userOrg.PINSentDate = null;
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            string encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
+            var encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
             return RedirectToAction("PINSent", encOrgId);
         }
 
         #endregion
-
     }
 }

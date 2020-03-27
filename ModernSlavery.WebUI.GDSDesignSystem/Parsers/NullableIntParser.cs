@@ -1,21 +1,20 @@
 ﻿using System.Reflection;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
 {
     public class NullableIntParser
     {
-
         public static void ParseAndValidate(
             GovUkViewModel model,
             PropertyInfo property,
             HttpRequest httpRequest)
         {
-            string parameterName = $"GovUk_Text_{property.Name}";
+            var parameterName = $"GovUk_Text_{property.Name}";
 
-            StringValues parameterValues = httpRequest.Form[parameterName];
+            var parameterValues = httpRequest.Form[parameterName];
 
             ParserHelpers.ThrowIfMoreThanOneValue(parameterValues, property);
             ParserHelpers.SaveUnparsedValueFromRequestToModel(model, httpRequest, parameterName);
@@ -28,12 +27,12 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
 
             if (parameterValues.Count > 0)
             {
-                string parameterValue = parameterValues[0];
+                var parameterValue = parameterValues[0];
 
                 if (!double.TryParse(parameterValue, out _))
                 {
                     ParserHelpers.AddErrorMessageBasedOnPropertyDisplayName(model, property,
-                        (name) => $"{name} must be a number");
+                        name => $"{name} must be a number");
                     return;
                 }
 
@@ -41,7 +40,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
                 if (!int.TryParse(parameterValue, out parsedIntValue))
                 {
                     ParserHelpers.AddErrorMessageBasedOnPropertyDisplayName(model, property,
-                        (name) => $"{name} must be a whole number");
+                        name => $"{name} must be a whole number");
                     return;
                 }
 
@@ -50,6 +49,5 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
 
             model.ValueWasSuccessfullyParsed(property);
         }
-
     }
 }

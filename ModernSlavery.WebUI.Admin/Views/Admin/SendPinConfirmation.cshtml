@@ -1,8 +1,7 @@
-﻿@model ModernSlavery.Core.Entities.UserOrganisation
-
+﻿@model UserOrganisation
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = "Send PIN Confirmation - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 <div class="govuk-grid-row">
@@ -23,7 +22,7 @@
         <h2 class="govuk-heading-m">More options</h2>
 
         <p class="govuk-body">
-            Go  to
+            Go to
             <a href="@(Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.OrganisationId}))"
                class="govuk-link">
                 @(Model.Organisation.OrganisationName)

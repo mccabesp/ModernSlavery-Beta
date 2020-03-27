@@ -5,7 +5,6 @@ namespace ModernSlavery.WebUI.Shared.Interfaces
 {
     public interface IHttpSession
     {
-
         string SessionID { get; }
         object this[string key] { get; set; }
         IEnumerable<string> Keys { get; }
@@ -14,6 +13,5 @@ namespace ModernSlavery.WebUI.Shared.Interfaces
         T Get<T>(string key);
         Task LoadAsync();
         Task SaveAsync();
-
     }
 }

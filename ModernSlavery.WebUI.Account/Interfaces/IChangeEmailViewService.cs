@@ -6,11 +6,8 @@ namespace ModernSlavery.WebUI.Account.Interfaces
 {
     public interface IChangeEmailViewService
     {
-
         Task<ModelStateDictionary> InitiateChangeEmailAsync(string newEmailAddress, User currentUser);
 
         Task<ModelStateDictionary> CompleteChangeEmailAsync(string code, User currentUser);
-
     }
-
 }

@@ -2,11 +2,9 @@
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
-
     [Serializable]
     public class ScopingViewModel
     {
-
         public long OrganisationId { get; set; }
         public string DUNSNumber { get; set; }
         public string OrganisationName { get; set; }
@@ -30,7 +28,5 @@ namespace ModernSlavery.WebUI.Submission.Models
         public ScopeViewModel ThisScope { get; set; }
 
         public string OrgAddressHtml => OrganisationAddress?.Replace(",", "<br />");
-
     }
-
 }

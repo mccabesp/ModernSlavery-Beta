@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
@@ -11,15 +10,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 {
     public partial class SubmissionController : BaseController
     {
-
         #region private methods
 
-        private static bool IsPersonResponsibleModified(ReturnViewModel postedReturnViewModel, ReturnViewModel stashedReturnViewModel)
+        private static bool IsPersonResponsibleModified(ReturnViewModel postedReturnViewModel,
+            ReturnViewModel stashedReturnViewModel)
         {
-            bool hasFirstNameChanged =
+            var hasFirstNameChanged =
                 stashedReturnViewModel != null && postedReturnViewModel.FirstName != stashedReturnViewModel.FirstName;
-            bool hasLastNameChanged = stashedReturnViewModel != null && postedReturnViewModel.LastName != stashedReturnViewModel.LastName;
-            bool hasJobTitleChanged = stashedReturnViewModel != null && postedReturnViewModel.JobTitle != stashedReturnViewModel.JobTitle;
+            var hasLastNameChanged = stashedReturnViewModel != null &&
+                                     postedReturnViewModel.LastName != stashedReturnViewModel.LastName;
+            var hasJobTitleChanged = stashedReturnViewModel != null &&
+                                     postedReturnViewModel.JobTitle != stashedReturnViewModel.JobTitle;
             return hasFirstNameChanged || hasLastNameChanged || hasJobTitleChanged;
         }
 
@@ -33,21 +34,16 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             #region Check user, then retrieve model from Session
 
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
-            var stashedReturnViewModel = this.UnstashModel<ReturnViewModel>();
+            var stashedReturnViewModel = UnstashModel<ReturnViewModel>();
 
             #endregion
 
-            if (stashedReturnViewModel == null)
-            {
-                return SessionExpiredView();
-            }
+            if (stashedReturnViewModel == null) return SessionExpiredView();
 
-            stashedReturnViewModel = await LoadReturnViewModelFromDBorFromDraftFileAsync(stashedReturnViewModel, VirtualUser.UserId);
+            stashedReturnViewModel =
+                await LoadReturnViewModelFromDBorFromDraftFileAsync(stashedReturnViewModel, VirtualUser.UserId);
 
             if (!stashedReturnViewModel.ReportInfo.Draft.IsUserAllowedAccess)
             {
@@ -63,24 +59,19 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("person-responsible")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PersonResponsible(ReturnViewModel postedReturnViewModel, string returnUrl = null)
+        public async Task<IActionResult> PersonResponsible(ReturnViewModel postedReturnViewModel,
+            string returnUrl = null)
         {
             #region Check user, then retrieve model from Session
 
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
-            var stashedReturnViewModel = this.UnstashModel<ReturnViewModel>();
+            var stashedReturnViewModel = UnstashModel<ReturnViewModel>();
 
             #endregion
 
-            if (stashedReturnViewModel == null)
-            {
-                return SessionExpiredView();
-            }
+            if (stashedReturnViewModel == null) return SessionExpiredView();
 
             postedReturnViewModel.ReportInfo = stashedReturnViewModel.ReportInfo;
 
@@ -96,10 +87,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             await _SubmissionPresenter.KeepDraftFileLockedToUserAsync(postedReturnViewModel, CurrentUser.UserId);
 
             if (!postedReturnViewModel.ReportInfo.Draft.HasDraftBeenModifiedDuringThisSession)
-            {
                 postedReturnViewModel.ReportInfo.Draft.HasDraftBeenModifiedDuringThisSession =
                     IsPersonResponsibleModified(postedReturnViewModel, stashedReturnViewModel);
-            }
 
             if (!stashedReturnViewModel.ReportInfo.Draft.IsUserAllowedAccess)
             {
@@ -115,7 +104,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return View("PersonResponsible", postedReturnViewModel);
             }
 
-            this.StashModel(postedReturnViewModel);
+            StashModel(postedReturnViewModel);
 
             return RedirectToAction(returnUrl.EqualsI("CheckData") ? "CheckData" : "OrganisationSize");
         }
@@ -128,6 +117,5 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         #endregion
-
     }
 }

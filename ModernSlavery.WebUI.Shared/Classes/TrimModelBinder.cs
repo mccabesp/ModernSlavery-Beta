@@ -10,20 +10,15 @@ namespace ModernSlavery.WebUI.Shared.Classes
 {
     public class TrimModelBinder : IDisplayMetadataProvider
     {
-
         public void CreateDisplayMetadata(DisplayMetadataProviderContext context)
         {
             if (context.Key.MetadataKind == ModelMetadataKind.Property)
-            {
                 context.DisplayMetadata.ConvertEmptyStringToNull = true;
-            }
         }
-
     }
 
     public class TrimmingModelBinder : IModelBinder
     {
-
         private readonly IModelBinder FallbackBinder;
 
         public TrimmingModelBinder(IModelBinder fallbackBinder)
@@ -33,13 +28,11 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            if (bindingContext == null)
-            {
-                throw new ArgumentNullException(nameof(bindingContext));
-            }
+            if (bindingContext == null) throw new ArgumentNullException(nameof(bindingContext));
 
-            ValueProviderResult valueProviderResult = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
-            if (valueProviderResult != null && valueProviderResult.FirstValue is string str && !string.IsNullOrEmpty(str))
+            var valueProviderResult = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
+            if (valueProviderResult != null && valueProviderResult.FirstValue is string str &&
+                !string.IsNullOrEmpty(str))
             {
                 bindingContext.Result = ModelBindingResult.Success(str.Trim());
                 return Task.CompletedTask;
@@ -47,18 +40,13 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
             return FallbackBinder.BindModelAsync(bindingContext);
         }
-
     }
 
     public class TrimmingModelBinderProvider : IModelBinderProvider
     {
-
         public IModelBinder GetBinder(ModelBinderProviderContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
             if (!context.Metadata.IsComplexType && context.Metadata.ModelType == typeof(string))
             {
@@ -68,6 +56,5 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
             return null;
         }
-
     }
 }

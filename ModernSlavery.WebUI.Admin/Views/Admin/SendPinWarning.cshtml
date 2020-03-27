@@ -1,19 +1,16 @@
 ﻿@using Microsoft.AspNetCore.Http
-@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model ModernSlavery.Core.Entities.UserOrganisation
-
+@model UserOrganisation
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = "Send PIN Warning - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
     @{
-        Uri referrer = Context.Request.GetTypedHeaders().Referer;
-        string unconfirmedPinsPage = Url.Action("UnconfirmedPins", "AdminUnconfirmedPins", null, "https");
-        string viewOrganisationPage = Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.OrganisationId}, "https");
-        string viewUserPage = Url.Action("ViewUser", "AdminViewUser", new {id = Model.UserId}, "https");
+        var referrer = Context.Request.GetTypedHeaders().Referer;
+        var unconfirmedPinsPage = Url.Action("UnconfirmedPins", "AdminUnconfirmedPins", null, "https");
+        var viewOrganisationPage = Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.OrganisationId}, "https");
+        var viewUserPage = Url.Action("ViewUser", "AdminViewUser", new {id = Model.UserId}, "https");
 
         var crumbs = new List<CrumbViewModel>();
         crumbs.Add(new CrumbViewModel
@@ -79,9 +76,9 @@
 
         <form method="POST" action="@Url.Action("SendPin", "AdminUnconfirmedPins")">
             @Html.AntiForgeryToken()
-            <input type="hidden" name="userId" value="@(Model.User.UserId)" />
-            <input type="hidden" name="organisationId" value="@(Model.Organisation.OrganisationId)" />
-            <input type="submit" class="govuk-button govuk-!-margin-bottom-4" data-module="govuk-button" value="Send PIN" />
+            <input type="hidden" name="userId" value="@(Model.User.UserId)"/>
+            <input type="hidden" name="organisationId" value="@(Model.Organisation.OrganisationId)"/>
+            <input type="submit" class="govuk-button govuk-!-margin-bottom-4" data-module="govuk-button" value="Send PIN"/>
         </form>
 
         <p class="govuk-body">

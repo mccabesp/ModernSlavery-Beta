@@ -1,7 +1,7 @@
-﻿using ModernSlavery.Core.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
@@ -9,7 +9,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminViewUserController : Controller
     {
-
         private readonly IDataRepository dataRepository;
 
         public AdminViewUserController(IDataRepository dataRepository)
@@ -24,6 +23,5 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             return View("../Admin/ViewUser", user);
         }
-
     }
 }

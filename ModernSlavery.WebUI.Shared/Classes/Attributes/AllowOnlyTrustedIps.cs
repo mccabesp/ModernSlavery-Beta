@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel.Options;
-using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 {
@@ -18,11 +15,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var sharedOptions = (SharedOptions)context.HttpContext.RequestServices.GetService(typeof(SharedOptions));
-            var trustedIPDomains= sharedOptions?.TrustedIpDomains.SplitI();
+            var sharedOptions = (SharedOptions) context.HttpContext.RequestServices.GetService(typeof(SharedOptions));
+            var trustedIPDomains = sharedOptions?.TrustedIpDomains.SplitI();
             if (trustedIPDomains != null && trustedIPDomains.Any())
             {
-                string userHostAddress = context.HttpContext.GetUserHostAddress();
+                var userHostAddress = context.HttpContext.GetUserHostAddress();
                 if (string.IsNullOrWhiteSpace(userHostAddress) || !userHostAddress.IsTrustedAddress(trustedIPDomains))
                 {
                     LogAttempt(context, sharedOptions.TrustedIpDomains, userHostAddress);
@@ -38,15 +35,17 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
         {
             try
             {
-                ILogger logger = context.HttpContext.RequestServices?.GetService<ILogger<AllowOnlyTrustedDomainsAttribute>>();
+                ILogger logger = context.HttpContext.RequestServices
+                    ?.GetService<ILogger<AllowOnlyTrustedDomainsAttribute>>();
                 logger = context.HttpContext.RequestServices?.GetService<ILogger>();
-                if (logger == null)return;
+                if (logger == null) return;
 
-                string controllerMessagePart = context.Controller == null || string.IsNullOrWhiteSpace(context.Controller.ToString())
-                    ? "an unknown controller"
-                    : $"controller {context.Controller}";
+                var controllerMessagePart =
+                    context.Controller == null || string.IsNullOrWhiteSpace(context.Controller.ToString())
+                        ? "an unknown controller"
+                        : $"controller {context.Controller}";
 
-                string forbiddingReasonMessagePart = string.IsNullOrWhiteSpace(userHostAddress)
+                var forbiddingReasonMessagePart = string.IsNullOrWhiteSpace(userHostAddress)
                     ? "since it was not possible to read its host address information"
                     : $"for address {userHostAddress} as it is not part of the trusted ips '{trustedIPDomains}'";
 
@@ -58,6 +57,5 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
                 // It's more important that the code continues
             }
         }
-
     }
 }

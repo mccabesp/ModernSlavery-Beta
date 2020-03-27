@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
@@ -11,10 +10,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 {
     public partial class SubmissionController : BaseController
     {
-
         #region private methods
 
-        private static bool IsOrganisationSizeModified(ReturnViewModel postedReturnViewModel, ReturnViewModel stashedReturnViewModel)
+        private static bool IsOrganisationSizeModified(ReturnViewModel postedReturnViewModel,
+            ReturnViewModel stashedReturnViewModel)
         {
             return postedReturnViewModel.OrganisationSize != stashedReturnViewModel.OrganisationSize;
         }
@@ -29,21 +28,16 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             #region Check user, then retrieve model from Session
 
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
-            var stashedReturnViewModel = this.UnstashModel<ReturnViewModel>();
+            var stashedReturnViewModel = UnstashModel<ReturnViewModel>();
 
             #endregion
 
-            if (stashedReturnViewModel == null)
-            {
-                return SessionExpiredView();
-            }
+            if (stashedReturnViewModel == null) return SessionExpiredView();
 
-            stashedReturnViewModel = await LoadReturnViewModelFromDBorFromDraftFileAsync(stashedReturnViewModel, VirtualUser.UserId);
+            stashedReturnViewModel =
+                await LoadReturnViewModelFromDBorFromDraftFileAsync(stashedReturnViewModel, VirtualUser.UserId);
 
             if (!stashedReturnViewModel.ReportInfo.Draft.IsUserAllowedAccess)
             {
@@ -59,24 +53,19 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("organisation-size")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OrganisationSize(ReturnViewModel postedReturnViewModel, string returnUrl = null)
+        public async Task<IActionResult> OrganisationSize(ReturnViewModel postedReturnViewModel,
+            string returnUrl = null)
         {
             #region Check user, then retrieve model from Session
 
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
-            var stashedReturnViewModel = this.UnstashModel<ReturnViewModel>();
+            var stashedReturnViewModel = UnstashModel<ReturnViewModel>();
 
             #endregion
 
-            if (stashedReturnViewModel == null)
-            {
-                return SessionExpiredView();
-            }
+            if (stashedReturnViewModel == null) return SessionExpiredView();
 
             postedReturnViewModel.ReportInfo = stashedReturnViewModel.ReportInfo;
 
@@ -87,10 +76,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             await _SubmissionPresenter.KeepDraftFileLockedToUserAsync(postedReturnViewModel, CurrentUser.UserId);
 
             if (!postedReturnViewModel.ReportInfo.Draft.HasDraftBeenModifiedDuringThisSession)
-            {
                 postedReturnViewModel.ReportInfo.Draft.HasDraftBeenModifiedDuringThisSession =
                     IsOrganisationSizeModified(postedReturnViewModel, stashedReturnViewModel);
-            }
 
             if (!stashedReturnViewModel.ReportInfo.Draft.IsUserAllowedAccess)
             {
@@ -100,7 +87,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             #endregion
 
-            this.StashModel(postedReturnViewModel);
+            StashModel(postedReturnViewModel);
 
             return RedirectToAction(returnUrl.EqualsI("CheckData") ? "CheckData" : "EmployerWebsite");
         }
@@ -113,6 +100,5 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         #endregion
-
     }
 }

@@ -6,33 +6,29 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.WebUI.Admin.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Core.SharedKernel;
-using Newtonsoft.Json;
-using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
+using Newtonsoft.Json;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     public partial class AdminController
     {
-
-        private async Task<long> UpdateSearchIndexesAsync(string parameters, string comment, StringWriter writer, bool test)
+        private async Task<long> UpdateSearchIndexesAsync(string parameters, string comment, StringWriter writer,
+            bool test)
         {
-            if (!string.IsNullOrWhiteSpace(parameters))
-            {
-                throw new ArgumentException("ERROR: parameters must be empty");
-            }
+            if (!string.IsNullOrWhiteSpace(parameters)) throw new ArgumentException("ERROR: parameters must be empty");
 
-            long count = await AdminService.EmployerSearchRepository.GetDocumentCountAsync();
+            var count = await AdminService.EmployerSearchRepository.GetDocumentCountAsync();
             if (!test)
             {
                 await AdminService.ExecuteWebjobQueue.AddMessageAsync(
@@ -44,18 +40,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        private async Task<long> UpdateDownloadFilesAsync(string parameters, string comment, StringWriter writer, bool test)
+        private async Task<long> UpdateDownloadFilesAsync(string parameters, string comment, StringWriter writer,
+            bool test)
         {
-            if (!string.IsNullOrWhiteSpace(parameters))
-            {
-                throw new ArgumentException("ERROR: parameters must be empty");
-            }
+            if (!string.IsNullOrWhiteSpace(parameters)) throw new ArgumentException("ERROR: parameters must be empty");
 
-            long count = await AdminService.EmployerSearchRepository.GetDocumentCountAsync();
+            var count = await AdminService.EmployerSearchRepository.GetDocumentCountAsync();
             if (!test)
             {
                 await AdminService.ExecuteWebjobQueue.AddMessageAsync(
-                    new QueueWrapper($"command=UpdateDownloadFiles&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
+                    new QueueWrapper(
+                        $"command=UpdateDownloadFiles&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
                 writer.WriteLine(
                     $"An email will be sent to '{CurrentUser.EmailAddress}' when the background task '{nameof(UpdateDownloadFilesAsync)}' has completed");
             }
@@ -63,14 +58,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        private async Task<long> FixOrganisationsNamesAsync(string parameters, string comment, StringWriter writer, bool test)
+        private async Task<long> FixOrganisationsNamesAsync(string parameters, string comment, StringWriter writer,
+            bool test)
         {
-            if (!string.IsNullOrWhiteSpace(parameters))
-            {
-                throw new ArgumentException("ERROR: parameters must be empty");
-            }
+            if (!string.IsNullOrWhiteSpace(parameters)) throw new ArgumentException("ERROR: parameters must be empty");
 
-            int count = await SharedBusinessLogic.DataRepository.GetAll<OrganisationName>()
+            var count = await SharedBusinessLogic.DataRepository.GetAll<OrganisationName>()
                 .Where(o => o.Name.ToLower().Contains(" ltd"))
                 .Select(o => o.OrganisationId)
                 .Distinct()
@@ -78,7 +71,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (!test)
             {
                 await AdminService.ExecuteWebjobQueue.AddMessageAsync(
-                    new QueueWrapper($"command=FixOrganisationsNames&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
+                    new QueueWrapper(
+                        $"command=FixOrganisationsNames&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
                 writer.WriteLine(
                     $"An email will be sent to '{CurrentUser.EmailAddress}' when the background task '{nameof(FixOrganisationsNamesAsync)}' has completed");
             }
@@ -88,10 +82,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         public class BulkResult
         {
-
             public int Count { get; set; }
             public int TotalRecords { get; set; }
-
         }
 
         #region Manual Changes
@@ -101,9 +93,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             //Throw error if the user is not a super administrator
             if (!IsDatabaseAdministrator)
-            {
                 return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a database administrator");
-            }
 
             return View(new ManualChangesViewModel());
         }
@@ -115,14 +105,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             //Throw error if the user is not a super administrator
             if (!IsDatabaseAdministrator)
-            {
                 return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a database administrator");
-            }
 
             model.Results = null;
             ModelState.Clear();
-            bool test = model.LastTestedCommand != model.Command
-                        || model.LastTestedInput != model.Parameters.ReplaceI(Environment.NewLine, ";");
+            var test = model.LastTestedCommand != model.Command
+                       || model.LastTestedInput != model.Parameters.ReplaceI(Environment.NewLine, ";");
             model.Tested = false;
             BulkResult result = null;
             long count = 0;
@@ -147,10 +135,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             count = await ResetOrganisationNameAsync(model.Parameters, model.Comment, writer, test);
                             break;
                         case "Convert public to private":
-                            count = await ConvertPublicOrganisationsToPrivateAsync(model.Parameters, model.Comment, writer, test);
+                            count = await ConvertPublicOrganisationsToPrivateAsync(model.Parameters, model.Comment,
+                                writer, test);
                             break;
                         case "Convert private to public":
-                            count = await ConvertPrivateOrganisationsToPublicAsync(model.Parameters, model.Comment, writer, test);
+                            count = await ConvertPrivateOrganisationsToPublicAsync(model.Parameters, model.Comment,
+                                writer, test);
                             break;
                         case "Retire organisations":
                             count = await RetireOrganisationsAsync(model.Parameters, model.Comment, writer, test);
@@ -162,7 +152,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             count = await DeleteSubmissionsAsync(model.Parameters, model.Comment, writer, test);
                             break;
                         case "Set organisation company number":
-                            count = await SetOrganisationCompanyNumberAsync(model.Parameters, model.Comment, writer, test);
+                            count = await SetOrganisationCompanyNumberAsync(model.Parameters, model.Comment, writer,
+                                test);
                             break;
                         case "Set organisation DUNS number":
                             count = await SetOrganisationDUNSNumberAsync(model.Parameters, model.Comment, writer, test);
@@ -185,7 +176,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 test);
                             break;
                         case "Set organisation as in scope":
-                            count = await SetOrganisationScopeAsync(model.Parameters, model.Comment, writer, ScopeStatuses.InScope, test);
+                            count = await SetOrganisationScopeAsync(model.Parameters, model.Comment, writer,
+                                ScopeStatuses.InScope, test);
                             break;
                         case "Update search indexes":
                             count = await UpdateSearchIndexesAsync(model.Parameters, model.Comment, writer, test);
@@ -237,7 +229,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             total = result.TotalRecords;
                             break;
                         case "Expire security code":
-                            count = await ExpireSecurityCodeAsync(model.Parameters, model.Comment, writer, test, ManualActions.Expire);
+                            count = await ExpireSecurityCodeAsync(model.Parameters, model.Comment, writer, test,
+                                ManualActions.Expire);
                             break;
                         case "Expire security codes for all active and pending orgs":
                             result = await ExpireSecurityCodeBulkWorkAsync(
@@ -250,7 +243,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             total = result.TotalRecords;
                             break;
                         default:
-                            throw new NotImplementedException($"ERROR: The command '{model.Command}' has not yet been implemented");
+                            throw new NotImplementedException(
+                                $"ERROR: The command '{model.Command}' has not yet been implemented");
                     }
 
                     if (test)
@@ -270,35 +264,31 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     if (!string.IsNullOrWhiteSpace(model.Parameters))
                     {
                         total = total ?? model.Parameters.LineCount();
-                        model.SuccessMessage = $"SUCCESSFULLY {(test ? "TESTED" : "EXECUTED")} '{model.Command}': {count} of {total}";
+                        model.SuccessMessage =
+                            $"SUCCESSFULLY {(test ? "TESTED" : "EXECUTED")} '{model.Command}': {count} of {total}";
                     }
                     else
                     {
-                        model.SuccessMessage = $"SUCCESSFULLY {(test ? "TESTED" : "EXECUTED")} '{model.Command}': {count} items";
+                        model.SuccessMessage =
+                            $"SUCCESSFULLY {(test ? "TESTED" : "EXECUTED")} '{model.Command}': {count} items";
                     }
                 }
                 catch (AggregateException ex)
                 {
-                    foreach (Exception iex in ex.InnerExceptions)
+                    foreach (var iex in ex.InnerExceptions)
                     {
-                        Exception exception = iex;
+                        var exception = iex;
 
-                        while (exception.InnerException != null)
-                        {
-                            exception = exception.InnerException;
-                        }
+                        while (exception.InnerException != null) exception = exception.InnerException;
 
                         ModelState.AddModelError("", exception.Message);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Exception exception = ex;
+                    var exception = ex;
 
-                    while (exception.InnerException != null)
-                    {
-                        exception = exception.InnerException;
-                    }
+                    while (exception.InnerException != null) exception = exception.InnerException;
 
                     ModelState.AddModelError("", exception.Message);
                 }
@@ -320,17 +310,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             employerReference = lineToReview.BeforeFirst("=")?.ToUpper();
 
             // if found, remove from line to review
-            if (!string.IsNullOrEmpty(employerReference))
-            {
-                lineToReview = lineToReview.Replace(employerReference, "");
-            }
+            if (!string.IsNullOrEmpty(employerReference)) lineToReview = lineToReview.Replace(employerReference, "");
 
             return !string.IsNullOrEmpty(employerReference);
         }
 
         private static bool HasDateTimeInfo(ref string lineToReview, out DateTime extractedDateTime)
         {
-            string parameterDateTimeSection = lineToReview.AfterFirst("=")?.ToUpper();
+            var parameterDateTimeSection = lineToReview.AfterFirst("=")?.ToUpper();
             extractedDateTime = parameterDateTimeSection.ToDateTime();
 
             return extractedDateTime != DateTime.MinValue;
@@ -343,24 +330,18 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         /// <param name="snapshotYear">the snapshot year or zero if unable to extract</param>
         private static void GetSnapshotYear(ref string lineToReview, out int snapshotYear)
         {
-            string parameterDetailSection = lineToReview.AfterFirst("=")?.ToUpper();
+            var parameterDetailSection = lineToReview.AfterFirst("=")?.ToUpper();
 
-            bool containsComma = parameterDetailSection.ContainsI(",");
+            var containsComma = parameterDetailSection.ContainsI(",");
 
-            string candidateSnapshotYear = parameterDetailSection;
+            var candidateSnapshotYear = parameterDetailSection;
 
-            if (containsComma)
-            {
-                candidateSnapshotYear = parameterDetailSection.BeforeFirst(",")?.ToUpper();
-            }
+            if (containsComma) candidateSnapshotYear = parameterDetailSection.BeforeFirst(",")?.ToUpper();
 
             snapshotYear = candidateSnapshotYear.ToInt32();
 
             // if found, remove from line to review
-            if (snapshotYear != default)
-            {
-                lineToReview = lineToReview.Replace(snapshotYear.ToString(), "");
-            }
+            if (snapshotYear != default) lineToReview = lineToReview.Replace(snapshotYear.ToString(), "");
         }
 
         /// <summary>
@@ -378,24 +359,18 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         /// </returns>
         private static bool GetComment(ref string lineToReview, out string comment)
         {
-            string parameterDetailSection = lineToReview.AfterFirst("=");
+            var parameterDetailSection = lineToReview.AfterFirst("=");
 
-            bool containsComma = parameterDetailSection.ContainsI(",");
+            var containsComma = parameterDetailSection.ContainsI(",");
 
             comment = parameterDetailSection;
 
-            if (containsComma)
-            {
-                comment = parameterDetailSection.AfterFirst(",");
-            }
+            if (containsComma) comment = parameterDetailSection.AfterFirst(",");
 
-            bool found = !string.IsNullOrEmpty(comment);
+            var found = !string.IsNullOrEmpty(comment);
 
             // if the comment was found - not empty -, then remove it from line under review
-            if (found)
-            {
-                lineToReview = lineToReview.Replace(comment, "");
-            }
+            if (found) lineToReview = lineToReview.Replace(comment, "");
 
             return found;
         }
@@ -407,24 +382,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             bool test)
         {
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var listOfModifiedOrgs = new HashSet<Organisation>();
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
-                string outcome = line;
+                var outcome = line;
 
                 i++;
 
-                if (!HasEmployerReference(ref outcome, out string employerRef))
+                if (!HasEmployerReference(ref outcome, out var employerRef))
                 {
                     writer.WriteLine(
                         Color.Red,
@@ -432,9 +404,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                GetSnapshotYear(ref outcome, out int changeScopeToSnapshotYear);
-                bool wasCommentFoundInLine = GetComment(ref outcome, out string changeScopeToComment);
-                bool commentBeginsWithNumber = Regex.IsMatch(changeScopeToComment, "^(\\s*\\d{1}|\\d{1})");
+                GetSnapshotYear(ref outcome, out var changeScopeToSnapshotYear);
+                var wasCommentFoundInLine = GetComment(ref outcome, out var changeScopeToComment);
+                var commentBeginsWithNumber = Regex.IsMatch(changeScopeToComment, "^(\\s*\\d{1}|\\d{1})");
 
                 if (commentBeginsWithNumber && changeScopeToSnapshotYear == default)
                 {
@@ -467,7 +439,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     processed.Add(employerRef);
 
-                    CustomResult<OrganisationScope> outOfScopeOutcome = await AdminService.OrganisationBusinessLogic.SetAsScopeAsync(
+                    var outOfScopeOutcome = await AdminService.OrganisationBusinessLogic.SetAsScopeAsync(
                         employerRef,
                         changeScopeToSnapshotYear,
                         changeScopeToComment,
@@ -482,17 +454,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     }
 
                     if (outOfScopeOutcome.Result.Organisation != null)
-                    {
                         listOfModifiedOrgs.Add(outOfScopeOutcome.Result.Organisation);
-                    }
 
-                    string hasBeenWillBe = test ? "will be" : "has been";
+                    var hasBeenWillBe = test ? "will be" : "has been";
                     writer.WriteLine(
                         $"{i}: {employerRef}: {hasBeenWillBe} set as '{outOfScopeOutcome.Result.ScopeStatus}' for snapshotYear '{outOfScopeOutcome.Result.SnapshotDate.Year}' with comment '{outOfScopeOutcome.Result.Reason}'");
                     if (!test)
-                    {
                         await AdminService.ManualChangeLog.WriteAsync(
-                            new ManualChangeLogModel {
+                            new ManualChangeLogModel
+                            {
                                 MethodName = $"SetOrg{scopeStatus.ToString()}",
                                 Action = ManualActions.Update,
                                 Source = CurrentUser.EmailAddress,
@@ -501,7 +471,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 ReferenceValue = employerRef,
                                 TargetName = nameof(Organisation.OrganisationScopes)
                             });
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -524,23 +493,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        private async Task<long> FixDatabaseErrorsAsync(string parameters, string comment, StringWriter writer, bool test)
+        private async Task<long> FixDatabaseErrorsAsync(string parameters, string comment, StringWriter writer,
+            bool test)
         {
-            if (!string.IsNullOrWhiteSpace(parameters))
-            {
-                throw new ArgumentException("ERROR: parameters must be empty");
-            }
+            if (!string.IsNullOrWhiteSpace(parameters)) throw new ArgumentException("ERROR: parameters must be empty");
 
             var count = 0;
 
             #region Fix latest registrations
 
-            IQueryable<Organisation> orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+            var orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                 .Where(o => o.LatestRegistration == null && o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null));
             var subCount = 0;
-            foreach (Organisation org in orgs)
+            foreach (var org in orgs)
             {
-                UserOrganisation latestReg = org.UserOrganisations.OrderByDescending(o => o.PINConfirmedDate)
+                var latestReg = org.UserOrganisations.OrderByDescending(o => o.PINConfirmedDate)
                     .FirstOrDefault(o => o.PINConfirmedDate != null);
                 if (latestReg != null)
                 {
@@ -552,15 +519,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
             }
 
-            if (!test && subCount > 0)
-            {
-                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-            }
+            if (!test && subCount > 0) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            if (subCount == 0)
-            {
-                writer.WriteLine("No organisations missing a latest registration");
-            }
+            if (subCount == 0) writer.WriteLine("No organisations missing a latest registration");
 
             count += subCount;
 
@@ -571,9 +532,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                 .Where(o => o.LatestReturn == null && o.Returns.Any(r => r.Status == ReturnStatuses.Submitted));
             subCount = 0;
-            foreach (Organisation org in orgs)
+            foreach (var org in orgs)
             {
-                Return latestReturn = org.Returns.OrderByDescending(o => o.AccountingDate)
+                var latestReturn = org.Returns.OrderByDescending(o => o.AccountingDate)
                     .FirstOrDefault(o => o.Status == ReturnStatuses.Submitted);
                 if (latestReturn != null)
                 {
@@ -585,15 +546,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
             }
 
-            if (!test && subCount > 0)
-            {
-                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-            }
+            if (!test && subCount > 0) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            if (subCount == 0)
-            {
-                writer.WriteLine("No organisations missing a latest return");
-            }
+            if (subCount == 0) writer.WriteLine("No organisations missing a latest return");
 
             count += subCount;
 
@@ -602,11 +557,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             #region Fix latest scopes
 
             orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                .Where(o => o.LatestScope == null && o.OrganisationScopes.Any(s => s.ScopeStatus != ScopeStatuses.Unknown));
+                .Where(o => o.LatestScope == null &&
+                            o.OrganisationScopes.Any(s => s.ScopeStatus != ScopeStatuses.Unknown));
             subCount = 0;
-            foreach (Organisation org in orgs)
+            foreach (var org in orgs)
             {
-                OrganisationScope latestScope = org.OrganisationScopes.OrderByDescending(o => o.SnapshotDate)
+                var latestScope = org.OrganisationScopes.OrderByDescending(o => o.SnapshotDate)
                     .FirstOrDefault(o => o.ScopeStatus != ScopeStatuses.Unknown);
                 if (latestScope != null)
                 {
@@ -618,15 +574,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
             }
 
-            if (!test && subCount > 0)
-            {
-                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-            }
+            if (!test && subCount > 0) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            if (subCount == 0)
-            {
-                writer.WriteLine("No organisations missing a latest scope");
-            }
+            if (subCount == 0) writer.WriteLine("No organisations missing a latest scope");
 
             count += subCount;
 
@@ -635,23 +585,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        private async Task<int> SetOrganisationCompanyNumberAsync(string input, string comment, StringWriter writer, bool test)
+        private async Task<int> SetOrganisationCompanyNumberAsync(string input, string comment, StringWriter writer,
+            bool test)
         {
-            string methodName = nameof(SetOrganisationCompanyNumberAsync);
+            var methodName = nameof(SetOrganisationCompanyNumberAsync);
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var processedCoNos = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (!line.Contains('='))
@@ -660,11 +608,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                string employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -674,7 +619,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 processed.Add(employerRef);
 
-                string newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI()?.ToUpper();
+                var newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI()?.ToUpper();
 
                 if (string.IsNullOrWhiteSpace(newValue))
                 {
@@ -692,22 +637,24 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     if (processedCoNos.Contains(newValue))
                     {
-                        writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate company number '{newValue}'");
+                        writer.WriteLine(Color.Red,
+                            $"{i}: ERROR: '{employerRef}' duplicate company number '{newValue}'");
                         continue;
                     }
 
                     processedCoNos.Add(newValue);
                 }
 
-                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
-                string oldValue = org.CompanyNumber;
+                var oldValue = org.CompanyNumber;
 
                 if (oldValue == newValue)
                 {
@@ -719,7 +666,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                          && await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                              .AnyAsync(o => o.CompanyNumber == newValue && o.OrganisationId != org.OrganisationId))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR '{employerRef}' Another organisation exists with this company number");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR '{employerRef}' Another organisation exists with this company number");
                     continue;
                 }
                 else
@@ -751,22 +699,20 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        private async Task<int> SetOrganisationSicCodesAsync(string input, string comment, StringWriter writer, bool test)
+        private async Task<int> SetOrganisationSicCodesAsync(string input, string comment, StringWriter writer,
+            bool test)
         {
-            string methodName = nameof(SetOrganisationSicCodesAsync);
+            var methodName = nameof(SetOrganisationSicCodesAsync);
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (!line.Contains('='))
@@ -776,11 +722,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure we have value BEFORE the = sign
-                string employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -791,11 +734,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 processed.Add(employerRef);
 
                 // ensure the employer ref exists
-                Organisation org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
@@ -818,35 +762,33 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure we have value AFTER the = sign
-                string newSicCodes = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI()?.ToUpper();
+                var newSicCodes = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI()?.ToUpper();
                 if (string.IsNullOrWhiteSpace(newSicCodes))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' must contain at least one SIC code");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' must contain at least one SIC code");
                     continue;
                 }
 
                 // ensure all sic codes are integers
-                string[] sicCodes = newSicCodes.Trim(' ').Split(',');
-                if (sicCodes.Any(x => int.TryParse(x, out int o) == false))
+                var sicCodes = newSicCodes.Trim(' ').Split(',');
+                if (sicCodes.Any(x => int.TryParse(x, out var o) == false))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' you can only input numeric SIC codes");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' you can only input numeric SIC codes");
                     continue;
                 }
 
                 // ensure all sic codes exist in db
                 var invalidSicCodes = new List<string>();
                 var parsedSicCodes = new List<int>();
-                foreach (string sc in sicCodes)
+                foreach (var sc in sicCodes)
                 {
-                    int parsedSc = int.Parse(sc);
+                    var parsedSc = int.Parse(sc);
                     if (SharedBusinessLogic.DataRepository.GetAll<SicCode>().Any(x => x.SicCodeId == parsedSc) == false)
-                    {
                         invalidSicCodes.Add(sc);
-                    }
                     else
-                    {
                         parsedSicCodes.Add(parsedSc);
-                    }
                 }
 
                 if (invalidSicCodes.Count > 0)
@@ -858,24 +800,26 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // get all existing sic codes
-                string prevSicCodes = org.GetSicCodeIdsString();
+                var prevSicCodes = org.GetSicCodeIdsString();
 
                 // remove all existing sic codes
-                Lists.ForEach<OrganisationSicCode>(org.GetSicCodes(), ent => ent.Retired = VirtualDateTime.Now);
+                org.GetSicCodes().ForEach(ent => ent.Retired = VirtualDateTime.Now);
 
                 // set new sic codes
                 parsedSicCodes.ForEach(
-                    x => {
+                    x =>
+                    {
                         var sic = new OrganisationSicCode {Organisation = org, SicCodeId = x, Source = "Manual"};
                         SharedBusinessLogic.DataRepository.Insert(sic);
                         org.OrganisationSicCodes.Add(sic);
                     });
 
                 //Output the actual execution result
-                string oldValue = string.Join(",", prevSicCodes);
-                string newValue = string.Join(",", parsedSicCodes);
-                string hasBeenWillBe = test ? "will be" : "has been";
-                writer.WriteLine($"{i}: {employerRef}:{org.OrganisationName} SIC codes={oldValue} {hasBeenWillBe} set to {newValue}");
+                var oldValue = string.Join(",", prevSicCodes);
+                var newValue = string.Join(",", parsedSicCodes);
+                var hasBeenWillBe = test ? "will be" : "has been";
+                writer.WriteLine(
+                    $"{i}: {employerRef}:{org.OrganisationName} SIC codes={oldValue} {hasBeenWillBe} set to {newValue}");
                 if (!test)
                 {
                     await AdminService.ManualChangeLog.WriteAsync(
@@ -898,22 +842,20 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        private async Task<int> SetOrganisationAddressesAsync(string input, string comment, StringWriter writer, bool test)
+        private async Task<int> SetOrganisationAddressesAsync(string input, string comment, StringWriter writer,
+            bool test)
         {
-            string methodName = nameof(SetOrganisationAddressesAsync);
+            var methodName = nameof(SetOrganisationAddressesAsync);
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (!line.Contains('='))
@@ -923,11 +865,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure we have value BEFORE the = sign
-                string employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -938,11 +877,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 processed.Add(employerRef);
 
                 // ensure the employer ref exists
-                Organisation org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
@@ -965,16 +905,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure we have value AFTER the = sign
-                string addressEntries = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
+                var addressEntries = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
                 if (string.IsNullOrWhiteSpace(addressEntries))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' must contain an address entry");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' must contain an address entry");
                     continue;
                 }
 
                 // ensure all address fields are present
                 // [Address1],[Address2],[Address3],[TownCity],[County],[Country],[PostCode]
-                string[] addressFields = addressEntries.Split(',');
+                var addressFields = addressEntries.Split(',');
                 if (addressFields.Length != 7)
                 {
                     writer.WriteLine(
@@ -984,81 +925,54 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // extract fields
-                string address1 = addressFields[0];
-                string address2 = addressFields[1];
-                string address3 = addressFields[2];
-                string townCity = addressFields[3];
-                string county = addressFields[4];
-                string country = addressFields[5];
-                string postCode = addressFields[6];
+                var address1 = addressFields[0];
+                var address2 = addressFields[1];
+                var address3 = addressFields[2];
+                var townCity = addressFields[3];
+                var county = addressFields[4];
+                var country = addressFields[5];
+                var postCode = addressFields[6];
 
                 // ensure mandatory fields are set
                 var requiredState = new List<string>();
 
-                if (string.IsNullOrWhiteSpace(address1))
-                {
-                    requiredState.Add("Address1 is required");
-                }
+                if (string.IsNullOrWhiteSpace(address1)) requiredState.Add("Address1 is required");
 
-                if (address1.Length > 100)
-                {
-                    requiredState.Add("Address1 is greater than 100 chars");
-                }
+                if (address1.Length > 100) requiredState.Add("Address1 is greater than 100 chars");
 
                 if (string.IsNullOrWhiteSpace(address2) == false && address2.Length > 100)
-                {
                     requiredState.Add("Address2 is greater than 100 chars");
-                }
 
                 if (string.IsNullOrWhiteSpace(address3) == false && address3.Length > 100)
-                {
                     requiredState.Add("Address3 is greater than 100 chars");
-                }
 
-                if (string.IsNullOrWhiteSpace(townCity))
-                {
-                    requiredState.Add("Town\\City is required");
-                }
+                if (string.IsNullOrWhiteSpace(townCity)) requiredState.Add("Town\\City is required");
 
-                if (townCity.Length > 100)
-                {
-                    requiredState.Add("Town\\City is greater than 100 chars");
-                }
+                if (townCity.Length > 100) requiredState.Add("Town\\City is greater than 100 chars");
 
                 if (string.IsNullOrWhiteSpace(county) == false && county.Length > 100)
-                {
                     requiredState.Add("County is greater than 100 chars");
-                }
 
                 if (string.IsNullOrWhiteSpace(country) == false && country.Length > 100)
-                {
                     requiredState.Add("Country is greater than 100 chars");
-                }
 
-                if (string.IsNullOrWhiteSpace(postCode))
-                {
-                    requiredState.Add("Postcode is required");
-                }
+                if (string.IsNullOrWhiteSpace(postCode)) requiredState.Add("Postcode is required");
 
-                if (postCode.Length < 3)
-                {
-                    requiredState.Add("Postcode is less than 3 chars");
-                }
+                if (postCode.Length < 3) requiredState.Add("Postcode is less than 3 chars");
 
-                if (postCode.Length > 100)
-                {
-                    requiredState.Add("Postcode is greater than 100 chars");
-                }
+                if (postCode.Length > 100) requiredState.Add("Postcode is greater than 100 chars");
 
                 if (requiredState.Count > 0)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' {string.Join(",", requiredState)}");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' {string.Join(",", requiredState)}");
                     continue;
                 }
 
                 // add new address
-                OrganisationAddress prevAddress = org.LatestAddress;
-                var newAddress = new OrganisationAddress {
+                var prevAddress = org.LatestAddress;
+                var newAddress = new OrganisationAddress
+                {
                     OrganisationId = org.OrganisationId,
                     Address1 = address1,
                     Address2 = address2,
@@ -1072,9 +986,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 newAddress.SetStatus(AddressStatuses.Active, CurrentUser.UserId, $"Inserted by {newAddress.Source}");
                 if (prevAddress != null)
-                {
-                    prevAddress.SetStatus(AddressStatuses.Retired, CurrentUser.UserId, $"Replaced by {newAddress.Source}");
-                }
+                    prevAddress.SetStatus(AddressStatuses.Retired, CurrentUser.UserId,
+                        $"Replaced by {newAddress.Source}");
 
                 org.LatestAddress = newAddress;
 
@@ -1082,10 +995,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 org.OrganisationAddresses.Add(newAddress);
 
                 //Output the actual execution result
-                string oldValue = prevAddress == null ? "No previous address" : prevAddress.GetAddressString();
-                string newValue = string.Join(",", addressFields);
-                string hasBeenWillBe = test ? "will be" : "has been";
-                writer.WriteLine($"{i}: {employerRef}:{org.OrganisationName} Address={oldValue} {hasBeenWillBe} set to {newValue}");
+                var oldValue = prevAddress == null ? "No previous address" : prevAddress.GetAddressString();
+                var newValue = string.Join(",", addressFields);
+                var hasBeenWillBe = test ? "will be" : "has been";
+                writer.WriteLine(
+                    $"{i}: {employerRef}:{org.OrganisationName} Address={oldValue} {hasBeenWillBe} set to {newValue}");
                 if (!test)
                 {
                     await AdminService.ManualChangeLog.WriteAsync(
@@ -1110,20 +1024,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         private async Task<int> SetPublicSectorTypeAsync(string input, string comment, StringWriter writer, bool test)
         {
-            string methodName = nameof(SetPublicSectorTypeAsync);
+            var methodName = nameof(SetPublicSectorTypeAsync);
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (!line.Contains('='))
@@ -1133,11 +1044,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure we have value BEFORE the = sign
-                string employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -1148,11 +1056,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 processed.Add(employerRef);
 
                 // ensure the employer ref exists
-                Organisation org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
@@ -1168,15 +1077,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 // ensure the org is public sector
                 if (org.SectorType != SectorTypes.Public)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' is not a public sector organisation");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' is not a public sector organisation");
                     continue;
                 }
 
                 // ensure we have value AFTER the = sign
-                string enteredClassification = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
+                var enteredClassification = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
                 if (string.IsNullOrWhiteSpace(enteredClassification))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' must contain a public sector type");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' must contain a public sector type");
                     continue;
                 }
 
@@ -1190,7 +1101,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure the public sector type is an integer
-                if (int.TryParse(enteredClassification, out int parsedPublicSectorTypeId) == false)
+                if (int.TryParse(enteredClassification, out var parsedPublicSectorTypeId) == false)
                 {
                     writer.WriteLine(
                         Color.Red,
@@ -1218,14 +1129,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // retire current public sector type
-                OrganisationPublicSectorType prevClassification = org.LatestPublicSectorType;
-                if (prevClassification != null)
-                {
-                    prevClassification.Retired = VirtualDateTime.Now;
-                }
+                var prevClassification = org.LatestPublicSectorType;
+                if (prevClassification != null) prevClassification.Retired = VirtualDateTime.Now;
 
                 // create new public sector type mapping to the org
-                var newOrgSectorClass = new OrganisationPublicSectorType {
+                var newOrgSectorClass = new OrganisationPublicSectorType
+                {
                     OrganisationId = org.OrganisationId,
                     PublicSectorTypeId = parsedPublicSectorTypeId,
                     PublicSectorType = newSectorType,
@@ -1235,11 +1144,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 org.LatestPublicSectorType = newOrgSectorClass;
 
                 //Output the actual execution result
-                string oldValue = prevClassification == null
+                var oldValue = prevClassification == null
                     ? "No previous public sector type"
                     : prevClassification.PublicSectorType.Description;
-                string newValue = newSectorType.Description;
-                string hasBeenWillBe = test ? "will be" : "has been";
+                var newValue = newSectorType.Description;
+                var hasBeenWillBe = test ? "will be" : "has been";
                 writer.WriteLine(
                     $"{i}: {employerRef}:{org.OrganisationName} public sector type={oldValue} {hasBeenWillBe} set to {newValue}");
                 if (!test)
@@ -1264,23 +1173,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        private async Task<int> SetOrganisationDUNSNumberAsync(string input, string comment, StringWriter writer, bool test)
+        private async Task<int> SetOrganisationDUNSNumberAsync(string input, string comment, StringWriter writer,
+            bool test)
         {
-            string methodName = nameof(SetOrganisationDUNSNumberAsync);
+            var methodName = nameof(SetOrganisationDUNSNumberAsync);
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var processedNumbers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (!line.Contains('='))
@@ -1289,11 +1196,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                string employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -1303,7 +1207,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 processed.Add(employerRef);
 
-                string newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI()?.ToUpper();
+                var newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI()?.ToUpper();
 
                 if (string.IsNullOrWhiteSpace(newValue))
                 {
@@ -1325,15 +1229,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 processedNumbers.Add(newValue);
 
-                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
-                string oldValue = org.DUNSNumber;
+                var oldValue = org.DUNSNumber;
 
                 if (oldValue == newValue)
                 {
@@ -1351,14 +1256,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 else if (await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .AnyAsync(o => o.DUNSNumber == newValue && o.OrganisationId != org.OrganisationId))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR '{employerRef}' Another organisation exists with this DUNS number");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR '{employerRef}' Another organisation exists with this DUNS number");
                     continue;
                 }
                 else
                 {
                     //Output the actual execution result
                     org.DUNSNumber = newValue;
-                    writer.WriteLine($"{i}: {employerRef}: {org.OrganisationName} DUNS Number='{org.DUNSNumber}' set to '{newValue}'");
+                    writer.WriteLine(
+                        $"{i}: {employerRef}: {org.OrganisationName} DUNS Number='{org.DUNSNumber}' set to '{newValue}'");
                     if (!test)
                     {
                         await AdminService.ManualChangeLog.WriteAsync(
@@ -1384,20 +1291,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         private async Task<int> DeleteSubmissionsAsync(string input, string comment, StringWriter writer, bool test)
         {
-            string methodName = nameof(DeleteSubmissionsAsync);
+            var methodName = nameof(DeleteSubmissionsAsync);
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (!line.Contains('='))
@@ -1406,11 +1310,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                string employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -1420,53 +1321,54 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 processed.Add(employerRef);
 
-                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
-                string number = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
+                var number = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
                 if (number == null || !string.IsNullOrWhiteSpace(number) && !number.IsNumber())
                 {
                     writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' invalid year '{number}'");
                     continue;
                 }
 
-                int year = number.ToInt32(AdminService.SharedBusinessLogic.GetAccountingStartDate(org.SectorType).Year);
-                Return @return = org.Returns.OrderByDescending(o => o.StatusDate)
+                var year = number.ToInt32(AdminService.SharedBusinessLogic.GetAccountingStartDate(org.SectorType).Year);
+                var @return = org.Returns.OrderByDescending(o => o.StatusDate)
                     .FirstOrDefault(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year);
                 if (@return == null)
                 {
-                    writer.WriteLine(Color.Orange, $"{i}: WARNING: '{employerRef}' Cannot find submitted data for year {year}");
+                    writer.WriteLine(Color.Orange,
+                        $"{i}: WARNING: '{employerRef}' Cannot find submitted data for year {year}");
                     continue;
                 }
 
                 var newValue = ReturnStatuses.Deleted;
-                ReturnStatuses oldValue = @return.Status;
+                var oldValue = @return.Status;
 
                 //Output the actual execution result
                 @return.SetStatus(newValue, CurrentUser.UserId, comment);
-                if (@return.Organisation.LatestReturn != null && @return.Organisation.LatestReturn.ReturnId == @return.ReturnId)
+                if (@return.Organisation.LatestReturn != null &&
+                    @return.Organisation.LatestReturn.ReturnId == @return.ReturnId)
                 {
                     //Get the latest return (if any)
-                    Return latestReturn = @return.Organisation.Returns.OrderByDescending(o => o.AccountingDate)
+                    var latestReturn = @return.Organisation.Returns.OrderByDescending(o => o.AccountingDate)
                         .FirstOrDefault(o => o.Status == ReturnStatuses.Submitted);
 
                     //Set the new latest return or the organisation 
                     @return.Organisation.LatestReturn = latestReturn;
-                    if (latestReturn != null)
-                    {
-                        latestReturn.Organisation = org;
-                    }
+                    if (latestReturn != null) latestReturn.Organisation = org;
 
                     //Remove the old latest return 
                     @return.Organisation = null;
                 }
 
-                writer.WriteLine($"{i}: {employerRef}: {org.OrganisationName} Year='{year}' Status='{oldValue}' set to '{newValue}'");
+                writer.WriteLine(
+                    $"{i}: {employerRef}: {org.OrganisationName} Year='{year}' Status='{oldValue}' set to '{newValue}'");
                 if (!test)
                 {
                     await AdminService.ManualChangeLog.WriteAsync(
@@ -1493,17 +1395,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private async Task<int> UnRetireOrganisationsAsync(string input, string comment, StringWriter writer, bool test)
         {
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (line.Contains('='))
@@ -1512,11 +1411,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                string employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -1526,7 +1422,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 processed.Add(employerRef);
 
-                var manualChangeLogModel = new ManualChangeLogModel {
+                var manualChangeLogModel = new ManualChangeLogModel
+                {
                     MethodName = nameof(UnRetireOrganisationsAsync),
                     Action = ManualActions.Update,
                     Source = CurrentUser.EmailAddress,
@@ -1535,11 +1432,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     ReferenceValue = employerRef
                 };
 
-                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
@@ -1548,7 +1446,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 try
                 {
-                    CustomError errorMessage = AdminService.OrganisationBusinessLogic.UnRetire(org,CurrentUser.UserId, comment);
+                    var errorMessage =
+                        AdminService.OrganisationBusinessLogic.UnRetire(org, CurrentUser.UserId, comment);
 
                     if (errorMessage != null)
                     {
@@ -1581,20 +1480,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         private async Task<int> RetireOrganisationsAsync(string input, string comment, StringWriter writer, bool test)
         {
-            string methodName = nameof(RetireOrganisationsAsync);
+            var methodName = nameof(RetireOrganisationsAsync);
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (line.Contains('='))
@@ -1603,11 +1499,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                string employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -1617,16 +1510,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 processed.Add(employerRef);
 
-                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
                 var newValue = OrganisationStatuses.Retired;
-                OrganisationStatuses oldValue = org.Status;
+                var oldValue = org.Status;
 
                 if (oldValue == newValue)
                 {
@@ -1638,7 +1532,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     //Output the actual execution result
                     org.SetStatus(newValue, CurrentUser.UserId, comment);
-                    writer.WriteLine($"{i}: {employerRef}: {org.OrganisationName} Status='{oldValue}' set to '{newValue}'");
+                    writer.WriteLine(
+                        $"{i}: {employerRef}: {org.OrganisationName} Status='{oldValue}' set to '{newValue}'");
                     if (!test)
                     {
                         await AdminService.ManualChangeLog.WriteAsync(
@@ -1665,22 +1560,20 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        private async Task<int> ConvertPrivateOrganisationsToPublicAsync(string input, string comment, StringWriter writer, bool test)
+        private async Task<int> ConvertPrivateOrganisationsToPublicAsync(string input, string comment,
+            StringWriter writer, bool test)
         {
-            string methodName = nameof(ConvertPrivateOrganisationsToPublicAsync);
+            var methodName = nameof(ConvertPrivateOrganisationsToPublicAsync);
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (line.Contains('='))
@@ -1689,11 +1582,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                string employerRef = line?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -1705,47 +1595,43 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 var newSector = SectorTypes.Public;
 
-                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
-                SectorTypes oldSector = org.SectorType;
+                var oldSector = org.SectorType;
 
                 var badReturnDates = false;
-                foreach (Return @return in org.Returns)
+                foreach (var @return in org.Returns)
                 {
-                    DateTime oldDate = @return.AccountingDate;
-                    DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector,oldDate.Year);
-                    if (oldDate == newDate)
-                    {
-                        continue;
-                    }
+                    var oldDate = @return.AccountingDate;
+                    var newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    if (oldDate == newDate) continue;
 
                     badReturnDates = true;
                     break;
                 }
 
                 var badScopeDates = false;
-                foreach (OrganisationScope scope in org.OrganisationScopes)
+                foreach (var scope in org.OrganisationScopes)
                 {
-                    DateTime oldDate = scope.SnapshotDate;
-                    DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector,oldDate.Year);
-                    if (oldDate == newDate)
-                    {
-                        continue;
-                    }
+                    var oldDate = scope.SnapshotDate;
+                    var newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    if (oldDate == newDate) continue;
 
                     badScopeDates = true;
                     break;
                 }
 
-                IEnumerable<OrganisationSicCode> sicCodes = org.GetSicCodes();
+                var sicCodes = org.GetSicCodes();
 
-                if (oldSector == newSector && sicCodes.Any(s => s.SicCodeId == 1 && s.Retired == null) && !badReturnDates && !badScopeDates)
+                if (oldSector == newSector && sicCodes.Any(s => s.SicCodeId == 1 && s.Retired == null) &&
+                    !badReturnDates && !badScopeDates)
                 {
                     writer.WriteLine(
                         Color.Orange,
@@ -1758,7 +1644,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         //Change the sector type
                         org.SectorType = newSector;
                         if (!test)
-                        {
                             await AdminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
@@ -1770,21 +1655,20 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     oldSector.ToString(),
                                     newSector.ToString(),
                                     comment));
-                        }
                     }
 
                     //Add SIC Code 1
                     if (!sicCodes.Any(sic => sic.SicCodeId == 1 && sic.Retired == null))
                     {
                         org.OrganisationSicCodes.Add(
-                            new OrganisationSicCode {
+                            new OrganisationSicCode
+                            {
                                 OrganisationId = org.OrganisationId,
                                 SicCodeId = 1,
                                 Source = "Manual",
                                 Created = sicCodes.Any() ? sicCodes.First().Created : VirtualDateTime.Now
                             });
                         if (!test)
-                        {
                             await AdminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
@@ -1796,24 +1680,19 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     null,
                                     "1",
                                     comment));
-                        }
                     }
 
                     //Set accounting Date
                     if (badReturnDates)
-                    {
-                        foreach (Return @return in org.Returns)
+                        foreach (var @return in org.Returns)
                         {
-                            DateTime oldDate = @return.AccountingDate;
-                            DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector,oldDate.Year);
-                            if (oldDate == newDate)
-                            {
-                                continue;
-                            }
+                            var oldDate = @return.AccountingDate;
+                            var newDate =
+                                AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                            if (oldDate == newDate) continue;
 
                             @return.AccountingDate = newDate;
                             if (!test)
-                            {
                                 await AdminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
@@ -1825,25 +1704,19 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         oldDate.ToString(),
                                         newDate.ToString(),
                                         comment));
-                            }
                         }
-                    }
 
                     //Set snapshot Date
                     if (badScopeDates)
-                    {
-                        foreach (OrganisationScope scope in org.OrganisationScopes)
+                        foreach (var scope in org.OrganisationScopes)
                         {
-                            DateTime oldDate = scope.SnapshotDate;
-                            DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
-                            if (oldDate == newDate)
-                            {
-                                continue;
-                            }
+                            var oldDate = scope.SnapshotDate;
+                            var newDate =
+                                AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                            if (oldDate == newDate) continue;
 
                             scope.SnapshotDate = newDate;
                             if (!test)
-                            {
                                 await AdminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
@@ -1855,15 +1728,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         oldDate.ToString(),
                                         newDate.ToString(),
                                         comment));
-                            }
                         }
-                    }
 
-                    writer.WriteLine($"{i}: {employerRef}: {org.OrganisationName} sector {oldSector} set to '{newSector}'");
-                    if (!test)
-                    {
-                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-                    }
+                    writer.WriteLine(
+                        $"{i}: {employerRef}: {org.OrganisationName} sector {oldSector} set to '{newSector}'");
+                    if (!test) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
                 count++;
@@ -1872,22 +1741,20 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        private async Task<int> ConvertPublicOrganisationsToPrivateAsync(string input, string comment, StringWriter writer, bool test)
+        private async Task<int> ConvertPublicOrganisationsToPrivateAsync(string input, string comment,
+            StringWriter writer, bool test)
         {
-            string methodName = nameof(ConvertPublicOrganisationsToPrivateAsync);
+            var methodName = nameof(ConvertPublicOrganisationsToPrivateAsync);
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (line.Contains('='))
@@ -1896,11 +1763,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                string employerRef = line?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -1912,45 +1776,40 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 var newSector = SectorTypes.Private;
 
-                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
-                SectorTypes oldSector = org.SectorType;
+                var oldSector = org.SectorType;
 
                 var badReturnDates = false;
-                foreach (Return @return in org.Returns)
+                foreach (var @return in org.Returns)
                 {
-                    DateTime oldDate = @return.AccountingDate;
-                    DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
-                    if (oldDate == newDate)
-                    {
-                        continue;
-                    }
+                    var oldDate = @return.AccountingDate;
+                    var newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    if (oldDate == newDate) continue;
 
                     badReturnDates = true;
                     break;
                 }
 
                 var badScopeDates = false;
-                foreach (OrganisationScope scope in org.OrganisationScopes)
+                foreach (var scope in org.OrganisationScopes)
                 {
-                    DateTime oldDate = scope.SnapshotDate;
-                    DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
-                    if (oldDate == newDate)
-                    {
-                        continue;
-                    }
+                    var oldDate = scope.SnapshotDate;
+                    var newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    if (oldDate == newDate) continue;
 
                     badScopeDates = true;
                     break;
                 }
 
-                IEnumerable<OrganisationSicCode> sicCodes = org.GetSicCodes();
+                var sicCodes = org.GetSicCodes();
 
                 if (oldSector == newSector && !sicCodes.Any(s => s.SicCodeId == 1) && !badReturnDates && !badScopeDates)
                 {
@@ -1965,7 +1824,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     {
                         org.SectorType = newSector;
                         if (!test)
-                        {
                             await AdminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
@@ -1977,21 +1835,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     oldSector.ToString(),
                                     newSector.ToString(),
                                     comment));
-                        }
                     }
 
                     //Remove SIC Code 1
                     if (sicCodes.Any(s => s.SicCodeId == 1))
-                    {
-                        foreach (OrganisationSicCode sic in org.OrganisationSicCodes.ToList())
+                        foreach (var sic in org.OrganisationSicCodes.ToList())
                         {
-                            if (sic.SicCodeId != 1)
-                            {
-                                continue;
-                            }
+                            if (sic.SicCodeId != 1) continue;
 
                             if (!test)
-                            {
                                 await AdminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
@@ -2001,7 +1853,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         employerRef,
                                         nameof(OrganisationSicCode),
                                         JsonConvert.SerializeObject(
-                                            new {
+                                            new
+                                            {
                                                 sic.OrganisationSicCodeId,
                                                 sic.SicCodeId,
                                                 sic.OrganisationId,
@@ -2011,27 +1864,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                             }),
                                         null,
                                         comment));
-                            }
 
                             SharedBusinessLogic.DataRepository.Delete(sic);
                         }
-                    }
 
                     //Set accounting Date
                     if (badReturnDates)
-                    {
-                        foreach (Return @return in org.Returns)
+                        foreach (var @return in org.Returns)
                         {
-                            DateTime oldDate = @return.AccountingDate;
-                            DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
-                            if (oldDate == newDate)
-                            {
-                                continue;
-                            }
+                            var oldDate = @return.AccountingDate;
+                            var newDate =
+                                AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                            if (oldDate == newDate) continue;
 
                             @return.AccountingDate = newDate;
                             if (!test)
-                            {
                                 await AdminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
@@ -2043,32 +1890,24 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         oldDate.ToString(),
                                         newDate.ToString(),
                                         comment));
-                            }
 
                             if (string.IsNullOrWhiteSpace(@return.ResponsiblePerson))
-                            {
                                 writer.WriteLine(
                                     Color.Orange,
                                     $"    WARNING: No personal responsible for '{employerRef}' for data submited for year '{oldDate.Year}'");
-                            }
                         }
-                    }
 
                     //Set snapshot Date
                     if (badScopeDates)
-                    {
-                        foreach (OrganisationScope scope in org.OrganisationScopes)
+                        foreach (var scope in org.OrganisationScopes)
                         {
-                            DateTime oldDate = scope.SnapshotDate;
-                            DateTime newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
-                            if (oldDate == newDate)
-                            {
-                                continue;
-                            }
+                            var oldDate = scope.SnapshotDate;
+                            var newDate =
+                                AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                            if (oldDate == newDate) continue;
 
                             scope.SnapshotDate = newDate;
                             if (!test)
-                            {
                                 await AdminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
@@ -2080,15 +1919,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         oldDate.ToString(),
                                         newDate.ToString(),
                                         comment));
-                            }
                         }
-                    }
 
-                    writer.WriteLine($"{i}: {employerRef}: {org.OrganisationName} sector {oldSector} set to '{newSector}'");
-                    if (!test)
-                    {
-                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-                    }
+                    writer.WriteLine(
+                        $"{i}: {employerRef}: {org.OrganisationName} sector {oldSector} set to '{newSector}'");
+                    if (!test) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
                 count++;
@@ -2102,20 +1937,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         /// </summary>
         private async Task<int> SetOrganisationNameAsync(string input, string comment, StringWriter writer, bool test)
         {
-            string methodName = nameof(SetOrganisationNameAsync);
+            var methodName = nameof(SetOrganisationNameAsync);
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (!line.Contains('='))
@@ -2124,11 +1956,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                string employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -2137,30 +1966,34 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 processed.Add(employerRef);
-                string newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
+                var newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
                 if (string.IsNullOrWhiteSpace(newValue))
                 {
                     writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' No organisation name specified");
                     continue;
                 }
 
-                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
-                string oldValue = org.OrganisationName;
+                var oldValue = org.OrganisationName;
                 if (oldValue == newValue)
                 {
-                    writer.WriteLine(Color.Orange, $"{i}: WARNING: '{employerRef}' '{org.OrganisationName}' already set to '{newValue}'");
+                    writer.WriteLine(Color.Orange,
+                        $"{i}: WARNING: '{employerRef}' '{org.OrganisationName}' already set to '{newValue}'");
                 }
                 else if (await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .AnyAsync(o => o.OrganisationName.ToLower() == newValue.ToLower() && o.OrganisationId != org.OrganisationId))
+                    .AnyAsync(o =>
+                        o.OrganisationName.ToLower() == newValue.ToLower() && o.OrganisationId != org.OrganisationId))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Another organisation exists with this company name");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Another organisation exists with this company name");
                     continue;
                 }
                 else
@@ -2168,7 +2001,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     //Output the actual execution result
                     org.OrganisationName = newValue;
                     if (!test)
-                    {
                         await AdminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
                                 methodName,
@@ -2180,11 +2012,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 oldValue,
                                 newValue,
                                 comment));
-                    }
 
-                    org.OrganisationNames.Add(new OrganisationName {Organisation = org, Source = "Manual", Name = newValue});
+                    org.OrganisationNames.Add(new OrganisationName
+                        {Organisation = org, Source = "Manual", Name = newValue});
                     if (!test)
-                    {
                         await AdminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
                                 methodName,
@@ -2196,13 +2027,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 oldValue,
                                 newValue,
                                 comment));
-                    }
 
                     writer.WriteLine($"{i}: {employerRef}: '{oldValue}' set to '{newValue}'");
-                    if (!test)
-                    {
-                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-                    }
+                    if (!test) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
                 count++;
@@ -2216,20 +2043,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         /// </summary>
         private async Task<int> ResetOrganisationNameAsync(string input, string comment, StringWriter writer, bool test)
         {
-            string methodName = nameof(ResetOrganisationNameAsync);
+            var methodName = nameof(ResetOrganisationNameAsync);
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 i++;
                 if (!line.Contains('='))
@@ -2238,11 +2062,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                string employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef))
-                {
-                    continue;
-                }
+                var employerRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(employerRef)) continue;
 
                 if (processed.Contains(employerRef))
                 {
@@ -2251,30 +2072,34 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 processed.Add(employerRef);
-                string newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
+                var newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
                 if (string.IsNullOrWhiteSpace(newValue))
                 {
                     writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' No organisation name specified");
                     continue;
                 }
 
-                Organisation org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
                 if (org == null)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
                     continue;
                 }
 
-                string oldValue = org.OrganisationName;
+                var oldValue = org.OrganisationName;
                 if (oldValue == newValue && org.OrganisationNames.Count() == 1)
                 {
-                    writer.WriteLine(Color.Orange, $"{i}: WARNING: '{employerRef}' '{org.OrganisationName}' already set to '{newValue}'");
+                    writer.WriteLine(Color.Orange,
+                        $"{i}: WARNING: '{employerRef}' '{org.OrganisationName}' already set to '{newValue}'");
                 }
                 else if (await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .AnyAsync(o => o.OrganisationName.ToLower() == newValue.ToLower() && o.OrganisationId != org.OrganisationId))
+                    .AnyAsync(o =>
+                        o.OrganisationName.ToLower() == newValue.ToLower() && o.OrganisationId != org.OrganisationId))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Another organisation exists with this company name");
+                    writer.WriteLine(Color.Red,
+                        $"{i}: ERROR: '{employerRef}' Another organisation exists with this company name");
                     continue;
                 }
                 else
@@ -2284,7 +2109,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         //Output the actual execution result
                         org.OrganisationName = newValue;
                         if (!test)
-                        {
                             await AdminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
@@ -2296,15 +2120,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     oldValue,
                                     newValue,
                                     comment));
-                        }
                     }
 
                     if (org.OrganisationName.Count() != 1)
                     {
-                        foreach (OrganisationName name in org.OrganisationNames.ToList())
+                        foreach (var name in org.OrganisationNames.ToList())
                         {
                             if (!test)
-                            {
                                 await AdminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
@@ -2314,7 +2136,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         employerRef,
                                         nameof(OrganisationName),
                                         JsonConvert.SerializeObject(
-                                            new {
+                                            new
+                                            {
                                                 name.OrganisationNameId,
                                                 name.OrganisationId,
                                                 name.Name,
@@ -2323,15 +2146,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                             }),
                                         null,
                                         comment));
-                            }
 
                             SharedBusinessLogic.DataRepository.Delete(name);
                         }
 
                         org.OrganisationNames.Add(
-                            new OrganisationName {Organisation = org, Source = "Manual", Name = newValue, Created = org.Created});
+                            new OrganisationName
+                                {Organisation = org, Source = "Manual", Name = newValue, Created = org.Created});
                         if (!test)
-                        {
                             await AdminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
@@ -2343,14 +2165,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     oldValue,
                                     newValue,
                                     comment));
-                        }
                     }
 
                     writer.WriteLine($"{i}: {employerRef}: '{oldValue}' set to '{newValue}'");
-                    if (!test)
-                    {
-                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-                    }
+                    if (!test) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
                 count++;
@@ -2359,7 +2177,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        public delegate Task<CustomResult<Organisation>> SecurityCodeDelegate(string employerRef, DateTime securityCodeExpiryDateTime);
+        public delegate Task<CustomResult<Organisation>> SecurityCodeDelegate(string employerRef,
+            DateTime securityCodeExpiryDateTime);
 
         private async Task<int> SecurityCodeWorkAsync(string input,
             string comment,
@@ -2369,20 +2188,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             SecurityCodeDelegate callBackDelegatedMethod)
         {
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var listOfModifiedOrgs = new HashSet<Organisation>();
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
-                string outcome = line;
+                var outcome = line;
 
                 i++;
 
@@ -2392,7 +2208,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                if (!HasEmployerReference(ref outcome, out string employerRef))
+                if (!HasEmployerReference(ref outcome, out var employerRef))
                 {
                     writer.WriteLine(
                         Color.Red,
@@ -2400,7 +2216,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                if (!HasDateTimeInfo(ref outcome, out DateTime extractedDateTime))
+                if (!HasDateTimeInfo(ref outcome, out var extractedDateTime))
                 {
                     writer.WriteLine(
                         Color.Red,
@@ -2418,7 +2234,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 try
                 {
-                    CustomResult<Organisation> securityCodeWorksOutcome = await callBackDelegatedMethod(employerRef, extractedDateTime);
+                    var securityCodeWorksOutcome = await callBackDelegatedMethod(employerRef, extractedDateTime);
 
                     if (securityCodeWorksOutcome.Failed)
                     {
@@ -2429,21 +2245,22 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     }
 
                     if (securityCodeWorksOutcome.Result != null)
-                    {
                         listOfModifiedOrgs.Add(securityCodeWorksOutcome.Result);
-                    }
 
-                    string hasBeenWillBe = test ? "will be" : "has been";
-                    string createdOrExtended = manualAction == ManualActions.Extend ? "extended" : "created";
-                    string securityCodeHiddenOrShow =
-                        test ? new string('*', SharedBusinessLogic.SharedOptions.PinLength) : $"{securityCodeWorksOutcome.Result.SecurityCode}";
+                    var hasBeenWillBe = test ? "will be" : "has been";
+                    var createdOrExtended = manualAction == ManualActions.Extend ? "extended" : "created";
+                    var securityCodeHiddenOrShow =
+                        test
+                            ? new string('*', SharedBusinessLogic.SharedOptions.PinLength)
+                            : $"{securityCodeWorksOutcome.Result.SecurityCode}";
                     writer.WriteLine(
                         $"{i}: {securityCodeWorksOutcome.Result}: {hasBeenWillBe} {createdOrExtended} to be '{securityCodeHiddenOrShow}' and will expire on '{securityCodeWorksOutcome.Result.SecurityCodeExpiryDateTime:dd/MMMM/yyyy}'");
 
                     if (!test)
                     {
-                        string serialisedInfo = JsonConvert.SerializeObject(
-                            new {
+                        var serialisedInfo = JsonConvert.SerializeObject(
+                            new
+                            {
                                 securityCodeWorksOutcome.Result.SecurityCode,
                                 securityCodeWorksOutcome.Result.SecurityCodeExpiryDateTime,
                                 securityCodeWorksOutcome.Result.SecurityCodeCreatedDateTime,
@@ -2451,7 +2268,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             });
 
                         await AdminService.ManualChangeLog.WriteAsync(
-                            new ManualChangeLogModel {
+                            new ManualChangeLogModel
+                            {
                                 MethodName = $"{manualAction.ToString()}SecurityCode",
                                 Action = manualAction,
                                 Source = CurrentUser.EmailAddress,
@@ -2487,23 +2305,20 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             bool test,
             ManualActions manualAction)
         {
-            string methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod().Name;
 
             //Split the input into separate action lines
-            string[] lines = input.SplitI(Environment.NewLine);
-            if (lines.Length == 0)
-            {
-                throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
-            }
+            var lines = input.SplitI(Environment.NewLine);
+            if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
             var count = 0;
             var i = 0;
             var processed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var listOfModifiedOrgs = new HashSet<Organisation>();
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
-                string outcome = line;
+                var outcome = line;
 
                 i++;
 
@@ -2513,7 +2328,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                if (!HasEmployerReference(ref outcome, out string employerRef))
+                if (!HasEmployerReference(ref outcome, out var employerRef))
                 {
                     writer.WriteLine(
                         Color.Red,
@@ -2531,7 +2346,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 try
                 {
-                    CustomResult<Organisation> securityCodeWorksOutcome =
+                    var securityCodeWorksOutcome =
                         await AdminService.OrganisationBusinessLogic.ExpireSecurityCodeAsync(employerRef);
 
                     if (securityCodeWorksOutcome.Failed)
@@ -2543,17 +2358,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     }
 
                     if (securityCodeWorksOutcome.Result != null)
-                    {
                         listOfModifiedOrgs.Add(securityCodeWorksOutcome.Result);
-                    }
 
-                    string hasBeenWillBe = test ? "will be" : "has been";
+                    var hasBeenWillBe = test ? "will be" : "has been";
                     writer.WriteLine($"{i}: {securityCodeWorksOutcome.Result}: {hasBeenWillBe} expired.");
 
                     if (!test)
                     {
-                        string serialisedInfo = JsonConvert.SerializeObject(
-                            new {
+                        var serialisedInfo = JsonConvert.SerializeObject(
+                            new
+                            {
                                 securityCodeWorksOutcome.Result.SecurityCode,
                                 securityCodeWorksOutcome.Result.SecurityCodeExpiryDateTime,
                                 securityCodeWorksOutcome.Result.SecurityCodeCreatedDateTime,
@@ -2561,9 +2375,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             });
 
                         if (!test)
-                        {
                             await AdminService.ManualChangeLog.WriteAsync(
-                                new ManualChangeLogModel {
+                                new ManualChangeLogModel
+                                {
                                     MethodName = methodName,
                                     Action = manualAction,
                                     Source = CurrentUser.EmailAddress,
@@ -2573,7 +2387,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     TargetName = nameof(Organisation.SecurityCode),
                                     TargetNewValue = serialisedInfo
                                 });
-                        }
                     }
                 }
                 catch (Exception ex)
@@ -2594,7 +2407,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        public delegate Task<CustomBulkResult<Organisation>> SecurityCodeBulkDelegate(DateTime securityCodeExpiryDateTime);
+        public delegate Task<CustomBulkResult<Organisation>> SecurityCodeBulkDelegate(
+            DateTime securityCodeExpiryDateTime);
 
         private async Task<BulkResult> SecurityCodeBulkWorkAsync(string input,
             string comment,
@@ -2604,12 +2418,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             SecurityCodeBulkDelegate callBackBulkDelegatedMethod)
         {
             var result = new BulkResult();
-            string methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod().Name;
 
             if (string.IsNullOrEmpty(input))
-            {
                 throw new ArgumentException("ERROR: You must supply the expiry date for the security codes");
-            }
 
             if (input.Contains('='))
             {
@@ -2617,7 +2429,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 return result;
             }
 
-            if (!HasDateTimeInfo(ref input, out DateTime extractedDateTime))
+            if (!HasDateTimeInfo(ref input, out var extractedDateTime))
             {
                 writer.WriteLine(
                     Color.Red,
@@ -2627,35 +2439,34 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             try
             {
-                CustomBulkResult<Organisation> securityCodeBulkWorkOutcome = await callBackBulkDelegatedMethod(extractedDateTime);
+                var securityCodeBulkWorkOutcome = await callBackBulkDelegatedMethod(extractedDateTime);
 
                 if (securityCodeBulkWorkOutcome.Failed)
                 {
                     var groupedErrors = securityCodeBulkWorkOutcome.ConcurrentBagOfErrors
                         .GroupBy(x => new {x.ErrorMessage.Code, x.ErrorMessage.Description})
                         .Select(
-                            r => new {
+                            r => new
+                            {
                                 Total = r.Count(), // count of similar errors
                                 r.Key.Code,
                                 r.Key.Description
                             });
                     foreach (var reportedError in groupedErrors)
-                    {
                         writer.WriteLine(
                             Color.Red,
                             $"{reportedError.Total} ERROR(S) of type '{reportedError.Code}' {reportedError.Description}");
-                    }
                 }
 
-                int numberOfSuccesses = securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses.Count;
-                int numberOfFailures = securityCodeBulkWorkOutcome.ConcurrentBagOfErrors.Count;
+                var numberOfSuccesses = securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses.Count;
+                var numberOfFailures = securityCodeBulkWorkOutcome.ConcurrentBagOfErrors.Count;
 
-                string hasBeenWillBe = test ? "will be" : "have been";
-                string hasBeenWillBeSuccessfully = test ? hasBeenWillBe : $"{hasBeenWillBe} successfully";
-                string failureMessage = numberOfFailures > 0
+                var hasBeenWillBe = test ? "will be" : "have been";
+                var hasBeenWillBeSuccessfully = test ? hasBeenWillBe : $"{hasBeenWillBe} successfully";
+                var failureMessage = numberOfFailures > 0
                     ? $"A Total of {numberOfFailures} records FAILED and {hasBeenWillBe} ignored. " // The space at the end of this message is required for presentation.
                     : string.Empty;
-                string successMessage = numberOfSuccesses > 0
+                var successMessage = numberOfSuccesses > 0
                     ? $"A total of {numberOfSuccesses} security codes {hasBeenWillBeSuccessfully} set to expire on '{extractedDateTime:dd/MMMM/yyyy}'"
                     : string.Empty;
 
@@ -2663,20 +2474,19 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 /* Completed List of all individual issues */
                 if (securityCodeBulkWorkOutcome.Failed)
-                {
-                    foreach (CustomResult<Organisation> detailedError in securityCodeBulkWorkOutcome.ConcurrentBagOfErrors)
+                    foreach (var detailedError in securityCodeBulkWorkOutcome.ConcurrentBagOfErrors)
                     {
-                        string orgDetails = detailedError.ErrorRelatedObject != null
+                        var orgDetails = detailedError.ErrorRelatedObject != null
                             ? detailedError.ErrorRelatedObject.ToString()
                             : "[null]";
-                        writer.Write($"[{orgDetails} {detailedError.ErrorMessage.Code} '{detailedError.ErrorMessage.Description}'] ");
+                        writer.Write(
+                            $"[{orgDetails} {detailedError.ErrorMessage.Code} '{detailedError.ErrorMessage.Description}'] ");
                     }
-                }
 
                 if (!test)
-                {
                     await AdminService.ManualChangeLog.WriteAsync(
-                        new ManualChangeLogModel {
+                        new ManualChangeLogModel
+                        {
                             MethodName = methodName,
                             Action = manualAction,
                             Source = CurrentUser.EmailAddress,
@@ -2684,11 +2494,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             TargetName = nameof(Organisation.SecurityCode),
                             TargetNewValue = $"{failureMessage}{successMessage}"
                         });
-                }
 
                 if (!test && securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses.Count > 0)
                 {
-                    SharedBusinessLogic.DataRepository.UpdateChangesInBulk(securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses);
+                    SharedBusinessLogic.DataRepository.UpdateChangesInBulk(securityCodeBulkWorkOutcome
+                        .ConcurrentBagOfSuccesses);
                     writer.WriteLine(Color.Green, "INFO: Changes saved to database");
                 }
 
@@ -2710,16 +2520,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             ManualActions manualAction)
         {
             var result = new BulkResult();
-            string methodName = MethodBase.GetCurrentMethod().Name;
+            var methodName = MethodBase.GetCurrentMethod().Name;
 
-            if (!string.IsNullOrWhiteSpace(input))
-            {
-                throw new ArgumentException("ERROR: parameters must be empty");
-            }
+            if (!string.IsNullOrWhiteSpace(input)) throw new ArgumentException("ERROR: parameters must be empty");
 
             try
             {
-                CustomBulkResult<Organisation> securityCodeBulkWorkOutcome =
+                var securityCodeBulkWorkOutcome =
                     await AdminService.OrganisationBusinessLogic.ExpireSecurityCodesInBulkAsync();
 
                 if (securityCodeBulkWorkOutcome.Failed)
@@ -2727,28 +2534,27 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     var groupedErrors = securityCodeBulkWorkOutcome.ConcurrentBagOfErrors
                         .GroupBy(x => new {x.ErrorMessage.Code, x.ErrorMessage.Description})
                         .Select(
-                            r => new {
+                            r => new
+                            {
                                 Total = r.Count(), // count of similar errors
                                 r.Key.Code,
                                 r.Key.Description
                             });
                     foreach (var reportedError in groupedErrors)
-                    {
                         writer.WriteLine(
                             Color.Red,
                             $"{reportedError.Total} ERROR(S) of type '{reportedError.Code}' {reportedError.Description}");
-                    }
                 }
 
-                int numberOfSuccesses = securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses.Count;
-                int numberOfFailures = securityCodeBulkWorkOutcome.ConcurrentBagOfErrors.Count;
+                var numberOfSuccesses = securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses.Count;
+                var numberOfFailures = securityCodeBulkWorkOutcome.ConcurrentBagOfErrors.Count;
 
-                string hasBeenWillBe = test ? "will be" : "have been";
-                string hasBeenWillBeSuccessfully = test ? hasBeenWillBe : $"{hasBeenWillBe} successfully";
-                string failureMessage = numberOfFailures > 0
+                var hasBeenWillBe = test ? "will be" : "have been";
+                var hasBeenWillBeSuccessfully = test ? hasBeenWillBe : $"{hasBeenWillBe} successfully";
+                var failureMessage = numberOfFailures > 0
                     ? $"A Total of {numberOfFailures} records FAILED and {hasBeenWillBe} ignored. "
                     : string.Empty;
-                string successMessage = numberOfSuccesses > 0
+                var successMessage = numberOfSuccesses > 0
                     ? $"A total of {numberOfSuccesses} security codes {hasBeenWillBeSuccessfully} expired."
                     : string.Empty;
 
@@ -2756,20 +2562,19 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 /* Completed List of all individual issues */
                 if (securityCodeBulkWorkOutcome.Failed)
-                {
-                    foreach (CustomResult<Organisation> detailedError in securityCodeBulkWorkOutcome.ConcurrentBagOfErrors)
+                    foreach (var detailedError in securityCodeBulkWorkOutcome.ConcurrentBagOfErrors)
                     {
-                        string orgDetails = detailedError.ErrorRelatedObject != null
+                        var orgDetails = detailedError.ErrorRelatedObject != null
                             ? detailedError.ErrorRelatedObject.ToString()
                             : "[null]";
-                        writer.Write($"[{orgDetails} {detailedError.ErrorMessage.Code} '{detailedError.ErrorMessage.Description}'] ");
+                        writer.Write(
+                            $"[{orgDetails} {detailedError.ErrorMessage.Code} '{detailedError.ErrorMessage.Description}'] ");
                     }
-                }
 
                 if (!test)
-                {
                     await AdminService.ManualChangeLog.WriteAsync(
-                        new ManualChangeLogModel {
+                        new ManualChangeLogModel
+                        {
                             MethodName = methodName,
                             Action = manualAction,
                             Source = CurrentUser.EmailAddress,
@@ -2777,11 +2582,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             TargetName = nameof(Organisation.SecurityCode),
                             TargetNewValue = $"{failureMessage}{successMessage}"
                         });
-                }
 
                 if (!test && securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses.Count > 0)
                 {
-                    SharedBusinessLogic.DataRepository.UpdateChangesInBulk(securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses);
+                    SharedBusinessLogic.DataRepository.UpdateChangesInBulk(securityCodeBulkWorkOutcome
+                        .ConcurrentBagOfSuccesses);
                     writer.WriteLine(Color.Green, "INFO: Changes saved to database");
                 }
 
@@ -2797,6 +2602,5 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         #endregion
-
     }
 }

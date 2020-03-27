@@ -6,8 +6,9 @@ using System.Reflection;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
-using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.GDSDesignSystem.Partials;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 {
@@ -22,27 +23,27 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             where TModel : GovUkViewModel
             where TPropertyListItem : struct, IConvertible
         {
-            PropertyInfo property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
+            var property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
             ThrowIfPropertyTypeIsNotListOfEnums<TPropertyListItem>(property);
-            string propertyName = property.Name;
+            var propertyName = property.Name;
 
-            TModel model = htmlHelper.ViewData.Model;
-            List<TPropertyListItem> currentlySelectedValues =
+            var model = htmlHelper.ViewData.Model;
+            var currentlySelectedValues =
                 ExpressionHelpers.GetPropertyValueFromModelAndExpression(model, propertyLambdaExpression);
 
-            List<TPropertyListItem> allEnumValues =
+            var allEnumValues =
                 Enum.GetValues(typeof(TPropertyListItem))
                     .Cast<TPropertyListItem>()
                     .ToList();
 
-            List<ItemViewModel> checkboxes = allEnumValues
+            var checkboxes = allEnumValues
                 .Select(enumValue =>
                 {
                     var isEnumValueInListOfCurrentlySelectedValues =
                         currentlySelectedValues != null && currentlySelectedValues.Contains(enumValue);
 
-                    string checkboxLabelText = GetCheckboxLabelText(enumValue);
-                    
+                    var checkboxLabelText = GetCheckboxLabelText(enumValue);
+
                     var checkboxItemViewModel = new CheckboxItemViewModel
                     {
                         Value = enumValue.ToString(),
@@ -53,13 +54,10 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
                             Text = checkboxLabelText
                         }
                     };
-                    
-                    if (conditionalOptions != null && conditionalOptions.TryGetValue(enumValue, out Func<object, object> conditionalHtml))
-                    {
-                        checkboxItemViewModel.Conditional = new Conditional {Html = conditionalHtml};
 
-                    }
-                    
+                    if (conditionalOptions != null && conditionalOptions.TryGetValue(enumValue, out var conditionalHtml)
+                    ) checkboxItemViewModel.Conditional = new Conditional {Html = conditionalHtml};
+
                     return checkboxItemViewModel;
                 })
                 .Cast<ItemViewModel>()
@@ -74,34 +72,30 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
                 Hint = hintOptions
             };
             if (model.HasErrorFor(property))
-            {
                 checkboxesViewModel.ErrorMessage = new ErrorMessageViewModel
                 {
                     Text = model.GetErrorFor(property)
                 };
-            }
 
-            return htmlHelper.Partial("/GovUkDesignSystemComponents/Checkboxes.cshtml", checkboxesViewModel);
+            return htmlHelper.Partial("/Components/Checkboxes.cshtml", checkboxesViewModel);
         }
 
         private static void ThrowIfPropertyTypeIsNotListOfEnums<TPropertyListItem>(PropertyInfo property)
         {
             if (!typeof(TPropertyListItem).IsEnum)
-            {
                 throw new ArgumentException(
                     "GovUkCheckboxesFor can only be used on List<Enum> properties, " +
                     $"but was actually used on property [{property.Name}] which is a List of type [{property.PropertyType.FullName}] "
                 );
-            }
         }
 
         private static string GetCheckboxLabelText<TEnum>(
             TEnum enumValue)
             where TEnum : struct, IConvertible
         {
-            string textFromAttribute = GovUkRadioCheckboxLabelTextAttribute.GetValueForEnum(typeof(TEnum), enumValue);
+            var textFromAttribute = GovUkRadioCheckboxLabelTextAttribute.GetValueForEnum(typeof(TEnum), enumValue);
 
-            string checkboxLabel = textFromAttribute ?? enumValue.ToString();
+            var checkboxLabel = textFromAttribute ?? enumValue.ToString();
 
             return checkboxLabel;
         }

@@ -7,12 +7,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
     public class PinAttribute : RegularExpressionAttribute
     {
-        private static SharedOptions _sharedOptions= Activator.CreateInstance<SharedOptions>();
+        private static readonly SharedOptions _sharedOptions = Activator.CreateInstance<SharedOptions>();
 
         public PinAttribute() : base(_sharedOptions.PinRegex)
         {
             ErrorMessage = _sharedOptions.PinRegexError;
         }
-
     }
 }

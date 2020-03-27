@@ -1,10 +1,7 @@
-@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model ModernSlavery.WebUI.Admin.Models.ChangeOrganisationNameViewModel
-
+@model ChangeOrganisationNameViewModel
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = $"Change name - {Model.Organisation.OrganisationName} - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
@@ -19,13 +16,13 @@
         crumbs.Add(new CrumbViewModel
         {
             Text = Model.Organisation.OrganisationName,
-            Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new { id = Model.Organisation.OrganisationId })
+            Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Organisation.OrganisationId})
         });
 
         crumbs.Add(new CrumbViewModel
         {
             Text = "Name history",
-            Href = Url.Action("ViewNameHistory", "AdminOrganisationName", new { id = Model.Organisation.OrganisationId })
+            Href = Url.Action("ViewNameHistory", "AdminOrganisationName", new {id = Model.Organisation.OrganisationId})
         });
 
         crumbs.Add(new CrumbViewModel
@@ -46,34 +43,33 @@
         <span class="govuk-caption-xl">Administration</span>
         <h1 class="govuk-heading-xl">
             Change name
-            <br />
+            <br/>
             <span class="govuk-!-font-size-27">
                 for @(Model.Organisation.OrganisationName)
             </span>
         </h1>
 
-        <form method="post" action="@Url.Action("ChangeNamePost", "AdminOrganisationName", new { id = Model.Organisation.OrganisationId })">
+        <form method="post" action="@Url.Action("ChangeNamePost", "AdminOrganisationName", new {id = Model.Organisation.OrganisationId})">
             @(Html.AntiForgeryToken())
             @(Html.HiddenFor(m => m.Action))
-
             @(Html.GovUkErrorSummary(new[]
             {
-                nameof(ChangeOrganisationNameViewModel.Reason),
+                nameof(ChangeOrganisationNameViewModel.Reason)
             }))
 
             <fieldset class="govuk-fieldset">
 
                 @*<legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                    <h2 class="govuk-fieldset__heading">
-                        What is their name?
-                    </h2>
-                </legend>*@
+                        <h2 class="govuk-fieldset__heading">
+                            What is their name?
+                        </h2>
+                    </legend>*@
 
                 @(Html.GovUkTextInputFor(
                     m => m.Name,
-                    labelOptions: new LabelViewModel { Text = "What is their name?" },
-                    formGroupOptions: new FormGroupViewModel { Classes = "govuk-!-margin-bottom-3" }
-                ))
+                    new LabelViewModel {Text = "What is their name?"},
+                    formGroupOptions: new FormGroupViewModel {Classes = "govuk-!-margin-bottom-3"}
+                    ))
             </fieldset>
 
             @(Html.GovUkTextAreaFor(
@@ -87,8 +83,7 @@
                 {
                     Classes = "govuk-!-margin-top-4"
                 }
-            ))
-
+                ))
             @(Html.GovUkButton(new ButtonViewModel
             {
                 Text = "Continue",
@@ -96,7 +91,7 @@
             }))
 
             <p class="govuk-body">
-                <a href="@Url.Action("ViewOrganisation", "AdminViewOrganisation", new { id = Model.Organisation.OrganisationId })"
+                <a href="@Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Organisation.OrganisationId})"
                    class="govuk-link">
                     Cancel and return to organisation page
                 </a>
@@ -106,4 +101,3 @@
 
     </div>
 </div>
-

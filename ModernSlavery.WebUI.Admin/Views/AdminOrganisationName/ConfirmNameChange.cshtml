@@ -1,10 +1,7 @@
-﻿@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model ModernSlavery.WebUI.Admin.Models.ChangeOrganisationNameViewModel
-
+﻿@model ChangeOrganisationNameViewModel
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = $"Change name - {Model.Organisation.OrganisationName} - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
@@ -19,13 +16,13 @@
         crumbs.Add(new CrumbViewModel
         {
             Text = Model.Organisation.OrganisationName,
-            Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new { id = Model.Organisation.OrganisationId })
+            Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Organisation.OrganisationId})
         });
 
         crumbs.Add(new CrumbViewModel
         {
             Text = "Name history",
-            Href = Url.Action("ViewNameHistory", "AdminOrganisationName", new { id = Model.Organisation.OrganisationId })
+            Href = Url.Action("ViewNameHistory", "AdminOrganisationName", new {id = Model.Organisation.OrganisationId})
         });
 
         crumbs.Add(new CrumbViewModel
@@ -46,7 +43,7 @@
         <span class="govuk-caption-xl">Administration</span>
         <h1 class="govuk-heading-xl">
             Change name
-            <br />
+            <br/>
             <span class="govuk-!-font-size-27">
                 for @(Model.Organisation.OrganisationName)
             </span>
@@ -56,33 +53,33 @@
             Check the new name
         </h2>
 
-        <form method="post" action="@Url.Action("ChangeNamePost", "AdminOrganisationName", new { id = Model.Organisation.OrganisationId })">
+        <form method="post" action="@Url.Action("ChangeNamePost", "AdminOrganisationName", new {id = Model.Organisation.OrganisationId})">
             @(Html.AntiForgeryToken())
             @(Html.HiddenFor(m => m.Action))
             @(Html.HiddenFor(m => m.Reason))
 
             <table class="govuk-table">
                 <tbody class="govuk-table__body">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header">
-                            Old name
-                        </th>
-                        <td class="govuk-table__cell">
-                            @(Model.Organisation.OrganisationName)
-                        </td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header">
-                            New name
-                        </th>
-                        <td class="govuk-table__cell">
-                            @(Model.Name)
-                            @(Html.HiddenFor(m => m.Name))
-                        </td>
-                    </tr>
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">
+                        Old name
+                    </th>
+                    <td class="govuk-table__cell">
+                        @(Model.Organisation.OrganisationName)
+                    </td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">
+                        New name
+                    </th>
+                    <td class="govuk-table__cell">
+                        @(Model.Name)
+                        @(Html.HiddenFor(m => m.Name))
+                    </td>
+                </tr>
                 </tbody>
             </table>
-            
+
             @(Html.GovUkButton(new ButtonViewModel
             {
                 Text = "Confirm and save",
@@ -90,7 +87,7 @@
             }))
 
             <p class="govuk-body">
-                <a href="@Url.Action("ViewOrganisation", "AdminViewOrganisation", new { id = Model.Organisation.OrganisationId })"
+                <a href="@Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Organisation.OrganisationId})"
                    class="govuk-link">
                     Cancel and return to organisation page
                 </a>

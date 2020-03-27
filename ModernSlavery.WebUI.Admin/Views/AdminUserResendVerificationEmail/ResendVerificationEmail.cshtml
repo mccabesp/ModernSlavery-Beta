@@ -1,16 +1,13 @@
-﻿@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model ModernSlavery.WebUI.Admin.Models.AdminResendVerificationEmailViewModel
-
+﻿@model AdminResendVerificationEmailViewModel
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = $"Re-send verification email - {Model.User.Fullname} - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
     @{
         var crumbs = new List<CrumbViewModel>
-{
+        {
             new CrumbViewModel
             {
                 Text = "Admin",
@@ -40,27 +37,26 @@
         <span class="govuk-caption-xl">Administration</span>
         <h1 class="govuk-heading-xl">
             Re-send verification email
-            <br />
+            <br/>
             <span class="govuk-!-font-size-27">
                 for @(Model.User.Fullname)
             </span>
         </h1>
 
-        <form method="post" action="@Url.Action("ResendVerificationEmailPost", "AdminUserResendVerificationEmail", new { id = Model.User.UserId })">
+        <form method="post" action="@Url.Action("ResendVerificationEmailPost", "AdminUserResendVerificationEmail", new {id = Model.User.UserId})">
             @(Html.AntiForgeryToken())
-            
             @(Html.GovUkErrorSummary())
 
             <table class="govuk-table">
                 <tbody class="govuk-table__body">
-                    <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header">User's name</th>
-                        <td class="govuk-table__cell">@(Model.User.Fullname)</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header">User's email address</th>
-                        <td class="govuk-table__cell">@(Model.User.EmailAddress)</td>
-                    </tr>
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">User's name</th>
+                    <td class="govuk-table__cell">@(Model.User.Fullname)</td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">User's email address</th>
+                    <td class="govuk-table__cell">@(Model.User.EmailAddress)</td>
+                </tr>
                 </tbody>
             </table>
 
@@ -75,8 +71,7 @@
                 {
                     Classes = "govuk-!-margin-top-6"
                 }
-            ))
-
+                ))
             @(Html.GovUkButton(new ButtonViewModel
             {
                 Text = "Re-send verification email",
@@ -84,7 +79,7 @@
             }))
 
             <p class="govuk-body">
-                <a href="@Url.Action("ViewUser", "AdminViewUser", new { id = Model.User.UserId })"
+                <a href="@Url.Action("ViewUser", "AdminViewUser", new {id = Model.User.UserId})"
                    class="govuk-link">
                     Cancel and return to user page
                 </a>

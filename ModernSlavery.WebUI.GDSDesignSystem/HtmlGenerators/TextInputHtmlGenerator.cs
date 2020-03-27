@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Linq.Expressions;
-using System.Reflection;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.GDSDesignSystem.Partials;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 {
     internal static class TextInputHtmlGenerator
     {
-
         internal static IHtmlContent GenerateHtml<TModel, TProperty>(
             IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TProperty>> propertyLambdaExpression,
@@ -22,21 +21,19 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
         )
             where TModel : GovUkViewModel
         {
-            PropertyInfo property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
+            var property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
 
-            string propertyName = property.Name;
+            var propertyName = property.Name;
 
-            TModel model = htmlHelper.ViewData.Model;
+            var model = htmlHelper.ViewData.Model;
 
-            string id = $"GovUk_{propertyName}";
-            string currentValue = ExtensionHelpers.GetCurrentValue(model, property, propertyLambdaExpression);
+            var id = $"GovUk_{propertyName}";
+            var currentValue = ExtensionHelpers.GetCurrentValue(model, property, propertyLambdaExpression);
 
-            if (labelOptions != null)
+            if (labelOptions != null) labelOptions.For = id;
+
+            var textInputViewModel = new TextInputViewModel
             {
-                labelOptions.For = id;
-            }
-
-            var textInputViewModel = new TextInputViewModel {
                 Name = $"GovUk_Text_{propertyName}",
                 Id = id,
                 Value = currentValue,
@@ -48,12 +45,9 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             };
 
             if (model.HasErrorFor(property))
-            {
                 textInputViewModel.ErrorMessage = new ErrorMessageViewModel {Text = model.GetErrorFor(property)};
-            }
 
-            return htmlHelper.Partial("/GovUkDesignSystemComponents/TextInput.cshtml", textInputViewModel);
+            return htmlHelper.Partial("/Components/TextInput.cshtml", textInputViewModel);
         }
-
     }
 }

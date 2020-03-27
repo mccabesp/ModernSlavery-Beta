@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
-using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.Account.Interfaces;
-using ModernSlavery.WebUI.Account.Models.ChangeDetails;
+using ModernSlavery.WebUI.Account.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
@@ -12,14 +11,13 @@ using ModernSlavery.WebUI.Shared.Resources;
 
 namespace ModernSlavery.WebUI.Account.Controllers
 {
-
     [Route("manage-account")]
     public class ChangeDetailsController : BaseController
     {
-
         public ChangeDetailsController(
             IChangeDetailsViewService changeDetailsService,
-            ILogger<ChangeDetailsController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
+            ILogger<ChangeDetailsController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) :
+            base(logger, webService, sharedBusinessLogic)
         {
             ChangeDetailsService = changeDetailsService;
         }
@@ -30,16 +28,10 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public async Task<IActionResult> ChangeDetailsAsync()
         {
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             // prevent impersonation
-            if (IsImpersonatingUser)
-            {
-                this.RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
-            }
+            if (IsImpersonatingUser) RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
 
             // map the user to the edit view model
             var model = AutoMapper.Map<ChangeDetailsViewModel>(VirtualUser);
@@ -53,30 +45,19 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public async Task<IActionResult> ChangeDetails([FromForm] ChangeDetailsViewModel formData)
         {
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
             // Validate fields
-            if (ModelState.IsValid == false)
-            {
-                return View(nameof(ChangeDetails), formData);
-            }
+            if (ModelState.IsValid == false) return View(nameof(ChangeDetails), formData);
 
             // Execute change details
-            bool success = await ChangeDetailsService.ChangeDetailsAsync(formData, VirtualUser);
+            var success = await ChangeDetailsService.ChangeDetailsAsync(formData, VirtualUser);
 
             // set success alert flag
-            if (success)
-            {
-                TempData.Add(nameof(AccountResources.ChangeDetailsSuccessAlert), true);
-            }
+            if (success) TempData.Add(nameof(AccountResources.ChangeDetailsSuccessAlert), true);
 
             // go to manage account page
-            return this.RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
+            return RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));
         }
-
     }
-
 }

@@ -1,17 +1,15 @@
 ﻿.gpg-data {
-	margin-top: 1em;
     margin-bottom: 2em;
+    margin-top: 1em;
 }
 
 .gpg-data td:nth-child(2),
 .gpg-data td:nth-child(3),
 .gpg-data th:nth-child(2),
 .gpg-data th:nth-child(3) {
-	width: 21%;
-	text-align: right;
+    text-align: right;
+    width: 21%;
 }
 
 .gpg-data__status--notcompleted,
-.gpg-data__status--notprovided {
-    text-align: right;
-}
+.gpg-data__status--notprovided { text-align: right; }

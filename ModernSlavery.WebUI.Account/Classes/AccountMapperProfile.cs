@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Models;
-using ModernSlavery.WebUI.Account.Models.ChangeDetails;
-using ModernSlavery.WebUI.Account.Models.ManageAccount;
+using ModernSlavery.WebUI.Account.Models;
 
 namespace ModernSlavery.WebUI.Account.Classes
 {
-
     public class AccountMapperProfile : Profile
     {
         public AccountMapperProfile()
@@ -16,7 +14,5 @@ namespace ModernSlavery.WebUI.Account.Classes
             CreateMap<User, UpdateDetailsModel>();
             CreateMap<ChangeDetailsViewModel, UpdateDetailsModel>();
         }
-
     }
-
 }

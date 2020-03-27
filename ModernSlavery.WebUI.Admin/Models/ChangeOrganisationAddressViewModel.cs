@@ -2,18 +2,26 @@
 using ModernSlavery.WebUI.GDSDesignSystem;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
     public class ChangeOrganisationAddressViewModel : GovUkViewModel
     {
-
         // Not mapped, only used for displaying information in the views
         public Organisation Organisation { get; set; }
 
         public ManuallyChangeOrganisationAddressViewModelActions Action { get; set; }
 
+        [GovUkValidateRequired(ErrorMessageIfMissing =
+            "Select whether you want to use this address from Companies House or to enter an address manually")]
+        public AcceptCompaniesHouseAddress? AcceptCompaniesHouseAddress { get; set; }
+
+        [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a reason for this change.")]
+        public string Reason { get; set; }
+
         #region Used by Manual Change page
+
         public string PoBox { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
@@ -38,21 +46,12 @@ namespace ModernSlavery.WebUI.Admin.Models
             PostCode = address.PostCode;
 
             if (address.IsUkAddress.HasValue)
-            {
                 IsUkAddress = address.IsUkAddress.Value
                     ? ManuallyChangeOrganisationAddressIsUkAddress.Yes
                     : ManuallyChangeOrganisationAddressIsUkAddress.No;
-            }
         }
+
         #endregion
-
-        [GovUkValidateRequired(ErrorMessageIfMissing =
-            "Select whether you want to use this address from Companies House or to enter an address manually")]
-        public AcceptCompaniesHouseAddress? AcceptCompaniesHouseAddress { get; set; }
-
-        [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a reason for this change.")]
-        public string Reason { get; set; }
-
     }
 
     public enum ManuallyChangeOrganisationAddressIsUkAddress

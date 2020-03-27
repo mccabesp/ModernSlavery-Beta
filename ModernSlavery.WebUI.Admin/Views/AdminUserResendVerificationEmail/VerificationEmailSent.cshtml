@@ -1,16 +1,13 @@
-﻿@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model ModernSlavery.Core.Entities.User
-
+﻿@model User
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = $"Re-send verification email - {Model.Fullname} - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
     @{
         var crumbs = new List<CrumbViewModel>
-{
+        {
             new CrumbViewModel
             {
                 Text = "Admin",

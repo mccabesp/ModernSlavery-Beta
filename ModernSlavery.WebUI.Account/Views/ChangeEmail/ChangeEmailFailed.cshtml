@@ -1,11 +1,8 @@
-﻿@using ModernSlavery.WebUI.Account.Controllers
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@using ModernSlavery.WebUI.Shared.Interfaces
-@using ModernSlavery.WebUI.Shared.Options
-@inject IWebService WebService
+﻿@inject IWebService WebService
 @if (ViewContext.ModelState.ErrorCount > 0)
 {
     @await Html.PartialAsync("Patterns/ErrorSummary", ViewContext.ModelState)
+    ;
 }
 
 <div class="grid-row">
@@ -29,9 +26,8 @@
             </li>
 
             <li>
-                <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountHome))>Manage organisations</a>
+                <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountHome))">Manage organisations</a>
             </li>
         </ul>
     </div>
-
 </div>

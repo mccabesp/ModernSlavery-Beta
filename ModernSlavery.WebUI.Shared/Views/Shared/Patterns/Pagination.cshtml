@@ -1,7 +1,7 @@
-﻿@model ModernSlavery.WebUI.Shared.Classes.Patterns.Pagination
+﻿@model Pagination
 <nav class="gem-c-pagination" role="navigation" aria-label="Pagination">
     <ul class="gem-c-pagination__list" data-module="track-click">
-        @foreach (PaginationLink link in Model.Items)
+        @foreach (var link in Model.Items)
         {
             if (link.IsPrevious)
             {

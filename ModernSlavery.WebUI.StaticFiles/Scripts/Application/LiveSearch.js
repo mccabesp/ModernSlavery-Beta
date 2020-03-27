@@ -1,6 +1,6 @@
 ﻿// Modified from https://github.com/DFEAGILEDEVOPS/cscp-website/blob/c0fe7fa88d129cbb3fdeda64d201421cbb94c4d5/Web/Web.UI/Server/Assets/Scripts/Elements/Forms/live-search.js
 
-(function () {
+(function() {
     "use strict";
 
     window.GOVUK = window.GOVUK || {};
@@ -13,9 +13,9 @@
         this.onRefresh = options.onRefresh;
         this.formId = options.formId;
         this.$form = $("#" + options.formId);
-        this.$resultsBlock = options.$results.find('#main');
-        this.$loadingBlock = options.$results.find('#loading');
-        this.action = this.$form.attr('action') + '-js';
+        this.$resultsBlock = options.$results.find("#main");
+        this.$loadingBlock = options.$results.find("#loading");
+        this.action = this.$form.attr("action") + "-js";
         this.$atomAutodiscoveryLink = options.$atomAutodiscoveryLink;
 
         if (GOVUK.support.history()) {
@@ -27,39 +27,42 @@
             this.bindEvents();
             this.bindFilterEvents();
         } else {
-            this.$form.find('.js-live-search-fallback').show();
+            this.$form.find(".js-live-search-fallback").show();
         }
     }
+
     LiveSearch.prototype.bindEvents = function bindEvents() {
         this.$form = $("#" + this.formId);
 
-        this.$form.find('input[type=text]').keypress(
-            function (e) {
+        this.$form.find("input[type=text]").keypress(
+            function(e) {
                 if (e.keyCode === 13) {
                     // 13 is the return key
                     this.formChange();
-                    $(e.target).typeahead('close');
+                    $(e.target).typeahead("close");
                     e.preventDefault();
                 }
             }.bind(this)
         );
 
-        this.$form.find('#ClearFilters').click(this.clearFilters.bind(this));
+        this.$form.find("#ClearFilters").click(this.clearFilters.bind(this));
 
-        $(window).on('popstate', this.popState.bind(this));
+        $(window).on("popstate", this.popState.bind(this));
         this.clearLoadingIndicator();
         if (this.onRefresh) this.onRefresh();
     };
 
     LiveSearch.prototype.bindFilterEvents = function bindFilterEvents() {
         this.$form = $("#" + this.formId);
-        this.$form.on('change', '.options-container input[type=checkbox], .options-container input[type=radio]', this.formChange.bind(this));
+        this.$form.on("change",
+            ".options-container input[type=checkbox], .options-container input[type=radio]",
+            this.formChange.bind(this));
         this.clearLoadingIndicator();
         if (this.onRefresh) this.onRefresh();
     };
 
     LiveSearch.prototype.saveState = function saveState(newState) {
-        if (typeof newState === 'undefined') {
+        if (typeof newState === "undefined") {
             newState = this.$form.serializeArray();
         }
         this.previousState = this.state;
@@ -92,7 +95,7 @@
     };
 
     LiveSearch.prototype.cache = function cache(slug, data) {
-        if (typeof data === 'undefined') {
+        if (typeof data === "undefined") {
             return this.resultCache[slug];
         } else {
             this.resultCache[slug] = data;
@@ -108,31 +111,31 @@
         //var cachedResultData = this.cache(searchState);
         var liveSearch = this;
         //if (typeof cachedResultData === 'undefined') {
-            this.showLoadingIndicator();
-            return $.ajax({
-                url: this.action,
-                data: this.state,
-                searchState: searchState
-            }).done(function (response) {
-                liveSearch.cache($.param(liveSearch.state), response);
-                liveSearch.displayResults(response, this.searchState);
-                liveSearch.clearLoadingIndicator();
-            }).error(function () {
-                window.location = '/error/1146';
-            });
+        this.showLoadingIndicator();
+        return $.ajax({
+            url: this.action,
+            data: this.state,
+            searchState: searchState
+        }).done(function(response) {
+            liveSearch.cache($.param(liveSearch.state), response);
+            liveSearch.displayResults(response, this.searchState);
+            liveSearch.clearLoadingIndicator();
+        }).error(function() {
+            window.location = "/error/1146";
+        });
         //} else {
-            //this.displayResults(cachedResultData, searchState);
-            //var out = new $.Deferred()
-            //return out.resolve();
+        //this.displayResults(cachedResultData, searchState);
+        //var out = new $.Deferred()
+        //return out.resolve();
         //}
     };
 
     LiveSearch.prototype.showLoadingIndicator = function showLoadingIndicator() {
-        this.$loadingBlock.text('Loading...');
+        this.$loadingBlock.text("Loading...");
     };
 
     LiveSearch.prototype.clearLoadingIndicator = function showLoadingIndicator() {
-        this.$loadingBlock.html('&nbsp;');
+        this.$loadingBlock.html("&nbsp;");
     };
 
     LiveSearch.prototype.displayResults = function displayResults(results, action) {
@@ -150,11 +153,12 @@
     LiveSearch.prototype.restoreBooleans = function restoreBooleans() {
         var that = this;
         // update the radio buttons
-        this.$form.find('.options-container input[type=checkbox], .options-container input[type=radio]').each(function (i, el) {
-            var $el = $(el);
-            var checked = that.isBooleanSelected($el.attr('name'), $el.attr('value'));
-            if ($el.prop('checked') !== checked) $el.click();
-        });
+        this.$form.find(".options-container input[type=checkbox], .options-container input[type=radio]").each(
+            function(i, el) {
+                var $el = $(el);
+                var checked = that.isBooleanSelected($el.attr("name"), $el.attr("value"));
+                if ($el.prop("checked") !== checked) $el.click();
+            });
     };
 
     LiveSearch.prototype.isBooleanSelected = function isBooleanSelected(name, value) {
@@ -169,9 +173,9 @@
 
     LiveSearch.prototype.restoreTextInputs = function restoreTextInputs() {
         var that = this;
-        this.$form.find('input[type=text]').each(function (i, el) {
+        this.$form.find("input[type=text]").each(function(i, el) {
             var $el = $(el);
-            $el.val(that.getTextInputValue($el.attr('name')));
+            $el.val(that.getTextInputValue($el.attr("name")));
         });
     };
 
@@ -179,18 +183,18 @@
         var i, _i;
         for (i = 0, _i = this.state.length; i < _i; i++) {
             if (this.state[i].name === name) {
-                return this.state[i].value
+                return this.state[i].value;
             }
         }
-        return '';
+        return "";
     };
 
-    LiveSearch.prototype.clearFilters = function (e) {
+    LiveSearch.prototype.clearFilters = function(e) {
         this.clearBooleans();
         this.saveState();
 
         var self = this;
-        this.updateResults().done(function () {
+        this.updateResults().done(function() {
             self.saveHistory();
             self.collapseFilters();
         });
@@ -200,11 +204,12 @@
     };
 
     LiveSearch.prototype.clearBooleans = function clearBooleans() {
-        this.$form.unbind('change');
-        this.$form.find('.options-container input[type=checkbox], .options-container input[type=radio]').each(function (i, el) {
-            var $el = $(el);
-            if ($el.prop('checked')) $el.click();
-        });
+        this.$form.unbind("change");
+        this.$form.find(".options-container input[type=checkbox], .options-container input[type=radio]").each(
+            function(i, el) {
+                var $el = $(el);
+                if ($el.prop("checked")) $el.click();
+            });
         this.bindFilterEvents();
     };
 

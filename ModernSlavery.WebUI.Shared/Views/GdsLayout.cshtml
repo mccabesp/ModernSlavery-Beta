@@ -1,8 +1,4 @@
-﻿@using ModernSlavery.Core.SharedKernel.Options
-@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@using ModernSlavery.WebUI.Shared.Classes.Cookies
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
+﻿@using ModernSlavery.WebUI.Shared.Classes.Cookies
 @using ModernSlavery.WebUI.Shared.Interfaces
 @using ModernSlavery.WebUI.Shared.Options
 @inject SharedOptions sharedOptions
@@ -10,19 +6,19 @@
 @inject StaticAssetsVersioningHelper staticAssetsVersioningHelper
 @inject IWebService WebService
 @{
-    string assetsPath = "/assets/images";
+    var assetsPath = "/assets/images";
 }
 <!DOCTYPE html>
 <html lang="en" class="govuk-template app-html-class">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <title>@(ViewBag.Title ?? "Modern Slavery Reporting service")</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="blue" />
+    <meta name="theme-color" content="blue"/>
 
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 
-    <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="@(assetsPath)/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="@(assetsPath)/favicon.ico" type="image/x-icon"/>
     <link rel="mask-icon" href="@(assetsPath)/govuk-mask-icon.svg" color="blue">
     <link rel="apple-touch-icon" sizes="180x180" href="@(assetsPath)/govuk-apple-touch-icon-180x180.png">
     <link rel="apple-touch-icon" sizes="167x167" href="@(assetsPath)/govuk-apple-touch-icon-167x167.png">
@@ -30,7 +26,7 @@
     <link rel="apple-touch-icon" href="@(assetsPath)/govuk-apple-touch-icon.png">
 
     <!--[if !IE 8]><!-->
-    <link href="@(staticAssetsVersioningHelper.GetAppCssFilename())" rel="stylesheet" />
+    <link href="@(staticAssetsVersioningHelper.GetAppCssFilename())" rel="stylesheet"/>
     <!--<![endif]-->
     <!--[if IE 8]>
         <link href="@(staticAssetsVersioningHelper.GetAppIe8CssFilename())" rel="stylesheet" />
@@ -42,148 +38,148 @@
 </head>
 
 <body class="govuk-template__body app-body-class">
-    <script>
-        document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
-    </script>
+<script>
+    document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
+</script>
 
-    @if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request) && !ViewContext.RouteData.Values["action"].Equals("CookieSettingsGet"))
-    {
-        await Html.RenderPartialAsync("/Views/Components/CookieBanner.cshtml");
-    }
-
-    <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
-
-    @{
-        List<HeaderNavigationViewModel> headerNavigationLinks;
-        if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
-        {
-            headerNavigationLinks = new List<HeaderNavigationViewModel>
+@if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request) && !ViewContext.RouteData.Values["action"].Equals("CookieSettingsGet"))
 {
-                new HeaderNavigationViewModel
-                {
-                    Text = "Search",
-                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
-                },
-                new HeaderNavigationViewModel
-                {
-                    Text = "Guidance",
-                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingGuidance)
-                },
-                new HeaderNavigationViewModel
-                {
-                    Text = "Submit",
-                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)
-                }
-            };
-        }
-        else
-        {
-            headerNavigationLinks = new List<HeaderNavigationViewModel>
-{
-                new HeaderNavigationViewModel
-                {
-                    Text = "Search and compare",
-                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
-                },
-                new HeaderNavigationViewModel
-                {
-                    Text = "Download",
-                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingDownloads)
-                },
-                new HeaderNavigationViewModel
-                {
-                    Text = "Close the gap",
-                    Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingActionHub)
-                }
-            };
-        }
+    await Html.RenderPartialAsync("/Views/Components/CookieBanner.cshtml");
+}
 
-        string controllerName = ViewContext.RouteData.Values["Controller"].ToString();
-        if (controllerName.StartsWith("Admin"))
-        {
-            headerNavigationLinks.Add(new HeaderNavigationViewModel
-            {
-                Text = "Admin",
-                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome)
-            });
-        }
+<a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
-        if (User.Identity.IsAuthenticated)
-        {
-            headerNavigationLinks.Add(new HeaderNavigationViewModel
-            {
-                Text = "Sign out",
-                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut),
-                Classes = "sign-out-link"
-            });
-        }
-        else
-        {
-            headerNavigationLinks.Add(new HeaderNavigationViewModel
-            {
-                Text = "Sign in",
-                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome),
-                Classes = "sign-out-link"
-            });
-        }
-
-        @(Html.GovUkHeader(new HeaderViewModel
-        {
-            ServiceName = "Modern Slavery Reporting service",
-            AssetsPath = assetsPath,
-            HomepageUrl = "https://www.gov.uk",
-            ServiceUrl = "/",
-            Navigation = headerNavigationLinks
-        }))
-
-    }
-
-    <div class="govuk-width-container">
-
-        @(Html.GovUkPhaseBanner(new PhaseBannerViewModel
-        {
-            Phase = "DISCOVERY",
-            Html = @<text>This is a new service – your <a class="govuk-link" href="@Url.Action("SendFeedbackGet")">feedback</a> will help us to improve it.</text>
-        }))
-        @(RenderSection("BeforeMain", false))
-
-        <main class="govuk-main-wrapper" id="main-content" role="main">
-            @RenderBody()
-        </main>
-    </div>
-
-    @(Html.GovUkFooter(new FooterViewModel
+@{
+    List<HeaderNavigationViewModel> headerNavigationLinks;
+    if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
     {
-        MetaNavigation = new FooterMetaNavigationViewModel
+        headerNavigationLinks = new List<HeaderNavigationViewModel>
         {
-            Links = new[]
+            new HeaderNavigationViewModel
             {
-                new FooterLinksViewModel
-                {
-                    Text = "Contact Us",
-                    Href = Url.Action("ContactUs")
-                },
-                new FooterLinksViewModel
-                {
-                    Text = "Cookies",
-                    Href = Url.Action("CookieSettingsGet")
-                },
-                new FooterLinksViewModel
-                {
-                    Text = "Privacy Policy",
-                    Href = Url.Action("PrivacyPolicy")
-                },
-                new FooterLinksViewModel
-                {
-                    Text = "Report Concerns",
-                    Href = Url.Action("ReportConcerns")
-                }
+                Text = "Search",
+                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
+            },
+            new HeaderNavigationViewModel
+            {
+                Text = "Guidance",
+                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingGuidance)
+            },
+            new HeaderNavigationViewModel
+            {
+                Text = "Submit",
+                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)
             }
-        }
+        };
+    }
+    else
+    {
+        headerNavigationLinks = new List<HeaderNavigationViewModel>
+        {
+            new HeaderNavigationViewModel
+            {
+                Text = "Search and compare",
+                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
+            },
+            new HeaderNavigationViewModel
+            {
+                Text = "Download",
+                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingDownloads)
+            },
+            new HeaderNavigationViewModel
+            {
+                Text = "Close the gap",
+                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingActionHub)
+            }
+        };
+    }
+
+    var controllerName = ViewContext.RouteData.Values["Controller"].ToString();
+    if (controllerName.StartsWith("Admin"))
+    {
+        headerNavigationLinks.Add(new HeaderNavigationViewModel
+        {
+            Text = "Admin",
+            Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome)
+        });
+    }
+
+    if (User.Identity.IsAuthenticated)
+    {
+        headerNavigationLinks.Add(new HeaderNavigationViewModel
+        {
+            Text = "Sign out",
+            Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut),
+            Classes = "sign-out-link"
+        });
+    }
+    else
+    {
+        headerNavigationLinks.Add(new HeaderNavigationViewModel
+        {
+            Text = "Sign in",
+            Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome),
+            Classes = "sign-out-link"
+        });
+    }
+
+    @(Html.GovUkHeader(new HeaderViewModel
+    {
+        ServiceName = "Modern Slavery Reporting service",
+        AssetsPath = assetsPath,
+        HomepageUrl = "https://www.gov.uk",
+        ServiceUrl = "/",
+        Navigation = headerNavigationLinks
     }))
 
-    <script src="@(staticAssetsVersioningHelper.GetAppJsFilename())"></script>
-    <script>window.GOVUKFrontend.initAll()</script>
-    @RenderSection("AfterLoadedCompiledScripts", false)
+}
+
+<div class="govuk-width-container">
+
+    @(Html.GovUkPhaseBanner(new PhaseBannerViewModel
+    {
+        Phase = "DISCOVERY",
+        Html = @<text>This is a new service – your <a class="govuk-link" href="@Url.Action("SendFeedbackGet")">feedback</a> will help us to improve it.</text>
+    }))
+    @(RenderSection("BeforeMain", false))
+
+    <main class="govuk-main-wrapper" id="main-content" role="main">
+        @RenderBody()
+    </main>
+</div>
+
+@(Html.GovUkFooter(new FooterViewModel
+{
+    MetaNavigation = new FooterMetaNavigationViewModel
+    {
+        Links = new[]
+        {
+            new FooterLinksViewModel
+            {
+                Text = "Contact Us",
+                Href = Url.Action("ContactUs")
+            },
+            new FooterLinksViewModel
+            {
+                Text = "Cookies",
+                Href = Url.Action("CookieSettingsGet")
+            },
+            new FooterLinksViewModel
+            {
+                Text = "Privacy Policy",
+                Href = Url.Action("PrivacyPolicy")
+            },
+            new FooterLinksViewModel
+            {
+                Text = "Report Concerns",
+                Href = Url.Action("ReportConcerns")
+            }
+        }
+    }
+}))
+
+<script src="@(staticAssetsVersioningHelper.GetAppJsFilename())"></script>
+<script>window.GOVUKFrontend.initAll()</script>
+@RenderSection("AfterLoadedCompiledScripts", false)
 </body>
 </html>

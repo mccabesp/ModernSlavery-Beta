@@ -4,13 +4,13 @@
 */
 
 .govuk-tag-late {
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-size: 14px;
-    display: inline-block;
-    padding: .5em;
-    color: #b10e1e;
+    -webkit-font-smoothing: antialiased;
     border: 1px solid #b10e1e;
+    color: #b10e1e;
+    display: inline-block;
+    font-size: 14px;
+    padding: .5em;
     text-align: center;
 }
 
@@ -23,13 +23,13 @@
 }
 
 .govuk-tag-voluntary {
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-size: 14px;
-    display: inline-block;
-    padding: .5em;
-    color: #85994b;
+    -webkit-font-smoothing: antialiased;
     border: 1px solid #85994b;
+    color: #85994b;
+    display: inline-block;
+    font-size: 14px;
+    padding: .5em;
     text-align: center;
 }
 

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using ModernSlavery.WebUI.Viewing.Controllers;
-using ModernSlavery.WebUI.Viewing.Models.Search;
+using ModernSlavery.WebUI.Viewing.Models;
 using NUnit.Framework;
 
 namespace ModernSlavery.WebUI.Tests

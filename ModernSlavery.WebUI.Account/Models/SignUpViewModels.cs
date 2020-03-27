@@ -9,7 +9,6 @@ namespace ModernSlavery.WebUI.Account.Models
     [DefaultResource(typeof(AccountResources))]
     public class SignUpViewModel
     {
-
         [Required(AllowEmptyStrings = false)]
         [Display(Name = "First name")]
         public string FirstName { get; set; }
@@ -40,18 +39,14 @@ namespace ModernSlavery.WebUI.Account.Models
         [Password]
         public string Password { get; set; }
 
-        [Display(Name = nameof(SendUpdates))]
-        public bool SendUpdates { get; set; }
+        [Display(Name = nameof(SendUpdates))] public bool SendUpdates { get; set; }
 
-        [Display(Name = nameof(AllowContact))]
-        public bool AllowContact { get; set; }
+        [Display(Name = nameof(AllowContact))] public bool AllowContact { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
-
     }
-
 }

@@ -1,13 +1,9 @@
-@using ModernSlavery.BusinessDomain
 @using ModernSlavery.BusinessDomain.Shared.Interfaces
-@using ModernSlavery.Core.Entities
-@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model ModernSlavery.WebUI.Admin.Models.AdminChangeCompaniesHouseOptInOutViewModel
+@model AdminChangeCompaniesHouseOptInOutViewModel
+@Layout = "~/Views/GdsLayout.cshtml"
 @inject IUpdateFromCompaniesHouseService UpdateFromCompaniesHouseService
 @{
     ViewBag.Title = "Opt in - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
@@ -22,7 +18,7 @@
         crumbs.Add(new CrumbViewModel
         {
             Text = Model.Organisation.OrganisationName,
-            Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new { id = Model.Organisation.OrganisationId })
+            Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Organisation.OrganisationId})
         });
 
         crumbs.Add(new CrumbViewModel
@@ -43,7 +39,7 @@
         <span class="govuk-caption-xl">Administration</span>
         <h1 class="govuk-heading-xl">
             Companies House synchronisation
-            <br />
+            <br/>
             <span class="govuk-!-font-size-27">
                 for @(Model.Organisation.OrganisationName)
             </span>
@@ -59,26 +55,26 @@
 
         <table class="govuk-table">
             <tbody class="govuk-table__body">
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-third">Current name</th>
-                    <td class="govuk-table__cell">@(Model.Organisation.OrganisationName)</td>
-                    <td></td>
-                </tr>
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-third">Current address</th>
-                    <td class="govuk-table__cell">@(Model.Organisation.OrganisationAddresses.OrderByDescending(a => a.Created).FirstOrDefault()?.GetAddressString() ?? "(No address)")</td>
-                </tr>
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-third">Current SIC codes</th>
-                    <td class="govuk-table__cell">
-                        @foreach (OrganisationSicCode organisationSicCode in Model.Organisation.OrganisationSicCodes.Where(osc => !osc.Retired.HasValue))
-                        {
-                            @(organisationSicCode.SicCode.SicCodeId)
-                            <br />
-                        }
-                    </td>
-                    <td></td>
-                </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">Current name</th>
+                <td class="govuk-table__cell">@(Model.Organisation.OrganisationName)</td>
+                <td></td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">Current address</th>
+                <td class="govuk-table__cell">@(Model.Organisation.OrganisationAddresses.OrderByDescending(a => a.Created).FirstOrDefault()?.GetAddressString() ?? "(No address)")</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">Current SIC codes</th>
+                <td class="govuk-table__cell">
+                    @foreach (var organisationSicCode in Model.Organisation.OrganisationSicCodes.Where(osc => !osc.Retired.HasValue))
+                    {
+                        @(organisationSicCode.SicCode.SicCodeId)
+                        <br/>
+                    }
+                </td>
+                <td></td>
+            </tr>
             </tbody>
         </table>
 
@@ -87,42 +83,41 @@
 
         <table class="govuk-table">
             <tbody class="govuk-table__body">
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-third">New name</th>
-                    <td class="govuk-table__cell">@(UpdateFromCompaniesHouseService.IsCompanyNameEqual(Model.Organisation.GetName(), Model.CompaniesHouseCompany.CompanyName) ? "(Not changed)" : Model.CompaniesHouseCompany.CompanyName)</td>
-                </tr>
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-third">New address</th>
-                    @{ OrganisationAddress addressFromCoHo = UpdateFromCompaniesHouseService.CreateOrganisationAddressFromCompaniesHouseAddress(Model.CompaniesHouseCompany.RegisteredOfficeAddress); }
-                    <td class="govuk-table__cell">@(UpdateFromCompaniesHouseService.AddressMatches(addressFromCoHo, Model.Organisation.LatestAddress) ? "(Not changed)" : addressFromCoHo.GetAddressString())</td>
-                </tr>
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header govuk-!-width-one-third">New SIC codes</th>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">New name</th>
+                <td class="govuk-table__cell">@(UpdateFromCompaniesHouseService.IsCompanyNameEqual(Model.Organisation.GetName(), Model.CompaniesHouseCompany.CompanyName) ? "(Not changed)" : Model.CompaniesHouseCompany.CompanyName)</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">New address</th>
+                @{ var addressFromCoHo = UpdateFromCompaniesHouseService.CreateOrganisationAddressFromCompaniesHouseAddress(Model.CompaniesHouseCompany.RegisteredOfficeAddress); }
+                <td class="govuk-table__cell">@(UpdateFromCompaniesHouseService.AddressMatches(addressFromCoHo, Model.Organisation.LatestAddress) ? "(Not changed)" : addressFromCoHo.GetAddressString())</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header govuk-!-width-one-third">New SIC codes</th>
 
-                    @if (UpdateFromCompaniesHouseService.SicCodesEqual(Model.Organisation.GetSicCodes(), Model.CompaniesHouseCompany.SicCodes))
-                    {
-                        <td class="govuk-table__cell">
-                            (Not changed)
-                        </td>
-                    }
-                    else
-                    {
-                        <td class="govuk-table__cell">
-                            @foreach (string organisationSicCode in Model.CompaniesHouseCompany.SicCodes)
-                            {
-                                @(organisationSicCode)
-                                <br />
-                            }
-                        </td>
-                    }
-                </tr>
+                @if (UpdateFromCompaniesHouseService.SicCodesEqual(Model.Organisation.GetSicCodes(), Model.CompaniesHouseCompany.SicCodes))
+                {
+                    <td class="govuk-table__cell">
+                        (Not changed)
+                    </td>
+                }
+                else
+                {
+                    <td class="govuk-table__cell">
+                        @foreach (var organisationSicCode in Model.CompaniesHouseCompany.SicCodes)
+                        {
+                            @(organisationSicCode)
+                            <br/>
+                        }
+                    </td>
+                }
+            </tr>
             </tbody>
         </table>
 
 
-        <form method="POST" action="@Url.Action("OptIn", "AdminOrganisationCompaniesHouseOptInOut", new { id = Model.Organisation.OrganisationId })">
+        <form method="POST" action="@Url.Action("OptIn", "AdminOrganisationCompaniesHouseOptInOut", new {id = Model.Organisation.OrganisationId})">
             @(Html.AntiForgeryToken())
-
             @(Html.GovUkTextAreaFor(
                 m => m.Reason,
                 labelOptions: new LabelViewModel
@@ -134,8 +129,7 @@
                 {
                     Classes = "govuk-!-margin-top-8"
                 }
-            ))
-
+                ))
             @(Html.GovUkButton(new ButtonViewModel
             {
                 Text = "Confirm",
@@ -143,7 +137,7 @@
             }))
 
             <p class="govuk-body">
-                <a href="@Url.Action("ViewOrganisation", "AdminViewOrganisation", new { id = Model.Organisation.OrganisationId })"
+                <a href="@Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Organisation.OrganisationId})"
                    class="govuk-link">
                     Cancel and return to organisation page
                 </a>

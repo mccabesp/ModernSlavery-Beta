@@ -15,12 +15,10 @@ using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Tests.Common.Classes;
 using ModernSlavery.Tests.Common.TestHelpers;
-using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Tests.TestHelpers;
 using ModernSlavery.WebUI.Viewing.Controllers;
 using ModernSlavery.WebUI.Viewing.Models;
-using ModernSlavery.WebUI.Viewing.Models.Compare;
-using ModernSlavery.WebUI.Viewing.Models.Search;
 using Moq;
 using NUnit.Framework;
 

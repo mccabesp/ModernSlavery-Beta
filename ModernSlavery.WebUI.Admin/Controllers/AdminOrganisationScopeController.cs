@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.WebUI.Admin.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
+using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
@@ -18,7 +17,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminOrganisationScopeController : Controller
     {
-
         private readonly AuditLogger auditLogger;
 
         private readonly IDataRepository dataRepository;
@@ -32,7 +30,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("organisation/{id}/scope")]
         public IActionResult ViewScopeHistory(long id)
         {
-            Organisation organisation = dataRepository.Get<Organisation>(id);
+            var organisation = dataRepository.Get<Organisation>(id);
 
             return View("ViewOrganisationScope", organisation);
         }
@@ -43,14 +41,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var organisation = dataRepository.Get<Organisation>(id);
             var currentScopeStatus = organisation.GetScopeStatus(year);
 
-            var viewModel = new AdminChangeScopeViewModel {
+            var viewModel = new AdminChangeScopeViewModel
+            {
                 OrganisationName = organisation.OrganisationName,
                 OrganisationId = organisation.OrganisationId,
                 ReportingYear = year,
                 CurrentScopeStatus = currentScopeStatus,
                 NewScopeStatus = GetNewScopeStatus(currentScopeStatus)
             };
-            
+
             return View("ChangeScope", viewModel);
         }
 
@@ -64,9 +63,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (currentOrganisationScope.ScopeStatus != ScopeStatuses.InScope
                 && currentOrganisationScope.ScopeStatus != ScopeStatuses.OutOfScope)
-            {
                 viewModel.ParseAndValidateParameters(Request, m => m.NewScopeStatus);
-            }
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
 
@@ -82,12 +79,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 return View("ChangeScope", viewModel);
             }
-            
-            RetireOldScopesForCurrentSnapshotDate(organisation, year);
-            
-            ScopeStatuses newScope = ConvertNewScopeStatusToScopeStatus(viewModel.NewScopeStatus);
 
-            var newOrganisationScope = new OrganisationScope {
+            RetireOldScopesForCurrentSnapshotDate(organisation, year);
+
+            var newScope = ConvertNewScopeStatusToScopeStatus(viewModel.NewScopeStatus);
+
+            var newOrganisationScope = new OrganisationScope
+            {
                 Organisation = organisation,
                 ScopeStatus = newScope,
                 ScopeStatusDate = VirtualDateTime.Now,
@@ -110,56 +108,43 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 this,
                 AuditedAction.AdminChangeOrganisationScope,
                 organisation,
-                new {
+                new
+                {
                     PreviousScope = currentOrganisationScope.ScopeStatus.ToString(),
                     NewScope = newScope.ToString(),
-                    Reason = viewModel.Reason
+                    viewModel.Reason
                 });
 
-            return RedirectToAction("ViewScopeHistory", "AdminOrganisationScope", new {id = organisation.OrganisationId});
+            return RedirectToAction("ViewScopeHistory", "AdminOrganisationScope",
+                new {id = organisation.OrganisationId});
         }
 
         private void RetireOldScopesForCurrentSnapshotDate(Organisation organisation, int year)
         {
-            IEnumerable<OrganisationScope> organisationScopesForCurrentSnapshotDate =
+            var organisationScopesForCurrentSnapshotDate =
                 organisation.OrganisationScopes
-                .Where(scope => scope.SnapshotDate.Year == year);
-            
-            foreach (OrganisationScope organisationScope in organisationScopesForCurrentSnapshotDate)
-            {
+                    .Where(scope => scope.SnapshotDate.Year == year);
+
+            foreach (var organisationScope in organisationScopesForCurrentSnapshotDate)
                 organisationScope.Status = ScopeRowStatuses.Retired;
-            }
         }
 
         private NewScopeStatus? GetNewScopeStatus(ScopeStatuses previousScopeStatus)
         {
-            if (previousScopeStatus == ScopeStatuses.InScope)
-            {
-                return NewScopeStatus.OutOfScope;
-            }
+            if (previousScopeStatus == ScopeStatuses.InScope) return NewScopeStatus.OutOfScope;
 
-            if (previousScopeStatus == ScopeStatuses.OutOfScope)
-            {
-                return NewScopeStatus.InScope;
-            }
+            if (previousScopeStatus == ScopeStatuses.OutOfScope) return NewScopeStatus.InScope;
 
             return null;
         }
-        
+
         private ScopeStatuses ConvertNewScopeStatusToScopeStatus(NewScopeStatus? newScopeStatus)
         {
-            if (newScopeStatus == NewScopeStatus.InScope)
-            {
-                return ScopeStatuses.InScope;
-            }
+            if (newScopeStatus == NewScopeStatus.InScope) return ScopeStatuses.InScope;
 
-            if (newScopeStatus == NewScopeStatus.OutOfScope)
-            {
-                return ScopeStatuses.OutOfScope;
-            }
-            
+            if (newScopeStatus == NewScopeStatus.OutOfScope) return ScopeStatuses.OutOfScope;
+
             throw new Exception();
         }
-
     }
 }

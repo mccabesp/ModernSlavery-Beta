@@ -2,12 +2,12 @@
 using ModernSlavery.WebUI.GDSDesignSystem;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
     public class ChangeOrganisationNameViewModel : GovUkViewModel
     {
-
         // Not mapped, only used for displaying information in the views
         public Organisation Organisation { get; set; }
 
@@ -22,7 +22,6 @@ namespace ModernSlavery.WebUI.Admin.Models
 
         [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a reason for this change")]
         public string Reason { get; set; }
-
     }
 
     public enum AcceptCompaniesHouseName

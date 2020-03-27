@@ -2,8 +2,7 @@
     ViewBag.Title = "Search for your organisation - Modern Slavery reporting service";
 }
 @using ModernSlavery.Core.SharedKernel
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@model ModernSlavery.WebUI.Shared.Models.OrganisationViewModel
+@model OrganisationViewModel
 <div id="organisation-search-content">
     <div class="grid-row">
         <div class="column-full">
@@ -17,7 +16,7 @@
         @Html.HiddenFor(m => m.SectorType)
         @Html.HiddenFor(m => m.ManualRegistration)
 
-        <input type="submit" style="display:none" name="command" value="search">
+        <input type="submit" style="display: none" name="command" value="search">
         <div class="grid-row">
             <div class="column-two-thirds">
                 @await Html.CustomValidationSummaryAsync()

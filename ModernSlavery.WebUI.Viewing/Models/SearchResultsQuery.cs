@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Viewing.Models
 {
-
     [Serializable]
     public class SearchResultsQuery
     {
-
         // TODO: dotnet core supports defining named query params using FromQueryAttribute
         // Example:
         // [FromQuery("s")] 
@@ -46,19 +44,12 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public bool IsEmployerSizeValid()
         {
             // if null then we won't filter on this so its valid
-            if (es == null)
-            {
-                return true;
-            }
+            if (es == null) return true;
 
-            foreach (int size in es)
-            {
+            foreach (var size in es)
                 // ensure we have a valid org size
                 if (!Enum.IsDefined(typeof(OrganisationSizes), size))
-                {
                     return false;
-                }
-            }
 
             return true;
         }
@@ -66,19 +57,12 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public bool IsReportingStatusValid()
         {
             // if null then we won't filter on this so its valid
-            if (st == null)
-            {
-                return true;
-            }
+            if (st == null) return true;
 
-            foreach (int value in st)
-            {
+            foreach (var value in st)
                 // ensure we have a valid enum entry
                 if (!Enum.IsDefined(typeof(SearchReportingStatusFilter), value))
-                {
                     return false;
-                }
-            }
 
             return true;
         }
@@ -87,24 +71,16 @@ namespace ModernSlavery.WebUI.Viewing.Models
         {
             exception = null;
 
-            if (!IsPageValid())
-            {
-                exception = new HttpBadRequestResult($"EmployerSearch: Invalid page {p}");
-            }
+            if (!IsPageValid()) exception = new HttpBadRequestResult($"EmployerSearch: Invalid page {p}");
 
             if (!IsEmployerSizeValid())
-            {
                 exception = new HttpBadRequestResult($"EmployerSearch: Invalid EmployerSize {es.ToDelimitedString()}");
-            }
 
             if (!IsReportingStatusValid())
-            {
-                exception = new HttpBadRequestResult($"EmployerSearch: Invalid ReportingStatus {st.ToDelimitedString()}");
-            }
+                exception = new HttpBadRequestResult(
+                    $"EmployerSearch: Invalid ReportingStatus {st.ToDelimitedString()}");
 
             return exception == null;
         }
-
     }
-
 }

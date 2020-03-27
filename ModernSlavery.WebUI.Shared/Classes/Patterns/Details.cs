@@ -1,13 +1,11 @@
-﻿using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using Microsoft.AspNetCore.Html;
+﻿using Microsoft.AspNetCore.Html;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Patterns
 {
-
     [Partial("Patterns/Details")]
     public class Details
     {
-
         public string Id { get; set; }
         public bool Expanded { get; set; }
         public string LinkText { get; set; }
@@ -20,7 +18,5 @@ namespace ModernSlavery.WebUI.Shared.Classes.Patterns
         public bool IsPanel { get; set; } = true;
 
         public IHtmlContent HtmlContent { get; set; }
-
     }
-
 }

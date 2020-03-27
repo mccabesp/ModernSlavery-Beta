@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using ModernSlavery.WebUI.Shared.Classes.Patterns;
-using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Patterns;
 
 namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
 {
@@ -14,7 +13,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
     [RestrictChildren("Next", "Back")]
     public class PaginationTagHelper : TagHelper
     {
-
         private readonly IHtmlHelper _htmlHelper;
 
         public PaginationTagHelper(IHtmlHelper htmlHelper)
@@ -22,9 +20,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
             _htmlHelper = htmlHelper;
         }
 
-        [ViewContext]
-        [HtmlAttributeNotBound]
-        public ViewContext ViewContext { get; set; }
+        [ViewContext] [HtmlAttributeNotBound] public ViewContext ViewContext { get; set; }
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
@@ -37,18 +33,16 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
 
             (_htmlHelper as IViewContextAware).Contextualize(ViewContext);
 
-            IHtmlContent content = await _htmlHelper.PartialModelAsync(new Pagination(accordionContext.Pages.ToArray()));
+            var content = await _htmlHelper.PartialModelAsync(new Pagination(accordionContext.Pages.ToArray()));
 
             output.Content.SetHtmlContent(content);
             output.TagName = null;
         }
-
     }
 
     [HtmlTargetElement("Back", ParentTag = "Pagination", TagStructure = TagStructure.WithoutEndTag)]
     public class PaginationBackTagHelper : TagHelper
     {
-
         private readonly IUrlHelper _urlHelper;
 
         public PaginationBackTagHelper(IUrlHelper urlHelper)
@@ -56,9 +50,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
             _urlHelper = urlHelper;
         }
 
-        [ViewContext]
-        [HtmlAttributeNotBound]
-        public ViewContext ViewContext { get; set; }
+        [ViewContext] [HtmlAttributeNotBound] public ViewContext ViewContext { get; set; }
 
         public string Title { get; set; }
         public string Label { get; set; }
@@ -68,25 +60,21 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
-            TagHelperContent htmlContent = await output.GetChildContentAsync();
+            var htmlContent = await output.GetChildContentAsync();
             var accordionContext = (PaginationContext) context.Items[typeof(PaginationContext)];
 
             if (string.IsNullOrWhiteSpace(Controller))
-            {
                 Controller = ViewContext?.RouteData?.Values["Controller"]?.ToString();
-            }
 
             accordionContext.Pages.Add(new PaginationLink(_urlHelper.Action(Action, Controller), Title, Label, true));
 
             output.SuppressOutput();
         }
-
     }
 
     [HtmlTargetElement("Next", ParentTag = "Pagination", TagStructure = TagStructure.WithoutEndTag)]
     public class PaginationNextTagHelper : TagHelper
     {
-
         private readonly IUrlHelper _urlHelper;
 
         public PaginationNextTagHelper(IUrlHelper urlHelper)
@@ -94,9 +82,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
             _urlHelper = urlHelper;
         }
 
-        [ViewContext]
-        [HtmlAttributeNotBound]
-        public ViewContext ViewContext { get; set; }
+        [ViewContext] [HtmlAttributeNotBound] public ViewContext ViewContext { get; set; }
 
         public string Title { get; set; }
         public string Label { get; set; }
@@ -105,24 +91,19 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
-            TagHelperContent htmlContent = await output.GetChildContentAsync();
+            var htmlContent = await output.GetChildContentAsync();
             var accordionContext = (PaginationContext) context.Items[typeof(PaginationContext)];
             if (string.IsNullOrWhiteSpace(Controller))
-            {
                 Controller = ViewContext?.RouteData?.Values["Controller"]?.ToString();
-            }
 
             accordionContext.Pages.Add(new PaginationLink(_urlHelper.Action(Action, Controller), Title, Label));
             output.SuppressOutput();
         }
-
     }
 
 
     public class PaginationContext
     {
-
         public List<PaginationLink> Pages = new List<PaginationLink>();
-
     }
 }

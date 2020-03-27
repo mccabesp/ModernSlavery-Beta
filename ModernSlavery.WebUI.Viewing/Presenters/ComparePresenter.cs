@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -8,14 +7,11 @@ using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Shared.Classes.Cookies;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Viewing.Classes;
-using HttpContext = Microsoft.AspNetCore.Http.HttpContext;
 
 namespace ModernSlavery.WebUI.Viewing.Presenters
 {
-
     public interface IComparePresenter
     {
-
         Lazy<SessionList<string>> ComparedEmployers { get; }
 
         int MaxCompareBasketShareCount { get; }
@@ -43,13 +39,12 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         void SaveComparedEmployersToCookie(HttpRequest request);
 
         bool BasketContains(params string[] encEmployerIds);
-
     }
 
     public class ComparePresenter : IComparePresenter
     {
-
-        public ComparePresenter(IOptionsSnapshot<ViewingOptions> options, IHttpContextAccessor httpContext, IHttpSession session)
+        public ComparePresenter(IOptionsSnapshot<ViewingOptions> options, IHttpContextAccessor httpContext,
+            IHttpSession session)
         {
             Options = options;
             HttpContext = httpContext.HttpContext;
@@ -61,37 +56,29 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
 
         public void LoadComparedEmployersFromCookie()
         {
-            string value = HttpContext.GetRequestCookieValue(CookieNames.LastCompareQuery);
+            var value = HttpContext.GetRequestCookieValue(CookieNames.LastCompareQuery);
 
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return;
-            }
+            if (string.IsNullOrWhiteSpace(value)) return;
 
-            string[] employerIds = value.SplitI(",");
+            var employerIds = value.SplitI(",");
 
             ClearBasket();
 
-            if (employerIds.Any())
-            {
-                AddRangeToBasket(employerIds);
-            }
+            if (employerIds.Any()) AddRangeToBasket(employerIds);
         }
 
         public void SaveComparedEmployersToCookie(HttpRequest request)
         {
-            IList<string> employerIds = ComparedEmployers.Value.ToList();
+            var employerIds = ComparedEmployers.Value.ToList();
 
-            CookieSettings cookieSettings = CookieHelper.GetCookieSettingsCookie(request);
+            var cookieSettings = CookieHelper.GetCookieSettingsCookie(request);
             if (cookieSettings.RememberSettings)
-            {
                 //Save into the cookie
                 HttpContext.SetResponseCookie(
                     CookieNames.LastCompareQuery,
                     employerIds.ToDelimitedString(),
                     VirtualDateTime.Now.AddMonths(1),
                     secure: true);
-            }
         }
 
         private SessionList<string> CreateCompareSessionList(IHttpSession session)
@@ -126,13 +113,9 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
-                {
                     Session.Remove("SortColumn");
-                }
                 else
-                {
                     Session["SortColumn"] = value;
-                }
             }
         }
 
@@ -154,20 +137,14 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
 
         public void AddToBasket(string encEmployerId)
         {
-            int newBasketCount = ComparedEmployers.Value.Count + 1;
-            if (newBasketCount <= MaxCompareBasketCount)
-            {
-                ComparedEmployers.Value.Add(encEmployerId);
-            }
+            var newBasketCount = ComparedEmployers.Value.Count + 1;
+            if (newBasketCount <= MaxCompareBasketCount) ComparedEmployers.Value.Add(encEmployerId);
         }
 
         public void AddRangeToBasket(string[] encEmployerIds)
         {
-            int newBasketCount = ComparedEmployers.Value.Count + encEmployerIds.Length;
-            if (newBasketCount <= MaxCompareBasketCount)
-            {
-                ComparedEmployers.Value.Add(encEmployerIds);
-            }
+            var newBasketCount = ComparedEmployers.Value.Count + encEmployerIds.Length;
+            if (newBasketCount <= MaxCompareBasketCount) ComparedEmployers.Value.Add(encEmployerIds);
         }
 
         public void RemoveFromBasket(string encEmployerId)
@@ -186,7 +163,5 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         }
 
         #endregion
-
     }
-
 }

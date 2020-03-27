@@ -2,17 +2,15 @@
 {
     public static class ReportingPeriodHelper
     {
-
         public static string FormatReportingPeriod(int reportingPeriodStartYear)
         {
-            int fourDigitStartYear = reportingPeriodStartYear;
+            var fourDigitStartYear = reportingPeriodStartYear;
 
-            int fourDigitEndYear = reportingPeriodStartYear + 1;
-            int twoDigitEndYear = fourDigitEndYear % 100;
+            var fourDigitEndYear = reportingPeriodStartYear + 1;
+            var twoDigitEndYear = fourDigitEndYear % 100;
 
-            string formattedYear = $"{fourDigitStartYear}-{twoDigitEndYear}";
+            var formattedYear = $"{fourDigitStartYear}-{twoDigitEndYear}";
             return formattedYear;
         }
-
     }
 }

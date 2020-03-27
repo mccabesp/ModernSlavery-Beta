@@ -9,7 +9,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
 {
     public class ExceptionMiddleware
     {
-
         private readonly IConfiguration _config; //ms
         private readonly ILogger _logger;
         private readonly RequestDelegate _next;
@@ -21,7 +20,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             _next = next;
         }
 
-        public async Task InvokeAsync(Microsoft.AspNetCore.Http.HttpContext httpContext)
+        public async Task InvokeAsync(HttpContext httpContext)
         {
             try
             {
@@ -34,12 +33,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             }
         }
 
-        private static Task HandleExceptionAsync(Microsoft.AspNetCore.Http.HttpContext context, Exception exception)
+        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "text/plain";
             context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
             return context.Response.WriteAsync($"ERROR {context.Response.StatusCode} Internal Server Error");
         }
-
     }
 }

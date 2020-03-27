@@ -1,10 +1,7 @@
-@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model ModernSlavery.WebUI.Admin.Models.AdminReturnLateFlagViewModel
-
+@model AdminReturnLateFlagViewModel
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = "Change late flag - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
@@ -50,18 +47,18 @@
 
         <table class="govuk-table">
             <tbody class="govuk-table__body">
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header">Reporting year</th>
-                    <td class="govuk-table__cell">@(Model.Return.GetReportingPeriod())</td>
-                </tr>
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header">Current late flag</th>
-                    <td class="govuk-table__cell">@(Model.Return.IsLateSubmission ? "Late" : "Not late")</td>
-                </tr>
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header">New late flag</th>
-                    <td class="govuk-table__cell">@(Model.NewLateFlag.Value ? "Late" : "Not late")</td>
-                </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Reporting year</th>
+                <td class="govuk-table__cell">@(Model.Return.GetReportingPeriod())</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Current late flag</th>
+                <td class="govuk-table__cell">@(Model.Return.IsLateSubmission ? "Late" : "Not late")</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">New late flag</th>
+                <td class="govuk-table__cell">@(Model.NewLateFlag.Value ? "Late" : "Not late")</td>
+            </tr>
             </tbody>
         </table>
 

@@ -1,12 +1,8 @@
 ﻿@{
     ViewBag.Title = "Enter your PIN - Modern Slavery reporting service";
 }
-@using ModernSlavery.WebUI.Shared.Classes
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@using ModernSlavery.WebUI.Shared.Interfaces
-@using ModernSlavery.WebUI.Shared.Options
 @inject IWebService WebService
-@model ModernSlavery.WebUI.Registration.Models.CompleteViewModel
+@model CompleteViewModel
 <main id="content" role="main">
     @await Html.PartialAsync("_ServiceInfo")
 
@@ -24,13 +20,13 @@
                     Enter the PIN to enable you to report Modern Slavery information for this organisation.
                 </p>
                 <div class="form-group @Html.SetErrorClass(model => model.PIN, "error") ">
-                    @Html.LabelFor(model => model.PIN, "Enter PIN", new { @class = "form-label" })
-                    @Html.ValidationMessageFor(model => model.PIN, null, new { @class = "error-danger" })
+                    @Html.LabelFor(model => model.PIN, "Enter PIN", new {@class = "form-label"})
+                    @Html.ValidationMessageFor(model => model.PIN, null, new {@class = "error-danger"})
                     <div class="col-md-10">
-                        @Html.CustomEditorFor(model => model.PIN, new { @class = "form-control", style = "text-transform: uppercase;", autocomplete = "off" })
+                        @Html.CustomEditorFor(model => model.PIN, new {@class = "form-control", style = "text-transform: uppercase;", autocomplete = "off"})
                     </div>
                 </div>
-                <br />
+                <br/>
                 <details>
                     <summary role="button" aria-controls="details-content-0" aria-expanded="true">Problems with your PIN?</summary>
                     <div class="panel panel-border-narrow" id="details-content-0" aria-hidden="false">
@@ -39,11 +35,11 @@
                         </p>
 
                     </div>
-                </details> <br />
+                </details> <br/>
 
-                <input type="submit" class="button" name="command" value="Activate and continue" />
+                <input type="submit" class="button" name="command" value="Activate and continue"/>
                 <p>
-                    <br />
+                    <br/>
                     <a href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)">Cancel</a>
                 </p>
             </div>

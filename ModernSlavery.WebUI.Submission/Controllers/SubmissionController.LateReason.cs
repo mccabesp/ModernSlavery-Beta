@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -10,7 +9,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 {
     public partial class SubmissionController : BaseController
     {
-
         #region public methods
 
         [HttpGet("late-reason")]
@@ -19,19 +17,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             #region Check user, then retrieve model from Session
 
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
-            var stashedReturnViewModel = this.UnstashModel<ReturnViewModel>();
+            var stashedReturnViewModel = UnstashModel<ReturnViewModel>();
 
             #endregion
 
-            if (stashedReturnViewModel == null)
-            {
-                return SessionExpiredView();
-            }
+            if (stashedReturnViewModel == null) return SessionExpiredView();
 
             ModelState.Clear();
 
@@ -46,19 +38,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             #region Check user, then retrieve model from Session
 
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null)
-            {
-                return checkResult;
-            }
+            if (checkResult != null) return checkResult;
 
-            var stashedReturnViewModel = this.UnstashModel<ReturnViewModel>();
+            var stashedReturnViewModel = UnstashModel<ReturnViewModel>();
 
             #endregion
 
-            if (stashedReturnViewModel == null)
-            {
-                return SessionExpiredView();
-            }
+            if (stashedReturnViewModel == null) return SessionExpiredView();
 
             postedReturnViewModel.ReportInfo.Draft = stashedReturnViewModel.ReportInfo.Draft;
 
@@ -72,6 +58,5 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         #endregion
-
     }
 }

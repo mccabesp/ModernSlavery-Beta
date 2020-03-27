@@ -1,19 +1,15 @@
 ﻿@using System.Data
-@using ModernSlavery.Core.Extensions
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@model ModernSlavery.WebUI.Admin.Models.DownloadViewModel.Download
+@model DownloadViewModel.Download
 @{
     ViewBag.Title = "Administration: " + Model.Filename;
 }
 <style type="text/css">
-    #content{
-        max-width:98% !important;
-    }
+    #content { max-width: 98% !important; }
 </style>
-<main id="content" role="main" style="clear:both;">
-    <div class="breadcrumbs dynamic-content default-content" style="display: block;float:none;">
+<main id="content" role="main" style="clear: both;">
+    <div class="breadcrumbs dynamic-content default-content" style="display: block; float: none;">
         <ol>
-            <li style="display: block; padding-top: 0.75em; padding-bottom: 0;">
+            <li style="display: block; padding-bottom: 0; padding-top: 0.75em;">
                 &lt;
 
                 <a href="javascript:window.history.back()">Back to previous page</a>
@@ -24,7 +20,7 @@
     <div class="grid-row">
         <div class="column-full">
 
-            <div style="float:right;font-size:smaller;text-align:right;">
+            <div style="float: right; font-size: smaller; text-align: right;">
                 <span>
                     <a href="@Url.Action("Read", "Admin", new {filePath = Context.Request.Query["filePath"], v = Guid.NewGuid().ToShortString()})" title="Show more recent content">@VirtualDateTime.Now.ToString("d MMM HH:mm")</a>
                 </span><br/>
@@ -36,7 +32,7 @@
                 <span id="companyname">@System.IO.Path.GetFileName(Model.Filename)</span>
             </h1>
 
-            <div style="left:0;width:100%;overflow-x:auto;overflow-y:visible;border:solid 1px;" class="double-scroll">
+            <div style="border: solid 1px; left: 0; overflow-x: auto; overflow-y: visible; width: 100%;" class="double-scroll">
                 @if (Model.Datatable != null)
                 {
                     <table border="1" cellpadding="5">
@@ -52,9 +48,9 @@
                         @foreach (DataRow row in Model.Datatable.Rows)
                         {
                             <tr>
-                                @foreach (object cell in row.ItemArray)
+                                @foreach (var cell in row.ItemArray)
                                 {
-                                    string value = cell.ToString();
+                                    var value = cell.ToString();
                                     if (value.StartsWithI("http://", "https://"))
                                     {
                                         <td><a href="@value" target="_blank">@value</a>)</td>
@@ -79,7 +75,7 @@
         </div>
     </div>
     <script type="text/javascript">
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('.double-scroll').doubleScroll({ resetOnWindowResize: true });
         });
     </script>

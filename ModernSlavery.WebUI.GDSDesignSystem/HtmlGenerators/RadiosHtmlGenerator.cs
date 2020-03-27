@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
-using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.GDSDesignSystem.Partials;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 {
@@ -20,24 +20,24 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             HintViewModel hintOptions = null)
             where TModel : GovUkViewModel
         {
-            PropertyInfo property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
+            var property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
             ThrowIfPropertyTypeIsNotNullableEnum(property);
-            string propertyName = property.Name;
+            var propertyName = property.Name;
 
-            TModel model = htmlHelper.ViewData.Model;
-            TProperty currentlySelectedValue =
+            var model = htmlHelper.ViewData.Model;
+            var currentlySelectedValue =
                 ExpressionHelpers.GetPropertyValueFromModelAndExpression(model, propertyLambdaExpression);
 
-            Type enumType = Nullable.GetUnderlyingType(typeof(TProperty));
-            Array allEnumValues = Enum.GetValues(enumType);
+            var enumType = Nullable.GetUnderlyingType(typeof(TProperty));
+            var allEnumValues = Enum.GetValues(enumType);
 
 
-            List<ItemViewModel> radios = allEnumValues
+            var radios = allEnumValues
                 .OfType<object>()
                 .Select(enumValue =>
                 {
-                    bool isEnumValueCurrentlySelected = enumValue.ToString() == currentlySelectedValue.ToString();
-                    string radioLabelText = GetRadioLabelText(enumType, enumValue);
+                    var isEnumValueCurrentlySelected = enumValue.ToString() == currentlySelectedValue.ToString();
+                    var radioLabelText = GetRadioLabelText(enumType, enumValue);
 
                     return new RadioItemViewModel
                     {
@@ -62,35 +62,30 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
                 Hint = hintOptions
             };
             if (model.HasErrorFor(property))
-            {
                 radiosViewModel.ErrorMessage = new ErrorMessageViewModel
                 {
                     Text = model.GetErrorFor(property)
                 };
-            }
 
-            return htmlHelper.Partial("/GovUkDesignSystemComponents/Radios.cshtml", radiosViewModel);
+            return htmlHelper.Partial("/Components/Radios.cshtml", radiosViewModel);
         }
 
         private static void ThrowIfPropertyTypeIsNotNullableEnum(PropertyInfo property)
         {
             if (!TypeHelpers.IsNullableEnum(property.PropertyType))
-            {
                 throw new ArgumentException(
                     "GovUkRadiosFor can only be used on Nullable Enum properties, " +
                     $"but was actually used on property [{property.Name}] of type [{property.PropertyType.FullName}] "
                 );
-            }
         }
 
         private static string GetRadioLabelText(Type enumType, object enumValue)
         {
-            string textFromAttribute = GovUkRadioCheckboxLabelTextAttribute.GetValueForEnum(enumType, enumValue);
+            var textFromAttribute = GovUkRadioCheckboxLabelTextAttribute.GetValueForEnum(enumType, enumValue);
 
-            string radioLabel = textFromAttribute ?? enumValue.ToString();
+            var radioLabel = textFromAttribute ?? enumValue.ToString();
 
             return radioLabel;
         }
-
     }
 }

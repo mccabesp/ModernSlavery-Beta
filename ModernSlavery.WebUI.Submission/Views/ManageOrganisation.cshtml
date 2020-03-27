@@ -1,20 +1,10 @@
 ﻿@inject SubmissionOptions SubmissionOptions
 @inject SharedOptions sharedOptions
-@using ModernSlavery.BusinessDomain.Shared.Models
-@using ModernSlavery.Core.Entities
-@using ModernSlavery.Core.Extensions
-@using ModernSlavery.Core.SharedKernel.Options
-@using ModernSlavery.WebUI.Shared.Classes
-@using ModernSlavery.WebUI.Shared.Interfaces
-@using ModernSlavery.WebUI.Shared.Options
-@using ModernSlavery.WebUI.Submission.Classes
-@using ModernSlavery.WebUI.Submission.Controllers
-@using ModernSlavery.WebUI.Submission.Models
 @inject IWebService WebService
-@model ModernSlavery.WebUI.Submission.Models.ManageOrganisationModel
+@model ManageOrganisationModel
 @{
     var controller = ViewData["Controller"] as SubmissionController;
-    Organisation currentOrg = Model.Organisation;
+    var currentOrg = Model.Organisation;
     ViewBag.Title = "Manage " + currentOrg.OrganisationName + " organisation - Modern Slavery reporting service";
 }
 
@@ -34,7 +24,7 @@
                     </dt>
                 </div>
                 <div>
-                    <dt style="font-weight: lighter; font-size: 0.8em; color: gray;">
+                    <dt style="color: gray; font-size: 0.8em; font-weight: lighter;">
                         @Html.Raw(currentOrg.LatestAddress.GetAddressString("&#44;<br/>"))
                     </dt>
                 </div>
@@ -81,7 +71,7 @@
 
             @for (int i = Model.ReportInfoModels.Count - 1, editScopeCount = SubmissionOptions.EditableScopeCount; i >= 0; i--, editScopeCount--)
             {
-                ReportInfoModel report = Model.ReportInfoModels[i];
+                var report = Model.ReportInfoModels[i];
                 if (report == null)
                 {
                     continue;
@@ -130,10 +120,10 @@
         <div class="grid-row">
             <div class="column-two-thirds">
                 <table class="organisations-table">
-                    @foreach (UserOrganisation assocUserOrg in Model.AssociatedUserOrgs)
+                    @foreach (var assocUserOrg in Model.AssociatedUserOrgs)
                     {
-                        string userFullname = assocUserOrg.User.Fullname;
-                        string encUserId = Encryption.EncryptQuerystring(assocUserOrg.UserId.ToString());
+                        var userFullname = assocUserOrg.User.Fullname;
+                        var encUserId = Encryption.EncryptQuerystring(assocUserOrg.UserId.ToString());
                         <tr>
                             <td style="border: none;" class="org-name">@userFullname</td>
                             <td style="border: none;">

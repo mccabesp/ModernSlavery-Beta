@@ -1,17 +1,16 @@
 ﻿@inject SharedOptions sharedOptions
 @{
     ViewBag.Title = "Confirm your organisation - Modern Slavery reporting service";
-    string emailAdd = sharedOptions.GpgReportingEmail;
-    string emailSubject = System.Net.WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));
+    var emailAdd = sharedOptions.GpgReportingEmail;
+    var emailSubject = WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));
 
     // c# 6 doesnt compile with razor in mvc5 so cant use string templates here :( need to update to MVC 6
-    string mailto = string.Join("", "mailto:", emailAdd, "?subject=", emailSubject);
+    var mailto = string.Join("", "mailto:", emailAdd, "?subject=", emailSubject);
 }
-@using ModernSlavery.Core.SharedKernel.Options
-@model ModernSlavery.WebUI.Submission.Models.ScopingViewModel
+@model ScopingViewModel
 <div class="grid-row">
     <div class="column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off" }))
+        @using (Html.BeginForm(null, null, FormMethod.Post, new {@class = "form", autocomplete = "off"}))
         {
             @Html.AntiForgeryToken()
 
@@ -24,7 +23,7 @@
             @await Html.PartialAsync("Parts/SnapshotDatePart", Model)
             @await Html.PartialAsync("Parts/EmployerDetailsPart", Model)
 
-            <br />
+            <br/>
             <p class="notice">
                 <i class="icon icon-important">
                     <span class="visually-hidden">Warning</span>

@@ -1,5 +1,4 @@
-﻿@using ModernSlavery.Core.Extensions
-@model ModernSlavery.WebUI.Admin.Models.DownloadViewModel
+﻿@model DownloadViewModel
 @{
     ViewBag.Title = "Administration: History";
 }
@@ -7,7 +6,7 @@
 <main id="content" role="main">
     <div class="breadcrumbs dynamic-content default-content" style="display: block;">
         <ol>
-            <li style="display: block; padding-top: 0.75em; padding-bottom: 0;">
+            <li style="display: block; padding-bottom: 0; padding-top: 0.75em;">
                 &lt;
                 @Html.ActionLink("Back to Administration home", "Home")
             </li>
@@ -16,7 +15,7 @@
 
     <div class="grid-row">
         <div class="column-full">
-            <div style="float:right;font-size:smaller;">
+            <div style="float: right; font-size: smaller;">
                 <span>
                     <a href="@Url.Action("History", "Admin", new {v = Guid.NewGuid().ToShortString()})" title="Show more recent content">@VirtualDateTime.Now.ToString("d MMM HH:mm")</a>
                 </span>
@@ -37,7 +36,7 @@
                 <tbody>
                 @{
                     var type = "Registration History";
-                    IEnumerable<DownloadViewModel.Download> downloads = Model.Downloads.Where(d => d.Type.EqualsI(type));
+                    var downloads = Model.Downloads.Where(d => d.Type.EqualsI(type));
                 }
                 <tr>
                     <td colspan="2">
@@ -52,7 +51,7 @@
                 }
                 else
                 {
-                    foreach (DownloadViewModel.Download download in downloads)
+                    foreach (var download in downloads)
                     {
                         <tr>
                             <td>
@@ -83,7 +82,7 @@
                 }
                 else
                 {
-                    foreach (DownloadViewModel.Download download in downloads)
+                    foreach (var download in downloads)
                     {
                         <tr>
                             <td>

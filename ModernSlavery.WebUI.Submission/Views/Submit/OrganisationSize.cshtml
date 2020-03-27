@@ -1,9 +1,5 @@
-﻿@using ModernSlavery.WebUI.Shared.Controllers
-@using System.ComponentModel.DataAnnotations
-@using ModernSlavery.Core.Entities
-@using ModernSlavery.Core.Extensions
+﻿@using System.ComponentModel.DataAnnotations
 @using ModernSlavery.Core.SharedKernel
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
 @model ModernSlavery.BusinessDomain.Shared.Models.ReturnViewModel
 
 <div class="grid-row">
@@ -70,7 +66,7 @@
                             <h1 class="heading-medium">
                                 How many employees are there in your organisation?
                             </h1>
-                            @Html.ValidationMessageFor(model => model.OrganisationSize, "", new { id = "OrganisationSizeError", @class = "error-message" })
+                            @Html.ValidationMessageFor(model => model.OrganisationSize, "", new {id = "OrganisationSizeError", @class = "error-message"})
                         </legend>
                         @foreach (OrganisationSizes orgSize in Enum.GetValues(typeof(OrganisationSizes)))
                         {
@@ -78,9 +74,9 @@
                             {
                                 continue;
                             }
-                            string id = Enum.GetName(typeof(OrganisationSizes), orgSize);
+                            var id = Enum.GetName(typeof(OrganisationSizes), orgSize);
                             var display = orgSize.GetAttribute<DisplayAttribute>();
-                            string voluntarily = orgSize == OrganisationSizes.Employees0To249 ? "and I wish to report voluntarily" : "";
+                            var voluntarily = orgSize == OrganisationSizes.Employees0To249 ? "and I wish to report voluntarily" : "";
                             <div class="multiple-choice">
                                 <input id="@id" type="radio" name="OrganisationSize" value="@((int) orgSize)" @(Model.OrganisationSize == orgSize ? "checked" : "")>
                                 <label for="@id">@display.Name @voluntarily</label>
@@ -90,9 +86,9 @@
                 </div>
             </div>
             <p>
-                <input id="ContinueStep" class="button" type="submit" role="button" value="Continue" />
-                <br />
-                <input id="CancelStep" class="link-button" type="submit" role="button" formaction="cancel-organisation-size" value="Cancel" style="margin-top: 15px" />
+                <input id="ContinueStep" class="button" type="submit" role="button" value="Continue"/>
+                <br/>
+                <input id="CancelStep" class="link-button" type="submit" role="button" formaction="cancel-organisation-size" value="Cancel" style="margin-top: 15px"/>
             </p>
         }
     </div>

@@ -1,0 +1,9 @@
+﻿@model ModernSlavery.WebUI.GDSDesignSystem.Partials.IHtmlText
+@if (Model.Html != null)
+{
+    @(Model.Html(new object()))
+}
+else
+{
+    @(Model.Text ?? "")
+}

@@ -2,8 +2,6 @@
 {
     public class PinFailedToSendViewModel
     {
-
         public string OrganisationName { get; set; }
-
     }
 }

@@ -2,7 +2,6 @@ namespace ModernSlavery.WebUI.Viewing.Models
 {
     public class ReportingStepsViewModel
     {
-
         /// <summary>
         ///     The current step of the step-by-step navigation.
         /// </summary>
@@ -12,6 +11,5 @@ namespace ModernSlavery.WebUI.Viewing.Models
         ///     The current task of the step-by-step navigation.
         /// </summary>
         public int? CurrentTask { get; set; } = null;
-
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -8,18 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
-using ModernSlavery.WebUI.Shared.Models.HttpResultModels;
 using ModernSlavery.WebUI.Viewing.Models;
-using ModernSlavery.WebUI.Viewing.Models.Compare;
 using ModernSlavery.WebUI.Viewing.Presenters;
 
 namespace ModernSlavery.WebUI.Viewing.Controllers
@@ -27,13 +21,13 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
     [Route("viewing")]
     public class CompareController : BaseController
     {
-
         public CompareController(
             ISearchPresenter searchViewService,
             IComparePresenter compareViewService,
             ICompareBusinessLogic compareBusinessLogic,
             IOrganisationBusinessLogic organisationBusinessLogic,
-            ILogger<CompareController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
+            ILogger<CompareController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(
+            logger, webService, sharedBusinessLogic)
         {
             CompareBusinessLogic = compareBusinessLogic;
             OrganisationBusinessLogic = organisationBusinessLogic;
@@ -46,17 +40,12 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         {
             //Check the parameters are populated
             if (string.IsNullOrWhiteSpace(employerIdentifier))
-            {
                 return new HttpBadRequestResult($"Missing {nameof(employerIdentifier)}");
-            }
 
-            if (string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
-            }
+            if (string.IsNullOrWhiteSpace(returnUrl)) return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
 
             //Get the employer from the encrypted identifier
-            EmployerSearchModel employer = GetEmployer(employerIdentifier);
+            var employer = GetEmployer(employerIdentifier);
 
             //Add the employer to the compare list
             CompareViewService.AddToBasket(employer.OrganisationIdEncrypted);
@@ -74,17 +63,12 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         {
             //Check the parameters are populated
             if (string.IsNullOrWhiteSpace(employerIdentifier))
-            {
                 return new HttpBadRequestResult($"Missing {nameof(employerIdentifier)}");
-            }
 
-            if (string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
-            }
+            if (string.IsNullOrWhiteSpace(returnUrl)) return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
 
             //Get the employer from the encrypted identifier
-            EmployerSearchModel employer = GetEmployer(employerIdentifier);
+            var employer = GetEmployer(employerIdentifier);
 
             //Add the employer to the compare list
             CompareViewService.AddToBasket(employer.OrganisationIdEncrypted);
@@ -93,9 +77,10 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             CompareViewService.SaveComparedEmployersToCookie(Request);
 
             //Setup compare basket
-            bool fromSearchResults = returnUrl.Contains("/search-results");
-            bool fromEmployer = returnUrl.StartsWithI("/employer");
-            ViewBag.BasketViewModel = new CompareBasketViewModel {
+            var fromSearchResults = returnUrl.Contains("/search-results");
+            var fromEmployer = returnUrl.StartsWithI("/employer");
+            ViewBag.BasketViewModel = new CompareBasketViewModel
+            {
                 CanAddEmployers = false,
                 CanClearCompare = true,
                 CanViewCompare = fromSearchResults && CompareViewService.BasketItemCount > 1
@@ -104,7 +89,8 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
             ViewBag.ReturnUrl = returnUrl;
 
-            var model = new AddRemoveButtonViewModel {
+            var model = new AddRemoveButtonViewModel
+            {
                 OrganisationIdEncrypted = employer.OrganisationIdEncrypted, OrganisationName = employer.Name
             };
 
@@ -116,17 +102,12 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         {
             //Check the parameters are populated
             if (string.IsNullOrWhiteSpace(employerIdentifier))
-            {
                 return new HttpBadRequestResult($"Missing {nameof(employerIdentifier)}");
-            }
 
-            if (string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
-            }
+            if (string.IsNullOrWhiteSpace(returnUrl)) return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
 
             //Get the employer from the encrypted identifier
-            EmployerSearchModel employer = GetEmployer(employerIdentifier);
+            var employer = GetEmployer(employerIdentifier);
 
             //Remove the employer from the list
             CompareViewService.RemoveFromBasket(employer.OrganisationIdEncrypted);
@@ -143,17 +124,12 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         {
             //Check the parameters are populated
             if (string.IsNullOrWhiteSpace(employerIdentifier))
-            {
                 return new HttpBadRequestResult($"Missing {nameof(employerIdentifier)}");
-            }
 
-            if (string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
-            }
+            if (string.IsNullOrWhiteSpace(returnUrl)) return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
 
             //Get the employer from the encrypted identifier
-            EmployerSearchModel employer = GetEmployer(employerIdentifier);
+            var employer = GetEmployer(employerIdentifier);
 
             //Remove the employer from the list
             CompareViewService.RemoveFromBasket(employer.OrganisationIdEncrypted);
@@ -162,9 +138,10 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             CompareViewService.SaveComparedEmployersToCookie(Request);
 
             //Setup compare basket
-            bool fromSearchResults = returnUrl.Contains("/search-results");
-            bool fromEmployer = returnUrl.StartsWithI("/employer");
-            ViewBag.BasketViewModel = new CompareBasketViewModel {
+            var fromSearchResults = returnUrl.Contains("/search-results");
+            var fromEmployer = returnUrl.StartsWithI("/employer");
+            ViewBag.BasketViewModel = new CompareBasketViewModel
+            {
                 CanAddEmployers = false,
                 CanClearCompare = true,
                 CanViewCompare = fromSearchResults && CompareViewService.BasketItemCount > 1
@@ -173,7 +150,8 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
             ViewBag.ReturnUrl = returnUrl;
 
-            var model = new AddRemoveButtonViewModel {
+            var model = new AddRemoveButtonViewModel
+            {
                 OrganisationIdEncrypted = employer.OrganisationIdEncrypted, OrganisationName = employer.Name
             };
 
@@ -184,10 +162,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         public IActionResult ClearEmployers(string returnUrl)
         {
             //Check the parameters are populated
-            if (string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
-            }
+            if (string.IsNullOrWhiteSpace(returnUrl)) return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
 
             CompareViewService.ClearBasket();
 
@@ -201,20 +176,14 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         public async Task<IActionResult> SortEmployers(string column, string returnUrl)
         {
             //Check the parameters are populated
-            if (string.IsNullOrWhiteSpace(column))
-            {
-                return new HttpBadRequestResult($"Missing {nameof(column)}");
-            }
+            if (string.IsNullOrWhiteSpace(column)) return new HttpBadRequestResult($"Missing {nameof(column)}");
 
             //Check the parameters are populated
-            if (string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
-            }
+            if (string.IsNullOrWhiteSpace(returnUrl)) return new HttpBadRequestResult($"Missing {nameof(returnUrl)}");
 
 
             //Calculate the sort direction
-            bool sort = CompareViewService.SortColumn != column || !CompareViewService.SortAscending;
+            var sort = CompareViewService.SortColumn != column || !CompareViewService.SortAscending;
 
             //Track the download 
             if (CompareViewService.SortColumn != column || CompareViewService.SortAscending != sort)
@@ -246,7 +215,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             //Load employers from querystring (via shared email)
             if (!string.IsNullOrWhiteSpace(employers))
             {
-                string[] comparedEmployers = employers.SplitI("-");
+                var comparedEmployers = employers.SplitI("-");
                 if (comparedEmployers.Any())
                 {
                     CompareViewService.ClearBasket();
@@ -270,47 +239,50 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             ReportBackUrl = null;
 
             //Get the compare basket organisations
-            IEnumerable<CompareReportModel> compareReports = await CompareBusinessLogic.GetCompareDataAsync(
+            var compareReports = await CompareBusinessLogic.GetCompareDataAsync(
                 CompareViewService.ComparedEmployers.Value.AsEnumerable(),
                 year,
                 CompareViewService.SortColumn,
                 CompareViewService.SortAscending);
 
             //Track the compared employers
-            string lastComparedEmployerList = CompareViewService.ComparedEmployers.Value.ToList().ToSortedSet().ToDelimitedString();
+            var lastComparedEmployerList =
+                CompareViewService.ComparedEmployers.Value.ToList().ToSortedSet().ToDelimitedString();
             if (CompareViewService.LastComparedEmployerList != lastComparedEmployerList && IsAction("CompareEmployers"))
             {
-                SortedSet<string> employerIds = compareReports.Select(r => r.EncOrganisationId).ToSortedSet();
+                var employerIds = compareReports.Select(r => r.EncOrganisationId).ToSortedSet();
                 await TrackPageViewAsync(
                     $"compare-employers: {employerIds.ToDelimitedString()}",
                     $"{ViewBag.ReturnUrl}?{employerIds.ToEncapsulatedString("e=", null, "&", "&", false)}");
-                foreach (CompareReportModel employer in compareReports)
-                {
+                foreach (var employer in compareReports)
                     await TrackPageViewAsync(
                         $"{employer.EncOrganisationId}: {employer.OrganisationName}",
                         $"{ViewBag.ReturnUrl}?{employer.EncOrganisationId}={employer.OrganisationName}");
-                }
 
                 CompareViewService.LastComparedEmployerList = lastComparedEmployerList;
             }
 
             //Generate the shared links
-            string shareEmailUrl = Url.Action(
+            var shareEmailUrl = Url.Action(
                 nameof(CompareEmployers),
                 "Compare",
                 new {year, employers = CompareViewService.ComparedEmployers.Value.ToList().ToDelimitedString("-")},
                 Request.Scheme);
 
-            ViewBag.BasketViewModel = new CompareBasketViewModel {CanAddEmployers = true, CanViewCompare = false, CanClearCompare = true};
+            ViewBag.BasketViewModel = new CompareBasketViewModel
+                {CanAddEmployers = true, CanViewCompare = false, CanClearCompare = true};
 
             return View(
                 "CompareEmployers",
-                new CompareViewModel {
+                new CompareViewModel
+                {
                     LastSearchUrl = SearchViewService.GetLastSearchUrl(),
                     CompareReports = compareReports,
                     CompareBasketCount = CompareViewService.BasketItemCount,
                     ShareEmailUrl =
-                        CompareViewService.BasketItemCount <= CompareViewService.MaxCompareBasketShareCount ? shareEmailUrl : null,
+                        CompareViewService.BasketItemCount <= CompareViewService.MaxCompareBasketShareCount
+                            ? shareEmailUrl
+                            : null,
                     Year = year,
                     SortAscending = CompareViewService.SortAscending,
                     SortColumn = CompareViewService.SortColumn
@@ -322,12 +294,9 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpPost("~/compare-employers/{year:int=0}")]
         public IActionResult CompareEmployers(string command, int year = 0)
         {
-            if (year == 0)
-            {
-                year = SharedBusinessLogic.SharedOptions.FirstReportingYear;
-            }
+            if (year == 0) year = SharedBusinessLogic.SharedOptions.FirstReportingYear;
 
-            string args = command.AfterFirst(":");
+            var args = command.AfterFirst(":");
             command = command.BeforeFirst(":");
 
             //Clear the default back url of the employer hub pages
@@ -338,10 +307,12 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             {
                 case "employer":
                     EmployerBackUrl = RequestUrl.PathAndQuery;
-                    return RedirectToAction(nameof(ViewingController.Employer), "Viewing", new {employerIdentifier = args});
+                    return RedirectToAction(nameof(ViewingController.Employer), "Viewing",
+                        new {employerIdentifier = args});
                 case "report":
                     ReportBackUrl = RequestUrl.PathAndQuery;
-                    return RedirectToAction(nameof(ViewingController.Report), "Viewing", new {employerIdentifier = args, year});
+                    return RedirectToAction(nameof(ViewingController.Report), "Viewing",
+                        new {employerIdentifier = args, year});
             }
 
             return new HttpBadRequestResult($"Invalid command '{command}'");
@@ -350,25 +321,21 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("download-compare-data")]
         public async Task<IActionResult> DownloadCompareData(int year = 0)
         {
-            if (year == 0)
-            {
-                year = SharedBusinessLogic.SharedOptions.FirstReportingYear;
-            }
+            if (year == 0) year = SharedBusinessLogic.SharedOptions.FirstReportingYear;
 
             var result = await CompareEmployers(year) as ViewResult;
             var viewModel = result.Model as CompareViewModel;
-            IEnumerable<CompareReportModel> data = viewModel?.CompareReports;
+            var data = viewModel?.CompareReports;
 
             //Ensure we some data
             if (data == null || !data.Any())
-            {
                 return new HttpNotFoundResult($"There is no employer data for year {year}");
-            }
 
-            DataTable model = CompareBusinessLogic.GetCompareDatatable(data);
+            var model = CompareBusinessLogic.GetCompareDatatable(data);
 
             //Setup the HTTP response
-            var contentDisposition = new ContentDisposition {
+            var contentDisposition = new ContentDisposition
+            {
                 FileName = $"Compared GPG Data {year}-{(year + 1).ToTwoDigitYear()}.csv", Inline = false
             };
             HttpContext.SetResponseHeader("Content-Disposition", contentDisposition.ToString());
@@ -386,34 +353,26 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("help/{view}")]
         public IActionResult CompareHelp(string view)
         {
-            if (string.IsNullOrWhiteSpace(view))
-            {
-                return new HttpBadRequestResult("Missing view name");
-            }
+            if (string.IsNullOrWhiteSpace(view)) return new HttpBadRequestResult("Missing view name");
 
-            return View($"Help/{view}"); 
+            return View($"Help/{view}");
         }
 
         #region Helpers
 
         private EmployerSearchModel GetEmployer(string employerIdentifier, bool activeOnly = true)
         {
-            EmployerSearchModel employer = SearchViewService.LastSearchResults?.GetEmployer(employerIdentifier);
+            var employer = SearchViewService.LastSearchResults?.GetEmployer(employerIdentifier);
             if (employer == null)
             {
                 //Get the employer from the database
-                CustomResult<Organisation> organisationResult = activeOnly
+                var organisationResult = activeOnly
                     ? OrganisationBusinessLogic.LoadInfoFromActiveEmployerIdentifier(employerIdentifier)
                     : OrganisationBusinessLogic.LoadInfoFromEmployerIdentifier(employerIdentifier);
-                if (organisationResult.Failed)
-                {
-                    throw organisationResult.ErrorMessage.ToHttpException();
-                }
+                if (organisationResult.Failed) throw organisationResult.ErrorMessage.ToHttpException();
 
                 if (organisationResult.Result.OrganisationId == 0)
-                {
                     throw new HttpException(HttpStatusCode.NotFound, "Employer not found");
-                }
 
                 employer = EmployerSearchModel.Create(organisationResult.Result);
             }
@@ -433,7 +392,5 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         public IComparePresenter CompareViewService { get; }
 
         #endregion
-
     }
-
 }

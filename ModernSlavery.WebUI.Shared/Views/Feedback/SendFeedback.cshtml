@@ -1,10 +1,7 @@
-@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@using ModernSlavery.WebUI.Shared.Models
-@model ModernSlavery.WebUI.Shared.Models.FeedbackViewModel
+@model FeedbackViewModel
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = "Send us feedback - Modern Slavery reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
@@ -29,7 +26,6 @@
                     nameof(FeedbackViewModel.WhyVisitGpgSite),
                     nameof(FeedbackViewModel.WhoAreYou)
                 }))
-
                 @(Html.GovUkRadiosFor(
                     m => m.HowEasyIsThisServiceToUse,
                     new FieldsetViewModel
@@ -50,7 +46,7 @@
                             {
                                 HowDidYouHearAboutGpg.Other,
                                 @<text>
-                                    @( Html.GovUkTextInputFor(m => m.OtherSourceText))
+                                    @(Html.GovUkTextInputFor(m => m.OtherSourceText))
                                  </text>
                             }
                         };
@@ -81,7 +77,7 @@
                             {
                                 WhyVisitGpgSite.Other,
                                 @<text>
-                                    @( Html.GovUkTextInputFor(m => m.OtherReasonText))
+                                    @(Html.GovUkTextInputFor(m => m.OtherReasonText))
                                  </text>
                             }
                         };
@@ -112,7 +108,7 @@
                             {
                                 WhoAreYou.Other,
                                 @<text>
-                                    @( Html.GovUkTextInputFor(m => m.OtherPersonText))
+                                    @(Html.GovUkTextInputFor(m => m.OtherPersonText))
                                  </text>
                             }
                         };
@@ -135,7 +131,6 @@
                     },
                     whoAreYouConditionalOptions
                     ))
-
                 @(Html.GovUkCharacterCountFor(
                     m => m.Details,
                     labelOptions: new LabelViewModel
@@ -166,7 +161,6 @@
                         Name = nameof(Model.EmailAddress),
                         InputMode = "email"
                     }))
-
                     @(Html.GovUkTextInput(new TextInputViewModel
                     {
                         Label = new LabelViewModel

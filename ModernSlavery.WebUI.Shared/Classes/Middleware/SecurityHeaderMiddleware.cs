@@ -8,8 +8,9 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
 {
     public class SecurityHeaderMiddleware
     {
-
         private readonly RequestDelegate _next;
+
+        private readonly SecurityHeaderOptions _securityHeaders;
 
         public SecurityHeaderMiddleware(RequestDelegate next, SecurityHeaderOptions securityHeaders)
         {
@@ -17,22 +18,19 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             _securityHeaders = securityHeaders ?? throw new ArgumentNullException(nameof(securityHeaders));
         }
 
-        private readonly SecurityHeaderOptions _securityHeaders;
-
-        public async Task Invoke(Microsoft.AspNetCore.Http.HttpContext httpContext)
+        public async Task Invoke(HttpContext httpContext)
         {
             httpContext.Response.OnStarting(
-                () => {
-                    foreach (string key in _securityHeaders.Keys)
+                () =>
+                {
+                    foreach (var key in _securityHeaders.Keys)
                     {
-                        string value = _securityHeaders[key];
+                        var value = _securityHeaders[key];
 
                         //Lookup the same value from another header
-                        string varName = value.GetVariableName();
+                        var varName = value.GetVariableName();
                         if (!string.IsNullOrWhiteSpace(varName) && _securityHeaders.ContainsKey(varName))
-                        {
                             value = _securityHeaders[varName];
-                        }
 
                         httpContext.SetResponseHeader(key, value);
                     }

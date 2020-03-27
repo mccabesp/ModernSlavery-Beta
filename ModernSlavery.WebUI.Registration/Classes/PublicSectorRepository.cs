@@ -14,28 +14,31 @@ namespace ModernSlavery.WebUI.Registration.Classes
 {
     public class PublicSectorRepository : IPagedRepository<EmployerRecord>
     {
-
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
         private readonly IDataRepository _DataRepository;
         private readonly SharedOptions _sharedOptions;
-        public PublicSectorRepository(IDataRepository dataRepository, ICompaniesHouseAPI companiesHouseAPI, SharedOptions sharedOptions)
+
+        public PublicSectorRepository(IDataRepository dataRepository, ICompaniesHouseAPI companiesHouseAPI,
+            SharedOptions sharedOptions)
         {
             _DataRepository = dataRepository;
             _CompaniesHouseAPI = companiesHouseAPI;
             _sharedOptions = sharedOptions;
         }
 
-        public async Task<PagedResult<EmployerRecord>> SearchAsync(string searchText, int page, int pageSize, bool test = false)
+        public async Task<PagedResult<EmployerRecord>> SearchAsync(string searchText, int page, int pageSize,
+            bool test = false)
         {
             var result = new PagedResult<EmployerRecord>();
             if (test)
             {
                 var employers = new List<EmployerRecord>();
 
-                int min = await _DataRepository.CountAsync<Organisation>();
+                var min = await _DataRepository.CountAsync<Organisation>();
 
-                int id = Numeric.Rand(min, int.MaxValue - 1);
-                var employer = new EmployerRecord {
+                var id = Numeric.Rand(min, int.MaxValue - 1);
+                var employer = new EmployerRecord
+                {
                     OrganisationName = _sharedOptions.TestPrefix + "_GovDept_" + id,
                     CompanyNumber = ("_" + id).Left(10),
                     Address1 = "Test Address 1",
@@ -56,8 +59,10 @@ namespace ModernSlavery.WebUI.Registration.Classes
                 result.Results = employers;
                 return result;
             }
-            List<Organisation> searchResults = await _DataRepository.ToListAsync<Organisation>(o => o.SectorType == SectorTypes.Public && o.Status == OrganisationStatuses.Active);
-            List<Organisation> searchResultsList = searchResults.Where(o => o.OrganisationName.ContainsI(searchText))
+
+            var searchResults = await _DataRepository.ToListAsync<Organisation>(o =>
+                o.SectorType == SectorTypes.Public && o.Status == OrganisationStatuses.Active);
+            var searchResultsList = searchResults.Where(o => o.OrganisationName.ContainsI(searchText))
                 .OrderBy(o => o.OrganisationName)
                 .ThenBy(o => o.OrganisationName)
                 .ToList();
@@ -73,14 +78,9 @@ namespace ModernSlavery.WebUI.Registration.Classes
         {
             string sics = null;
             if (!string.IsNullOrWhiteSpace(companyNumber))
-            {
                 sics = await _CompaniesHouseAPI.GetSicCodesAsync(companyNumber);
-            }
 
-            if (!string.IsNullOrWhiteSpace(sics))
-            {
-                sics = "," + sics;
-            }
+            if (!string.IsNullOrWhiteSpace(sics)) sics = "," + sics;
 
             sics = "1" + sics;
             return sics;
@@ -98,10 +98,10 @@ namespace ModernSlavery.WebUI.Registration.Classes
             throw new NotImplementedException();
         }
 
-        public void ClearSearch() { }
-
+        public void ClearSearch()
+        {
+        }
     }
 
     #endregion
-
 }

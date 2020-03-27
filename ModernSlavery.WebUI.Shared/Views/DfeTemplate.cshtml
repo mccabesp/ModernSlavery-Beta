@@ -1,6 +1,4 @@
-﻿@using ModernSlavery.Core.SharedKernel.Options
-@using ModernSlavery.WebUI.Shared.Classes.Cookies
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
+﻿@using ModernSlavery.WebUI.Shared.Classes.Cookies
 @inject SharedOptions sharedOptions;
 @{
     Layout = "GovUkTemplate.cshtml";
@@ -10,14 +8,14 @@
     @await Html.PartialAsync("_Tracking")
 
     @RenderSection("Head", false)
-    
+
     @if (sharedOptions.IsLocal())
     {
         @Html.UnpackBundle("/assets/stylesheets/application.min.css", "all")
     }
     else
     {
-        <link rel="stylesheet" type="text/css" media="all" href="~/assets/stylesheets/application.min.css" asp-append-version="true" />
+        <link rel="stylesheet" type="text/css" media="all" href="~/assets/stylesheets/application.min.css" asp-append-version="true"/>
     }
 }
 
@@ -42,7 +40,7 @@
     @RenderSection("scripts", false)
 
     @{
-        CookieSettings cookieSettings = CookieHelper.GetCookieSettingsCookie(Context.Request);
+        var cookieSettings = CookieHelper.GetCookieSettingsCookie(Context.Request);
     }
     @if (cookieSettings.GoogleAnalyticsGpg || cookieSettings.GoogleAnalyticsGovUk)
     {

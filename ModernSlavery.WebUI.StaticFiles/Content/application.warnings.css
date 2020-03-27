@@ -1,61 +1,61 @@
 ﻿/*https://design-system.service.gov.uk/components/warning-text/ */
 
 .govuk-warning-text {
-    font-family: "nta",Arial,sans-serif;
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    color: #0b0c0c;
+    font-family: "nta", Arial, sans-serif;
     font-size: 16px;
     font-size: 1rem;
+    font-weight: 400;
     line-height: 1.25;
-    color: #0b0c0c;
-    position: relative;
     margin-bottom: 20px;
-    padding: 10px 0
+    padding: 10px 0;
+    position: relative;
 }
 
 .govuk-warning-text__icon {
-    font-family: "nta",Arial,sans-serif;
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-weight: 700;
-    display: inline-block;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    min-width: 32px;
-    min-height: 29px;
-    margin-top: -20px;
-    padding-top: 3px;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -webkit-user-select: none;
+    background: #0b0c0c;
     border: 3px solid #0b0c0c;
     border-radius: 50%;
     color: #fff;
-    background: #0b0c0c;
+    display: inline-block;
+    font-family: "nta", Arial, sans-serif;
     font-size: 3.6em;
+    font-weight: 700;
+    left: 0;
     line-height: 29px;
+    margin-top: -20px;
+    min-height: 29px;
+    min-width: 32px;
+    padding-top: 3px;
+    position: absolute;
     text-align: center;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+    top: 50%;
     user-select: none
 }
 
 .govuk-warning-text__text {
     display: block;
-    padding-left: 50px;
     font-size: large;
+    padding-left: 50px;
 }
 
 .govuk-warning-text__assistive {
-    position: absolute !important;
-    width: 1px !important;
+    -webkit-clip-path: inset(50%) !important;
+    border: 0 !important;
+    clip: rect(0 0 0 0) !important;
+    clip-path: inset(50%) !important;
     height: 1px !important;
     margin: -1px !important;
-    padding: 0 !important;
     overflow: hidden !important;
-    clip: rect(0 0 0 0) !important;
-    -webkit-clip-path: inset(50%) !important;
-    clip-path: inset(50%) !important;
-    border: 0 !important;
-    white-space: nowrap !important
+    padding: 0 !important;
+    position: absolute !important;
+    white-space: nowrap !important;
+    width: 1px !important;
 }

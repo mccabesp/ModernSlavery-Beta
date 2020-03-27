@@ -11,7 +11,7 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.IdServer.Models.Consent;
+using ModernSlavery.IdServer.Models;
 
 namespace ModernSlavery.IdServer.Controllers
 {

@@ -10,20 +10,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 {
     public partial class AdminController : BaseController
     {
-
         /// <summary>
         ///     Refresh DATA in SCV files
         /// </summary>
         /// <param name="filePath"></param>
         private async Task UpdateFileAsync(string filePath, string action = null)
         {
-            string fileName = Path.GetFileName(filePath);
+            var fileName = Path.GetFileName(filePath);
 
             if (fileName == Filenames.UnfinishedOrganisations)
-            {
                 throw new NotImplementedException(
                     $"Cannot execute {nameof(UpdateFileAsync)} on {fileName} as the code has not yet been implemented");
-            }
 
             //Mark the file as updating
             await SetFileUpdatedAsync(filePath);
@@ -41,17 +38,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private async Task<bool> GetFileUpdatingAsync(string filePath)
         {
             filePath = filePath.ToLower();
-            DateTime updated = Session[$"FileUpdate:{filePath}"].ToDateTime();
-            if (updated == DateTime.MinValue)
-            {
-                return false;
-            }
+            var updated = Session[$"FileUpdate:{filePath}"].ToDateTime();
+            if (updated == DateTime.MinValue) return false;
 
-            DateTime changed = updated;
+            var changed = updated;
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
-            {
                 changed = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(filePath);
-            }
 
             return updated == changed;
         }
@@ -64,14 +56,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             filePath = filePath.ToLower();
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
-            {
-                Session[$"FileUpdate:{filePath}"] = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(filePath);
-            }
+                Session[$"FileUpdate:{filePath}"] =
+                    await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(filePath);
             else
-            {
                 Session[$"FileUpdate:{filePath}"] = VirtualDateTime.Now;
-            }
         }
-
     }
 }

@@ -1,6 +1,4 @@
-﻿@using ModernSlavery.Core.Extensions
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@model ModernSlavery.WebUI.Admin.Models.ManualChangesViewModel
+﻿@model ManualChangesViewModel
 @{
     ViewBag.Title = "Administration: Manual Changes";
     var options = new[]
@@ -37,7 +35,7 @@
 <main id="content" role="main">
     <div class="breadcrumbs dynamic-content default-content" style="display: block;">
         <ol>
-            <li style="display: block; padding-top: 0.75em; padding-bottom: 0;">
+            <li style="display: block; padding-bottom: 0; padding-top: 0.75em;">
                 &lt;
                 @Html.ActionLink("Back to administration home", "Home")
             </li>
@@ -59,11 +57,11 @@
                 </h1>
                 if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
                 {
-                    <p style="font-weight:bold;color:darkgreen">@Model.SuccessMessage</p>
+                    <p style="color: darkgreen; font-weight: bold;">@Model.SuccessMessage</p>
                 }
                 if (Model.Tested)
                 {
-                    <p style="font-weight:bold;color:#b10e1e">CHECK THE TEST RESULTS BELOW AND CLICK THE 'EXECUTE' BUTTON AGAIN TO IMPLEMENT THE ACTUAL CHANGES</p>
+                    <p style="color: #b10e1e; font-weight: bold;">CHECK THE TEST RESULTS BELOW AND CLICK THE 'EXECUTE' BUTTON AGAIN TO IMPLEMENT THE ACTUAL CHANGES</p>
                 }
                 <h3 class="heading-small">COMMAND</h3>
                 @Html.DropDownListFor(model => Model.Command, new SelectList(options), new {@class = "form-control"})
@@ -83,7 +81,7 @@
                 <p>@Html.TextAreaFor(model => Model.Comment, 3, 60, new {@class = "form-control", style = "width:100%"})</p>
 
                 <h3 class="heading-small">RESPONSE</h3>
-                <div style="overflow:auto;min-height:100px;max-height:400px;border: 2px solid #6f777b;">@Html.Raw(Model.Results.ReplaceI(Environment.NewLine, "</br>"))</div>
+                <div style="border: 2px solid #6f777b; max-height: 400px; min-height: 100px; overflow: auto;">@Html.Raw(Model.Results.ReplaceI(Environment.NewLine, "</br>"))</div>
 
                 <p>
                     <button type="submit" class="button" role="button" onclick="if (!confirm('Are you sure you want to execute this action?')) return false;">Execute</button>

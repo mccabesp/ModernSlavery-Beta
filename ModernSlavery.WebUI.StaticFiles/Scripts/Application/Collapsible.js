@@ -1,5 +1,5 @@
 ﻿//Collapsible
-(function ($) {
+(function($) {
     "use strict";
     window.GOVUK = window.GOVUK || {};
 
@@ -12,7 +12,7 @@
             throw new ReferenceError("collapsibleElement did not resolve using the id: " + options.elementId);
 
         if (options.useAccessibleButton == true)
-            // Replace div.container-head with a button
+        // Replace div.container-head with a button
             this.replaceHeadWithButton();
 
         // attached the aria controls
@@ -26,12 +26,11 @@
     }
 
     Collapsible.prototype = {
-
-        getCollapsibleElement: function () {
+        getCollapsibleElement: function() {
             return document.getElementById(this.collapseId);
         },
 
-        replaceHeadWithButton: function () {
+        replaceHeadWithButton: function() {
             /* Replace the div at the head with a button element. This is based on feedback from Leonie Watson.
              * The button has all of the accessibility hooks that are used by screen readers and etc.
              * We do this in the JavaScript because if the JavaScript is not active then the button shouldn't
@@ -46,11 +45,12 @@
                 button = document.createElement("button");
 
                 // clone the attributes
-                Array.prototype.forEach.call(collapsibleElement.attributes, function (attr) {
-                    var namedItem = document.createAttribute(attr.name);
-                    namedItem.value = attr.value;
-                    button.attributes.setNamedItem(namedItem)
-                });
+                Array.prototype.forEach.call(collapsibleElement.attributes,
+                    function(attr) {
+                        var namedItem = document.createAttribute(attr.name);
+                        namedItem.value = attr.value;
+                        button.attributes.setNamedItem(namedItem);
+                    });
 
                 button.id = this.collapseId;
                 button.className = collapsibleElement.className;
@@ -59,18 +59,18 @@
             }
         },
 
-        bindAriaControls: function () {
+        bindAriaControls: function() {
             var controlsId = this.getCollapsibleElement().getAttribute("aria-controls");
             if (!controlsId || controlsId == "")
                 return;
             this.ariaControlsElement = document.getElementById(controlsId);
         },
 
-        hasAriaControls: function () {
+        hasAriaControls: function() {
             return this.ariaControlsElement != undefined && this.ariaControlsElement != null;
         },
 
-        bindEvents: function () {
+        bindEvents: function() {
             // bind click event listener
             this.getCollapsibleElement().addEventListener("click", this.expanderClickHandler.bind(this));
             $("input[type=radio]", this.getCollapsibleElement()).click(this.expanderClickHandler.bind(this));
@@ -78,11 +78,11 @@
             this.listenForKeys();
         },
 
-        isClosed: function () {
+        isClosed: function() {
             return $(this.getCollapsibleElement()).hasClass("selected") != true;
         },
 
-        expanderClickHandler: function (e) {
+        expanderClickHandler: function(e) {
             e.preventDefault();
             if (this.isClosed()) {
                 this.open();
@@ -91,16 +91,16 @@
             }
         },
 
-        open: function () {
+        open: function() {
             if (this.isClosed())
                 this.setExpanded("true");
         },
 
-        close: function () {
+        close: function() {
             this.setExpanded("false");
         },
 
-        setExpanded: function (flag) {
+        setExpanded: function(flag) {
             if (this.hasAriaControls() == true) {
                 var $ariaControlsElement = $(this.ariaControlsElement);
                 if (flag == "true" || flag === true) {
@@ -108,8 +108,7 @@
                     $ariaControlsElement.removeClass("js-collapsed");
                     $ariaControlsElement.attr("aria-hidden", "false");
                     $ariaControlsElement.attr("aria-expanded", "true");
-                }
-                else {
+                } else {
                     $ariaControlsElement.removeClass("js-expanded");
                     $ariaControlsElement.addClass("js-collapsed");
                     $ariaControlsElement.attr("aria-hidden", "true");
@@ -129,33 +128,34 @@
             }
         },
 
-        getTarget: function () {
+        getTarget: function() {
             return document.getElementById(this.controlsId);
         },
 
-        listenForKeys: function () {
+        listenForKeys: function() {
             this.specialKeyHandler = this.checkForSpecialKeys.bind(this);
             this.getCollapsibleElement().addEventListener("keypress", this.specialKeyHandler);
         },
 
-        checkForSpecialKeys: function (e) {
+        checkForSpecialKeys: function(e) {
             if (e.keyCode == 13) {
                 // keyCode 13 is the return key.
                 this.expanderClickHandler(e);
             }
         },
 
-        stopListeningForKeys: function () {
+        stopListeningForKeys: function() {
             this.getCollapsibleElement().removeEventListener("keypress", this.specialKeyHandler);
         }
     };
 
     // Instantiate an option select for each one found on the page
-    Collapsible.bindElements = function (selector) {
+    Collapsible.bindElements = function(selector) {
         var collapsibleElements = $(selector);
-        Array.prototype.forEach.call(collapsibleElements, function (element) {
-            new Collapsible({ elementId: element.id, useAccessibleButton: true });
-        });
+        Array.prototype.forEach.call(collapsibleElements,
+            function(element) {
+                new Collapsible({ elementId: element.id, useAccessibleButton: true });
+            });
     };
 
     GOVUK.Collapsible = Collapsible;

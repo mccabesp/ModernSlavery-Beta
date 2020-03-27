@@ -1,10 +1,7 @@
-﻿@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.GovUkDesignSystemComponents
-@model ModernSlavery.Core.Entities.Organisation
-
+﻿@model Organisation
+@Layout = "~/Views/GdsLayout.cshtml"
 @{
     ViewBag.Title = $"Changed address - {Model.OrganisationName} - Administration - Modern Slavery Reporting service";
-    Layout = "~/Views/GdsLayout.cshtml";
 }
 
 @section BeforeMain {
@@ -19,13 +16,13 @@
         crumbs.Add(new CrumbViewModel
         {
             Text = Model.OrganisationName,
-            Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new { id = Model.OrganisationId })
+            Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.OrganisationId})
         });
 
         crumbs.Add(new CrumbViewModel
         {
             Text = "Address history",
-            Href = Url.Action("ViewAddressHistory", "AdminOrganisationAddress", new { id = Model.OrganisationId })
+            Href = Url.Action("ViewAddressHistory", "AdminOrganisationAddress", new {id = Model.OrganisationId})
         });
 
         crumbs.Add(new CrumbViewModel
@@ -42,7 +39,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        
+
         <div class="govuk-panel govuk-panel--confirmation govuk-!-margin-bottom-7">
             <h1 class="govuk-panel__title govuk-!-font-size-36">
                 Address has been changed
