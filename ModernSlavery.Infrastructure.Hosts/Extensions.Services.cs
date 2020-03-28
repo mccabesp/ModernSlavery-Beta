@@ -11,14 +11,14 @@ using ModernSlavery.WebUI.Shared.Options;
 using StackExchange.Redis;
 using DataProtectionOptions = ModernSlavery.WebUI.Shared.Options.DataProtectionOptions;
 
-namespace ModernSlavery.Infrastructure.Hosts.WebHost
+namespace ModernSlavery.Infrastructure.Hosts
 {
     public static partial class Extensions
     {
         public static (IServiceCollection, DistributedCacheOptions) AddDistributedCache(
             this IServiceCollection services, DistributedCacheOptions cacheOptions)
         {
-            switch (cacheOptions.Type)
+            switch (cacheOptions.Type.ToLower())
             {
                 case "redis":
                     if (string.IsNullOrWhiteSpace(cacheOptions.AzureConnectionString))

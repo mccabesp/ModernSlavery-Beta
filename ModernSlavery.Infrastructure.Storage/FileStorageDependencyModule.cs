@@ -22,13 +22,13 @@ namespace ModernSlavery.Infrastructure.Storage
         {
             // use the 'localStorageRoot' when hosting the storage in a local folder
             if (string.IsNullOrWhiteSpace(_options.LocalStorageRoot))
-                builder.ContainerBuilder.Register(
+                builder.Autofac.Register(
                         c => new AzureFileRepository(_options,
                             new ExponentialRetry(TimeSpan.FromMilliseconds(500), 10)))
                     .As<IFileRepository>()
                     .SingleInstance();
             else
-                builder.ContainerBuilder.Register(c => new SystemFileRepository(_options)).As<IFileRepository>()
+                builder.Autofac.Register(c => new SystemFileRepository(_options)).As<IFileRepository>()
                     .SingleInstance();
         }
 

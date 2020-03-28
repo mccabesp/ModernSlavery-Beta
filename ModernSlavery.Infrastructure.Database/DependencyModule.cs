@@ -12,9 +12,9 @@ namespace ModernSlavery.Infrastructure.Database
 
         public void Register(IDependencyBuilder builder)
         {
-            builder.ContainerBuilder.RegisterType<DatabaseContext>().As<IDbContext>().InstancePerLifetimeScope();
+            builder.Autofac.RegisterType<DatabaseContext>().As<IDbContext>().InstancePerLifetimeScope();
 
-            builder.ContainerBuilder.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerLifetimeScope();
+            builder.Autofac.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerLifetimeScope();
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)

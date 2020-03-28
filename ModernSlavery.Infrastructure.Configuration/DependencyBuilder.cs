@@ -1,32 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.StaticFiles.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Core.SharedKernel
 {
     public class DependencyBuilder : IDisposable, IDependencyBuilder
     {
+        private string _assemblyPrefix;
+        public DependencyBuilder(string assemblyPrefix)
+        {
+            if (string.IsNullOrWhiteSpace(assemblyPrefix)) throw new ArgumentNullException(nameof(assemblyPrefix));
+            _assemblyPrefix = assemblyPrefix;
+        }
+
+        public void Dispose()
+        {
+            Services = null;
+            Autofac = null;
+            _registeredModules = null;
+            _configuredModules = null;
+        }
+
+        public IServiceCollection Services { get; private set; }
+        public ContainerBuilder Autofac { get; private set; }
         private HashSet<Type> _configuredModules;
+
         private IContainer _container;
         private Dictionary<Type, IDependencyModule> _registeredModules;
 
         private IServiceProvider _serviceProvider;
+        private readonly Dictionary<string, Assembly> _loadedAssemblies = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
 
-        public DependencyBuilder(IServiceCollection services)
+        public void AddServices(IServiceCollection services)
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
-            ContainerBuilder = new ContainerBuilder();
-            ContainerBuilder.Populate(services);
+            Services=services ?? throw new ArgumentNullException(nameof(services));
+
+        }
+        public void AddBuilder(ContainerBuilder containerBuilder)
+        {
+            Autofac = containerBuilder ?? throw new ArgumentNullException(nameof(containerBuilder));
+            //var builder = new ContainerBuilder();
+            Autofac.Populate(Services);
+            //var container= builder.Build();
+
+            //var serviceProvider = new AutofacServiceProvider(container);
+            //Services.AddSingleton(serviceProvider);
             _registeredModules = new Dictionary<Type, IDependencyModule>();
         }
-
-        public IServiceCollection ServiceCollection { get; }
-        public ContainerBuilder ContainerBuilder { get; }
 
         /// <summary>
         ///     Registers all dependencies declared within the Bind method of the specified IDependencyModule
@@ -35,15 +63,7 @@ namespace ModernSlavery.Core.SharedKernel
         public void RegisterModule<TModule>() where TModule : class, IDependencyModule
         {
             //Resolve a new instance of the dependencies module
-            RegisterModule(typeof(TModule));
-        }
-
-        public void Dispose()
-        {
-            if (_container == null) return;
-            _configuredModules = null;
-            _registeredModules = null;
-            _container = null;
+            RegisterModule(typeof(TModule),false);
         }
 
         private void RegisterModule(Type dependencyType, bool autoOnly = false)
@@ -51,21 +71,19 @@ namespace ModernSlavery.Core.SharedKernel
             //Check if the dependency module has already been registered
             if (_registeredModules.ContainsKey(dependencyType)) return;
 
-            ContainerBuilder.Register((context, parameters) =>
-            {
-                var scope = context.Resolve<ILifetimeScope>();
+            Autofac.RegisterType(dependencyType).AsSelf().SingleInstance();
 
+            Autofac.RegisterBuildCallback(scope => 
+            {
                 using (var innerScope = scope.BeginLifetimeScope(b => b.RegisterType(dependencyType).ExternallyOwned()))
                 {
-                    var module = (IDependencyModule) innerScope.Resolve(dependencyType, parameters);
+                    var module = (IDependencyModule)innerScope.Resolve(dependencyType);
 
                     if (!autoOnly || module.AutoSetup)
                     {
                         module.Register(this);
                         _registeredModules[dependencyType] = module;
                     }
-
-                    return module;
                 }
             });
         }
@@ -78,29 +96,51 @@ namespace ModernSlavery.Core.SharedKernel
         {
             if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 
-            var type = typeof(IDependencyModule);
+            void BindModules(Assembly assembly)
+            {
+                var type = typeof(IDependencyModule);
 
-            var moduleTypes = assembly.ExportedTypes.Where(p => type.IsAssignableFrom(p));
+                var moduleTypes = assembly.ExportedTypes.Where(p => p.IsClass && type.IsAssignableFrom(p));
 
-            foreach (var moduleType in moduleTypes)
-                RegisterModule(moduleType, true);
+                foreach (var moduleType in moduleTypes)
+                    RegisterModule(moduleType, true);
+            }
+
+            foreach (var childAssembly in GetAssemblies(assembly))
+                BindModules(childAssembly);
+
+            BindModules(assembly);
+
+            IEnumerable<Assembly> GetAssemblies(Assembly assembly)
+            {
+                foreach (var child in assembly.GetReferencedAssemblies()
+                    .Where(a => a.Name.StartsWith(_assemblyPrefix, true, default)))
+                {
+                    if (_loadedAssemblies.ContainsKey(child.FullName)) continue;
+                    var childAssembly = Assembly.Load(child);
+                    _loadedAssemblies[childAssembly.FullName] = childAssembly;
+                    yield return childAssembly;
+
+                    foreach (var grandChildAssembly in GetAssemblies(childAssembly))
+                        yield return grandChildAssembly;
+                }
+            }
+
         }
 
         /// <summary>
         ///     Bind all classes implementing IDependenciesModule in all assemblies of the current AppDomain who's assembly name
         ///     starts with the specified prefix
         /// </summary>
-        /// <param name="assemblyPrefix">The prefix of the assembly names to search</param>
-        public void RegisterDomainAssemblyModules(string assemblyPrefix)
+        public void RegisterDomainAssemblyModules()
         {
-            if (string.IsNullOrWhiteSpace(assemblyPrefix)) throw new ArgumentNullException(nameof(assemblyPrefix));
 
             var type = typeof(IDependencyModule);
 
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => a.GetName().Name.StartsWith(assemblyPrefix, true, default));
+            AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name.StartsWith(_assemblyPrefix, true, default)).ForEach(
+                a => { _loadedAssemblies[a.FullName] = a; });
 
-            foreach (var assembly in assemblies)
+            foreach (var assembly in _loadedAssemblies.Values.ToList())
                 RegisterAssemblyModules(assembly);
         }
 
@@ -138,38 +178,6 @@ namespace ModernSlavery.Core.SharedKernel
             //Resolve a new instance of the dependencies module
             foreach (var moduleType in _registeredModules.Keys.Except(_configuredModules))
                 ConfigureModule(moduleType);
-        }
-
-
-        /// <summary>
-        ///     Builds all the registered dependencies into the service provider and autofac container
-        ///     Configure all the registered dependencies marked for autosetup
-        /// </summary>
-        /// <returns>The system service provider</returns>
-        public IServiceProvider Build()
-        {
-            //Configure the container
-            _container = ContainerBuilder.Build();
-
-            //Register Autofac as the service provider
-            var serviceProvider = new AutofacServiceProvider(_container);
-            ServiceCollection.AddSingleton(serviceProvider);
-
-            //Register the container
-            ServiceCollection.AddSingleton(_container);
-
-            //Create the holder for the configured modules
-            _configuredModules = new HashSet<Type>();
-
-            //Save the service provider for later calling the configurations
-            _serviceProvider = _container.Resolve<IServiceProvider>();
-
-            //Configure all the autosetup modules
-            ConfigureModules();
-            ;
-
-            //Return the service provides
-            return _serviceProvider;
         }
     }
 }

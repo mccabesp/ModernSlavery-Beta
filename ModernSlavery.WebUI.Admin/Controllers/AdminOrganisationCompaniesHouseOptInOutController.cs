@@ -5,6 +5,7 @@ using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models.CompaniesHouse;
+using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
 using ModernSlavery.WebUI.Shared.Classes;

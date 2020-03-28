@@ -20,9 +20,9 @@ namespace ModernSlavery.Infrastructure.Storage
         public void Register(IDependencyBuilder builder)
         {
             // Register queues
-            builder.ContainerBuilder.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.SendEmail);
-            builder.ContainerBuilder.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.SendNotifyEmail);
-            builder.ContainerBuilder.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.ExecuteWebJob);
+            builder.Autofac.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.SendEmail);
+            builder.Autofac.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.SendNotifyEmail);
+            builder.Autofac.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.ExecuteWebJob);
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)

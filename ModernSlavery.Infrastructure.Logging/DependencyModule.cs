@@ -10,11 +10,11 @@ namespace ModernSlavery.Infrastructure.Logging
 {
     public class DependencyModule : IDependencyModule
     {
-        private readonly StorageOptions _options;
+        private readonly StorageOptions _storageOptions;
 
         public DependencyModule(StorageOptions options)
         {
-            _options = options;
+            _storageOptions = options;
         }
 
         public bool AutoSetup { get; } = false;
@@ -22,23 +22,23 @@ namespace ModernSlavery.Infrastructure.Logging
         public void Register(IDependencyBuilder builder)
         {
             // Register queues (without key filtering)
-            builder.ContainerBuilder
-                .Register(c => new LogEventQueue(_options.AzureConnectionString, c.Resolve<IFileRepository>()))
+            builder.Autofac
+                .Register(c => new LogEventQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>()))
                 .SingleInstance();
-            builder.ContainerBuilder
-                .Register(c => new LogRecordQueue(_options.AzureConnectionString, c.Resolve<IFileRepository>()))
+            builder.Autofac
+                .Register(c => new LogRecordQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>()))
                 .SingleInstance();
 
             // Register record loggers
-            builder.ContainerBuilder.RegisterLogRecord(Filenames.BadSicLog);
-            builder.ContainerBuilder.RegisterLogRecord(Filenames.ManualChangeLog);
-            builder.ContainerBuilder.RegisterLogRecord(Filenames.RegistrationLog);
-            builder.ContainerBuilder.RegisterLogRecord(Filenames.SubmissionLog);
-            builder.ContainerBuilder.RegisterLogRecord(Filenames.SearchLog);
+            builder.Autofac.RegisterLogRecord(Filenames.BadSicLog);
+            builder.Autofac.RegisterLogRecord(Filenames.ManualChangeLog);
+            builder.Autofac.RegisterLogRecord(Filenames.RegistrationLog);
+            builder.Autofac.RegisterLogRecord(Filenames.SubmissionLog);
+            builder.Autofac.RegisterLogRecord(Filenames.SearchLog);
 
             // Register log records (without key filtering)
-            builder.ContainerBuilder.RegisterType<UserAuditLogger>().As<IUserLogger>().SingleInstance();
-            builder.ContainerBuilder.RegisterType<RegistrationAuditLogger>().As<IRegistrationLogger>().SingleInstance();
+            builder.Autofac.RegisterType<UserAuditLogger>().As<IUserLogger>().SingleInstance();
+            builder.Autofac.RegisterType<RegistrationAuditLogger>().As<IRegistrationLogger>().SingleInstance();
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)

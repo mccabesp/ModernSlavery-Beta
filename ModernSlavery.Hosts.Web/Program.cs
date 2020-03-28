@@ -1,46 +1,25 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using ModernSlavery.Core.Extensions;
-using ModernSlavery.Infrastructure.Hosts.WebHost;
-using Extensions = ModernSlavery.Infrastructure.Hosts.Extensions;
+using ModernSlavery.Infrastructure.Hosts;
+using ModernSlavery.WebUI;
 
-namespace ModernSlavery.WebUI
+// ReSharper disable once CheckNamespace
+namespace ModernSlavery.Hosts.Web
 {
-    public class Program
+    public static class Program
     {
         public static async Task Main(string[] args)
         {
-            Console.Title = "ModernSlavery.WebUI";
-
-            //Add a handler for unhandled exceptions
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
             //Create the web host
-            var hostBuilder = Host.CreateDefaultBuilder(args).ConfigureWebHostBuilder<Startup>();
-            var host = hostBuilder.Build();
-
+            var host = Host.CreateDefaultBuilder(args).ConfigureWebHostBuilder<DependencyModule>().Build();
+            
             //Show thread availability
             Console.WriteLine(Extensions.GetThreadCount());
 
             //Run the host
-            await host.RunAsync();
+            await host.RunAsync().ConfigureAwait(false);
         }
 
-        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            var ex = e.ExceptionObject as Exception;
-
-            Console.WriteLine(
-                $"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
-            Debug.WriteLine(
-                $"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
-
-            //Show thread availability
-            Console.WriteLine(Extensions.GetThreadCount());
-
-            throw ex;
-        }
     }
 }

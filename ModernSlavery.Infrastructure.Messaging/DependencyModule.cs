@@ -9,7 +9,7 @@ namespace ModernSlavery.Infrastructure.Messaging
     {
         public void Register(IDependencyBuilder builder)
         {
-            builder.ContainerBuilder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
+            builder.Autofac.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
         }
 
         public bool AutoSetup { get; } = false;

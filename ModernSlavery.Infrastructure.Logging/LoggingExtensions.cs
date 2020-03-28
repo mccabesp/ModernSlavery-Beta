@@ -1,6 +1,7 @@
 ﻿using System;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
@@ -49,19 +50,18 @@ namespace ModernSlavery.Infrastructure.Logging
         /// <param name="builder"></param>
         public static ILoggingBuilder AddAzureQueueLogger(this ILoggingBuilder builder)
         {
-            // Build the current service provider
-            var serviceProvider = builder.Services.BuildServiceProvider();
+            builder.Services.AddSingleton(ctx =>
+                {
+                    // Resolve filter options
+                    var filterOptions = ctx.GetRequiredService<LoggerFilterOptions>();
 
-            // Resolve filter options
-            var filterOptions = serviceProvider.GetService<LoggerFilterOptions>();
+                    // Resolve the keyed queue from autofac
+                    var logEventQueue = ctx.GetRequiredService<LogEventQueue>();
 
-            // Resolve the keyed queue from autofac
-            var lifetimeScope = serviceProvider.GetService<IContainer>();
-            var logEventQueue = lifetimeScope.Resolve<LogEventQueue>();
+                    return new EventLoggerProvider(logEventQueue, AppDomain.CurrentDomain.FriendlyName, filterOptions);
+                });
 
-            // Register the logging provider
-            return builder.AddProvider(new EventLoggerProvider(logEventQueue, AppDomain.CurrentDomain.FriendlyName,
-                filterOptions));
+            return builder;
         }
     }
 }

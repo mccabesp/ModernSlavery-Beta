@@ -7,7 +7,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.WebUI.Admin.Classes
 {
     public class AuditLogger
     {

@@ -21,7 +21,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
         public void Register(IDependencyBuilder builder)
         {
             //Add a dedicated httpclient for Companies house API with exponential retry policy
-            builder.ServiceCollection.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI),
+            builder.Services.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI),
                     httpClient =>
                     {
                         CompaniesHouseAPI.SetupHttpClient(httpClient, _options.ApiServer, _options.ApiKey);
@@ -29,7 +29,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10))
                 .AddPolicyHandler(CompaniesHouseAPI.GetRetryPolicy());
 
-            builder.ContainerBuilder.RegisterType<CompaniesHouseAPI>()
+            builder.Autofac.RegisterType<CompaniesHouseAPI>()
                 .As<ICompaniesHouseAPI>()
                 .SingleInstance()
                 .WithParameter(

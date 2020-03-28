@@ -5,8 +5,13 @@ using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.SharedKernel.Options
 {
+    [Options("root")]
     public class SharedOptions : IOptions
     {
+        public SharedOptions()
+        {
+
+        }
         private string _IdentityIssuer;
 
         private int[] _reminderEmailDays;

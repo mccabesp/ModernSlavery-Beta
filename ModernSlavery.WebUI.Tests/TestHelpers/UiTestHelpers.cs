@@ -46,6 +46,7 @@ using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
+using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Admin.Controllers;

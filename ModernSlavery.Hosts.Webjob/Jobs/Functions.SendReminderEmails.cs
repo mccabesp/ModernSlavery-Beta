@@ -129,13 +129,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             SaveReminderEmailRecord(user, sectorType);
         }
 
-        private static void SaveReminderEmailRecord(User user, SectorTypes sectorType)
+        private void SaveReminderEmailRecord(User user, SectorTypes sectorType)
         {
             var reminderEmailRecord = new ReminderEmail
                 {UserId = user.UserId, SectorType = sectorType, DateSent = VirtualDateTime.Now};
-            var dataRepository = Program.ContainerIOC.Resolve<IDataRepository>();
-            dataRepository.Insert(reminderEmailRecord);
-            dataRepository.SaveChangesAsync().Wait();
+            _SharedBusinessLogic.DataRepository.Insert(reminderEmailRecord);
+            _SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
         }
 
         private string GetOrganisationNameString(List<Organisation> organisations)

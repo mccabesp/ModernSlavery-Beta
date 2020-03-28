@@ -4,7 +4,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AspNetCoreModuleName>AspNetCoreModule</AspNetCoreModuleName>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
-    <RootNamespace>ModernSlavery.WebUI</RootNamespace>
     <Copyright>Crown Copyright © $([System.DateTime]::UtcNow.Year) ($([System.DateTime]::UtcNow.ToLocalTime()))</Copyright>
     <ProjectGuid>73D4A349-7276-4C72-9C67-A8FD08D7ED82</ProjectGuid>
     <LangVersion>8.0</LangVersion>
@@ -155,6 +154,8 @@
     <LangVersion>8.0</LangVersion>
 
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+
+    <AssemblyName>ModernSlavery.Hosts.Web</AssemblyName>
 
   </PropertyGroup>
 

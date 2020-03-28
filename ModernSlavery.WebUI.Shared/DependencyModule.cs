@@ -21,14 +21,14 @@ namespace ModernSlavery.WebUI.Shared
         public void Register(IDependencyBuilder builder)
         {
             //Register HttpCache and HttpSession
-            builder.ContainerBuilder.RegisterType<HttpSession>().As<IHttpSession>().InstancePerLifetimeScope();
-            builder.ContainerBuilder.RegisterType<HttpCache>().As<IHttpCache>().SingleInstance();
+            builder.Autofac.RegisterType<HttpSession>().As<IHttpSession>().InstancePerLifetimeScope();
+            builder.Autofac.RegisterType<HttpCache>().As<IHttpCache>().SingleInstance();
 
             //Register Url route helper
-            builder.ServiceCollection.AddSingleton<UrlRouteHelper>(); 
+            builder.Services.AddSingleton<UrlRouteHelper>(); 
             
             //Register the web service container
-            builder.ServiceCollection.AddSingleton<WebService>();
+            builder.Services.AddSingleton<WebService>();
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)

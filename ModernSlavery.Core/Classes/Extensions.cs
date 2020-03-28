@@ -264,7 +264,7 @@ namespace ModernSlavery.Core.Classes
         /// <param name="fileName"></param>
         /// <param name="remotePath">The path to the remote file</param>
         /// <param name="localPath">The path to the local file (default=</param>
-        public static async Task PushRemoteFileAsync(IFileRepository fileRepository,
+        public static async Task PushRemoteFileAsync(this IFileRepository fileRepository,
             string fileName,
             string remotePath,
             string localPath = null, bool OverwriteIfNewer = false)

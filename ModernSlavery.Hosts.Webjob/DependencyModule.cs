@@ -1,7 +1,13 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Autofac;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Admin;
 using ModernSlavery.BusinessDomain.Registration;
 using ModernSlavery.BusinessDomain.Shared;
@@ -9,8 +15,10 @@ using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Hosts.Webjob.Classes;
@@ -21,22 +29,27 @@ using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.WebUI.Shared.Options;
 using DataProtectionOptions = Microsoft.AspNetCore.DataProtection.DataProtectionOptions;
+using Extensions = ModernSlavery.Core.Classes.Extensions;
 using ResponseCachingOptions = Microsoft.AspNetCore.ResponseCaching.ResponseCachingOptions;
 
 namespace ModernSlavery.Hosts.Webjob
 {
     public class DependencyModule : IDependencyModule
     {
+        private readonly ILogger _logger;
         private readonly CompaniesHouseOptions _coHoOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
         private readonly DistributedCacheOptions _distributedCacheOptions;
         private readonly ResponseCachingOptions _responseCachingOptions;
         private readonly SharedOptions _sharedOptions;
 
-        public DependencyModule(SharedOptions sharedOptions, CompaniesHouseOptions coHoOptions,
+        public DependencyModule(
+            ILogger<DependencyModule> logger, 
+            SharedOptions sharedOptions, CompaniesHouseOptions coHoOptions,
             ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions,
             DataProtectionOptions dataProtectionOptions)
         {
+            _logger = logger;
             _sharedOptions = sharedOptions;
             _coHoOptions = coHoOptions;
             _responseCachingOptions = responseCachingOptions;
@@ -48,11 +61,11 @@ namespace ModernSlavery.Hosts.Webjob
 
         public void Register(IDependencyBuilder builder)
         {
-            builder.ServiceCollection.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
+            builder.Services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
 
-            builder.ServiceCollection.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
+            builder.Services.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
 
-            builder.ServiceCollection.AddSingleton<IJobActivator, AutofacJobActivator>();
+            builder.Services.AddSingleton<IJobActivator, AutofacJobActivator>();
 
             //Register the database dependencies
             builder.RegisterModule<DatabaseDependencyModule>();
@@ -70,49 +83,122 @@ namespace ModernSlavery.Hosts.Webjob
             builder.RegisterModule<Infrastructure.CompaniesHouse.DependencyModule>();
 
             //Register the messaging dependencies
-            builder.ContainerBuilder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
-            builder.ContainerBuilder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
+            builder.Autofac.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
+            builder.Autofac.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
 
             // Register the email template dependencies
-            builder.ContainerBuilder
+            builder.Autofac
                 .RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates")))
                 .As<IEmailTemplateRepository>().SingleInstance();
 
             //Register some singletons
-            builder.ContainerBuilder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
+            builder.Autofac.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
                 .WithParameter("seed", _sharedOptions.ObfuscationSeed);
-            builder.ContainerBuilder.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
+            builder.Autofac.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
 
             // Register email provider dependencies
-            builder.ContainerBuilder.RegisterType<GovNotifyEmailProvider>().SingleInstance();
-            builder.ContainerBuilder.RegisterType<SmtpEmailProvider>().SingleInstance();
-            builder.ContainerBuilder.RegisterType<EmailProvider>().SingleInstance();
+            builder.Autofac.RegisterType<GovNotifyEmailProvider>().SingleInstance();
+            builder.Autofac.RegisterType<SmtpEmailProvider>().SingleInstance();
+            builder.Autofac.RegisterType<EmailProvider>().SingleInstance();
 
             #region Register the busines logic dependencies
 
-            builder.ContainerBuilder.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().SingleInstance();
-            builder.ContainerBuilder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>()
+            builder.Autofac.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().SingleInstance();
+            builder.Autofac.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>()
                 .InstancePerDependency();
-            builder.ContainerBuilder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>()
+            builder.Autofac.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>()
                 .InstancePerDependency();
-            builder.ContainerBuilder.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>()
+            builder.Autofac.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>()
                 .InstancePerDependency();
-            builder.ContainerBuilder.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>()
+            builder.Autofac.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>()
                 .InstancePerDependency();
-            builder.ContainerBuilder.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance();
-            builder.ContainerBuilder.RegisterType<UpdateFromCompaniesHouseService>()
+            builder.Autofac.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance();
+            builder.Autofac.RegisterType<UpdateFromCompaniesHouseService>()
                 .As<UpdateFromCompaniesHouseService>().InstancePerDependency();
 
             #endregion
 
             // Need to register webJob class in Autofac as well
-            builder.ContainerBuilder.RegisterType<Functions>().InstancePerDependency();
-            builder.ContainerBuilder.RegisterType<DisableWebjobProvider>().SingleInstance();
+            builder.Autofac.RegisterType<Functions>().InstancePerDependency();
+            builder.Autofac.RegisterType<DisableWebjobProvider>().SingleInstance();
+
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
-            //TODO: Add configuration here
+            //Add configuration here
+            var app = serviceProvider.GetService<IWebJobsBuilder>();
+
+            var lifetime = serviceProvider.GetService<IHostApplicationLifetime>(); var config = serviceProvider.GetService<IConfiguration>();
+            var fileRepository = serviceProvider.GetService<IFileRepository>();
+            var sharedOptions = serviceProvider.GetService<SharedOptions>();
+
+            // Register email templates
+            var emailTemplatesConfigPath = "Email:Templates";
+            // Gpg templates
+            RegisterEmailTemplate<ChangeEmailPendingVerificationTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<ChangeEmailCompletedVerificationTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<ChangeEmailCompletedNotificationTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<ChangePasswordCompletedTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<ResetPasswordVerificationTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<ResetPasswordCompletedTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<CloseAccountCompletedTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<OrphanOrganisationTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<CreateAccountPendingVerificationTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<OrganisationRegistrationApprovedTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<OrganisationRegistrationDeclinedTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<OrganisationRegistrationRemovedTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<GeoOrganisationRegistrationRequestTemplate>(emailTemplatesConfigPath);
+
+            // system templates
+            RegisterEmailTemplate<SendEmailTemplate>(emailTemplatesConfigPath);
+
+            void RegisterEmailTemplate<TTemplate>(string templatesConfigPath) where TTemplate : EmailTemplate
+            {
+                // resolve config and resolve template repository
+                var repo = serviceProvider.GetService<IEmailTemplateRepository>();
+
+                // get the template id using the type name
+                var templateConfigKey = typeof(TTemplate).Name;
+                var templateId = config.GetValue<string>($"{templatesConfigPath}:{templateConfigKey}");
+
+                // add this template to the repository
+                repo.Add<TTemplate>(templateId, $"{templateConfigKey}.html");
+            }
+
+            Task.WaitAll(fileRepository.PushRemoteFileAsync(Filenames.SicSectorSynonyms, sharedOptions.DataPath));
+
+            lifetime.ApplicationStarted.Register(
+                () =>
+                {
+                    // Summary:
+                    //     Triggered when the application host has fully started and is about to wait for
+                    //     a graceful shutdown.
+                    _logger.LogInformation("Application Started");
+                });
+            lifetime.ApplicationStopping.Register(
+                () =>
+                {
+                    // Summary:
+                    //     Triggered when the application host is performing a graceful shutdown. Requests
+                    //     may still be in flight. Shutdown will block until this event completes.
+                    _logger.LogInformation("Application Stopping");
+                });
+        }
+
+        public class AutofacJobActivator : IJobActivator
+        {
+            private readonly IContainer _container;
+
+            public AutofacJobActivator(IContainer container)
+            {
+                _container = container;
+            }
+
+            public T CreateInstance<T>()
+            {
+                return _container.Resolve<T>();
+            }
         }
     }
 }

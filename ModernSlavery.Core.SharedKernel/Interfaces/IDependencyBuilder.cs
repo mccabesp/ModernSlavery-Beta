@@ -6,8 +6,8 @@ namespace ModernSlavery.Core.SharedKernel.Interfaces
     public interface IDependencyBuilder
     {
         //
-        IServiceCollection ServiceCollection { get; }
-        ContainerBuilder ContainerBuilder { get; }
+        IServiceCollection Services { get; }
+        ContainerBuilder Autofac { get; }
 
         /// <summary>
         ///     Registers all dependencies declared within the Bind method of the specified IDependencyModule

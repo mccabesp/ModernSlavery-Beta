@@ -31,7 +31,7 @@ namespace ModernSlavery.Core.SharedKernel.Interfaces
             get
             {
                 if (!_firstReportingYear.HasValue)
-                    _firstReportingYear = _configuration.GetValue("FirstReportingYear", 2017);
+                    _firstReportingYear = _configuration.GetValueOrDefault("FirstReportingYear", 2017);
                 return _firstReportingYear.Value;
             }
             set

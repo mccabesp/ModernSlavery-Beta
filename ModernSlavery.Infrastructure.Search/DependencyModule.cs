@@ -21,13 +21,13 @@ namespace ModernSlavery.Infrastructure.Search
         public void Register(IDependencyBuilder builder)
         {
             // Setup azure search
-            builder.ContainerBuilder.Register(c =>
+            builder.Autofac.Register(c =>
                     new SearchServiceClient(_options.AzureServiceName,
                         new SearchCredentials(_options.AzureApiAdminKey)))
                 .As<ISearchServiceClient>()
                 .SingleInstance();
 
-            builder.ContainerBuilder.RegisterType<AzureEmployerSearchRepository>()
+            builder.Autofac.RegisterType<AzureEmployerSearchRepository>()
                 .As<ISearchRepository<EmployerSearchModel>>()
                 .SingleInstance()
                 .WithParameter("serviceName", _options.AzureServiceName)
@@ -35,7 +35,7 @@ namespace ModernSlavery.Infrastructure.Search
                 .WithParameter("adminApiKey", _options.AzureApiAdminKey)
                 .WithParameter("disabled", _options.Disabled);
 
-            builder.ContainerBuilder.RegisterType<AzureSicCodeSearchRepository>()
+            builder.Autofac.RegisterType<AzureSicCodeSearchRepository>()
                 .As<ISearchRepository<SicCodeSearchModel>>()
                 .SingleInstance()
                 .WithParameter("indexName", _options.SicCodeIndexName)

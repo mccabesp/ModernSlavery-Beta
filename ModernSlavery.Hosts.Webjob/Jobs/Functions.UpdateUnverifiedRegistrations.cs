@@ -20,12 +20,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                var filePath = Path.Combine(SharedBusinessLogic.SharedOptions.DownloadsPath,
+                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath,
                     Filenames.UnverifiedRegistrations);
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateUnverifiedRegistrations))
-                    && await SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
+                    && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
                     return;
 
                 await UpdateUnverifiedRegistrationsAsync(log, filePath);

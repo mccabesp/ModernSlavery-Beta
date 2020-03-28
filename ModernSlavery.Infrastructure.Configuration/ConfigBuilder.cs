@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Infrastructure.Configuration
 {
-    public interface IConfigBuilder
-    {
-        IConfiguration Build(Dictionary<string, string> additionalSettings = null);
-    }
-
-    public class ConfigBuilder : IConfigBuilder
+    public class ConfigBuilder
     {
         private readonly IConfigurationBuilder _Builder;
 
@@ -24,12 +20,12 @@ namespace ModernSlavery.Infrastructure.Configuration
         public IConfiguration Configuration { get; private set; }
 
 
-        public IConfiguration Build(Dictionary<string, string> additionalSettings = null)
+        public IConfiguration Build(string environmentName,Dictionary<string, string> additionalSettings = null)
         {
-            Console.WriteLine($"Environment: {EnvironmentName}");
+            Console.WriteLine($"Environment: {environmentName}");
 
             _Builder.AddJsonFile("appsettings.json", false, true);
-            _Builder.AddJsonFile($"appsettings.{EnvironmentName}.json", true, true);
+            _Builder.AddJsonFile($"appsettings.{environmentName}.json", true, true);
 
             _Builder.AddEnvironmentVariables();
 
@@ -77,6 +73,11 @@ namespace ModernSlavery.Infrastructure.Configuration
                 foreach (var key in GetKeys(config))
                     Console.WriteLine($@"APPSETTING[""{key}""]={config[key]}");
 
+            Encryption.SetDefaultEncryptionKey(config["DefaultEncryptionKey"]);
+
+            //Initialise the virtual date and time
+            VirtualDateTime.Initialise(config["DateTimeOffset"]);
+
             return config;
         }
 
@@ -95,7 +96,9 @@ namespace ModernSlavery.Infrastructure.Configuration
             {
                 if (_EnvironmentName == null)
                 {
-                    _EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                    _EnvironmentName = Configuration?[HostDefaults.EnvironmentKey];
+                    if (string.IsNullOrWhiteSpace(_EnvironmentName))
+                        _EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
                     if (string.IsNullOrWhiteSpace(_EnvironmentName))
                         _EnvironmentName = Environment.GetEnvironmentVariable("ASPNET_ENV");
                     if (string.IsNullOrWhiteSpace(_EnvironmentName))

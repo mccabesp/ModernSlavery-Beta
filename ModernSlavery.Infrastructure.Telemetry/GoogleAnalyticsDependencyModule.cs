@@ -29,7 +29,7 @@ namespace ModernSlavery.Infrastructure.Telemetry
         public void Register(IDependencyBuilder builder)
         {
             //Add a dedicated httpclient for Google Analytics tracking with exponential retry policy
-            builder.ServiceCollection.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), client =>
+            builder.Services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), client =>
                 {
                     client.BaseAddress = GoogleAnalyticsTracker.BaseUri;
                     client.DefaultRequestHeaders.Clear();
@@ -46,7 +46,7 @@ namespace ModernSlavery.Infrastructure.Telemetry
                                             TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
             //Register WebTracker
-            builder.ContainerBuilder.RegisterType<GoogleAnalyticsTracker>()
+            builder.Autofac.RegisterType<GoogleAnalyticsTracker>()
                 .As<IWebTracker>()
                 .SingleInstance()
                 .WithParameter(

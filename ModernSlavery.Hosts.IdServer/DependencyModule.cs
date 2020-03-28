@@ -8,19 +8,25 @@ using AutoMapper;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.IdServer.Classes;
 using ModernSlavery.Infrastructure.Database;
-using ModernSlavery.Infrastructure.Hosts.WebHost;
+using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
+using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Options;
+using IApplicationLifetime = Microsoft.AspNetCore.Hosting.IApplicationLifetime;
 
 namespace ModernSlavery.IdServer
 {
@@ -28,22 +34,24 @@ namespace ModernSlavery.IdServer
     {
         public static Action<IServiceCollection> ConfigureTestServices;
         public static Action<ContainerBuilder> ConfigureTestContainer;
-        private readonly DataProtectionOptions _dataProtectionOptions;
-        private readonly DistributedCacheOptions _distributedCacheOptions;
-
-        private readonly ILogger _Logger;
+        
+        private readonly ILogger _logger;
         private readonly SharedOptions _sharedOptions;
         private readonly StorageOptions _storageOptions;
+        private readonly DataProtectionOptions _dataProtectionOptions;
+        private readonly DistributedCacheOptions _distributedCacheOptions; 
+        private readonly ResponseCachingOptions _responseCachingOptions;
 
         public DependencyModule(ILogger<DependencyModule> logger, SharedOptions sharedOptions,
             StorageOptions storageOptions, DistributedCacheOptions distributedCacheOptions,
-            DataProtectionOptions dataProtectionOptions)
+            DataProtectionOptions dataProtectionOptions, ResponseCachingOptions responseCachingOptions)
         {
-            _Logger = logger;
+            _logger = logger;
             _sharedOptions = sharedOptions;
             _storageOptions = storageOptions;
             _distributedCacheOptions = distributedCacheOptions;
             _dataProtectionOptions = dataProtectionOptions;
+            _responseCachingOptions = responseCachingOptions;
         }
 
         public bool AutoSetup { get; } = false;
@@ -52,12 +60,12 @@ namespace ModernSlavery.IdServer
         {
             #region Configure identity server
 
-            builder.ServiceCollection.AddSingleton<IEventSink, AuditEventSink>();
+            builder.Services.AddSingleton<IEventSink, AuditEventSink>();
 
             var clients = new Clients(_sharedOptions);
             var resources = new Resources(_sharedOptions);
 
-            var identityServer = builder.ServiceCollection.AddIdentityServer(
+            var identityServer = builder.Services.AddIdentityServer(
                     options =>
                     {
                         options.Events.RaiseSuccessEvents = true;
@@ -80,31 +88,31 @@ namespace ModernSlavery.IdServer
             #endregion
 
             //Allow caching of http responses
-            builder.ServiceCollection.AddResponseCaching();
+            builder.Services.AddResponseCaching();
 
             //This is to allow access to the current http context anywhere
-            builder.ServiceCollection.AddHttpContextAccessor();
+            builder.Services.AddHttpContextAccessor();
 
-            builder.ServiceCollection.AddControllersWithViews();
+            builder.Services.AddControllersWithViews();
 
-            var mvcBuilder = builder.ServiceCollection.AddRazorPages();
+            var mvcBuilder = builder.Services.AddRazorPages();
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
             if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
 
             //Add the distributed cache and data protection
-            builder.ServiceCollection.AddDistributedCache(_distributedCacheOptions)
+            builder.Services.AddDistributedCache(_distributedCacheOptions)
                 .AddDataProtection(_dataProtectionOptions);
 
             //Add app insights tracking
-            builder.ServiceCollection.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
+            builder.Services.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
 
             //This may now be required 
-            builder.ServiceCollection.AddHttpsRedirection(options => { options.HttpsPort = 443; });
+            builder.Services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
 
             //Override any test services
-            ConfigureTestServices?.Invoke(builder.ServiceCollection);
+            ConfigureTestServices?.Invoke(builder.Services);
 
             //Register the database dependencies
             builder.RegisterModule<DatabaseDependencyModule>();
@@ -113,18 +121,18 @@ namespace ModernSlavery.IdServer
             builder.RegisterModule<FileStorageDependencyModule>();
 
             // Register queues (without key filtering)
-            builder.ContainerBuilder
+            builder.Autofac
                 .Register(c => new LogEventQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>()))
                 .SingleInstance();
-            builder.ContainerBuilder
+            builder.Autofac
                 .Register(c => new LogRecordQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>()))
                 .SingleInstance();
 
             // Register log records (without key filtering)
-            builder.ContainerBuilder.RegisterType<UserAuditLogger>().As<IUserLogger>().SingleInstance();
+            builder.Autofac.RegisterType<UserAuditLogger>().As<IUserLogger>().SingleInstance();
 
             // Register Action helpers
-            builder.ContainerBuilder.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
+            builder.Autofac.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
                 .SingleInstance();
 
             // Initialise AutoMapper
@@ -139,15 +147,87 @@ namespace ModernSlavery.IdServer
                 //});
             });
 
-            builder.ContainerBuilder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            builder.Autofac.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
 
             //Override any test services
-            ConfigureTestContainer?.Invoke(builder.ContainerBuilder);
+            ConfigureTestContainer?.Invoke(builder.Autofac);
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
-            //TODO: Add configuration here
+            //Add configuration here
+            var app = serviceProvider.GetService<IApplicationBuilder>();
+
+            var lifetime = serviceProvider.GetService<IHostApplicationLifetime>();
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+
+            loggerFactory.UseLogEventQueueLogger(app.ApplicationServices);
+
+            app.UseMiddleware<ExceptionMiddleware>();
+            if (Debugger.IsAttached || _sharedOptions.IsDevelopment() || _sharedOptions.IsLocal())
+            {
+                IdentityModelEventSource.ShowPII = true;
+
+                app.UseBrowserLink();
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/error/500"); //This must use a subdirectory as must start with '/'
+                app.UseStatusCodePagesWithReExecute("/error/{0}");
+            }
+
+            app.UseIdentityServer();
+            app.UseStaticFiles(
+                new StaticFileOptions
+                {
+                    OnPrepareResponse = ctx =>
+                    {
+                        //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
+                        if (_responseCachingOptions.StaticCacheSeconds > 0)
+                            ctx.Context.SetResponseCache(_responseCachingOptions.StaticCacheSeconds);
+                    }
+                }); //For the wwwroot folder
+
+            // Include un-bundled js + css folders to serve the source files in dev environment
+            if (_sharedOptions.IsLocal())
+                app.UseStaticFiles(
+                    new StaticFileOptions
+                    {
+                        FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()),
+                        RequestPath = "",
+                        OnPrepareResponse = ctx =>
+                        {
+                            //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
+                            if (_responseCachingOptions.StaticCacheSeconds > 0)
+                                ctx.Context.SetResponseCache(_responseCachingOptions.StaticCacheSeconds);
+                        }
+                    });
+
+            app.UseRouting();
+            app.UseMiddleware<MaintenancePageMiddleware>(_sharedOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
+            app.UseMiddleware<StickySessionMiddleware>(_sharedOptions.StickySessions); //Enable/Disable sticky sessions based on  
+            app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses
+
+            //app.UseMvcWithDefaultRoute();
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+
+            lifetime.ApplicationStarted.Register(
+                () =>
+                {
+                    // Summary:
+                    //     Triggered when the application host has fully started and is about to wait for
+                    //     a graceful shutdown.
+                    _logger.LogInformation("Application Started");
+                });
+            lifetime.ApplicationStopping.Register(
+                () =>
+                {
+                    // Summary:
+                    //     Triggered when the application host is performing a graceful shutdown. Requests
+                    //     may still be in flight. Shutdown will block until this event completes.
+                    _logger.LogInformation("Application Stopping");
+                });
         }
 
 
@@ -162,14 +242,14 @@ namespace ModernSlavery.IdServer
             if (!string.IsNullOrWhiteSpace(certThumprint))
             {
                 cert = HttpsCertificate.LoadCertificateFromThumbprint(certThumprint);
-                _Logger.LogInformation(
+                _logger.LogInformation(
                     $"Successfully loaded certificate '{cert.FriendlyName}' expiring '{cert.GetExpirationDateString()}' from thumbprint '{certThumprint}'");
             }
             else
             {
                 var certPath = Path.Combine(Directory.GetCurrentDirectory(), @"LocalHost.pfx");
                 cert = HttpsCertificate.LoadCertificateFromFile(certPath, "LocalHost");
-                _Logger.LogInformation(
+                _logger.LogInformation(
                     $"Successfully loaded certificate '{cert.FriendlyName}' expiring '{cert.GetExpirationDateString()}' from file '{certPath}'");
             }
 
@@ -178,7 +258,7 @@ namespace ModernSlavery.IdServer
                 var expires = cert.GetExpirationDateString().ToDateTime();
                 if (expires < VirtualDateTime.UtcNow)
                 {
-                    _Logger.LogError(
+                    _logger.LogError(
                         $"The website certificate for '{sharedOptions.ExternalHost}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
                 }
                 else
@@ -186,7 +266,7 @@ namespace ModernSlavery.IdServer
                     var remainingTime = expires - VirtualDateTime.Now;
 
                     if (expires < VirtualDateTime.UtcNow.AddDays(sharedOptions.CertExpiresWarningDays))
-                        _Logger.LogWarning(
+                        _logger.LogWarning(
                             $"The website certificate for '{sharedOptions.SiteAuthority}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
                 }
             }

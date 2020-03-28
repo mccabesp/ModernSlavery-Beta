@@ -11,18 +11,22 @@ namespace ModernSlavery.Infrastructure.Configuration
 {
     public class OptionsBinder
     {
-        private readonly Dictionary<Type, object> _bindings = new Dictionary<Type, object>();
-        public readonly IConfiguration Configuration;
-        public readonly IServiceCollection Services;
+        private readonly IConfiguration _configuration;
+        private readonly IServiceCollection _services;
+        private string _assemblyPrefix;
 
-
-        public OptionsBinder(IServiceCollection services, IConfiguration configuration)
+        public OptionsBinder(IServiceCollection services, IConfiguration configuration, string assemblyPrefix)
         {
-            Services = services ?? throw new ArgumentNullException(nameof(services));
-            Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            if (string.IsNullOrWhiteSpace(assemblyPrefix)) throw new ArgumentNullException(nameof(assemblyPrefix));
+            _assemblyPrefix = assemblyPrefix;
         }
 
-        private object Bind(Type optionsType, string configSection = null, bool requireAttribute = false)
+        private readonly Dictionary<Type, object> _bindings = new Dictionary<Type, object>();
+        private readonly Dictionary<string, Assembly> _loadedAssemblies = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+
+        private object Bind(Type optionsType, string configSection = null)
         {
             if (_bindings.ContainsKey(optionsType)) return _bindings[optionsType];
 
@@ -31,20 +35,20 @@ namespace ModernSlavery.Infrastructure.Configuration
             if (string.IsNullOrWhiteSpace(configSection))
             {
                 var configSettingAttribute = instance.GetAttribute<OptionsAttribute>();
+                if (configSettingAttribute==null)throw new Exception($"Missing Options attribute on class '{optionsType.Name}'");
                 configSection = configSettingAttribute?.Key;
             }
 
-            if (string.IsNullOrWhiteSpace(configSection))
+            if (configSection.TrimI().EqualsI("root",""))
             {
-                if (requireAttribute) return null;
-                Configuration.Bind(instance);
+                _configuration.Bind(instance);
             }
             else
             {
-                Configuration.Bind(configSection, instance);
+                _configuration.Bind(configSection, instance);
             }
 
-            Services.AddSingleton(instance);
+            _services.AddSingleton(optionsType,instance);
 
             _bindings[optionsType] = instance;
 
@@ -86,7 +90,7 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             configSection.Bind(instance);
 
-            Services.AddSingleton(instance);
+            _services.AddSingleton(instance);
 
             _bindings[optionsType] = instance;
 
@@ -110,16 +114,14 @@ namespace ModernSlavery.Infrastructure.Configuration
         ///     Only classes with OptionsAttribute.Key will be bound.
         /// </summary>
         /// <param name="assemblyPrefix"></param>
-        public void BindAssemblies(string assemblyPrefix)
+        public void BindAssemblies()
         {
-            if (string.IsNullOrWhiteSpace(assemblyPrefix)) throw new ArgumentNullException(nameof(assemblyPrefix));
-
             var type = typeof(IOptions);
 
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => a.GetName().Name.StartsWith(assemblyPrefix, true, default));
+            AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name.StartsWith(_assemblyPrefix, true, default)).ForEach(
+                a => { _loadedAssemblies[a.FullName] = a; });
 
-            foreach (var assembly in assemblies)
+            foreach (var assembly in _loadedAssemblies.Values.ToList())
                 BindAssembly(assembly);
         }
 
@@ -132,12 +134,35 @@ namespace ModernSlavery.Infrastructure.Configuration
         {
             if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 
-            var type = typeof(IOptions);
+            foreach (var childAssembly in GetAssemblies(assembly))
+                BindOptions(childAssembly);
 
-            var optionsTypes = assembly.ExportedTypes.Where(p => type.IsAssignableFrom(p));
+            BindOptions(assembly);
 
-            foreach (var optionsType in optionsTypes)
-                Bind(optionsType, requireAttribute: true);
+            void BindOptions(Assembly assembly)
+            {
+                var type = typeof(IOptions);
+
+                var optionsTypes = assembly.ExportedTypes.Where(p => p.IsClass && type.IsAssignableFrom(p));
+
+                foreach (var optionsType in optionsTypes)
+                    Bind(optionsType);
+            }
+
+            IEnumerable<Assembly> GetAssemblies(Assembly assembly)
+            {
+                foreach (var child in assembly.GetReferencedAssemblies()
+                    .Where(a => a.Name.StartsWith(_assemblyPrefix, true, default)))
+                {
+                    if (_loadedAssemblies.ContainsKey(child.FullName)) continue;
+                    var childAssembly = Assembly.Load(child);
+                    _loadedAssemblies[childAssembly.FullName] = childAssembly;
+                    yield return childAssembly;
+
+                    foreach (var grandChildAssembly in GetAssemblies(childAssembly))
+                        yield return grandChildAssembly;
+                }
+            }
         }
     }
 }
