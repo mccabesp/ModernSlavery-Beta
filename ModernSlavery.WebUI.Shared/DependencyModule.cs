@@ -2,6 +2,7 @@
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
@@ -16,9 +17,14 @@ namespace ModernSlavery.WebUI.Shared
     [AutoRegister]
     public class DependencyModule: IDependencyModule
     {
-        public DependencyModule()
+        private readonly ILogger _logger;
+        public DependencyModule(
+            ILogger<DependencyModule> logger
+            //TODO Add any required IOptions here
+        )
         {
-            //Any IOptions constructor parameters are automatically resolved
+            _logger = logger;
+            //TODO set any required local IOptions here
         }
 
         public void Register(IDependencyBuilder builder)

@@ -2,6 +2,7 @@
 using System.Net.Http;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
@@ -11,11 +12,16 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
     [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
-        private readonly CompaniesHouseOptions _options;
+        private readonly CompaniesHouseOptions _companiesHouseOptions;
 
-        public DependencyModule(CompaniesHouseOptions options)
+        private readonly ILogger _logger;
+        public DependencyModule(
+            ILogger<DependencyModule> logger,
+            CompaniesHouseOptions companiesHouseOptions
+        )
         {
-            _options = options;
+            _logger = logger;
+            _companiesHouseOptions = companiesHouseOptions;
         }
 
         public void Register(IDependencyBuilder builder)
@@ -24,7 +30,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             builder.Services.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI),
                     httpClient =>
                     {
-                        CompaniesHouseAPI.SetupHttpClient(httpClient, _options.ApiServer, _options.ApiKey);
+                        CompaniesHouseAPI.SetupHttpClient(httpClient, _companiesHouseOptions.ApiServer, _companiesHouseOptions.ApiKey);
                     })
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10))
                 .AddPolicyHandler(CompaniesHouseAPI.GetRetryPolicy());

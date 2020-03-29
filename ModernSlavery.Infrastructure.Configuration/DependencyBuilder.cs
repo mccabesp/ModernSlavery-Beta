@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Extensions;
@@ -71,11 +72,22 @@ namespace ModernSlavery.Infrastructure.Configuration
                 .Where(a => a.FullName.StartsWith(_assemblyPrefix, true, default))
                 .ForEach(a => _loadedAssemblies[a.FullName] = a);
             RegisterModules(Assembly.GetEntryAssembly());
-            
+
+            Autofac.Populate(Services);
             _container = Autofac.Build();
+
+            //Register Autofac as the service provider
 
             _serviceProvider = new AutofacServiceProvider(_container);
 
+            //Pass the services to the app builder
+            if (_container.TryResolve(out IApplicationBuilder appBuilder))
+            {
+                appBuilder.ApplicationServices = _serviceProvider;
+                Services.AddSingleton(appBuilder);
+            }
+
+            Services.AddSingleton(_container);
             Services.AddSingleton(_serviceProvider);
             Services.AddSingleton(_container);
         }

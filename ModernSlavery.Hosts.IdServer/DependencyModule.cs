@@ -154,9 +154,8 @@ namespace ModernSlavery.Hosts.IdServer
             var app = serviceProvider.GetService<IApplicationBuilder>();
 
             var lifetime = serviceProvider.GetService<IHostApplicationLifetime>();
-            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
 
-            loggerFactory.UseLogEventQueueLogger(app.ApplicationServices);
+            container.UseLogEventQueueLogger();
 
             app.UseMiddleware<ExceptionMiddleware>();
             if (Debugger.IsAttached || _sharedOptions.IsDevelopment() || _sharedOptions.IsLocal())

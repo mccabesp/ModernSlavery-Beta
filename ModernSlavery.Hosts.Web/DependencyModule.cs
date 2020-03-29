@@ -235,10 +235,9 @@ namespace ModernSlavery.Hosts.Web
             var app = container.Resolve<IApplicationBuilder>();
 
             var lifetime = container.Resolve<IHostApplicationLifetime>();
-            var loggerFactory = container.Resolve<ILoggerFactory>();
             var fileRepository = container.Resolve<IFileRepository>();
 
-            loggerFactory.UseLogEventQueueLogger(app.ApplicationServices);
+            container.UseLogEventQueueLogger();
 
             app.UseMiddleware<ExceptionMiddleware>();
             if (_sharedOptions.UseDeveloperExceptions)
@@ -301,14 +300,6 @@ namespace ModernSlavery.Hosts.Web
 
             //app.UseMvcWithDefaultRoute();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-
-            //Initialise the application
-            //Ensure ShortCodes, SicCodes and SicSections exist on remote 
-            Task.WaitAll(
-                fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.DataPath),
-                fileRepository.PushRemoteFileAsync(Filenames.SicCodes, _sharedOptions.DataPath),
-                fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.DataPath)
-            );
 
             lifetime.ApplicationStarted.Register(
                 () =>

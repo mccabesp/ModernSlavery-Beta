@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -27,21 +28,23 @@ namespace ModernSlavery.Infrastructure.Logging
         ///     Adds the LogEvent queue as logging provider to the application
         /// </summary>
         /// <param name="factory"></param>
-        public static ILoggerFactory UseLogEventQueueLogger(this ILoggerFactory factory,
-            IServiceProvider serviceProvider)
+        public static ILoggerFactory UseLogEventQueueLogger(this IContainer container)
         {
+            Debugger.Break(); //TODO Remove this and fix code below not working
+            return null;
+
+            var loggerFactory = container.Resolve<ILoggerFactory>();
+
             // Resolve filter options
-            var filterOptions = serviceProvider.GetService<LoggerFilterOptions>();
+            var filterOptions = container.Resolve<LoggerFilterOptions>();
 
             // Resolve the keyed queue from autofac
-            var lifetimeScope = serviceProvider.GetService<ILifetimeScope>();
-            var logEventQueue = lifetimeScope.Resolve<LogEventQueue>();
+            var logEventQueue = container.Resolve<LogEventQueue>();
 
             // Create the logging provider
-            factory.AddProvider(new EventLoggerProvider(logEventQueue, AppDomain.CurrentDomain.FriendlyName,
-                filterOptions));
+            loggerFactory.AddProvider(new EventLoggerProvider(logEventQueue, AppDomain.CurrentDomain.FriendlyName,filterOptions));
 
-            return factory;
+            return loggerFactory;
         }
 
         /// <summary>

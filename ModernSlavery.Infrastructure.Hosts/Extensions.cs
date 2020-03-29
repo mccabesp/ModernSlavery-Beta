@@ -81,11 +81,11 @@ namespace ModernSlavery.Infrastructure.Hosts
                 });
 
             //Build the app configuration
-            
+            IConfiguration config=null;
             hostBuilder.ConfigureAppConfiguration((ctx, configurationBuilder) =>
                 {
                     var configBuilder = new ConfigBuilder(configurationBuilder);
-                    var config = configBuilder.Build(ctx.HostingEnvironment.EnvironmentName, additionalSettings);
+                    config = configBuilder.Build(ctx.HostingEnvironment.EnvironmentName, additionalSettings);
 
                     //Setup Threads
                     config.SetupThreads();
@@ -100,8 +100,6 @@ namespace ModernSlavery.Infrastructure.Hosts
 
             hostBuilder.ConfigureServices((ctx, services) =>
             {
-                //services.AddAutofac();
-
                 //Load all the IOptions in the domain
                 var optionsBinder = new OptionsBinder(services, ctx.Configuration, nameof(ModernSlavery));
                 optionsBinder.BindAssemblies();
@@ -110,16 +108,13 @@ namespace ModernSlavery.Infrastructure.Hosts
                 dependencyBuilder.AddServices(services);
             });
 
-            //Register Autofac as the service provider
-            //hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-
             //Add the logging to the web host
             hostBuilder.ConfigureLogging(
                 builder =>
                 {
                     //For more info see https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.2
                     builder.ClearProviders();
-                    builder.AddConfiguration();
+                    builder.AddConfiguration(config.GetSection("Logging"));
                     builder.AddDebug();
                     builder.AddConsole(); //Use the console
                     builder.AddEventSourceLogger(); //Log to windows event log
