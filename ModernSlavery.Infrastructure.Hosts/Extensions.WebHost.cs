@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Autofac;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.SharedKernel.Interfaces;
@@ -29,7 +32,11 @@ namespace ModernSlavery.Infrastructure.Hosts
                 //Specify the root path of the site
                 if (!string.IsNullOrWhiteSpace(webRoot))webHostBuilder.UseWebRoot(webRoot);
                 
-               // webHostBuilder.Configure(appBuilder => { dependencyBuilder.ConfigureModules(); });
+               webHostBuilder.Configure(appBuilder =>
+               {
+                   dependencyBuilder.Autofac.RegisterInstance(appBuilder).As<IApplicationBuilder>();
+                   dependencyBuilder.ConfigureModules();
+               });
             });
 
             return hostBuilder;

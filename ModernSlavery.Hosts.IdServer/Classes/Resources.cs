@@ -5,7 +5,7 @@ using IdentityServer4.Models;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel.Options;
 
-namespace ModernSlavery.IdServer.Classes
+namespace ModernSlavery.Hosts.IdServer.Classes
 {
     public interface IResources
     {

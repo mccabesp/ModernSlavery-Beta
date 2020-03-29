@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Autofac;
-using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
-using ModernSlavery.WebUI.Account.Controllers;
-using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Account.Interfaces;
+using ModernSlavery.WebUI.Account.ViewServices;
 
 namespace ModernSlavery.WebUI.Account
 {
+    [AutoRegister]
     public class DependencyModule: IDependencyModule
     {
         public DependencyModule()
@@ -18,11 +15,17 @@ namespace ModernSlavery.WebUI.Account
             //Any IOptions constructor parameters are automatically resolved
         }
 
-        public bool AutoSetup { get; } = false;
-
         public void Register(IDependencyBuilder builder)
         {
-            //TODO: Register dependencies here
+            //Register dependencies here
+            builder.Autofac.RegisterType<ChangeDetailsViewService>().As<IChangeDetailsViewService>()
+                .InstancePerLifetimeScope();
+            builder.Autofac.RegisterType<ChangeEmailViewService>().As<IChangeEmailViewService>()
+                .InstancePerLifetimeScope();
+            builder.Autofac.RegisterType<ChangePasswordViewService>().As<IChangePasswordViewService>()
+                .InstancePerLifetimeScope();
+            builder.Autofac.RegisterType<CloseAccountViewService>().As<ICloseAccountViewService>()
+                .InstancePerLifetimeScope();
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)

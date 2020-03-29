@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ModernSlavery.IdServer.Models
+namespace ModernSlavery.Hosts.IdServer.Models
 {
     public class LoginViewModel : LoginInputModel
     {

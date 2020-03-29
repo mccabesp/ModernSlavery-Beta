@@ -7,6 +7,7 @@ using ModernSlavery.BusinessDomain.Registration;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.BusinessDomain;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.IdServer.Models.Diagnostics;
+using ModernSlavery.Hosts.IdServer.Models;
 
-namespace ModernSlavery.IdServer.Controllers
+namespace ModernSlavery.Hosts.IdServer.Controllers
 {
     [Authorize]
     public class DiagnosticsController : Controller

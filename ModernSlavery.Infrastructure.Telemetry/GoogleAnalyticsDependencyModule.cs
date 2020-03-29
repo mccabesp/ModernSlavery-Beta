@@ -4,6 +4,7 @@ using System.Net.Http;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using Polly;
@@ -11,6 +12,7 @@ using Polly.Extensions.Http;
 
 namespace ModernSlavery.Infrastructure.Telemetry
 {
+    [AutoRegister(false)]
     public class GoogleAnalyticsDependencyModule : IDependencyModule
     {
         private readonly SharedOptions _sharedOptions;
@@ -19,12 +21,6 @@ namespace ModernSlavery.Infrastructure.Telemetry
         {
             _sharedOptions = sharedOptions;
         }
-
-        #region Interface properties
-
-        public bool AutoSetup { get; } = false;
-
-        #endregion
 
         public void Register(IDependencyBuilder builder)
         {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModernSlavery.WebUI.GDSDesignSystem.Partials
+namespace ModernSlavery.WebUI.GDSDesignSystem.Interfaces
 {
     public interface IHtmlText
     {

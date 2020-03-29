@@ -9,9 +9,9 @@ using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.IdServer.Models.Grants;
+using ModernSlavery.Hosts.IdServer.Models;
 
-namespace ModernSlavery.IdServer.Controllers
+namespace ModernSlavery.Hosts.IdServer.Controllers
 {
     /// <summary>
     ///     This sample controller allows a user to revoke grants given to clients

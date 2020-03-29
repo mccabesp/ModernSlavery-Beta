@@ -1,5 +1,5 @@
 ﻿using System;
-using ModernSlavery.WebUI.GDSDesignSystem.Partials;
+using ModernSlavery.WebUI.GDSDesignSystem.Interfaces;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.Models
 {

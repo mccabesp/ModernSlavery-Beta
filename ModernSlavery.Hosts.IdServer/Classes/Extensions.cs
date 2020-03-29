@@ -2,7 +2,7 @@
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Database.Classes;
 
-namespace ModernSlavery.IdServer.Classes
+namespace ModernSlavery.Hosts.IdServer.Classes
 {
     public static class CustomIdentityServerBuilderExtensions
     {

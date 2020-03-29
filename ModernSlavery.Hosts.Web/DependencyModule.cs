@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using ModernSlavery.BusinessDomain.Admin;
@@ -24,12 +25,14 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
-using ModernSlavery.Hosts.Web;
 using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Database.Classes;
+using ModernSlavery.Infrastructure.Hosts;
+using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Telemetry;
 using ModernSlavery.WebUI.Account.Interfaces;
@@ -46,15 +49,11 @@ using ModernSlavery.WebUI.Shared.Options;
 using ModernSlavery.WebUI.Shared.Services;
 using ModernSlavery.WebUI.Submission.Classes;
 using ModernSlavery.WebUI.Viewing.Presenters;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using ModernSlavery.Infrastructure.Hosts;
-using ModernSlavery.Infrastructure.Logging;
 using AuditLogger = ModernSlavery.Infrastructure.Logging.AuditLogger;
-using Extensions = ModernSlavery.Core.Classes.Extensions;
 
-namespace ModernSlavery.WebUI
+namespace ModernSlavery.Hosts.Web
 {
+    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
@@ -79,12 +78,6 @@ namespace ModernSlavery.WebUI
             _dataProtectionOptions = dataProtectionOptions;
             _basicAuthenticationOptions = basicAuthenticationOptions;
         }
-
-        #region Interface properties
-
-        public bool AutoSetup { get; } = false;
-
-        #endregion
 
         #region Static properties
 
@@ -179,9 +172,6 @@ namespace ModernSlavery.WebUI
             //Override any test services
             ConfigureTestServices?.Invoke(builder.Services);
 
-            //Register the database dependencies
-            builder.RegisterModule<DatabaseDependencyModule>();
-
             //Register the file storage dependencies
             builder.RegisterModule<FileStorageDependencyModule>();
 
@@ -191,91 +181,18 @@ namespace ModernSlavery.WebUI
             //Register the log storage dependencies
             builder.RegisterModule<Infrastructure.Logging.DependencyModule>();
 
-            //Register the search dependencies
-            builder.RegisterModule<Infrastructure.Search.DependencyModule>();
-
-            //Register Email queuers
-            builder.Autofac.RegisterType<SendEmailService>().As<ISendEmailService>().SingleInstance();
-            builder.Autofac.RegisterType<NotificationService>().As<INotificationService>().SingleInstance();
-
             builder.Autofac.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
 
-            //Register the messaging dependencies
-            builder.RegisterModule<Infrastructure.Messaging.DependencyModule>();
-
-
-            //Register the companies house dependencies
-            builder.RegisterModule<Infrastructure.CompaniesHouse.DependencyModule>();
-
-            //Register public and private repositories
-            builder.Autofac.RegisterType<PublicSectorRepository>()
-                .As<IPagedRepository<EmployerRecord>>()
-                .Keyed<IPagedRepository<EmployerRecord>>("Public")
-                .InstancePerLifetimeScope();
-
-            builder.Autofac.RegisterType<PrivateSectorRepository>()
-                .As<IPagedRepository<EmployerRecord>>()
-                .Keyed<IPagedRepository<EmployerRecord>>("Private")
-                .InstancePerLifetimeScope();
-
-            //Register business logic and services
-            // BL Services
-            builder.Autofac.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().SingleInstance();
-
-            builder.Autofac.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>()
-                .InstancePerLifetimeScope();
-
-            builder.Autofac.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>()
-                .SingleInstance();
-            builder.Autofac.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance();
-            builder.Autofac.RegisterType<UpdateFromCompaniesHouseService>()
-                .As<UpdateFromCompaniesHouseService>().InstancePerLifetimeScope();
-
-            builder.Autofac.RegisterType<DraftFileBusinessLogic>().As<IDraftFileBusinessLogic>()
-                .SingleInstance();
-            builder.Autofac.RegisterType<DownloadableFileBusinessLogic>().As<IDownloadableFileBusinessLogic>()
-                .InstancePerLifetimeScope();
-
-            builder.Autofac.RegisterType<RegistrationService>().As<IRegistrationService>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<AdminService>().As<IAdminService>().InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<PinInThePostService>().As<PinInThePostService>().SingleInstance();
-
             // register web ui services
-            builder.Autofac.RegisterType<ChangeDetailsViewService>().As<IChangeDetailsViewService>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<ChangeEmailViewService>().As<IChangeEmailViewService>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<ChangePasswordViewService>().As<IChangePasswordViewService>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<CloseAccountViewService>().As<ICloseAccountViewService>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<SubmissionPresenter>().As<ISubmissionPresenter>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<ViewingPresenter>().As<IViewingPresenter>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<SearchPresenter>().As<ISearchPresenter>().InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<ComparePresenter>().As<IComparePresenter>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<ScopePresenter>().As<IScopePresenter>().InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<AdminSearchService>().As<AdminSearchService>()
-                .InstancePerLifetimeScope();
             builder.Autofac.RegisterType<AuditLogger>().As<IAuditLogger>().InstancePerLifetimeScope();
 
             //Register some singletons
             builder.Autofac.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
                 .WithParameter("seed", _sharedOptions.ObfuscationSeed);
+
             builder.Autofac.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
 
-            //Register factories
-            builder.Autofac.RegisterType<ErrorViewModelFactory>().As<IErrorViewModelFactory>()
-                .SingleInstance();
-
-
+            
             // Register Action helpers
             builder.Autofac.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
                 .SingleInstance();
@@ -289,12 +206,6 @@ namespace ModernSlavery.WebUI
 
             //Register google analytics tracker
             builder.RegisterModule<GoogleAnalyticsDependencyModule>();
-
-            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            builder.Autofac.RegisterAssemblyTypes(typeof(BaseController).Assembly)
-                .Where(t => t.IsAssignableTo<BaseController>())
-                .InstancePerLifetimeScope()
-                .WithAttributeFiltering();
 
             // Initialise AutoMapper
             var mapperConfig = new MapperConfiguration(config =>
@@ -321,17 +232,11 @@ namespace ModernSlavery.WebUI
         public void Configure(IServiceProvider serviceProvider, IContainer container)
         {
             //Add configuration here
-            var app = serviceProvider.GetService<IApplicationBuilder>();
+            var app = container.Resolve<IApplicationBuilder>();
 
-            var lifetime = serviceProvider.GetService<IHostApplicationLifetime>();
-            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
-            var _fileRepository = app.ApplicationServices.GetService<IFileRepository>();
-
-            //Initialise the virtual date and time
-            VirtualDateTime.Initialise(_sharedOptions.DateTimeOffset);
-
-            //Set the default encryption key
-            Encryption.SetDefaultEncryptionKey(_sharedOptions.DefaultEncryptionKey);
+            var lifetime = container.Resolve<IHostApplicationLifetime>();
+            var loggerFactory = container.Resolve<ILoggerFactory>();
+            var fileRepository = container.Resolve<IFileRepository>();
 
             loggerFactory.UseLogEventQueueLogger(app.ApplicationServices);
 
@@ -400,9 +305,9 @@ namespace ModernSlavery.WebUI
             //Initialise the application
             //Ensure ShortCodes, SicCodes and SicSections exist on remote 
             Task.WaitAll(
-                _fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.DataPath),
-                _fileRepository.PushRemoteFileAsync(Filenames.SicCodes, _sharedOptions.DataPath),
-                _fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.DataPath)
+                fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.DataPath),
+                fileRepository.PushRemoteFileAsync(Filenames.SicCodes, _sharedOptions.DataPath),
+                fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.DataPath)
             );
 
             lifetime.ApplicationStarted.Register(

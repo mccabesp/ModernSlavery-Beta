@@ -8,7 +8,6 @@ using AutoMapper;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
@@ -16,9 +15,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
-using ModernSlavery.IdServer.Classes;
+using ModernSlavery.Hosts.IdServer.Classes;
 using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
@@ -26,10 +26,10 @@ using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Options;
-using IApplicationLifetime = Microsoft.AspNetCore.Hosting.IApplicationLifetime;
 
-namespace ModernSlavery.IdServer
+namespace ModernSlavery.Hosts.IdServer
 {
+    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         public static Action<IServiceCollection> ConfigureTestServices;
@@ -53,8 +53,6 @@ namespace ModernSlavery.IdServer
             _dataProtectionOptions = dataProtectionOptions;
             _responseCachingOptions = responseCachingOptions;
         }
-
-        public bool AutoSetup { get; } = false;
 
         public void Register(IDependencyBuilder builder)
         {
@@ -113,9 +111,6 @@ namespace ModernSlavery.IdServer
 
             //Override any test services
             ConfigureTestServices?.Invoke(builder.Services);
-
-            //Register the database dependencies
-            builder.RegisterModule<DatabaseDependencyModule>();
 
             //Register the file storage dependencies
             builder.RegisterModule<FileStorageDependencyModule>();

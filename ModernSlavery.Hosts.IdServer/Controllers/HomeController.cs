@@ -12,7 +12,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
-namespace ModernSlavery.IdServer.Controllers
+namespace ModernSlavery.Hosts.IdServer.Controllers
 {
     [Route("Home")]
     public class HomeController : BaseController

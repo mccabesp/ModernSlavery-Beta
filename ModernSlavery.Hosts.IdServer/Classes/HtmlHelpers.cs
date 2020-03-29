@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
-namespace ModernSlavery.IdServer.Classes
+namespace ModernSlavery.Hosts.IdServer.Classes
 {
     public static class HtmlHelpers
     {

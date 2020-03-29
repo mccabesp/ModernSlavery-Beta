@@ -5,7 +5,7 @@
 using System;
 using Microsoft.AspNetCore.Server.IISIntegration;
 
-namespace ModernSlavery.IdServer.Models
+namespace ModernSlavery.Hosts.IdServer.Models
 {
     public class AccountOptions
     {

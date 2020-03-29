@@ -4,7 +4,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace ModernSlavery.IdServer.Models
+namespace ModernSlavery.Hosts.IdServer.Models
 {
     public class LoginInputModel
     {

@@ -100,7 +100,7 @@ namespace ModernSlavery.Infrastructure.Hosts
 
             hostBuilder.ConfigureServices((ctx, services) =>
             {
-                services.AddAutofac();
+                //services.AddAutofac();
 
                 //Load all the IOptions in the domain
                 var optionsBinder = new OptionsBinder(services, ctx.Configuration, nameof(ModernSlavery));
@@ -110,21 +110,8 @@ namespace ModernSlavery.Infrastructure.Hosts
                 dependencyBuilder.AddServices(services);
             });
 
-            //Configure the autofac dependencies
-            hostBuilder.ConfigureContainer<ContainerBuilder>(builder =>
-            {
-                dependencyBuilder.AddBuilder(builder);
-
-                //Register all the automatic dependencies in all the assemblies in the business domain 
-                dependencyBuilder.RegisterDomainAssemblyModules();
-
-                //Register the dependencies in the startup assembly
-                dependencyBuilder.RegisterModule<TStartupModule>();
-            });
-
-
             //Register Autofac as the service provider
-            hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+            //hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
             //Add the logging to the web host
             hostBuilder.ConfigureLogging(
@@ -141,7 +128,7 @@ namespace ModernSlavery.Infrastructure.Hosts
                     builder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
                 });
 
-            hostBuilder.UseConsoleLifetime();
+            //hostBuilder.UseConsoleLifetime();
             return dependencyBuilder;
         }
 

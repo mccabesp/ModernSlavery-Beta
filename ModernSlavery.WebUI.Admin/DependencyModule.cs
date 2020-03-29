@@ -1,16 +1,19 @@
 ﻿using System;
 using Autofac;
+using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.WebUI.Admin.Classes;
 
-namespace ModernSlavery.WebUI.Account
+namespace ModernSlavery.WebUI.Admin
 {
+    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
-        public bool AutoSetup { get; } = false;
-
         public void Register(IDependencyBuilder builder)
         {
-            //TODO: Register dependencies here
+            //Register dependencies here
+            builder.Autofac.RegisterType<AdminSearchService>().As<AdminSearchService>()
+                .InstancePerLifetimeScope();
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)

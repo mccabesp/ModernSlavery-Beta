@@ -1,13 +1,13 @@
 ﻿using System;
 using Autofac;
+using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
-namespace ModernSlavery.WebUI.Account
+namespace ModernSlavery.WebUI.StaticFiles
 {
+    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
-        public bool AutoSetup { get; } = false;
-
         public void Register(IDependencyBuilder builder)
         {
             //TODO: Register dependencies here

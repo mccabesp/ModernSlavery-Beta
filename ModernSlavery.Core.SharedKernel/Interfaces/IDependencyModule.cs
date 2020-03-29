@@ -12,15 +12,6 @@ namespace ModernSlavery.Core.SharedKernel.Interfaces
     public interface IDependencyModule
     {
         /// <summary>
-        ///     Set this to true if you want the dependencies within this module to automatically be registered by the applications
-        ///     dependency builder
-        ///     If set to false the module must be explicitly registered by a call to DependencyBuilder.Register in a
-        ///     DependencyModule
-        ///     or by a call to IserviceCollection.SetupDependencies within an application host
-        /// </summary>
-        bool AutoSetup { get; }
-
-        /// <summary>
         ///     Place all your dependency registrations in here using builder.ContainerBuilder (Autofac IContainer) or
         ///     builder.Services (IServiceCollection)
         ///     You can also register other modules using builder.Register<TModule>()

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
-using ModernSlavery.WebUI.GDSDesignSystem.Partials;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 {

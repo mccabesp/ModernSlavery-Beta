@@ -25,11 +25,11 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.IdServer.Models;
+using ModernSlavery.Hosts.IdServer.Models;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
-namespace ModernSlavery.IdServer.Controllers
+namespace ModernSlavery.Hosts.IdServer.Controllers
 {
     /// <summary>
     ///     This sample controller implements a typical login/logout/provision workflow for local and external accounts.

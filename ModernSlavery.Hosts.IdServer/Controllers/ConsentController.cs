@@ -11,9 +11,9 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.IdServer.Models;
+using ModernSlavery.Hosts.IdServer.Models;
 
-namespace ModernSlavery.IdServer.Controllers
+namespace ModernSlavery.Hosts.IdServer.Controllers
 {
     /// <summary>
     ///     This controller processes the consent UI

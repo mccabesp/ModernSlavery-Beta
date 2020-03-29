@@ -1,17 +1,21 @@
 ﻿using System;
 using Autofac;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
-namespace ModernSlavery.Infrastructure.Messaging
+namespace ModernSlavery.BusinessDomain.Account
 {
     [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
+        public DependencyModule()
+        {
+            //TODO: Add IOptions parameters
+        }
+
         public void Register(IDependencyBuilder builder)
         {
-            builder.Autofac.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
+            //TODO: Add registrationsd here
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)

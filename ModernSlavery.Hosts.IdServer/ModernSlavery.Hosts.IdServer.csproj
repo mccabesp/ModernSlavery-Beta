@@ -4,7 +4,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AspNetCoreModuleName>AspNetCoreModule</AspNetCoreModuleName>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
-    <RootNamespace>ModernSlavery.IdServer</RootNamespace>
     <Copyright>Crown Copyright © $([System.DateTime]::UtcNow.Year) ($([System.DateTime]::UtcNow.ToLocalTime()))</Copyright>
     <ProjectGuid>F0DBFCDC-2EC9-4181-BF63-1B8F3D585A4E</ProjectGuid>
     <LangVersion>8.0</LangVersion>

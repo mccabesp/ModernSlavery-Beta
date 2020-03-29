@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.SharedKernel.Interfaces;
@@ -28,7 +29,10 @@ namespace ModernSlavery.Infrastructure.Hosts
                     builder.AddServiceBus();
                     builder.AddEventHubs();
                     builder.AddTimers();
+
                     dependencyBuilder.ConfigureModules();
+                    
+                    builder.UseExternalStartup();
                 });
 
             return hostBuilder;

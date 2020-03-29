@@ -1,39 +1,32 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Autofac;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.BusinessDomain.Admin;
-using ModernSlavery.BusinessDomain.Registration;
-using ModernSlavery.BusinessDomain.Shared;
-using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Submission;
-using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Hosts.Webjob.Classes;
 using ModernSlavery.Hosts.Webjob.Jobs;
 using ModernSlavery.Infrastructure.CompaniesHouse;
-using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.WebUI.Shared.Options;
 using DataProtectionOptions = Microsoft.AspNetCore.DataProtection.DataProtectionOptions;
-using Extensions = ModernSlavery.Core.Classes.Extensions;
 using ResponseCachingOptions = Microsoft.AspNetCore.ResponseCaching.ResponseCachingOptions;
 
 namespace ModernSlavery.Hosts.Webjob
 {
+    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
@@ -57,8 +50,6 @@ namespace ModernSlavery.Hosts.Webjob
             _dataProtectionOptions = dataProtectionOptions;
         }
 
-        public bool AutoSetup { get; } = false;
-
         public void Register(IDependencyBuilder builder)
         {
             builder.Services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
@@ -67,20 +58,11 @@ namespace ModernSlavery.Hosts.Webjob
 
             builder.Services.AddSingleton<IJobActivator, AutofacJobActivator>();
 
-            //Register the database dependencies
-            builder.RegisterModule<DatabaseDependencyModule>();
-
             //Register the file storage dependencies
             builder.RegisterModule<FileStorageDependencyModule>();
 
             //Register the log storage dependencies
             builder.RegisterModule<Infrastructure.Logging.DependencyModule>();
-
-            //Register the search dependencies
-            builder.RegisterModule<Infrastructure.Search.DependencyModule>();
-
-            //Register the companies house dependencies
-            builder.RegisterModule<Infrastructure.CompaniesHouse.DependencyModule>();
 
             //Register the messaging dependencies
             builder.Autofac.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
@@ -100,23 +82,6 @@ namespace ModernSlavery.Hosts.Webjob
             builder.Autofac.RegisterType<GovNotifyEmailProvider>().SingleInstance();
             builder.Autofac.RegisterType<SmtpEmailProvider>().SingleInstance();
             builder.Autofac.RegisterType<EmailProvider>().SingleInstance();
-
-            #region Register the busines logic dependencies
-
-            builder.Autofac.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().SingleInstance();
-            builder.Autofac.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>()
-                .InstancePerDependency();
-            builder.Autofac.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>()
-                .InstancePerDependency();
-            builder.Autofac.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>()
-                .InstancePerDependency();
-            builder.Autofac.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>()
-                .InstancePerDependency();
-            builder.Autofac.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance();
-            builder.Autofac.RegisterType<UpdateFromCompaniesHouseService>()
-                .As<UpdateFromCompaniesHouseService>().InstancePerDependency();
-
-            #endregion
 
             // Need to register webJob class in Autofac as well
             builder.Autofac.RegisterType<Functions>().InstancePerDependency();

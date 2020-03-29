@@ -8,7 +8,7 @@ using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Newtonsoft.Json;
 
-namespace ModernSlavery.IdServer.Models.Diagnostics
+namespace ModernSlavery.Hosts.IdServer.Models
 {
     public class DiagnosticsViewModel
     {

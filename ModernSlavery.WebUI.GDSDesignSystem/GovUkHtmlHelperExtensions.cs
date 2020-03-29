@@ -4,8 +4,8 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators;
+using ModernSlavery.WebUI.GDSDesignSystem.Interfaces;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
-using ModernSlavery.WebUI.GDSDesignSystem.Partials;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem
 {

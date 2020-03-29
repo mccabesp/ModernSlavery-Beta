@@ -1,16 +1,20 @@
 ﻿using System;
 using Autofac;
+using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.WebUI.Submission.Classes;
 
-namespace ModernSlavery.WebUI.Account
+namespace ModernSlavery.WebUI.Submission
 {
+    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
-        public bool AutoSetup { get; } = false;
-
         public void Register(IDependencyBuilder builder)
         {
-            //TODO: Register dependencies here
+            //Register dependencies here
+            builder.Autofac.RegisterType<SubmissionPresenter>().As<ISubmissionPresenter>()
+                .InstancePerLifetimeScope();
+            builder.Autofac.RegisterType<ScopePresenter>().As<IScopePresenter>().InstancePerLifetimeScope();
         }
 
         public void Configure(IServiceProvider serviceProvider, IContainer container)

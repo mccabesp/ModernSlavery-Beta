@@ -3,7 +3,7 @@ using IdentityModel;
 using IdentityServer4.Validation;
 using ModernSlavery.Core.Interfaces;
 
-namespace ModernSlavery.IdServer.Classes
+namespace ModernSlavery.Hosts.IdServer.Classes
 {
     public class CustomResourceOwnerPasswordValidator : IResourceOwnerPasswordValidator
     {

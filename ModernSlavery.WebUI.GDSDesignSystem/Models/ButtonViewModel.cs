@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModernSlavery.WebUI.GDSDesignSystem.Partials;
+using ModernSlavery.WebUI.GDSDesignSystem.Interfaces;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.Models
 {

@@ -3,10 +3,12 @@ using System.Net.Http;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Infrastructure.CompaniesHouse
 {
+    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly CompaniesHouseOptions _options;
@@ -15,8 +17,6 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
         {
             _options = options;
         }
-
-        public bool AutoSetup { get; } = false;
 
         public void Register(IDependencyBuilder builder)
         {

@@ -3,10 +3,12 @@ using Autofac;
 using Microsoft.Azure.Search;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Search
 {
+    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly SearchOptions _options;
@@ -15,8 +17,6 @@ namespace ModernSlavery.Infrastructure.Search
         {
             _options = options;
         }
-
-        public bool AutoSetup { get; } = false;
 
         public void Register(IDependencyBuilder builder)
         {

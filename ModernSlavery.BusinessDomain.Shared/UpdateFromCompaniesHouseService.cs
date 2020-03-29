@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models.CompaniesHouse;
 
-namespace ModernSlavery.BusinessDomain.Shared.Interfaces
+namespace ModernSlavery.BusinessDomain.Shared
 {
     public class UpdateFromCompaniesHouseService : IUpdateFromCompaniesHouseService
     {
