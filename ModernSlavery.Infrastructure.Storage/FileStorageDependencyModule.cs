@@ -32,7 +32,7 @@ namespace ModernSlavery.Infrastructure.Storage
                     .SingleInstance();
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Add configuration here
         }

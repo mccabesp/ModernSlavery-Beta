@@ -27,7 +27,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             builder.Autofac.RegisterType<PinInThePostService>().As<PinInThePostService>().SingleInstance();
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Add configuration here
         }

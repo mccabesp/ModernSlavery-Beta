@@ -20,7 +20,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
             builder.Autofac.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance();
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Add configuration here
         }

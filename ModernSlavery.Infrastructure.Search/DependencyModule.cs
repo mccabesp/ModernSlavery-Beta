@@ -42,7 +42,7 @@ namespace ModernSlavery.Infrastructure.Search
                 .WithParameter("disabled", _options.Disabled);
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Add configuration here
         }

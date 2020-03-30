@@ -30,7 +30,7 @@ namespace ModernSlavery.WebUI.Viewing
                 .InstancePerLifetimeScope();
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Configure dependencies here
         }

@@ -11,7 +11,7 @@ namespace ModernSlavery.Hosts.Web
     {
         public static async Task Main(string[] args)
         {
-            //Create the web host
+            //Create the host
             var host = CreateHostBuilder(args).Build();
 
             //Show thread availability
@@ -29,7 +29,7 @@ namespace ModernSlavery.Hosts.Web
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             //Create the web host
-            return Host.CreateDefaultBuilder(args).ConfigureWebHostBuilder<DependencyModule>();
+            return WebHost.ConfigureWebHostBuilder(commandlineArgs: args);
         }
     }
 }

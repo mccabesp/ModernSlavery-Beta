@@ -56,6 +56,7 @@
     <ProjectReference Include="..\ModernSlavery.WebUI.Admin\ModernSlavery.WebUI.Admin.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Registration\ModernSlavery.WebUI.Registration.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.StaticFiles\ModernSlavery.WebUI.StaticFiles.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Submission\ModernSlavery.WebUI.Submission.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Viewing\ModernSlavery.WebUI.Viewing.csproj" />
   </ItemGroup>
@@ -141,6 +142,10 @@
     </AdditionalFiles>
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <!-- *** THIS IS REQUIRED TO DEPLY WebjobS WITH WEBUI ON AZURE *** -->

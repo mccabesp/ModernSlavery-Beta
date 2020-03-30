@@ -12,14 +12,14 @@ namespace ModernSlavery.Infrastructure.Configuration
     public class OptionsBinder
     {
         private readonly IConfiguration _configuration;
-        private readonly IServiceCollection _services;
+        public readonly IServiceCollection Services;
         private string _assemblyPrefix;
 
-        public OptionsBinder(IServiceCollection services, IConfiguration configuration, string assemblyPrefix)
+        public OptionsBinder(IConfiguration configuration, string assemblyPrefix)
         {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            if (string.IsNullOrWhiteSpace(assemblyPrefix)) throw new ArgumentNullException(nameof(assemblyPrefix));
+            Services=new ServiceCollection();
+            if (string.IsNullOrWhiteSpace(assemblyPrefix)) assemblyPrefix=nameof(ModernSlavery);
             _assemblyPrefix = assemblyPrefix;
         }
 
@@ -48,7 +48,7 @@ namespace ModernSlavery.Infrastructure.Configuration
                 _configuration.Bind(configSection, instance);
             }
 
-            _services.AddSingleton(optionsType,instance);
+            Services.AddSingleton(optionsType,instance);
 
             _bindings[optionsType] = instance;
 
@@ -90,7 +90,7 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             configSection.Bind(instance);
 
-            _services.AddSingleton(instance);
+            Services.AddSingleton(instance);
 
             _bindings[optionsType] = instance;
 

@@ -2,19 +2,24 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles.Infrastructure;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Configuration;
+using Microsoft.Extensions.Logging.EventLog;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel;
@@ -56,10 +61,10 @@ namespace ModernSlavery.Infrastructure.Hosts
             set => _EnvironmentName = value;
         }
 
-        public static DependencyBuilder ConfigureHost<TStartupModule>(this IHostBuilder hostBuilder, string applicationName=null, string contentRoot = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
+        public static IHostBuilder ConfigureHost(this IHostBuilder hostBuilder, string applicationName = null, string contentRoot = null, bool autoConfigureOnBuild=false,Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs)
         {
             //Set the console title to the application name
-            if (string.IsNullOrWhiteSpace(applicationName)) applicationName = typeof(TStartupModule).Assembly.GetName().Name;
+            if (string.IsNullOrWhiteSpace(applicationName)) applicationName = Assembly.GetEntryAssembly().GetName().Name;
             Console.Title = applicationName;
 
             //Add a handler for unhandled exceptions
@@ -67,64 +72,85 @@ namespace ModernSlavery.Infrastructure.Hosts
 
             //Configure the host defaults
             hostBuilder.UseEnvironment(EnvironmentName);
-            
+
             //Build the host configuration
-            hostBuilder.ConfigureHostConfiguration(builder =>
+            hostBuilder.ConfigureHostConfiguration(configBuilder =>
                 {
-                    builder.AddInMemoryCollection(new Dictionary<string, string>
-                    {
-                        [HostDefaults.ApplicationKey] = applicationName,
-                        [HostDefaults.ContentRootKey] = string.IsNullOrWhiteSpace(contentRoot) ? AppContext.BaseDirectory : contentRoot,
-                    });
+                    configBuilder.AddEnvironmentVariables(prefix: "DOTNET_");
+                    if (additionalSettings==null) additionalSettings=new Dictionary<string, string>();
+                    additionalSettings[HostDefaults.ApplicationKey] = applicationName;
+                    additionalSettings[HostDefaults.ContentRootKey] = string.IsNullOrWhiteSpace(contentRoot)
+                        ? AppContext.BaseDirectory
+                        : contentRoot;
 
-                    if (commandlineArgs!=null && commandlineArgs.Any())builder.AddCommandLine(commandlineArgs);
+                    configBuilder.AddInMemoryCollection(additionalSettings);
+                    if (commandlineArgs != null && commandlineArgs.Any()) configBuilder.AddCommandLine(commandlineArgs);
                 });
 
-            //Build the app configuration
-            IConfiguration config=null;
-            hostBuilder.ConfigureAppConfiguration((ctx, configurationBuilder) =>
-                {
-                    var configBuilder = new ConfigBuilder(configurationBuilder);
-                    config = configBuilder.Build(ctx.HostingEnvironment.EnvironmentName, additionalSettings);
-
-                    //Setup Threads
-                    config.SetupThreads();
-
-                    //Setup SeriLogger
-                    config.SetupSerilogLogger();
-                });
-
-
-            //Configure the service dependencies
-            var dependencyBuilder = new DependencyBuilder(nameof(ModernSlavery));
-
-            hostBuilder.ConfigureServices((ctx, services) =>
+            //Configure the application configuration
+            hostBuilder.ConfigureAppConfiguration((context, builder) =>
             {
-                //Load all the IOptions in the domain
-                var optionsBinder = new OptionsBinder(services, ctx.Configuration, nameof(ModernSlavery));
-                optionsBinder.BindAssemblies();
+                //Build the configuration and save till later
+                var config = new ConfigBuilder(builder, EnvironmentName, additionalSettings).Build();
 
-                //Register the startup module service dependencies and descendents
-                dependencyBuilder.AddServices(services);
+                //Setup Threads
+                config.SetupThreads();
+            });
+
+            //Register the dependencies
+            DependencyBuilder dependencyBuilder = null;
+            hostBuilder.ConfigureServices((context, serviceCollection) =>
+            {
+                dependencyBuilder = new DependencyBuilder(context.Configuration, autoConfigureOnBuild: autoConfigureOnBuild);
+                //Add any registered services to the dependency module builder which may be used by the options builder.
+                dependencyBuilder.Services = serviceCollection;
+            });
+            
+            
+            //Register Autofac as the service provider
+            var serviceProviderFactory = new AutofacServiceProviderFactory();
+            hostBuilder.UseServiceProviderFactory(serviceProviderFactory);
+
+            hostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) =>
+            {
+                //Build all the required dependencies
+                dependencyBuilder.Build(builder);
+                dependencyBuilder.ServiceProviderFactory = serviceProviderFactory;
+                hostBuilder.Properties.Add("serviceProviderFactory", serviceProviderFactory);
+                hostBuilder.Properties.Add("dependencyBuilder", dependencyBuilder);
             });
 
             //Add the logging to the web host
             hostBuilder.ConfigureLogging(
-                builder =>
+                (hostingContext, logging) =>
                 {
-                    //For more info see https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.2
-                    builder.ClearProviders();
-                    builder.AddConfiguration(config.GetSection("Logging"));
-                    builder.AddDebug();
-                    builder.AddConsole(); //Use the console
-                    builder.AddEventSourceLogger(); //Log to windows event log
-                    builder.AddAzureQueueLogger(); //Use the custom logger
-                    builder.AddApplicationInsights(); //log to app insights
-                    builder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
+                    //Setup the seri logger
+                    hostingContext.Configuration.SetupSerilogLogger();
+                    
+                    var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                    // IMPORTANT: This needs to be added *before* configuration is loaded, this lets
+                    // the defaults be overridden by the configuration.
+                    if (isWindows)
+                    {
+                        // Default the EventLogLoggerProvider to warning or above
+                        logging.AddFilter<EventLogLoggerProvider>(level => level >= LogLevel.Warning);
+                    }
+
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
+                    logging.AddDebug();
+                    logging.AddEventSourceLogger();
+
+                    // Add the EventLogLoggerProvider on windows machines
+                    if (isWindows) logging.AddEventLog();
+
+                    logging.AddAzureQueueLogger(); //Use the custom logger
+                    logging.AddApplicationInsights(); //log to app insights
+                    logging.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
                 });
 
             //hostBuilder.UseConsoleLifetime();
-            return dependencyBuilder;
+            return hostBuilder;
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

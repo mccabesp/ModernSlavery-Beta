@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.DevOps
             //TODO: Register dependencies here
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Configure dependencies here
         }

@@ -43,7 +43,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                     (p, ctx) => ctx.Resolve<IHttpClientFactory>().CreateClient(nameof(ICompaniesHouseAPI)));
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Add configuration here
         }

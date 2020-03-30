@@ -23,7 +23,7 @@ namespace ModernSlavery.BusinessDomain.Shared
                 .As<UpdateFromCompaniesHouseService>().InstancePerLifetimeScope();
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Add configuration here
         }

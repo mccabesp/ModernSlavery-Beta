@@ -28,7 +28,7 @@ namespace ModernSlavery.WebUI.Submission
             builder.Autofac.RegisterType<ScopePresenter>().As<IScopePresenter>().InstancePerLifetimeScope();
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //Configure dependencies here
         }

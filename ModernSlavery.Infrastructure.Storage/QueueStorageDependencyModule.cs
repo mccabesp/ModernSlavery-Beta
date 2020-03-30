@@ -25,7 +25,7 @@ namespace ModernSlavery.Infrastructure.Storage
             builder.Autofac.RegisterAzureQueue(_options.AzureConnectionString, QueueNames.ExecuteWebJob);
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Add configuration here
         }

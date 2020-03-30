@@ -34,7 +34,7 @@ namespace ModernSlavery.WebUI.Account
                 .InstancePerLifetimeScope();
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
         }
     }

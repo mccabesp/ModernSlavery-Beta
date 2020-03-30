@@ -28,7 +28,7 @@ namespace ModernSlavery.Infrastructure.Database
             builder.Autofac.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerLifetimeScope();
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Add configuration here
         }

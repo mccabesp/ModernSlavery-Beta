@@ -89,14 +89,15 @@ namespace ModernSlavery.Hosts.Webjob
 
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //Add configuration here
-            var app = serviceProvider.GetService<IWebJobsBuilder>();
+            var app = lifetimeScope.Resolve<IWebJobsBuilder>();
 
-            var lifetime = serviceProvider.GetService<IHostApplicationLifetime>(); var config = serviceProvider.GetService<IConfiguration>();
-            var fileRepository = serviceProvider.GetService<IFileRepository>();
-            var sharedOptions = serviceProvider.GetService<SharedOptions>();
+            var lifetime = lifetimeScope.Resolve<IHostApplicationLifetime>(); 
+            var config = lifetimeScope.Resolve<IConfiguration>();
+            var fileRepository = lifetimeScope.Resolve<IFileRepository>();
+            var sharedOptions = lifetimeScope.Resolve<SharedOptions>();
 
             // Register email templates
             var emailTemplatesConfigPath = "Email:Templates";
@@ -121,7 +122,7 @@ namespace ModernSlavery.Hosts.Webjob
             void RegisterEmailTemplate<TTemplate>(string templatesConfigPath) where TTemplate : EmailTemplate
             {
                 // resolve config and resolve template repository
-                var repo = serviceProvider.GetService<IEmailTemplateRepository>();
+                var repo = lifetimeScope.Resolve<IEmailTemplateRepository>();
 
                 // get the template id using the type name
                 var templateConfigKey = typeof(TTemplate).Name;

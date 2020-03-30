@@ -21,10 +21,9 @@ namespace ModernSlavery.Core.SharedKernel.Interfaces
 
         /// <summary>
         ///     Place any configuration of your services registered in "Configure" method.
-        ///     Use serviceProvider or container to resolve previously registered dependencies.
+        ///     Use lifetimeScope to resolve previously registered dependencies.
         /// </summary>
-        /// <param name="serviceProvider">The system container of registered dependencies</param>
-        /// <param name="container">The AutoFac container of registered dependencies</param>
-        public void Configure(IServiceProvider serviceProvider, IContainer container);
+        /// <param name="lifetimeScope">The AutoFac scope for resolution of registered dependencies</param>
+        public void Configure(ILifetimeScope lifetimeScope);
     }
 }

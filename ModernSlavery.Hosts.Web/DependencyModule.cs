@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
-using System.Threading.Tasks;
 using Autofac;
-using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -14,41 +12,22 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
-using ModernSlavery.BusinessDomain.Admin;
-using ModernSlavery.BusinessDomain.Registration;
-using ModernSlavery.BusinessDomain.Shared;
-using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Submission;
-using ModernSlavery.BusinessDomain.Viewing;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Infrastructure.CompaniesHouse;
-using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Telemetry;
-using ModernSlavery.WebUI.Account.Interfaces;
-using ModernSlavery.WebUI.Account.ViewServices;
-using ModernSlavery.WebUI.Admin.Classes;
-using ModernSlavery.WebUI.Registration.Classes;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Classes.Providers;
-using ModernSlavery.WebUI.Shared.Controllers;
-using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Shared.Options;
-using ModernSlavery.WebUI.Shared.Services;
-using ModernSlavery.WebUI.Submission.Classes;
-using ModernSlavery.WebUI.Viewing.Presenters;
 using AuditLogger = ModernSlavery.Infrastructure.Logging.AuditLogger;
 
 namespace ModernSlavery.Hosts.Web
@@ -158,9 +137,6 @@ namespace ModernSlavery.Hosts.Web
             //This may now be required 
             builder.Services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
 
-            //Register StaticAssetsVersioningHelper
-            builder.Services.AddSingleton<StaticAssetsVersioningHelper>();
-
             //Configure the services required for authentication by IdentityServer
             builder.Services.AddIdentityServerClient(
                 _sharedOptions.IdentityIssuer,
@@ -185,13 +161,6 @@ namespace ModernSlavery.Hosts.Web
 
             // register web ui services
             builder.Autofac.RegisterType<AuditLogger>().As<IAuditLogger>().InstancePerLifetimeScope();
-
-            //Register some singletons
-            builder.Autofac.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
-                .WithParameter("seed", _sharedOptions.ObfuscationSeed);
-
-            builder.Autofac.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
-
             
             // Register Action helpers
             builder.Autofac.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
@@ -229,15 +198,13 @@ namespace ModernSlavery.Hosts.Web
             ConfigureTestContainer?.Invoke(builder.Autofac);
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //Add configuration here
-            var app = container.Resolve<IApplicationBuilder>();
+            var app = lifetimeScope.Resolve<IApplicationBuilder>();
+            var hostApplicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>();
 
-            var lifetime = container.Resolve<IHostApplicationLifetime>();
-            var fileRepository = container.Resolve<IFileRepository>();
-
-            container.UseLogEventQueueLogger();
+            lifetimeScope.UseLogEventQueueLogger();
 
             app.UseMiddleware<ExceptionMiddleware>();
             if (_sharedOptions.UseDeveloperExceptions)
@@ -301,7 +268,7 @@ namespace ModernSlavery.Hosts.Web
             //app.UseMvcWithDefaultRoute();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
-            lifetime.ApplicationStarted.Register(
+            hostApplicationLifetime.ApplicationStarted.Register(
                 () =>
                 {
                     // Summary:
@@ -309,7 +276,7 @@ namespace ModernSlavery.Hosts.Web
                     //     a graceful shutdown.
                     _logger.LogInformation("Application Started");
                 });
-            lifetime.ApplicationStopping.Register(
+            hostApplicationLifetime.ApplicationStopping.Register(
                 () =>
                 {
                     // Summary:

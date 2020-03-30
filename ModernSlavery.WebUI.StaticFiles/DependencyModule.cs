@@ -4,6 +4,7 @@ using Autofac;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.ResponseCaching;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Attributes;
@@ -33,15 +34,15 @@ namespace ModernSlavery.WebUI.StaticFiles
             //TODO: Register dependencies here
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Configure dependencies here
 
             //Ensure ShortCodes, SicCodes and SicSections exist on remote 
             Task.WaitAll(
-                fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.DataPath),
-                fileRepository.PushRemoteFileAsync(Filenames.SicCodes, _sharedOptions.DataPath),
-                fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.DataPath)
+                _fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.DataPath),
+                _fileRepository.PushRemoteFileAsync(Filenames.SicCodes, _sharedOptions.DataPath),
+                _fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.DataPath)
             );
         }
     }

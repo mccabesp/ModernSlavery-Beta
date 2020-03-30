@@ -52,9 +52,12 @@ namespace ModernSlavery.WebUI.Shared
                 .Where(t => t.IsAssignableTo<BaseController>())
                 .InstancePerLifetimeScope()
                 .WithAttributeFiltering();
+
+            //Register StaticAssetsVersioningHelper
+            builder.Services.AddSingleton<StaticAssetsVersioningHelper>();
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
         }
     }

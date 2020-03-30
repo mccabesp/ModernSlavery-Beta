@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Autofac;
+using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Extensions;
@@ -15,13 +17,16 @@ namespace ModernSlavery.Infrastructure.Configuration
 {
     public class DependencyBuilder : IDisposable, IDependencyBuilder
     {
+        public IConfiguration Configuration { get; }
         private string _assemblyPrefix;
         private IContainer _optionsContainer;
-        public DependencyBuilder(string assemblyPrefix)
+        private readonly bool _autoConfigureOnBuild;
+        public DependencyBuilder(IConfiguration configuration, string assemblyPrefix = null, bool autoConfigureOnBuild=true)
         {
-            if (string.IsNullOrWhiteSpace(assemblyPrefix)) throw new ArgumentNullException(nameof(assemblyPrefix));
+            Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            if (string.IsNullOrWhiteSpace(assemblyPrefix)) assemblyPrefix = nameof(ModernSlavery);
             _assemblyPrefix = assemblyPrefix;
-            Autofac = new ContainerBuilder();
+            _autoConfigureOnBuild = autoConfigureOnBuild;
         }
 
         public void Dispose()
@@ -30,68 +35,69 @@ namespace ModernSlavery.Infrastructure.Configuration
             Autofac = null;
             _registeredModules = null;
             _configuredModules = null;
-            _container = null;
             _autoRegisteredModules = null;
-            _serviceProvider = null;
             _callingModuleNames = null;
             _registeredAssemblyNames = null;
         }
 
-        public IServiceCollection Services { get; private set; }
-        public ContainerBuilder Autofac { get; private set; }
-        private HashSet<Type> _configuredModules=new HashSet<Type>();
+        public IServiceCollection Services { get; set; }=new ServiceCollection();
 
-        private IContainer _container;
-        private Dictionary<Type, IDependencyModule> _registeredModules;
+        public ContainerBuilder Autofac { get; set; }
+        public ILifetimeScope LifetimeScope { get; set; }
+        public AutofacServiceProviderFactory ServiceProviderFactory { get; set; }
+
+        private readonly Dictionary<string, Assembly> _loadedAssemblies = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
         private SortedSet<string> _registeredAssemblyNames = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
         private SortedSet<string> _autoRegisteredModules = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        private IServiceProvider _serviceProvider;
-        private readonly Dictionary<string, Assembly> _loadedAssemblies= new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+        private Dictionary<Type, IDependencyModule> _registeredModules = new Dictionary<Type, IDependencyModule>();
+        private HashSet<Type> _configuredModules = new HashSet<Type>();
 
         private Queue<string> _callingModuleNames = new Queue<string>();
 
-        public void AddServices(IServiceCollection services)
+        public void Build(ContainerBuilder builder)
         {
-            Services = services ?? throw new ArgumentNullException(nameof(services));
+            //Create the builder for registering all dependency modules
+            Autofac = builder;
+            Autofac.RegisterBuildCallback(lifeTimeScope =>
+            {
+                LifetimeScope = lifeTimeScope;//This full scope will be required later when calling ConfigModules
 
-            Autofac.Populate(Services);
+                //Automatically run the configuration modules
+                if (_autoConfigureOnBuild)ConfigureModules();
 
+            });
+            
+
+            //Load all the IOptions in the domain
+            var optionsBinder = new OptionsBinder(Configuration, _assemblyPrefix);
+            optionsBinder.BindAssemblies();
+
+            //Populate the temporary builder for resolving constructors of dependency modules
             var innerBuider = new ContainerBuilder();
             innerBuider.Populate(Services);
+            innerBuider.Populate(optionsBinder.Services);
             _optionsContainer = innerBuider.Build();
+            Autofac.Populate(optionsBinder.Services);
 
-            _registeredModules = new Dictionary<Type, IDependencyModule>();
+            //Clear the services otherwise we will get duplicated IHost which cases "Server has already started" exception when host is run.
+            Services = new ServiceCollection();
 
-        }
-
-        public void Build()
-        {
             //Ensure domain assemblies are preloaded
             AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => a.FullName.StartsWith(_assemblyPrefix, true, default))
                 .ForEach(a => _loadedAssemblies[a.FullName] = a);
+
+            //Register the DependencyModules in the root assembly and all descendent assemblies
             RegisterModules(Assembly.GetEntryAssembly());
 
+            //Populate the default builder with all the services created using dependency modules by the dependency builder
             Autofac.Populate(Services);
-            _container = Autofac.Build();
-
-            //Register Autofac as the service provider
-
-            _serviceProvider = new AutofacServiceProvider(_container);
-
-            //Pass the services to the app builder
-            if (_container.TryResolve(out IApplicationBuilder appBuilder))
-            {
-                appBuilder.ApplicationServices = _serviceProvider;
-                Services.AddSingleton(appBuilder);
-            }
-
-            Services.AddSingleton(_container);
-            Services.AddSingleton(_serviceProvider);
-            Services.AddSingleton(_container);
         }
 
+        /// <summary>
+        /// //Register the DependencyModules in the assembly and all descendent assemblies
+        /// </summary>
+        /// <param name="assembly"></param>
         private void RegisterModules(Assembly assembly)
         {
             if (_registeredAssemblyNames.Contains(assembly.FullName)) return;
@@ -153,13 +159,13 @@ namespace ModernSlavery.Infrastructure.Configuration
         {
             var moduleName = moduleType.FullName ?? moduleType.ToString();
             var callingModuleName = _callingModuleNames.Peek();
-            if (_autoRegisteredModules.Contains(moduleName))throw new Exception($"Dependency module '{callingModuleName}' explicitly references automatic module '{moduleName}'. Consider removing the reference in '{callingModuleName}' or add '[AutoRegister(false)]' attribute to the module '{moduleName}'");
+            if (_autoRegisteredModules.Contains(moduleName)) throw new Exception($"Dependency module '{callingModuleName}' explicitly references automatic module '{moduleName}'. Consider removing the reference in '{callingModuleName}' or add '[AutoRegister(false)]' attribute to the module '{moduleName}'");
 
             //Check if the dependency module has already been registered
             if (_registeredModules.ContainsKey(moduleType)) return;
 
             //Check if the module is to be automatically registered if in a referenced assembly
-            var autoRegisterAttribute=moduleType.GetCustomAttribute<AutoRegisterAttribute>();
+            var autoRegisterAttribute = moduleType.GetCustomAttribute<AutoRegisterAttribute>();
             var auto = autoRegisterAttribute != null && autoRegisterAttribute.Enabled;
 
             //This shouldnt happen since if the module contains a reference to a module in a referenced assembly then that module should already be registered
@@ -180,7 +186,7 @@ namespace ModernSlavery.Infrastructure.Configuration
         }
 
 
-        private void ConfigureModule(Type moduleType)
+        private void ConfigureModule(ILifetimeScope lifetimeScope, Type moduleType)
         {
             if (_configuredModules.Contains(moduleType)) return;
 
@@ -188,7 +194,7 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             var module = _registeredModules[moduleType];
 
-            module.Configure(_serviceProvider, _container);
+            module.Configure(lifetimeScope);
 
             _configuredModules.Add(moduleType);
         }
@@ -197,14 +203,22 @@ namespace ModernSlavery.Infrastructure.Configuration
         ///     Configures all previously registered dependencies declared within the Register method of the specified
         ///     IDependencyModule
         /// </summary>
-        public void ConfigureModules()
+        public void ConfigureModules(params object[] additionalServices)
         {
-            if (_container==null)Build();
-            if (_registeredModules == null || !_registeredModules.Any())throw new Exception("No dependency modules have been registered");
+            if (LifetimeScope==null)throw new Exception($"{nameof(ConfigureModules)} can only be called after build is complete");
 
-            //Resolve a new instance of the dependencies module
-            foreach (var moduleType in _registeredModules.Keys.Except(_configuredModules))
-                ConfigureModule(moduleType);
+            if (!_registeredModules.Any()) throw new Exception("No dependency modules have been registered");
+            
+            using (var innerScope = LifetimeScope.BeginLifetimeScope(builder =>
+            {
+                foreach (var additionalService in additionalServices)
+                    builder.RegisterInstance(additionalService).AsImplementedInterfaces().SingleInstance();
+            }))
+            {
+                //Resolve a new instance of the dependencies module
+                foreach (var moduleType in _registeredModules.Keys.Except(_configuredModules))
+                    ConfigureModule(innerScope, moduleType);
+            }
         }
     }
 }

@@ -10,29 +10,34 @@ namespace ModernSlavery.Infrastructure.Configuration
 {
     public class ConfigBuilder
     {
-        private readonly IConfigurationBuilder _Builder;
+        private readonly IConfigurationBuilder _configBuilder;
+        private readonly string _environmentName;
+        private readonly Dictionary<string, string> _additionalSettings;
 
-        public ConfigBuilder(IConfigurationBuilder configBuilder = null)
+        public ConfigBuilder(IConfigurationBuilder configBuilder, string environmentName, Dictionary<string, string> additionalSettings = null)
         {
-            _Builder = configBuilder ?? new ConfigurationBuilder();
+            _configBuilder = configBuilder ?? new ConfigurationBuilder();
+            if (string.IsNullOrWhiteSpace(environmentName)) throw new ArgumentNullException(nameof(environmentName));
+            _environmentName = environmentName;
+            _additionalSettings = additionalSettings;
         }
 
         public IConfiguration Configuration { get; private set; }
 
 
-        public IConfiguration Build(string environmentName,Dictionary<string, string> additionalSettings = null)
+        public IConfiguration Build()
         {
-            Console.WriteLine($"Environment: {environmentName}");
+            Console.WriteLine($"Environment: {_environmentName}");
 
-            _Builder.AddJsonFile("appsettings.json", false, true);
-            _Builder.AddJsonFile($"appsettings.{environmentName}.json", true, true);
+            _configBuilder.AddJsonFile("appsettings.json", false, true);
+            _configBuilder.AddJsonFile($"appsettings.{_environmentName}.json", true, true);
 
-            _Builder.AddEnvironmentVariables();
+            _configBuilder.AddEnvironmentVariables();
 
-            if (additionalSettings != null && additionalSettings.Any())
-                _Builder.AddInMemoryCollection(additionalSettings);
+            if (_additionalSettings != null && _additionalSettings.Any())
+                _configBuilder.AddInMemoryCollection(_additionalSettings);
 
-            var configuration = _Builder.Build();
+            var configuration = _configBuilder.Build();
 
             //Add the azure key vault to configuration
             var vault = configuration["Vault"];
@@ -51,23 +56,23 @@ namespace ModernSlavery.Infrastructure.Configuration
 
                 if (exceptions.Count > 0) throw new AggregateException(exceptions);
 
-                _Builder.AddAzureKeyVault(vault, clientId, clientSecret);
+                _configBuilder.AddAzureKeyVault(vault, clientId, clientSecret);
             }
 
             /* make sure these files are loaded AFTER the vault, so their keys superseed the vaults' values - that way, unit tests will pass because the obfuscation key is whatever the appSettings says it is [and not a hidden secret inside the vault])  */
             if (Debugger.IsAttached || IsEnvironment("Local"))
             {
                 var appAssembly = Misc.GetTopAssembly();
-                if (appAssembly != null) _Builder.AddUserSecrets(appAssembly, true);
+                if (appAssembly != null) _configBuilder.AddUserSecrets(appAssembly, true);
 
-                _Builder.AddJsonFile("appsettings.secret.json", true, true);
+                _configBuilder.AddJsonFile("appsettings.secret.json", true, true);
             }
 
-            _Builder.AddJsonFile("appsettings.unittests.json", true, false);
+            _configBuilder.AddJsonFile("appsettings.unittests.json", true, false);
 
             // override using the azure environment variables into the configuration
-            _Builder.AddEnvironmentVariables();
-            var config = _Builder.Build();
+            _configBuilder.AddEnvironmentVariables();
+            var config = _configBuilder.Build();
 
             if (!IsProduction() && config.GetValue<bool>("DUMP_APPSETTINGS"))
                 foreach (var key in GetKeys(config))

@@ -1,23 +1,29 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.WebJobs;
+﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.SharedKernel.Interfaces;
-using ModernSlavery.Infrastructure.Logging;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Infrastructure.Configuration;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
-    public static partial class Extensions
+    public static class WebjobHost
     {
-        public static IHostBuilder ConfigureWebjobHostBuilder<TStartupModule>(this IHostBuilder hostBuilder, string applicationName=null, string contentRoot = null, string webRoot = null) where TStartupModule : class, IDependencyModule
+        public class WebJobsStartup: IWebJobsStartup
         {
-            var dependencyBuilder=hostBuilder.ConfigureHost<TStartupModule>(applicationName, contentRoot);
-
-            hostBuilder.ConfigureWebJobs(builder =>
+            public void Configure(IWebJobsBuilder builder)
+            {
+                throw new System.NotImplementedException();
+            }
+        }
+        public static IHostBuilder ConfigureWebjobHostBuilder(string applicationName=null, string contentRoot = null, string webRoot = null, params string[] commandlineArgs)
+        {
+            var hostBuilder = new HostBuilder();
+            
+            hostBuilder.ConfigureHost(applicationName, contentRoot, autoConfigureOnBuild: true, commandlineArgs:commandlineArgs);
+            hostBuilder.ConfigureWebJobs(webjobHostBuilder =>
                 {
-                    builder.AddAzureStorageCoreServices();
-                    builder.AddAzureStorage(
+                    webjobHostBuilder.AddAzureStorageCoreServices();
+                    webjobHostBuilder.AddAzureStorage(
                         queueConfig =>
                         {
                             queueConfig.BatchSize = 1; //Process queue messages 1 item per time per job function
@@ -26,15 +32,11 @@ namespace ModernSlavery.Infrastructure.Hosts
                         {
                             //Configure blobs here
                         });
-                    builder.AddServiceBus();
-                    builder.AddEventHubs();
-                    builder.AddTimers();
-
-                    dependencyBuilder.ConfigureModules();
-                    
-                    builder.UseExternalStartup();
+                    webjobHostBuilder.AddServiceBus();
+                    webjobHostBuilder.AddEventHubs();
+                    webjobHostBuilder.AddTimers();
                 });
-
+            
             return hostBuilder;
         }
     }

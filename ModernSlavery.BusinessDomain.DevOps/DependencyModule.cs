@@ -18,7 +18,7 @@ namespace ModernSlavery.BusinessDomain.DevOps
             //TODO: Add registrationsd here
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Add configuration here
         }

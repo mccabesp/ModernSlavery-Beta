@@ -148,14 +148,14 @@ namespace ModernSlavery.Hosts.IdServer
             ConfigureTestContainer?.Invoke(builder.Autofac);
         }
 
-        public void Configure(IServiceProvider serviceProvider, IContainer container)
+        public void Configure(ILifetimeScope lifetimeScope)
         {
             //Add configuration here
-            var app = serviceProvider.GetService<IApplicationBuilder>();
+            var app = lifetimeScope.Resolve<IApplicationBuilder>();
 
-            var lifetime = serviceProvider.GetService<IHostApplicationLifetime>();
+            var lifetime = lifetimeScope.Resolve<IHostApplicationLifetime>();
 
-            container.UseLogEventQueueLogger();
+            lifetimeScope.UseLogEventQueueLogger();
 
             app.UseMiddleware<ExceptionMiddleware>();
             if (Debugger.IsAttached || _sharedOptions.IsDevelopment() || _sharedOptions.IsLocal())
