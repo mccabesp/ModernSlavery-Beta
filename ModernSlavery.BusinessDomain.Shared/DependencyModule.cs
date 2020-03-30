@@ -3,12 +3,10 @@ using System.Net.Http;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Shared
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         public DependencyModule()

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -15,7 +14,6 @@ using ModernSlavery.WebUI.Shared.Services;
 
 namespace ModernSlavery.WebUI.Shared
 {
-    [AutoRegister]
     public class DependencyModule: IDependencyModule
     {
         private readonly ILogger _logger;
@@ -30,6 +28,10 @@ namespace ModernSlavery.WebUI.Shared
 
         public void Register(IDependencyBuilder builder)
         {
+            //Register references dependency modules
+            builder.RegisterModule<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            builder.RegisterModule<ModernSlavery.WebUI.GDSDesignSystem.DependencyModule>();
+
             //Register HttpCache and HttpSession
             builder.Autofac.RegisterType<HttpSession>().As<IHttpSession>().InstancePerLifetimeScope();
             builder.Autofac.RegisterType<HttpCache>().As<IHttpCache>().SingleInstance();

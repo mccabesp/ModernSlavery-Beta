@@ -5,13 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Registration.Classes;
 
 namespace ModernSlavery.WebUI.Registration
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
@@ -26,6 +24,11 @@ namespace ModernSlavery.WebUI.Registration
 
         public void Register(IDependencyBuilder builder)
         {
+            //Register references dependency modules
+            builder.RegisterModule<ModernSlavery.BusinessDomain.Registration.DependencyModule>();
+            builder.RegisterModule<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            builder.RegisterModule<ModernSlavery.WebUI.Shared.DependencyModule>();
+
             //Register public and private repositories
             builder.Autofac.RegisterType<PublicSectorRepository>()
                 .As<IPagedRepository<EmployerRecord>>()

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Web.WebPages;
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +17,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Infrastructure.CompaniesHouse;
@@ -30,11 +31,11 @@ using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Classes.Providers;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Options;
+using ModernSlavery.WebUI.Viewing.Controllers;
 using AuditLogger = ModernSlavery.Infrastructure.Logging.AuditLogger;
 
 namespace ModernSlavery.Hosts.Web
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
@@ -100,7 +101,7 @@ namespace ModernSlavery.Hosts.Web
                     {
                         options.DataAnnotationLocalizerProvider =
                             DataAnnotationLocalizerProvider.DefaultResourceHandler;
-                    });
+                    }).AddApplicationPart(typeof(ViewingController).Assembly);
 
             var mvcBuilder = builder.Services.AddRazorPages();
 

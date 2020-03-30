@@ -2,13 +2,11 @@
 using Autofac;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;
 
 namespace ModernSlavery.Infrastructure.Storage
 {
-    [AutoRegister(false)]
     public class FileStorageDependencyModule : IDependencyModule
     {
         private readonly StorageOptions _options;

@@ -4,12 +4,10 @@ using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Infrastructure.CompaniesHouse
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly CompaniesHouseOptions _companiesHouseOptions;

@@ -1,12 +1,10 @@
 ﻿using System;
 using Autofac;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Submission
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         public DependencyModule()

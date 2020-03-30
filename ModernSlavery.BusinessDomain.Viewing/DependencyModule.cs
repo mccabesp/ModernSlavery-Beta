@@ -1,12 +1,10 @@
 ﻿using System;
 using Autofac;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Viewing
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         public DependencyModule()
@@ -18,6 +16,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
         {
             //Add registrations here
             builder.Autofac.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance();
+            builder.Autofac.RegisterType<ViewingService>().As<IViewingService>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

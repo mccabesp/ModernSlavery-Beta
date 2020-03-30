@@ -12,7 +12,6 @@ using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Hosts.Webjob.Classes;
@@ -26,7 +25,6 @@ using ResponseCachingOptions = Microsoft.AspNetCore.ResponseCaching.ResponseCach
 
 namespace ModernSlavery.Hosts.Webjob
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;

@@ -3,13 +3,11 @@ using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
 
 namespace ModernSlavery.WebUI.Admin
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
@@ -24,6 +22,11 @@ namespace ModernSlavery.WebUI.Admin
 
         public void Register(IDependencyBuilder builder)
         {
+            //Register references dependency modules
+            builder.RegisterModule<ModernSlavery.BusinessDomain.Admin.DependencyModule>();
+            builder.RegisterModule<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            builder.RegisterModule<ModernSlavery.WebUI.Shared.DependencyModule>();
+
             //Register dependencies here
             builder.Autofac.RegisterType<AdminSearchService>().As<AdminSearchService>()
                 .InstancePerLifetimeScope();

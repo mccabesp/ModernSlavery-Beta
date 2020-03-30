@@ -3,14 +3,12 @@ using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Viewing.Presenters;
 
 namespace ModernSlavery.WebUI.Viewing
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
@@ -25,6 +23,11 @@ namespace ModernSlavery.WebUI.Viewing
 
         public void Register(IDependencyBuilder builder)
         {
+            //Register references dependency modules
+            builder.RegisterModule<ModernSlavery.BusinessDomain.Viewing.DependencyModule>();
+            builder.RegisterModule<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            builder.RegisterModule<ModernSlavery.WebUI.Shared.DependencyModule>();
+
             //Register dependencies here
             builder.Autofac.RegisterType<ViewingPresenter>().As<IViewingPresenter>()
                 .InstancePerLifetimeScope();

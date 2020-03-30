@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Configuration
@@ -35,8 +34,6 @@ namespace ModernSlavery.Infrastructure.Configuration
             Autofac = null;
             _registeredModules = null;
             _configuredModules = null;
-            _autoRegisteredModules = null;
-            _callingModuleNames = null;
             _registeredAssemblyNames = null;
         }
 
@@ -48,11 +45,8 @@ namespace ModernSlavery.Infrastructure.Configuration
 
         private readonly Dictionary<string, Assembly> _loadedAssemblies = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
         private SortedSet<string> _registeredAssemblyNames = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
-        private SortedSet<string> _autoRegisteredModules = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
         private Dictionary<Type, IDependencyModule> _registeredModules = new Dictionary<Type, IDependencyModule>();
         private HashSet<Type> _configuredModules = new HashSet<Type>();
-
-        private Queue<string> _callingModuleNames = new Queue<string>();
 
         public void Build(ContainerBuilder builder)
         {
@@ -126,20 +120,12 @@ namespace ModernSlavery.Infrastructure.Configuration
             {
                 if (_registeredModules.ContainsKey(assemblyModuleType)) continue;
 
-                //Check if the module is to be automatically registered if in a referenced assembly
-                var autoRegisterAttribute = assemblyModuleType.GetCustomAttribute<AutoRegisterAttribute>() ?? throw new Exception($"Dependency module '{assemblyModuleType.FullName}' does not contain '[AutoRegister(false)]' attribute'");
-
-                var auto = autoRegisterAttribute != null && autoRegisterAttribute.Enabled;
-                if (!auto) continue;
                 var moduleName = assemblyModuleType.FullName ?? assemblyModuleType.ToString();
 
                 //If only 1 dependency the load it 
                 var moduleInstance = CreateInstance(assemblyModuleType);
-                _callingModuleNames.Enqueue(moduleName);
                 moduleInstance.Register(this);
-                _callingModuleNames.Dequeue();
                 _registeredModules[assemblyModuleType] = moduleInstance;
-                _autoRegisteredModules.Add(moduleName);
             }
         }
 
@@ -157,19 +143,8 @@ namespace ModernSlavery.Infrastructure.Configuration
 
         private void RegisterModule(Type moduleType)
         {
-            var moduleName = moduleType.FullName ?? moduleType.ToString();
-            var callingModuleName = _callingModuleNames.Peek();
-            if (_autoRegisteredModules.Contains(moduleName)) throw new Exception($"Dependency module '{callingModuleName}' explicitly references automatic module '{moduleName}'. Consider removing the reference in '{callingModuleName}' or add '[AutoRegister(false)]' attribute to the module '{moduleName}'");
-
             //Check if the dependency module has already been registered
             if (_registeredModules.ContainsKey(moduleType)) return;
-
-            //Check if the module is to be automatically registered if in a referenced assembly
-            var autoRegisterAttribute = moduleType.GetCustomAttribute<AutoRegisterAttribute>();
-            var auto = autoRegisterAttribute != null && autoRegisterAttribute.Enabled;
-
-            //This shouldnt happen since if the module contains a reference to a module in a referenced assembly then that module should already be registered
-            if (auto) throw new Exception($"Attempt to register an automatically registered dependency module. Change '[AutoRegister(false)]' attribute for the module '{moduleName}'");
 
             var moduleInstance = CreateInstance(moduleType);
             moduleInstance.Register(this);

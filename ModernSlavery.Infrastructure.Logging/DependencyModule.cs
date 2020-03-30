@@ -2,14 +2,12 @@
 using Autofac;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
 namespace ModernSlavery.Infrastructure.Logging
 {
-    [AutoRegister(false)]
     public class DependencyModule : IDependencyModule
     {
         private readonly StorageOptions _storageOptions;

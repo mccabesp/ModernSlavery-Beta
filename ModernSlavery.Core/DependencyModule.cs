@@ -1,13 +1,11 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.Core
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;

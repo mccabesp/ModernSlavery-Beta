@@ -15,7 +15,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Hosts.IdServer.Classes;
@@ -29,7 +28,6 @@ using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.Hosts.IdServer
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         public static Action<IServiceCollection> ConfigureTestServices;

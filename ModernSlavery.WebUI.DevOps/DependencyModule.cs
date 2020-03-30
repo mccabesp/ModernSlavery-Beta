@@ -3,12 +3,10 @@ using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.WebUI.DevOps
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
@@ -23,6 +21,10 @@ namespace ModernSlavery.WebUI.DevOps
 
         public void Register(IDependencyBuilder builder)
         {
+            //Register references dependency modules
+            builder.RegisterModule<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            builder.RegisterModule<ModernSlavery.WebUI.Shared.DependencyModule>();
+
             //TODO: Register dependencies here
             //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
             builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)

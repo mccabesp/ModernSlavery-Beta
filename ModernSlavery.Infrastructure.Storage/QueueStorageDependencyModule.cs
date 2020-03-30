@@ -1,13 +1,11 @@
 ﻿using System;
 using Autofac;
 using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
 namespace ModernSlavery.Infrastructure.Storage
 {
-    [AutoRegister(false)]
     public class QueueStorageDependencyModule : IDependencyModule
     {
         private readonly StorageOptions _options;

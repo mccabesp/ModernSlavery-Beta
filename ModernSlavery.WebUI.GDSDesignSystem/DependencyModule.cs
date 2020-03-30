@@ -1,12 +1,10 @@
 ﻿using System;
 using Autofac;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem
 {
-    [AutoRegister]
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;

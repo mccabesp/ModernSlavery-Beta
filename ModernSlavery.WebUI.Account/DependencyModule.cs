@@ -3,7 +3,6 @@ using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Account.Interfaces;
 using ModernSlavery.WebUI.Account.ViewServices;
@@ -11,7 +10,6 @@ using ModernSlavery.WebUI.Shared.Controllers;
 
 namespace ModernSlavery.WebUI.Account
 {
-    [AutoRegister]
     public class DependencyModule: IDependencyModule
     {
         private readonly ILogger _logger;
@@ -26,6 +24,10 @@ namespace ModernSlavery.WebUI.Account
 
         public void Register(IDependencyBuilder builder)
         {
+            //Register references dependency modules
+            builder.RegisterModule<ModernSlavery.BusinessDomain.Account.DependencyModule>();
+            builder.RegisterModule<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            builder.RegisterModule<ModernSlavery.WebUI.Shared.DependencyModule>();
             //Register dependencies here
             builder.Autofac.RegisterType<ChangeDetailsViewService>().As<IChangeDetailsViewService>()
                 .InstancePerLifetimeScope();
