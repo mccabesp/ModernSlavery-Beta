@@ -1,10 +1,13 @@
 ﻿using System;
 using Autofac;
+using Autofac.Features.AttributeFilters;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Account.Interfaces;
 using ModernSlavery.WebUI.Account.ViewServices;
+using ModernSlavery.WebUI.Shared.Controllers;
 
 namespace ModernSlavery.WebUI.Account
 {
@@ -32,6 +35,12 @@ namespace ModernSlavery.WebUI.Account
                 .InstancePerLifetimeScope();
             builder.Autofac.RegisterType<CloseAccountViewService>().As<ICloseAccountViewService>()
                 .InstancePerLifetimeScope();
+
+            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
+            builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
+                .Where(t => t.IsAssignableTo<Controller>())
+                .InstancePerLifetimeScope()
+                .WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

@@ -1,6 +1,7 @@
 ﻿using System;
 using Autofac;
 using Autofac.Features.AttributeFilters;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
@@ -48,8 +49,8 @@ namespace ModernSlavery.WebUI.Shared
             builder.Autofac.RegisterType<NotificationService>().As<INotificationService>().SingleInstance();
 
             //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            builder.Autofac.RegisterAssemblyTypes(typeof(BaseController).Assembly)
-                .Where(t => t.IsAssignableTo<BaseController>())
+            builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
+                .Where(t => t.IsAssignableTo<Controller>())
                 .InstancePerLifetimeScope()
                 .WithAttributeFiltering();
 

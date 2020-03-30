@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using Autofac;
+using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +28,7 @@ using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Classes.Providers;
+using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Options;
 using AuditLogger = ModernSlavery.Infrastructure.Logging.AuditLogger;
 
@@ -175,6 +177,13 @@ namespace ModernSlavery.Hosts.Web
 
             //Register google analytics tracker
             builder.RegisterModule<GoogleAnalyticsDependencyModule>();
+
+            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
+            builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
+                .Where(t => t.IsAssignableTo<BaseController>())
+                .InstancePerLifetimeScope()
+                .WithAttributeFiltering();
+
 
             // Initialise AutoMapper
             var mapperConfig = new MapperConfiguration(config =>

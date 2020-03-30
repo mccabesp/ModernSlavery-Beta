@@ -1,5 +1,7 @@
 ﻿using System;
 using Autofac;
+using Autofac.Features.AttributeFilters;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.SharedKernel.Attributes;
 using ModernSlavery.Core.SharedKernel.Interfaces;
@@ -26,6 +28,12 @@ namespace ModernSlavery.WebUI.Submission
             builder.Autofac.RegisterType<SubmissionPresenter>().As<ISubmissionPresenter>()
                 .InstancePerLifetimeScope();
             builder.Autofac.RegisterType<ScopePresenter>().As<IScopePresenter>().InstancePerLifetimeScope();
+
+            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
+            builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
+                .Where(t => t.IsAssignableTo<Controller>())
+                .InstancePerLifetimeScope()
+                .WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
