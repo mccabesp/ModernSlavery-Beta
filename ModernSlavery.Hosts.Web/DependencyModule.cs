@@ -24,6 +24,7 @@ using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Storage;
+using ModernSlavery.Infrastructure.Storage.FileRepositories;
 using ModernSlavery.Infrastructure.Telemetry;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
@@ -157,13 +158,19 @@ namespace ModernSlavery.Hosts.Web
             //Register the queue storage dependencies
             builder.RegisterModule<QueueStorageDependencyModule>();
 
+            //Register the queue storage dependencies
+            builder.Autofac.RegisterType<DnBOrgsRepository>().As<IDnBOrgsRepository>().WithParameter("dataPath",_sharedOptions.DataPath).WithAttributeFiltering();
+
             //Register the log storage dependencies
             builder.RegisterModule<Infrastructure.Logging.DependencyModule>();
+
+            //Register the search dependencies
+            builder.RegisterModule<Infrastructure.Search.DependencyModule>();
 
             builder.Autofac.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
 
             // register web ui services
-            builder.Autofac.RegisterType<AuditLogger>().As<IAuditLogger>().InstancePerLifetimeScope();
+            //builder.Autofac.RegisterType<AuditLogger>().As<IAuditLogger>().InstancePerLifetimeScope();
             
             // Register Action helpers
             builder.Autofac.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()

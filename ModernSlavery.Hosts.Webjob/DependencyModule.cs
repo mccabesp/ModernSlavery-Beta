@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Autofac;
+using Autofac.Features.AttributeFilters;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
@@ -77,9 +78,9 @@ namespace ModernSlavery.Hosts.Webjob
             builder.Autofac.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
 
             // Register email provider dependencies
-            builder.Autofac.RegisterType<GovNotifyEmailProvider>().SingleInstance();
-            builder.Autofac.RegisterType<SmtpEmailProvider>().SingleInstance();
-            builder.Autofac.RegisterType<EmailProvider>().SingleInstance();
+            builder.Autofac.RegisterType<GovNotifyEmailProvider>().SingleInstance().WithAttributeFiltering();
+            builder.Autofac.RegisterType<SmtpEmailProvider>().SingleInstance().WithAttributeFiltering();
+            builder.Autofac.RegisterType<EmailProvider>().SingleInstance().WithAttributeFiltering();
 
             // Need to register webJob class in Autofac as well
             builder.Autofac.RegisterType<Functions>().InstancePerDependency();

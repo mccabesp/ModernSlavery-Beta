@@ -38,7 +38,7 @@ namespace ModernSlavery.Hosts.Webjob
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             //Create the WebjobHost
-            return WebjobHost.ConfigureWebjobHostBuilder(commandlineArgs: args);
+            return WebjobHost.ConfigureWebjobHostBuilder<DependencyModule>(commandlineArgs: args);
         }
     }
 

@@ -1,17 +1,18 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Configuration;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
     public static class WebHost
     {
-        public static IHostBuilder ConfigureWebHostBuilder(string applicationName = null, string contentRoot = null, string webRoot = null, params string[] commandlineArgs)
+        public static IHostBuilder ConfigureWebHostBuilder<TStartupModule>(string applicationName = null, string contentRoot = null, string webRoot = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
             var hostBuilder = new HostBuilder();
 
-            hostBuilder.ConfigureHost(applicationName, contentRoot, commandlineArgs: commandlineArgs);
+            hostBuilder.ConfigureHost<TStartupModule>(applicationName, contentRoot, commandlineArgs: commandlineArgs);
 
             //Configure the host defaults
             hostBuilder.ConfigureWebHostDefaults(webHostBuilder =>

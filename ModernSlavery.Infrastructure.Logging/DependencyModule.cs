@@ -37,6 +37,8 @@ namespace ModernSlavery.Infrastructure.Logging
             // Register log records (without key filtering)
             builder.Autofac.RegisterType<UserAuditLogger>().As<IUserLogger>().SingleInstance();
             builder.Autofac.RegisterType<RegistrationAuditLogger>().As<IRegistrationLogger>().SingleInstance();
+
+            builder.Autofac.RegisterType<SeriEventLogger>().As<IEventLogger>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

@@ -6,7 +6,7 @@ using ModernSlavery.Core.SharedKernel.Options;
 namespace ModernSlavery.WebUI.Shared.Options
 {
     [Options("UrlRoutes")]
-    public class UrlRouteOptions : Dictionary<string, string>
+    public class UrlRouteOptions : Dictionary<string, string>,IOptions
     {
         public enum Routes
         {

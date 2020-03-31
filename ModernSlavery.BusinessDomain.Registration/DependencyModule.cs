@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
@@ -20,7 +21,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             builder.Autofac.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>()
                 .SingleInstance();
             builder.Autofac.RegisterType<RegistrationService>().As<IRegistrationService>()
-                .InstancePerLifetimeScope();
+                .InstancePerLifetimeScope().WithAttributeFiltering();
 
             builder.Autofac.RegisterType<PinInThePostService>().As<PinInThePostService>().SingleInstance();
         }

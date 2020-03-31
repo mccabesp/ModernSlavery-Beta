@@ -21,6 +21,12 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
     [Route("viewing")]
     public class CompareController : BaseController
     {
+        public ICompareBusinessLogic CompareBusinessLogic { get; set; }
+        public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
+
+        public ISearchPresenter SearchViewService { get; }
+
+        public IComparePresenter CompareViewService { get; }
         public CompareController(
             ISearchPresenter searchViewService,
             IComparePresenter compareViewService,
@@ -382,15 +388,6 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
         #endregion
 
-        #region Dependencies
 
-        public ICompareBusinessLogic CompareBusinessLogic { get; set; }
-        public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
-
-        public ISearchPresenter SearchViewService { get; }
-
-        public IComparePresenter CompareViewService { get; }
-
-        #endregion
     }
 }

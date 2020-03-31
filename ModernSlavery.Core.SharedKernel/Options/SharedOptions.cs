@@ -12,6 +12,11 @@ namespace ModernSlavery.Core.SharedKernel.Options
         {
 
         }
+
+        public int FirstReportingYear { get; set; } = 2020;
+        public DateTime PrivateAccountingDate { get; set; }
+        public DateTime PublicAccountingDate { get; set; }
+
         private string _IdentityIssuer;
 
         private int[] _reminderEmailDays;
@@ -100,8 +105,6 @@ namespace ModernSlavery.Core.SharedKernel.Options
         public string AssemblyCopyright => Misc.GetTopAssembly().GetAssemblyCopyright();
         public string DatabaseConnectionName { get; set; } = "ModernSlaveryDatabase";
 
-        public int FirstReportingYear { get; set; } = 2020;
-
         public string GpgReportingEmail { get; set; }
         public string DataControllerEmail { get; set; }
         public string DataProtectionOfficerEmail { get; set; }
@@ -178,7 +181,6 @@ namespace ModernSlavery.Core.SharedKernel.Options
         public string DownloadsLocation { get; set; }
 
         public string SaveDraftPath { get; set; }
-
         #endregion
     }
 }

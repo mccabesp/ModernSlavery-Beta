@@ -24,6 +24,8 @@ namespace ModernSlavery.Infrastructure.Database
             builder.Autofac.RegisterType<DatabaseContext>().As<IDbContext>().InstancePerLifetimeScope();
 
             builder.Autofac.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerLifetimeScope();
+
+            builder.Autofac.RegisterType<ShortCodesRepository>().As<IShortCodesRepository>().InstancePerLifetimeScope();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

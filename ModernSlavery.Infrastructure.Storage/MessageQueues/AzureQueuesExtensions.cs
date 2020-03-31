@@ -16,13 +16,21 @@ namespace ModernSlavery.Infrastructure.Storage.MessageQueues
 
             if (string.IsNullOrWhiteSpace(queueName)) throw new ArgumentNullException(nameof(queueName));
 
-            builder.Register(
-                    ctx =>
-                        supportLargeMessages
-                            ? new AzureQueue(azureConnectionString, queueName, ctx.Resolve<IFileRepository>())
-                            : new AzureQueue(azureConnectionString, queueName))
-                .Keyed<IQueue>(queueName)
-                .SingleInstance();
+            if (supportLargeMessages)
+                builder.RegisterType<AzureQueue>()
+                    .Keyed<IQueue>(queueName)
+                    .SingleInstance()
+                    .WithParameter("connectionString", azureConnectionString)
+                    .WithParameter("queueName", queueName);
+
+            else
+                builder.RegisterType<AzureQueue>()
+                    .Keyed<IQueue>(queueName)
+                    .SingleInstance()
+                    .WithParameter("connectionString", azureConnectionString)
+                    .WithParameter("queueName", queueName)
+                    .WithParameter("fileRepository", null);
+
         }
     }
 }

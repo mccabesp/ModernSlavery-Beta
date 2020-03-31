@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using Autofac.Features.AttributeFilters;
 using Microsoft.Azure.Search;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -31,13 +32,13 @@ namespace ModernSlavery.Infrastructure.Search
                 .WithParameter("serviceName", _options.AzureServiceName)
                 .WithParameter("indexName", _options.EmployerIndexName)
                 .WithParameter("adminApiKey", _options.AzureApiAdminKey)
-                .WithParameter("disabled", _options.Disabled);
+                .WithParameter("disabled", _options.Disabled).WithAttributeFiltering();
 
             builder.Autofac.RegisterType<AzureSicCodeSearchRepository>()
                 .As<ISearchRepository<SicCodeSearchModel>>()
                 .SingleInstance()
                 .WithParameter("indexName", _options.SicCodeIndexName)
-                .WithParameter("disabled", _options.Disabled);
+                .WithParameter("disabled", _options.Disabled).WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

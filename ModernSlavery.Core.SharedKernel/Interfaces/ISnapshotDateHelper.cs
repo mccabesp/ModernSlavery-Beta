@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.Core.SharedKernel.Interfaces
 {
@@ -15,15 +16,13 @@ namespace ModernSlavery.Core.SharedKernel.Interfaces
 
     public class SnapshotDateHelper : ISnapshotDateHelper
     {
-        private readonly IConfiguration _configuration;
+        private readonly SharedOptions _sharedOptions;
 
         private int? _firstReportingYear;
 
-        public SnapshotDateHelper(IConfiguration configuration)
+        public SnapshotDateHelper(SharedOptions sharedOptions)
         {
-            _configuration = configuration;
-            PrivateAccountingDate = _configuration.GetValue<DateTime>("PrivateAccountingDate");
-            PublicAccountingDate = _configuration.GetValue<DateTime>("PublicAccountingDate");
+            _sharedOptions= sharedOptions;
         }
 
         public int FirstReportingYear
@@ -31,18 +30,18 @@ namespace ModernSlavery.Core.SharedKernel.Interfaces
             get
             {
                 if (!_firstReportingYear.HasValue)
-                    _firstReportingYear = _configuration.GetValueOrDefault("FirstReportingYear", 2017);
+                    _firstReportingYear = _sharedOptions.FirstReportingYear;
                 return _firstReportingYear.Value;
             }
             set
             {
                 _firstReportingYear = value;
-                _configuration["FirstReportingYear"] = value.ToString();
+                _sharedOptions.FirstReportingYear = value;
             }
         }
 
-        public DateTime PrivateAccountingDate { get; }
-        public DateTime PublicAccountingDate { get; }
+        public DateTime PrivateAccountingDate => _sharedOptions.PrivateAccountingDate;
+        public DateTime PublicAccountingDate=> _sharedOptions.PublicAccountingDate;
         public int CurrentSnapshotYear => GetSnapshotDate(SectorTypes.Private).Year;
 
         public DateTime GetSnapshotDate(SectorTypes sectorType, int year = 0)

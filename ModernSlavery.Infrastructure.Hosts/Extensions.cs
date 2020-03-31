@@ -61,7 +61,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             set => _EnvironmentName = value;
         }
 
-        public static IHostBuilder ConfigureHost(this IHostBuilder hostBuilder, string applicationName = null, string contentRoot = null, bool autoConfigureOnBuild=false,Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs)
+        public static IHostBuilder ConfigureHost<TStartupModule>(this IHostBuilder hostBuilder, string applicationName = null, string contentRoot = null, bool autoConfigureOnBuild=false,Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
             //Set the console title to the application name
             if (string.IsNullOrWhiteSpace(applicationName)) applicationName = Assembly.GetEntryAssembly().GetName().Name;
@@ -114,7 +114,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             hostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) =>
             {
                 //Build all the required dependencies
-                dependencyBuilder.Build(builder);
+                dependencyBuilder.Build<TStartupModule>(builder);
                 dependencyBuilder.ServiceProviderFactory = serviceProviderFactory;
                 hostBuilder.Properties.Add("serviceProviderFactory", serviceProviderFactory);
                 hostBuilder.Properties.Add("dependencyBuilder", dependencyBuilder);

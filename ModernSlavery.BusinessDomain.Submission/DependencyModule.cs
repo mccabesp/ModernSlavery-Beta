@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
@@ -17,8 +18,10 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Add registrations here
             builder.Autofac.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>()
                 .InstancePerLifetimeScope();
+            builder.Autofac.RegisterType<SubmissionService>().As<ISubmissionService>()
+                .InstancePerLifetimeScope().WithAttributeFiltering();
             builder.Autofac.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>()
-                .InstancePerLifetimeScope();
+                .InstancePerLifetimeScope().WithAttributeFiltering();
             builder.Autofac.RegisterType<DraftFileBusinessLogic>().As<IDraftFileBusinessLogic>()
                 .SingleInstance();
         }

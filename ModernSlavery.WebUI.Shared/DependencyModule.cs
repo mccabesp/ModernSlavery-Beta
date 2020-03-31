@@ -37,18 +37,18 @@ namespace ModernSlavery.WebUI.Shared
             builder.Autofac.RegisterType<HttpCache>().As<IHttpCache>().SingleInstance();
 
             //Register Url route helper
-            builder.Services.AddSingleton<UrlRouteHelper>(); 
+            builder.Autofac.RegisterType<UrlRouteHelper>().As<IUrlRouteHelper>().InstancePerLifetimeScope(); 
             
             //Register the web service container
-            builder.Services.AddSingleton<WebService>();
+            builder.Autofac.RegisterType<WebService>().As<IWebService>().InstancePerLifetimeScope();
 
             //Register factories
             builder.Autofac.RegisterType<ErrorViewModelFactory>().As<IErrorViewModelFactory>()
                 .SingleInstance();
 
             //Register Email queuers
-            builder.Autofac.RegisterType<SendEmailService>().As<ISendEmailService>().SingleInstance();
-            builder.Autofac.RegisterType<NotificationService>().As<INotificationService>().SingleInstance();
+            builder.Autofac.RegisterType<SendEmailService>().As<ISendEmailService>().SingleInstance().WithAttributeFiltering();
+            builder.Autofac.RegisterType<NotificationService>().As<INotificationService>().SingleInstance().WithAttributeFiltering();
 
             //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
             builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)

@@ -28,7 +28,7 @@ namespace ModernSlavery.Hosts.IdServer
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             //Create the web host
-            return WebHost.ConfigureWebHostBuilder(commandlineArgs: args);
+            return WebHost.ConfigureWebHostBuilder<DependencyModule>(commandlineArgs: args);
         }
     }
 }

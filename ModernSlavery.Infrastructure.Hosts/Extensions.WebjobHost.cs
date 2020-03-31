@@ -2,6 +2,7 @@
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Configuration;
 
 namespace ModernSlavery.Infrastructure.Hosts
@@ -15,11 +16,11 @@ namespace ModernSlavery.Infrastructure.Hosts
                 throw new System.NotImplementedException();
             }
         }
-        public static IHostBuilder ConfigureWebjobHostBuilder(string applicationName=null, string contentRoot = null, string webRoot = null, params string[] commandlineArgs)
+        public static IHostBuilder ConfigureWebjobHostBuilder<TStartupModule>(string applicationName=null, string contentRoot = null, string webRoot = null, params string[] commandlineArgs) where TStartupModule: class, IDependencyModule
         {
             var hostBuilder = new HostBuilder();
             
-            hostBuilder.ConfigureHost(applicationName, contentRoot, autoConfigureOnBuild: true, commandlineArgs:commandlineArgs);
+            hostBuilder.ConfigureHost<TStartupModule>(applicationName, contentRoot, autoConfigureOnBuild: true, commandlineArgs:commandlineArgs);
             hostBuilder.ConfigureWebJobs(webjobHostBuilder =>
                 {
                     webjobHostBuilder.AddAzureStorageCoreServices();

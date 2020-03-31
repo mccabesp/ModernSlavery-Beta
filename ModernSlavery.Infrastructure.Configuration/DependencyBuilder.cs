@@ -48,7 +48,7 @@ namespace ModernSlavery.Infrastructure.Configuration
         private Dictionary<Type, IDependencyModule> _registeredModules = new Dictionary<Type, IDependencyModule>();
         private HashSet<Type> _configuredModules = new HashSet<Type>();
 
-        public void Build(ContainerBuilder builder)
+        public void Build<TStartupModule>(ContainerBuilder builder) where TStartupModule : class, IDependencyModule
         {
             //Create the builder for registering all dependency modules
             Autofac = builder;
@@ -82,7 +82,7 @@ namespace ModernSlavery.Infrastructure.Configuration
                 .ForEach(a => _loadedAssemblies[a.FullName] = a);
 
             //Register the DependencyModules in the root assembly and all descendent assemblies
-            RegisterModules(Assembly.GetEntryAssembly());
+            RegisterModules(typeof(TStartupModule).Assembly);
 
             //Populate the default builder with all the services created using dependency modules by the dependency builder
             Autofac.Populate(Services);

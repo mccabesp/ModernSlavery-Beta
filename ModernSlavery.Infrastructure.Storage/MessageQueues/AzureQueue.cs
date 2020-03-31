@@ -68,7 +68,10 @@ namespace ModernSlavery.Infrastructure.Storage.MessageQueues
 
         #region Constructors
 
-        public AzureQueue(string connectionString, string queueName)
+        /// <summary>
+        ///     Enables large message support when providing a FileRepository.
+        /// </summary>
+        public AzureQueue(string connectionString, string queueName, IFileRepository fileRepository)
         {
             if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullException(nameof(connectionString));
 
@@ -77,15 +80,8 @@ namespace ModernSlavery.Infrastructure.Storage.MessageQueues
             this.connectionString = connectionString;
             Name = queueName;
             lazyQueue = new Lazy<Task<CloudQueue>>(async () => await ConnectToAzureQueueLazyAsync());
-        }
 
-        /// <summary>
-        ///     Enables large message support when providing a FileRepository.
-        /// </summary>
-        public AzureQueue(string connectionString, string queueName, IFileRepository fileRepository) : this(
-            connectionString, queueName)
-        {
-            this.fileRepository = fileRepository ?? throw new ArgumentNullException(nameof(fileRepository));
+            this.fileRepository = fileRepository;
         }
 
         #endregion
