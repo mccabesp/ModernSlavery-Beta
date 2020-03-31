@@ -1,15 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Shared.Options
 {
     [Options("Features")]
-    public class FeatureSwitchOptions : IOptions
+    public class FeatureSwitchOptions : Dictionary<String,FeatureSwitchOptions.Feature>,IOptions
     {
-        public Feature[] Features { get; set; }
+        public FeatureSwitchOptions():base(StringComparer.OrdinalIgnoreCase)
+        {
 
+        }
         public bool IsDisabled(string featureName)
         {
             return !IsEnabled(featureName);
@@ -17,7 +23,7 @@ namespace ModernSlavery.WebUI.Shared.Options
 
         public bool IsEnabled(string featureName)
         {
-            var feature = Features?.FirstOrDefault(f => f.EqualsI(featureName));
+            var feature = this.ContainsKey(featureName) ? this[featureName] : null;
 
             if (feature == null) return true;
 
@@ -31,12 +37,9 @@ namespace ModernSlavery.WebUI.Shared.Options
         {
             public enum Actions
             {
-                Disable,
-                Enable
+                Enable,
+                Disable
             }
-
-            public string Name { get; set; }
-
             public Actions Action { get; set; }
             public DateTime StartDate { get; set; } = DateTime.MinValue;
             public DateTime EndDate { get; set; } = DateTime.MaxValue;

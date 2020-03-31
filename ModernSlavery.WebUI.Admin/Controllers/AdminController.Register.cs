@@ -537,7 +537,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 //Show confirmation
                 if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
                     TempData["TestUrl"] = Url.Action("Impersonate", "Admin",
-                        new {area = "Admin", emailAddress = userOrg.User.EmailAddress});
+                        new {emailAddress = userOrg.User.EmailAddress});
 
                 result = RedirectToAction("RequestAccepted");
             }
@@ -757,7 +757,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var result = UnwrapRegistrationRequest(model, out userOrg, true);
 
                 ViewBag.TestUrl = Url.Action("Impersonate", "Admin",
-                    new {area = "Admin", emailAddress = userOrg.User.EmailAddress});
+                    new {emailAddress = userOrg.User.EmailAddress});
             }
 
             return View("RequestCancelled", model);

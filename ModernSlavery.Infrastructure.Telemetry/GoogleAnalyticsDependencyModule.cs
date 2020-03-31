@@ -22,6 +22,15 @@ namespace ModernSlavery.Infrastructure.Telemetry
 
         public void Register(IDependencyBuilder builder)
         {
+            if (string.IsNullOrWhiteSpace(_sharedOptions.GoogleAnalyticsAccountId))
+            {
+                if (_sharedOptions.IsProduction())
+                    throw new ArgumentNullException(nameof(_sharedOptions.GoogleAnalyticsAccountId));
+
+                builder.Autofac.RegisterType<FakeWebTracker>().As<IWebTracker>().SingleInstance();
+                return;
+            }
+
             //Add a dedicated httpclient for Google Analytics tracking with exponential retry policy
             builder.Services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), client =>
                 {

@@ -85,11 +85,11 @@
                     {
                         <tr>
                             <td>
-                                <a href="@Url.Action("Read", "Admin", new {area = "Admin", filePath = download.Filepath})">
+                                <a href="@Url.Action("Read", "Admin", new {filePath = download.Filepath})">
                                     <b>@download.Title</b>
                                 </a><br/>@download.Description</td>
                             <td>
-                                <a download="true" href="@Url.Action("Download", "Admin", new {area = "Admin", filePath = download.Filepath})" target="_blank">@download.Name</a>
+                                <a download="true" href="@Url.Action("Download", "Admin", new {filePath = download.Filepath})" target="_blank">@download.Name</a>
                             </td>
                         </tr>
                     }

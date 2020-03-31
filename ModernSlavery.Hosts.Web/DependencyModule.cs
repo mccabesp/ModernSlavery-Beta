@@ -72,13 +72,14 @@ namespace ModernSlavery.Hosts.Web
 
         public void Register(IDependencyBuilder builder)
         {
+
             //Allow handler for caching of http responses
             builder.Services.AddResponseCaching();
 
             //Allow creation of a static http context anywhere
             builder.Services.AddHttpContextAccessor();
 
-            builder.Services.AddControllersWithViews(
+            var mvcBuilder = builder.Services.AddControllersWithViews(
                     options =>
                     {
                         options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
@@ -89,27 +90,36 @@ namespace ModernSlavery.Hosts.Web
                         _responseCachingOptions.CacheProfiles.ForEach(p =>
                             options.CacheProfiles.Add(p)); //Load the response cache profiles from options
                         options.Filters.Add<ErrorHandlingFilter>();
-                    })
-                .AddControllersAsServices() // Add controllers as services so attribute filters be resolved in contructors.
-                // Set the default resolver to use Pascalcase instead of the default camelCase which may break Ajaz responses
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-                    options.JsonSerializerOptions.PropertyNamingPolicy = null;
-                })
-                .AddDataAnnotationsLocalization(
+                    });
+
+            mvcBuilder.AddControllersAsServices(); // Add controllers as services so attribute filters be resolved in contructors.
+            mvcBuilder.AddTagHelpersAsServices();
+            mvcBuilder.AddViewComponentsAsServices();
+
+            // Set the default resolver to use Pascalcase instead of the default camelCase which may break Ajaz responses
+            mvcBuilder.AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+            });
+
+            mvcBuilder.AddDataAnnotationsLocalization(
                     options =>
                     {
                         options.DataAnnotationLocalizerProvider =
                             DataAnnotationLocalizerProvider.DefaultResourceHandler;
-                    }).AddApplicationPart(typeof(ViewingController).Assembly);
+                    });
 
-            var mvcBuilder = builder.Services.AddRazorPages();
+            mvcBuilder.AddApplicationPart(typeof(ViewingController).Assembly);
+            //builder.RegisterModule<ModernSlavery.WebUI.Viewing.DependencyModule>();
+
+            mvcBuilder = builder.Services.AddRazorPages();
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
             if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
-
+            
+            mvcBuilder.AddViewComponentsAsServices();
 
             //Add antiforgery token by default to forms
             builder.Services.AddAntiforgery();
@@ -159,7 +169,7 @@ namespace ModernSlavery.Hosts.Web
             builder.RegisterModule<QueueStorageDependencyModule>();
 
             //Register the queue storage dependencies
-            builder.Autofac.RegisterType<DnBOrgsRepository>().As<IDnBOrgsRepository>().WithParameter("dataPath",_sharedOptions.DataPath).WithAttributeFiltering();
+            builder.Autofac.RegisterType<DnBOrgsRepository>().As<IDnBOrgsRepository>().WithParameter("dataPath", _sharedOptions.DataPath).WithAttributeFiltering();
 
             //Register the log storage dependencies
             builder.RegisterModule<Infrastructure.Logging.DependencyModule>();
@@ -171,7 +181,7 @@ namespace ModernSlavery.Hosts.Web
 
             // register web ui services
             //builder.Autofac.RegisterType<AuditLogger>().As<IAuditLogger>().InstancePerLifetimeScope();
-            
+
             // Register Action helpers
             builder.Autofac.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
                 .SingleInstance();
@@ -185,13 +195,6 @@ namespace ModernSlavery.Hosts.Web
 
             //Register google analytics tracker
             builder.RegisterModule<GoogleAnalyticsDependencyModule>();
-
-            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
-                .Where(t => t.IsAssignableTo<BaseController>())
-                .InstancePerLifetimeScope()
-                .WithAttributeFiltering();
-
 
             // Initialise AutoMapper
             var mapperConfig = new MapperConfiguration(config =>
@@ -276,9 +279,9 @@ namespace ModernSlavery.Hosts.Web
             app.UseMiddleware<StickySessionMiddleware>(_sharedOptions
                 .StickySessions); //Enable/Disable sticky sessions based on  
 
-            
+
             //Force basic authentication
-            if (_basicAuthenticationOptions.Enabled)app.UseMiddleware<BasicAuthenticationMiddleware>(_basicAuthenticationOptions.Username, _basicAuthenticationOptions.Password);
+            if (_basicAuthenticationOptions.Enabled) app.UseMiddleware<BasicAuthenticationMiddleware>(_basicAuthenticationOptions.Username, _basicAuthenticationOptions.Password);
 
             app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses
 

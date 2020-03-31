@@ -248,6 +248,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             ISharedBusinessLogic sharedBusinessLogic)
         {
             Logger = logger;
+            WebService = webService;
             AutoMapper = webService.AutoMapper;
             Cache = webService.Cache;
             Session = webService.Session;
@@ -672,7 +673,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     "Registration/ReviewDUNSNumber"))
                     return null;
 
-                return RedirectToAction("Home", "Admin", new {area = "Admin"});
+                return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
                 //return View("CustomError", WebService.ErrorViewModelFactory.Create(1117));
             }
 
