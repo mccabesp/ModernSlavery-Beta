@@ -36,11 +36,11 @@ namespace ModernSlavery.WebUI.Viewing
             builder.Autofac.RegisterType<ComparePresenter>().As<IComparePresenter>()
                 .InstancePerLifetimeScope();
 
-            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
-                .Where(t => t.IsAssignableTo<Controller>())
-                .InstancePerLifetimeScope()
-                .WithAttributeFiltering();
+            ////Register all controllers - this is required to ensure KeyFilter is resolved in constructors
+            //builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
+            //    .Where(t => t.IsAssignableTo<Controller>())
+            //    .InstancePerLifetimeScope()
+            //    .WithAttributeFiltering();
 
         }
 

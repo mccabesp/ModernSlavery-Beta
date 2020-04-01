@@ -10,19 +10,17 @@ using System.Threading;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.StaticFiles.Infrastructure;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
+using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Configuration;
 using Microsoft.Extensions.Logging.EventLog;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Configuration;
 using ModernSlavery.Infrastructure.Logging;
@@ -151,6 +149,31 @@ namespace ModernSlavery.Infrastructure.Hosts
 
             //hostBuilder.UseConsoleLifetime();
             return hostBuilder;
+        }
+
+        /// <summary>
+        /// Adds all the controller, taghelpers, views and razor pages from the assembly of the class
+        /// Also, can turn on runtime compilation of razor views during development.
+        ///
+        /// This avoids having to add an explicit reference in the host library to a component in the Razor class library.
+        /// Without this the razor views will not be found.
+        /// </summary>
+        /// <typeparam name="TModule">The entry class within the Razor Class library</typeparam>
+        /// <param name="mvcBuilder">The mvcBuilder</param>
+        /// <returns></returns>
+        public static IMvcBuilder AddRazorClassLibrary<TModule>(this IMvcBuilder mvcBuilder) where TModule : class
+        {
+            var partAssembly = typeof(TModule).Assembly;
+
+            mvcBuilder.AddApplicationPart(partAssembly);
+
+            var razorAssemblyPath = Path.GetDirectoryName(partAssembly.Location);
+            var razorAssemblyLocation = Path.Combine(razorAssemblyPath,$"{Path.GetFileNameWithoutExtension(partAssembly.Location)}.Views{Path.GetExtension(partAssembly.Location)}");
+            var razorAssembly = Assembly.LoadFile(razorAssemblyLocation);
+            mvcBuilder.PartManager.ApplicationParts.Add(new CompiledRazorAssemblyPart(razorAssembly));
+
+
+            return mvcBuilder;
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

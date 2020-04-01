@@ -1,13 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
-using System.Web.WebPages;
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,10 +29,8 @@ using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Classes.Providers;
-using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Options;
 using ModernSlavery.WebUI.Viewing.Controllers;
-using AuditLogger = ModernSlavery.Infrastructure.Logging.AuditLogger;
 
 namespace ModernSlavery.Hosts.Web
 {
@@ -92,7 +89,18 @@ namespace ModernSlavery.Hosts.Web
                         options.Filters.Add<ErrorHandlingFilter>();
                     });
 
-            mvcBuilder.AddControllersAsServices(); // Add controllers as services so attribute filters be resolved in contructors.
+            mvcBuilder.AddRazorClassLibrary<ViewingController>();
+            mvcBuilder.AddRazorClassLibrary<WebUI.Shared.DependencyModule>();
+            mvcBuilder.AddRazorClassLibrary<WebUI.GDSDesignSystem.DependencyModule>();
+
+            builder.RegisterModule<WebUI.Viewing.DependencyModule>();
+
+            //Log all the application parts when in development
+            if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal())
+                builder.Services.AddHostedService<ApplicationPartsLogger>();
+
+            // Add controllers, taghelpers, views as services so attribute dependencies can be resolved in their contructors
+            mvcBuilder.AddControllersAsServices(); 
             mvcBuilder.AddTagHelpersAsServices();
             mvcBuilder.AddViewComponentsAsServices();
 
@@ -110,19 +118,18 @@ namespace ModernSlavery.Hosts.Web
                             DataAnnotationLocalizerProvider.DefaultResourceHandler;
                     });
 
-            mvcBuilder.AddApplicationPart(typeof(ViewingController).Assembly);
-            //builder.RegisterModule<ModernSlavery.WebUI.Viewing.DependencyModule>();
+            //Add antiforgery token by default to forms
+            builder.Services.AddAntiforgery();
 
-            mvcBuilder = builder.Services.AddRazorPages();
+            builder.Services.AddRazorPages();
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
-            if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
-            
-            mvcBuilder.AddViewComponentsAsServices();
-
-            //Add antiforgery token by default to forms
-            builder.Services.AddAntiforgery();
+            if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation(compilationOptions =>
+            {
+                // add each to options file providers 
+                compilationOptions.FileProviders.Add(new PhysicalFileProvider(@"C:\Users\mccab\source\repos\ModernSlavery\ModernSlavery.WebUI.Viewing\Views"));
+            });
 
             //Add services needed for sessions
             builder.Services.AddSession(
@@ -177,10 +184,8 @@ namespace ModernSlavery.Hosts.Web
             //Register the search dependencies
             builder.RegisterModule<Infrastructure.Search.DependencyModule>();
 
+            //Register the user audit log repository
             builder.Autofac.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
-
-            // register web ui services
-            //builder.Autofac.RegisterType<AuditLogger>().As<IAuditLogger>().InstancePerLifetimeScope();
 
             // Register Action helpers
             builder.Autofac.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
@@ -258,7 +263,7 @@ namespace ModernSlavery.Hosts.Web
                 app.UseStaticFiles(
                     new StaticFileOptions
                     {
-                        FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()),
+                        FileProvider = new PhysicalFileProvider(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"wwwroot")),
                         RequestPath = "",
                         OnPrepareResponse = ctx =>
                         {
