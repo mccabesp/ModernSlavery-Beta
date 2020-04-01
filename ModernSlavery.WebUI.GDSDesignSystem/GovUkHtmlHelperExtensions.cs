@@ -15,28 +15,28 @@ namespace ModernSlavery.WebUI.GDSDesignSystem
             this IHtmlHelper htmlHelper,
             BackLinkViewModel backLinkViewModel)
         {
-            return htmlHelper.Partial("/Components/BackLink.cshtml", backLinkViewModel);
+            return htmlHelper.Partial("~/Partials/BackLink.cshtml", backLinkViewModel);
         }
 
         public static IHtmlContent GovUkBreadcrumbs(
             this IHtmlHelper htmlHelper,
             BreadcrumbsViewModel breadcrumbsViewModel)
         {
-            return htmlHelper.Partial("/Components/Breadcrumbs.cshtml", breadcrumbsViewModel);
+            return htmlHelper.Partial("~/Partials/Breadcrumbs.cshtml", breadcrumbsViewModel);
         }
 
         public static IHtmlContent GovUkButton(
             this IHtmlHelper htmlHelper,
             ButtonViewModel buttonViewModel)
         {
-            return htmlHelper.Partial("/Components/Button.cshtml", buttonViewModel);
+            return htmlHelper.Partial("~/Partials/Button.cshtml", buttonViewModel);
         }
 
         public static IHtmlContent GovUkCharacterCount(
             this IHtmlHelper htmlHelper,
             CharacterCountViewModel characterCountViewModel)
         {
-            return htmlHelper.Partial("/Components/CharacterCount.cshtml", characterCountViewModel);
+            return htmlHelper.Partial("~/Partials/CharacterCount.cshtml", characterCountViewModel);
         }
 
         public static IHtmlContent GovUkCharacterCountFor<TModel>(
@@ -61,7 +61,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem
             this IHtmlHelper htmlHelper,
             CheckboxesViewModel checkboxesViewModel)
         {
-            return htmlHelper.Partial("/Components/Checkboxes.cshtml", checkboxesViewModel);
+            return htmlHelper.Partial("~/Partials/Checkboxes.cshtml", checkboxesViewModel);
         }
 
         public static IHtmlContent GovUkCheckboxesFor<TModel, TPropertyListItem>(
@@ -86,7 +86,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem
             this IHtmlHelper htmlHelper,
             CheckboxItemViewModel checkboxItemViewModel)
         {
-            return htmlHelper.Partial("/Components/CheckboxItem.cshtml", checkboxItemViewModel);
+            return htmlHelper.Partial("~/Partials/CheckboxItem.cshtml", checkboxItemViewModel);
         }
 
         public static IHtmlContent GovUkCheckboxItemFor<TModel>(
@@ -110,14 +110,14 @@ namespace ModernSlavery.WebUI.GDSDesignSystem
             this IHtmlHelper htmlHelper,
             ErrorMessageViewModel errorMessageViewModel)
         {
-            return htmlHelper.Partial("/Components/ErrorMessage.cshtml", errorMessageViewModel);
+            return htmlHelper.Partial("~/Partials/ErrorMessage.cshtml", errorMessageViewModel);
         }
 
         public static IHtmlContent GovUkErrorSummary(
             this IHtmlHelper htmlHelper,
             ErrorSummaryViewModel errorSummaryViewModel)
         {
-            return htmlHelper.Partial("/Components/ErrorSummary.cshtml", errorSummaryViewModel);
+            return htmlHelper.Partial("~/Partials/ErrorSummary.cshtml", errorSummaryViewModel);
         }
 
         public static IHtmlContent GovUkErrorSummary<TModel>(
@@ -135,84 +135,84 @@ namespace ModernSlavery.WebUI.GDSDesignSystem
             this IHtmlHelper htmlHelper,
             FieldsetViewModel fieldsetViewModel)
         {
-            return htmlHelper.Partial("/Components/Fieldset.cshtml", fieldsetViewModel);
+            return htmlHelper.Partial("~/Partials/Fieldset.cshtml", fieldsetViewModel);
         }
 
         public static IHtmlContent GovUkFooter(
             this IHtmlHelper htmlHelper,
             FooterViewModel footerViewModel)
         {
-            return htmlHelper.Partial("/Components/Footer.cshtml", footerViewModel);
+            return htmlHelper.Partial("~/Partials/Footer.cshtml", footerViewModel);
         }
 
         public static IHtmlContent GovUkHeader(
             this IHtmlHelper htmlHelper,
             HeaderViewModel headerViewModel)
         {
-            return htmlHelper.Partial("/Components/Header.cshtml", headerViewModel);
+            return htmlHelper.Partial("~/Partials/Header.cshtml", headerViewModel);
         }
 
         public static IHtmlContent GovUkHint(
             this IHtmlHelper htmlHelper,
             HintViewModel hintViewModel)
         {
-            return htmlHelper.Partial("/Components/Hint.cshtml", hintViewModel);
+            return htmlHelper.Partial("~/Partials/Hint.cshtml", hintViewModel);
         }
 
         public static IHtmlContent GovUkHtmlText(
             this IHtmlHelper htmlHelper,
             IHtmlText htmlText)
         {
-            return htmlHelper.Partial("/Components/SubComponents/HtmlText.cshtml", htmlText);
+            return htmlHelper.Partial("~/Partials/HtmlText.cshtml", htmlText);
         }
 
         public static IHtmlContent GovUkInsetText(
             this IHtmlHelper htmlHelper,
             InsetTextViewModel insetTextViewModel)
         {
-            return htmlHelper.Partial("/Components/InsetText.cshtml", insetTextViewModel);
+            return htmlHelper.Partial("~/Partials/InsetText.cshtml", insetTextViewModel);
         }
 
         public static IHtmlContent GovUkItem(
             this IHtmlHelper htmlHelper,
             ItemViewModel itemViewModel)
         {
-            return htmlHelper.Partial("/Components/Item.cshtml", itemViewModel);
+            return htmlHelper.Partial("~/Partials/Item.cshtml", itemViewModel);
         }
 
         public static IHtmlContent GovUkItemSet(
             this IHtmlHelper htmlHelper,
             ItemSetViewModel itemSetViewModel)
         {
-            return htmlHelper.Partial("/Components/ItemSet.cshtml", itemSetViewModel);
+            return htmlHelper.Partial("~/Partials/ItemSet.cshtml", itemSetViewModel);
         }
 
         public static IHtmlContent GovUkLabel(
             this IHtmlHelper htmlHelper,
             LabelViewModel labelViewModel)
         {
-            return htmlHelper.Partial("/Components/Label.cshtml", labelViewModel);
+            return htmlHelper.Partial("~/Partials/Label.cshtml", labelViewModel);
         }
 
         public static IHtmlContent GovUkLegend(
             this IHtmlHelper htmlHelper,
             LegendViewModel legendViewModel)
         {
-            return htmlHelper.Partial("/Components/Legend.cshtml", legendViewModel);
+            return htmlHelper.Partial("~/Partials/Legend.cshtml", legendViewModel);
         }
 
         public static IHtmlContent GovUkPhaseBanner(
             this IHtmlHelper htmlHelper,
             PhaseBannerViewModel phaseBannerViewModel)
         {
-            return htmlHelper.Partial("/Components/PhaseBanner.cshtml", phaseBannerViewModel);
+            return htmlHelper.Partial("~/Partials/PhaseBanner.cshtml", phaseBannerViewModel);
         }
 
         public static IHtmlContent GovUkRadios(
             this IHtmlHelper htmlHelper,
             RadiosViewModel radioItemViewModel)
         {
-            return htmlHelper.Partial("/Components/Radios.cshtml", radioItemViewModel);
+            return htmlHelper.Partial("~/Partials/Radios.cshtml", radioItemViewModel);
         }
 
         public static IHtmlContent GovUkRadiosFor<TModel, TProperty>(
@@ -233,21 +233,21 @@ namespace ModernSlavery.WebUI.GDSDesignSystem
             this IHtmlHelper htmlHelper,
             RadioItemViewModel radioItemViewModel)
         {
-            return htmlHelper.Partial("/Components/RadioItem.cshtml", radioItemViewModel);
+            return htmlHelper.Partial("~/Partials/RadioItem.cshtml", radioItemViewModel);
         }
 
         public static IHtmlContent GovUkTag(
             this IHtmlHelper htmlHelper,
             TagViewModel tagViewModel)
         {
-            return htmlHelper.Partial("/Components/Tag.cshtml", tagViewModel);
+            return htmlHelper.Partial("~/Partials/Tag.cshtml", tagViewModel);
         }
 
         public static IHtmlContent GovUkTextArea(
             this IHtmlHelper htmlHelper,
             TextAreaViewModel textAreaViewModel)
         {
-            return htmlHelper.Partial("/Components/TextArea.cshtml", textAreaViewModel);
+            return htmlHelper.Partial("~/Partials/TextArea.cshtml", textAreaViewModel);
         }
 
         public static IHtmlContent GovUkTextAreaFor<TModel>(
@@ -272,7 +272,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem
             this IHtmlHelper htmlHelper,
             TextInputViewModel textInputViewModel)
         {
-            return htmlHelper.Partial("/Components/TextInput.cshtml", textInputViewModel);
+            return htmlHelper.Partial("~/Partials/TextInput.cshtml", textInputViewModel);
         }
 
         public static IHtmlContent GovUkTextInputFor<TModel>(

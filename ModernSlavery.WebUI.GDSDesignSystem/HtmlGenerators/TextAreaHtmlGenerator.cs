@@ -42,7 +42,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             if (model.HasErrorFor(property))
                 textAreaViewModel.ErrorMessage = new ErrorMessageViewModel {Text = model.GetErrorFor(property)};
 
-            return htmlHelper.Partial("/Components/Textarea.cshtml", textAreaViewModel);
+            return htmlHelper.Partial("~/Partials/Textarea.cshtml", textAreaViewModel);
         }
     }
 }

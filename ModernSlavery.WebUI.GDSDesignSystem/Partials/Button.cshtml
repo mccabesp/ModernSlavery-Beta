@@ -30,7 +30,7 @@
            draggable="false">
             @*This doesn't work yet - The ModernSlavery.WebUI.Classes.TagHelpers.AnchorTagHelper doesn't currently allow arbitrary attributes*@
             @*@(Html.Raw( Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : "" ))*@
-            @{ await Html.RenderPartialAsync("/Components/SubComponents/HtmlText.cshtml", Model); }
+            @{ await Html.RenderPartialAsync("~/Partials/HtmlText.cshtml", Model); }
         </a>
     }
     else
@@ -44,7 +44,7 @@
                 aria-disabled="@(Model.Disabled ? "true" : "false")"
                 data-prevent-double-click="@(Model.PreventDoubleClick ? "true" : "false")"
                 @(Html.Raw(Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : ""))>
-            @{ await Html.RenderPartialAsync("/Components/SubComponents/HtmlText.cshtml", Model); }
+            @{ await Html.RenderPartialAsync("~/Partials/HtmlText.cshtml", Model); }
             @{
                 if (Model.IsStartButton)
                 {

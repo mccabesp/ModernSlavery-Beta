@@ -76,7 +76,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
                     Text = model.GetErrorFor(property)
                 };
 
-            return htmlHelper.Partial("/Components/Checkboxes.cshtml", checkboxesViewModel);
+            return htmlHelper.Partial("~/Partials/Checkboxes.cshtml", checkboxesViewModel);
         }
 
         private static void ThrowIfPropertyTypeIsNotListOfEnums<TPropertyListItem>(PropertyInfo property)

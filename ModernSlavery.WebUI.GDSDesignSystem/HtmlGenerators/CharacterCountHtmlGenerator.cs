@@ -47,7 +47,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             if (model.HasErrorFor(property))
                 characterCountViewModel.ErrorMessage = new ErrorMessageViewModel {Text = model.GetErrorFor(property)};
 
-            return htmlHelper.Partial("/Components/CharacterCount.cshtml", characterCountViewModel);
+            return htmlHelper.Partial("~/Partials/CharacterCount.cshtml", characterCountViewModel);
         }
 
         private static void ThrowIfPropertyDoesNotHaveCharacterCountAttribute(PropertyInfo property)

@@ -5,19 +5,19 @@
         var describedBy = Model.DescribedBy;
         if (Model.Label != null)
         {
-            await Html.RenderPartialAsync("/Components/Label.cshtml", Model.Label);
+            await Html.RenderPartialAsync("~/Partials/Label.cshtml", Model.Label);
         }
         if (Model.Hint != null)
         {
             Model.Hint.Id = $"{Model.Id}-hint";
             describedBy += Model.Hint.Id;
-            await Html.RenderPartialAsync("/Components/Hint.cshtml", Model.Hint);
+            await Html.RenderPartialAsync("~/Partials/Hint.cshtml", Model.Hint);
         }
         if (Model.ErrorMessage != null)
         {
             Model.ErrorMessage.Id = $"{Model.Id}-error";
             describedBy += Model.ErrorMessage.Id;
-            await Html.RenderPartialAsync("/Components/ErrorMessage.cshtml", Model.ErrorMessage);
+            await Html.RenderPartialAsync("~/Partials/ErrorMessage.cshtml", Model.ErrorMessage);
         }
     }
     <input class="govuk-input @(Model.Classes) @(Model.ErrorMessage != null ? "govuk-input--error" : "")"
@@ -33,6 +33,6 @@
 
     @if (Model.TextInputAppendix != null)
     {
-        await Html.RenderPartialAsync("/Components/SubComponents/HtmlText.cshtml", Model.TextInputAppendix);
+        await Html.RenderPartialAsync("~/Partials/HtmlText.cshtml", Model.TextInputAppendix);
     }
 </div>

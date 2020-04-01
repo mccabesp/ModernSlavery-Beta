@@ -2,6 +2,7 @@
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -40,6 +41,7 @@ namespace ModernSlavery.WebUI.Viewing
                 .Where(t => t.IsAssignableTo<Controller>())
                 .InstancePerLifetimeScope()
                 .WithAttributeFiltering();
+
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

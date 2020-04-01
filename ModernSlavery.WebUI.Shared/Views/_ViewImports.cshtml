@@ -1,4 +1,6 @@
-﻿@using ModernSlavery.WebUI.Shared.Classes
+﻿@namespace ModernSlavery.WebUI.Shared.Views
+
+@using ModernSlavery.WebUI.Shared.Classes
 @using ModernSlavery.WebUI.Shared.Classes.Patterns
 @using ModernSlavery.WebUI.Shared.Models
 @using ModernSlavery.WebUI.Shared.Classes.Extensions
@@ -11,7 +13,9 @@
 @using ModernSlavery.Core.Entities
 @using ModernSlavery.Core.SharedKernel.Options
 
-@Layout = "DfeTemplate.cshtml"
+@{
+    Layout = "~/DfeTemplate.cshtml";
+}
 
 @addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
 @addTagHelper "*, ModernSlavery.WebUI.Shared.Classes.TagHelpers"

@@ -91,7 +91,7 @@ function compileJs(options) {
         fs.writeFileSync(outputFilePath, minifyResult.code);
     }
 
-    console.log(`Compiling JS`);
+    console.log(`Compiling JS from [${inputJsDirectory}]`);
     var files = fs.readdirSync(inputJsDirectory);
 
     var code = {};

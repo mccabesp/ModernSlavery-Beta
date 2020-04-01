@@ -44,7 +44,7 @@
 
 @if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request) && !ViewContext.RouteData.Values["action"].Equals("CookieSettingsGet"))
 {
-    await Html.RenderPartialAsync("/Views/Components/CookieBanner.cshtml");
+    await Html.RenderPartialAsync("~/Views/Components/CookieBanner.cshtml");
 }
 
 <a href="#main-content" class="govuk-skip-link">Skip to main content</a>

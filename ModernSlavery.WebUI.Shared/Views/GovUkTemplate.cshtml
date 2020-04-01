@@ -83,7 +83,7 @@
 }
 @if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request))
 {
-    await Html.RenderPartialAsync("/Views/Components/CookieBanner.cshtml");
+    await Html.RenderPartialAsync("~/Views/Components/CookieBanner.cshtml");
 }
 @RenderSection("bodyStart", false)
 <div id="skiplink-container">

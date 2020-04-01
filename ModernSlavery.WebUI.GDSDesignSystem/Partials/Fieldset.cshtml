@@ -4,6 +4,6 @@
           role="@(Model.Role)"
           describedBy="@(Model.DescribedBy)"
           @(Html.Raw(Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : ""))>
-    @{ await Html.RenderPartialAsync("/Components/Legend.cshtml", Model.Legend); }
+    @{ await Html.RenderPartialAsync("~/Partials/Legend.cshtml", Model.Legend); }
     @(Model.InnerHtml(new object()))
 </fieldset>

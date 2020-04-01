@@ -46,7 +46,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             if (model.HasErrorFor(property))
                 textInputViewModel.ErrorMessage = new ErrorMessageViewModel {Text = model.GetErrorFor(property)};
 
-            return htmlHelper.Partial("/Components/TextInput.cshtml", textInputViewModel);
+            return htmlHelper.Partial("~/Partials/TextInput.cshtml", textInputViewModel);
         }
     }
 }

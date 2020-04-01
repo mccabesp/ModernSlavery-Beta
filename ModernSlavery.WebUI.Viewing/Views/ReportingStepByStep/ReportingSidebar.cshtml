@@ -17,7 +17,7 @@
      data-hide-text="hide"
      data-show-all-text="Show all"
      data-hide-all-text="Hide all">
-    @{ await Html.RenderPartialAsync("/Views/ReportingStepByStep/ReportingSteps.cshtml", new ReportingStepsViewModel
+    @{ await Html.RenderPartialAsync("~/Views/ReportingStepByStep/ReportingSteps.cshtml", new ReportingStepsViewModel
        {
            CurrentStep = Model.CurrentStep,
            CurrentTask = Model.CurrentTask

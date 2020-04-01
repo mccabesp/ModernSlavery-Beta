@@ -6,7 +6,7 @@
      data-threshold="@(Model.Threshold)"
      data-maxwords="@(Model.MaxWords)">
     @{
-        await Html.RenderPartialAsync("/Components/TextArea.cshtml",
+        await Html.RenderPartialAsync("~/Partials/TextArea.cshtml",
             new TextAreaViewModel
             {
                 Id = Model.Id,

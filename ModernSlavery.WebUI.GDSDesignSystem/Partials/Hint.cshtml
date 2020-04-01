@@ -3,5 +3,5 @@
 <span class="govuk-hint @(Model.Classes)"
       id="@(Model.Id)"
       @(Html.Raw(Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : ""))>
-    @{ await Html.RenderPartialAsync("/Components/SubComponents/HtmlText.cshtml", Model); }
+    @{ await Html.RenderPartialAsync("~/Partials/HtmlText.cshtml", Model); }
 </span>

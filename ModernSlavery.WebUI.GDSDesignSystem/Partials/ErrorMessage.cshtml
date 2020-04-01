@@ -4,5 +4,5 @@
       id="@(Model.Id)"
       @(Html.Raw(Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : ""))>
     <span class="govuk-visually-hidden">@(Model.VisuallyHiddenText ?? "Error")</span>
-    @{ await Html.RenderPartialAsync("/Components/SubComponents/HtmlText.cshtml", Model); }
+    @{ await Html.RenderPartialAsync("~/Partials/HtmlText.cshtml", Model); }
 </span>

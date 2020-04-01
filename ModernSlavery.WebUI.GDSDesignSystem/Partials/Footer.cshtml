@@ -58,7 +58,7 @@
                     @if (Model.MetaNavigation.Html != null || !string.IsNullOrEmpty(Model.MetaNavigation.Text))
                     {
                         <div class="govuk-footer__meta-custom">
-                            @{ await Html.RenderPartialAsync("/Components/SubComponents/HtmlText.cshtml", Model.MetaNavigation); }
+                            @{ await Html.RenderPartialAsync("~/Partials/HtmlText.cshtml", Model.MetaNavigation); }
                         </div>
                     }
                 }

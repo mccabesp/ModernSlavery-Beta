@@ -27,7 +27,7 @@
     @{
         if (Model.Label != null)
         {
-            await Html.RenderPartialAsync("/Components/Label.cshtml", new LabelViewModel
+            await Html.RenderPartialAsync("~/Partials/Label.cshtml", new LabelViewModel
             {
                 Classes = $"{Model.StyleNamePrefix}__label {Model.Label.Classes}",
                 Text = Model.Label.Text,
@@ -39,7 +39,7 @@
 
         if (Model.Hint != null)
         {
-            await Html.RenderPartialAsync("/Components/Hint.cshtml", new HintViewModel
+            await Html.RenderPartialAsync("~/Partials/Hint.cshtml", new HintViewModel
             {
                 Id = hintId,
                 Classes = $"{Model.StyleNamePrefix}__hint",
@@ -56,7 +56,7 @@
     {
         <div class="@($"{Model.StyleNamePrefix}__conditional") @(Html.Raw(Model.Checked ? "" : $"{Model.StyleNamePrefix}__conditional--hidden"))"
              id="@conditionalId">
-            @{ await Html.RenderPartialAsync("/Components/SubComponents/HtmlText.cshtml", Model.Conditional); }
+            @{ await Html.RenderPartialAsync("~/Partials/HtmlText.cshtml", Model.Conditional); }
         </div>
     }
 }

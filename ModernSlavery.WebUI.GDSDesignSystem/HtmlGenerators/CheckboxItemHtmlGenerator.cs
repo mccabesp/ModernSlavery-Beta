@@ -37,7 +37,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
                 Checked = isChecked
             };
 
-            return htmlHelper.Partial("/Components/CheckboxItem.cshtml", checkboxItemViewModel);
+            return htmlHelper.Partial("~/Partials/CheckboxItem.cshtml", checkboxItemViewModel);
         }
     }
 }

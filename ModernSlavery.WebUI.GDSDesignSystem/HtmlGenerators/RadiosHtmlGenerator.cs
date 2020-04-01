@@ -66,7 +66,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
                     Text = model.GetErrorFor(property)
                 };
 
-            return htmlHelper.Partial("/Components/Radios.cshtml", radiosViewModel);
+            return htmlHelper.Partial("~/Partials/Radios.cshtml", radiosViewModel);
         }
 
         private static void ThrowIfPropertyTypeIsNotNullableEnum(PropertyInfo property)

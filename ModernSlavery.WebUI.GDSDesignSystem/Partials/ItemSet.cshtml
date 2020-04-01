@@ -13,12 +13,12 @@
                     if (Model.Hint != null)
                     {
                         Model.Hint.Id = hintId;
-                        await Html.RenderPartialAsync("/Components/Hint.cshtml", Model.Hint);
+                        await Html.RenderPartialAsync("~/Partials/Hint.cshtml", Model.Hint);
                     }
                     if (Model.ErrorMessage != null)
                     {
                         Model.ErrorMessage.Id = errorId;
-                        await Html.RenderPartialAsync("/Components/ErrorMessage.cshtml", Model.ErrorMessage);
+                        await Html.RenderPartialAsync("~/Partials/ErrorMessage.cshtml", Model.ErrorMessage);
                     }
                 }
 
@@ -43,7 +43,7 @@
     {
         Model.Fieldset.InnerHtml = innerHtml;
         Model.Fieldset.DescribedBy = Model.Fieldset.DescribedBy + errorId + hintId;
-        await Html.RenderPartialAsync("/Components/Fieldset.cshtml", Model.Fieldset);
+        await Html.RenderPartialAsync("~/Partials/Fieldset.cshtml", Model.Fieldset);
     }
     else
     {

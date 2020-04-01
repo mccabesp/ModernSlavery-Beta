@@ -1,4 +1,6 @@
-﻿@using ModernSlavery.WebUI.Viewing
+﻿@namespace ModernSlavery.WebUI.Viewing.Views
+
+@using ModernSlavery.WebUI.Viewing
 @using ModernSlavery.WebUI.Viewing.Classes
 @using ModernSlavery.WebUI.Viewing.Controllers
 @using ModernSlavery.WebUI.Viewing.Models
@@ -18,7 +20,6 @@
 @using ModernSlavery.Core.Entities
 @using ModernSlavery.Core.SharedKernel.Options
 
-@Layout ="DfeTemplate.cshtml"
-
+@{Layout="~/DfeTemplate.cshtml";}
 @addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
 @addTagHelper "*, ModernSlavery.WebUI.Shared.Classes.TagHelpers"

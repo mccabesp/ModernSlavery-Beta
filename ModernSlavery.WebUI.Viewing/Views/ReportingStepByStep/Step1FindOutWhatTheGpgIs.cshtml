@@ -1,12 +1,12 @@
 ﻿@using ModernSlavery.WebUI.Shared.Views.Components
 @using ModernSlavery.WebUI.Viewing.Models
-@Layout = "~/Views/GdsLayout.cshtml"
+@{Layout = "~/Views/GdsLayout.cshtml";}
 @{
     ViewBag.Title = "Modern Slavery Reporting service";
 }
 
 @section BeforeMain {
-    @{ await Html.RenderPartialAsync("/Views/ReportingStepByStep/ReportingPageHeader.cshtml"); }
+    @{ await Html.RenderPartialAsync("~/Views/ReportingStepByStep/ReportingPageHeader.cshtml"); }
 }
 
 <div class="govuk-grid-row">
@@ -110,7 +110,7 @@
             This has been unlawful in the UK since 1970.
         </div>
 
-        @{ await Html.RenderPartialAsync("/Views/Components/PaginationLink.cshtml",
+        @{ await Html.RenderPartialAsync("~/Views/Components/PaginationLink.cshtml",
                 new PaginationLinkViewModel
                 {
                     ArrowDirection = ArrowDirection.Right,
@@ -121,7 +121,7 @@
 
     </div>
     <div class="govuk-grid-column-one-third">
-        @{ await Html.RenderPartialAsync("/Views/ReportingStepByStep/ReportingSidebar.cshtml",
+        @{ await Html.RenderPartialAsync("~/Views/ReportingStepByStep/ReportingSidebar.cshtml",
                 new ReportingStepsViewModel
                 {
                     CurrentStep = 0,

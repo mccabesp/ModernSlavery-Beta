@@ -5,7 +5,7 @@
     {
         var step = Model[i];
         step.Position = i + 1;
-        await Html.RenderPartialAsync("/Views/Components/StepByStep/Step.cshtml", step);
+        await Html.RenderPartialAsync("~/Views/Components/StepByStep/Step.cshtml", step);
     }
 </ol>
 

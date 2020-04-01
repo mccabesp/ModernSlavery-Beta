@@ -39,7 +39,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
                 Errors = errorSummaryItems
             };
 
-            return htmlHelper.Partial("/Components/ErrorSummary.cshtml", errorSummaryViewModel);
+            return htmlHelper.Partial("~/Partials/ErrorSummary.cshtml", errorSummaryViewModel);
         }
 
         private static List<string> GetErroredPropertyNamesInSpecifiedOrder(
