@@ -4,11 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Shared.Services
 {

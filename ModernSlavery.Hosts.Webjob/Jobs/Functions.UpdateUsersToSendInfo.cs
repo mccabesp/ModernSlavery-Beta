@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
 {

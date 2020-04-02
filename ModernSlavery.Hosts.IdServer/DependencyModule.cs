@@ -16,8 +16,6 @@ using Microsoft.IdentityModel.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel.Interfaces;
-using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Hosts.IdServer.Classes;
 using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Hosts;

@@ -1,5 +1,5 @@
 ﻿using System;
-using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.BusinessDomain.Shared.Models
 {

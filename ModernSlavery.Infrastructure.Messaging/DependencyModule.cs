@@ -2,7 +2,6 @@
 using Autofac;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Messaging
 {

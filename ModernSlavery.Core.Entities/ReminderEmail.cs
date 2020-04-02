@@ -1,5 +1,4 @@
 ﻿using System;
-using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.Core.Entities
 {

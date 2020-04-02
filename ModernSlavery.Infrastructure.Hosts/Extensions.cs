@@ -17,7 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Configuration;
 using ModernSlavery.Infrastructure.Logging;
 

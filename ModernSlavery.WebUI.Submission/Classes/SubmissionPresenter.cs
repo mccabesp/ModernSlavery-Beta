@@ -8,7 +8,6 @@ using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Submission.Models;
 
 namespace ModernSlavery.WebUI.Submission.Classes

@@ -10,7 +10,6 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.CompaniesHouse;
-using ModernSlavery.Core.SharedKernel.Options;
 using Newtonsoft.Json;
 using Polly;
 using Polly.Extensions.Http;

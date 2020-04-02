@@ -4,7 +4,6 @@ using Autofac.Features.AttributeFilters;
 using Microsoft.Azure.Search;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Search
 {

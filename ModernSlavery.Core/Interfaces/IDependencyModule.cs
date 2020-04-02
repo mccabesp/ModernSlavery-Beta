@@ -1,7 +1,6 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 
-namespace ModernSlavery.Core.SharedKernel.Interfaces
+namespace ModernSlavery.Core.Interfaces
 {
     /// <summary>
     ///     A module for containing all required dependencies requiring registration and associated configuration code to be

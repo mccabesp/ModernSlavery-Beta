@@ -7,7 +7,6 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.WebUI.Account.Controllers;
 using ModernSlavery.WebUI.Account.Interfaces;
 using ModernSlavery.WebUI.Account.Models;

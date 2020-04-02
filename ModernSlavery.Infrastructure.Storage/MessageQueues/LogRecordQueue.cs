@@ -1,5 +1,5 @@
-﻿using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel;
+﻿using ModernSlavery.Core;
+using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Storage.MessageQueues
 {

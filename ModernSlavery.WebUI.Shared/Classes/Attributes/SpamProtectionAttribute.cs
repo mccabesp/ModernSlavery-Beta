@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 {

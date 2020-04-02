@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.Core.Entities
 {

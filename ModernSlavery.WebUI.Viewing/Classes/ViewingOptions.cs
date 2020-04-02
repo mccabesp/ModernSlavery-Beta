@@ -1,4 +1,5 @@
-﻿using ModernSlavery.Core.SharedKernel.Options;
+﻿using ModernSlavery.Core.Attributes;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.WebUI.Viewing.Classes
 {

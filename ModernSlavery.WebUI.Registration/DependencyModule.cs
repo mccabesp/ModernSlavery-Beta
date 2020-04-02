@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.WebUI.Registration.Classes;
 
 namespace ModernSlavery.WebUI.Registration

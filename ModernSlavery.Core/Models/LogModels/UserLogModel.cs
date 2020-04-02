@@ -1,6 +1,5 @@
 ﻿using System;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.Core.Models.LogModels
 {

@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Attributes

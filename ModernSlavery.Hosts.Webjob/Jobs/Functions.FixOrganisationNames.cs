@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
-using ModernSlavery.Core.SharedKernel;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs

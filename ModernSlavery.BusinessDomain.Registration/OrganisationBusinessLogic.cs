@@ -12,7 +12,6 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Registration
 {

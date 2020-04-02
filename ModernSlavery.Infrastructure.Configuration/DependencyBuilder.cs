@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Autofac;
@@ -10,7 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core.Interfaces;
+using IContainer = Autofac.IContainer;
 
 namespace ModernSlavery.Infrastructure.Configuration
 {

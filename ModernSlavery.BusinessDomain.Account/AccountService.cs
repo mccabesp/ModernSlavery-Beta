@@ -4,7 +4,6 @@ using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel.Options;
 using IRegistrationBusinessLogic = ModernSlavery.BusinessDomain.Registration.IRegistrationBusinessLogic;
 
 namespace ModernSlavery.BusinessDomain.Account

@@ -3,11 +3,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs

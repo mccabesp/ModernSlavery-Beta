@@ -1,15 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace ModernSlavery.Core.SharedKernel
+namespace ModernSlavery.Core
 {
-    public enum SectorTypes
-    {
-        Unknown = 0,
-        Private = 1,
-        Public = 2
-    }
-
     public enum ManualActions : byte
     {
         Unknown = 0,

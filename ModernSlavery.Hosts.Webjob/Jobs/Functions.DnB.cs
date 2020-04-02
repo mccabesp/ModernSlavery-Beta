@@ -6,12 +6,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
-using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
 {

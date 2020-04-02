@@ -2,7 +2,7 @@
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Configuration;
 
 namespace ModernSlavery.Infrastructure.Hosts

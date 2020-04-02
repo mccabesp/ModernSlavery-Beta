@@ -1,7 +1,7 @@
 ﻿using System;
 using Autofac;
-using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
 namespace ModernSlavery.Infrastructure.Storage

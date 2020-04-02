@@ -1,6 +1,6 @@
 ﻿using System;
 using Autofac;
-using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Account
 {

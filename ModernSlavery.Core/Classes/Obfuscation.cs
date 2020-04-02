@@ -1,7 +1,6 @@
 ﻿using Cryptography.Obfuscation;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Core.Classes
 {

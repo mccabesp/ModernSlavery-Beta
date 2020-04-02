@@ -2,7 +2,6 @@
 using Autofac;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Database.Classes;
 
 namespace ModernSlavery.Infrastructure.Database

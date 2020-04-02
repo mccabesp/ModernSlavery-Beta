@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
-using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
 namespace ModernSlavery.Infrastructure.Logging

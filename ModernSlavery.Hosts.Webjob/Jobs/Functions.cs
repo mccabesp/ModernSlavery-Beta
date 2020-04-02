@@ -5,11 +5,10 @@ using ModernSlavery.BusinessDomain.Admin;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Viewing;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Hosts.Webjob.Classes;
 using ModernSlavery.Infrastructure.Storage;
 

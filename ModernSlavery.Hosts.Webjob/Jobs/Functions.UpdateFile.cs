@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel;
 using Extensions = ModernSlavery.Core.Classes.Extensions;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs

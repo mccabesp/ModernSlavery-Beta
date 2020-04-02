@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.BusinessDomain.Viewing
 {

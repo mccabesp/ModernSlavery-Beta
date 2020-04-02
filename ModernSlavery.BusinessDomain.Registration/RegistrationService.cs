@@ -1,9 +1,9 @@
 ﻿using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.BusinessDomain.Registration
 {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.BusinessDomain.Shared.Models
 {

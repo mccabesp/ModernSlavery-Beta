@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModernSlavery.Core.SharedKernel.Options
+namespace ModernSlavery.Core.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class OptionsAttribute : Attribute

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.WebUI.Viewing.Models
 {

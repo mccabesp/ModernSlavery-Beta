@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.SharedKernel;
 
 namespace ModernSlavery.Core.Interfaces
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 
 namespace ModernSlavery.WebUI.Viewing.Models

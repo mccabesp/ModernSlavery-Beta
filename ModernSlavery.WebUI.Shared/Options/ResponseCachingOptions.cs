@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.Core.SharedKernel.Options;
+using ModernSlavery.Core.Attributes;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.WebUI.Shared.Options
 {

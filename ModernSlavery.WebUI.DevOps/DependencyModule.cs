@@ -3,7 +3,7 @@ using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.WebUI.DevOps
 {

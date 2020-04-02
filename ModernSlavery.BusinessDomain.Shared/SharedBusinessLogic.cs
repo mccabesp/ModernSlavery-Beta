@@ -1,11 +1,9 @@
 ﻿using System;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.Core.SharedKernel.Interfaces;
-using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.BusinessDomain.Shared
 {

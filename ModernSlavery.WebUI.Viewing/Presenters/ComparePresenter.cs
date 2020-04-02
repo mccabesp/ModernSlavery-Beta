@@ -2,8 +2,8 @@
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Shared.Classes.Cookies;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Viewing.Classes;

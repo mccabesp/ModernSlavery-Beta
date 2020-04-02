@@ -1,4 +1,4 @@
-﻿using ModernSlavery.Core.SharedKernel.Options;
+﻿using ModernSlavery.Core.Attributes;
 
 namespace ModernSlavery.Core.Options
 {

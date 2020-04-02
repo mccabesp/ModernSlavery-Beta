@@ -2,7 +2,7 @@
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Submission
 {

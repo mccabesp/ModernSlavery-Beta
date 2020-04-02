@@ -9,12 +9,11 @@ using Autofac.Features.AttributeFilters;
 using Microsoft.ApplicationInsights;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.Core.SharedKernel.Options;
 using Index = Microsoft.Azure.Search.Models.Index;
 
 namespace ModernSlavery.Infrastructure.Search

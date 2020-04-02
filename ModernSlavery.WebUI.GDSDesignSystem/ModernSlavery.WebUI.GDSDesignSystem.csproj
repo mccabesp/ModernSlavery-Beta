@@ -24,11 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.Core.SharedKernel\ModernSlavery.Core.SharedKernel.csproj" />
+    <Folder Include="TagHelpers\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TagHelpers\" />
+    <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -8,7 +8,6 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Viewing
 {

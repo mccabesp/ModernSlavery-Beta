@@ -5,11 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.WebUI.Viewing.Models;
 
 namespace ModernSlavery.WebUI.Viewing.Presenters

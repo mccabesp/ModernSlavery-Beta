@@ -7,12 +7,11 @@ using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.SharedKernel;
-using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Submission
 {

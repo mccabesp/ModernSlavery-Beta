@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.Core.SharedKernel
+namespace ModernSlavery.Core
 {
     public static class EnumHelper
     {

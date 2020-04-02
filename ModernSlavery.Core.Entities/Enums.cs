@@ -2,6 +2,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ModernSlavery.Core.Entities
 {
+    public enum SectorTypes
+    {
+        Unknown = 0,
+        Private = 1,
+        Public = 2
+    }
     public enum UserStatuses : byte
     {
         Unknown = 0,

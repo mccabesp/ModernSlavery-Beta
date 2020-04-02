@@ -1,7 +1,7 @@
 ﻿using System;
 using Autofac;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.SharedKernel.Interfaces;
+using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem
 {
