@@ -8,10 +8,9 @@
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.AzureStorage" Version="3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="3.1.1" />
     <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.10.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.12.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.6.0" />
-    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="3.0.4" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="3.0.6" />
     <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.1.1" />
@@ -26,7 +25,6 @@
     <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Logging\ModernSlavery.Infrastructure.Logging.csproj" />
-    <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
   </ItemGroup>
 
 </Project>

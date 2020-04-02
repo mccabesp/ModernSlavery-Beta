@@ -469,7 +469,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult == null) return checkResult;
 
-            if (!IsImpersonatingUser && !CurrentUser.IsAdministrator())
+            if (!IsImpersonatingUser && !SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
             {
                 // check if the user has accepted the privacy statement
                 var hasReadPrivacy = VirtualUser.AcceptedPrivacyStatement;
@@ -542,12 +542,12 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             string.IsNullOrWhiteSpace(SharedBusinessLogic.SharedOptions.TrustedIpDomains) ||
             UserHostAddress.IsTrustedAddress(SharedBusinessLogic.SharedOptions.TrustedIpDomains.SplitI());
 
-        public bool IsAdministrator => CurrentUser.IsAdministrator();
-        public bool IsSuperAdministrator => IsTrustedIP && CurrentUser.IsSuperAdministrator();
-        public bool IsDatabaseAdministrator => IsTrustedIP && CurrentUser.IsDatabaseAdministrator();
+        public bool IsAdministrator => SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser);
+        public bool IsSuperAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(CurrentUser);
+        public bool IsDatabaseAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsDatabaseAdministrator(CurrentUser);
 
         public bool IsTestUser => CurrentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix);
-        public bool IsImpersonatingUser => OriginalUser != null && OriginalUser.IsAdministrator();
+        public bool IsImpersonatingUser => OriginalUser != null && SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(OriginalUser);
 
         protected User VirtualUser =>
             User.Identity.IsAuthenticated
@@ -661,7 +661,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             }
 
             //Ensure admins always routed to their home page
-            if (VirtualUser.IsAdministrator())
+            if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
             {
                 if (IsAnyAction(
                     "SignUp/VerifyEmail",

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 

@@ -79,6 +79,7 @@ namespace ModernSlavery.Infrastructure.Configuration
                     Console.WriteLine($@"APPSETTING[""{key}""]={config[key]}");
 
             Encryption.SetDefaultEncryptionKey(config["DefaultEncryptionKey"]);
+            Encryption.EncryptEmails = config.GetValueOrDefault("EncryptEmails", true);
 
             //Initialise the virtual date and time
             VirtualDateTime.Initialise(config["DateTimeOffset"]);

@@ -1,10 +1,12 @@
 ﻿@inject SubmissionOptions SubmissionOptions
 @inject SharedOptions sharedOptions
 @inject IWebService WebService
+@using ModernSlavery.Core.Models
 @model ManageOrganisationModel
 @{
     var controller = ViewData["Controller"] as SubmissionController;
     var currentOrg = Model.Organisation;
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Manage " + currentOrg.OrganisationName + " organisation - Modern Slavery reporting service";
 }
 

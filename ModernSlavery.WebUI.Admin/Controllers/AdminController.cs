@@ -38,6 +38,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public partial class AdminController : BaseController
     {
+        private readonly IAdminService _adminService;
         #region Constructors
 
         public AdminController(
@@ -45,14 +46,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             ILogger<AdminController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(
             logger, webService, sharedBusinessLogic)
         {
-            AdminService = adminService;
+            _adminService = adminService;
         }
-
-        #endregion
-
-        #region Dependencies
-
-        public IAdminService AdminService { get; }
 
         #endregion
 
@@ -81,10 +76,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             var viewModel = new AdminHomepageViewModel
             {
-                IsSuperAdministrator = CurrentUser.IsSuperAdministrator(),
-                IsDatabaseAdministrator = CurrentUser.IsDatabaseAdministrator(),
+                IsSuperAdministrator = _adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(CurrentUser),
+                IsDatabaseAdministrator = _adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsDatabaseAdministrator(CurrentUser),
                 IsDowngradedDueToIpRestrictions =
-                    !IsTrustedIP && (CurrentUser.IsDatabaseAdministrator() || CurrentUser.IsSuperAdministrator()),
+                    !IsTrustedIP && (_adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsDatabaseAdministrator(CurrentUser) || _adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(CurrentUser)),
                 FeedbackCount = SharedBusinessLogic.DataRepository.GetAll<Feedback>().Count(),
                 LatestFeedbackDate = SharedBusinessLogic.DataRepository.GetAll<Feedback>()
                     .OrderByDescending(feedback => feedback.CreatedDate)
@@ -141,7 +136,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 Organisation = userOrg.Organisation.OrganisationName,
                                 CompanyNo = userOrg.Organisation.CompanyNumber,
                                 Address = userOrg?.Address.GetAddressString(),
-                                SicCodes = userOrg.Organisation.GetSicCodeIdsString(),
+                                SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
                                 UserFirstname = userOrg.User.Firstname,
                                 UserLastname = userOrg.User.Lastname,
                                 UserJobtitle = userOrg.User.JobTitle,
@@ -155,7 +150,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 if (logRecords.Count > 0)
-                    await AdminService.RegistrationLog.WriteAsync(logRecords.OrderBy(l => l.StatusDate));
+                    await _adminService.RegistrationLog.WriteAsync(logRecords.OrderBy(l => l.StatusDate));
 
                 //Get the files again
                 files = await SharedBusinessLogic.FileRepository.GetFilesAsync(
@@ -254,7 +249,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             });
                 }
 
-                if (logRecords.Count > 0) await AdminService.LogSubmission(logRecords.OrderBy(l => l.StatusDate));
+                if (logRecords.Count > 0) await _adminService.LogSubmission(logRecords.OrderBy(l => l.StatusDate));
 
                 //Get the files again
                 files = await SharedBusinessLogic.FileRepository.GetFilesAsync(
@@ -698,8 +693,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             model.Uploads.Add(upload);
 
             //Reload D&B
-            await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.ClearAllDnBOrgsAsync();
-            var allDnBOrgs = await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
+            await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.ClearAllDnBOrgsAsync();
+            var allDnBOrgs = await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
             upload = new UploadViewModel.Upload
             {
                 Type = "DnBOrgs",
@@ -769,7 +764,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             {
                 try
                 {
-                    await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.ImportAsync(
+                    await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.ImportAsync(
                         SharedBusinessLogic.DataRepository, CurrentUser);
                 }
                 catch (Exception ex)
@@ -817,7 +812,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             case "DnBOrgs":
                                 var dnbOrgs = csvReader.GetRecords<DnBOrgsModel>().ToList();
                                 if (dnbOrgs.Count > 0)
-                                    await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.UploadAsync(dnbOrgs);
+                                    await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.UploadAsync(dnbOrgs);
 
                                 records = dnbOrgs.Cast<object>().ToList();
                                 break;
@@ -846,7 +841,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         switch (upload.Type)
                         {
                             case "DnBOrgs":
-                                await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.ClearAllDnBOrgsAsync();
+                                await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.ClearAllDnBOrgsAsync();
                                 break;
                             case "SicSection":
                                 await DataMigrations.Update_SICSectionsAsync(
@@ -957,7 +952,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 try
                 {
                     //Lookup the sic codes from companies house
-                    var sicCodeResults = await AdminService.PrivateSectorRepository.GetSicCodesAsync(org.CompanyNumber);
+                    var sicCodeResults = await _adminService.PrivateSectorRepository.GetSicCodesAsync(org.CompanyNumber);
                     var sicCodes = sicCodeResults.SplitI().Select(s => s.ToInt32());
                     foreach (var code in sicCodes)
                     {
@@ -973,7 +968,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                         if (badSicCodes.Contains($"{org.OrganisationId}:{code}")) continue;
 
-                        await AdminService.BadSicLog.WriteAsync(
+                        await _adminService.BadSicLog.WriteAsync(
                             new BadSicLogModel
                             {
                                 OrganisationId = org.OrganisationId, OrganisationName = org.OrganisationName,
@@ -1027,7 +1022,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             //Ensure we get a valid user from the database
             var currentUser = SharedBusinessLogic.DataRepository.FindUser(User);
-            if (currentUser == null || !currentUser.IsAdministrator()) throw new IdentityNotMappedException();
+            if (currentUser == null || !_adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(currentUser)) throw new IdentityNotMappedException();
 
             if (currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) &&
                 !emailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
@@ -1040,14 +1035,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             // find the latest active user by email
             var impersonatedUser =
-                await AdminService.UserRepository.FindByEmailAsync(emailAddress, UserStatuses.Active);
+                await _adminService.UserRepository.FindByEmailAsync(emailAddress, UserStatuses.Active);
             if (impersonatedUser == null)
             {
                 ModelState.AddModelError("", "This user does not exist");
                 return View("Impersonate");
             }
 
-            if (impersonatedUser.IsAdministrator())
+            if (_adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(impersonatedUser))
             {
                 ModelState.AddModelError("", "Impersonating other administrators is not permitted");
                 return View("Impersonate");

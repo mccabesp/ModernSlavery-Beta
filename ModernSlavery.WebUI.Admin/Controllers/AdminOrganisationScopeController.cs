@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -18,20 +19,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminOrganisationScopeController : Controller
     {
+        private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
 
-        private readonly IDataRepository dataRepository;
-
-        public AdminOrganisationScopeController(IDataRepository dataRepository, AuditLogger auditLogger)
+        public AdminOrganisationScopeController(
+            IAdminService adminService, 
+            AuditLogger auditLogger)
         {
-            this.dataRepository = dataRepository;
+            _adminService = adminService;
             this.auditLogger = auditLogger;
         }
 
         [HttpGet("organisation/{id}/scope")]
         public IActionResult ViewScopeHistory(long id)
         {
-            var organisation = dataRepository.Get<Organisation>(id);
+            var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             return View("ViewOrganisationScope", organisation);
         }
@@ -39,8 +41,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("organisation/{id}/scope/change/{year}")]
         public IActionResult ChangeScopeGet(long id, int year)
         {
-            var organisation = dataRepository.Get<Organisation>(id);
-            var currentScopeStatus = organisation.GetScopeStatus(year);
+            var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
+            var currentScopeStatus = organisation.GetLatestScopeForSnapshotYear(year).ScopeStatus;
 
             var viewModel = new AdminChangeScopeViewModel
             {
@@ -59,8 +61,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangeScopePost(long id, int year, AdminChangeScopeViewModel viewModel)
         {
-            var organisation = dataRepository.Get<Organisation>(id);
-            var currentOrganisationScope = organisation.GetScopeForYear(year);
+            var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
+            var currentOrganisationScope = organisation.GetLatestScopeForSnapshotYear(year);
 
             if (currentOrganisationScope.ScopeStatus != ScopeStatuses.InScope
                 && currentOrganisationScope.ScopeStatus != ScopeStatuses.OutOfScope)
@@ -71,7 +73,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (viewModel.HasAnyErrors())
             {
                 // If there are any errors, return the user back to the same page to correct the mistakes
-                var currentScopeStatus = organisation.GetScopeStatus(year);
+                var currentScopeStatus = organisation.GetLatestScopeForSnapshotYear(year).ScopeStatus;
 
                 viewModel.OrganisationName = organisation.OrganisationName;
                 viewModel.OrganisationId = organisation.OrganisationId;
@@ -99,11 +101,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Status = ScopeRowStatuses.Active
             };
 
-            dataRepository.Insert(newOrganisationScope);
-            await dataRepository.SaveChangesAsync();
+            _adminService.SharedBusinessLogic.DataRepository.Insert(newOrganisationScope);
+            await _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             organisation.LatestScope = newOrganisationScope;
-            await dataRepository.SaveChangesAsync();
+            await _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             auditLogger.AuditChangeToOrganisation(
                 this,

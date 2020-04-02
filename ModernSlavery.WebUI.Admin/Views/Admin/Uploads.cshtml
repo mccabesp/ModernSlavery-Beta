@@ -1,5 +1,6 @@
 ﻿@model UploadViewModel
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Administration: Uploads";
     var infoNotification = TempData["uploadinfo"].ToStringOrEmpty();
     var controller = ViewData["Controller"] as BaseController;

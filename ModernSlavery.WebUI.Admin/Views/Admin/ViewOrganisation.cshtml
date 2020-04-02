@@ -1,9 +1,13 @@
 @using Microsoft.AspNetCore.Http
+@using ModernSlavery.Core.Interfaces
+@using ModernSlavery.Core.Models
 @using ModernSlavery.Core.SharedKernel
+@using ModernSlavery.Core.SharedKernel.Interfaces
 @model Organisation
 @{Layout = "~/Views/GdsLayout.cshtml";}
 @inject IWebService WebService
 @inject SharedOptions sharedOptions;
+@inject IObfuscator Obfuscator; 
 @{
     ViewBag.Title = $"Organisation Details - {Model.OrganisationName} - Administration - Modern Slavery Reporting service";
 }
@@ -51,7 +55,7 @@
 </h1>
 
 <p class="govuk-body">
-    <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingEmployer, new {employerIdentifier = Model.GetEncryptedId()}))"
+    <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingEmployer, new {employerIdentifier = Obfuscator.Obfuscate(Model.OrganisationId)}))"
        class="govuk-link">
         '@(Model.OrganisationName)' on viewing service
     </a>
@@ -249,7 +253,7 @@
                     @(returnForYear.AccountingDate.ToString("d MMM yyyy"))
                 </th>
                 <td class="govuk-table__cell" rowspan="@(Model.Returns.Count(s => s.AccountingDate == returnForYear.AccountingDate))">
-                    <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingReport, new {employerIdentifier = Model.GetEncryptedId(), year = returnForYear.AccountingDate.Year}))"
+                    <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingReport, new {employerIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = returnForYear.AccountingDate.Year}))"
                        class="govuk-link">
                         @(returnForYear.AccountingDate.Year)
                     </a>

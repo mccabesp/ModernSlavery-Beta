@@ -1,6 +1,7 @@
 ﻿@inject IWebService WebService
 @model RemoveOrganisationModel
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Remove organisation reason - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
     var userId = Encryption.DecryptQuerystring(Model.EncUserId).ToInt64();

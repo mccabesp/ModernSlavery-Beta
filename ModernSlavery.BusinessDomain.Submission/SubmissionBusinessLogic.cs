@@ -12,17 +12,19 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
+using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Submission
 {
     public class SubmissionBusinessLogic : ISubmissionBusinessLogic
     {
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
-
-        public SubmissionBusinessLogic(ISharedBusinessLogic sharedBusinessLogic, IDataRepository dataRepo,
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
+        public SubmissionBusinessLogic(ISharedBusinessLogic sharedBusinessLogic, IDataRepository dataRepo,IOrganisationBusinessLogic organisationBusinessLogic,
             [KeyFilter(Filenames.SubmissionLog)] IAuditLogger submissionLog)
         {
             _sharedBusinessLogic = sharedBusinessLogic;
+            _organisationBusinessLogic = organisationBusinessLogic;
             DataRepository = dataRepo;
             SubmissionLog = submissionLog;
         }
@@ -226,7 +228,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                 SectorType = reportToConvert.Organisation.SectorType,
                 ReturnId = reportToConvert.ReturnId,
                 OrganisationId = reportToConvert.OrganisationId,
-                EncryptedOrganisationId = reportToConvert.Organisation.GetEncryptedId(),
                 DiffMeanBonusPercent = reportToConvert.DiffMeanBonusPercent,
                 DiffMeanHourlyPayPercent = reportToConvert.DiffMeanHourlyPayPercent,
                 DiffMedianBonusPercent = reportToConvert.DiffMedianBonusPercent,
@@ -260,13 +261,13 @@ namespace ModernSlavery.BusinessDomain.Submission
             model.LatestOrganisationName = reportToConvert.Organisation.OrganisationName;
 
             model.Sector = reportToConvert.Organisation.GetSicSectorsString(reportToConvert.StatusDate);
-            model.LatestSector = reportToConvert.Organisation.GetSicSectorsString();
+            model.LatestSector =  _organisationBusinessLogic.GetOrganisationSicSectorsString(reportToConvert.Organisation);
 
             model.OrganisationSize = reportToConvert.OrganisationSize;
             model.Modified = reportToConvert.Modified;
 
             model.IsInScopeForThisReportYear =
-                reportToConvert.Organisation.GetIsInscope(reportToConvert.AccountingDate.Year);
+                reportToConvert.Organisation.GetIsInscope(reportToConvert.AccountingDate);
 
             return model;
         }
@@ -277,7 +278,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             if (!reports.Any())
                 return new CustomResult<Return>(
-                    InternalMessages.HttpNotFoundCausedByOrganisationReturnNotInDatabase(organisation.GetEncryptedId(),
+                    InternalMessages.HttpNotFoundCausedByOrganisationReturnNotInDatabase(_sharedBusinessLogic.Obfuscator.Obfuscate(organisation.OrganisationId),
                         year));
 
             var result = reports.OrderByDescending(r => r.Status == ReturnStatuses.Submitted)

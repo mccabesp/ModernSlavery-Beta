@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 

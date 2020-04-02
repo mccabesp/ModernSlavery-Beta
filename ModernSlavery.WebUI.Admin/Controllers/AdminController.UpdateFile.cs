@@ -26,7 +26,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await SetFileUpdatedAsync(filePath);
 
             //trigger the update webjob
-            await AdminService.ExecuteWebjobQueue.AddMessageAsync(
+            await _adminService.ExecuteWebjobQueue.AddMessageAsync(
                 new QueueWrapper($"command=UpdateFile&filePath={filePath}&action={action}"));
         }
 

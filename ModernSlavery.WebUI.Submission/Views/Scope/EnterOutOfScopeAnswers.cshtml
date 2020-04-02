@@ -1,7 +1,9 @@
 ﻿@inject SharedOptions sharedOptions
 @using Microsoft.AspNetCore.Html
+@using ModernSlavery.Core.Models
 @model ScopingViewModel
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Tell us why your organisation is not in scope - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
     var backLink = Model.IsChangeJourney && Model.IsOutOfScopeJourney ? Model.StartUrl : Url.Action("ConfirmOutOfScopeDetails");

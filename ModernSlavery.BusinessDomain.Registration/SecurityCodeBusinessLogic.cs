@@ -2,6 +2,7 @@
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.BusinessDomain.Registration
 {
@@ -13,11 +14,23 @@ namespace ModernSlavery.BusinessDomain.Registration
         CustomResult<Organisation> ExtendSecurityCode(Organisation organisation,
             DateTime securityCodeExpiryDateTime);
 
+        /// <summary>
+        ///     The security code is created exclusively during setting, for all other cases (extend/expire) see method
+        ///     'SetSecurityCodeExpiryDate'
+        /// </summary>
+        /// <param name="securityCodeExpiryDateTime"></param>
+        Organisation SetOrganisationSecurityCode(Organisation organisation, DateTime securityCodeExpiryDateTime);
+
         CustomResult<Organisation> ExpireSecurityCode(Organisation organisation);
     }
 
     public class SecurityCodeBusinessLogic : ISecurityCodeBusinessLogic
     {
+        private readonly SharedOptions _sharedOptions;
+        public SecurityCodeBusinessLogic(SharedOptions sharedOptions)
+        {
+            _sharedOptions = sharedOptions;
+        }
         public CustomResult<Organisation> CreateSecurityCode(Organisation organisation,
             DateTime securityCodeExpiryDateTime)
         {
@@ -84,9 +97,22 @@ namespace ModernSlavery.BusinessDomain.Registration
             return securityCodeNotExpiredValidationResult;
         }
 
-        private Organisation SetOrganisationSecurityCode(Organisation organisation, DateTime securityCodeExpiryDateTime)
+        /// <summary>
+        ///     The security code is created exclusively during setting, for all other cases (extend/expire) see method
+        ///     'SetSecurityCodeExpiryDate'
+        /// </summary>
+        /// <param name="securityCodeExpiryDateTime"></param>
+        public virtual Organisation SetOrganisationSecurityCode(Organisation organisation, DateTime securityCodeExpiryDateTime)
         {
-            organisation.SetSecurityCode(securityCodeExpiryDateTime);
+            //Set the security token
+            string newSecurityCode = null;
+            do
+            {
+                newSecurityCode = Crypto.GeneratePasscode(_sharedOptions.SecurityCodeChars.ToCharArray(), _sharedOptions.SecurityCodeLength);
+            } while (newSecurityCode == organisation.SecurityCode);
+
+            organisation.SecurityCode = newSecurityCode;
+            organisation.SetSecurityCodeExpiryDate(securityCodeExpiryDateTime);
             return organisation;
         }
 

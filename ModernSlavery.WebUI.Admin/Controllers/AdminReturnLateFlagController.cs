@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
@@ -15,19 +16,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminReturnLateFlagController : Controller
     {
+        private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
-        private readonly IDataRepository dataRepository;
 
-        public AdminReturnLateFlagController(IDataRepository dataRepository, AuditLogger auditLogger)
+        public AdminReturnLateFlagController(
+            IAdminService adminService, 
+            AuditLogger auditLogger)
         {
-            this.dataRepository = dataRepository;
+            _adminService = adminService;
             this.auditLogger = auditLogger;
         }
 
         [HttpGet("return/{id}/change-late-flag")]
         public IActionResult ChangeLateFlag(long id)
         {
-            var specifiedReturn = dataRepository.Get<Return>(id);
+            var specifiedReturn = _adminService.SharedBusinessLogic.DataRepository.Get<Return>(id);
 
             var viewModel = new AdminReturnLateFlagViewModel
                 {Return = specifiedReturn, NewLateFlag = !specifiedReturn.IsLateSubmission};
@@ -40,7 +43,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ChangeLateFlag(long id, AdminReturnLateFlagViewModel viewModel)
         {
-            var specifiedReturn = dataRepository.Get<Return>(id);
+            var specifiedReturn = _adminService.SharedBusinessLogic.DataRepository.Get<Return>(id);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
 
@@ -56,7 +59,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             specifiedReturn.IsLateSubmission = viewModel.NewLateFlag.Value;
 
-            dataRepository.SaveChangesAsync().Wait();
+            _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
             auditLogger.AuditChangeToOrganisation(
                 this,

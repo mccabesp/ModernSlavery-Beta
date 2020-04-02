@@ -10,6 +10,7 @@ using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.BusinessDomain.Submission
@@ -17,16 +18,17 @@ namespace ModernSlavery.BusinessDomain.Submission
     public class ScopeBusinessLogic : IScopeBusinessLogic
     {
         private readonly ISearchBusinessLogic _searchBusinessLogic;
-        private readonly ISharedBusinessLogic _sharedBusinessLogic;
+        private readonly ISharedBusinessLogic _sharedBusinessLogic; 
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
         private readonly SharedOptions SharedOptions;
-
         public ScopeBusinessLogic(ISharedBusinessLogic sharedBusinessLogic,
             IDataRepository dataRepo,
-            ISearchBusinessLogic searchBusinessLogic,
+            ISearchBusinessLogic searchBusinessLogic,IOrganisationBusinessLogic organisationBusinessLogic,
             SharedOptions sharedOptions)
         {
             _sharedBusinessLogic = sharedBusinessLogic;
             _searchBusinessLogic = searchBusinessLogic;
+            _organisationBusinessLogic = organisationBusinessLogic;
             DataRepository = dataRepo;
             SharedOptions = sharedOptions;
         }
@@ -127,8 +129,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             string comment,
             bool saveToDatabase)
         {
-            snapshotYear = organisation
-                .GetAccountingStartDate(snapshotYear)
+            snapshotYear = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType,snapshotYear)
                 .Year;
 
             var oldOrgScope = organisation.GetLatestScopeForSnapshotYearOrThrow(snapshotYear);
@@ -152,7 +153,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     : oldOrgScope.Reason,
                 ScopeStatus = newStatus,
                 ScopeStatusDate = VirtualDateTime.Now,
-                StatusDetails = currentUser.IsAdministrator()
+                StatusDetails = _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(currentUser)
                     ? "Changed by Admin"
                     : null,
                 RegisterStatus = oldOrgScope.RegisterStatus,
@@ -342,7 +343,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             // set the latest scope if not set
             if (org.LatestScope == null)
             {
-                org.LatestScope = org.GetCurrentScope();
+                org.LatestScope = _organisationBusinessLogic.GetOrganisationCurrentScope(org);
                 changed = true;
             }
 

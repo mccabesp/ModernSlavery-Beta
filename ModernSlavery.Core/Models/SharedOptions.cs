@@ -2,8 +2,9 @@
 using System.IO;
 using System.Linq;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.SharedKernel.Options;
 
-namespace ModernSlavery.Core.SharedKernel.Options
+namespace ModernSlavery.Core.Models
 {
     [Options("root")]
     public class SharedOptions : IOptions
@@ -12,7 +13,6 @@ namespace ModernSlavery.Core.SharedKernel.Options
         {
 
         }
-
         public int FirstReportingYear { get; set; } = 2020;
         public DateTime PrivateAccountingDate { get; set; }
         public DateTime PublicAccountingDate { get; set; }

@@ -1,6 +1,6 @@
 ﻿using ModernSlavery.Core.SharedKernel.Options;
 
-namespace ModernSlavery.WebUI.Shared.Options
+namespace ModernSlavery.Infrastructure.Hosts
 {
     [Options("DataProtection")]
     public class DataProtectionOptions : IOptions

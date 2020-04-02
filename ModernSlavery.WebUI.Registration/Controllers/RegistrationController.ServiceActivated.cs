@@ -210,7 +210,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         Organisation = userOrg.Organisation.OrganisationName,
                         CompanyNo = userOrg.Organisation.CompanyNumber,
                         Address = userOrg?.Address.GetAddressString(),
-                        SicCodes = userOrg.Organisation.GetSicCodeIdsString(),
+                        SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
                         UserFirstname = userOrg.User.Firstname,
                         UserLastname = userOrg.User.Lastname,
                         UserJobtitle = userOrg.User.JobTitle,

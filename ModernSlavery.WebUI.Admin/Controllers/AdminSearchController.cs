@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 
@@ -9,10 +10,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminSearchController : Controller
     {
+        private readonly IAdminService _adminService;
         private readonly AdminSearchService adminSearchService;
 
-        public AdminSearchController(AdminSearchService adminSearchService)
+        public AdminSearchController(
+            IAdminService adminService, 
+            AdminSearchService adminSearchService)
         {
+            _adminService = adminService;
             this.adminSearchService = adminSearchService;
         }
 

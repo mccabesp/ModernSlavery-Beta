@@ -1,8 +1,10 @@
 ﻿@inject ISnapshotDateHelper SnapshotDateHelper
 @inject IWebService WebService
+@using ModernSlavery.Core.Interfaces
 @using ModernSlavery.Core.SharedKernel.Interfaces
 @model IEnumerable<UserOrganisation>
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Manage your organisation - Modern Slavery reporting service";
     var hasRegisteredOrgs = Model.Any();
 }
@@ -42,7 +44,7 @@
                 var encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
                 var latestReturn = userOrg.Organisation.LatestReturn;
                 var scopeStatus = userOrg.Organisation.GetScopeStatus(accountingDate);
-                var address = userOrg.Organisation.GetAddressString();
+                var address = userOrg.Organisation.GetLatestAddress().GetAddressString();
 
                 <tr>
                     @if (userOrg.PINSentDate != null && userOrg.PINConfirmedDate == null)

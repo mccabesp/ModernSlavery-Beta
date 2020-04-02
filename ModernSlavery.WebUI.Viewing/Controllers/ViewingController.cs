@@ -310,7 +310,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(400));
                 }
 
-                var organisationIdEncrypted = organisation.GetEncryptedId();
+                var organisationIdEncrypted = SharedBusinessLogic.Obfuscator.Obfuscate(organisation.OrganisationId);
                 return RedirectToActionPermanent(nameof(Employer), new {employerIdentifier = organisationIdEncrypted});
             }
 

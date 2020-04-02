@@ -45,7 +45,7 @@ namespace ModernSlavery.Core.Entities
             }
             set
             {
-                if (!string.IsNullOrWhiteSpace(value) && EncryptEmails)
+                if (!string.IsNullOrWhiteSpace(value) && Encryption.EncryptEmails)
                     _EmailAddress = Encryption.EncryptData(value.ToLower());
                 else
                     _EmailAddress = value;
@@ -64,7 +64,7 @@ namespace ModernSlavery.Core.Entities
                 : Encryption.DecryptData(_ContactEmailAddress);
             set
             {
-                if (!string.IsNullOrWhiteSpace(value) && EncryptEmails)
+                if (!string.IsNullOrWhiteSpace(value) && Encryption.EncryptEmails)
                     _ContactEmailAddress = Encryption.EncryptData(value);
                 else
                     _ContactEmailAddress = value;

@@ -11,28 +11,10 @@ namespace ModernSlavery.Core.Entities
     [DebuggerDisplay("{UserId}, {EmailAddress}, {Status}")]
     public partial class User
     {
-        private SharedOptions SharedOptions;
-
-        public User(SharedOptions sharedOptions) : this()
-        {
-            SharedOptions = sharedOptions;
-        }
-
-        private string AdminEmails => SharedOptions.AdminEmails;
-        private string SuperAdminEmails => SharedOptions.SuperAdminEmails;
-        private string DatabaseAdminEmails => SharedOptions.DatabaseAdminEmails;
-
-        [NotMapped] public bool EncryptEmails => SharedOptions.EncryptEmails;
-
         [NotMapped] public string Fullname => (Firstname + " " + Lastname).TrimI();
 
         [NotMapped] public string ContactFullname => (ContactFirstName + " " + ContactLastName).TrimI();
 
-        [NotMapped]
-        public TimeSpan LockRemaining =>
-            LoginDate == null || LoginAttempts < SharedOptions.MaxLoginAttempts
-                ? TimeSpan.Zero
-                : LoginDate.Value.AddMinutes(SharedOptions.LockoutMinutes) - VirtualDateTime.Now;
 
         [NotMapped]
         public bool SendUpdates
@@ -59,36 +41,6 @@ namespace ModernSlavery.Core.Entities
                 return DateTime.Parse(value);
             }
             set => SetSetting(UserSettingKeys.AcceptedPrivacyStatement, value.HasValue ? value.Value.ToString() : null);
-        }
-
-        public bool IsAdministrator()
-        {
-            if (!EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
-
-            if (string.IsNullOrWhiteSpace(AdminEmails))
-                throw new ArgumentException("Missing AdminEmails from web.config");
-
-            return EmailAddress.LikeAny(AdminEmails.SplitI(";"));
-        }
-
-        public bool IsSuperAdministrator()
-        {
-            if (!EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
-
-            if (string.IsNullOrWhiteSpace(SuperAdminEmails))
-                throw new ArgumentException("Missing SuperAdminEmails from web.config");
-
-            return EmailAddress.LikeAny(SuperAdminEmails.SplitI(";"));
-        }
-
-        public bool IsDatabaseAdministrator()
-        {
-            if (!EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
-
-            if (string.IsNullOrWhiteSpace(DatabaseAdminEmails))
-                return IsSuperAdministrator();
-
-            return EmailAddress.LikeAny(DatabaseAdminEmails.SplitI(";"));
         }
 
         /// <summary>

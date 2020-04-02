@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Tests.Common\ModernSlavery.Tests.Common.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
   </ItemGroup>
 

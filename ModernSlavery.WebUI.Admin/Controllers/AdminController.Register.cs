@@ -87,7 +87,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             model.OrganisationName = userOrg.Organisation.OrganisationName;
             model.CompanyNumber = userOrg.Organisation.CompanyNumber;
             model.SectorType = userOrg.Organisation.SectorType;
-            model.SicCodes = userOrg.Organisation.GetSicCodes().Select(o => o.SicCode.SicCodeId).ToList();
+            model.SicCodes = userOrg.Organisation.GetLatestSicCodeIds().ToList();
 
             // pre populate the DUNSNumber text box
             if (!ignoreDUNS) model.DUNSNumber = userOrg.Organisation.DUNSNumber;
@@ -268,7 +268,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var orgs =
                     await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                         .Where(o => orgIds.Contains(o.OrganisationId)).ToListAsync();
-                model.ManualEmployers = orgs.Select(o => EmployerRecord.Create(o)).ToList();
+                model.ManualEmployers = orgs.Select(o => _adminService.OrganisationBusinessLogic.CreateEmployerRecord(o)).ToList();
             }
 
             //Ensure exact match shown at top
@@ -511,7 +511,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 //Log the approval
                 if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-                    await AdminService.RegistrationLog.WriteAsync(
+                    await _adminService.RegistrationLog.WriteAsync(
                         new RegisterLogModel
                         {
                             StatusDate = VirtualDateTime.Now,
@@ -522,7 +522,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             Organisation = userOrg.Organisation.OrganisationName,
                             CompanyNo = userOrg.Organisation.CompanyNumber,
                             Address = userOrg?.Address.GetAddressString(),
-                            SicCodes = userOrg.Organisation.GetSicCodeIdsString(),
+                            SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
                             UserFirstname = userOrg.User.Firstname,
                             UserLastname = userOrg.User.Lastname,
                             UserJobtitle = userOrg.User.JobTitle,
@@ -550,15 +550,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Send notification email to existing users 
-            AdminService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation,
+            _adminService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation,
                 userOrg.User);
 
             //Ensure the organisation has an employer reference
             if (userOrg.PINConfirmedDate.HasValue && string.IsNullOrWhiteSpace(userOrg.Organisation.EmployerReference))
-                await AdminService.OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(userOrg.Organisation);
+                await _adminService.OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(userOrg.Organisation);
 
             //Add or remove this organisation to/from the search index
-            await AdminService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
+            await _adminService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
 
             //Save the model for the redirect
             StashModel(model);
@@ -574,7 +574,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             //Send an acceptance link to the email address
             var returnUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
-            return await AdminService.SharedBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(returnUrl,
+            return await _adminService.SharedBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(returnUrl,
                 emailAddress, test);
         }
 
@@ -623,7 +623,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             //Log the rejection
             if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-                await AdminService.RegistrationLog.WriteAsync(
+                await _adminService.RegistrationLog.WriteAsync(
                     new RegisterLogModel
                     {
                         StatusDate = VirtualDateTime.Now,
@@ -634,7 +634,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         Organisation = userOrg.Organisation.OrganisationName,
                         CompanyNo = userOrg.Organisation.CompanyNumber,
                         Address = userOrg?.Address.GetAddressString(),
-                        SicCodes = userOrg.Organisation.GetSicCodeIdsString(),
+                        SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
                         UserFirstname = userOrg.User.Firstname,
                         UserLastname = userOrg.User.Lastname,
                         UserJobtitle = userOrg.User.JobTitle,
@@ -654,7 +654,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var orgId = userOrg.OrganisationId;
             var emailAddress = userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress);
 
-            var allDnBOrgs = await AdminService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
+            var allDnBOrgs = await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
 
             //Delete the organisation if it has no returns, no D&B addresses, is not in D&B, is not in scopes table, and is not registered to another user
             if (userOrg.Organisation != null
@@ -671,7 +671,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 SharedBusinessLogic.DataRepository.Delete(userOrg.Organisation);
             }
 
-            var searchRecord = EmployerSearchModel.Create(userOrg.Organisation, true);
+            var searchRecord = _adminService.OrganisationBusinessLogic.CreateEmployerSearchModel(userOrg.Organisation, true);
             SharedBusinessLogic.DataRepository.Delete(userOrg);
 
             //Send the declined email to the applicant
@@ -690,7 +690,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Remove this organisation from the search index
-            await AdminService.SearchBusinessLogic.EmployerSearchRepository.RemoveFromIndexAsync(new[] {searchRecord});
+            await _adminService.SearchBusinessLogic.EmployerSearchRepository.RemoveFromIndexAsync(new[] {searchRecord});
 
             //Save the model for the redirect
             StashModel(model);
@@ -707,7 +707,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (!SharedBusinessLogic.SharedOptions.IsProduction()) emailAddress = CurrentUser.EmailAddress;
 
             //Send a verification link to the email address
-            return await AdminService.SharedBusinessLogic.SendEmailService.SendRegistrationDeclinedAsync(emailAddress,
+            return await _adminService.SharedBusinessLogic.SendEmailService.SendRegistrationDeclinedAsync(emailAddress,
                 reason);
         }
 

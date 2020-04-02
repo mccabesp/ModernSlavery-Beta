@@ -1,19 +1,11 @@
 ﻿using System;
-using Microsoft.Extensions.Configuration;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.SharedKernel.Options;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.Core.SharedKernel;
 
-namespace ModernSlavery.Core.SharedKernel.Interfaces
+namespace ModernSlavery.Core.Classes
 {
-    public interface ISnapshotDateHelper
-    {
-        int FirstReportingYear { get; set; }
-        int CurrentSnapshotYear { get; }
-        DateTime PrivateAccountingDate { get; }
-        DateTime PublicAccountingDate { get; }
-        DateTime GetSnapshotDate(SectorTypes sectorType, int year = 0);
-    }
-
     public class SnapshotDateHelper : ISnapshotDateHelper
     {
         private readonly SharedOptions _sharedOptions;

@@ -4,13 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.BusinessDomain.Registration;
 using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Account.Interfaces;
 using ModernSlavery.WebUI.Account.Models;
+using IRegistrationBusinessLogic = ModernSlavery.BusinessDomain.Registration.IRegistrationBusinessLogic;
 
 namespace ModernSlavery.WebUI.Account.ViewServices
 {
@@ -21,6 +22,7 @@ namespace ModernSlavery.WebUI.Account.ViewServices
         public CloseAccountViewService(
             IUserRepository userRepository,
             IRegistrationBusinessLogic registrationBusinessLogic,
+            IOrganisationBusinessLogic organisationBusinessLogic,
             ILogger<CloseAccountViewService> logger,
             ISendEmailService sendEmailService,
             ISharedBusinessLogic sharedBusinessLogic)
@@ -28,13 +30,15 @@ namespace ModernSlavery.WebUI.Account.ViewServices
             UserRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             RegistrationBusinessLogic = registrationBusinessLogic ??
                                         throw new ArgumentNullException(nameof(registrationBusinessLogic));
+            _organisationBusinessLogic = organisationBusinessLogic;
             Logger = logger;
-            SendEmailService = sendEmailService;
+            SendEmailService = sendEmailService; 
         }
 
 
         private IUserRepository UserRepository { get; }
         private IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
         private ILogger<CloseAccountViewService> Logger { get; }
         private ISendEmailService SendEmailService { get; }
 
@@ -91,7 +95,7 @@ namespace ModernSlavery.WebUI.Account.ViewServices
                     SendEmailService.SendAccountClosedNotificationAsync(userToRetire.EmailAddress, testEmail));
 
                 //Create the notification to GEO for each newly orphaned organisation
-                userOrgs.Where(org => org.GetIsOrphan())
+                userOrgs.Where(org => _organisationBusinessLogic.GetOrganisationIsOrphan(org))
                     .ForEach(org =>
                         sendEmails.Add(
                             SendEmailService.SendGEOOrphanOrganisationNotificationAsync(org.OrganisationName,

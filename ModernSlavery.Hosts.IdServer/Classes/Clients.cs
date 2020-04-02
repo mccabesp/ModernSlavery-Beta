@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using IdentityServer4;
 using IdentityServer4.Models;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.Hosts.IdServer.Classes

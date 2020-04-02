@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -16,27 +17,27 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminOrganisationSectorController : Controller
     {
+        private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
-        private readonly IDataRepository dataRepository;
 
         public AdminOrganisationSectorController(
-            IDataRepository dataRepository,
+            IAdminService adminService,
             AuditLogger auditLogger)
         {
-            this.dataRepository = dataRepository;
+            _adminService = adminService;
             this.auditLogger = auditLogger;
         }
 
         [HttpGet("organisation/{id}/change-public-sector-classification")]
         public IActionResult ChangePublicSectorClassificationGet(long id)
         {
-            var organisation = dataRepository.Get<Organisation>(id);
+            var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             var viewModel = new AdminChangePublicSectorClassificationViewModel
             {
                 OrganisationId = organisation.OrganisationId,
                 OrganisationName = organisation.OrganisationName,
-                PublicSectorTypes = dataRepository.GetAll<PublicSectorType>().ToList(),
+                PublicSectorTypes = _adminService.SharedBusinessLogic.DataRepository.GetAll<PublicSectorType>().ToList(),
                 SelectedPublicSectorTypeId = organisation.LatestPublicSectorType?.PublicSectorTypeId
             };
 
@@ -47,10 +48,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public IActionResult ChangePublicSectorClassificationPost(long id,
             AdminChangePublicSectorClassificationViewModel viewModel)
         {
-            var organisation = dataRepository.Get<Organisation>(id);
+            var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
             viewModel.OrganisationId = organisation.OrganisationId;
             viewModel.OrganisationName = organisation.OrganisationName;
-            viewModel.PublicSectorTypes = dataRepository.GetAll<PublicSectorType>().ToList();
+            viewModel.PublicSectorTypes = _adminService.SharedBusinessLogic.DataRepository.GetAll<PublicSectorType>().ToList();
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
 
@@ -61,7 +62,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (viewModel.HasAnyErrors()) return View("ChangePublicSectorClassification", viewModel);
 
-            var newPublicSectorType = dataRepository.GetAll<PublicSectorType>()
+            var newPublicSectorType = _adminService.SharedBusinessLogic.DataRepository.GetAll<PublicSectorType>()
                 .FirstOrDefault(p => p.PublicSectorTypeId == viewModel.SelectedPublicSectorTypeId.Value);
             if (newPublicSectorType == null)
                 throw new ArgumentException(
@@ -73,7 +74,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             AddNewOrganisationPublicSectorType(organisation, viewModel.SelectedPublicSectorTypeId.Value);
 
-            dataRepository.SaveChangesAsync().Wait();
+            _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
             return RedirectToAction("ViewOrganisation", "AdminViewOrganisation",
                 new {id = organisation.OrganisationId});
@@ -98,7 +99,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         private void RetireExistingOrganisationPublicSectorTypesForOrganisation(Organisation organisation)
         {
-            var organisationPublicSectorTypes = dataRepository.GetAll<OrganisationPublicSectorType>()
+            var organisationPublicSectorTypes = _adminService.SharedBusinessLogic.DataRepository.GetAll<OrganisationPublicSectorType>()
                 .Where(opst => opst.OrganisationId == organisation.OrganisationId)
                 .ToList();
 
@@ -115,7 +116,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Source = "Service Desk"
             };
 
-            dataRepository.Insert(newOrganisationPublicSectorType);
+            _adminService.SharedBusinessLogic.DataRepository.Insert(newOrganisationPublicSectorType);
 
             organisation.LatestPublicSectorType = newOrganisationPublicSectorType;
         }

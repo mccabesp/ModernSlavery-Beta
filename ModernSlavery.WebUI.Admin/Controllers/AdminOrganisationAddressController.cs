@@ -21,17 +21,20 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminOrganisationAddressController : BaseController
     {
+        private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
         private readonly ICompaniesHouseAPI CompaniesHouseApi;
         private readonly IUpdateFromCompaniesHouseService UpdateFromCompaniesHouseService;
 
         public AdminOrganisationAddressController(
+            IAdminService adminService,
             ICompaniesHouseAPI companiesHouseApi,
             IUpdateFromCompaniesHouseService updateFromCompaniesHouseService,
             AuditLogger auditLogger,
             ILogger<AdminOrganisationAddressController> logger, IWebService webService,
             ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
+            _adminService = adminService;
             UpdateFromCompaniesHouseService = updateFromCompaniesHouseService;
             this.auditLogger = auditLogger;
             CompaniesHouseApi = companiesHouseApi;
@@ -60,7 +63,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         UpdateFromCompaniesHouseService.CreateOrganisationAddressFromCompaniesHouseAddress(
                             organisationFromCompaniesHouse.RegisteredOfficeAddress);
 
-                    if (!organisation.GetAddress().AddressMatches(addressFromCompaniesHouse))
+                    if (!organisation.GetLatestAddress().AddressMatches(addressFromCompaniesHouse))
                         return OfferNewCompaniesHouseAddress(organisation, addressFromCompaniesHouse);
                 }
                 catch (Exception ex)
@@ -203,7 +206,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         private void SaveChangesAndAuditAction(ChangeOrganisationAddressViewModel viewModel, Organisation organisation)
         {
-            var oldAddressString = organisation.GetAddressString();
+            var oldAddressString = organisation.GetLatestAddress()?.GetAddressString();
 
             RetireOldAddress(organisation);
 
@@ -228,7 +231,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         private static void RetireOldAddress(Organisation organisation)
         {
-            var oldOrganisationAddress = organisation.GetAddress();
+            var oldOrganisationAddress = organisation.GetLatestAddress();
             oldOrganisationAddress.Status = AddressStatuses.Retired;
             oldOrganisationAddress.StatusDate = VirtualDateTime.Now;
             oldOrganisationAddress.Modified = VirtualDateTime.Now;

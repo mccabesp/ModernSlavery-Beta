@@ -380,7 +380,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
                 if (organisationResult.Result.OrganisationId == 0)
                     throw new HttpException(HttpStatusCode.NotFound, "Employer not found");
 
-                employer = EmployerSearchModel.Create(organisationResult.Result);
+                employer = OrganisationBusinessLogic.CreateEmployerSearchModel(organisationResult.Result);
             }
 
             return employer;

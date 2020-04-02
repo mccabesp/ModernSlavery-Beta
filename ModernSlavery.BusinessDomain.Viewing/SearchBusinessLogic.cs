@@ -16,14 +16,17 @@ namespace ModernSlavery.BusinessDomain.Viewing
         public SearchBusinessLogic(
             ISearchRepository<EmployerSearchModel> employerSearchRepository,
             ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
+            IOrganisationBusinessLogic organisationBusinessLogic,
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog
         )
         {
             EmployerSearchRepository = employerSearchRepository;
             SicCodeSearchRepository = sicCodeSearchRepository;
+            _organisationBusinessLogic = organisationBusinessLogic;
             SearchLog = searchLog;
         }
 
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
         public ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; set; }
         public ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
 
@@ -55,13 +58,12 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             //Batch update the included organisations
             if (includes.Any())
-                await EmployerSearchRepository.AddOrUpdateIndexDataAsync(includes.Select(o =>
-                    EmployerSearchModel.Create(o)));
+                await EmployerSearchRepository.AddOrUpdateIndexDataAsync(includes.Select(o => _organisationBusinessLogic.CreateEmployerSearchModel(o)));
 
             //Batch remove the excluded organisations
             if (excludes.Any())
                 await EmployerSearchRepository.RemoveFromIndexAsync(excludes.Select(o =>
-                    EmployerSearchModel.Create(o, true)));
+                    _organisationBusinessLogic.CreateEmployerSearchModel(o, true)));
         }
     }
 }

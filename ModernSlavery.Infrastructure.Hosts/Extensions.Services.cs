@@ -7,9 +7,8 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.Shared.Options;
 using StackExchange.Redis;
-using DataProtectionOptions = ModernSlavery.WebUI.Shared.Options.DataProtectionOptions;
+using DataProtectionOptions = ModernSlavery.Infrastructure.Hosts.DataProtectionOptions;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {

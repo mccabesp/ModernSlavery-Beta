@@ -55,7 +55,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             {
                 await WriteRecordsPerYearAsync(
                     filePath,
-                    _OrganisationBusinessLogic.GetOrganisationsFileModelByYearAsync);
+                    _OrganisationBusinessLogic.GetOrganisationFileModelByYearAsync);
             }
             finally
             {

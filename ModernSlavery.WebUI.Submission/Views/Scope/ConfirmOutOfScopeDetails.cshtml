@@ -1,5 +1,6 @@
 ﻿@inject SharedOptions sharedOptions
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Confirm your organisation - Modern Slavery reporting service";
     var emailAdd = sharedOptions.GpgReportingEmail;
     var emailSubject = WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));
@@ -7,6 +8,7 @@
     // c# 6 doesnt compile with razor in mvc5 so cant use string templates here :( need to update to MVC 6
     var mailto = string.Join("", "mailto:", emailAdd, "?subject=", emailSubject);
 }
+@using ModernSlavery.Core.Models
 @model ScopingViewModel
 <div class="grid-row">
     <div class="column-two-thirds">

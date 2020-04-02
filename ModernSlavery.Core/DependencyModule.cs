@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 
@@ -21,6 +23,8 @@ namespace ModernSlavery.Core
 
         public void Register(IDependencyBuilder builder)
         {
+            builder.Autofac.RegisterType<SnapshotDateHelper>().As<ISnapshotDateHelper>().SingleInstance();
+
             //Register some singletons
             builder.Autofac.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
                 .WithParameter("seed", _sharedOptions.ObfuscationSeed);

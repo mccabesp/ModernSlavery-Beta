@@ -38,7 +38,7 @@ namespace ModernSlavery.Infrastructure.Search
             }
 
             SearchLog = searchLog;
-            IndexName = indexName;
+            IndexName = indexName.ToLower();
 
             _searchServiceClient = new Lazy<Task<ISearchServiceClient>>(
                 async () =>

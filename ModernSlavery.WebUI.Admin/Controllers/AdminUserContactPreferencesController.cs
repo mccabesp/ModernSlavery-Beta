@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
@@ -13,20 +14,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminUserContactPreferencesController : Controller
     {
+        private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
 
-        private readonly IDataRepository dataRepository;
-
-        public AdminUserContactPreferencesController(IDataRepository dataRepository, AuditLogger auditLogger)
+        public AdminUserContactPreferencesController(
+            IAdminService adminService, 
+            AuditLogger auditLogger)
         {
-            this.dataRepository = dataRepository;
+            _adminService = adminService;
             this.auditLogger = auditLogger;
         }
 
         [HttpGet("user/{id}/change-contact-preferences")]
         public IActionResult ChangeContactPreferencesGet(long id)
         {
-            var user = dataRepository.Get<User>(id);
+            var user = _adminService.SharedBusinessLogic.DataRepository.Get<User>(id);
 
             var viewModel = new AdminChangeUserContactPreferencesViewModel
             {
@@ -42,7 +44,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpPost("user/{id}/change-contact-preferences")]
         public IActionResult ChangeContactPreferencesPost(long id, AdminChangeUserContactPreferencesViewModel viewModel)
         {
-            var user = dataRepository.Get<User>(id);
+            var user = _adminService.SharedBusinessLogic.DataRepository.Get<User>(id);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
 
@@ -70,7 +72,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             user.AllowContact = viewModel.AllowContact;
             user.SendUpdates = viewModel.SendUpdates;
 
-            dataRepository.SaveChangesAsync().Wait();
+            _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
             return RedirectToAction("ViewUser", "AdminViewUser", new {id = user.UserId});
         }

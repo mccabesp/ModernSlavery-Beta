@@ -1,5 +1,6 @@
 ﻿@model CompareViewModel
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Modern Slavery: Employer comparison";
     string backUrl = string.IsNullOrWhiteSpace(Model.LastSearchUrl) ? "/" : Model.LastSearchUrl;
 }

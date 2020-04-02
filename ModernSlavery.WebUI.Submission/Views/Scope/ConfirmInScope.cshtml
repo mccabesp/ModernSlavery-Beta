@@ -1,6 +1,8 @@
 ﻿@inject SharedOptions sharedOptions
 @using System.Net;
+@using ModernSlavery.Core.Models
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Confirm In Scope - Modern Slavery reporting service";
     var emailAdd = sharedOptions.GpgReportingEmail;
     var emailSubject =  WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));

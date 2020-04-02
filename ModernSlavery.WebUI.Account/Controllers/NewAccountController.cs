@@ -172,7 +172,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             else
                 VirtualUser.EmailAddress = model.EmailAddress;
 
-            if (!VirtualUser.IsAdministrator())
+            if (!SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
             {
                 VirtualUser.SetSetting(UserSettingKeys.AllowContact, model.AllowContact.ToString());
                 VirtualUser.SetSetting(UserSettingKeys.SendUpdates, model.SendUpdates.ToString());
@@ -224,7 +224,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             if (checkResult != null) return checkResult;
 
             //If its an administrator go to admin home
-            if (VirtualUser.IsAdministrator())
+            if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
                 return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             return View("EmailConfirmed");
@@ -275,7 +275,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             if (VirtualUser != null && !VirtualUser.EmailVerifiedDate.EqualsI(null, DateTime.MinValue))
             {
-                if (VirtualUser.IsAdministrator())
+                if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
                     return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
                 return RedirectToAction("EmailConfirmed");

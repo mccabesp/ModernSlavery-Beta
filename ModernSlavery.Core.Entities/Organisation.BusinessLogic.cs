@@ -12,27 +12,7 @@ namespace ModernSlavery.Core.Entities
     [DebuggerDisplay("{OrganisationName},{Status}")]
     public partial class Organisation
     {
-        private readonly int PinInPostExpiryDays;
-        private readonly string SecurityCodeChars;
-        private readonly int SecurityCodeLength;
-        private IObfuscator _obfuscator;
-        private ISnapshotDateHelper _snapshotDateHelper;
-        private SharedOptions SharedOptions;
-
-        public Organisation(SharedOptions sharedOptions, IObfuscator obfuscator,
-            ISnapshotDateHelper snapshotDateHelper) : this()
-        {
-            SharedOptions = sharedOptions;
-            _obfuscator = obfuscator;
-            _snapshotDateHelper = snapshotDateHelper;
-
-            PinInPostExpiryDays = sharedOptions.PinInPostExpiryDays;
-            SecurityCodeChars = sharedOptions.SecurityCodeChars;
-            SecurityCodeLength = sharedOptions.SecurityCodeLength;
-        }
-
-        private DateTime PinExpiresDate => VirtualDateTime.Now.AddDays(0 - PinInPostExpiryDays);
-
+        
         public OrganisationStatus PreviousStatus
         {
             get
@@ -64,21 +44,7 @@ namespace ModernSlavery.Core.Entities
         /// <summary>
         ///     Returns true if organisation has been made an orphan and is in scope
         /// </summary>
-        public bool GetIsOrphan()
-        {
-            return Status == Entities.OrganisationStatuses.Active
-                   && (LatestScope.ScopeStatus == ScopeStatuses.InScope ||
-                       LatestScope.ScopeStatus == ScopeStatuses.PresumedInScope)
-                   && (UserOrganisations == null
-                       || !UserOrganisations.Any(uo => uo.PINConfirmedDate != null
-                                                       || uo.Method ==
-                                                       RegistrationMethods.Manual
-                                                       || uo.Method ==
-                                                       RegistrationMethods.PinInPost
-                                                       && uo.PINSentDate.HasValue
-                                                       && uo.PINSentDate.Value >
-                                                       PinExpiresDate));
-        }
+
 
         public string GetRegistrationStatus()
         {
@@ -98,116 +64,86 @@ namespace ModernSlavery.Core.Entities
             return "No registrations";
         }
 
-        public string GetSicSectorsString(DateTime? maxDate = null, string delimiter = ", ")
+        public string GetSicSectorsString(IEnumerable<OrganisationSicCode> organisationSicCodes, string delimiter = ", ")
         {
-            var organisationSicCodes = GetSicCodes(maxDate);
             return organisationSicCodes.Select(s => s.SicCode.SicSection.Description.Trim())
                 .UniqueI()
                 .OrderBy(s => s)
                 .ToDelimitedString(delimiter);
         }
 
+        public string GetSicSectorsString(DateTime maxDate, string delimiter = ", ")
+        {
+            var organisationSicCodes = GetSicCodes(maxDate);
+            return GetSicSectorsString(organisationSicCodes, delimiter);
+        }
+
+        public string GetLatestSicSectorsString(string delimiter = ", ")
+        {
+            var organisationSicCodes = GetLatestSicCodes();
+            return GetSicSectorsString(organisationSicCodes, delimiter);
+        }
         /// <summary>
         ///     Returns the latest organisation name before specified date/time
         /// </summary>
         /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
         /// <returns>The name of the organisation</returns>
-        public IEnumerable<OrganisationSicCode> GetSicCodes(DateTime? maxDate = null)
+        public IEnumerable<OrganisationSicCode> GetSicCodes(DateTime maxDate)
         {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = GetAccountingStartDate().AddYears(1);
-
             return OrganisationSicCodes.Where(s =>
-                s.Created < maxDate.Value && (s.Retired == null || s.Retired.Value > maxDate.Value));
+                s.Created < maxDate && (s.Retired == null || s.Retired.Value > maxDate));
         }
 
-        public SortedSet<int> GetSicCodeIds(DateTime? maxDate = null)
+        public IEnumerable<OrganisationSicCode> GetLatestSicCodes()
         {
-            var organisationSicCodes = GetSicCodes(maxDate);
-
-            var codes = new SortedSet<int>();
-            foreach (var sicCode in organisationSicCodes) codes.Add(sicCode.SicCodeId);
-
-            return codes;
+            return OrganisationSicCodes.Where(s =>s.Retired == null).OrderByDescending(s=>s.Created);
+        }
+        public IEnumerable<int> GetLatestSicCodeIds(string delimiter = ", ")
+        {
+            return GetLatestSicCodes().Select(s => s.SicCodeId);
+        }
+        public string GetLatestSicCodeIdsString(string delimiter = ", ")
+        {
+            return GetLatestSicCodeIds().OrderBy(s => s).ToDelimitedString(delimiter);
         }
 
-
-        public string GetSicSource(DateTime? maxDate = null)
+        public string GetSicSource(DateTime maxDate)
         {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = GetAccountingStartDate().AddYears(1);
-
             return OrganisationSicCodes.FirstOrDefault(s =>
-                    s.Created < maxDate.Value && (s.Retired == null || s.Retired.Value > maxDate.Value))
+                    s.Created < maxDate && (s.Retired == null || s.Retired.Value > maxDate))
                 ?.Source;
         }
 
-        public string GetSicCodeIdsString(DateTime? maxDate = null, string delimiter = ", ")
+        public string GetSicCodeIdsString(DateTime maxDate, string delimiter = ", ")
         {
             return GetSicCodes(maxDate).OrderBy(s => s.SicCodeId).Select(s => s.SicCodeId).ToDelimitedString(delimiter);
         }
 
-        public string GetSicSectionIdsString(DateTime? maxDate = null, string delimiter = ", ")
+        public string GetSicSectionIdsString(DateTime maxDate, string delimiter = ", ")
         {
             var organisationSicCodes = GetSicCodes(maxDate);
             return organisationSicCodes.Select(s => s.SicCode.SicSectionId).UniqueI().OrderBy(s => s)
                 .ToDelimitedString(delimiter);
         }
 
-        public string GetEncryptedId()
-        {
-            return _obfuscator.Obfuscate(OrganisationId.ToString());
-        }
-
         //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
-        public Return GetReturn(int year = 0)
+        public Return GetReturn(int year)
         {
-            var accountingStartDate = GetAccountingStartDate(year);
-            return Returns.Where(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate == accountingStartDate)
+            return Returns.Where(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year)
                 .OrderByDescending(r => r.StatusDate)
                 .FirstOrDefault();
         }
 
-        //Returns the latest return for the specified accounting date or the latest ever if no accounting date specified
-        public Return GetReturn(DateTime? accountingStartDate = null)
-        {
-            if (accountingStartDate == null || accountingStartDate.Value == DateTime.MinValue)
-                accountingStartDate = GetAccountingStartDate();
-
-            return Returns.FirstOrDefault(r =>
-                r.Status == ReturnStatuses.Submitted && r.AccountingDate == accountingStartDate);
-        }
-
-
-        //Returns the latest scope for the current accounting date
-        public OrganisationScope GetCurrentScope()
-        {
-            var accountingStartDate = GetAccountingStartDate();
-
-            return GetScopeForYear(accountingStartDate);
-        }
-
-
         //Returns the scope for the specified accounting date
-        public OrganisationScope GetScopeForYear(DateTime accountingStartDate)
-        {
-            return GetScopeForYear(accountingStartDate.Year);
-        }
-
-        public OrganisationScope GetScopeForYear(int year)
+        public OrganisationScope GetScope(DateTime accountingStartDate)
         {
             return OrganisationScopes.FirstOrDefault(s =>
-                s.Status == ScopeRowStatuses.Active && s.SnapshotDate.Year == year);
-        }
-
-
-        public ScopeStatuses GetScopeStatus(int year = 0)
-        {
-            var accountingStartDate = GetAccountingStartDate(year);
-            return GetScopeStatus(accountingStartDate);
+                s.Status == ScopeRowStatuses.Active && s.SnapshotDate == accountingStartDate);
         }
 
         public ScopeStatuses GetScopeStatus(DateTime accountingStartDate)
         {
-            var scope = GetScopeForYear(accountingStartDate);
+            var scope = GetScope(accountingStartDate);
             return scope == null ? ScopeStatuses.Unknown : scope.ScopeStatus;
         }
 
@@ -216,30 +152,27 @@ namespace ModernSlavery.Core.Entities
         /// </summary>
         /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
         /// <returns>The name of the organisation</returns>
-        public OrganisationName GetName(DateTime? maxDate = null)
+        public OrganisationName GetName(DateTime maxDate)
         {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = GetAccountingStartDate().AddYears(1);
-
-            return OrganisationNames.Where(n => n.Created < maxDate.Value)
+            return OrganisationNames.Where(n => n.Created < maxDate)
                 .OrderByDescending(n => n.Created)
                 .FirstOrDefault();
         }
-
-
+        public OrganisationName GetLatestName()
+        {
+            return OrganisationNames
+                .OrderByDescending(n => n.Created)
+                .FirstOrDefault();
+        }
         /// <summary>
         ///     Returns the latest address before specified date/time
         /// </summary>
         /// <param name="maxDate">Ignore address changes after this date/time - if empty returns the latest address</param>
         /// <returns>The address of the organisation</returns>
-        public OrganisationAddress GetAddress(DateTime? maxDate = null, AddressStatuses status = AddressStatuses.Active)
+        public OrganisationAddress GetAddress(DateTime maxDate, AddressStatuses status = AddressStatuses.Active)
         {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = GetAccountingStartDate().AddYears(1);
-
-            if (status == AddressStatuses.Active && LatestAddress != null &&
-                maxDate == GetAccountingStartDate().AddYears(1)) return LatestAddress;
-
             var addressStatus = OrganisationAddresses.SelectMany(a =>
-                    a.AddressStatuses.Where(s => s.Status == status && s.StatusDate < maxDate.Value))
+                    a.AddressStatuses.Where(s => s.Status == status && s.StatusDate < maxDate))
                 .OrderByDescending(s => s.StatusDate)
                 .FirstOrDefault();
 
@@ -250,22 +183,30 @@ namespace ModernSlavery.Core.Entities
             return null;
         }
 
+        public OrganisationAddress GetLatestAddress(AddressStatuses status = AddressStatuses.Active)
+        {
+            var addressStatus = OrganisationAddresses.SelectMany(a =>
+                    a.AddressStatuses.Where(s => s.Status == status))
+                .OrderByDescending(s => s.StatusDate)
+                .FirstOrDefault();
+
+            if (addressStatus != null && addressStatus.Address.Status == status) return addressStatus.Address;
+
+            if (LatestAddress != null && LatestAddress.Status == status) return LatestAddress;
+
+            return null;
+        }
         /// <summary>
         ///     Returns the latest organisation name before specified date/time
         /// </summary>
         /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
         /// <returns>The name of the organisation</returns>
-        public string GetAddressString(DateTime? maxDate = null, AddressStatuses status = AddressStatuses.Active,
+        public string GetAddressString(DateTime maxDate, AddressStatuses status = AddressStatuses.Active,
             string delimiter = ", ")
         {
             var address = GetAddress(maxDate, status);
 
             return address?.GetAddressString(delimiter);
-        }
-
-        public bool GetIsDissolved()
-        {
-            return DateOfCessation != null && DateOfCessation < GetAccountingStartDate();
         }
 
         public override bool Equals(object obj)
@@ -303,36 +244,10 @@ namespace ModernSlavery.Core.Entities
             return searchResults;
         }
 
-        public IEnumerable<Return> GetRecentReports(int recentCount)
+        public bool GetIsInscope(DateTime maxDate)
         {
-            foreach (var year in GetRecentReportingYears(recentCount))
-            {
-                var defaultReturn = new Return
-                {
-                    Organisation = this,
-                    AccountingDate = GetAccountingStartDate(year),
-                    Modified = VirtualDateTime.Now
-                };
-                defaultReturn.IsLateSubmission = defaultReturn.CalculateIsLateSubmission();
-
-                yield return GetReturn(year) ?? defaultReturn;
-            }
+            return !GetScopeStatus(maxDate).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
         }
-
-        public IEnumerable<int> GetRecentReportingYears(int recentCount)
-        {
-            var endYear = GetAccountingStartDate().Year;
-            var startYear = endYear - (recentCount - 1);
-            if (startYear < _snapshotDateHelper.FirstReportingYear) startYear = _snapshotDateHelper.FirstReportingYear;
-
-            for (var year = endYear; year >= startYear; year--) yield return year;
-        }
-
-        public bool GetIsInscope(int year)
-        {
-            return !GetScopeStatus(year).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
-        }
-
 
         public IEnumerable<Return> GetSubmittedReports()
         {
@@ -378,24 +293,6 @@ namespace ModernSlavery.Core.Entities
         }
 
         /// <summary>
-        ///     The security code is created exclusively during setting, for all other cases (extend/expire) see method
-        ///     'SetSecurityCodeExpiryDate'
-        /// </summary>
-        /// <param name="securityCodeExpiryDateTime"></param>
-        public virtual void SetSecurityCode(DateTime securityCodeExpiryDateTime)
-        {
-            //Set the security token
-            string newSecurityCode = null;
-            do
-            {
-                newSecurityCode = Crypto.GeneratePasscode(SecurityCodeChars.ToCharArray(), SecurityCodeLength);
-            } while (newSecurityCode == SecurityCode);
-
-            SecurityCode = newSecurityCode;
-            SetSecurityCodeExpiryDate(securityCodeExpiryDateTime);
-        }
-
-        /// <summary>
         ///     Method to modify the security code expiring information (create/extend/expire). It additionally timestamps such
         ///     change.
         /// </summary>
@@ -425,17 +322,6 @@ namespace ModernSlavery.Core.Entities
         public override string ToString()
         {
             return $"ref:{EmployerReference}, name:{OrganisationName}";
-        }
-
-        /// <summary>
-        ///     Returns the accounting start date for the specified sector and year
-        /// </summary>
-        /// <param name="sectorType">The sector type of the organisation</param>
-        /// <param name="year">The starting year of the accounting period. If 0 then uses current accounting period</param>
-        /// <returns></returns>
-        public DateTime GetAccountingStartDate(int year = 0)
-        {
-            return _snapshotDateHelper.GetSnapshotDate(SectorType, year);
         }
     }
 }

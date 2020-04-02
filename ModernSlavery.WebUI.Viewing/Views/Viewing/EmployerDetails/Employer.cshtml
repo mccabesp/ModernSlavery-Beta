@@ -1,5 +1,9 @@
 ﻿@inject ViewingOptions ViewingOptions
 @inject ISnapshotDateHelper SnapshotDateHelper
+@inject IObfuscator Obfuscator;
+@inject IOrganisationBusinessLogic OrganisationBusinessLogic
+@using ModernSlavery.BusinessDomain.Shared.Interfaces
+@using ModernSlavery.Core.Interfaces
 @using ModernSlavery.Core.SharedKernel
 @using ModernSlavery.Core.SharedKernel.Interfaces
 @model EmployerDetailsViewModel
@@ -8,13 +12,14 @@
     ViewBag.EmployerName = Model.Organisation.OrganisationName;
 
     var organisation = Model.Organisation;
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = organisation.OrganisationName + " Details";
     ViewBag.pageDescription = "View Modern Slavery details for " + organisation.OrganisationName;
     ViewBag.ogTitle = ViewBag.Title;
     ViewBag.ogType = "business.gender_pay_gap";
     ViewBag.pageClass = "employer-report-page";
 
-    var employerIdentifier = organisation.GetEncryptedId();
+    var employerIdentifier = Obfuscator.Obfuscate(organisation.OrganisationId);
 
     var backUrl = !string.IsNullOrWhiteSpace(Model.EmployerBackUrl) ? Model.EmployerBackUrl : !string.IsNullOrWhiteSpace(Model.LastSearchUrl) ? Model.LastSearchUrl : "/";
     if (string.IsNullOrWhiteSpace(ViewBag.ReturnUrl))
@@ -53,7 +58,7 @@
                     </div>
                     <div>
                         <dt class="metadata-text-label">Nature of business (SIC)</dt>
-                        <dd class="metadata-text-value">@organisation.GetSicSectorsString()</dd>
+                        <dd class="metadata-text-value">@organisation.GetLatestSicSectorsString()</dd>
                     </div>
                 </dl>
                 <partial name="~/Views/Compare/AddRemoveEmployer.cshtml" model="viewModel"/>
@@ -80,7 +85,7 @@
             </div>
         </div>
 
-        @foreach (var report in organisation.GetRecentReports(ViewingOptions.ShowReportYearCount))
+        @foreach (var report in OrganisationBusinessLogic.GetOrganisationRecentReports(organisation,ViewingOptions.ShowReportYearCount))
         {
             <div class="grid-row">
                 <div class="column-full">
@@ -99,7 +104,7 @@
                         {
                             <tr>
                                 <td colspan="2" style="border-bottom: none;">
-                                    @if (organisation.GetIsInscope(report.AccountingDate.Year))
+                                    @if (organisation.GetIsInscope(report.AccountingDate))
                                     {
                                         <span>
                                             This organisation

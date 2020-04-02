@@ -85,7 +85,7 @@
             <tbody class="govuk-table__body">
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header govuk-!-width-one-third">New name</th>
-                <td class="govuk-table__cell">@(UpdateFromCompaniesHouseService.IsCompanyNameEqual(Model.Organisation.GetName(), Model.CompaniesHouseCompany.CompanyName) ? "(Not changed)" : Model.CompaniesHouseCompany.CompanyName)</td>
+                <td class="govuk-table__cell">@(UpdateFromCompaniesHouseService.IsCompanyNameEqual(Model.Organisation.GetLatestName(), Model.CompaniesHouseCompany.CompanyName) ? "(Not changed)" : Model.CompaniesHouseCompany.CompanyName)</td>
             </tr>
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header govuk-!-width-one-third">New address</th>
@@ -95,7 +95,7 @@
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header govuk-!-width-one-third">New SIC codes</th>
 
-                @if (UpdateFromCompaniesHouseService.SicCodesEqual(Model.Organisation.GetSicCodes(), Model.CompaniesHouseCompany.SicCodes))
+                @if (UpdateFromCompaniesHouseService.SicCodesEqual(Model.Organisation.GetLatestSicCodes(), Model.CompaniesHouseCompany.SicCodes))
                 {
                     <td class="govuk-table__cell">
                         (Not changed)

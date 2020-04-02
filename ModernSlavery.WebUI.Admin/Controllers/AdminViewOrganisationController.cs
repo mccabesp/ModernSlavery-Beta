@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 
@@ -9,17 +10,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminViewOrganisationController : Controller
     {
-        private readonly IDataRepository dataRepository;
-
-        public AdminViewOrganisationController(IDataRepository dataRepository)
+        private readonly IAdminService _adminService;
+        public AdminViewOrganisationController(
+            IAdminService adminService)
         {
-            this.dataRepository = dataRepository;
+            _adminService = adminService;
         }
 
         [HttpGet("organisation/{id}")]
         public IActionResult ViewOrganisation(long id)
         {
-            var organisation = dataRepository.Get<Organisation>(id);
+            var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             return View("../Admin/ViewOrganisation", organisation);
         }

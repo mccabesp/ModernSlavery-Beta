@@ -21,7 +21,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// </summary>
         /// <param name="year"></param>
         /// <returns></returns>
-        Task<List<OrganisationsFileModel>> GetOrganisationsFileModelByYearAsync(int year);
+        Task<List<OrganisationsFileModel>> GetOrganisationFileModelByYearAsync(int year);
 
         Task SetUniqueEmployerReferencesAsync();
         Task SetUniqueEmployerReferenceAsync(Organisation organisation);
@@ -38,21 +38,11 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         CustomResult<Organisation> LoadInfoFromEmployerIdentifier(string employerIdentifier);
         CustomResult<Organisation> LoadInfoFromActiveEmployerIdentifier(string employerIdentifier);
         Task<CustomResult<Organisation>> GetOrganisationByEncryptedReturnIdAsync(string encryptedReturnId);
-        string GetSicSectorsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ");
+        string GetOrganisationSicSectorsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ");
+        string GetOrganisationSicSource(Organisation organisation, DateTime? maxDate = null);
+        string GetOrganisationSicSectionIdsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ");
 
-        /// <summary>
-        ///     Returns the latest organisation name before specified date/time
-        /// </summary>
-        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
-        /// <returns>The name of the organisation</returns>
-        IEnumerable<OrganisationSicCode> GetSicCodes(Organisation org, DateTime? maxDate = null);
-
-        SortedSet<int> GetSicCodeIds(Organisation org, DateTime? maxDate = null);
-        string GetSicSource(Organisation org, DateTime? maxDate = null);
-        string GetSicCodeIdsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ");
-        string GetSicSectionIdsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ");
-
-        AddressModel GetAddressModel(Organisation org, DateTime? maxDate = null,
+        AddressModel GetOrganisationAddressModel(Organisation org, DateTime? maxDate = null,
             AddressStatuses status = AddressStatuses.Active);
 
         CustomError UnRetire(Organisation org, long byUserId, string details = null);
@@ -63,30 +53,75 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="dataRepository"></param>
         /// <param name="sicCodes"></param>
         /// <returns></returns>
-        IEnumerable<string> GetSectors(string sicCodes);
+        IEnumerable<string> GetOrganisationSectors(string sicCodes);
 
         Organisation GetOrganisationById(long organisationId);
+        IEnumerable<Return> GetOrganisationRecentReports(Organisation organisation,int recentCount);
+
+        EmployerSearchModel CreateEmployerSearchModel(Organisation organisation, bool keyOnly = false,
+            List<SicCodeSearchModel> listOfSicCodeSearchModels = null);
+
+        EmployerRecord CreateEmployerRecord(Organisation org, long userId = 0);
+
+        IEnumerable<int> GetOrganisationRecentReportingYears(Organisation organisation,int recentCount);
+        bool GetOrganisationIsOrphan(Organisation organisation);
+
+        bool GetOrganisationIsDissolved(Organisation organisation);
+
+        /// <summary>
+        ///     Returns the latest organisation name before specified date/time
+        /// </summary>
+        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
+        /// <returns>The name of the organisation</returns>
+        OrganisationName GetOrganisationName(Organisation organisation, DateTime? maxDate = null);
+
+        /// <summary>
+        ///     Returns the latest address before specified date/time
+        /// </summary>
+        /// <param name="maxDate">Ignore address changes after this date/time - if empty returns the latest address</param>
+        /// <returns>The address of the organisation</returns>
+        OrganisationAddress GetOrganisationAddress(Organisation organisation, DateTime? maxDate = null, AddressStatuses status = AddressStatuses.Active);
+
+        /// <summary>
+        ///     Returns the latest organisation name before specified date/time
+        /// </summary>
+        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
+        /// <returns>The name of the organisation</returns>
+        string GetOrganisationAddressString(Organisation organisation, DateTime? maxDate = null, AddressStatuses status = AddressStatuses.Active,
+            string delimiter = ", ");
+
+        /// <summary>
+        ///     Returns the latest organisation name before specified date/time
+        /// </summary>
+        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
+        /// <returns>The name of the organisation</returns>
+        IEnumerable<OrganisationSicCode> GetOrganisationSicCodes(Organisation organisation,DateTime? maxDate = null);
+
+        SortedSet<int> GetOrganisationSicCodeIds(Organisation organisation, DateTime? maxDate = null);
+        string GetOrganisationSicCodeIdsString(Organisation organisation, DateTime? maxDate = null, string delimiter = ", ");
         Task<Organisation> GetOrganisationByEmployerReferenceAsync(string employerReference);
 
         Task<Organisation> GetOrganisationByEmployerReferenceAndSecurityCodeAsync(
             string employerReference,
             string securityCode);
 
+        Return GetOrganisationReturn(Organisation organisation, int year = 0);
+        OrganisationScope GetOrganisationCurrentScope(Organisation organisation);
         Task<Organisation> GetOrganisationByEmployerReferenceOrThrowAsync(string employerReference);
 
-        Task<CustomResult<Organisation>> CreateSecurityCodeAsync(string employerRef,
+        Task<CustomResult<Organisation>> CreateOrganisationSecurityCodeAsync(string employerRef,
             DateTime securityCodeExpiryDateTime);
 
-        Task<CustomBulkResult<Organisation>> CreateSecurityCodesInBulkAsync(
+        Task<CustomBulkResult<Organisation>> CreateOrganisationSecurityCodesInBulkAsync(
             DateTime securityCodeExpiryDateTime);
 
-        Task<CustomResult<Organisation>> ExtendSecurityCodeAsync(string employerRef,
+        Task<CustomResult<Organisation>> ExtendOrganisationSecurityCodeAsync(string employerRef,
             DateTime securityCodeExpiryDateTime);
 
-        Task<CustomBulkResult<Organisation>> ExtendSecurityCodesInBulkAsync(
+        Task<CustomBulkResult<Organisation>> ExtendOrganisationSecurityCodesInBulkAsync(
             DateTime securityCodeExpiryDateTime);
 
-        Task<CustomResult<Organisation>> ExpireSecurityCodeAsync(string employerRef);
-        Task<CustomBulkResult<Organisation>> ExpireSecurityCodesInBulkAsync();
+        Task<CustomResult<Organisation>> ExpireOrganisationSecurityCodeAsync(string employerRef);
+        Task<CustomBulkResult<Organisation>> ExpireOrganisationSecurityCodesInBulkAsync();
     }
 }

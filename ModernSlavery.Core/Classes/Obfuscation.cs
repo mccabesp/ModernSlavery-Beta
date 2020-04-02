@@ -1,5 +1,6 @@
 ﻿using Cryptography.Obfuscation;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 
 namespace ModernSlavery.Core.Classes
@@ -26,6 +27,11 @@ namespace ModernSlavery.Core.Classes
         public int DeObfuscate(string value)
         {
             return _obfuscator.Deobfuscate(value); // 15
+        }
+
+        public string Obfuscate(long value)
+        {
+            return _obfuscator.Obfuscate(value.ToInt32());
         }
     }
 }

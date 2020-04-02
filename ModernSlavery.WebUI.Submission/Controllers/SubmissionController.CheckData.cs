@@ -37,7 +37,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 "Viewing",
                 new
                 {
-                    employerIdentifier = postedReturn.Organisation.GetEncryptedId(),
+                    employerIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(postedReturn.Organisation.OrganisationId),
                     year = postedReturn.AccountingDate.Year
                 },
                 "https");
@@ -239,7 +239,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     });
 
             //This is required for the submission complete page
-            postedReturnViewModel.EncryptedOrganisationId = postedReturn.Organisation.GetEncryptedId();
+            postedReturnViewModel.EncryptedOrganisationId = SharedBusinessLogic.Obfuscator.Obfuscate(postedReturn.Organisation.OrganisationId);
             StashModel(postedReturnViewModel);
 
             if (SharedBusinessLogic.SharedOptions.EnableSubmitAlerts

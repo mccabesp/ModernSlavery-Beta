@@ -56,7 +56,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             model.IsSecurityCodeExpired = org.HasSecurityCodeExpired();
 
             model.Employers = new PagedResult<EmployerRecord>();
-            model.Employers.Results = new List<EmployerRecord> {EmployerRecord.Create(org)};
+            model.Employers.Results = new List<EmployerRecord> {_organisationBusinessLogic.CreateEmployerRecord(org)};
             model.SelectedEmployerIndex = 0;
 
             //Mark the organisation as authorised

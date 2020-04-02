@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -19,15 +20,18 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminOrganisationNameController : BaseController
     {
+        private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
         private readonly ICompaniesHouseAPI companiesHouseApi;
 
         public AdminOrganisationNameController(
+            IAdminService adminService,
             ICompaniesHouseAPI companiesHouseApi,
             AuditLogger auditLogger,
             ILogger<AdminOrganisationNameController> logger, IWebService webService,
             ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
+            _adminService = adminService;
             this.companiesHouseApi = companiesHouseApi;
             this.auditLogger = auditLogger;
         }

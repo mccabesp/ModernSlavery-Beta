@@ -4,6 +4,7 @@ using System.Linq;
 using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 
@@ -13,17 +14,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminDownloadsController : Controller
     {
-        private readonly IDataRepository dataRepository;
-
-        public AdminDownloadsController(IDataRepository dataRepository)
+        private readonly IAdminService _adminService;
+        public AdminDownloadsController(IAdminService adminService)
         {
-            this.dataRepository = dataRepository;
+            _adminService = adminService;
         }
 
         [HttpGet("download-feedback")]
         public FileContentResult DownloadFeedback()
         {
-            var feedback = dataRepository.GetAll<Feedback>().ToList();
+            var feedback = _adminService.SharedBusinessLogic.DataRepository.GetAll<Feedback>().ToList();
 
             var memoryStream = new MemoryStream();
             using (var writer = new StreamWriter(memoryStream))

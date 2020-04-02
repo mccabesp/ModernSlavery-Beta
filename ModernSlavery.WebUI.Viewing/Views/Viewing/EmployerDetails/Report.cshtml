@@ -8,6 +8,7 @@
     ViewBag.EndYear = (Model.AccountingDate.Year + 1).ToTwoDigitYear();
 
 
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = Model.OrganisationName + " Modern Slavery statement" + " / " + Model.AccountingDate.Year + "-" + (Model.AccountingDate.Year + 1).ToTwoDigitYear();
     ViewBag.pageDescription = $"View {Model.AccountingDate.Year} Modern Slavery statement for {Model.OrganisationName}";
     ViewBag.ogTitle = ViewBag.Title;

@@ -9,23 +9,17 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.ApplicationInsights.Extensibility;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
-using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
-using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Infrastructure.Configuration;
 using ModernSlavery.Infrastructure.Logging;
-using Serilog;
-using Serilog.Core;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
@@ -200,16 +194,6 @@ namespace ModernSlavery.Infrastructure.Hosts
                 $"Threads (Worker busy:{workerMax - workerFree:N0} min:{workerMin:N0} max:{workerMax:N0}, I/O busy:{ioMax - ioFree:N0} min:{ioMin:N0} max:{ioMax:N0})";
         }
 
-        public static void LoadOptions<T>(this IConfiguration section, IServiceCollection services)
-            where T : class, new()
-        {
-            // Register the IOptions object
-            services.Configure<T>(section);
-
-            // Explicitly register the settings object by delegating to the IOptions object this allows resolution of Options class without IOptions dependency
-            services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<T>>().Value);
-        }
-
         public static void SetupThreads(this IConfiguration config)
         {
             //Culture is required so UK dates can be parsed correctly
@@ -233,19 +217,34 @@ namespace ModernSlavery.Infrastructure.Hosts
             return $"Min Threads Set (Work:{workerMin:N0}, I/O: {ioMin:N0})";
         }
 
-        public static void SetupSerilogLogger(this IConfiguration config)
+        public static void AddAutoMapper(this IServiceCollection services, bool assertConfigurationIsValid=false)
         {
-            Logger log;
+            var assemblyPrefix = nameof(ModernSlavery);
 
-            if (config[""].EqualsI("LOCAL"))
-                log = new LoggerConfiguration().WriteTo.Console().CreateLogger();
-            else
-                log = new LoggerConfiguration().WriteTo
-                    .ApplicationInsights(TelemetryConfiguration.Active, TelemetryConverter.Traces)
-                    .CreateLogger();
+            // Initialise AutoMapper
+            var mapperConfig = new MapperConfiguration(config =>
+            {
+                AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(a => a.GetName().Name.StartsWith(assemblyPrefix, true, default)).ForEach(
+                        assembly =>
+                        {
+                            // register all out mapper profiles (classes/mappers/*)
+                            config.AddMaps(assembly);
+                            // allows auto mapper to inject our dependencies
+                            //config.ConstructServicesUsing(serviceTypeToConstruct =>
+                            //{
+                            //    //TODO
+                            //});                    });
+                        });
+            });
 
-            Log.Logger = log;
-            Log.Information("Serilog logger setup complete");
+            // only during development, validate your mappings; remove it before release
+            if (assertConfigurationIsValid)mapperConfig.AssertConfigurationIsValid();
+
+
+            //Add a single mapper to the dependency container
+            services.AddSingleton(mapperConfig.CreateMapper());
         }
+
     }
 }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Options;
@@ -52,7 +53,7 @@ namespace ModernSlavery.Infrastructure.Logging
                     Organisation = logOrg.OrganisationName,
                     CompanyNo = logOrg.CompanyNumber,
                     Address = logAddress.GetAddressString(),
-                    SicCodes = logOrg.GetSicCodeIdsString(),
+                    SicCodes = logOrg.GetLatestSicCodeIdsString(),
                     UserFirstname = logUser.Firstname,
                     UserLastname = logUser.Lastname,
                     UserJobtitle = logUser.JobTitle,

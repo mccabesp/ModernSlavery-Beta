@@ -18,17 +18,18 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminOrganisationCompaniesHouseOptInOutController : Controller
     {
+        private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
         private readonly ICompaniesHouseAPI companiesHouseApi;
-        private readonly IDataRepository dataRepository;
         private readonly UpdateFromCompaniesHouseService updateFromCompaniesHouseService;
 
-        public AdminOrganisationCompaniesHouseOptInOutController(IDataRepository dataRepository,
+        public AdminOrganisationCompaniesHouseOptInOutController(
+            IAdminService adminService, 
             AuditLogger auditLogger,
             ICompaniesHouseAPI companiesHouseApi,
             UpdateFromCompaniesHouseService updateFromCompaniesHouseService)
         {
-            this.dataRepository = dataRepository;
+            _adminService = adminService;
             this.auditLogger = auditLogger;
             this.companiesHouseApi = companiesHouseApi;
             this.updateFromCompaniesHouseService = updateFromCompaniesHouseService;
@@ -38,7 +39,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("organisation/{id}/coho-sync/opt-in")]
         public IActionResult OptIn(long id)
         {
-            var organisation = dataRepository.Get<Organisation>(id);
+            var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             var model = new AdminChangeCompaniesHouseOptInOutViewModel();
             model.Organisation = organisation;
@@ -52,7 +53,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult OptIn(long id, AdminChangeCompaniesHouseOptInOutViewModel viewModel)
         {
-            var organisation = dataRepository.Get<Organisation>(id);
+            var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
 
@@ -68,7 +69,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             updateFromCompaniesHouseService.UpdateOrganisationDetails(organisation.OrganisationId);
 
             organisation.OptedOutFromCompaniesHouseUpdate = false;
-            dataRepository.SaveChangesAsync().Wait();
+            _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
             auditLogger.AuditChangeToOrganisation(
                 this,
@@ -103,7 +104,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("organisation/{id}/coho-sync/opt-out")]
         public IActionResult OptOut(long id)
         {
-            var organisation = dataRepository.Get<Organisation>(id);
+            var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             var model = new AdminChangeCompaniesHouseOptInOutViewModel();
             model.Organisation = organisation;
@@ -116,7 +117,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult OptOut(long id, AdminChangeCompaniesHouseOptInOutViewModel viewModel)
         {
-            var organisation = dataRepository.Get<Organisation>(id);
+            var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
 
@@ -129,7 +130,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             organisation.OptedOutFromCompaniesHouseUpdate = true;
-            dataRepository.SaveChangesAsync().Wait();
+            _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
             auditLogger.AuditChangeToOrganisation(
                 this,

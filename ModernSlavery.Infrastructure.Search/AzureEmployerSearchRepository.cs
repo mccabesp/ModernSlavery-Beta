@@ -50,7 +50,7 @@ namespace ModernSlavery.Infrastructure.Search
             }
 
             SearchLog = searchLog;
-            IndexName = indexName;
+            IndexName = indexName.ToLower();
 
             if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentNullException(nameof(serviceName));
 

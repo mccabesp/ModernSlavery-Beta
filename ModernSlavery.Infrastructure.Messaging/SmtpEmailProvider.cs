@@ -9,6 +9,7 @@ using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Options;
 

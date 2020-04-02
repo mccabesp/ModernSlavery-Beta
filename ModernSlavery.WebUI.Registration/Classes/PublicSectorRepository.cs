@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
@@ -17,13 +18,16 @@ namespace ModernSlavery.WebUI.Registration.Classes
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
         private readonly IDataRepository _DataRepository;
         private readonly SharedOptions _sharedOptions;
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
 
         public PublicSectorRepository(IDataRepository dataRepository, ICompaniesHouseAPI companiesHouseAPI,
-            SharedOptions sharedOptions)
+            SharedOptions sharedOptions,
+            IOrganisationBusinessLogic organisationBusinessLogic)
         {
             _DataRepository = dataRepository;
             _CompaniesHouseAPI = companiesHouseAPI;
             _sharedOptions = sharedOptions;
+            _organisationBusinessLogic = organisationBusinessLogic;
         }
 
         public async Task<PagedResult<EmployerRecord>> SearchAsync(string searchText, int page, int pageSize,
@@ -70,7 +74,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
             result.VirtualRecordTotal = searchResultsList.Count;
             result.CurrentPage = page;
             result.PageSize = pageSize;
-            result.Results = searchResultsList.Page(pageSize, page).Select(o => EmployerRecord.Create(o)).ToList();
+            result.Results = searchResultsList.Page(pageSize, page).Select(o => _organisationBusinessLogic.CreateEmployerRecord(o)).ToList();
             return result;
         }
 

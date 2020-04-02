@@ -16,6 +16,7 @@ namespace ModernSlavery.Core.Extensions
         private static string DefaultEncryptionKey = "BA9138B8C0724F168A05482456802405";
 
         public static Encoding EncryptionEncoding = Encoding.UTF8;
+        public static bool EncryptEmails = false;
 
         public static void SetDefaultEncryptionKey(string defaultEncryptionKey)
         {

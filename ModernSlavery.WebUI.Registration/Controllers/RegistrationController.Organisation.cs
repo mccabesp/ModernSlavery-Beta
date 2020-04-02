@@ -778,7 +778,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     o => o.OrganisationName,
                     o => orgIds.Contains(o.OrganisationId));
 
-            model.ManualEmployers = employers.Select(o => EmployerRecord.Create(o)).ToList();
+            model.ManualEmployers = employers.Select(o => RegistrationService.OrganisationBusinessLogic.CreateEmployerRecord(o)).ToList();
 
             //Ensure exact match shown at top
             if (model.ManualEmployers != null && model.ManualEmployers.Count > 1)
@@ -1229,7 +1229,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             Organisation = userOrg.Organisation.OrganisationName,
                             CompanyNo = userOrg.Organisation.CompanyNumber,
                             Address = userOrg?.Address.GetAddressString(),
-                            SicCodes = userOrg.Organisation.GetSicCodeIdsString(),
+                            SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
                             UserFirstname = userOrg.User.Firstname,
                             UserLastname = userOrg.User.Lastname,
                             UserJobtitle = userOrg.User.JobTitle,
@@ -1413,7 +1413,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             //Update the new organisation name
             if (string.IsNullOrWhiteSpace(oldName) || !newName.Equals(oldName))
             {
-                var oldOrgName = org.GetName();
+                var oldOrgName = org.GetLatestName();
 
                 //Set the latest name if there isnt a name already or new name is from CoHo
                 if (oldOrgName == null
@@ -1462,8 +1462,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 //Update the new and retire the old SIC codes
                 if (newSicCodeIds.Count > 0)
                 {
-                    var oldSicCodes = org.GetSicCodes();
-                    var oldSicCodeIds = org.GetSicCodeIds();
+                    var oldSicCodes = org.GetLatestSicCodes();
+                    var oldSicCodeIds = org.GetLatestSicCodeIds();
 
                     //Set the sic codes if there arent any sic codes already or new sic codes are from CoHo
                     if (!oldSicCodes.Any()
@@ -1490,7 +1490,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             #region Set the organisation address
 
-            var oldAddress = org.GetAddress();
+            var oldAddress = org.GetLatestAddress();
             var oldAddressModel = AddressModel.Create(oldAddress);
 
             AddressModel newAddressModel = null;

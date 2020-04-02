@@ -1,5 +1,6 @@
 ﻿@model SearchViewModel
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Modern Slavery search results";
     ViewBag.pageDescription = "Employers that have published their Modern Slavery statement.";
     if (string.IsNullOrWhiteSpace(ViewBag.ReturnUrl))
@@ -9,23 +10,23 @@
 }
 <div class="grid-row">
     <div class="column-full">
-        @using (Html.BeginForm("SearchResults", "Viewing", FormMethod.Get, new {id = "FinderForm", @class = "js-live-search-form"}))
+        @using (Html.BeginForm("SearchResults", "Viewing", FormMethod.Get, new { id = "FinderForm", @class = "js-live-search-form" }))
         {
-            <partial name="~/Views/Compare/ComparisonBasket.cshtml" model="ViewBag.BasketViewModel"/>
+            <partial name="~/Views/Compare/ComparisonBasket.cshtml" model="ViewBag.BasketViewModel" />
             <div class="grid-row finder">
                 <div class="column-two-thirds">
-                    <partial name="Finder/Parts/Facets/Keywords" model="Model"/>
+                    <partial name="Finder/Parts/Facets/Keywords" model="Model" />
                 </div>
             </div>
 
             <div class="grid-row finder">
                 <div class="column-one-third">
-                    <partial name="Finder/Parts/Filter" model="Model"/>
+                    <partial name="Finder/Parts/Filter" model="Model" />
                 </div>
                 <div class="column-two-thirds js-live-search-results-block" aria-live="assertive">
                     <div id="loading"></div>
                     <div id="main">
-                        <partial name="Finder/Parts/MainContent" model="Model"/>
+                        <partial name="Finder/Parts/MainContent" model="Model" />
                     </div>
                 </div>
             </div>

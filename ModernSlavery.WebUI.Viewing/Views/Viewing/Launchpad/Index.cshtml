@@ -1,6 +1,8 @@
+@using ModernSlavery.Core.Models
 @inject IWebService WebService
 @inject SharedOptions sharedOptions
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Modern Slavery statement";
     ViewBag.pageDescription = "Find and compare Modern Slavery information reported by employers. Learn more about Modern Slavery and how to eliminate it.";
     ViewBag.pageClass = "landing-page";

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
@@ -19,23 +20,24 @@ namespace ModernSlavery.WebUI.Registration.Classes
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
         private readonly IDataRepository _DataRepository;
 
-
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHttpSession _Session;
         private readonly SharedOptions SharedOptions;
-
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
         public PrivateSectorRepository(
             SharedOptions sharedOptions,
             IHttpContextAccessor httpContextAccessor,
             IHttpSession session,
             IDataRepository dataRepository,
-            ICompaniesHouseAPI companiesHouseAPI)
+            ICompaniesHouseAPI companiesHouseAPI,
+            IOrganisationBusinessLogic organisationBusinessLogic)
         {
             SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             _httpContextAccessor = httpContextAccessor;
             _Session = session;
             _DataRepository = dataRepository;
             _CompaniesHouseAPI = companiesHouseAPI;
+            _organisationBusinessLogic = organisationBusinessLogic;
         }
 
         public void Delete(EmployerRecord entity)
@@ -119,9 +121,9 @@ namespace ModernSlavery.WebUI.Registration.Classes
                     if (localResults.Count > 0)
                     {
                         if (test) //Make sure test employer is first
-                            searchResults.Results.AddRange(localResults.Select(o => EmployerRecord.Create(o)));
+                            searchResults.Results.AddRange(localResults.Select(o => _organisationBusinessLogic.CreateEmployerRecord(o)));
                         else
-                            searchResults.Results.InsertRange(0, localResults.Select(o => EmployerRecord.Create(o)));
+                            searchResults.Results.InsertRange(0, localResults.Select(o => _organisationBusinessLogic.CreateEmployerRecord(o)));
 
                         searchResults.ActualRecordTotal += localTotal;
                     }

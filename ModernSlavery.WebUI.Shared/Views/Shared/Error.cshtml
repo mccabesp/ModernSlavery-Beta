@@ -1,5 +1,6 @@
 ﻿@model ErrorViewModel
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "ERROR: " + Model.Title;
     ViewData["Sitemap:Route"] = "error/{errorCode?}";
 }

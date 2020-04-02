@@ -143,7 +143,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             {
                 var sendEmails = new List<Task>();
                 var testEmail = !SharedBusinessLogic.SharedOptions.IsProduction();
-                if (orgToRemove.GetIsOrphan())
+                if (RegistrationService.OrganisationBusinessLogic.GetOrganisationIsOrphan(orgToRemove))
                     sendEmails.Add(
                         SharedBusinessLogic.SendEmailService.SendGEOOrphanOrganisationNotificationAsync(
                             orgToRemove.OrganisationName, testEmail));

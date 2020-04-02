@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 
@@ -9,17 +10,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminViewUserController : Controller
     {
-        private readonly IDataRepository dataRepository;
-
-        public AdminViewUserController(IDataRepository dataRepository)
+        private readonly IAdminService _adminService;
+        public AdminViewUserController(
+            IAdminService adminService)
         {
-            this.dataRepository = dataRepository;
+            _adminService = adminService;
         }
 
         [HttpGet("user/{id}")]
         public IActionResult ViewUser(long id)
         {
-            var user = dataRepository.Get<User>(id);
+            var user = _adminService.SharedBusinessLogic.DataRepository.Get<User>(id);
 
             return View("../Admin/ViewUser", user);
         }

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Entities.Views;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel.Options;
 
 namespace ModernSlavery.Infrastructure.Database

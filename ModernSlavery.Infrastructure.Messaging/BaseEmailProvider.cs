@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Options;

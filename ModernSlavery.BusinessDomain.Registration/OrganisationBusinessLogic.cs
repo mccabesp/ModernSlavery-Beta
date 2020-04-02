@@ -53,7 +53,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         /// </summary>
         /// <param name="year"></param>
         /// <returns></returns>
-        public virtual async Task<List<OrganisationsFileModel>> GetOrganisationsFileModelByYearAsync(int year)
+        public virtual async Task<List<OrganisationsFileModel>> GetOrganisationFileModelByYearAsync(int year)
         {
 #if DEBUG
             var orgs = Debugger.IsAttached
@@ -78,7 +78,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                     StatusDate = o.StatusDate,
                     StatusDetails = o.StatusDetails,
                     Address = o.LatestAddress?.GetAddressString(),
-                    SicCodes = GetSicCodeIdsString(o),
+                    SicCodes = GetOrganisationSicCodeIdsString(o),
                     LatestRegistrationDate = o.LatestRegistration?.PINConfirmedDate,
                     LatestRegistrationMethod = o.LatestRegistration?.Method,
                     Created = o.Created,
@@ -212,69 +212,34 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         #region Entity
 
-        public string GetSicSectorsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ")
+        public string GetOrganisationSicSectorsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ")
         {
-            var organisationSicCodes = GetSicCodes(org, maxDate);
+            var organisationSicCodes = GetOrganisationSicCodes(org, maxDate);
             return organisationSicCodes.Select(s => s.SicCode.SicSection.Description.Trim())
                 .UniqueI()
                 .OrderBy(s => s)
                 .ToDelimitedString(delimiter);
         }
 
-        /// <summary>
-        ///     Returns the latest organisation name before specified date/time
-        /// </summary>
-        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
-        /// <returns>The name of the organisation</returns>
-        public IEnumerable<OrganisationSicCode> GetSicCodes(Organisation org, DateTime? maxDate = null)
-        {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue)
-                maxDate = _sharedBusinessLogic.GetAccountingStartDate(org.SectorType).AddYears(1);
 
-            return org.OrganisationSicCodes.Where(s =>
-                s.Created < maxDate.Value && (s.Retired == null || s.Retired.Value > maxDate.Value));
+        public string GetOrganisationSicSource(Organisation organisation, DateTime? maxDate = null)
+        {
+            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1);
+
+            return organisation.GetSicSource(maxDate.Value);
         }
 
-        public SortedSet<int> GetSicCodeIds(Organisation org, DateTime? maxDate = null)
+        public string GetOrganisationSicSectionIdsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ")
         {
-            var organisationSicCodes = GetSicCodes(org, maxDate);
-
-            var codes = new SortedSet<int>();
-            foreach (var sicCode in organisationSicCodes) codes.Add(sicCode.SicCodeId);
-
-            return codes;
-        }
-
-
-        public string GetSicSource(Organisation org, DateTime? maxDate = null)
-        {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue)
-                maxDate = _sharedBusinessLogic.GetAccountingStartDate(org.SectorType).AddYears(1);
-
-            return org.OrganisationSicCodes
-                .FirstOrDefault(
-                    s => s.Created < maxDate.Value && (s.Retired == null || s.Retired.Value > maxDate.Value))
-                ?.Source;
-        }
-
-        public string GetSicCodeIdsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ")
-        {
-            return GetSicCodes(org, maxDate).OrderBy(s => s.SicCodeId).Select(s => s.SicCodeId)
-                .ToDelimitedString(delimiter);
-        }
-
-        public string GetSicSectionIdsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ")
-        {
-            var organisationSicCodes = GetSicCodes(org, maxDate);
+            var organisationSicCodes = GetOrganisationSicCodes(org, maxDate);
             return organisationSicCodes.Select(s => s.SicCode.SicSectionId).UniqueI().OrderBy(s => s)
                 .ToDelimitedString(delimiter);
         }
 
-
-        public AddressModel GetAddressModel(Organisation org, DateTime? maxDate = null,
+        public AddressModel GetOrganisationAddressModel(Organisation org, DateTime? maxDate = null,
             AddressStatuses status = AddressStatuses.Active)
         {
-            var address = org.GetAddress(maxDate, status);
+            var address = GetOrganisationAddress(org, maxDate, status);
 
             return address == null ? null : AddressModel.Create(address);
         }
@@ -295,7 +260,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         /// <param name="dataRepository"></param>
         /// <param name="sicCodes"></param>
         /// <returns></returns>
-        public IEnumerable<string> GetSectors(string sicCodes)
+        public IEnumerable<string> GetOrganisationSectors(string sicCodes)
         {
             var results = new SortedDictionary<string, HashSet<long>>(StringComparer.OrdinalIgnoreCase);
 
@@ -330,6 +295,262 @@ namespace ModernSlavery.BusinessDomain.Registration
             return _DataRepository.Get<Organisation>(organisationId);
         }
 
+        public IEnumerable<Return> GetOrganisationRecentReports(Organisation organisation,int recentCount)
+        {
+            foreach (var year in GetOrganisationRecentReportingYears(organisation,recentCount))
+            {
+                var defaultReturn = new Return
+                {
+                    Organisation = organisation,
+                    AccountingDate =_sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType,year),
+                    Modified = VirtualDateTime.Now
+                };
+                defaultReturn.IsLateSubmission = defaultReturn.CalculateIsLateSubmission();
+
+                yield return  organisation.GetReturn(year) ?? defaultReturn;
+            }
+        }
+        public EmployerRecord CreateEmployerRecord(Organisation org, long userId = 0)
+        {
+            OrganisationAddress address = null;
+            if (userId > 0) address = org.UserOrganisations.FirstOrDefault(uo => uo.UserId == userId)?.Address;
+
+            if (address == null) address = org.LatestAddress;
+
+            if (address == null)
+                return new EmployerRecord
+                {
+                    OrganisationId = org.OrganisationId,
+                    SectorType = org.SectorType,
+                    OrganisationName = org.OrganisationName,
+                    NameSource = GetOrganisationName(org)?.Source,
+                    EmployerReference = org.EmployerReference,
+                    DateOfCessation = org.DateOfCessation,
+                    DUNSNumber = org.DUNSNumber,
+                    CompanyNumber = org.CompanyNumber,
+                    SicSectors = GetOrganisationSicSectorsString(org,null, ",<br/>"),
+                    SicCodeIds = GetOrganisationSicCodeIdsString(org),
+                    SicSource = GetOrganisationSicSource(org),
+                    RegistrationStatus = org.GetRegistrationStatus(),
+                    References = org.OrganisationReferences.ToDictionary(
+                        r => r.ReferenceName,
+                        r => r.ReferenceValue,
+                        StringComparer.OrdinalIgnoreCase)
+                };
+
+            return new EmployerRecord
+            {
+                OrganisationId = org.OrganisationId,
+                SectorType = org.SectorType,
+                OrganisationName = org.OrganisationName,
+                NameSource = GetOrganisationName(org)?.Source,
+                EmployerReference = org.EmployerReference,
+                DateOfCessation = org.DateOfCessation,
+                DUNSNumber = org.DUNSNumber,
+                CompanyNumber = org.CompanyNumber,
+                SicSectors = GetOrganisationSicSectorsString(org,null, ",<br/>"),
+                SicCodeIds = GetOrganisationSicCodeIdsString(org),
+                SicSource = GetOrganisationSicSource(org),
+                ActiveAddressId = address.AddressId,
+                AddressSource = address.Source,
+                Address1 = address.Address1,
+                Address2 = address.Address2,
+                Address3 = address.Address3,
+                City = address.TownCity,
+                County = address.County,
+                Country = address.Country,
+                PostCode = address.PostCode,
+                PoBox = address.PoBox,
+                IsUkAddress = address.IsUkAddress,
+                RegistrationStatus = org.GetRegistrationStatus(),
+                References = org.OrganisationReferences.ToDictionary(
+                    r => r.ReferenceName,
+                    r => r.ReferenceValue,
+                    StringComparer.OrdinalIgnoreCase)
+            };
+        }
+        public EmployerSearchModel CreateEmployerSearchModel(Organisation organisation, bool keyOnly = false,
+            List<SicCodeSearchModel> listOfSicCodeSearchModels = null)
+        {
+            if (keyOnly) return new EmployerSearchModel { OrganisationId = organisation.OrganisationId.ToString() };
+
+            // Get the last two names for the org. Most recent name first
+            var names = organisation.OrganisationNames.Select(n => n.Name).Reverse().Take(2).ToArray();
+
+            var abbreviations = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+            names.ForEach(n => abbreviations.Add(n.ToAbbr()));
+            names.ForEach(n => abbreviations.Add(n.ToAbbr(".")));
+            var excludes = new[]
+                {"Ltd", "Limited", "PLC", "Corporation", "Incorporated", "LLP", "The", "And", "&", "For", "Of", "To"};
+            names.ForEach(n => abbreviations.Add(n.ToAbbr(excludeWords: excludes)));
+            names.ForEach(n => abbreviations.Add(n.ToAbbr(".", excludeWords: excludes)));
+
+            abbreviations.RemoveWhere(a => string.IsNullOrWhiteSpace(a));
+            abbreviations.Remove(organisation.OrganisationName);
+
+            // extract the prev org name (if exists)
+            var prevOrganisationName = "";
+            if (names.Length > 1)
+            {
+                prevOrganisationName = names[names.Length - 1];
+                abbreviations.Remove(prevOrganisationName);
+            }
+
+            //Get the latest sic codes
+            var sicCodes = GetOrganisationSicCodes(organisation);
+
+            var submittedReports = organisation.GetSubmittedReports().ToArray();
+
+            var result = new EmployerSearchModel
+            {
+                OrganisationId = organisation.OrganisationId.ToString(),
+                Name = organisation.OrganisationName,
+                PreviousName = prevOrganisationName,
+                PartialNameForSuffixSearches = organisation.OrganisationName,
+                PartialNameForCompleteTokenSearches = organisation.OrganisationName,
+                Abbreviations = abbreviations.ToArray(),
+                Size = organisation.LatestReturn == null ? 0 : (int)organisation.LatestReturn.OrganisationSize,
+                SicSectionIds = sicCodes.Select(sic => sic.SicCode.SicSectionId.ToString()).Distinct().ToArray(),
+                SicSectionNames = sicCodes.Select(sic => sic.SicCode.SicSection.Description).Distinct().ToArray(),
+                SicCodeIds = sicCodes.Select(sicCode => sicCode.SicCodeId.ToString()).Distinct().ToArray(),
+                Address = organisation.LatestAddress?.GetAddressString(),
+                LatestReportedDate = submittedReports.Select(x => x.Created).FirstOrDefault(),
+                ReportedYears = submittedReports.Select(x => x.AccountingDate.Year.ToString()).ToArray(),
+                ReportedLateYears =
+                    submittedReports.Where(x => x.IsLateSubmission).Select(x => x.AccountingDate.Year.ToString())
+                        .ToArray(),
+                ReportedExplanationYears = submittedReports
+                    .Where(x => string.IsNullOrEmpty(x.CompanyLinkToGPGInfo) == false)
+                    .Select(x => x.AccountingDate.Year.ToString())
+                    .ToArray()
+            };
+
+            if (listOfSicCodeSearchModels != null)
+                result.SicCodeListOfSynonyms = GetListOfSynonyms(result.SicCodeIds, listOfSicCodeSearchModels);
+
+            return result;
+        }
+
+        private string[] GetListOfSynonyms(string[] resultSicCodeIds,
+            List<SicCodeSearchModel> listOfSicCodeSearchModels)
+        {
+            var result = new List<string>();
+
+            foreach (var resultSicCodeId in resultSicCodeIds)
+            {
+                var sicCodeSearchModel = listOfSicCodeSearchModels.FirstOrDefault(x => x.SicCodeId == resultSicCodeId);
+
+                if (sicCodeSearchModel == null) continue;
+
+                result.Add(sicCodeSearchModel.SicCodeDescription);
+
+                if (sicCodeSearchModel.SicCodeListOfSynonyms != null &&
+                    sicCodeSearchModel.SicCodeListOfSynonyms.Length > 0)
+                    result.AddRange(sicCodeSearchModel.SicCodeListOfSynonyms);
+            }
+
+            return result.Any()
+                ? result.ToArray()
+                : null;
+        }
+
+        public IEnumerable<int> GetOrganisationRecentReportingYears(Organisation organisation,int recentCount)
+        {
+            var endYear = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).Year;
+            var startYear = endYear - (recentCount - 1);
+            if (startYear < _sharedBusinessLogic.SharedOptions.FirstReportingYear) startYear = _sharedBusinessLogic.SharedOptions.FirstReportingYear;
+
+            for (var year = endYear; year >= startYear; year--) yield return year;
+        }
+
+        public bool GetOrganisationIsOrphan(Organisation organisation)
+        {
+            return organisation.Status == OrganisationStatuses.Active
+                   && (organisation.LatestScope.ScopeStatus == ScopeStatuses.InScope ||
+                       organisation.LatestScope.ScopeStatus == ScopeStatuses.PresumedInScope)
+                   && (organisation.UserOrganisations == null
+                       || !organisation.UserOrganisations.Any(uo => uo.PINConfirmedDate != null
+                                                                   || uo.Method ==
+                                                                   RegistrationMethods.Manual
+                                                                   || uo.Method ==
+                                                                   RegistrationMethods.PinInPost
+                                                                   && uo.PINSentDate.HasValue
+                                                                   && uo.PINSentDate.Value >
+                                                                   _sharedBusinessLogic.SharedOptions.PinExpiresDate));
+        }
+
+        public bool GetOrganisationIsDissolved(Organisation organisation)
+        {
+            return organisation.DateOfCessation != null && organisation.DateOfCessation < _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType);
+        }
+
+        /// <summary>
+        ///     Returns the latest organisation name before specified date/time
+        /// </summary>
+        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
+        /// <returns>The name of the organisation</returns>
+        public OrganisationName GetOrganisationName(Organisation organisation, DateTime? maxDate = null)
+        {
+            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate =_sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1);
+
+            return organisation.GetName(maxDate.Value);
+        }
+
+        /// <summary>
+        ///     Returns the latest address before specified date/time
+        /// </summary>
+        /// <param name="maxDate">Ignore address changes after this date/time - if empty returns the latest address</param>
+        /// <returns>The address of the organisation</returns>
+        public OrganisationAddress GetOrganisationAddress(Organisation organisation, DateTime? maxDate = null, AddressStatuses status = AddressStatuses.Active)
+        {
+            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1);
+
+            if (status == AddressStatuses.Active && organisation.LatestAddress != null &&
+                maxDate == _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1)) return organisation.LatestAddress;
+
+            return organisation.GetAddress(maxDate.Value);
+        }
+
+        /// <summary>
+        ///     Returns the latest organisation name before specified date/time
+        /// </summary>
+        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
+        /// <returns>The name of the organisation</returns>
+        public string GetOrganisationAddressString(Organisation organisation, DateTime? maxDate = null, AddressStatuses status = AddressStatuses.Active,
+            string delimiter = ", ")
+        {
+            var address = GetOrganisationAddress(organisation, maxDate, status);
+
+            return address?.GetAddressString(delimiter);
+        }
+
+        /// <summary>
+        ///     Returns the latest organisation name before specified date/time
+        /// </summary>
+        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
+        /// <returns>The name of the organisation</returns>
+        public IEnumerable<OrganisationSicCode> GetOrganisationSicCodes(Organisation organisation,DateTime? maxDate = null)
+        {
+            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1);
+
+            return organisation.OrganisationSicCodes.Where(s =>
+                s.Created < maxDate && (s.Retired == null || s.Retired.Value > maxDate));
+        }
+
+        public SortedSet<int> GetOrganisationSicCodeIds(Organisation organisation, DateTime? maxDate = null)
+        {
+            var organisationSicCodes = GetOrganisationSicCodes(organisation,maxDate);
+
+            var codes = new SortedSet<int>();
+            foreach (var sicCode in organisationSicCodes) codes.Add(sicCode.SicCodeId);
+
+            return codes;
+        }
+        public string GetOrganisationSicCodeIdsString(Organisation organisation, DateTime? maxDate = null, string delimiter = ", ")
+        {
+            return GetOrganisationSicCodes(organisation, maxDate).OrderBy(s => s.SicCodeId).Select(s => s.SicCodeId).ToDelimitedString(delimiter);
+        }
+
         public virtual async Task<Organisation> GetOrganisationByEmployerReferenceAsync(string employerReference)
         {
             return await _DataRepository.FirstOrDefaultAsync<Organisation>(o =>
@@ -344,6 +565,20 @@ namespace ModernSlavery.BusinessDomain.Registration
                 o.EmployerReference.ToUpper() == employerReference.ToUpper() && o.SecurityCode == securityCode);
         }
 
+        //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
+        public Return GetOrganisationReturn(Organisation organisation, int year = 0)
+        {
+            var accountingStartDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType,year);
+            return organisation.GetReturn(year);
+        }
+
+        //Returns the latest scope for the current accounting date
+        public OrganisationScope GetOrganisationCurrentScope(Organisation organisation)
+        {
+            var accountingStartDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType);
+
+            return organisation.GetScope(accountingStartDate);
+        }
         public virtual async Task<Organisation> GetOrganisationByEmployerReferenceOrThrowAsync(string employerReference)
         {
             var org = await GetOrganisationByEmployerReferenceAsync(employerReference);
@@ -389,41 +624,41 @@ namespace ModernSlavery.BusinessDomain.Registration
             };
         }
 
-        public async Task<CustomResult<Organisation>> CreateSecurityCodeAsync(string employerRef,
+        public async Task<CustomResult<Organisation>> CreateOrganisationSecurityCodeAsync(string employerRef,
             DateTime securityCodeExpiryDateTime)
         {
             var org = await GetOrganisationByEmployerReferenceOrThrowAsync(employerRef);
             return _securityCodeLogic.CreateSecurityCode(org, securityCodeExpiryDateTime);
         }
 
-        public async Task<CustomBulkResult<Organisation>> CreateSecurityCodesInBulkAsync(
+        public async Task<CustomBulkResult<Organisation>> CreateOrganisationSecurityCodesInBulkAsync(
             DateTime securityCodeExpiryDateTime)
         {
             return await ActionSecurityCodesInBulkAsync(securityCodeExpiryDateTime,
                 _securityCodeLogic.CreateSecurityCode);
         }
 
-        public async Task<CustomResult<Organisation>> ExtendSecurityCodeAsync(string employerRef,
+        public async Task<CustomResult<Organisation>> ExtendOrganisationSecurityCodeAsync(string employerRef,
             DateTime securityCodeExpiryDateTime)
         {
             var org = await GetOrganisationByEmployerReferenceOrThrowAsync(employerRef);
             return _securityCodeLogic.ExtendSecurityCode(org, securityCodeExpiryDateTime);
         }
 
-        public async Task<CustomBulkResult<Organisation>> ExtendSecurityCodesInBulkAsync(
+        public async Task<CustomBulkResult<Organisation>> ExtendOrganisationSecurityCodesInBulkAsync(
             DateTime securityCodeExpiryDateTime)
         {
             return await ActionSecurityCodesInBulkAsync(securityCodeExpiryDateTime,
                 _securityCodeLogic.ExtendSecurityCode);
         }
 
-        public async Task<CustomResult<Organisation>> ExpireSecurityCodeAsync(string employerRef)
+        public async Task<CustomResult<Organisation>> ExpireOrganisationSecurityCodeAsync(string employerRef)
         {
             var org = await GetOrganisationByEmployerReferenceOrThrowAsync(employerRef);
             return _securityCodeLogic.ExpireSecurityCode(org);
         }
 
-        public async Task<CustomBulkResult<Organisation>> ExpireSecurityCodesInBulkAsync()
+        public async Task<CustomBulkResult<Organisation>> ExpireOrganisationSecurityCodesInBulkAsync()
         {
             var listOfOrganisations = await GetAllActiveOrPendingOrganisationsOrThrowAsync();
 

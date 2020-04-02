@@ -1,6 +1,8 @@
 ﻿using System;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
@@ -15,6 +17,7 @@ namespace ModernSlavery.BusinessDomain.Shared
         ISourceComparer SourceComparer { get; }
         ISendEmailService SendEmailService { get; }
         INotificationService NotificationService { get; }
+        IAuthorisationBusinessLogic AuthorisationBusinessLogic { get; }
         IObfuscator Obfuscator { get; }
 
         /// <summary>
@@ -32,7 +35,7 @@ namespace ModernSlavery.BusinessDomain.Shared
 
         public SharedBusinessLogic(SharedOptions sharedOptions, ISnapshotDateHelper snapshotDateHelper,
             ISourceComparer sourceComparer,
-            ISendEmailService sendEmailService, INotificationService notificationService,
+            ISendEmailService sendEmailService, INotificationService notificationService, IAuthorisationBusinessLogic authorisationBusinessLogic,
             IFileRepository fileRepository, IDataRepository dataRepository, IObfuscator obfuscator)
         {
             SharedOptions = sharedOptions;
@@ -40,6 +43,7 @@ namespace ModernSlavery.BusinessDomain.Shared
             SourceComparer = sourceComparer;
             SendEmailService = sendEmailService;
             NotificationService = notificationService;
+            AuthorisationBusinessLogic = authorisationBusinessLogic;
             FileRepository = fileRepository;
             DataRepository = dataRepository;
             Obfuscator = obfuscator;
@@ -52,7 +56,7 @@ namespace ModernSlavery.BusinessDomain.Shared
         public ISourceComparer SourceComparer { get; }
         public ISendEmailService SendEmailService { get; }
         public INotificationService NotificationService { get; }
-
+        public IAuthorisationBusinessLogic AuthorisationBusinessLogic { get; }
         /// <summary>
         ///     Returns the accounting start date for the specified sector and year
         /// </summary>

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -21,15 +22,18 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminOrganisationSicCodesController : BaseController
     {
+        private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
         private readonly ICompaniesHouseAPI companiesHouseApi;
 
         public AdminOrganisationSicCodesController(
+            IAdminService adminService,
             ICompaniesHouseAPI companiesHouseApi,
             AuditLogger auditLogger,
             ILogger<AdminOrganisationSicCodesController> logger, IWebService webService,
             ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
+            _adminService = adminService;
             this.companiesHouseApi = companiesHouseApi;
             this.auditLogger = auditLogger;
         }
@@ -55,9 +59,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     var sicCodeIdsFromCompaniesHouse = organisationFromCompaniesHouse.SicCodes;
                     var sicCodesFromDatabase =
-                        organisation.GetSicCodes().Select(osc => osc.SicCodeId.ToString()).ToList();
+                        organisation.GetLatestSicCodeIds().ToList();
 
-                    if (!sicCodesFromDatabase.ToHashSet().SetEquals(sicCodeIdsFromCompaniesHouse))
+                    if (!sicCodesFromDatabase.ToHashSet().SetEquals(sicCodeIdsFromCompaniesHouse.Select(s => s.ToInt32())))
                         return OfferNewCompaniesHouseSicCodes(organisation, sicCodeIdsFromCompaniesHouse);
                 }
                 catch (Exception ex)
@@ -90,7 +94,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             var sicCodesFromCompaniesHouse = new Dictionary<string, SicCode>();
             var sicCodeIdsFromCompaniesHouse = new List<int>();
-            var sicCodeIdsFromDatabase = organisation.GetSicCodeIds().ToList();
+            var sicCodeIdsFromDatabase = organisation.GetLatestSicCodeIds().ToList();
 
             foreach (var sicCodeIdString in sicCodeIdStringsFromCompaniesHouse.Distinct())
             {
@@ -141,8 +145,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 .ToList();
 
             var sicCodeIdsToKeep = organisation
-                .GetSicCodes()
-                .Select(sc => sc.SicCodeId)
+                .GetLatestSicCodeIds()
                 .Except(sicCodeIdsToRemove)
                 .ToList();
 
@@ -257,7 +260,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             var newSicCodeToRemove = viewModel.SicCodeIdToChange.Value;
 
-            if (!organisation.GetSicCodeIds().Contains(newSicCodeToRemove))
+            if (!organisation.GetLatestSicCodeIds().Contains(newSicCodeToRemove))
                 throw new ArgumentException("Cannot remove SIC code as it is not present on organisation "
                                             + $" OrganisationId({organisation.OrganisationId}) SIC code({newSicCodeToRemove})");
 
@@ -271,7 +274,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             var newSicCodeToKeep = viewModel.SicCodeIdToChange.Value;
 
-            if (!organisation.GetSicCodeIds().Contains(newSicCodeToKeep))
+            if (!organisation.GetLatestSicCodeIds().Contains(newSicCodeToKeep))
                 throw new ArgumentException("Cannot keep SIC code as it is not present on organisation "
                                             + $" OrganisationId({organisation.OrganisationId}) SIC code({newSicCodeToKeep})");
 
@@ -319,14 +322,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         private void SaveChangesAndAuditAction(ChangeOrganisationSicCodesViewModel viewModel, Organisation organisation)
         {
-            var oldSicCodes = organisation.GetSicCodeIdsString();
+            var oldSicCodes = organisation.GetLatestSicCodeIdsString();
 
             RemoveSicCodes(viewModel, organisation);
             AddSicCodes(viewModel, organisation);
 
             SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
-            var newSicCodes = organisation.GetSicCodeIdsString();
+            var newSicCodes = organisation.GetLatestSicCodeIdsString();
 
             auditLogger.AuditChangeToOrganisation(
                 this,
@@ -353,7 +356,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var sicCodeId in viewModel.SicCodeIdsToRemove)
                 {
                     var organisationSicCodeToRemove =
-                        organisation.GetSicCodes().Where(osc => osc.SicCodeId == sicCodeId).First();
+                        organisation.GetLatestSicCodes().Where(osc => osc.SicCodeId == sicCodeId).First();
                     organisationSicCodeToRemove.Retired = VirtualDateTime.Now;
                 }
         }

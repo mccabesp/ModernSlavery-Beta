@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using CompareAttribute = System.ComponentModel.DataAnnotations.CompareAttribute;

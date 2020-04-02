@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -19,16 +20,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminUserResendVerificationEmailController : BaseController
     {
+        private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
-        private readonly ISendEmailService emailSender;
 
         public AdminUserResendVerificationEmailController(
-            ISendEmailService emailSender, AuditLogger auditLogger,
+            IAdminService adminService,
+            AuditLogger auditLogger,
             ILogger<AdminUserResendVerificationEmailController> logger, IWebService webService,
             ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
+            _adminService = adminService;
             this.auditLogger = auditLogger;
-            this.emailSender = emailSender;
         }
 
         [HttpGet("user/{id}/resend-verification-email")]
@@ -83,7 +85,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var verifyUrl =
                 await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountVerifyEmail, new {vcode = verifyCode});
 
-            if (!emailSender.SendCreateAccountPendingVerificationAsync(verifyUrl, user.EmailAddress).Result)
+            if (!_adminService.SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, user.EmailAddress).Result)
             {
                 viewModel.AddErrorFor<AdminResendVerificationEmailViewModel, object>(
                     m => m.OtherErrorMessagePlaceholder,

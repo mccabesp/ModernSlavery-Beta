@@ -18,8 +18,8 @@ namespace ModernSlavery.BusinessDomain.Shared
         private readonly IEventLogger _CustomLogger;
         private readonly IDataRepository _DataRepository;
         private readonly IPostcodeChecker _PostcodeChecker;
-
-        public UpdateFromCompaniesHouseService(IEventLogger customLogger, IDataRepository dataRepository,
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
+        public UpdateFromCompaniesHouseService(IEventLogger customLogger, IDataRepository dataRepository,IOrganisationBusinessLogic organisationBusinessLogic,
             ICompaniesHouseAPI companiesHouseAPI, IPostcodeChecker postcodeChecker)
         {
             _CustomLogger = customLogger;
@@ -177,7 +177,7 @@ namespace ModernSlavery.BusinessDomain.Shared
             var companiesHouseAddress = organisationFromCompaniesHouse.RegisteredOfficeAddress;
             var newOrganisationAddressFromCompaniesHouse =
                 CreateOrganisationAddressFromCompaniesHouseAddress(companiesHouseAddress);
-            var oldOrganisationAddress = organisation.GetAddress();
+            var oldOrganisationAddress = _organisationBusinessLogic.GetOrganisationAddress(organisation);
             if (oldOrganisationAddress.AddressMatches(newOrganisationAddressFromCompaniesHouse)
                 || IsNewOrganisationAddressNullOrEmpty(newOrganisationAddressFromCompaniesHouse))
                 return;
@@ -198,7 +198,7 @@ namespace ModernSlavery.BusinessDomain.Shared
             var companyNameFromCompaniesHouse = organisationFromCompaniesHouse.CompanyName;
             companyNameFromCompaniesHouse = FirstHundredChars(companyNameFromCompaniesHouse);
 
-            if (IsCompanyNameEqual(organisation.GetName(), companyNameFromCompaniesHouse)) return;
+            if (IsCompanyNameEqual(_organisationBusinessLogic.GetOrganisationName(organisation), companyNameFromCompaniesHouse)) return;
 
             var nameToAdd = new OrganisationName
             {
@@ -212,7 +212,7 @@ namespace ModernSlavery.BusinessDomain.Shared
 
         private void RetireExtraSicCodes(Organisation organisation, List<string> companySicCodes)
         {
-            var sicCodeIds = organisation.GetSicCodes().Select(sicCode => sicCode.SicCodeId);
+            var sicCodeIds = _organisationBusinessLogic.GetOrganisationSicCodes(organisation).Select(sicCode => sicCode.SicCodeId);
             var newSicCodeIds =
                 companySicCodes.Where(sicCode => !string.IsNullOrEmpty(sicCode)).Select(sicCode => int.Parse(sicCode));
 
@@ -224,7 +224,7 @@ namespace ModernSlavery.BusinessDomain.Shared
 
         private void AddNewSicCodes(Organisation organisation, List<string> companySicCodes)
         {
-            var sicCodeIds = organisation.GetSicCodes().Select(sicCode => sicCode.SicCodeId);
+            var sicCodeIds = _organisationBusinessLogic.GetOrganisationSicCodes(organisation).Select(sicCode => sicCode.SicCodeId);
             var newSicCodeIds =
                 companySicCodes.Where(sicCode => !string.IsNullOrEmpty(sicCode)).Select(sicCode => int.Parse(sicCode));
 

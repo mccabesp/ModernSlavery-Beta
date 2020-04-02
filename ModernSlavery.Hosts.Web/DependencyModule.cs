@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Core.SharedKernel.Interfaces;
 using ModernSlavery.Core.SharedKernel.Options;
 using ModernSlavery.Infrastructure.CompaniesHouse;
@@ -208,23 +209,8 @@ namespace ModernSlavery.Hosts.Web
             //Register google analytics tracker
             builder.RegisterModule<GoogleAnalyticsDependencyModule>();
 
-            // Initialise AutoMapper
-            var mapperConfig = new MapperConfiguration(config =>
-            {
-                // register all out mapper profiles (classes/mappers/*)
-                config.AddMaps(typeof(Program));
-                // allows auto mapper to inject our dependencies
-                //config.ConstructServicesUsing(serviceTypeToConstruct =>
-                //{
-                //    //TODO
-                //});
-            });
-
-            // only during development, validate your mappings; remove it before release
-            if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal())
-                mapperConfig.AssertConfigurationIsValid();
-
-            builder.Autofac.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            //Register the AutoMapper configurations in all domain assemblies
+            builder.Services.AddAutoMapper(_sharedOptions.IsLocal() || _sharedOptions.IsDevelopment());
 
             //Override any test services
             ConfigureTestContainer?.Invoke(builder.Autofac);

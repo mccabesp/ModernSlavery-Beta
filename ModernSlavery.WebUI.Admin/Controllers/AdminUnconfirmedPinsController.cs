@@ -19,22 +19,19 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Route("admin")]
     public class AdminUnconfirmedPinsController : BaseController
     {
-        private readonly IDataRepository dataRepository;
-        protected readonly INotificationService NotificationService;
-        private readonly IOrganisationBusinessLogic organisationBusinessLogic;
-
+        private readonly IAdminService _adminService;
         public AdminUnconfirmedPinsController(
-            IOrganisationBusinessLogic organisationBusinessLogic,
+            IAdminService adminService,
             ILogger<AdminUnconfirmedPinsController> logger, IWebService webService,
             ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
-            this.organisationBusinessLogic = organisationBusinessLogic;
+            _adminService = adminService;
         }
 
         [HttpGet("unconfirmed-pins")]
         public async Task<IActionResult> UnconfirmedPins()
         {
-            var model = await dataRepository.GetAll<UserOrganisation>()
+            var model = await _adminService.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .Where(uo => uo.Method == RegistrationMethods.PinInPost)
                 .Where(uo => uo.PINConfirmedDate == null)
                 .Where(uo => uo.PIN != null)
@@ -46,7 +43,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("send-pin")]
         public async Task<IActionResult> SendPinWarning(long userId, long organisationId)
         {
-            var userOrganisation = await dataRepository.GetAll<UserOrganisation>()
+            var userOrganisation = await _adminService.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == userId && uo.OrganisationId == organisationId);
 
             return View("../Admin/SendPinWarning", userOrganisation);
@@ -57,20 +54,20 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendPin(long userId, long organisationId)
         {
-            var userOrganisation = await dataRepository.GetAll<UserOrganisation>()
+            var userOrganisation = await _adminService.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == userId && uo.OrganisationId == organisationId);
 
             if (userOrganisation.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays) <
                 VirtualDateTime.Now)
             {
-                var newPin = organisationBusinessLogic.GeneratePINCode(false);
+                var newPin = _adminService.OrganisationBusinessLogic.GeneratePINCode(false);
                 userOrganisation.PIN = newPin;
             }
 
             userOrganisation.PINSentDate = VirtualDateTime.Now;
-            await dataRepository.SaveChangesAsync();
+            await _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            NotificationService.SendPinEmail(
+            _adminService.SharedBusinessLogic.NotificationService.SendPinEmail(
                 userOrganisation.User.EmailAddress,
                 userOrganisation.PIN,
                 userOrganisation.Organisation.OrganisationName);

@@ -28,10 +28,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             if (!string.IsNullOrWhiteSpace(parameters)) throw new ArgumentException("ERROR: parameters must be empty");
 
-            var count = await AdminService.EmployerSearchRepository.GetDocumentCountAsync();
+            var count = await _adminService.EmployerSearchRepository.GetDocumentCountAsync();
             if (!test)
             {
-                await AdminService.ExecuteWebjobQueue.AddMessageAsync(
+                await _adminService.ExecuteWebjobQueue.AddMessageAsync(
                     new QueueWrapper($"command=UpdateSearch&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
                 writer.WriteLine(
                     $"An email will be sent to '{CurrentUser.EmailAddress}' when the background task '{nameof(UpdateSearchIndexesAsync)}' has completed");
@@ -45,10 +45,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             if (!string.IsNullOrWhiteSpace(parameters)) throw new ArgumentException("ERROR: parameters must be empty");
 
-            var count = await AdminService.EmployerSearchRepository.GetDocumentCountAsync();
+            var count = await _adminService.EmployerSearchRepository.GetDocumentCountAsync();
             if (!test)
             {
-                await AdminService.ExecuteWebjobQueue.AddMessageAsync(
+                await _adminService.ExecuteWebjobQueue.AddMessageAsync(
                     new QueueWrapper(
                         $"command=UpdateDownloadFiles&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
                 writer.WriteLine(
@@ -70,7 +70,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 .CountAsync();
             if (!test)
             {
-                await AdminService.ExecuteWebjobQueue.AddMessageAsync(
+                await _adminService.ExecuteWebjobQueue.AddMessageAsync(
                     new QueueWrapper(
                         $"command=FixOrganisationsNames&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
                 writer.WriteLine(
@@ -195,7 +195,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 writer,
                                 test,
                                 ManualActions.Create,
-                                AdminService.OrganisationBusinessLogic.CreateSecurityCodeAsync);
+                                _adminService.OrganisationBusinessLogic.CreateOrganisationSecurityCodeAsync);
                             break;
                         case "Create security codes for all active and pending orgs":
                             result = await SecurityCodeBulkWorkAsync(
@@ -204,7 +204,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 writer,
                                 test,
                                 ManualActions.Create,
-                                AdminService.OrganisationBusinessLogic.CreateSecurityCodesInBulkAsync);
+                                _adminService.OrganisationBusinessLogic.CreateOrganisationSecurityCodesInBulkAsync);
                             count = result.Count;
                             total = result.TotalRecords;
                             break;
@@ -215,7 +215,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 writer,
                                 test,
                                 ManualActions.Extend,
-                                AdminService.OrganisationBusinessLogic.ExtendSecurityCodeAsync);
+                                _adminService.OrganisationBusinessLogic.ExtendOrganisationSecurityCodeAsync);
                             break;
                         case "Extend security codes for all active and pending orgs":
                             result = await SecurityCodeBulkWorkAsync(
@@ -224,7 +224,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 writer,
                                 test,
                                 ManualActions.Create,
-                                AdminService.OrganisationBusinessLogic.ExtendSecurityCodesInBulkAsync);
+                                _adminService.OrganisationBusinessLogic.ExtendOrganisationSecurityCodesInBulkAsync);
                             count = result.Count;
                             total = result.TotalRecords;
                             break;
@@ -439,7 +439,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     processed.Add(employerRef);
 
-                    var outOfScopeOutcome = await AdminService.OrganisationBusinessLogic.SetAsScopeAsync(
+                    var outOfScopeOutcome = await _adminService.OrganisationBusinessLogic.SetAsScopeAsync(
                         employerRef,
                         changeScopeToSnapshotYear,
                         changeScopeToComment,
@@ -460,7 +460,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     writer.WriteLine(
                         $"{i}: {employerRef}: {hasBeenWillBe} set as '{outOfScopeOutcome.Result.ScopeStatus}' for snapshotYear '{outOfScopeOutcome.Result.SnapshotDate.Year}' with comment '{outOfScopeOutcome.Result.Reason}'");
                     if (!test)
-                        await AdminService.ManualChangeLog.WriteAsync(
+                        await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel
                             {
                                 MethodName = $"SetOrg{scopeStatus.ToString()}",
@@ -486,7 +486,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 //todo: writer.WriteLine(Color.Green, $"INFO: Changes saved to database, attempting to update search index.");
 
-                await AdminService.SearchBusinessLogic.UpdateSearchIndexAsync(listOfModifiedOrgs.ToArray());
+                await _adminService.SearchBusinessLogic.UpdateSearchIndexAsync(listOfModifiedOrgs.ToArray());
                 //todo: writer.WriteLine(Color.Green, $"INFO: Search index updated successfully.");
             }
 
@@ -678,7 +678,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         $"{i}: {employerRef}: {org.OrganisationName} Company Number='{org.CompanyNumber}' set to '{newValue}'");
                     if (!test)
                     {
-                        await AdminService.ManualChangeLog.WriteAsync(
+                        await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
                                 methodName,
                                 ManualActions.Update,
@@ -800,10 +800,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // get all existing sic codes
-                var prevSicCodes = org.GetSicCodeIdsString();
+                var prevSicCodes = org.GetLatestSicCodeIdsString();
 
                 // remove all existing sic codes
-                org.GetSicCodes().ForEach(ent => ent.Retired = VirtualDateTime.Now);
+                org.GetLatestSicCodes().ForEach(ent => ent.Retired = VirtualDateTime.Now);
 
                 // set new sic codes
                 parsedSicCodes.ForEach(
@@ -822,7 +822,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     $"{i}: {employerRef}:{org.OrganisationName} SIC codes={oldValue} {hasBeenWillBe} set to {newValue}");
                 if (!test)
                 {
-                    await AdminService.ManualChangeLog.WriteAsync(
+                    await _adminService.ManualChangeLog.WriteAsync(
                         new ManualChangeLogModel(
                             methodName,
                             ManualActions.Update,
@@ -1002,7 +1002,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     $"{i}: {employerRef}:{org.OrganisationName} Address={oldValue} {hasBeenWillBe} set to {newValue}");
                 if (!test)
                 {
-                    await AdminService.ManualChangeLog.WriteAsync(
+                    await _adminService.ManualChangeLog.WriteAsync(
                         new ManualChangeLogModel(
                             methodName,
                             ManualActions.Update,
@@ -1153,7 +1153,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     $"{i}: {employerRef}:{org.OrganisationName} public sector type={oldValue} {hasBeenWillBe} set to {newValue}");
                 if (!test)
                 {
-                    await AdminService.ManualChangeLog.WriteAsync(
+                    await _adminService.ManualChangeLog.WriteAsync(
                         new ManualChangeLogModel(
                             methodName,
                             ManualActions.Update,
@@ -1268,7 +1268,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         $"{i}: {employerRef}: {org.OrganisationName} DUNS Number='{org.DUNSNumber}' set to '{newValue}'");
                     if (!test)
                     {
-                        await AdminService.ManualChangeLog.WriteAsync(
+                        await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
                                 methodName,
                                 ManualActions.Update,
@@ -1337,7 +1337,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var year = number.ToInt32(AdminService.SharedBusinessLogic.GetAccountingStartDate(org.SectorType).Year);
+                var year = number.ToInt32(_adminService.SharedBusinessLogic.GetAccountingStartDate(org.SectorType).Year);
                 var @return = org.Returns.OrderByDescending(o => o.StatusDate)
                     .FirstOrDefault(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year);
                 if (@return == null)
@@ -1371,7 +1371,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     $"{i}: {employerRef}: {org.OrganisationName} Year='{year}' Status='{oldValue}' set to '{newValue}'");
                 if (!test)
                 {
-                    await AdminService.ManualChangeLog.WriteAsync(
+                    await _adminService.ManualChangeLog.WriteAsync(
                         new ManualChangeLogModel(
                             methodName,
                             ManualActions.Update,
@@ -1447,7 +1447,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 try
                 {
                     var errorMessage =
-                        AdminService.OrganisationBusinessLogic.UnRetire(org, CurrentUser.UserId, comment);
+                        _adminService.OrganisationBusinessLogic.UnRetire(org, CurrentUser.UserId, comment);
 
                     if (errorMessage != null)
                     {
@@ -1467,9 +1467,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     $"{i}: {employerRef}: {org.OrganisationName} reverted from status '{manualChangeLogModel.TargetOldValue}' to '{manualChangeLogModel.TargetNewValue}'");
                 if (!test)
                 {
-                    await AdminService.ManualChangeLog.WriteAsync(manualChangeLogModel);
+                    await _adminService.ManualChangeLog.WriteAsync(manualChangeLogModel);
                     await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-                    await AdminService.SearchBusinessLogic.UpdateSearchIndexAsync(org);
+                    await _adminService.SearchBusinessLogic.UpdateSearchIndexAsync(org);
                 }
 
                 count++;
@@ -1536,7 +1536,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         $"{i}: {employerRef}: {org.OrganisationName} Status='{oldValue}' set to '{newValue}'");
                     if (!test)
                     {
-                        await AdminService.ManualChangeLog.WriteAsync(
+                        await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
                                 methodName,
                                 ManualActions.Update,
@@ -1550,7 +1550,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
                         //Add or remove this organisation to/from the search index
-                        await AdminService.SearchBusinessLogic.UpdateSearchIndexAsync(org);
+                        await _adminService.SearchBusinessLogic.UpdateSearchIndexAsync(org);
                     }
                 }
 
@@ -1610,7 +1610,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var @return in org.Returns)
                 {
                     var oldDate = @return.AccountingDate;
-                    var newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    var newDate = _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badReturnDates = true;
@@ -1621,14 +1621,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var scope in org.OrganisationScopes)
                 {
                     var oldDate = scope.SnapshotDate;
-                    var newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    var newDate = _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badScopeDates = true;
                     break;
                 }
 
-                var sicCodes = org.GetSicCodes();
+                var sicCodes = org.GetLatestSicCodes();
 
                 if (oldSector == newSector && sicCodes.Any(s => s.SicCodeId == 1 && s.Retired == null) &&
                     !badReturnDates && !badScopeDates)
@@ -1644,7 +1644,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         //Change the sector type
                         org.SectorType = newSector;
                         if (!test)
-                            await AdminService.ManualChangeLog.WriteAsync(
+                            await _adminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
                                     ManualActions.Update,
@@ -1669,7 +1669,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 Created = sicCodes.Any() ? sicCodes.First().Created : VirtualDateTime.Now
                             });
                         if (!test)
-                            await AdminService.ManualChangeLog.WriteAsync(
+                            await _adminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
                                     ManualActions.Create,
@@ -1688,12 +1688,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         {
                             var oldDate = @return.AccountingDate;
                             var newDate =
-                                AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
                             @return.AccountingDate = newDate;
                             if (!test)
-                                await AdminService.ManualChangeLog.WriteAsync(
+                                await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
                                         ManualActions.Update,
@@ -1712,12 +1712,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         {
                             var oldDate = scope.SnapshotDate;
                             var newDate =
-                                AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
                             scope.SnapshotDate = newDate;
                             if (!test)
-                                await AdminService.ManualChangeLog.WriteAsync(
+                                await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
                                         ManualActions.Update,
@@ -1791,7 +1791,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var @return in org.Returns)
                 {
                     var oldDate = @return.AccountingDate;
-                    var newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    var newDate = _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badReturnDates = true;
@@ -1802,14 +1802,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var scope in org.OrganisationScopes)
                 {
                     var oldDate = scope.SnapshotDate;
-                    var newDate = AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    var newDate = _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badScopeDates = true;
                     break;
                 }
 
-                var sicCodes = org.GetSicCodes();
+                var sicCodes = org.GetLatestSicCodes();
 
                 if (oldSector == newSector && !sicCodes.Any(s => s.SicCodeId == 1) && !badReturnDates && !badScopeDates)
                 {
@@ -1824,7 +1824,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     {
                         org.SectorType = newSector;
                         if (!test)
-                            await AdminService.ManualChangeLog.WriteAsync(
+                            await _adminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
                                     ManualActions.Update,
@@ -1844,7 +1844,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             if (sic.SicCodeId != 1) continue;
 
                             if (!test)
-                                await AdminService.ManualChangeLog.WriteAsync(
+                                await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
                                         ManualActions.Delete,
@@ -1874,12 +1874,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         {
                             var oldDate = @return.AccountingDate;
                             var newDate =
-                                AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
                             @return.AccountingDate = newDate;
                             if (!test)
-                                await AdminService.ManualChangeLog.WriteAsync(
+                                await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
                                         ManualActions.Update,
@@ -1903,12 +1903,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         {
                             var oldDate = scope.SnapshotDate;
                             var newDate =
-                                AdminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
                             scope.SnapshotDate = newDate;
                             if (!test)
-                                await AdminService.ManualChangeLog.WriteAsync(
+                                await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
                                         ManualActions.Update,
@@ -2001,7 +2001,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     //Output the actual execution result
                     org.OrganisationName = newValue;
                     if (!test)
-                        await AdminService.ManualChangeLog.WriteAsync(
+                        await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
                                 methodName,
                                 ManualActions.Update,
@@ -2016,7 +2016,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     org.OrganisationNames.Add(new OrganisationName
                         {Organisation = org, Source = "Manual", Name = newValue});
                     if (!test)
-                        await AdminService.ManualChangeLog.WriteAsync(
+                        await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
                                 methodName,
                                 ManualActions.Create,
@@ -2109,7 +2109,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         //Output the actual execution result
                         org.OrganisationName = newValue;
                         if (!test)
-                            await AdminService.ManualChangeLog.WriteAsync(
+                            await _adminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
                                     ManualActions.Update,
@@ -2127,7 +2127,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         foreach (var name in org.OrganisationNames.ToList())
                         {
                             if (!test)
-                                await AdminService.ManualChangeLog.WriteAsync(
+                                await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
                                         ManualActions.Delete,
@@ -2154,7 +2154,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             new OrganisationName
                                 {Organisation = org, Source = "Manual", Name = newValue, Created = org.Created});
                         if (!test)
-                            await AdminService.ManualChangeLog.WriteAsync(
+                            await _adminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
                                     ManualActions.Create,
@@ -2267,7 +2267,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 CurrentUser.EmailAddress
                             });
 
-                        await AdminService.ManualChangeLog.WriteAsync(
+                        await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel
                             {
                                 MethodName = $"{manualAction.ToString()}SecurityCode",
@@ -2347,7 +2347,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 try
                 {
                     var securityCodeWorksOutcome =
-                        await AdminService.OrganisationBusinessLogic.ExpireSecurityCodeAsync(employerRef);
+                        await _adminService.OrganisationBusinessLogic.ExpireOrganisationSecurityCodeAsync(employerRef);
 
                     if (securityCodeWorksOutcome.Failed)
                     {
@@ -2375,7 +2375,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             });
 
                         if (!test)
-                            await AdminService.ManualChangeLog.WriteAsync(
+                            await _adminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel
                                 {
                                     MethodName = methodName,
@@ -2484,7 +2484,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     }
 
                 if (!test)
-                    await AdminService.ManualChangeLog.WriteAsync(
+                    await _adminService.ManualChangeLog.WriteAsync(
                         new ManualChangeLogModel
                         {
                             MethodName = methodName,
@@ -2527,7 +2527,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             try
             {
                 var securityCodeBulkWorkOutcome =
-                    await AdminService.OrganisationBusinessLogic.ExpireSecurityCodesInBulkAsync();
+                    await _adminService.OrganisationBusinessLogic.ExpireOrganisationSecurityCodesInBulkAsync();
 
                 if (securityCodeBulkWorkOutcome.Failed)
                 {
@@ -2572,7 +2572,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     }
 
                 if (!test)
-                    await AdminService.ManualChangeLog.WriteAsync(
+                    await _adminService.ManualChangeLog.WriteAsync(
                         new ManualChangeLogModel
                         {
                             MethodName = methodName,

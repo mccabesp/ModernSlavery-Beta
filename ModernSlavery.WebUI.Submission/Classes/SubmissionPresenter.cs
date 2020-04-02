@@ -342,7 +342,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
                 result.AccountingDate =
                     GetSnapshotDate(userOrganisationFromDatabase.Organisation.SectorType, snapshotYear);
                 result.OrganisationId = organisationId;
-                result.EncryptedOrganisationId = userOrganisationFromDatabase.Organisation.GetEncryptedId();
+                result.EncryptedOrganisationId = _sharedBusinessLogic.Obfuscator.Obfuscate(userOrganisationFromDatabase.Organisation.OrganisationId);
                 result.SectorType = userOrganisationFromDatabase.Organisation.SectorType;
                 return result;
             }
@@ -350,7 +350,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             // populate with return from db
             result.ReturnId = returnFromDatabase.ReturnId;
             result.OrganisationId = returnFromDatabase.OrganisationId;
-            result.EncryptedOrganisationId = returnFromDatabase.Organisation.GetEncryptedId();
+            result.EncryptedOrganisationId = _sharedBusinessLogic.Obfuscator.Obfuscate(returnFromDatabase.Organisation.OrganisationId);
             result.DiffMeanBonusPercent = returnFromDatabase.DiffMeanBonusPercent;
             result.DiffMeanHourlyPayPercent = returnFromDatabase.DiffMeanHourlyPayPercent;
             result.DiffMedianBonusPercent = returnFromDatabase.DiffMedianBonusPercent;
