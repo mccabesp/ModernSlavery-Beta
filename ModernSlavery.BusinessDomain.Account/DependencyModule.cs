@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Account
@@ -13,7 +14,7 @@ namespace ModernSlavery.BusinessDomain.Account
 
         public void Register(IDependencyBuilder builder)
         {
-            //TODO: Add registrationsd here
+            builder.Autofac.RegisterType<AuthorisationBusinessLogic>().As<IAuthorisationBusinessLogic>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

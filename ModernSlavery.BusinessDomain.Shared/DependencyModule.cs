@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using Autofac;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Autofac;
 using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Shared
