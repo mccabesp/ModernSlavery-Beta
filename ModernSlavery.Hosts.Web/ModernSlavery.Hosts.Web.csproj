@@ -9,6 +9,16 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
+  <!-- This is required to auto recompile during development -->
+  <ItemGroup>
+    <Watch Include="..\ModernSlavery.WebUI.*\**\*.cshtml" />
+  </ItemGroup>
+
+  <!-- This is required to auto recompile during development-->
+  <ItemGroup>
+    <Watch Include="..\RazorClassLibRazorComponent\**\*.razor" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Autofac.Mvc5" Version="5.0.0" />
@@ -149,6 +159,7 @@
   </ItemGroup>
 
   <!-- *** THIS IS REQUIRED TO DEPLY WebjobS WITH WEBUI ON AZURE *** -->
+  <!-- To debug razor (.cshtml) you must select IIS express and run Ctrl + F5 (run without debugging) - NOT debug mode -->
   <PropertyGroup>
     <MSDeployPackagePublishDependsOn>
       CopyWebjobs;

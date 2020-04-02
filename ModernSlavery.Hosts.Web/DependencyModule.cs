@@ -5,7 +5,6 @@ using Autofac;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -30,7 +29,6 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Classes.Providers;
 using ModernSlavery.WebUI.Shared.Options;
-using ModernSlavery.WebUI.Viewing.Controllers;
 
 namespace ModernSlavery.Hosts.Web
 {
@@ -89,10 +87,19 @@ namespace ModernSlavery.Hosts.Web
                         options.Filters.Add<ErrorHandlingFilter>();
                     });
 
-            mvcBuilder.AddRazorClassLibrary<ViewingController>();
+            mvcBuilder.AddRazorClassLibrary<WebUI.Account.DependencyModule>();
+            mvcBuilder.AddRazorClassLibrary<WebUI.Admin.DependencyModule>();
+            mvcBuilder.AddRazorClassLibrary<WebUI.Registration.DependencyModule>();
+            mvcBuilder.AddRazorClassLibrary<WebUI.Submission.DependencyModule>();
+            mvcBuilder.AddRazorClassLibrary<WebUI.Viewing.DependencyModule>();
+
             mvcBuilder.AddRazorClassLibrary<WebUI.Shared.DependencyModule>();
             mvcBuilder.AddRazorClassLibrary<WebUI.GDSDesignSystem.DependencyModule>();
 
+            builder.RegisterModule<WebUI.Account.DependencyModule>();
+            builder.RegisterModule<WebUI.Admin.DependencyModule>();
+            builder.RegisterModule<WebUI.Registration.DependencyModule>();
+            builder.RegisterModule<WebUI.Submission.DependencyModule>();
             builder.RegisterModule<WebUI.Viewing.DependencyModule>();
 
             //Log all the application parts when in development
