@@ -141,13 +141,13 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li id="login-links" class="nowrap">
-                                <a href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut)">"Sign out"</a>
+                                <a href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut)">Sign out</a>
                             </li>
                         }
                         else
                         {
                             <li id="login-links" class="nowrap">
-                                <a href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)">"Sign in"</a>
+                                <a href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)">Sign in</a>
                             </li>
                         }
                     </ul>

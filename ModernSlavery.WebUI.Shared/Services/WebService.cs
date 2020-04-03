@@ -22,6 +22,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
             HostingEnvironment = hostingEnvironment;
             ShortCodesRepository = shortCodesRepository;
             RouteHelper = urlHelper;
+            WebTracker = webTracker;
             CustomLogger = eventLogger;
         }
 

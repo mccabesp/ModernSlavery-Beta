@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Hosts;
@@ -95,6 +96,7 @@ namespace ModernSlavery.Hosts.Web
             mvcBuilder.AddRazorClassLibrary<WebUI.Shared.DependencyModule>();
             mvcBuilder.AddRazorClassLibrary<WebUI.GDSDesignSystem.DependencyModule>();
 
+            builder.RegisterModule<WebUI.StaticFiles.DependencyModule>();
             builder.RegisterModule<WebUI.Account.DependencyModule>();
             builder.RegisterModule<WebUI.Admin.DependencyModule>();
             builder.RegisterModule<WebUI.Registration.DependencyModule>();
@@ -238,31 +240,7 @@ namespace ModernSlavery.Hosts.Web
 
             app.UseHttpsRedirection();
             //app.UseResponseCompression(); //Disabled to use IIS compression which has better performance (see https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-2.1)
-            app.UseStaticFiles(
-                new StaticFileOptions
-                {
-                    OnPrepareResponse = ctx =>
-                    {
-                        //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
-                        if (_responseCachingOptions.StaticCacheSeconds > 0)
-                            ctx.Context.SetResponseCache(_responseCachingOptions.StaticCacheSeconds);
-                    }
-                }); //For the wwwroot folder
-
-            // Include un-bundled js + css folders to serve the source files in dev environment
-            if (_sharedOptions.IsLocal())
-                app.UseStaticFiles(
-                    new StaticFileOptions
-                    {
-                        FileProvider = new PhysicalFileProvider(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"wwwroot")),
-                        RequestPath = "",
-                        OnPrepareResponse = ctx =>
-                        {
-                            //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
-                            if (_responseCachingOptions.StaticCacheSeconds > 0)
-                                ctx.Context.SetResponseCache(_responseCachingOptions.StaticCacheSeconds);
-                        }
-                    });
+           
 
             app.UseRouting();
             app.UseResponseCaching();

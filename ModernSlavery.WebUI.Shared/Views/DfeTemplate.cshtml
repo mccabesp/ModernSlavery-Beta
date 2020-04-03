@@ -10,14 +10,7 @@
 
     @RenderSection("Head", false)
 
-    @if (sharedOptions.IsLocal())
-    {
-        @Html.UnpackBundle("/assets/stylesheets/application.min.css", "all")
-    }
-    else
-    {
-        <link rel="stylesheet" type="text/css" media="all" href="~/assets/stylesheets/application.min.css" asp-append-version="true"/>
-    }
+    <link rel="stylesheet" type="text/css" media="all" href="~/assets/stylesheets/application.min.css" asp-append-version="true"/>
 }
 
 @RenderSection("PreMain", false)
@@ -28,15 +21,7 @@
 @section BodyEnd {
     <script src="~/assets/javascripts/jquery-1.11.3.min.js"></script>
     <script src="~/assets/javascripts/jquery.tablesorter.min.js"></script>
-
-    @if (sharedOptions.IsLocal())
-    {
-        @Html.UnpackBundle("/assets/javascripts/application.min.js")
-    }
-    else
-    {
-        <script src="~/assets/javascripts/application.min.js" type="text/javascript" asp-append-version="true"></script>
-    }
+    <script src="~/assets/javascripts/application.min.js" type="text/javascript" asp-append-version="true"></script>
 
     @RenderSection("scripts", false)
 

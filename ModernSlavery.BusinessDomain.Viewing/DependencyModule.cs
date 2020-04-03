@@ -22,6 +22,8 @@ namespace ModernSlavery.BusinessDomain.Viewing
             builder.Autofac.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance()
                 .WithAttributeFiltering();
             builder.Autofac.RegisterType<ViewingService>().As<IViewingService>().SingleInstance();
+            builder.Autofac.RegisterType<CompareBusinessLogic>().As<ICompareBusinessLogic>()
+                .InstancePerLifetimeScope();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

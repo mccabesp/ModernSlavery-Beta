@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Attributes;
-using ModernSlavery.Core.Options;
 
-namespace ModernSlavery.WebUI.Shared.Options
+namespace ModernSlavery.Core.Options
 {
     [Options("ResponseCaching")]
     public class ResponseCachingOptions : IOptions

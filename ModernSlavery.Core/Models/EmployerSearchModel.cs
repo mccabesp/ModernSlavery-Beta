@@ -25,14 +25,6 @@ namespace ModernSlavery.Core.Models
             return OrganisationId.GetHashCode();
         }
 
-        public string GetEncryptedOrganisionId()
-        {
-            return Encryption.EncryptQuerystring(OrganisationId);
-        }
-
-
-   
-
         #region Organisation Properties
 
         public virtual string OrganisationId { get; set; }

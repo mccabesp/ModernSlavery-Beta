@@ -379,6 +379,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         {
             if (keyOnly) return new EmployerSearchModel { OrganisationId = organisation.OrganisationId.ToString() };
 
+
             // Get the last two names for the org. Most recent name first
             var names = organisation.OrganisationNames.Select(n => n.Name).Reverse().Take(2).ToArray();
 
@@ -409,6 +410,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             var result = new EmployerSearchModel
             {
                 OrganisationId = organisation.OrganisationId.ToString(),
+                OrganisationIdEncrypted = _sharedBusinessLogic.Obfuscator.Obfuscate(organisation.OrganisationId),
                 Name = organisation.OrganisationName,
                 PreviousName = prevOrganisationName,
                 PartialNameForSuffixSearches = organisation.OrganisationName,

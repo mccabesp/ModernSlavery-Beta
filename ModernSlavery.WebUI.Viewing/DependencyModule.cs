@@ -6,6 +6,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Viewing.Presenters;
@@ -37,7 +39,6 @@ namespace ModernSlavery.WebUI.Viewing
             builder.Autofac.RegisterType<SearchPresenter>().As<ISearchPresenter>().InstancePerLifetimeScope();
             builder.Autofac.RegisterType<ComparePresenter>().As<IComparePresenter>()
                 .InstancePerLifetimeScope();
-
             ////Register all controllers - this is required to ensure KeyFilter is resolved in constructors
             //builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
             //    .Where(t => t.IsAssignableTo<Controller>())
