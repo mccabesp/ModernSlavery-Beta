@@ -13,7 +13,9 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         private readonly IRegistrationLogger RegistrationLog;
 
-        public RegistrationBusinessLogic(IDataRepository dataRepository, IRegistrationLogger registrationLog)
+        public RegistrationBusinessLogic(
+            IDataRepository dataRepository, 
+            IRegistrationLogger registrationLog)
         {
             DataRepository = dataRepository ?? throw new ArgumentNullException(nameof(dataRepository));
             RegistrationLog = registrationLog ?? throw new ArgumentNullException(nameof(registrationLog));

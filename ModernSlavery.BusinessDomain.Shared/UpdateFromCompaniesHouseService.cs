@@ -24,6 +24,7 @@ namespace ModernSlavery.BusinessDomain.Shared
         {
             _CustomLogger = customLogger;
             _DataRepository = dataRepository;
+            _organisationBusinessLogic = organisationBusinessLogic;
             _CompaniesHouseAPI = companiesHouseAPI;
             _PostcodeChecker = postcodeChecker;
         }

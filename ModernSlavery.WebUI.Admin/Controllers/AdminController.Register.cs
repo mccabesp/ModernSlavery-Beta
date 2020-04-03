@@ -251,12 +251,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     .Select(o => o.OrganisationId);
                 if (results.Any()) orgIds.AddRange(results);
 
-                results = Organisation.Search(
-                        SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                            .Where(o => o.OrganisationId != userOrg.OrganisationId),
+                results = _adminService.OrganisationBusinessLogic.SearchOrganisations(
                         model.OrganisationName,
-                        50 - results.Count(),
-                        SharedBusinessLogic.SharedOptions.LevenshteinDistance)
+                        50 - results.Count())
                     .Select(o => o.OrganisationId);
                 if (results.Any()) orgIds.AddRange(results);
             }

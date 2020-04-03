@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
@@ -106,7 +107,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
             string securityCode);
 
         Return GetOrganisationReturn(Organisation organisation, int year = 0);
-        OrganisationScope GetOrganisationCurrentScope(Organisation organisation);
         Task<Organisation> GetOrganisationByEmployerReferenceOrThrowAsync(string employerReference);
 
         Task<CustomResult<Organisation>> CreateOrganisationSecurityCodeAsync(string employerRef,
@@ -123,5 +123,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 
         Task<CustomResult<Organisation>> ExpireOrganisationSecurityCodeAsync(string employerRef);
         Task<CustomBulkResult<Organisation>> ExpireOrganisationSecurityCodesInBulkAsync();
+        IQueryable<Organisation> SearchOrganisations(string searchText,int records);
     }
 }

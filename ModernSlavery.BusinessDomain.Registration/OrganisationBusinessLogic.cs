@@ -17,9 +17,6 @@ namespace ModernSlavery.BusinessDomain.Registration
 {
     public class OrganisationBusinessLogic : IOrganisationBusinessLogic
     {
-        private readonly IDataRepository _DataRepository;
-        private readonly IEncryptionHandler _encryptionHandler;
-        private readonly IObfuscator _obfuscator;
         private readonly IScopeBusinessLogic _scopeLogic;
         private readonly ISecurityCodeBusinessLogic _securityCodeLogic;
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
@@ -27,22 +24,33 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public OrganisationBusinessLogic(
             ISharedBusinessLogic sharedBusinessLogic,
-            IDataRepository dataRepo,
             ISubmissionBusinessLogic submissionLogic,
             IScopeBusinessLogic scopeLogic,
-            IEncryptionHandler encryptionHandler,
             ISecurityCodeBusinessLogic securityCodeLogic,
-            IDnBOrgsRepository dnBOrgsRepository,
-            IObfuscator obfuscator)
+            IDnBOrgsRepository dnBOrgsRepository)
         {
             _sharedBusinessLogic = sharedBusinessLogic;
-            _DataRepository = dataRepo;
             _submissionLogic = submissionLogic;
             _scopeLogic = scopeLogic;
-            _obfuscator = obfuscator;
             _securityCodeLogic = securityCodeLogic;
-            _encryptionHandler = encryptionHandler;
             DnBOrgsRepository = dnBOrgsRepository;
+        }
+
+        public IQueryable<Organisation> SearchOrganisations(string searchText,int records)
+        {
+            var searchData = _sharedBusinessLogic.DataRepository.GetAll<Organisation>();
+            var levenshteinRecords =searchData.ToList().Select(o => new{ distance = o.OrganisationName.LevenshteinCompute(searchText), org = o });
+            var pattern = searchText?.ToLower();
+
+            var searchResults = levenshteinRecords.AsQueryable()
+                .Where(
+                    data => data.org.OrganisationName.ToLower().Contains(pattern)
+                            || data.org.OrganisationName.Length > _sharedBusinessLogic.SharedOptions.LevenshteinDistance &&
+                            data.distance <= _sharedBusinessLogic.SharedOptions.LevenshteinDistance)
+                .OrderBy(o => o.distance)
+                .Take(records)
+                .Select(o => o.org);
+            return searchResults;
         }
 
         public IDnBOrgsRepository DnBOrgsRepository { get; }
@@ -56,10 +64,10 @@ namespace ModernSlavery.BusinessDomain.Registration
         {
 #if DEBUG
             var orgs = Debugger.IsAttached
-                ? _DataRepository.GetAll<Organisation>().Take(100)
-                : _DataRepository.GetAll<Organisation>();
+                ? _sharedBusinessLogic.DataRepository.GetAll<Organisation>().Take(100)
+                : _sharedBusinessLogic.DataRepository.GetAll<Organisation>();
 #else
-            var orgs = _DataRepository.GetAll<Organisation>();
+            var orgs = _sharedBusinessLogic.DataRepository.GetAll<Organisation>();
 #endif
             var records = new List<OrganisationsFileModel>();
 
@@ -102,7 +110,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public virtual async Task SetUniqueEmployerReferencesAsync()
         {
-            var orgs = _DataRepository.GetAll<Organisation>().Where(o => o.EmployerReference == null)
+            var orgs = _sharedBusinessLogic.DataRepository.GetAll<Organisation>().Where(o => o.EmployerReference == null)
                 .ToAsyncEnumerable();
             await foreach (var org in orgs) await SetUniqueEmployerReferenceAsync(org);
         }
@@ -113,12 +121,12 @@ namespace ModernSlavery.BusinessDomain.Registration
             do
             {
                 organisation.EmployerReference = GenerateEmployerReference();
-            } while (await _DataRepository.AnyAsync<Organisation>(o =>
+            } while (await _sharedBusinessLogic.DataRepository.AnyAsync<Organisation>(o =>
                 o.OrganisationId != organisation.OrganisationId &&
                 o.EmployerReference == organisation.EmployerReference));
 
             //Save the organisation
-            await _DataRepository.SaveChangesAsync();
+            await _sharedBusinessLogic.DataRepository.SaveChangesAsync();
         }
 
         public virtual string GenerateEmployerReference()
@@ -154,7 +162,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public CustomResult<Organisation> LoadInfoFromEmployerIdentifier(string employerIdentifier)
         {
-            var organisationId = _obfuscator.DeObfuscate(employerIdentifier);
+            var organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(employerIdentifier);
 
             if (organisationId == 0)
                 return new CustomResult<Organisation>(
@@ -184,7 +192,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public async Task<CustomResult<Organisation>> GetOrganisationByEncryptedReturnIdAsync(string encryptedReturnId)
         {
-            var decryptedReturnId = _encryptionHandler.DecryptAndDecode(encryptedReturnId);
+            var decryptedReturnId = _sharedBusinessLogic.Obfuscator.DeObfuscate(encryptedReturnId);
 
             var result = await _submissionLogic.GetSubmissionByReturnIdAsync(decryptedReturnId.ToInt64());
 
@@ -199,7 +207,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         private async Task<IEnumerable<Organisation>> GetAllActiveOrPendingOrganisationsOrThrowAsync()
         {
-            var orgList = _DataRepository.GetAll<Organisation>()
+            var orgList = _sharedBusinessLogic.DataRepository.GetAll<Organisation>()
                 .Where(o => o.Status == OrganisationStatuses.Active || o.Status == OrganisationStatuses.Pending);
 
             if (!orgList.Any())
@@ -211,13 +219,11 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         #region Entity
 
-        public string GetOrganisationSicSectorsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ")
+        public string GetOrganisationSicSectorsString(Organisation organisation, DateTime? maxDate = null, string delimiter = ", ")
         {
-            var organisationSicCodes = GetOrganisationSicCodes(org, maxDate);
-            return organisationSicCodes.Select(s => s.SicCode.SicSection.Description.Trim())
-                .UniqueI()
-                .OrderBy(s => s)
-                .ToDelimitedString(delimiter);
+            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1);
+
+            return organisation.GetSicSectorsString(maxDate.Value, delimiter);
         }
 
 
@@ -270,7 +276,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 var code = sicCode.ToInt64();
                 if (code < 1) continue;
 
-                var sic = _DataRepository.GetAll<SicCode>().FirstOrDefault(s => s.SicCodeId == code);
+                var sic = _sharedBusinessLogic.DataRepository.GetAll<SicCode>().FirstOrDefault(s => s.SicCodeId == code);
                 var sector = sic == null ? "Other" : sic.SicSection.Description;
                 var sics = results.ContainsKey(sector) ? results[sector] : new HashSet<long>();
                 sics.Add(code);
@@ -291,7 +297,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public virtual Organisation GetOrganisationById(long organisationId)
         {
-            return _DataRepository.Get<Organisation>(organisationId);
+            return _sharedBusinessLogic.DataRepository.Get<Organisation>(organisationId);
         }
 
         public IEnumerable<Return> GetOrganisationRecentReports(Organisation organisation,int recentCount)
@@ -552,7 +558,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public virtual async Task<Organisation> GetOrganisationByEmployerReferenceAsync(string employerReference)
         {
-            return await _DataRepository.FirstOrDefaultAsync<Organisation>(o =>
+            return await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(o =>
                 o.EmployerReference.ToUpper() == employerReference.ToUpper());
         }
 
@@ -560,7 +566,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             string employerReference,
             string securityCode)
         {
-            return await _DataRepository.FirstOrDefaultAsync<Organisation>(o =>
+            return await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(o =>
                 o.EmployerReference.ToUpper() == employerReference.ToUpper() && o.SecurityCode == securityCode);
         }
 

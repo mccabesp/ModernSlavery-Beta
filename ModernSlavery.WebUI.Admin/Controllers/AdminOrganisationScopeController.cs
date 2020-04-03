@@ -42,7 +42,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public IActionResult ChangeScopeGet(long id, int year)
         {
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
-            var currentScopeStatus = organisation.GetLatestScopeForSnapshotYear(year).ScopeStatus;
+            var currentScopeStatus = organisation.GetScope(year).ScopeStatus;
 
             var viewModel = new AdminChangeScopeViewModel
             {
@@ -62,7 +62,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public async Task<IActionResult> ChangeScopePost(long id, int year, AdminChangeScopeViewModel viewModel)
         {
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
-            var currentOrganisationScope = organisation.GetLatestScopeForSnapshotYear(year);
+            var currentOrganisationScope = organisation.GetScope(year);
 
             if (currentOrganisationScope.ScopeStatus != ScopeStatuses.InScope
                 && currentOrganisationScope.ScopeStatus != ScopeStatuses.OutOfScope)
@@ -73,7 +73,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (viewModel.HasAnyErrors())
             {
                 // If there are any errors, return the user back to the same page to correct the mistakes
-                var currentScopeStatus = organisation.GetLatestScopeForSnapshotYear(year).ScopeStatus;
+                var currentScopeStatus = organisation.GetScope(year).ScopeStatus;
 
                 viewModel.OrganisationName = organisation.OrganisationName;
                 viewModel.OrganisationId = organisation.OrganisationId;

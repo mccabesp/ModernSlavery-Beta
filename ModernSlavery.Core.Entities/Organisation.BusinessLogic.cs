@@ -10,76 +10,33 @@ namespace ModernSlavery.Core.Entities
     [DebuggerDisplay("{OrganisationName},{Status}")]
     public partial class Organisation
     {
-        
-        public OrganisationStatus PreviousStatus
+        #region Overrides
+        public override bool Equals(object obj)
         {
-            get
-            {
-                return OrganisationStatuses
-                    .OrderByDescending(os => os.StatusDate).Skip(1)
-                    .FirstOrDefault();
-            }
+            // Check for null values and compare run-time types.
+            if (obj == null || GetType() != obj.GetType()) return false;
+
+            var target = (Organisation)obj;
+            return OrganisationId == target.OrganisationId;
         }
 
-        public void SetStatus(OrganisationStatuses status, long byUserId, string details = null)
+        public override int GetHashCode()
         {
-            if (status == Status && details == StatusDetails) return;
-
-            OrganisationStatuses.Add(
-                new OrganisationStatus
-                {
-                    OrganisationId = OrganisationId,
-                    Status = status,
-                    StatusDate = VirtualDateTime.Now,
-                    StatusDetails = details,
-                    ByUserId = byUserId
-                });
-            Status = status;
-            StatusDate = VirtualDateTime.Now;
-            StatusDetails = details;
+            return OrganisationId.GetHashCode();
         }
 
-        /// <summary>
-        ///     Returns true if organisation has been made an orphan and is in scope
-        /// </summary>
-
-
-        public string GetRegistrationStatus()
+        public override string ToString()
         {
-            var reg = UserOrganisations.OrderBy(uo => uo.PINConfirmedDate)
-                .FirstOrDefault(uo => uo.PINConfirmedDate != null);
-            if (reg != null) return $"Registered {reg.PINConfirmedDate?.ToFriendly(false)}";
-
-            reg = UserOrganisations.OrderBy(uo => uo.PINConfirmedDate)
-                .FirstOrDefault(uo => uo.PINSentDate != null && uo.PINConfirmedDate == null);
-            if (reg != null) return "Awaiting PIN";
-
-            reg = UserOrganisations.OrderBy(uo => uo.PINConfirmedDate)
-                .FirstOrDefault(uo =>
-                    uo.PINSentDate == null && uo.PINConfirmedDate == null && uo.Method == RegistrationMethods.Manual);
-            if (reg != null) return "Awaiting Approval";
-
-            return "No registrations";
+            return $"ref:{EmployerReference}, name:{OrganisationName}";
         }
+        #endregion
 
-        public string GetSicSectorsString(IEnumerable<OrganisationSicCode> organisationSicCodes, string delimiter = ", ")
+        #region SicCode
+        public string GetSicSource(DateTime maxDate)
         {
-            return organisationSicCodes.Select(s => s.SicCode.SicSection.Description.Trim())
-                .UniqueI()
-                .OrderBy(s => s)
-                .ToDelimitedString(delimiter);
-        }
-
-        public string GetSicSectorsString(DateTime maxDate, string delimiter = ", ")
-        {
-            var organisationSicCodes = GetSicCodes(maxDate);
-            return GetSicSectorsString(organisationSicCodes, delimiter);
-        }
-
-        public string GetLatestSicSectorsString(string delimiter = ", ")
-        {
-            var organisationSicCodes = GetLatestSicCodes();
-            return GetSicSectorsString(organisationSicCodes, delimiter);
+            return OrganisationSicCodes.FirstOrDefault(s =>
+                    s.Created < maxDate && (s.Retired == null || s.Retired.Value > maxDate))
+                ?.Source;
         }
         /// <summary>
         ///     Returns the latest organisation name before specified date/time
@@ -96,6 +53,7 @@ namespace ModernSlavery.Core.Entities
         {
             return OrganisationSicCodes.Where(s =>s.Retired == null).OrderByDescending(s=>s.Created);
         }
+
         public IEnumerable<int> GetLatestSicCodeIds(string delimiter = ", ")
         {
             return GetLatestSicCodes().Select(s => s.SicCodeId);
@@ -105,16 +63,25 @@ namespace ModernSlavery.Core.Entities
             return GetLatestSicCodeIds().OrderBy(s => s).ToDelimitedString(delimiter);
         }
 
-        public string GetSicSource(DateTime maxDate)
-        {
-            return OrganisationSicCodes.FirstOrDefault(s =>
-                    s.Created < maxDate && (s.Retired == null || s.Retired.Value > maxDate))
-                ?.Source;
-        }
-
         public string GetSicCodeIdsString(DateTime maxDate, string delimiter = ", ")
         {
             return GetSicCodes(maxDate).OrderBy(s => s.SicCodeId).Select(s => s.SicCodeId).ToDelimitedString(delimiter);
+        }
+        #endregion
+
+        #region SicSection
+        public IEnumerable<SicSection> GetSicSections(DateTime maxDate)
+        {
+            return GetSicSections(GetSicCodes(maxDate));
+        }
+
+        public IEnumerable<SicSection> GetLatestSicSections()
+        {
+            return GetSicSections(GetLatestSicCodes());
+        }
+        public IEnumerable<SicSection> GetSicSections(IEnumerable<OrganisationSicCode> organisationSicCodes)
+        {
+            return organisationSicCodes.Select(s => s.SicCode.SicSection).Distinct();
         }
 
         public string GetSicSectionIdsString(DateTime maxDate, string delimiter = ", ")
@@ -124,27 +91,27 @@ namespace ModernSlavery.Core.Entities
                 .ToDelimitedString(delimiter);
         }
 
-        //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
-        public Return GetReturn(int year)
+        public string GetSicSectorsString(IEnumerable<SicSection> sicSectors, string delimiter = ", ")
         {
-            return Returns.Where(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year)
-                .OrderByDescending(r => r.StatusDate)
-                .FirstOrDefault();
+            return sicSectors.Select(s => s.Description.Trim())
+                .UniqueI()
+                .OrderBy(s => s)
+                .ToDelimitedString(delimiter);
         }
 
-        //Returns the scope for the specified accounting date
-        public OrganisationScope GetScope(DateTime accountingStartDate)
+        public string GetSicSectorsString(DateTime maxDate, string delimiter = ", ")
         {
-            return OrganisationScopes.FirstOrDefault(s =>
-                s.Status == ScopeRowStatuses.Active && s.SnapshotDate == accountingStartDate);
+            return GetSicSectorsString(GetSicSections(maxDate), delimiter);
         }
 
-        public ScopeStatuses GetScopeStatus(DateTime accountingStartDate)
+        public string GetLatestSicSectorsString(string delimiter = ", ")
         {
-            var scope = GetScope(accountingStartDate);
-            return scope == null ? ScopeStatuses.Unknown : scope.ScopeStatus;
+            var organisationSicCodes = GetLatestSicCodes();
+            return GetSicSectorsString(GetLatestSicSections(), delimiter);
         }
+        #endregion
 
+        #region Name
         /// <summary>
         ///     Returns the latest organisation name before specified date/time
         /// </summary>
@@ -162,6 +129,9 @@ namespace ModernSlavery.Core.Entities
                 .OrderByDescending(n => n.Created)
                 .FirstOrDefault();
         }
+        #endregion
+
+        #region Address
         /// <summary>
         ///     Returns the latest address before specified date/time
         /// </summary>
@@ -206,45 +176,15 @@ namespace ModernSlavery.Core.Entities
 
             return address?.GetAddressString(delimiter);
         }
+        #endregion
 
-        public override bool Equals(object obj)
+        #region Returns
+        //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
+        public Return GetReturn(int year)
         {
-            // Check for null values and compare run-time types.
-            if (obj == null || GetType() != obj.GetType()) return false;
-
-            var target = (Organisation) obj;
-            return OrganisationId == target.OrganisationId;
-        }
-
-        public override int GetHashCode()
-        {
-            return OrganisationId.GetHashCode();
-        }
-
-        public static IQueryable<Organisation> Search(IQueryable<Organisation> searchData,
-            string searchText,
-            int records,
-            int levenshteinDistance = 0)
-        {
-            var levenshteinRecords =
-                searchData.ToList().Select(o => new
-                    {distance = o.OrganisationName.LevenshteinCompute(searchText), org = o});
-            var pattern = searchText?.ToLower();
-
-            var searchResults = levenshteinRecords.AsQueryable()
-                .Where(
-                    data => data.org.OrganisationName.ToLower().Contains(pattern)
-                            || data.org.OrganisationName.Length > levenshteinDistance &&
-                            data.distance <= levenshteinDistance)
-                .OrderBy(o => o.distance)
-                .Take(records)
-                .Select(o => o.org);
-            return searchResults;
-        }
-
-        public bool GetIsInscope(DateTime maxDate)
-        {
-            return !GetScopeStatus(maxDate).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
+            return Returns.Where(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year)
+                .OrderByDescending(r => r.StatusDate)
+                .FirstOrDefault();
         }
 
         public IEnumerable<Return> GetSubmittedReports()
@@ -252,26 +192,45 @@ namespace ModernSlavery.Core.Entities
             return Returns.Where(r => r.Status == ReturnStatuses.Submitted)
                 .OrderByDescending(r => r.AccountingDate);
         }
+        #endregion
 
-        public void RevertToLastStatus(long byUserId, string details = null)
+        #region Scope
+        public bool GetIsInscope(DateTime maxDate)
         {
-            var previousStatus = PreviousStatus
-                                 ?? throw new InvalidOperationException(
-                                     $"The list of Statuses for Organisation '{OrganisationName}' employerReference '{EmployerReference}' isn't long enough to perform a '{nameof(RevertToLastStatus)}' command. It needs to have at least 2 statuses so these can reverted.");
-
-            SetStatus(previousStatus.Status, byUserId, details);
+            return !GetScopeStatus(maxDate).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
         }
 
-        public OrganisationScope GetLatestScopeForSnapshotYear(int snapshotYear)
+        public OrganisationScope GetLatestScope()
+        {
+            return OrganisationScopes.OrderByDescending(s=>s.SnapshotDate).FirstOrDefault(orgScope =>
+                orgScope.Status == ScopeRowStatuses.Active);
+        }
+
+        //Returns the scope for the specified accounting date
+        public OrganisationScope GetScope(DateTime accountingStartDate)
+        {
+            return OrganisationScopes.FirstOrDefault(s =>
+                s.Status == ScopeRowStatuses.Active && s.SnapshotDate == accountingStartDate);
+        }
+
+
+        public ScopeStatuses GetScopeStatus(DateTime accountingStartDate)
+        {
+            var scope = GetScope(accountingStartDate);
+            return scope == null ? ScopeStatuses.Unknown : scope.ScopeStatus;
+        }
+
+
+        public OrganisationScope GetScope(int snapshotYear)
         {
             return OrganisationScopes.FirstOrDefault(orgScope =>
                 orgScope.Status == ScopeRowStatuses.Active
                 && orgScope.SnapshotDate.Year == snapshotYear);
         }
 
-        public OrganisationScope GetLatestScopeForSnapshotYearOrThrow(int snapshotYear)
+        public OrganisationScope GetScopeOrThrow(int snapshotYear)
         {
-            var organisationScope = GetLatestScopeForSnapshotYear(snapshotYear);
+            var organisationScope = GetScope(snapshotYear);
 
             if (organisationScope == null)
                 throw new ArgumentOutOfRangeException(
@@ -279,7 +238,18 @@ namespace ModernSlavery.Core.Entities
 
             return organisationScope;
         }
+        #endregion
 
+        #region Status
+        public OrganisationStatus PreviousStatus
+        {
+            get
+            {
+                return OrganisationStatuses
+                    .OrderByDescending(os => os.StatusDate).Skip(1)
+                    .FirstOrDefault();
+            }
+        }
         public bool IsActive()
         {
             return Status == Entities.OrganisationStatuses.Active;
@@ -290,6 +260,39 @@ namespace ModernSlavery.Core.Entities
             return Status == Entities.OrganisationStatuses.Pending;
         }
 
+        
+        public void SetStatus(OrganisationStatuses status, long byUserId, string details = null)
+        {
+            if (status == Status && details == StatusDetails) return;
+
+            OrganisationStatuses.Add(
+                new OrganisationStatus
+                {
+                    OrganisationId = OrganisationId,
+                    Status = status,
+                    StatusDate = VirtualDateTime.Now,
+                    StatusDetails = details,
+                    ByUserId = byUserId
+                });
+            Status = status;
+            StatusDate = VirtualDateTime.Now;
+            StatusDetails = details;
+        }
+
+        /// <summary>
+        ///     Returns true if organisation has been made an orphan and is in scope
+        /// </summary>
+        public void RevertToLastStatus(long byUserId, string details = null)
+        {
+            var previousStatus = PreviousStatus
+                                 ?? throw new InvalidOperationException(
+                                     $"The list of Statuses for Organisation '{OrganisationName}' employerReference '{EmployerReference}' isn't long enough to perform a '{nameof(RevertToLastStatus)}' command. It needs to have at least 2 statuses so these can reverted.");
+
+            SetStatus(previousStatus.Status, byUserId, details);
+        }
+        #endregion
+
+        #region Security Codes
         /// <summary>
         ///     Method to modify the security code expiring information (create/extend/expire). It additionally timestamps such
         ///     change.
@@ -309,6 +312,26 @@ namespace ModernSlavery.Core.Entities
         {
             return SecurityCodeExpiryDateTime < VirtualDateTime.Now;
         }
+        #endregion
+
+        #region Registration
+        public string GetRegistrationStatus()
+        {
+            var reg = UserOrganisations.OrderBy(uo => uo.PINConfirmedDate)
+                .FirstOrDefault(uo => uo.PINConfirmedDate != null);
+            if (reg != null) return $"Registered {reg.PINConfirmedDate?.ToFriendly(false)}";
+
+            reg = UserOrganisations.OrderBy(uo => uo.PINConfirmedDate)
+                .FirstOrDefault(uo => uo.PINSentDate != null && uo.PINConfirmedDate == null);
+            if (reg != null) return "Awaiting PIN";
+
+            reg = UserOrganisations.OrderBy(uo => uo.PINConfirmedDate)
+                .FirstOrDefault(uo =>
+                    uo.PINSentDate == null && uo.PINConfirmedDate == null && uo.Method == RegistrationMethods.Manual);
+            if (reg != null) return "Awaiting Approval";
+
+            return "No registrations";
+        }
 
         public UserOrganisation GetLatestRegistration()
         {
@@ -316,10 +339,7 @@ namespace ModernSlavery.Core.Entities
                 .OrderByDescending(uo => uo.PINConfirmedDate)
                 .FirstOrDefault();
         }
+        #endregion
 
-        public override string ToString()
-        {
-            return $"ref:{EmployerReference}, name:{OrganisationName}";
-        }
     }
 }

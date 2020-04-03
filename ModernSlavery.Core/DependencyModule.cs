@@ -27,7 +27,6 @@ namespace ModernSlavery.Core
             builder.Autofac.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
                 .WithParameter("seed", _sharedOptions.ObfuscationSeed);
 
-            builder.Autofac.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
             builder.Autofac.RegisterType<SourceComparer>().As<ISourceComparer>().SingleInstance();
         }
 

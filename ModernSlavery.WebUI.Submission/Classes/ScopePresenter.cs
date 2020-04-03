@@ -25,18 +25,21 @@ namespace ModernSlavery.WebUI.Submission.Classes
 
     public class ScopePresenter : IScopePresenter
     {
-        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic; 
+        private readonly ISearchBusinessLogic _searchBusinessLogic;
 
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
 
         public ScopePresenter(IScopeBusinessLogic scopeBL,
             IDataRepository dataRepo,
             IOrganisationBusinessLogic organisationBusinessLogic,
+            ISearchBusinessLogic searchBusinessLogic,
             ISharedBusinessLogic sharedBusinessLogic)
         {
             ScopeBusinessLogic = scopeBL;
             DataRepository = dataRepo;
             _organisationBusinessLogic = organisationBusinessLogic;
+            _searchBusinessLogic = searchBusinessLogic;
             _sharedBusinessLogic = sharedBusinessLogic;
         }
 
@@ -160,6 +163,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             }
 
             await ScopeBusinessLogic.SaveScopesAsync(org, newScopes);
+            await _searchBusinessLogic.UpdateSearchIndexAsync(org);
         }
 
         public virtual async Task SavePresumedScopeAsync(ScopingViewModel model, int snapshotYear)

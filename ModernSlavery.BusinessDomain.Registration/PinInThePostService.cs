@@ -16,7 +16,10 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         private readonly SharedOptions SharedOptions;
 
-        public PinInThePostService(SharedOptions sharedOptions, IEventLogger customLogger, IGovNotifyAPI govNotifyApi)
+        public PinInThePostService(
+            SharedOptions sharedOptions, 
+            IEventLogger customLogger, 
+            IGovNotifyAPI govNotifyApi)
         {
             SharedOptions = sharedOptions;
             CustomLogger = customLogger;

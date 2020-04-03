@@ -175,14 +175,14 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 userOrg.ConfirmAttempts = 0;
 
                 model.AccountingDate =
-                    RegistrationService.SharedBusinessLogic.GetAccountingStartDate(userOrg.Organisation.SectorType);
+                    _registrationService.SharedBusinessLogic.GetAccountingStartDate(userOrg.Organisation.SectorType);
                 model.OrganisationId = userOrg.OrganisationId;
                 StashModel(model);
 
                 result1 = RedirectToAction("ServiceActivated");
 
                 //Send notification email to existing users 
-                RegistrationService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(
+                _registrationService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(
                     userOrg.Organisation, userOrg.User);
             }
             else
@@ -199,7 +199,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //Log the registration
             if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-                await RegistrationService.RegistrationLog.WriteAsync(
+                await _registrationService.RegistrationLog.WriteAsync(
                     new RegisterLogModel
                     {
                         StatusDate = VirtualDateTime.Now,
@@ -224,7 +224,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //Add this organisation to the search index
             if (updateSearchIndex)
-                await RegistrationService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
+                await _registrationService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
 
             //Prompt the user with confirmation
             return result1;

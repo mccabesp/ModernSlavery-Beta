@@ -121,7 +121,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             // Remove the registration
             var actionByUser = IsImpersonatingUser == false ? VirtualUser : OriginalUser;
             var orgToRemove = userOrgToUnregister.Organisation;
-            await RegistrationService.RegistrationBusinessLogic.RemoveRegistrationAsync(userOrgToUnregister,
+            await _registrationService.RegistrationBusinessLogic.RemoveRegistrationAsync(userOrgToUnregister,
                 actionByUser);
 
             // Email user that has been unregistered
@@ -143,7 +143,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             {
                 var sendEmails = new List<Task>();
                 var testEmail = !SharedBusinessLogic.SharedOptions.IsProduction();
-                if (RegistrationService.OrganisationBusinessLogic.GetOrganisationIsOrphan(orgToRemove))
+                if (_registrationService.OrganisationBusinessLogic.GetOrganisationIsOrphan(orgToRemove))
                     sendEmails.Add(
                         SharedBusinessLogic.SendEmailService.SendGEOOrphanOrganisationNotificationAsync(
                             orgToRemove.OrganisationName, testEmail));

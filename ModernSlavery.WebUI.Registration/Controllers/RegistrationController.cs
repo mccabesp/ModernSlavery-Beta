@@ -18,16 +18,15 @@ namespace ModernSlavery.WebUI.Registration.Controllers
     [Route("Register")]
     public partial class RegistrationController : BaseController
     {
-        public readonly IRegistrationService RegistrationService;
+        private readonly IRegistrationService _registrationService;
 
         #region Constructors
 
         public RegistrationController(
             IRegistrationService registrationService,
-            ILogger<RegistrationController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) :
-            base(logger, webService, sharedBusinessLogic)
+            ILogger<RegistrationController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) :base(logger, webService, sharedBusinessLogic)
         {
-            RegistrationService = registrationService;
+            _registrationService = registrationService;
         }
 
         #endregion
@@ -92,7 +91,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     var pinInPostTestMode = SharedBusinessLogic.SharedOptions.PinInPostTestMode;
 
                     // Generate a new pin
-                    var pin = RegistrationService.OrganisationBusinessLogic.GeneratePINCode(thisIsATestUser);
+                    var pin = _registrationService.OrganisationBusinessLogic.GeneratePINCode(thisIsATestUser);
 
                     // Save the PIN and confirm code
                     userOrg.PIN = pin;
@@ -109,7 +108,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     {
                         // Try and send the PIN in post
                         var returnUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
-                        if (RegistrationService.PinInThePostService.SendPinInThePost(userOrg, pin, returnUrl,
+                        if (_registrationService.PinInThePostService.SendPinInThePost(userOrg, pin, returnUrl,
                             out var letterId))
                         {
                             userOrg.PITPNotifyLetterId = letterId;

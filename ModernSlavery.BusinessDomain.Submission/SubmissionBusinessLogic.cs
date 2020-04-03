@@ -18,24 +18,23 @@ namespace ModernSlavery.BusinessDomain.Submission
     public class SubmissionBusinessLogic : ISubmissionBusinessLogic
     {
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
-        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
-        public SubmissionBusinessLogic(ISharedBusinessLogic sharedBusinessLogic, IDataRepository dataRepo,IOrganisationBusinessLogic organisationBusinessLogic,
-            [KeyFilter(Filenames.SubmissionLog)] IAuditLogger submissionLog)
+        public IAuditLogger SubmissionLog { get; }
+
+        public SubmissionBusinessLogic(
+            ISharedBusinessLogic sharedBusinessLogic,
+            [KeyFilter(Filenames.SubmissionLog)] 
+            IAuditLogger submissionLog)
         {
             _sharedBusinessLogic = sharedBusinessLogic;
-            _organisationBusinessLogic = organisationBusinessLogic;
-            DataRepository = dataRepo;
             SubmissionLog = submissionLog;
         }
 
-        private IDataRepository DataRepository { get; }
-        public IAuditLogger SubmissionLog { get; }
 
         #region Repo
 
         public virtual async Task<Return> GetSubmissionByReturnIdAsync(long returnId)
         {
-            return await DataRepository.FirstOrDefaultAsync<Return>(o => o.ReturnId == returnId);
+            return await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Return>(o => o.ReturnId == returnId);
         }
 
         /// <summary>
@@ -46,7 +45,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// <returns></returns>
         public virtual async Task<Return> GetLatestSubmissionBySnapshotYearAsync(long organisationId, int snapshotYear)
         {
-            var orgSubmission = await DataRepository.FirstOrDefaultAsync<Return>(
+            var orgSubmission = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Return>(
                 s => s.AccountingDate.Year == snapshotYear
                      && s.OrganisationId == organisationId
                      && s.Status == ReturnStatuses.Submitted);
@@ -57,7 +56,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         public IEnumerable<Return> GetAllSubmissionsByOrganisationIdAndSnapshotYear(long organisationId,
             int snapshotYear)
         {
-            return DataRepository.GetAll<Return>().Where(s =>
+            return _sharedBusinessLogic.DataRepository.GetAll<Return>().Where(s =>
                 s.OrganisationId == organisationId && s.AccountingDate.Year == snapshotYear);
         }
 
@@ -68,11 +67,11 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// <returns></returns>
         public virtual IEnumerable<SubmissionsFileModel> GetSubmissionsFileModelByYear(int year)
         {
-            var scopes = DataRepository.GetAll<OrganisationScope>()
+            var scopes = _sharedBusinessLogic.DataRepository.GetAll<OrganisationScope>()
                 .Where(os => os.SnapshotDate.Year == year && os.Status == ScopeRowStatuses.Active)
                 .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SnapshotDate}).ToList();
 
-            var returns = DataRepository.GetAll<Return>()
+            var returns = _sharedBusinessLogic.DataRepository.GetAll<Return>()
                 .Where(r => r.AccountingDate.Year == year && r.Status == ReturnStatuses.Submitted).ToList();
 
 #if DEBUG
@@ -142,7 +141,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var prevPublicSnapshotDate = curPublicSnapshotDate.AddYears(-1);
 
             // create return table query
-            var lateSubmissions = DataRepository.GetAll<Return>()
+            var lateSubmissions = _sharedBusinessLogic.DataRepository.GetAll<Return>()
                 // filter only reports for the previous sector reporting start date and modified after their previous sector reporting end date
                 .Where(
                     r => r.Organisation.SectorType == SectorTypes.Private
@@ -176,7 +175,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     }).ToList();
 
             // create scope table query
-            var activeScopes = DataRepository.GetAll<OrganisationScope>()
+            var activeScopes = _sharedBusinessLogic.DataRepository.GetAll<OrganisationScope>()
                 .Where(os =>
                     os.SnapshotDate.Year == prevPrivateSnapshotDate.Year && os.Status == ScopeRowStatuses.Active)
                 .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SnapshotDate}).ToList();
@@ -260,7 +259,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             model.LatestOrganisationName = reportToConvert.Organisation.OrganisationName;
 
             model.Sector = reportToConvert.Organisation.GetSicSectorsString(reportToConvert.StatusDate);
-            model.LatestSector =  _organisationBusinessLogic.GetOrganisationSicSectorsString(reportToConvert.Organisation);
+            model.LatestSector = reportToConvert.Organisation.GetLatestSicSectorsString();
 
             model.OrganisationSize = reportToConvert.OrganisationSize;
             model.Modified = reportToConvert.Modified;
