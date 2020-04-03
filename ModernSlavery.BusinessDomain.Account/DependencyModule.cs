@@ -15,6 +15,8 @@ namespace ModernSlavery.BusinessDomain.Account
         public void Register(IDependencyBuilder builder)
         {
             builder.Autofac.RegisterType<AuthorisationBusinessLogic>().As<IAuthorisationBusinessLogic>().SingleInstance();
+            builder.Autofac.RegisterType<AuthenticationBusinessLogic>().As<IAuthenticationBusinessLogic>().SingleInstance();
+            builder.Autofac.RegisterType<AccountService>().As<IAccountService>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

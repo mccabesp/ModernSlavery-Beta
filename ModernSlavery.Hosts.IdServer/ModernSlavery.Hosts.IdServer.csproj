@@ -9,6 +9,13 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
+  <!-- This is required to auto recompile during development -->
+  <!-- To debug razor (.cshtml) you must select IIS express and run Ctrl + F5 (run without debugging) - NOT debug mode -->
+  <ItemGroup>
+    <Watch Include="..\ModernSlavery.WebUI.*\**\*.cshtml" />
+    <Watch Include="..\ModernSlavery.Hosts.IdServer\*\**\*.cshtml" />
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning;</WarningsAsErrors>
   </PropertyGroup>
@@ -19,7 +26,6 @@
     <PackageReference Include="Lindhart.Analyser.MissingAwaitWarning" Version="1.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.AzureStorage" Version="3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="3.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -33,13 +39,14 @@
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.BusinessDomain.Account\ModernSlavery.BusinessDomain.Account.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Infrastructure.Database\ModernSlavery.Infrastructure.Database.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Infrastructure.Database\ModernSlavery.Infrastructure.Database.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Hosts\ModernSlavery.Infrastructure.Hosts.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Logging\ModernSlavery.Infrastructure.Logging.csproj" />
-    <ProjectReference Include="..\ModernSlavery.Infrastructure.Storage\ModernSlavery.Infrastructure.Storage.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Infrastructure.Telemetry\ModernSlavery.Infrastructure.Telemetry.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.StaticFiles\ModernSlavery.WebUI.StaticFiles.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,57 +61,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="appsettings.DEV.json" />
-    <Content Remove="appsettings.json" />
-    <Content Remove="appsettings.loadtest.json" />
-    <Content Remove="appsettings.LOCAL.json" />
-    <Content Remove="appsettings.PREPROD.json" />
-    <Content Remove="appsettings.PROD.json" />
-    <Content Remove="AppSettings.secret.json" Condition="Exists('AppSettings.secret.json')" />
-    <Content Remove="appsettings.TEST.json" />
     <Content Remove="web.config" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.DEV.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Include="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Include="appsettings.loadtest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToPublishDirectory>never</CopyToPublishDirectory>
-    </Content>
-    <Content Include="appsettings.LOCAL.json" Condition="Exists('appsettings.LOCAL.json')">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>never</CopyToPublishDirectory>
-    </Content>
-    <Content Include="appsettings.PREPROD.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Include="appsettings.PROD.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Include="AppSettings.secret.json" Condition="Exists('AppSettings.secret.json')">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
-    <Content Include="appsettings.TEST.json">
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
     <Content Include="web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>

@@ -83,7 +83,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
             var verifyUrl =
-                await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountVerifyEmail, new {vcode = verifyCode});
+                WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountVerifyEmail, new {vcode = verifyCode});
 
             if (!_adminService.SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, user.EmailAddress).Result)
             {

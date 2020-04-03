@@ -45,7 +45,7 @@ namespace ModernSlavery.Core.Models
 
         public bool UseDeveloperExceptions { get; set; }
         public string StartUrl { get; set; }
-        public string DoneUrl { get; set; }
+        public string DoneUrl { get; set; } = "https://www.gov.uk/";
 
         public bool EnableSubmitAlerts { get; set; } = true;
 

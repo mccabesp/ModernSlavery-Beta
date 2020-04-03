@@ -141,7 +141,7 @@ namespace ModernSlavery.Infrastructure.Hosts
                     logging.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
                 });
 
-            //hostBuilder.UseConsoleLifetime();
+            hostBuilder.UseConsoleLifetime();
             return hostBuilder;
         }
 

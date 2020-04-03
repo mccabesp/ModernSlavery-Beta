@@ -1,13 +1,10 @@
-﻿using System.Threading.Tasks;
-using ModernSlavery.WebUI.Shared.Options;
+﻿using ModernSlavery.WebUI.Shared.Options;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.WebUI.Shared.Interfaces
 {
     public interface IUrlRouteHelper
     {
-        Task<string> Get(string routeName, object values = null);
-        Task<string> Get(UrlRouteOptions.Routes routeType, object values = null);
-        Task Set(string routeName, string url);
-        Task Set(UrlRouteOptions.Routes routeType, string url);
+        string Get(string routeName, object values = null);
+        string Get(UrlRouteOptions.Routes routeType, object values = null);
     }
 }

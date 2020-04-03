@@ -17,6 +17,7 @@ using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -63,13 +64,68 @@ namespace ModernSlavery.Hosts.IdServer.Controllers
             _events = events;
         }
 
+        #region Ping 
+        [Route("~/ping")]
+        public IActionResult Ping()
+        {
+            return new OkResult(); // OK = 200
+        }
+        #endregion
 
+        #region Home
         [Route("~/")]
         public IActionResult Redirect()
         {
-            return RedirectToAction("Login");
+            return RedirectToAction(nameof(Login));
         }
+        #endregion
 
+        #region Error
+        /// <summary>
+        ///     Shows the error page
+        /// </summary>
+        [Route("~/error/{errorId?}")]
+        public async Task<IActionResult> Error(string errorId = null)
+        {
+            var errorCode = errorId.ToInt32();
+
+            if (errorCode == 0)
+            {
+                if (Response.StatusCode.Between(400, 599))
+                    errorCode = Response.StatusCode;
+                else
+                    errorCode = 500;
+            }
+
+
+            // retrieve error details from identityserver
+            var message = await _interaction.GetErrorContextAsync(errorId);
+            if (message != null)
+            {
+                Logger.LogError($"{message.Error}: {message.ErrorDescription}");
+            }
+            else
+            {
+                //Get the exception which caused this error
+                var errorData = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+                if (errorData == null)
+                {
+                    //Log non-exception events
+                    var statusCodeData = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
+                    if (statusCodeData != null)
+                        Logger.LogError($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
+                    else
+                        Logger.LogError($"HttpStatusCode {errorCode}, Path: Unknown");
+                }
+            }
+
+            Response.StatusCode = errorCode;
+            var model = WebService.ErrorViewModelFactory.Create(message.Error, message.ErrorDescription);
+            return View("Error", model);
+        }
+        #endregion
+
+        #region SignIn
         /// <summary>
         ///     Show login page
         /// </summary>
@@ -149,14 +205,14 @@ namespace ModernSlavery.Hosts.IdServer.Controllers
 
                 if (user != null)
                 {
-                    if (user.LockRemaining > TimeSpan.Zero)
+                    if (SharedBusinessLogic.AuthenticationBusinessLogic.GetUserLoginLockRemaining(user) > TimeSpan.Zero)
                     {
                         await _events.RaiseAsync(
                             new UserLoginFailureEvent(model.Username,
                                 AccountOptions.TooManySigninAttemptsErrorMessage));
                         ModelState.AddModelError(
                             "",
-                            $"{AccountOptions.TooManySigninAttemptsErrorMessage}<br/>Please try again in {user.LockRemaining.ToFriendly(maxParts: 2)}.");
+                            $"{AccountOptions.TooManySigninAttemptsErrorMessage}<br/>Please try again in {SharedBusinessLogic.AuthenticationBusinessLogic.GetUserLoginLockRemaining(user).ToFriendly(maxParts: 2)}.");
                     }
                     else if (await _userRepository.CheckPasswordAsync(user, model.Password) == false)
                     {
@@ -185,7 +241,7 @@ namespace ModernSlavery.Hosts.IdServer.Controllers
                             claims.Add(
                                 new Claim(
                                     ClaimTypes.Role,
-                                    user.IsAdministrator() ? "GPGadmin" : "GPGemployer"));
+                                    SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(user) ? "GPGadmin" : "GPGemployer"));
 
                         // issue authentication cookie with subject ID and username
                         await HttpContext.SignInAsync(user.UserId.ToString(), user.EmailAddress, props,
@@ -240,7 +296,9 @@ namespace ModernSlavery.Hosts.IdServer.Controllers
             var vm = await BuildLoginViewModelAsync(model);
             return View(vm);
         }
+        #endregion
 
+        #region SignOut
         /// <summary>
         ///     Show logout page
         /// </summary>
@@ -301,10 +359,9 @@ namespace ModernSlavery.Hosts.IdServer.Controllers
 
             return View("LoggedOut", vm);
         }
+        #endregion
 
-        /*****************************************/
-        /* helper APIs for the AccountController */
-        /*****************************************/
+        #region Helper Methods
         private async Task<LoginViewModel> BuildLoginViewModelAsync(string returnUrl)
         {
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
@@ -568,8 +625,9 @@ namespace ModernSlavery.Hosts.IdServer.Controllers
             changeEmailToken = null;
             return false;
         }
+        #endregion
 
-        #region External Login
+        #region External SignIn
 
         /// <summary>
         ///     initiate roundtrip to external authentication provider

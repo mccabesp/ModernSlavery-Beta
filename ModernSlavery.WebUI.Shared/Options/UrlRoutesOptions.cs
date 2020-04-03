@@ -23,6 +23,8 @@ namespace ModernSlavery.WebUI.Shared.Options
 
             [EnumMember(Value = "AdminReviewRequest")]
             AdminReviewRequest,
+
+            [EnumMember(Value = "Start")] Start,
             [EnumMember(Value = "Done")] Done,
 
             [EnumMember(Value = "RegistrationAdd")]

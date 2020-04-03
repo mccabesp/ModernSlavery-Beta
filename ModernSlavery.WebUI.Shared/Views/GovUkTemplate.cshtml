@@ -116,22 +116,22 @@
                         @if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
                         {
                             <li>
-                                <a rel="track" data-track-category="Header Link Clicked" href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome))">Search</a>
+                                <a rel="track" data-track-category="Header Link Clicked" href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome))">Search</a>
                             </li>
                             <li>
-                                <a rel="track" data-track-category="Header Link Clicked" href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingGuidance))">Guidance</a>
+                                <a rel="track" data-track-category="Header Link Clicked" href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingGuidance))">Guidance</a>
                             </li>
                             <li>
-                                <a rel="track" data-track-category="Header Link Clicked" href=@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)>Submit</a>
+                                <a rel="track" data-track-category="Header Link Clicked" href=@WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)>Submit</a>
                             </li>
                         }
                         else
                         {
                             <li>
-                                <a rel="track" data-track-category="Header Link Clicked" href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome))">Search and compare</a>
+                                <a rel="track" data-track-category="Header Link Clicked" href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome))">Search and compare</a>
                             </li>
                             <li>
-                                <a rel="track" data-track-category="Header Link Clicked" href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingDownloads))">Download</a>
+                                <a rel="track" data-track-category="Header Link Clicked" href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingDownloads))">Download</a>
                             </li>
                             <li>
                                 <a rel="track" data-track-category="Header Link Clicked" href="/actions-to-close-the-gap">Close the gap</a>
@@ -141,13 +141,13 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li id="login-links" class="nowrap">
-                                <a href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut)">Sign out</a>
+                                <a href="@WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut)">Sign out</a>
                             </li>
                         }
                         else
                         {
                             <li id="login-links" class="nowrap">
-                                <a href="@await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)">Sign in</a>
+                                <a href="@WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)">Sign in</a>
                             </li>
                         }
                     </ul>

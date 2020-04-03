@@ -12,7 +12,7 @@
                 <h1 class="bold-large">You've submitted your Modern Slavery statement for @(Model.AccountingDate.Year) to @(Model.AccountingDate.AddYears(1).Year)</h1>
             </div>
             <p>
-                <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingEmployer, new {employerIdentifier = Model.EncryptedOrganisationId}))" target="_blank">See your Modern Slavery statement</a>
+                <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingEmployer, new {employerIdentifier = Model.EncryptedOrganisationId}))" target="_blank">See your Modern Slavery statement</a>
             </p>
             <p>
                 <a href="@Url.Action(nameof(SubmissionController.ManageOrganisations))">Manage organisations</a>

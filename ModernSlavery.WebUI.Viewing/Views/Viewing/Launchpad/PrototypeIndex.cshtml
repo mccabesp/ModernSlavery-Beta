@@ -51,7 +51,7 @@
     <div class="govuk-grid-column-one-third">
         <h3 class="govuk-heading-m">Report your Modern Slavery statement</h3>
         <p class="govuk-body">
-            <a href="@(sharedOptions.StartUrl ?? await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome))"
+            <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.Start) ?? WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome))"
                class="govuk-link govuk-!-font-weight-bold">
                 Submit Modern Slavery statement
             </a>

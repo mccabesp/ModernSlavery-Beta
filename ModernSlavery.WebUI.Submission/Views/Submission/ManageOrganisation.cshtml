@@ -10,7 +10,7 @@
     ViewBag.Title = "Manage " + currentOrg.OrganisationName + " organisation - Modern Slavery reporting service";
 }
 
-@await Html.PartialAsync("~/Areas/Account/Views/Shared/AccountNavigation.cshtml")
+@await Html.PartialAsync("AccountNavigation")
 
 <div class="grid-row">
     <div class="column-two-thirds">
@@ -129,7 +129,7 @@
                         <tr>
                             <td style="border: none;" class="org-name">@userFullname</td>
                             <td style="border: none;">
-                                <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationRemove, new {orgId = Model.EncCurrentOrgId, userId = encUserId}))">
+                                <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationRemove, new {orgId = Model.EncCurrentOrgId, userId = encUserId}))">
                                     Remove user from reporting
                                 </a>
                             </td>
@@ -141,7 +141,7 @@
                             @controller.CurrentUser.Fullname <span>(You)</span>
                         </td>
                         <td style="border: none;">
-                            <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationRemove, new {orgId = Model.EncCurrentOrgId, userId = Encryption.EncryptQuerystring(controller.CurrentUser.UserId.ToString())}))">
+                            <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationRemove, new {orgId = Model.EncCurrentOrgId, userId = Encryption.EncryptQuerystring(controller.CurrentUser.UserId.ToString())}))">
                                 Remove user from reporting
                             </a>
                         </td>

@@ -16,40 +16,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-        public Functions(
-            StorageOptions storageOptions,
-            IEventLogger customLogger,
-            [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog,
-            [KeyFilter(Filenames.ManualChangeLog)] IAuditLogger manualChangeLog,
-            IMessenger messenger,
-            ISharedBusinessLogic sharedBusinessLogic,
-            ISearchRepository<EmployerSearchModel> employerSearchRepository,
-            ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
-            ISubmissionBusinessLogic submissionBusinessLogic,
-            IOrganisationBusinessLogic organisationBusinessLogic,
-            ISearchBusinessLogic searchBusinessLogic,
-            IGovNotifyAPI govNotifyApi,
-            UpdateFromCompaniesHouseService updateFromCompaniesHouseService)
-        {
-            _StorageOptions = storageOptions;
-            _CustomLogger = customLogger;
-            _BadSicLog = badSicLog;
-            _ManualChangeLog = manualChangeLog;
-            _Messenger = messenger;
-            _SharedBusinessLogic = sharedBusinessLogic;
-            _EmployerSearchRepository = employerSearchRepository;
-            _SicCodeSearchRepository = sicCodeSearchRepository;
-            _SubmissionBusinessLogic = submissionBusinessLogic;
-            _OrganisationBusinessLogic = organisationBusinessLogic;
-            SearchBusinessLogic = searchBusinessLogic;
-            _updateFromCompaniesHouseService = updateFromCompaniesHouseService;
-            this.govNotifyApi = govNotifyApi;
-        }
-
-        #region Properties
-
+        #region Dependencies
         private readonly StorageOptions _StorageOptions;
-
         private readonly IEventLogger _CustomLogger;
         private readonly IAuditLogger _BadSicLog;
         private readonly IAuditLogger _ManualChangeLog;
@@ -64,6 +32,42 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private readonly IGovNotifyAPI govNotifyApi;
         private readonly UpdateFromCompaniesHouseService _updateFromCompaniesHouseService;
         private readonly ISnapshotDateHelper _snapshotDateHelper;
+        private readonly IAuthorisationBusinessLogic _authorisationBusinessLogic;
+        #endregion
+        public Functions(
+            StorageOptions storageOptions,
+            IEventLogger customLogger,
+            [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog,
+            [KeyFilter(Filenames.ManualChangeLog)] IAuditLogger manualChangeLog,
+            IMessenger messenger,
+            ISharedBusinessLogic sharedBusinessLogic,
+            ISearchRepository<EmployerSearchModel> employerSearchRepository,
+            ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
+            ISubmissionBusinessLogic submissionBusinessLogic,
+            IOrganisationBusinessLogic organisationBusinessLogic,
+            ISearchBusinessLogic searchBusinessLogic,
+            IGovNotifyAPI govNotifyApi,
+            UpdateFromCompaniesHouseService updateFromCompaniesHouseService,
+            IAuthorisationBusinessLogic authorisationBusinessLogic)
+        {
+            _StorageOptions = storageOptions;
+            _CustomLogger = customLogger;
+            _BadSicLog = badSicLog;
+            _ManualChangeLog = manualChangeLog;
+            _Messenger = messenger;
+            _SharedBusinessLogic = sharedBusinessLogic;
+            _EmployerSearchRepository = employerSearchRepository;
+            _SicCodeSearchRepository = sicCodeSearchRepository;
+            _SubmissionBusinessLogic = submissionBusinessLogic;
+            _OrganisationBusinessLogic = organisationBusinessLogic;
+            SearchBusinessLogic = searchBusinessLogic;
+            _updateFromCompaniesHouseService = updateFromCompaniesHouseService;
+            _authorisationBusinessLogic = authorisationBusinessLogic;
+            this.govNotifyApi = govNotifyApi;
+        }
+
+        #region Properties
+
 
         public static readonly ConcurrentSet<string> RunningJobs = new ConcurrentSet<string>();
         public static readonly ConcurrentSet<string> StartedJobs = new ConcurrentSet<string>();

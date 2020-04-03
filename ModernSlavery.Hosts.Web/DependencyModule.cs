@@ -67,7 +67,7 @@ namespace ModernSlavery.Hosts.Web
 
         public void Register(IDependencyBuilder builder)
         {
-
+ 
             //Allow handler for caching of http responses
             builder.Services.AddResponseCaching();
 
@@ -103,10 +103,6 @@ namespace ModernSlavery.Hosts.Web
             builder.RegisterModule<WebUI.Submission.DependencyModule>();
             builder.RegisterModule<WebUI.Viewing.DependencyModule>();
 
-            //Log all the application parts when in development
-            if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal())
-                builder.Services.AddHostedService<ApplicationPartsLogger>();
-
             // Add controllers, taghelpers, views as services so attribute dependencies can be resolved in their contructors
             mvcBuilder.AddControllersAsServices(); 
             mvcBuilder.AddTagHelpersAsServices();
@@ -133,11 +129,8 @@ namespace ModernSlavery.Hosts.Web
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
-            if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation(compilationOptions =>
-            {
-                // add each to options file providers 
-                compilationOptions.FileProviders.Add(new PhysicalFileProvider(@"C:\Users\mccab\source\repos\ModernSlavery\ModernSlavery.WebUI.Viewing\Views"));
-            });
+            // However this doesnt work on razor class/com,ponent libraries so we instead use a workaround 
+            //if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
 
             //Add services needed for sessions
             builder.Services.AddSession(
@@ -166,14 +159,6 @@ namespace ModernSlavery.Hosts.Web
             //This may now be required 
             builder.Services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
 
-            //Configure the services required for authentication by IdentityServer
-            builder.Services.AddIdentityServerClient(
-                _sharedOptions.IdentityIssuer,
-                _sharedOptions.SiteAuthority,
-                "ModernSlaveryServiceWebsite",
-                _sharedOptions.AuthSecret,
-                BackChannelHandler);
-
             //Override any test services
             ConfigureTestServices?.Invoke(builder.Services);
 
@@ -198,6 +183,17 @@ namespace ModernSlavery.Hosts.Web
             // Register Action helpers
             builder.Autofac.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
                 .SingleInstance();
+
+            #region Configure authentication client
+            //Configure the services required for authentication by IdentityServer
+            builder.Services.AddIdentityServerClient(
+                _sharedOptions.IdentityIssuer,
+                _sharedOptions.SiteAuthority,
+                "ModernSlaveryServiceWebsite",
+                _sharedOptions.AuthSecret,
+                BackChannelHandler);
+            #endregion
+
             builder.Autofac.Register(
                 x =>
                 {
@@ -248,16 +244,12 @@ namespace ModernSlavery.Hosts.Web
             app.UseAuthentication(); //Ensure the OIDC IDentity Server authentication services execute on each http request - Must be before UseMVC
             app.UseAuthorization();
             app.UseCookiePolicy();
-            app.UseMiddleware<MaintenancePageMiddleware>(_sharedOptions
-                .MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
-            app.UseMiddleware<StickySessionMiddleware>(_sharedOptions
-                .StickySessions); //Enable/Disable sticky sessions based on  
-
+            app.UseMiddleware<MaintenancePageMiddleware>(_sharedOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
+            app.UseMiddleware<StickySessionMiddleware>(_sharedOptions.StickySessions); //Enable/Disable sticky sessions based on  
+            app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses
 
             //Force basic authentication
             if (_basicAuthenticationOptions.Enabled) app.UseMiddleware<BasicAuthenticationMiddleware>(_basicAuthenticationOptions.Username, _basicAuthenticationOptions.Password);
-
-            app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses
 
             //app.UseMvcWithDefaultRoute();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

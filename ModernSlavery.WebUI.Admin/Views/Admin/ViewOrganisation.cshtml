@@ -53,7 +53,7 @@
 </h1>
 
 <p class="govuk-body">
-    <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingEmployer, new {employerIdentifier = Obfuscator.Obfuscate(Model.OrganisationId)}))"
+    <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingEmployer, new {employerIdentifier = Obfuscator.Obfuscate(Model.OrganisationId)}))"
        class="govuk-link">
         '@(Model.OrganisationName)' on viewing service
     </a>
@@ -251,7 +251,7 @@
                     @(returnForYear.AccountingDate.ToString("d MMM yyyy"))
                 </th>
                 <td class="govuk-table__cell" rowspan="@(Model.Returns.Count(s => s.AccountingDate == returnForYear.AccountingDate))">
-                    <a href="@(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingReport, new {employerIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = returnForYear.AccountingDate.Year}))"
+                    <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingReport, new {employerIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = returnForYear.AccountingDate.Year}))"
                        class="govuk-link">
                         @(returnForYear.AccountingDate.Year)
                     </a>

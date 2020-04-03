@@ -41,7 +41,7 @@
     <div class="column-three-thirds">
         <div class="column-two-thirds">
             <div class="heading-xsmall">
-                For employers to <a href="@(sharedOptions.StartUrl ?? await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome))">submit Modern Slavery statement</a>
+                For employers to <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.Start) ?? WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome))">submit Modern Slavery statement</a>
             </div>
         </div>
     </div>

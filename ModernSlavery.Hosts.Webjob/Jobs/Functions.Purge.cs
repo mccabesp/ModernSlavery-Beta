@@ -169,19 +169,19 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 new
                                 {
                                     org.OrganisationId,
-                                    Address = org.GetAddressString(),
+                                    Address = org.GetLatestAddress()?.GetAddressString(),
                                     org.EmployerReference,
                                     org.DUNSNumber,
                                     org.CompanyNumber,
                                     org.OrganisationName,
                                     org.SectorType,
                                     org.Status,
-                                    SicCodes = org.GetSicSectionIdsString(),
-                                    SicSource = org.GetSicSource(),
+                                    SicCodes = org.GetLatestSicCodeIdsString(),
+                                    SicSource = org.GetLatestSicSource(),
                                     org.DateOfCessation
                                 }),
                             null);
-                        var searchRecord = EmployerSearchModel.Create(org, true);
+                        var searchRecord = _OrganisationBusinessLogic.CreateEmployerSearchModel(org, true);
 
                         await _SharedBusinessLogic.DataRepository.BeginTransactionAsync(
                             async () =>

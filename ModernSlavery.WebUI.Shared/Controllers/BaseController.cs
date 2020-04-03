@@ -177,7 +177,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 ImpersonatedUserId = 0;
                 OriginalUser = null;
-                return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
+                return Redirect(WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
             }
 
             //otherwise actually logout
@@ -437,7 +437,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             CookieHelper.SetCookieSettingsCookie(Response, cookieSettings);
             CookieHelper.SetSeenCookieMessageCookie(Response);
 
-            return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingHome));
+            return Redirect(WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingHome));
         }
 
         [HttpGet("~/cookie-details")]
@@ -480,7 +480,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
             }
 
-            return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
+            return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
         }
 
         #endregion
@@ -672,7 +672,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     "Registration/ReviewDUNSNumber"))
                     return null;
 
-                return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return Redirect(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
                 //return View("CustomError", WebService.ErrorViewModelFactory.Create(1117));
             }
 
@@ -705,7 +705,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
             //Always allow users to manage their account
             if (IsAnyAction(
-                "ManageAccount/ManageAccount",
+                "Account/ManageAccount",
                 "ChangeEmail/ChangeEmail",
                 "ChangeEmail/ChangeEmailPending",
                 "ChangeEmail/VerifyChangeEmail",
@@ -736,7 +736,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 Logger.LogWarning(
                     $"Cannot find UserOrganisation for user {VirtualUser.UserId} and organisation {ReportingOrganisationId}");
 
-                return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
+                return Redirect(WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
             }
 
             if (userOrg.Organisation.SectorType == SectorTypes.Private)
@@ -748,7 +748,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                         if (IsAnyAction("Registration/PINSent", "Registration/RequestPIN")) return null;
 
                         return RedirectToAction(
-                            await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationPINSent));
+                            WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationPINSent));
                     }
 
                     //If PIN sent and expired then prompt to request a new pin
@@ -776,7 +776,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     if (IsAnyAction("Registration/ActivateService")) return null;
 
                     return RedirectToAction(
-                        await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationActivate));
+                        WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationActivate));
                 }
 
             //Ensure user has completed the registration process
@@ -796,7 +796,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 Logger.LogWarning(
                     $"UserOrganisation for user {userOrg.UserId} and organisation {userOrg.OrganisationId} PIN is not confirmed");
-                return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
+                return Redirect(WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
             }
 
             return null;

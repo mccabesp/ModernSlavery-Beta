@@ -16,6 +16,7 @@ namespace ModernSlavery.BusinessDomain.Shared
         ISendEmailService SendEmailService { get; }
         INotificationService NotificationService { get; }
         IAuthorisationBusinessLogic AuthorisationBusinessLogic { get; }
+        IAuthenticationBusinessLogic AuthenticationBusinessLogic { get; }
         IObfuscator Obfuscator { get; }
 
         /// <summary>
@@ -30,23 +31,6 @@ namespace ModernSlavery.BusinessDomain.Shared
     public class SharedBusinessLogic : ISharedBusinessLogic
     {
         private readonly ISnapshotDateHelper _snapshotDateHelper;
-
-        public SharedBusinessLogic(SharedOptions sharedOptions, ISnapshotDateHelper snapshotDateHelper,
-            ISourceComparer sourceComparer,
-            ISendEmailService sendEmailService, INotificationService notificationService, IAuthorisationBusinessLogic authorisationBusinessLogic,
-            IFileRepository fileRepository, IDataRepository dataRepository, IObfuscator obfuscator)
-        {
-            SharedOptions = sharedOptions;
-            _snapshotDateHelper = snapshotDateHelper;
-            SourceComparer = sourceComparer;
-            SendEmailService = sendEmailService;
-            NotificationService = notificationService;
-            AuthorisationBusinessLogic = authorisationBusinessLogic;
-            FileRepository = fileRepository;
-            DataRepository = dataRepository;
-            Obfuscator = obfuscator;
-        }
-
         public IObfuscator Obfuscator { get; }
         public SharedOptions SharedOptions { get; }
         public IFileRepository FileRepository { get; }
@@ -55,6 +39,28 @@ namespace ModernSlavery.BusinessDomain.Shared
         public ISendEmailService SendEmailService { get; }
         public INotificationService NotificationService { get; }
         public IAuthorisationBusinessLogic AuthorisationBusinessLogic { get; }
+        public IAuthenticationBusinessLogic AuthenticationBusinessLogic { get; }
+
+        public SharedBusinessLogic(SharedOptions sharedOptions, ISnapshotDateHelper snapshotDateHelper,
+            ISourceComparer sourceComparer,
+            ISendEmailService sendEmailService, 
+            INotificationService notificationService, 
+            IAuthorisationBusinessLogic authorisationBusinessLogic,
+            IAuthenticationBusinessLogic authenticationBusinessLogic,
+            IFileRepository fileRepository, IDataRepository dataRepository, IObfuscator obfuscator)
+        {
+            SharedOptions = sharedOptions;
+            _snapshotDateHelper = snapshotDateHelper;
+            SourceComparer = sourceComparer;
+            SendEmailService = sendEmailService;
+            NotificationService = notificationService;
+            AuthorisationBusinessLogic = authorisationBusinessLogic;
+            AuthenticationBusinessLogic = authenticationBusinessLogic;
+            FileRepository = fileRepository;
+            DataRepository = dataRepository;
+            Obfuscator = obfuscator;
+        }
+
         /// <summary>
         ///     Returns the accounting start date for the specified sector and year
         /// </summary>

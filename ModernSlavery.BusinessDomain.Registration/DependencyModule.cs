@@ -22,7 +22,8 @@ namespace ModernSlavery.BusinessDomain.Registration
                 .SingleInstance();
             builder.Autofac.RegisterType<RegistrationService>().As<IRegistrationService>()
                 .InstancePerLifetimeScope().WithAttributeFiltering();
-
+            builder.Autofac.RegisterType<RegistrationBusinessLogic>().As<IRegistrationBusinessLogic>()
+                .InstancePerLifetimeScope();
             builder.Autofac.RegisterType<PinInThePostService>().As<PinInThePostService>().SingleInstance();
         }
 

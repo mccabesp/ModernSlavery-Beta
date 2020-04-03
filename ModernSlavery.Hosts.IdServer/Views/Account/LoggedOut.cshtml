@@ -1,6 +1,7 @@
 ﻿@model ModernSlavery.Hosts.IdServer.Models.LoggedOutViewModel
 
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     // set this so the layout rendering sees an anonymous user
     ViewData["signed-out"] = true;
     ViewData["PageTitle"] = "Sign out - Modern Slavery reporting service - GOV.UK";

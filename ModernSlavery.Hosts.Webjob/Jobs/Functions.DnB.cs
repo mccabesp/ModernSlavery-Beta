@@ -229,7 +229,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             }
                         }
                         //Skip dissolved companies
-                        else if (dbOrg.GetIsDissolved())
+                        else if (_OrganisationBusinessLogic.GetOrganisationWasDissolvedBeforeCurrentAccountingYear(dbOrg))
                         {
                             dnbOrg.ImportedDate = VirtualDateTime.Now;
                             dnbChanges++;
@@ -237,7 +237,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         }
                         else if (dbOrg.OrganisationName != orgName.Name)
                         {
-                            var oldOrgName = dbOrg.GetName();
+                            var oldOrgName = dbOrg.GetLatestName();
                             if (oldOrgName == null ||
                                 _SharedBusinessLogic.SourceComparer.CanReplace(orgName.Source, oldOrgName.Source))
                             {
@@ -330,8 +330,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         newCodeIds = new SortedSet<int>(newCodesList);
 
                         var newCodes = new List<OrganisationSicCode>();
-                        var oldCodes = dbOrg.GetSicCodes().ToList();
-                        var oldSicSource = dbOrg.GetSicSource();
+                        var oldCodes = dbOrg.GetLatestSicCodes().ToList();
+                        var oldSicSource = dbOrg.GetLatestSicSource();
                         var oldCodeIds = oldCodes.Select(s => s.SicCodeId);
                         if (dbOrg.SectorType == SectorTypes.Public) newCodeIds.Add(1);
 

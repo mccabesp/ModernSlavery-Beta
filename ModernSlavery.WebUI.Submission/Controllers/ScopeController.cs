@@ -43,7 +43,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             var currentStateModel = UnstashModel<ScopingViewModel>();
             var model = currentStateModel?.EnterCodes ?? new EnterCodesViewModel();
@@ -69,7 +69,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             // When Spamlocked then return a CustomError view
             var remainingTime =
@@ -142,7 +142,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             return RedirectToAction(Url.Action(nameof(SubmissionController.ManageOrganisations)));
         }
@@ -153,7 +153,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             var stateModel = UnstashModel<ScopingViewModel>();
             // when model is null then return session expired view
@@ -171,7 +171,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             var stateModel = UnstashModel<ScopingViewModel>(true);
             // when model is null then return session expired view
@@ -204,7 +204,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             var stateModel = UnstashModel<ScopingViewModel>();
             // when model is null then return session expired view
@@ -219,7 +219,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             var stateModel = UnstashModel<ScopingViewModel>();
             // when model is null then return session expired view
@@ -235,7 +235,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             // update the state model
             var stateModel = UnstashModel<ScopingViewModel>();
@@ -285,7 +285,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             var stateModel = UnstashModel<ScopingViewModel>();
             // when model is null then return session expired view
@@ -301,7 +301,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             var stateModel = UnstashModel<ScopingViewModel>();
             // when model is null then return session expired view
@@ -336,7 +336,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             var stateModel = UnstashModel<ScopingViewModel>();
             // when model is null then return session expired view
@@ -353,7 +353,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
-                return RedirectToAction(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
 
             var stateModel = UnstashModel<ScopingViewModel>(true);
             // when model is null then return session expired view

@@ -5,7 +5,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
     public interface IRegistrationService
     {
-        Registration.IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
+        IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
         IAuditLogger BadSicLog { get; }
         IAuditLogger RegistrationLog { get; }
         IPinInThePostService PinInThePostService { get; }

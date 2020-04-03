@@ -51,7 +51,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 var users = await _SharedBusinessLogic.DataRepository.GetAll<User>().ToListAsync();
-                var records = users.Where(u => !u.IsAdministrator())
+                var records = users.Where(u => !_authorisationBusinessLogic.IsAdministrator(u))
                     .OrderBy(u => u.Lastname)
                     .Select(
                         u => new

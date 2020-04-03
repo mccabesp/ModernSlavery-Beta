@@ -4,12 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Autofac;
-using AutoMapper;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
@@ -18,13 +17,12 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
 using ModernSlavery.Hosts.IdServer.Classes;
-using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
+using ModernSlavery.Infrastructure.Telemetry;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
-using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.Hosts.IdServer
 {
@@ -54,7 +52,7 @@ namespace ModernSlavery.Hosts.IdServer
 
         public void Register(IDependencyBuilder builder)
         {
-            #region Configure identity server
+            #region Configure authentication server
 
             builder.Services.AddSingleton<IEventSink, AuditEventSink>();
 
@@ -89,13 +87,44 @@ namespace ModernSlavery.Hosts.IdServer
             //This is to allow access to the current http context anywhere
             builder.Services.AddHttpContextAccessor();
 
-            builder.Services.AddControllersWithViews();
+            var mvcBuilder = builder.Services.AddControllersWithViews();
 
-            var mvcBuilder = builder.Services.AddRazorPages();
+            mvcBuilder.AddRazorClassLibrary<DependencyModule>();
+            mvcBuilder.AddRazorClassLibrary<WebUI.Shared.DependencyModule>();
+            mvcBuilder.AddRazorClassLibrary<WebUI.GDSDesignSystem.DependencyModule>();
+
+            builder.RegisterModule<WebUI.StaticFiles.DependencyModule>();
+            builder.RegisterModule<ModernSlavery.BusinessDomain.Account.DependencyModule>();
+            //builder.RegisterModule<ModernSlavery.Infrastructure.CompaniesHouse.DependencyModule>();
+
+            // Add controllers, taghelpers, views as services so attribute dependencies can be resolved in their contructors
+            mvcBuilder.AddControllersAsServices();
+            mvcBuilder.AddTagHelpersAsServices();
+            mvcBuilder.AddViewComponentsAsServices();
+
+            builder.Services.AddRazorPages();
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
-            if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
+            // However this doesnt work on razor class/com,ponent libraries so we instead use a workaround 
+            //if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
+
+            //Add services needed for sessions
+            builder.Services.AddSession(
+                o =>
+                {
+                    o.Cookie.IsEssential = true; //This is required otherwise session will not load
+                    o.Cookie.SecurePolicy =
+                        CookieSecurePolicy.Always; //Equivalent to <httpCookies requireSSL="true" /> from Web.Config
+                    o.Cookie.HttpOnly = false; //Always use https cookies
+                    o.Cookie.SameSite = SameSiteMode.Strict;
+                    o.Cookie.Domain =
+                        _sharedOptions.ExternalHost
+                            .BeforeFirst(":"); //Domain cannot be an authority and contain a port number
+                    o.IdleTimeout =
+                        TimeSpan.FromMinutes(_sharedOptions
+                            .SessionTimeOutMinutes); //Equivalent to <sessionState timeout="20"> from old Web.config
+                });
 
             //Add the distributed cache and data protection
             builder.Services.AddDistributedCache(_distributedCacheOptions)
@@ -127,20 +156,12 @@ namespace ModernSlavery.Hosts.IdServer
             // Register Action helpers
             builder.Autofac.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
                 .SingleInstance();
+            
+            //Register google analytics tracker
+            builder.RegisterModule<GoogleAnalyticsDependencyModule>();
 
-            // Initialise AutoMapper
-            var mapperConfig = new MapperConfiguration(config =>
-            {
-                // register all out mapper profiles (classes/mappers/*)
-                // config.AddMaps(typeof(MvcApplication));
-                // allows auto mapper to inject our dependencies
-                //config.ConstructServicesUsing(serviceTypeToConstruct =>
-                //{
-                //    //TODO
-                //});
-            });
-
-            builder.Autofac.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
+            //Register the AutoMapper configurations in all domain assemblies
+            builder.Services.AddAutoMapper(_sharedOptions.IsLocal() || _sharedOptions.IsDevelopment());
 
             //Override any test services
             ConfigureTestContainer?.Invoke(builder.Autofac);
@@ -170,33 +191,9 @@ namespace ModernSlavery.Hosts.IdServer
             }
 
             app.UseIdentityServer();
-            app.UseStaticFiles(
-                new StaticFileOptions
-                {
-                    OnPrepareResponse = ctx =>
-                    {
-                        //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
-                        if (_responseCachingOptions.StaticCacheSeconds > 0)
-                            ctx.Context.SetResponseCache(_responseCachingOptions.StaticCacheSeconds);
-                    }
-                }); //For the wwwroot folder
-
-            // Include un-bundled js + css folders to serve the source files in dev environment
-            if (_sharedOptions.IsLocal())
-                app.UseStaticFiles(
-                    new StaticFileOptions
-                    {
-                        FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()),
-                        RequestPath = "",
-                        OnPrepareResponse = ctx =>
-                        {
-                            //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
-                            if (_responseCachingOptions.StaticCacheSeconds > 0)
-                                ctx.Context.SetResponseCache(_responseCachingOptions.StaticCacheSeconds);
-                        }
-                    });
 
             app.UseRouting();
+            app.UseSession(); //Must be before UseMvC or any middleware which requires session
             app.UseMiddleware<MaintenancePageMiddleware>(_sharedOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
             app.UseMiddleware<StickySessionMiddleware>(_sharedOptions.StickySessions); //Enable/Disable sticky sessions based on  
             app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses

@@ -11,7 +11,6 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Account.Interfaces;
 using ModernSlavery.WebUI.Account.Models;
-using IRegistrationBusinessLogic = ModernSlavery.BusinessDomain.Registration.IRegistrationBusinessLogic;
 
 namespace ModernSlavery.WebUI.Account.ViewServices
 {

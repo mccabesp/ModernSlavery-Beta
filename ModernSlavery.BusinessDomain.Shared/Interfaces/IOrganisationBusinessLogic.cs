@@ -67,7 +67,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         IEnumerable<int> GetOrganisationRecentReportingYears(Organisation organisation,int recentCount);
         bool GetOrganisationIsOrphan(Organisation organisation);
 
-        bool GetOrganisationIsDissolved(Organisation organisation);
+        bool GetOrganisationWasDissolvedBeforeCurrentAccountingYear(Organisation organisation);
 
         /// <summary>
         ///     Returns the latest organisation name before specified date/time

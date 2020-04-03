@@ -32,21 +32,27 @@ namespace ModernSlavery.Core.Entities
         #endregion
 
         #region SicCode
-        public string GetSicSource(DateTime maxDate)
+        public string GetLatestSicSource()
+        {
+            return OrganisationSicCodes.Where(s =>
+                    s.Retired == null).OrderByDescending(s=>s.Created).FirstOrDefault()
+                ?.Source;
+        }
+        public string GetSicSource(DateTime accountingDate)
         {
             return OrganisationSicCodes.FirstOrDefault(s =>
-                    s.Created < maxDate && (s.Retired == null || s.Retired.Value > maxDate))
+                    s.Created < accountingDate && (s.Retired == null || s.Retired.Value > accountingDate))
                 ?.Source;
         }
         /// <summary>
         ///     Returns the latest organisation name before specified date/time
         /// </summary>
-        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
+        /// <param name="accountingDate">Ignore name changes after this date/time - if empty returns the latest name</param>
         /// <returns>The name of the organisation</returns>
-        public IEnumerable<OrganisationSicCode> GetSicCodes(DateTime maxDate)
+        public IEnumerable<OrganisationSicCode> GetSicCodes(DateTime accountingDate)
         {
             return OrganisationSicCodes.Where(s =>
-                s.Created < maxDate && (s.Retired == null || s.Retired.Value > maxDate));
+                s.Created < accountingDate && (s.Retired == null || s.Retired.Value > accountingDate));
         }
 
         public IEnumerable<OrganisationSicCode> GetLatestSicCodes()
@@ -63,16 +69,16 @@ namespace ModernSlavery.Core.Entities
             return GetLatestSicCodeIds().OrderBy(s => s).ToDelimitedString(delimiter);
         }
 
-        public string GetSicCodeIdsString(DateTime maxDate, string delimiter = ", ")
+        public string GetSicCodeIdsString(DateTime accountingDate, string delimiter = ", ")
         {
-            return GetSicCodes(maxDate).OrderBy(s => s.SicCodeId).Select(s => s.SicCodeId).ToDelimitedString(delimiter);
+            return GetSicCodes(accountingDate).OrderBy(s => s.SicCodeId).Select(s => s.SicCodeId).ToDelimitedString(delimiter);
         }
         #endregion
 
         #region SicSection
-        public IEnumerable<SicSection> GetSicSections(DateTime maxDate)
+        public IEnumerable<SicSection> GetSicSections(DateTime accountingDate)
         {
-            return GetSicSections(GetSicCodes(maxDate));
+            return GetSicSections(GetSicCodes(accountingDate));
         }
 
         public IEnumerable<SicSection> GetLatestSicSections()
@@ -84,9 +90,9 @@ namespace ModernSlavery.Core.Entities
             return organisationSicCodes.Select(s => s.SicCode.SicSection).Distinct();
         }
 
-        public string GetSicSectionIdsString(DateTime maxDate, string delimiter = ", ")
+        public string GetSicSectionIdsString(DateTime accountingDate, string delimiter = ", ")
         {
-            var organisationSicCodes = GetSicCodes(maxDate);
+            var organisationSicCodes = GetSicCodes(accountingDate);
             return organisationSicCodes.Select(s => s.SicCode.SicSectionId).UniqueI().OrderBy(s => s)
                 .ToDelimitedString(delimiter);
         }
@@ -99,9 +105,9 @@ namespace ModernSlavery.Core.Entities
                 .ToDelimitedString(delimiter);
         }
 
-        public string GetSicSectorsString(DateTime maxDate, string delimiter = ", ")
+        public string GetSicSectorsString(DateTime accountingDate, string delimiter = ", ")
         {
-            return GetSicSectorsString(GetSicSections(maxDate), delimiter);
+            return GetSicSectorsString(GetSicSections(accountingDate), delimiter);
         }
 
         public string GetLatestSicSectorsString(string delimiter = ", ")
@@ -115,11 +121,11 @@ namespace ModernSlavery.Core.Entities
         /// <summary>
         ///     Returns the latest organisation name before specified date/time
         /// </summary>
-        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
+        /// <param name="accountingDate">Ignore name changes after this date/time - if empty returns the latest name</param>
         /// <returns>The name of the organisation</returns>
-        public OrganisationName GetName(DateTime maxDate)
+        public OrganisationName GetName(DateTime accountingDate)
         {
-            return OrganisationNames.Where(n => n.Created < maxDate)
+            return OrganisationNames.Where(n => n.Created < accountingDate)
                 .OrderByDescending(n => n.Created)
                 .FirstOrDefault();
         }
@@ -135,12 +141,12 @@ namespace ModernSlavery.Core.Entities
         /// <summary>
         ///     Returns the latest address before specified date/time
         /// </summary>
-        /// <param name="maxDate">Ignore address changes after this date/time - if empty returns the latest address</param>
+        /// <param name="accountingDate">Ignore address changes after this date/time - if empty returns the latest address</param>
         /// <returns>The address of the organisation</returns>
-        public OrganisationAddress GetAddress(DateTime maxDate, AddressStatuses status = AddressStatuses.Active)
+        public OrganisationAddress GetAddress(DateTime accountingDate, AddressStatuses status = AddressStatuses.Active)
         {
             var addressStatus = OrganisationAddresses.SelectMany(a =>
-                    a.AddressStatuses.Where(s => s.Status == status && s.StatusDate < maxDate))
+                    a.AddressStatuses.Where(s => s.Status == status && s.StatusDate < accountingDate))
                 .OrderByDescending(s => s.StatusDate)
                 .FirstOrDefault();
 
@@ -167,12 +173,12 @@ namespace ModernSlavery.Core.Entities
         /// <summary>
         ///     Returns the latest organisation name before specified date/time
         /// </summary>
-        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
+        /// <param name="accountingDate">Ignore name changes after this date/time - if empty returns the latest name</param>
         /// <returns>The name of the organisation</returns>
-        public string GetAddressString(DateTime maxDate, AddressStatuses status = AddressStatuses.Active,
+        public string GetAddressString(DateTime accountingDate, AddressStatuses status = AddressStatuses.Active,
             string delimiter = ", ")
         {
-            var address = GetAddress(maxDate, status);
+            var address = GetAddress(accountingDate, status);
 
             return address?.GetAddressString(delimiter);
         }
@@ -195,9 +201,9 @@ namespace ModernSlavery.Core.Entities
         #endregion
 
         #region Scope
-        public bool GetIsInscope(DateTime maxDate)
+        public bool GetIsInscope(DateTime accountingDate)
         {
-            return !GetScopeStatus(maxDate).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
+            return !GetScopeStatus(accountingDate).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
         }
 
         public OrganisationScope GetLatestScope()
@@ -260,7 +266,16 @@ namespace ModernSlavery.Core.Entities
             return Status == Entities.OrganisationStatuses.Pending;
         }
 
-        
+        public bool GetWasDissolvedBefore(DateTime? accountingDate=null)
+        {
+            return DateOfCessation != null && (accountingDate==null || DateOfCessation < accountingDate.Value);
+        }
+
+        public bool GetIsCurrentlyDissolved()
+        {
+            return DateOfCessation != null;
+        }
+
         public void SetStatus(OrganisationStatuses status, long byUserId, string details = null)
         {
             if (status == Status && details == StatusDetails) return;

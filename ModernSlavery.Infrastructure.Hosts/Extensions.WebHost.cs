@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -13,6 +14,13 @@ namespace ModernSlavery.Infrastructure.Hosts
             var hostBuilder = new HostBuilder();
 
             hostBuilder.ConfigureHost<TStartupModule>(applicationName, contentRoot, commandlineArgs: commandlineArgs);
+
+            hostBuilder.ConfigureServices((ctx,services) =>
+            {
+                //Log all the application parts when in development
+                if (ctx.Configuration.IsLocal()|| ctx.Configuration.IsDevelopment())
+                    services.AddHostedService<ApplicationPartsLogger>();
+            });
 
             //Configure the host defaults
             hostBuilder.ConfigureWebHostDefaults(webHostBuilder =>

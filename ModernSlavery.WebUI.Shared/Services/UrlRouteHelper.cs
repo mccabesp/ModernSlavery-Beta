@@ -3,55 +3,33 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Shared.Classes
 {
     public class UrlRouteHelper : IUrlRouteHelper
     {
-        private readonly IDistributedCache _cache;
         private readonly UrlRouteOptions _routeOptions;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UrlRouteHelper(UrlRouteOptions routeOptions, IDistributedCache cache,
-            IHttpContextAccessor httpContextAccessor)
+        public UrlRouteHelper(UrlRouteOptions routeOptions, IHttpContextAccessor httpContextAccessor)
         {
             _routeOptions = routeOptions;
-            _cache = cache;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<string> Get(string routeName, object values = null)
+        public string Get(string routeName, object values = null)
         {
             var route = _routeOptions.ContainsKey(routeName) ? _routeOptions[routeName] : null;
-            if (string.IsNullOrWhiteSpace(route)) route = await _cache.GetStringAsync($"UrlRoutes:{routeName}");
             if (values != null) route = values.Resolve(route);
             if (route.IsRelativeUri()) route = _httpContextAccessor.HttpContext.ResolveUrl(route);
             return route;
         }
 
-        public async Task<string> Get(UrlRouteOptions.Routes routeType, object values = null)
+        public string Get(UrlRouteOptions.Routes routeType, object values = null)
         {
-            return await Get(routeType.GetAttribute<EnumMemberAttribute>().Value, values);
-        }
-
-        public async Task Set(string routeName, string url)
-        {
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                if (_routeOptions.ContainsKey(routeName)) _routeOptions.Remove(routeName);
-                await _cache.RemoveAsync($"UrlRoutes:{routeName}");
-            }
-            else
-            {
-                _routeOptions[routeName] = url;
-                await _cache.SetStringAsync($"UrlRoutes:{routeName}", url);
-            }
-        }
-
-        public async Task Set(UrlRouteOptions.Routes routeType, string url)
-        {
-            await Set(routeType.GetAttribute<EnumMemberAttribute>().Value, url);
+            return Get(routeType.GetAttribute<EnumMemberAttribute>().Value, values);
         }
     }
 }

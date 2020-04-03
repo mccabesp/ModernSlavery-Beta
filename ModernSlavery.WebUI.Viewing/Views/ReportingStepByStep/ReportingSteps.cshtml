@@ -93,7 +93,7 @@
             },
             StepTasks = new List<StepTask>
 {
-                new StepTask {TaskText = "Register an organisation", TaskUrl = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationAdd)},
+                new StepTask {TaskText = "Register an organisation", TaskUrl = WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationAdd)},
             }
         },
         new StepViewModel
@@ -137,7 +137,7 @@
 {
                 new StepTask {
                     TaskText = "Submit your Modern Slavery statement",
-                    TaskUrl = @sharedOptions.StartUrl ?? await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome) },
+                    TaskUrl = WebService.RouteHelper.Get(UrlRouteOptions.Routes.Start) ?? WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome) },
             }
         },
         new StepViewModel

@@ -75,7 +75,6 @@ namespace ModernSlavery.Hosts.Webjob
             //Register some singletons
             builder.Autofac.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
                 .WithParameter("seed", _sharedOptions.ObfuscationSeed);
-            builder.Autofac.RegisterType<EncryptionHandler>().As<IEncryptionHandler>().SingleInstance();
 
             // Register email provider dependencies
             builder.Autofac.RegisterType<GovNotifyEmailProvider>().SingleInstance().WithAttributeFiltering();

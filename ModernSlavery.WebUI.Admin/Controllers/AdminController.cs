@@ -1052,7 +1052,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             OriginalUser = currentUser;
 
             //Refresh page to ensure identity is passed in cookie
-            return Redirect(await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
+            return Redirect(WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
         }
 
         #endregion

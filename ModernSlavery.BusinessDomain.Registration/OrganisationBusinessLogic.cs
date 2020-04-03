@@ -486,9 +486,10 @@ namespace ModernSlavery.BusinessDomain.Registration
                                                                    _sharedBusinessLogic.SharedOptions.PinExpiresDate));
         }
 
-        public bool GetOrganisationIsDissolved(Organisation organisation)
+        public bool GetOrganisationWasDissolvedBeforeCurrentAccountingYear(Organisation organisation)
         {
-            return organisation.DateOfCessation != null && organisation.DateOfCessation < _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType);
+            var accountingStartDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType);
+            return organisation.GetWasDissolvedBefore(accountingStartDate);
         }
 
         /// <summary>

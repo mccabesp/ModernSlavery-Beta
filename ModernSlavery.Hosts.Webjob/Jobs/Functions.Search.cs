@@ -121,7 +121,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             var lookupResult = SearchBusinessLogic.LookupSearchableOrganisations(allOrgsList);
             if (Debugger.IsAttached) lookupResult = lookupResult.Take(100);
             var listOfSicCodeRecords = await GetListOfSicCodeSearchModelsFromFileAsync(log);
-            var selection = lookupResult.Select(o => EmployerSearchModel.Create(o, false, listOfSicCodeRecords));
+            var selection = lookupResult.Select(o => _OrganisationBusinessLogic.CreateEmployerSearchModel(o, false, listOfSicCodeRecords));
             var selectionList = selection.ToList();
 
             if (selectionList.Any()) await _EmployerSearchRepository.RefreshIndexDataAsync(selectionList);

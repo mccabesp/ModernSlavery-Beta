@@ -59,17 +59,17 @@
             new HeaderNavigationViewModel
             {
                 Text = "Search",
-                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
+                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
             },
             new HeaderNavigationViewModel
             {
                 Text = "Guidance",
-                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingGuidance)
+                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingGuidance)
             },
             new HeaderNavigationViewModel
             {
                 Text = "Submit",
-                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)
+                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)
             }
         };
     }
@@ -80,17 +80,17 @@
             new HeaderNavigationViewModel
             {
                 Text = "Search and compare",
-                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
+                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
             },
             new HeaderNavigationViewModel
             {
                 Text = "Download",
-                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingDownloads)
+                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingDownloads)
             },
             new HeaderNavigationViewModel
             {
                 Text = "Close the gap",
-                Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingActionHub)
+                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingActionHub)
             }
         };
     }
@@ -101,7 +101,7 @@
         headerNavigationLinks.Add(new HeaderNavigationViewModel
         {
             Text = "Admin",
-            Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome)
+            Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome)
         });
     }
 
@@ -110,7 +110,7 @@
         headerNavigationLinks.Add(new HeaderNavigationViewModel
         {
             Text = "Sign out",
-            Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut),
+            Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut),
             Classes = "sign-out-link"
         });
     }
@@ -119,7 +119,7 @@
         headerNavigationLinks.Add(new HeaderNavigationViewModel
         {
             Text = "Sign in",
-            Href = await WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome),
+            Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome),
             Classes = "sign-out-link"
         });
     }

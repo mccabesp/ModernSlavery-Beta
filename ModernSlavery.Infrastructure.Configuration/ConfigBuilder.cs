@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
 
@@ -17,6 +19,12 @@ namespace ModernSlavery.Infrastructure.Configuration
         public ConfigBuilder(IConfigurationBuilder configBuilder, string environmentName, Dictionary<string, string> additionalSettings = null)
         {
             _configBuilder = configBuilder ?? new ConfigurationBuilder();
+            
+            if (_additionalSettings == null) _additionalSettings =new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            _additionalSettings[HostDefaults.EnvironmentKey] = environmentName;
+            _configBuilder.AddInMemoryCollection(_additionalSettings);
+            Configuration = _configBuilder.Build();
+
             if (string.IsNullOrWhiteSpace(environmentName)) throw new ArgumentNullException(nameof(environmentName));
             _environmentName = environmentName;
             _additionalSettings = additionalSettings;
@@ -24,18 +32,21 @@ namespace ModernSlavery.Infrastructure.Configuration
 
         public IConfiguration Configuration { get; private set; }
 
-
         public IConfiguration Build()
         {
             Console.WriteLine($"Environment: {_environmentName}");
+
+            string appSettingsPath = AppDomain.CurrentDomain.BaseDirectory;
+
+            //When running locally load from this project folder
+            if (Configuration.IsLocal())appSettingsPath = Path.Combine(Directory.GetParent(Environment.CurrentDirectory).FullName, this.GetType().Namespace);
+
+            _configBuilder.SetFileProvider(new PhysicalFileProvider(appSettingsPath));
 
             _configBuilder.AddJsonFile("appsettings.json", false, true);
             _configBuilder.AddJsonFile($"appsettings.{_environmentName}.json", true, true);
 
             _configBuilder.AddEnvironmentVariables();
-
-            if (_additionalSettings != null && _additionalSettings.Any())
-                _configBuilder.AddInMemoryCollection(_additionalSettings);
 
             var configuration = _configBuilder.Build();
 
@@ -60,7 +71,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             }
 
             /* make sure these files are loaded AFTER the vault, so their keys superseed the vaults' values - that way, unit tests will pass because the obfuscation key is whatever the appSettings says it is [and not a hidden secret inside the vault])  */
-            if (Debugger.IsAttached || IsEnvironment("Local"))
+            if (Debugger.IsAttached || Configuration.IsLocal())
             {
                 var appAssembly = Misc.GetTopAssembly();
                 if (appAssembly != null) _configBuilder.AddUserSecrets(appAssembly, true);
@@ -74,7 +85,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             _configBuilder.AddEnvironmentVariables();
             var config = _configBuilder.Build();
 
-            if (!IsProduction() && config.GetValue<bool>("DUMP_APPSETTINGS"))
+            if (!Configuration.IsProduction() && config.GetValue<bool>("DUMP_APPSETTINGS"))
                 foreach (var key in GetKeys(config))
                     Console.WriteLine($@"APPSETTING[""{key}""]={config[key]}");
 
@@ -91,73 +102,5 @@ namespace ModernSlavery.Infrastructure.Configuration
         {
             return section.GetChildren().Select(c => c.Key);
         }
-
-        #region Environment
-
-        private string _EnvironmentName;
-
-        public string EnvironmentName
-        {
-            get
-            {
-                if (_EnvironmentName == null)
-                {
-                    _EnvironmentName = Configuration?[HostDefaults.EnvironmentKey];
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName))
-                        _EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName))
-                        _EnvironmentName = Environment.GetEnvironmentVariable("ASPNET_ENV");
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName))
-                        _EnvironmentName = Environment.GetEnvironmentVariable("Hosting:Environment");
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName))
-                        _EnvironmentName = Environment.GetEnvironmentVariable("AzureWebJobsEnv");
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName))
-                        _EnvironmentName =
-                            Environment.GetEnvironmentVariable("Environment"); //This is used by webjobs SDK v3 
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName) &&
-                        Environment.GetEnvironmentVariable("DEV_ENVIRONMENT").ToBoolean()) _EnvironmentName = "Local";
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName)) _EnvironmentName = "Local";
-                }
-
-                return _EnvironmentName;
-            }
-            set => _EnvironmentName = value;
-        }
-
-        public bool IsLocal()
-        {
-            return IsEnvironment("LOCAL");
-        }
-
-        public bool IsDevelopment()
-        {
-            return IsEnvironment("DEV", "DEVELOPMENT");
-        }
-
-        public bool IsStaging()
-        {
-            return IsEnvironment("STAGING");
-        }
-
-        public bool IsPreProduction()
-        {
-            return IsEnvironment("PREPROD", "PREPRODUCTION");
-        }
-
-        public bool IsProduction()
-        {
-            return IsEnvironment("PROD", "PRODUCTION");
-        }
-
-        public bool IsEnvironment(params string[] environmentNames)
-        {
-            foreach (var environmentName in environmentNames)
-                if (EnvironmentName.EqualsI(environmentName))
-                    return true;
-
-            return false;
-        }
-
-        #endregion
     }
 }

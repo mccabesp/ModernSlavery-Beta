@@ -1,5 +1,7 @@
 ﻿@model ManageAccountViewModel
-
+@{
+    Layout = "~/Views/DfeTemplate.cshtml";
+}
 @await Html.PartialAsync("AccountNavigation")
 
 @if (string.IsNullOrWhiteSpace(ViewBag.ChangeSuccessMessage) == false)
@@ -179,5 +181,5 @@
 
     </div>
 </div>
-<hr style="background: black; border: 1px solid black;"/>
-<partial name="~/Views/Viewing/Launchpad/Parts/ServiceSurveyIntroAndLink.cshtml"/>
+<hr style="background: black; border: 1px solid black;" />
+<partial name="~/Views/Viewing/Launchpad/Parts/ServiceSurveyIntroAndLink.cshtml" />
