@@ -38,8 +38,6 @@ namespace ModernSlavery.Infrastructure.Search
 
         [IsFilterable] [IsFacetable] public override string[] SicSectionIds { get; set; }
 
-        public override string[] SicSectionNames { get; set; }
-
         [IsSearchable]
         [IsFilterable]
         [IsFacetable]

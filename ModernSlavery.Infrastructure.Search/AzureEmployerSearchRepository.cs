@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Autofac.Features.AttributeFilters;
+using AutoMapper;
 using Microsoft.ApplicationInsights;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
@@ -22,7 +23,7 @@ namespace ModernSlavery.Infrastructure.Search
     {
         private const string suggestorName = "sgOrgName";
         private const string synonymMapName = "desc-synonymmap";
-
+        private readonly IMapper _autoMapper;
         private readonly Lazy<Task<ISearchIndexClient>> _indexClient;
 
         private readonly Lazy<Task<ISearchServiceClient>> _serviceClient;
@@ -35,6 +36,7 @@ namespace ModernSlavery.Infrastructure.Search
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog,
             string serviceName,
             string indexName,
+            IMapper autoMapper,
             string adminApiKey = null,
             string queryApiKey = null,
             TelemetryClient telemetryClient = null,
@@ -47,7 +49,7 @@ namespace ModernSlavery.Infrastructure.Search
                 Console.WriteLine($"{nameof(AzureEmployerSearchRepository)} is disabled");
                 return;
             }
-
+            _autoMapper = autoMapper;
             SearchLog = searchLog;
             IndexName = indexName.ToLower();
 
@@ -134,7 +136,7 @@ namespace ModernSlavery.Infrastructure.Search
             newRecords = newRecords.OrderBy(o => o.Name);
 
             //Set the records to add or update
-            var actions = newRecords.Cast<AzureEmployerSearchModel>().Select(r => IndexAction.MergeOrUpload(r))
+            var actions = newRecords.Select(r => IndexAction.MergeOrUpload(_autoMapper.Map<AzureEmployerSearchModel>(r)))
                 .ToList();
 
             var batches = new ConcurrentBag<IndexBatch<AzureEmployerSearchModel>>();
@@ -184,7 +186,7 @@ namespace ModernSlavery.Infrastructure.Search
                 throw new ArgumentNullException(nameof(oldRecords), "You must supply at least one record to index");
 
             //Set the records to add or update
-            var actions = oldRecords.Cast<AzureEmployerSearchModel>().Select(r => IndexAction.Delete(r)).ToList();
+            var actions = oldRecords.Select(r => IndexAction.Delete(_autoMapper.Map<AzureEmployerSearchModel>(r))).ToList();
 
             var batches = new ConcurrentBag<IndexBatch<AzureEmployerSearchModel>>();
 

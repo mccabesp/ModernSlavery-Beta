@@ -43,7 +43,7 @@
                 var encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
                 var latestReturn = userOrg.Organisation.LatestReturn;
                 var scopeStatus = userOrg.Organisation.GetScopeStatus(accountingDate);
-                var address = userOrg.Organisation.GetLatestAddress().GetAddressString();
+                var address = userOrg.Organisation.GetLatestAddress()?.GetAddressString();
 
                 <tr>
                     @if (userOrg.PINSentDate != null && userOrg.PINConfirmedDate == null)
