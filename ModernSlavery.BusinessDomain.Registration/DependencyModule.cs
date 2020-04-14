@@ -24,7 +24,9 @@ namespace ModernSlavery.BusinessDomain.Registration
                 .InstancePerLifetimeScope().WithAttributeFiltering();
             builder.Autofac.RegisterType<RegistrationBusinessLogic>().As<IRegistrationBusinessLogic>()
                 .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<PinInThePostService>().As<PinInThePostService>().SingleInstance();
+            builder.Autofac.RegisterType<PinInThePostService>().As<IPinInThePostService>().SingleInstance(); 
+
+
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

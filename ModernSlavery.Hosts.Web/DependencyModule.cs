@@ -21,6 +21,7 @@ using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
+using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;
 using ModernSlavery.Infrastructure.Telemetry;
@@ -176,6 +177,8 @@ namespace ModernSlavery.Hosts.Web
 
             //Register the search dependencies
             builder.RegisterModule<Infrastructure.Search.DependencyModule>();
+
+            builder.Autofac.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
 
             //Register the user audit log repository
             builder.Autofac.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();

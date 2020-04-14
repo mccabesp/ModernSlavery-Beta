@@ -38,6 +38,8 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                 .WithParameter(
                     (p, ctx) => p.ParameterType == typeof(HttpClient),
                     (p, ctx) => ctx.Resolve<IHttpClientFactory>().CreateClient(nameof(ICompaniesHouseAPI)));
+
+            builder.Autofac.RegisterType<PostcodeChecker>().As<IPostcodeChecker>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

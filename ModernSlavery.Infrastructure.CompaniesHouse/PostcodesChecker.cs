@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace ModernSlavery.Infrastructure.CompaniesHouse
 {
-    public class PostcodesChecker : IPostcodeChecker
+    public class PostcodeChecker : IPostcodeChecker
     {
         public async Task<bool> IsValidPostcode(string postcode)
         {
