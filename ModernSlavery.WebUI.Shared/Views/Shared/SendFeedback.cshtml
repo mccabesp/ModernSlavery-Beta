@@ -14,7 +14,7 @@
 
 <div class="govuk-grid-row cookie-settings-page">
     <div class="govuk-grid-column-two-thirds">
-        <form method="POST" action="@Url.Action("SendFeedbackPost", "Feedback")">
+        <form method="POST" action="@Url.Action("SendFeedback", "Shared")">
             @(Html.AntiForgeryToken())
             <h1 class="govuk-heading-xl">Send us feedback</h1>
             <div class="govuk-form-group">

@@ -39,7 +39,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         }
 
         [Authorize]
-        [HttpGet("~/activate-service/{id}")]
+        [HttpGet("activate-service/{id}")]
         public async Task<IActionResult> ActivateService(string id)
         {
             //Ensure user has completed the registration process

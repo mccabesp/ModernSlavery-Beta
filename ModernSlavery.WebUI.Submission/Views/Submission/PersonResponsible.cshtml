@@ -1,4 +1,7 @@
-﻿@model ModernSlavery.BusinessDomain.Shared.Models.ReturnViewModel
+﻿@{
+    Layout = "~/Views/DfeTemplate.cshtml";
+}
+@model ModernSlavery.BusinessDomain.Shared.Models.ReturnViewModel
 
 <div class="grid-row">
     <div class="column-two-thirds">
@@ -58,35 +61,35 @@
             <div class="form-horizontal">
                 <fieldset>
                     <div class="form-group @Html.SetErrorClass(model => model.FirstName, "error")">
-                        @Html.LabelFor(model => model.FirstName, new {@class = "form-label col-md-2"})
-                        @Html.ValidationMessageFor(model => model.FirstName, "", new {@class = "error-danger"})
+                        @Html.LabelFor(model => model.FirstName, new { @class = "form-label col-md-2" })
+                        @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "error-danger" })
                         <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.FirstName, new {@class = "form-control"})
+                            @Html.CustomEditorFor(model => model.FirstName, new { @class = "form-control" })
                         </div>
                     </div>
 
                     <div class="form-group @Html.SetErrorClass(model => model.LastName, "error")">
-                        @Html.LabelFor(model => model.LastName, new {@class = "form-label col-md-2"})
-                        @Html.ValidationMessageFor(model => model.LastName, "", new {@class = "error-danger"})
+                        @Html.LabelFor(model => model.LastName, new { @class = "form-label col-md-2" })
+                        @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "error-danger" })
                         <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.LastName, new {@class = "form-control"})
+                            @Html.CustomEditorFor(model => model.LastName, new { @class = "form-control" })
                         </div>
                     </div>
 
                     <div class="form-group @Html.SetErrorClass(model => model.JobTitle, "error")">
-                        @Html.LabelFor(model => model.JobTitle, new {@class = "form-label col-md-2"})
-                        @Html.ValidationMessageFor(model => model.JobTitle, "", new {@class = "error-danger"})
+                        @Html.LabelFor(model => model.JobTitle, new { @class = "form-label col-md-2" })
+                        @Html.ValidationMessageFor(model => model.JobTitle, "", new { @class = "error-danger" })
                         <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.JobTitle, new {@class = "form-control"})
+                            @Html.CustomEditorFor(model => model.JobTitle, new { @class = "form-control" })
                         </div>
                     </div>
                 </fieldset>
             </div>
 
             <p>
-                <input id="ContinueStep" class="button" type="submit" role="button" value="Continue"/>
-                <br/>
-                <input id="CancelStep" class="link-button" type="submit" role="button" formaction="cancel-person-responsible" value="Cancel" style="margin-top: 15px"/>
+                <input id="ContinueStep" class="button" type="submit" role="button" value="Continue" />
+                <br />
+                <input id="CancelStep" class="link-button" type="submit" role="button" formaction="cancel-person-responsible" value="Cancel" style="margin-top: 15px" />
             </p>
         }
     </div>

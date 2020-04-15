@@ -2,6 +2,7 @@
 @inject IWebService WebService
 @inject SharedOptions sharedOptions
 @{
+    Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Registration request received - Modern Slavery reporting service";
 }
 <div id="request-received-content">
@@ -13,7 +14,7 @@
                 <div class="govuk-box-highlight">
                     <h1 class="bold-medium">
                         We’ve got your details.
-                        <br/>
+                        <br />
                         We will review them and get in touch to confirm.
                     </h1>
                 </div>
@@ -44,7 +45,7 @@
                     <a href="@Url.Action("OrganisationType")">Add another organisation</a>
                 </p>
                 <p>
-                    <a href="@WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)">Manage Organisations</a>
+                    <a href="@Url.Action("ManageOrganisations", "Submission")">Manage Organisations</a>
                 </p>
             </div>
         </div>

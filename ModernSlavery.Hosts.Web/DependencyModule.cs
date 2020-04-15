@@ -255,7 +255,10 @@ namespace ModernSlavery.Hosts.Web
             if (_basicAuthenticationOptions.Enabled) app.UseMiddleware<BasicAuthenticationMiddleware>(_basicAuthenticationOptions.Username, _basicAuthenticationOptions.Password);
 
             //app.UseMvcWithDefaultRoute();
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints => { 
+                endpoints.MapControllers();
+                endpoints.MapRazorPages();
+            });
 
             hostApplicationLifetime.ApplicationStarted.Register(
                 () =>

@@ -1,4 +1,7 @@
-﻿@inject IWebService WebService
+﻿@{
+    Layout = "~/Views/DfeTemplate.cshtml";
+}
+@inject IWebService WebService
 @model ModernSlavery.BusinessDomain.Shared.Models.ReturnViewModel
 <div class="grid-row">
     <div class="column-two-thirds">
@@ -12,7 +15,7 @@
                 <h1 class="bold-large">You've submitted your Modern Slavery statement for @(Model.AccountingDate.Year) to @(Model.AccountingDate.AddYears(1).Year)</h1>
             </div>
             <p>
-                <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingEmployer, new {employerIdentifier = Model.EncryptedOrganisationId}))" target="_blank">See your Modern Slavery statement</a>
+                <a href="@Url.Action("Employer", "Viewing", new {employerIdentifier = Model.EncryptedOrganisationId})" target="_blank">See your Modern Slavery statement</a>
             </p>
             <p>
                 <a href="@Url.Action(nameof(SubmissionController.ManageOrganisations))">Manage organisations</a>

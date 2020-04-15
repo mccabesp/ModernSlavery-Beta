@@ -43,7 +43,7 @@
     document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
 </script>
 
-@if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request) && !ViewContext.RouteData.Values["action"].Equals("CookieSettingsGet"))
+@if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request) && !ViewContext.RouteData.Values["action"].Equals("CookieSettings"))
 {
     await Html.RenderPartialAsync("~/Views/Components/CookieBanner.cshtml");
 }
@@ -59,17 +59,17 @@
             new HeaderNavigationViewModel
             {
                 Text = "Search",
-                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
+                Href = Url.Action("SearchResults", "Viewing")
             },
             new HeaderNavigationViewModel
             {
                 Text = "Guidance",
-                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingGuidance)
+                Href = Url.Action("StepByStepStandalone", "ReportingStepByStep")
             },
             new HeaderNavigationViewModel
             {
                 Text = "Submit",
-                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)
+                Href = Url.Action("ManageOrganisations", "Submission")
             }
         };
     }
@@ -80,17 +80,17 @@
             new HeaderNavigationViewModel
             {
                 Text = "Search and compare",
-                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome)
+                Href = Url.Action("SearchResults", "Viewing")
             },
             new HeaderNavigationViewModel
             {
                 Text = "Download",
-                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingDownloads)
+                Href = Url.Action("Download", "Viewing")
             },
             new HeaderNavigationViewModel
             {
                 Text = "Close the gap",
-                Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingActionHub)
+                Href = Url.Action("Overview", "ActionsHub")
             }
         };
     }
@@ -101,7 +101,7 @@
         headerNavigationLinks.Add(new HeaderNavigationViewModel
         {
             Text = "Admin",
-            Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome)
+            Href = Url.Action("Home", "Admin")
         });
     }
 
@@ -110,7 +110,7 @@
         headerNavigationLinks.Add(new HeaderNavigationViewModel
         {
             Text = "Sign out",
-            Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut),
+            Href = Url.Action("SignOut", "Account"),
             Classes = "sign-out-link"
         });
     }
@@ -119,7 +119,7 @@
         headerNavigationLinks.Add(new HeaderNavigationViewModel
         {
             Text = "Sign in",
-            Href = WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome),
+            Href = Url.Action("ManageOrganisations", "Submission"),
             Classes = "sign-out-link"
         });
     }
@@ -140,7 +140,7 @@
     @(Html.GovUkPhaseBanner(new PhaseBannerViewModel
     {
         Phase = "DISCOVERY",
-        Html = @<text>This is a new service – your <a class="govuk-link" href="@Url.Action("SendFeedbackGet")">feedback</a> will help us to improve it.</text>
+        Html = @<text>This is a new service – your <a class="govuk-link" asp-action="SendFeedback" asp-controller="shared">feedback</a> will help us to improve it.</text>
     }))
     @(RenderSection("BeforeMain", false))
 
@@ -158,22 +158,22 @@
             new FooterLinksViewModel
             {
                 Text = "Contact Us",
-                Href = Url.Action("ContactUs")
+                Href = Url.Page("/ContactUs")
             },
             new FooterLinksViewModel
             {
                 Text = "Cookies",
-                Href = Url.Action("CookieSettingsGet")
+                Href = Url.Action("CookieSettings","Shared")
             },
             new FooterLinksViewModel
             {
                 Text = "Privacy Policy",
-                Href = Url.Action("PrivacyPolicy")
+                Href = Url.Action("PrivacyPolicy","Shared")
             },
             new FooterLinksViewModel
             {
                 Text = "Report Concerns",
-                Href = Url.Action("ReportConcerns")
+                Href = Url.Action("ReportConcerns","Shared")
             }
         }
     }
