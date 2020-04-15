@@ -1,4 +1,7 @@
-﻿@model CloseAccountViewModel
+﻿@{
+    Layout = "~/Views/DfeTemplate.cshtml";
+}
+@model CloseAccountViewModel
 
 @if (ViewContext.ModelState.ErrorCount > 0)
 {
@@ -29,7 +32,7 @@
                     <li>You will not receive communications from the Modern Slavery Reporting service</li>
                 </ul>
 
-                <br/>
+                <br />
 
                 @if (Model.IsSoleUserOfOneOrMoreOrganisations)
                 {
@@ -48,19 +51,19 @@
                         </p>
                     </div>
 
-                    <br/>
+                    <br />
                 }
 
                 <h2 class="heading-small">Are you sure you want to close your account?</h2>
 
                 <div class="form-group @Html.SetErrorClass(model => model.EnterPassword, "error")">
-                    @Html.LabelFor(m => m.EnterPassword, new {@class = "form-label"})
-                    @Html.ValidationMessageFor(model => model.EnterPassword, "", new {@class = "error-message"})
-                    @Html.CustomEditorFor(model => model.EnterPassword, new {@class = "form-control form-control-3-4", autocomplete = "off"})
+                    @Html.LabelFor(m => m.EnterPassword, new { @class = "form-label" })
+                    @Html.ValidationMessageFor(model => model.EnterPassword, "", new { @class = "error-message" })
+                    @Html.CustomEditorFor(model => model.EnterPassword, new { @class = "form-control form-control-3-4", autocomplete = "off" })
                 </div>
 
                 <div>
-                    <input class="button button-warning" type="submit" role="button" value="Close account"/>
+                    <input class="button button-warning" type="submit" role="button" value="Close account" />
                 </div>
 
                 <div>

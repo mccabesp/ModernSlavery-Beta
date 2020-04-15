@@ -1,6 +1,6 @@
 ﻿@inject IWebService WebService
 @{
-    var manageOrgsPath = WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
+    var manageOrgsPath = Url.Action("ManageOrganisations", "Submission");
     var navEntries = new[]
     {
         new {Text = "Manage Organisations", UrlPath = manageOrgsPath},

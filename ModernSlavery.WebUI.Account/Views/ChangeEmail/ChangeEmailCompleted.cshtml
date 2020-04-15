@@ -1,4 +1,7 @@
-﻿@model ChangeEmailStatusViewModel
+﻿@{
+    Layout = "~/Views/DfeTemplate.cshtml";
+}
+@model ChangeEmailStatusViewModel
 @inject IWebService WebService
 <div class="grid-row">
 
@@ -19,7 +22,7 @@
             </li>
 
             <li>
-                <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountHome))">Manage organisations</a>
+                <a href="@Url.Action("ManageOrganisations", "Submission")">Manage organisations</a>
             </li>
         </ul>
 

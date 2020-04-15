@@ -225,7 +225,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             //If its an administrator go to admin home
             if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
-                return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                return RedirectToAction("Home","Admin");
 
             return View("EmailConfirmed");
         }
@@ -276,7 +276,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             if (VirtualUser != null && !VirtualUser.EmailVerifiedDate.EqualsI(null, DateTime.MinValue))
             {
                 if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
-                    return Redirect(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminHome));
+                    return RedirectToAction("Home", "Admin");
 
                 return RedirectToAction("EmailConfirmed");
             }

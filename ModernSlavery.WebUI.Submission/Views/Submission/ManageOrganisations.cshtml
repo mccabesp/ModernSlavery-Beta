@@ -49,7 +49,7 @@
                     @if (userOrg.PINSentDate != null && userOrg.PINConfirmedDate == null)
                     {
                         <th scope="row">
-                            <a id="ActivateOrg-@(encOrgId)" href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationActivate, new {id = encOrgId}))">
+                            <a id="ActivateOrg-@(encOrgId)" href="@Url.Action("ActivateService", "Registration", new {id = encOrgId})">
                                 <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
                             </a>
                         </th>
@@ -69,7 +69,7 @@
                     else
                     {
                         <th scope="row">
-                            <a id="ManageOrg-@(encOrgId)" href="@WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationActivate, new {id = encOrgId})">
+                            <a id="ManageOrg-@(encOrgId)" href="@Url.Action("ManageOrganisation", "Submission", new {id = encOrgId})">
                                 <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
                             </a>
                         </th>
@@ -99,7 +99,7 @@
     <div class="column-two-thirds">
 
         <p>
-            <a class="button" href="@WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationAdd)">Register an organisation</a>
+            <a class="button" href="@Url.Action("OrganisationType", "Registration")">Register an organisation</a>
         </p>
 
         @if (hasRegisteredOrgs == false)
@@ -107,7 +107,7 @@
             <h2 class="heading-small">Need to close your account?</h2>
             <p>
                 If you created an account by mistake or no longer responsible
-                for reporting Modern Slavery statement you can close your account in <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountHome))">manage account</a>.
+                for reporting Modern Slavery statement you can close your account in <a href="@Url.Action("Home", "Account")">manage account</a>.
             </p>
         }
 

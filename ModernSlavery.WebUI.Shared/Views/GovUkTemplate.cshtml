@@ -26,7 +26,7 @@
 
     @if (User.Identity.IsAuthenticated)
     {
-        <meta http-equiv="refresh" content="@(sharedOptions.SessionTimeOutMinutes * 60);@Url.Action("SessionExpired", null, null, "https")" />
+        <meta http-equiv="refresh" content="@(sharedOptions.SessionTimeOutMinutes * 60);@Url.Action("SessionExpired", "Shared", null, "https")" />
     }
     <meta name="google-site-verification" content="uRt7CAkfClOB8Jig6Pw2-DELUWuuyG2kYKip0UThxhg" />
 
@@ -116,22 +116,22 @@
                         @if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
                         {
                             <li>
-                                <a rel="track" data-track-category="Header Link Clicked" href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome))">Search</a>
+                                <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action("SearchResults", "Viewing"))">Search</a>
                             </li>
                             <li>
-                                <a rel="track" data-track-category="Header Link Clicked" href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingGuidance))">Guidance</a>
+                                <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action("StepByStepStandalone", "ReportingStepByStep"))">Guidance</a>
                             </li>
                             <li>
-                                <a rel="track" data-track-category="Header Link Clicked" href=@WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)>Submit</a>
+                                <a rel="track" data-track-category="Header Link Clicked" href="@Url.Action("ManageOrganisations", "Submission")">Submit</a>
                             </li>
                         }
                         else
                         {
                             <li>
-                                <a rel="track" data-track-category="Header Link Clicked" href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.SearchHome))">Search and compare</a>
+                                <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action("SearchResults", "Viewing"))">Search and compare</a>
                             </li>
                             <li>
-                                <a rel="track" data-track-category="Header Link Clicked" href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingDownloads))">Download</a>
+                                <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action("Download", "Viewing"))">Download</a>
                             </li>
                             <li>
                                 <a rel="track" data-track-category="Header Link Clicked" href="/actions-to-close-the-gap">Close the gap</a>
@@ -141,13 +141,13 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li id="login-links" class="nowrap">
-                                <a href="@WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountSignOut)">Sign out</a>
+                                <a href="@Url.Action("SignOut", "Account")">Sign out</a>
                             </li>
                         }
                         else
                         {
                             <li id="login-links" class="nowrap">
-                                <a href="@WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome)">Sign in</a>
+                                <a href="@Url.Action("ManageOrganisations", "Submission")">Sign in</a>
                             </li>
                         }
                     </ul>
@@ -169,14 +169,14 @@
         <div class="grid-row">
             <div class="column-full">
                 <div class="phase-banner-alpha">
-                    @if (!Context.GetUri().PathAndQuery.EqualsI(Url.Action("SendFeedbackGet", "Feedback"), Url.Action("ServiceUnavailable", "Error")))
+                    @if (!Context.GetUri().PathAndQuery.EqualsI(Url.Action("SendFeedback", "Shared"), Url.Action("ServiceUnavailable", "Error")))
                     {
                         <p>
                             <strong class="phase-tag">DISCOVERY</strong>
                             <span>
                                 This is a new service – your
 
-                                <a href="@Url.Action("SendFeedbackGet", "Feedback")"
+                                <a asp-action="SendFeedback" asp-controller="shared"
                                    title="Feedback form will open in a new page"
                                    class="font16-ext-link">
                                     feedback
@@ -199,16 +199,16 @@
             <div class="footer-meta-inner">
                 <ul>
                     <li>
-                        <a href="/contact-us">Contact Us</a>
+                        <a asp-page="/ContactUs">Contact Us</a>
                     </li>
                     <li>
-                        <a href="/cookies">Cookies</a>
+                        <a asp-action="Cookies" asp-controller="Shared">Cookies</a>
                     </li>
                     <li>
-                        <a href="/privacy-policy">Privacy Policy</a>
+                        <a asp-action="PrivacyPolicy" asp-controller="Shared">Privacy Policy</a>
                     </li>
                     <li>
-                        <a href="/report-concerns">Report Concerns</a>
+                        <a asp-action="ReportConcerns"asp-controller="Shared">Report Concerns</a>
                     </li>
                     @if (VirtualDateTime.Offset != TimeSpan.Zero)
                     {

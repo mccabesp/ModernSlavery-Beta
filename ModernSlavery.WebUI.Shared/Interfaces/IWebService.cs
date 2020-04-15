@@ -19,6 +19,5 @@ namespace ModernSlavery.WebUI.Shared.Interfaces
         IShortCodesRepository ShortCodesRepository { get; }
         IWebTracker WebTracker { get; }
         IEventLogger CustomLogger { get; }
-        IUrlRouteHelper RouteHelper { get; }
     }
 }

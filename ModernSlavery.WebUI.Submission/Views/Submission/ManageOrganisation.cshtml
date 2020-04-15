@@ -70,7 +70,6 @@
                     Report status
                 </div>
             </div>
-
             @for (int i = Model.ReportInfoModels.Count - 1, editScopeCount = SubmissionOptions.EditableScopeCount; i >= 0; i--, editScopeCount--)
             {
                 var report = Model.ReportInfoModels[i];
@@ -129,7 +128,7 @@
                         <tr>
                             <td style="border: none;" class="org-name">@userFullname</td>
                             <td style="border: none;">
-                                <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationRemove, new {orgId = Model.EncCurrentOrgId, userId = encUserId}))">
+                                <a href="@Url.Action("RemoveOrganisation", "Registration", new {orgId = Model.EncCurrentOrgId, userId = encUserId})">
                                     Remove user from reporting
                                 </a>
                             </td>
@@ -141,7 +140,7 @@
                             @controller.CurrentUser.Fullname <span>(You)</span>
                         </td>
                         <td style="border: none;">
-                            <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationRemove, new {orgId = Model.EncCurrentOrgId, userId = Encryption.EncryptQuerystring(controller.CurrentUser.UserId.ToString())}))">
+                            <a href="@Url.Action("RemoveOrganisation", "Registration", new {orgId = Model.EncCurrentOrgId, userId = Encryption.EncryptQuerystring(controller.CurrentUser.UserId.ToString())})">
                                 Remove user from reporting
                             </a>
                         </td>
