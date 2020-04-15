@@ -27,15 +27,21 @@
                         <h1 class="heading-medium" style="margin-top: 15px">
                             Select which type of organisation you would like to register
                         </h1>
-                        @Html.ValidationMessageFor(model => model.SectorType, null, new {@class = "error-danger"})
+                        @Html.ValidationMessageFor(model => model.SectorType, null, new { @class = "error-danger" })
                     </legend>
 
                     <div class="multiple-choice">
+                        <input id="fasttrack" type="radio" name="SectorType" value="fasttrack">
+                        <label for="fasttrack">
+                            Fast track
+                        </label>
+                    </div>
+                    <div class="multiple-choice">
                         <input id="private" type="radio" name="SectorType" value="@(SectorTypes.Private)">
                         <label for="private">
-                            Private limited company,<br/>
-                            Limited liability partnership,<br/>
-                            Charity,<br/>
+                            Private limited company,<br />
+                            Limited liability partnership,<br />
+                            Charity,<br />
                             Public limited company
                         </label>
                     </div>
