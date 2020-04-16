@@ -254,6 +254,24 @@
             </reference>
           </references>
         </layer>
+        <layer Id="9fc5a9e8-ec72-4062-b537-0a6716ef1300" name="Admin">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="09c5d930-9282-4483-a5c4-2367f5603a78" direction="Forward">
+              <layerMoniker Id="1917c8ec-7994-4066-ae2d-0f305af94299" />
+            </dependencyFromLayerToLayer>
+            <dependencyFromLayerToLayer Id="e7995109-08c3-4ef4-bc9e-49db0c64e4c4" direction="Forward">
+              <layerMoniker Id="a78bb6a7-e6bb-4662-a404-aeebefc5acb6" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="af51f071-5ca5-42f8-a04f-d3dad6dcf441" name="ModernSlavery.WebUI.Admin">
+              <ArtifactNode Label="ModernSlavery.WebUI.Admin" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.WebUI.Admin)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.WebUI.Admin)" Label="ModernSlavery.WebUI.Admin" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
       </childLayers>
     </layer>
     <layer Id="1acbd5d9-66f0-433c-aba6-516bafc4fda4" name="Infrastructure">
