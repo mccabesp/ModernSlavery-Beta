@@ -33,5 +33,43 @@
       <DependentUpon>DependencyValidation1.layerdiagram</DependentUpon>
     </Validate>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Viewing\ModernSlavery.BusinessDomain.Viewing.csproj">
+      <Name>ModernSlavery.BusinessDomain.Viewing</Name>
+      <Project>{27c22fc8-c51a-4094-ac55-de27c50142bd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ModernSlavery.Core.Entities\ModernSlavery.Core.Entities.csproj">
+      <Name>ModernSlavery.Core.Entities</Name>
+      <Project>{373fd2ad-1ec2-4415-bba2-6d1098961d03}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj">
+      <Name>ModernSlavery.Core</Name>
+      <Project>{7a23f343-e179-4866-b40c-cc5b8fd87695}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ModernSlavery.WebUI.Account\ModernSlavery.WebUI.Account.csproj">
+      <Name>ModernSlavery.WebUI.Account</Name>
+      <Project>{a3519fcd-519e-401f-a783-9c96cdfbde04}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ModernSlavery.WebUI.GDSDesignSystem\ModernSlavery.WebUI.GDSDesignSystem.csproj">
+      <Name>ModernSlavery.WebUI.GDSDesignSystem</Name>
+      <Project>{ae3d6ddb-5c46-4149-a74b-4c631ffc1c33}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ModernSlavery.WebUI.Registration\ModernSlavery.WebUI.Registration.csproj">
+      <Name>ModernSlavery.WebUI.Registration</Name>
+      <Project>{4949e9fc-7c01-418a-be91-53ce9f5a1a39}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj">
+      <Name>ModernSlavery.WebUI.Shared</Name>
+      <Project>{73c3b043-3113-4009-ab76-7d9a98221d35}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ModernSlavery.WebUI.Submission\ModernSlavery.WebUI.Submission.csproj">
+      <Name>ModernSlavery.WebUI.Submission</Name>
+      <Project>{7a52730d-dabb-45f9-a7dc-344240c956d8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ModernSlavery.WebUI.Viewing\ModernSlavery.WebUI.Viewing.csproj">
+      <Name>ModernSlavery.WebUI.Viewing</Name>
+      <Project>{75a179df-be22-4a01-bb04-6ae10c377e2b}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VSToolsPath)\ArchitectureTools\Microsoft.VisualStudio.TeamArchitect.ModelingProject.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

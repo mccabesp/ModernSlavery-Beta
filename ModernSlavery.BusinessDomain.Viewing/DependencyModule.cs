@@ -16,9 +16,6 @@ namespace ModernSlavery.BusinessDomain.Viewing
         public void Register(IDependencyBuilder builder)
         {
             //Add registrations here
-            builder.RegisterModule<ModernSlavery.BusinessDomain.Submission.DependencyModule>();
-            builder.RegisterModule<ModernSlavery.BusinessDomain.Registration.DependencyModule>();
-
             builder.Autofac.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance()
                 .WithAttributeFiltering();
             builder.Autofac.RegisterType<ViewingService>().As<IViewingService>().SingleInstance();
