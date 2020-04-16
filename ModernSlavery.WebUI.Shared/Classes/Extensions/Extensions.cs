@@ -11,8 +11,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 {
     public static partial class Extensions
     {
-        public static IUrlRouteHelper RouteHelper;
-
         public static void AddStringTrimmingProvider(this MvcOptions option)
         {
             var binderToFind =

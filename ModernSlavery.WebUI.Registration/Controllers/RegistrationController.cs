@@ -107,7 +107,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     else
                     {
                         // Try and send the PIN in post
-                        var returnUrl = WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
+                        var returnUrl = Url.Action("ManageOrganisations", "Submission", null, "https");
                         if (_registrationService.PinInThePostService.SendPinInThePost(userOrg, pin, returnUrl,
                             out var letterId))
                         {

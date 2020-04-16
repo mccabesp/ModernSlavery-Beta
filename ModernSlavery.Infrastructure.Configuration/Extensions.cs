@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Extensions.Configuration;
@@ -77,6 +78,25 @@ namespace ModernSlavery.Infrastructure.Configuration
                     return true;
 
             return false;
+        }
+
+        public static bool HasChildren(this IConfigurationSection section)
+        {
+            return section.GetChildren().Any();
+        }
+
+        public static IEnumerable<KeyValuePair<string, string>> GetChildValues(this IConfigurationSection parent)
+        {
+            var children = parent.GetChildren();
+
+            if (!children.Any())
+                yield return new KeyValuePair<string, string>(parent.Path, parent.Value);
+            else
+                foreach (var child in children)
+                {
+                    foreach (var childResult in child.GetChildValues())
+                        yield return childResult;
+                }
         }
 
         #endregion

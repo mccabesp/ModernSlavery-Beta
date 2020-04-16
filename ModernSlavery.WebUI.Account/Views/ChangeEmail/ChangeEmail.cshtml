@@ -1,5 +1,7 @@
-﻿@model ChangeEmailViewModel
-
+﻿@{
+    Layout = "~/Views/DfeTemplate.cshtml";
+}
+@model ChangeEmailViewModel
 @if (ViewContext.ModelState.ErrorCount > 0)
 {
     @await Html.PartialAsync("Patterns/ErrorSummary", ViewContext.ModelState)
@@ -20,19 +22,19 @@
                 </legend>
 
                 <div class="form-group @Html.SetErrorClass(model => model.EmailAddress, "error")">
-                    @Html.LabelFor(m => m.EmailAddress, new {@class = "form-label"})
-                    @Html.ValidationMessageFor(model => model.EmailAddress, "", new {@class = "error-message"})
-                    @Html.CustomEditorFor(model => model.EmailAddress, new {@class = "form-control form-control-3-4"})
+                    @Html.LabelFor(m => m.EmailAddress, new { @class = "form-label" })
+                    @Html.ValidationMessageFor(model => model.EmailAddress, "", new { @class = "error-message" })
+                    @Html.CustomEditorFor(model => model.EmailAddress, new { @class = "form-control form-control-3-4" })
                 </div>
 
                 <div class="form-group @Html.SetErrorClass(model => model.ConfirmEmailAddress, "error")">
-                    @Html.LabelFor(m => m.ConfirmEmailAddress, new {@class = "form-label"})
-                    @Html.ValidationMessageFor(model => model.ConfirmEmailAddress, "", new {@class = "error-message"})
-                    @Html.CustomEditorFor(model => model.ConfirmEmailAddress, new {@class = "form-control form-control-3-4"})
+                    @Html.LabelFor(m => m.ConfirmEmailAddress, new { @class = "form-label" })
+                    @Html.ValidationMessageFor(model => model.ConfirmEmailAddress, "", new { @class = "error-message" })
+                    @Html.CustomEditorFor(model => model.ConfirmEmailAddress, new { @class = "form-control form-control-3-4" })
                 </div>
 
                 <div>
-                    <input class="button" type="submit" role="button" value="Confirm"/>
+                    <input class="button" type="submit" role="button" value="Confirm" />
                 </div>
 
                 <div>

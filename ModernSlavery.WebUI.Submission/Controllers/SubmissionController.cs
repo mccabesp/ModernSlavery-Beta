@@ -70,7 +70,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 var hasReadPrivacy = VirtualUser.AcceptedPrivacyStatement;
                 if (hasReadPrivacy == null ||
                     hasReadPrivacy.Value < SharedBusinessLogic.SharedOptions.PrivacyChangedDate)
-                    return RedirectToAction(nameof(PrivacyPolicy), "Home");
+                    return RedirectToAction("PrivacyPolicy", "Shared");
             }
 
             //create the new view model 
@@ -79,7 +79,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         [Authorize]
-        [HttpGet("~/manage-organisations/{id}")]
+        [HttpGet("~/manage-organisation/{id}")]
         public async Task<IActionResult> ManageOrganisation(string id)
         {
             //Ensure user has completed the registration process

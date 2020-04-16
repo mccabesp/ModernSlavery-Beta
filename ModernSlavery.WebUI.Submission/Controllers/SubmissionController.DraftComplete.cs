@@ -44,8 +44,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> DraftCompletePost(string command)
         {
 
-            var doneUrl = WebService.RouteHelper.Get(UrlRouteOptions.Routes.Done);
-            if (string.IsNullOrWhiteSpace(doneUrl))doneUrl=WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingHome);
+            var doneUrl = Url.Action("Done");
+            if (string.IsNullOrWhiteSpace(doneUrl))doneUrl= Url.Action("Index", "Viewing");
 
             return Redirect(doneUrl);
         }

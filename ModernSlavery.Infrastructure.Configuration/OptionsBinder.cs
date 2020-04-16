@@ -32,17 +32,31 @@ namespace ModernSlavery.Infrastructure.Configuration
             if (_bindings.ContainsKey(optionsType)) return _bindings[optionsType];
 
             var instance = Activator.CreateInstance(optionsType);
-
+            var raw = false;
             if (string.IsNullOrWhiteSpace(configSection))
             {
                 var configSettingAttribute = instance.GetAttribute<OptionsAttribute>();
                 if (configSettingAttribute==null)throw new Exception($"Missing Options attribute on class '{optionsType.Name}'");
-                configSection = configSettingAttribute?.Key;
+                if (configSettingAttribute != null) {
+                    configSection = configSettingAttribute.Key;
+                    raw = configSettingAttribute.RawSettings;
+                }
             }
 
             if (configSection.TrimI().EqualsI("root",""))
             {
                 _configuration.Bind(instance);
+            }
+            else if (raw && optionsType.BaseType.IsAssignableFrom(typeof(Dictionary<string,string>)))
+            {
+                var result = instance as Dictionary<string, string>;
+
+                var section=_configuration.GetSection(configSection);
+                foreach (var childValue in section.GetChildValues())
+                {
+                    if (!string.IsNullOrWhiteSpace(childValue.Value))result[childValue.Key.Substring(section.Path.Length+1)] = childValue.Value;
+                }
+                instance = result;
             }
             else
             {

@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
@@ -18,7 +22,7 @@ namespace ModernSlavery.WebUI.Shared
         private readonly ILogger _logger;
         public DependencyModule(
             ILogger<DependencyModule> logger
-            //TODO Add any required IOptions here
+        //TODO Add any required IOptions here
         )
         {
             _logger = logger;
@@ -35,9 +39,6 @@ namespace ModernSlavery.WebUI.Shared
             builder.Autofac.RegisterType<HttpSession>().As<IHttpSession>().InstancePerLifetimeScope();
             builder.Autofac.RegisterType<HttpCache>().As<IHttpCache>().SingleInstance();
 
-            //Register Url route helper
-            builder.Autofac.RegisterType<UrlRouteHelper>().As<IUrlRouteHelper>().InstancePerLifetimeScope(); 
-            
             //Register the web service container
             builder.Autofac.RegisterType<WebService>().As<IWebService>().InstancePerLifetimeScope();
 
@@ -57,6 +58,9 @@ namespace ModernSlavery.WebUI.Shared
 
             //Register StaticAssetsVersioningHelper
             builder.Services.AddSingleton<StaticAssetsVersioningHelper>();
+
+            //Add the custom url helper
+            builder.Services.AddSingleton<IUrlHelperFactory,CustomUrlHelperFactory>();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

@@ -20,7 +20,7 @@
             }
             else
             {
-                <span>REQUIRED TO REPORT <br/> by @(reportDateFormatter.FullEndDate)</span>
+                <span>REQUIRED TO REPORT <br /> by @(reportDateFormatter.FullEndDate)</span>
             }
         </div>
         @if (Model.CanChangeScope)
@@ -56,7 +56,7 @@
                 <span> on @modifiedDateFormatter.FullStartDate</span>
             }
         </div>
-        <br/>
+        <br />
         @if (!isReportAvailable && !isDraftAvailable)
         {
             <a class="button" id="NewReport@(linkId)-@(Model.EncCurrentOrgId)" href="@(Url.Action("ReportForOrganisation", new {request = returnOrDraftInfoIsNotAvailable}))">

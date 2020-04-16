@@ -36,7 +36,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             model.Employers = new PagedResult<EmployerRecord>();
             StashModel(model);
             if (VirtualUser.UserOrganisations.Any())
-                model.BackAction = WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome);
+                model.BackAction = Url.Action("ManageOrganisations", "Submission");
 
             return View("OrganisationType", model);
         }
@@ -1123,7 +1123,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 PendingFasttrackCodes = null;
                 ClearStash();
                 if (CurrentUser.UserOrganisations.Any())
-                    return RedirectToAction(WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome));
+                    return RedirectToAction("ManageOrganisations", "Submission");
 
                 return RedirectToAction(nameof(OrganisationType));
             }
@@ -1210,8 +1210,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     userOrg.UserId + ":" + userOrg.OrganisationId + ":" + VirtualDateTime.Now.ToSmallDateTime());
 
                 if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-                    TempData["TestUrl"] = WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminReviewRequest,
-                        new { code = reviewCode });
+                    TempData["TestUrl"] = Url.Action("ReviewRequest", "Admin",new {code = reviewCode});
 
                 return RedirectToAction("RequestReceived");
             }
@@ -1740,8 +1739,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Send a verification link to the email address
             var reviewCode = userOrg.GetReviewCode();
-            var reviewUrl =
-                WebService.RouteHelper.Get(UrlRouteOptions.Routes.AdminReviewRequest, new { code = reviewCode });
+            var reviewUrl = Url.Action("ReviewRequest", "Admin", new {code = reviewCode});
 
             //If the email address is a test email then simulate sending
             if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)) return;

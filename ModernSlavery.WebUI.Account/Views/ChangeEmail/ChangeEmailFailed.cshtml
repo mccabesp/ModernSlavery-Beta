@@ -1,4 +1,7 @@
-﻿@inject IWebService WebService
+﻿@{
+    Layout = "~/Views/DfeTemplate.cshtml";
+}
+@inject IWebService WebService
 @if (ViewContext.ModelState.ErrorCount > 0)
 {
     @await Html.PartialAsync("Patterns/ErrorSummary", ViewContext.ModelState)
@@ -26,7 +29,7 @@
             </li>
 
             <li>
-                <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.AccountHome))">Manage organisations</a>
+                <a href="@Url.Action("ManageOrganisations", "Submission")">Manage organisations</a>
             </li>
         </ul>
     </div>

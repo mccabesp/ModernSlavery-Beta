@@ -6,13 +6,13 @@
         </p>
         <form method="post" action="@Url.Action("AcceptAllCookies")" id="cookie-banner-accept-all-form" class="cookie-banner-buttons">
             <input type="submit" class="cookie-banner-button" value="Accept cookies"/>
-            <a href="@Url.Action("CookieSettingsGet")" class="cookie-banner-button" role="button">Cookie settings</a>
+            <a asp-action="CookieSettings" asp-controller="shared" class="cookie-banner-button" role="button">Cookie settings</a>
         </form>
     </div>
 
     <div id="cookie-banner-confirmation-message" class="cookie-banner-width-container cookie-banner-initially-hidden">
         <p class="cookie-banner-body">
-            You’ve accepted all cookies. You can <a class="cookie-banner-link" href="@Url.Action("CookieSettingsGet")" tabindex="-1">change your cookie settings</a> at any time.
+            You’ve accepted all cookies. You can <a class="cookie-banner-link" asp-action="CookieSettings" asp-controller="shared" tabindex="-1">change your cookie settings</a> at any time.
         </p>
         <button id="cookie-banner-hide-button" class="cookie-banner-link cookie-banner-hide-button" tabindex="-1">Hide</button>
     </div>

@@ -6,10 +6,12 @@ namespace ModernSlavery.Core.Attributes
     public class OptionsAttribute : Attribute
     {
         public readonly string Key;
+        public readonly bool RawSettings;
 
-        public OptionsAttribute(string key)
+        public OptionsAttribute(string key, bool rawSettings=false)
         {
             Key = key;
+            RawSettings = rawSettings;
         }
     }
 }

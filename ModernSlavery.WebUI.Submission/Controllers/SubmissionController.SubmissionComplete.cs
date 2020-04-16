@@ -39,8 +39,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [PreventDuplicatePost]
         public async Task<IActionResult> SubmissionCompletePost(string command)
         {
-            var doneUrl = WebService.RouteHelper.Get(UrlRouteOptions.Routes.Done);
-            if (string.IsNullOrWhiteSpace(doneUrl)) doneUrl = WebService.RouteHelper.Get(UrlRouteOptions.Routes.ViewingHome);
+            var doneUrl = Url.Action("Done");
+            if (string.IsNullOrWhiteSpace(doneUrl)) doneUrl = Url.Action("Index", "Viewing");
 
             return await LogoutUser(doneUrl);
         }

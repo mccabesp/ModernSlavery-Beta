@@ -23,6 +23,7 @@ namespace ModernSlavery.Core.Extensions
         public static R GetProperty<R>(this object obj, string property)
         {
             var value = obj.GetType().GetProperty(property);
+            if (value == null) return default(R);
             return (R) value.GetValue(obj);
         }
 
