@@ -1,1 +1,420 @@
-﻿ 
+﻿<?xml version="1.0" encoding="utf-8"?>
+<layerModel xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" xmlns:dm1="http://schemas.microsoft.com/dsltools/SimpleShapesModel" dslVersion="1.0.0.0" Id="453987f5-9b29-4019-bb87-95e4d9bc2990" name="ModernSlavery" xmlns="http://schemas.microsoft.com/VisualStudio/TeamArchitect/LayerDesigner">
+  <layers>
+    <layer Id="7e97ee41-366c-4fff-b380-4adb7a7438b4" name="Core">
+      <childLayers>
+        <layer Id="b5049bb7-b6ea-46b2-af9e-dd7c0da50f2e" name="Extensions">
+          <references>
+            <reference Id="ee742474-30eb-46ac-ab17-23eaf28a1259" name="ModernSlavery.Core.Extensions">
+              <ArtifactNode Label="ModernSlavery.Core.Extensions" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Core.Extensions)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Core.Extensions)" Label="ModernSlavery.Core.Extensions" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="6b62982b-e326-4e96-81a6-f645e7c6a172" name="Entities">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="d3866d13-ee97-4666-bb8c-b580e17bb816" direction="Forward">
+              <layerMoniker Id="b5049bb7-b6ea-46b2-af9e-dd7c0da50f2e" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="e7db1fea-0bcf-4fc1-8e31-37eaa5e80767" name="ModernSlavery.Core.Entities">
+              <ArtifactNode Label="ModernSlavery.Core.Entities" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Core.Entities)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Core.Entities)" Label="ModernSlavery.Core.Entities" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+      </childLayers>
+      <references>
+        <reference Id="33ae6e2d-63dc-4fc6-a7a3-007e0d5d8935" name="ModernSlavery.Core">
+          <ArtifactNode Label="ModernSlavery.Core" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Core)" />
+          <ExpandedNode Id="(Namespace=ModernSlavery.Core)" Label="ModernSlavery.Core" Category="CodeSchema_Namespace">
+            <LinkCategory Ref="Represents" />
+          </ExpandedNode>
+        </reference>
+      </references>
+    </layer>
+    <layer Id="490d3608-97a1-4658-a182-3d2fa5d0fff1" name="BusinessDomain" requiredNamespace="ModernSlavery.BusinessDomain">
+      <dependencyToLayers>
+        <dependencyFromLayerToLayer Id="1b83a4d2-2809-438a-b4c0-56a110559349" direction="Forward">
+          <layerMoniker Id="7e97ee41-366c-4fff-b380-4adb7a7438b4" />
+        </dependencyFromLayerToLayer>
+      </dependencyToLayers>
+      <childLayers>
+        <layer Id="0a1b1790-0ff9-4675-aad0-3ac07808040d" name="Account">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="2e3377da-aed9-45ba-896c-789329fbe9de" direction="Forward">
+              <layerMoniker Id="fbda123f-db54-495b-8df2-3406e8d66449" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="83b6f314-056d-4ff0-98a1-c9272cc14210" name="ModernSlavery.BusinessDomain.Account">
+              <ArtifactNode Label="ModernSlavery.BusinessDomain.Account" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.BusinessDomain.Account)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.BusinessDomain.Account)" Label="ModernSlavery.BusinessDomain.Account" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="38382291-9250-4963-94fc-ca2727bcd7ce" name="Admin">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="ab2cc3cb-7157-4915-aced-46ebbf1836fd" direction="Forward">
+              <layerMoniker Id="fbda123f-db54-495b-8df2-3406e8d66449" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="60a83e19-1d07-4d18-a722-3bda7efc67c3" name="ModernSlavery.BusinessDomain.Admin">
+              <ArtifactNode Label="ModernSlavery.BusinessDomain.Admin" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.BusinessDomain.Admin)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.BusinessDomain.Admin)" Label="ModernSlavery.BusinessDomain.Admin" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="ff6b70d2-2d65-4d75-a96d-cd35a02c3c39" name="Registration">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="2b0b282d-b1cb-44a7-8199-b0c3327553cf" direction="Forward">
+              <layerMoniker Id="fbda123f-db54-495b-8df2-3406e8d66449" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="5aaf6532-127f-4ab9-8184-ab019317923a" name="ModernSlavery.BusinessDomain.Registration">
+              <ArtifactNode Label="ModernSlavery.BusinessDomain.Registration" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.BusinessDomain.Registration)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.BusinessDomain.Registration)" Label="ModernSlavery.BusinessDomain.Registration" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="aaff5b20-3a6c-464f-97d6-c6162a2e2573" name="Submission">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="9d4cdb60-3656-44dc-b7ae-dbe185d6c141" direction="Forward">
+              <layerMoniker Id="fbda123f-db54-495b-8df2-3406e8d66449" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="0f24f02d-d6a0-443f-bcd0-7662560670e7" name="ModernSlavery.BusinessDomain.Submission">
+              <ArtifactNode Label="ModernSlavery.BusinessDomain.Submission" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.BusinessDomain.Submission)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.BusinessDomain.Submission)" Label="ModernSlavery.BusinessDomain.Submission" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="fbda123f-db54-495b-8df2-3406e8d66449" name="Shared">
+          <references>
+            <reference Id="b182078e-eebf-44b3-9bef-e2a1919a1c45" name="ModernSlavery.BusinessDomain.Shared">
+              <ArtifactNode Label="ModernSlavery.BusinessDomain.Shared" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.BusinessDomain.Shared)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.BusinessDomain.Shared)" Label="ModernSlavery.BusinessDomain.Shared" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="54efacb6-d7b1-489b-81ef-ffa8c5f79218" name="Viewing">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="aac44db8-5254-4592-975c-369da84b351d" direction="Forward">
+              <layerMoniker Id="fbda123f-db54-495b-8df2-3406e8d66449" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="f2acd1ea-5b6f-4c73-b26d-36f7ad126992" name="ModernSlavery.BusinessDomain.Viewing">
+              <ArtifactNode Label="ModernSlavery.BusinessDomain.Viewing" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.BusinessDomain.Viewing)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.BusinessDomain.Viewing)" Label="ModernSlavery.BusinessDomain.Viewing" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+      </childLayers>
+    </layer>
+    <layer Id="6d4141dd-9802-416c-bc9b-865fd7959af8" name="WebUI">
+      <dependencyToLayers>
+        <dependencyFromLayerToLayer Id="ccc0a4a6-59b4-45b0-80c2-d3f377715b81" direction="Forward">
+          <layerMoniker Id="7e97ee41-366c-4fff-b380-4adb7a7438b4" />
+        </dependencyFromLayerToLayer>
+        <dependencyFromLayerToLayer Id="1248dd12-5053-45ef-8fdb-9daa21e4b6b5" direction="Forward">
+          <layerMoniker Id="490d3608-97a1-4658-a182-3d2fa5d0fff1" />
+        </dependencyFromLayerToLayer>
+      </dependencyToLayers>
+      <childLayers>
+        <layer Id="58f44784-9bea-4f43-a840-cb92193dac88" name="Account">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="a1bc0053-549f-4844-8b9a-e5419d263f88" direction="Forward">
+              <layerMoniker Id="a78bb6a7-e6bb-4662-a404-aeebefc5acb6" />
+            </dependencyFromLayerToLayer>
+            <dependencyFromLayerToLayer Id="eea90e1a-08e8-41be-9d3c-7b187fa7d7b9" direction="Forward">
+              <layerMoniker Id="1917c8ec-7994-4066-ae2d-0f305af94299" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="1f4dd360-8ecc-4419-b75a-9ec12af9f00d" name="ModernSlavery.WebUI.Account">
+              <ArtifactNode Label="ModernSlavery.WebUI.Account" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.WebUI.Account)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.WebUI.Account)" Label="ModernSlavery.WebUI.Account" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="6d357853-d82e-4add-84be-2d0d8f8e6548" name="Registration">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="8c584922-88ca-4d38-b044-ac8227323854" direction="Forward">
+              <layerMoniker Id="a78bb6a7-e6bb-4662-a404-aeebefc5acb6" />
+            </dependencyFromLayerToLayer>
+            <dependencyFromLayerToLayer Id="0e335292-c204-481f-ad0a-34f974844728" direction="Forward">
+              <layerMoniker Id="1917c8ec-7994-4066-ae2d-0f305af94299" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="6632bb7b-b2f3-44de-9360-1c9c58ca4240" name="ModernSlavery.WebUI.Registration">
+              <ArtifactNode Label="ModernSlavery.WebUI.Registration" Category="CodeSchema_Project" Id="(Assembly=../ModernSlavery.WebUI.Registration/ModernSlavery.WebUI.Registration.csproj)">
+                <Category Ref="File" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=ModernSlavery.WebUI.Registration)" Label="ModernSlavery.WebUI.Registration.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Produces" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="3d1a7cd2-130a-48fd-aae9-6386bfc0c88b" name="Submission">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="178b962b-2bc1-4bca-84f1-c619a775a031" direction="Forward">
+              <layerMoniker Id="a78bb6a7-e6bb-4662-a404-aeebefc5acb6" />
+            </dependencyFromLayerToLayer>
+            <dependencyFromLayerToLayer Id="de9f8037-6d2a-4e76-a480-8226b53eec7c" direction="Forward">
+              <layerMoniker Id="1917c8ec-7994-4066-ae2d-0f305af94299" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="a6b8ec47-04d5-464a-a330-daff01fa00fa" name="ModernSlavery.WebUI.Submission">
+              <ArtifactNode Label="ModernSlavery.WebUI.Submission" Category="CodeSchema_Project" Id="(Assembly=../ModernSlavery.WebUI.Submission/ModernSlavery.WebUI.Submission.csproj)">
+                <Category Ref="File" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=ModernSlavery.WebUI.Submission)" Label="ModernSlavery.WebUI.Submission.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Produces" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="5f09543d-7cd2-46a7-88b7-a8e4ea12b3a4" name="Viewing">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="817b0283-f401-4edd-a9bb-58f03d8e6e29" direction="Forward">
+              <layerMoniker Id="a78bb6a7-e6bb-4662-a404-aeebefc5acb6" />
+            </dependencyFromLayerToLayer>
+            <dependencyFromLayerToLayer Id="5654426e-5f8c-42fc-af38-86ef3bc1ec04" direction="Forward">
+              <layerMoniker Id="1917c8ec-7994-4066-ae2d-0f305af94299" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="60b5a7bf-4116-4854-a493-a277d335c180" name="ModernSlavery.WebUI.Viewing">
+              <ArtifactNode Label="ModernSlavery.WebUI.Viewing" Category="CodeSchema_Project" Id="(Assembly=../ModernSlavery.WebUI.Viewing/ModernSlavery.WebUI.Viewing.csproj)">
+                <Category Ref="File" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=ModernSlavery.WebUI.Viewing)" Label="ModernSlavery.WebUI.Viewing.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Produces" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="a78bb6a7-e6bb-4662-a404-aeebefc5acb6" name="Shared">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="74b550aa-0f8b-4e1c-b3d6-9e82677b22dd" direction="Forward">
+              <layerMoniker Id="1917c8ec-7994-4066-ae2d-0f305af94299" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="47158dad-9cf1-4148-bff5-6263cb0d445e" name="ModernSlavery.WebUI.Shared">
+              <ArtifactNode Label="ModernSlavery.WebUI.Shared" Category="CodeSchema_Project" Id="(Assembly=../ModernSlavery.WebUI.Shared/ModernSlavery.WebUI.Shared.csproj)">
+                <Category Ref="File" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=ModernSlavery.WebUI.Shared)" Label="ModernSlavery.WebUI.Shared.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Produces" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="1917c8ec-7994-4066-ae2d-0f305af94299" name="GDSDesignSystem">
+          <references>
+            <reference Id="889805d4-e17e-49da-a5d5-c7c965591a6c" name="ModernSlavery.WebUI.GDSDesignSystem">
+              <ArtifactNode Label="ModernSlavery.WebUI.GDSDesignSystem" Category="CodeSchema_Project" Id="(Assembly=../ModernSlavery.WebUI.GDSDesignSystem/ModernSlavery.WebUI.GDSDesignSystem.csproj)">
+                <Category Ref="File" />
+              </ArtifactNode>
+              <ExpandedNode Id="(Assembly=ModernSlavery.WebUI.GDSDesignSystem)" Label="ModernSlavery.WebUI.GDSDesignSystem.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Produces" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+      </childLayers>
+    </layer>
+    <layer Id="1acbd5d9-66f0-433c-aba6-516bafc4fda4" name="Infrastructure">
+      <dependencyToLayers>
+        <dependencyFromLayerToLayer Id="d644f89d-9bac-4ea7-ade8-8c6419128765" direction="Forward">
+          <layerMoniker Id="7e97ee41-366c-4fff-b380-4adb7a7438b4" />
+        </dependencyFromLayerToLayer>
+      </dependencyToLayers>
+      <childLayers>
+        <layer Id="059a5efe-ff3a-48db-826a-1094d187e864" name="CompaniesHouse">
+          <references>
+            <reference Id="6c9c2afb-977c-4dbb-a2f0-7e913fb09290" name="ModernSlavery.Infrastructure.CompaniesHouse">
+              <ArtifactNode Label="ModernSlavery.Infrastructure.CompaniesHouse" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Infrastructure.CompaniesHouse)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Infrastructure.CompaniesHouse)" Label="ModernSlavery.Infrastructure.CompaniesHouse" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="fa1decd7-2b4b-4e74-b888-8d5a131eb1c2" name="Configuration">
+          <references>
+            <reference Id="df1ba79a-ecac-44c2-a996-582ac08237e5" name="ModernSlavery.Infrastructure.Configuration">
+              <ArtifactNode Label="ModernSlavery.Infrastructure.Configuration" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Infrastructure.Configuration)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Infrastructure.Configuration)" Label="ModernSlavery.Infrastructure.Configuration" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="9e51b9bb-4b52-48ed-a7b4-7651ef7f0c31" name="Database">
+          <references>
+            <reference Id="ce859593-7dee-470c-a659-fce556804808" name="ModernSlavery.Infrastructure.Database">
+              <ArtifactNode Label="ModernSlavery.Infrastructure.Database" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Infrastructure.Database)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Infrastructure.Database)" Label="ModernSlavery.Infrastructure.Database" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="cb925603-0b8b-4539-b690-8edd4b57395f" name="Hosts">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="616be9b2-03a1-467e-a142-252c259c92f5" direction="Forward">
+              <layerMoniker Id="fa1decd7-2b4b-4e74-b888-8d5a131eb1c2" />
+            </dependencyFromLayerToLayer>
+            <dependencyFromLayerToLayer Id="fa47e688-90b8-47f4-a1c3-0a0b7956f028" direction="Forward">
+              <layerMoniker Id="cbc299c3-6929-473c-896d-39fb5a1b2863" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="1beed731-1014-4577-873e-9d460e18f838" name="ModernSlavery.Infrastructure.Hosts">
+              <ArtifactNode Label="ModernSlavery.Infrastructure.Hosts" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Infrastructure.Hosts)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Infrastructure.Hosts)" Label="ModernSlavery.Infrastructure.Hosts" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="cbc299c3-6929-473c-896d-39fb5a1b2863" name="Logging">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="bb10d20b-fa6b-46bd-88a7-2312c9011de2" direction="Forward">
+              <layerMoniker Id="9c7c60ad-5457-4040-a629-d36f557c8dc4" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="8a4450f2-25f1-46f3-9c18-cbab3d7dc253" name="ModernSlavery.Infrastructure.Logging">
+              <ArtifactNode Label="ModernSlavery.Infrastructure.Logging" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Infrastructure.Logging)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Infrastructure.Logging)" Label="ModernSlavery.Infrastructure.Logging" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="4a8ccb16-d8d6-4a9d-a9fa-7f433d791e4a" name="Messaging">
+          <references>
+            <reference Id="0f8c56d7-8634-49d3-9088-8b7b2992f4b1" name="ModernSlavery.Infrastructure.Messaging">
+              <ArtifactNode Label="ModernSlavery.Infrastructure.Messaging" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Infrastructure.Messaging)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Infrastructure.Messaging)" Label="ModernSlavery.Infrastructure.Messaging" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="c2b1616e-eb5f-4924-a26b-23d8ce4a9557" name="Search">
+          <references>
+            <reference Id="33f97624-6fb8-4d2d-87be-234b1787e83f" name="ModernSlavery.Infrastructure.Search">
+              <ArtifactNode Label="ModernSlavery.Infrastructure.Search" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Infrastructure.Search)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Infrastructure.Search)" Label="ModernSlavery.Infrastructure.Search" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="9c7c60ad-5457-4040-a629-d36f557c8dc4" name="Storage">
+          <references>
+            <reference Id="3fbf39c8-f475-41e4-adf2-e665e6395537" name="ModernSlavery.Infrastructure.Storage">
+              <ArtifactNode Label="ModernSlavery.Infrastructure.Storage" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Infrastructure.Storage)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Infrastructure.Storage)" Label="ModernSlavery.Infrastructure.Storage" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="711c36a6-0de4-441b-8690-8af4b5eb34d1" name="Telemetry">
+          <references>
+            <reference Id="ba75d477-85cb-406b-b7b5-5657e621d4bc" name="ModernSlavery.Infrastructure.Telemetry">
+              <ArtifactNode Label="ModernSlavery.Infrastructure.Telemetry" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Infrastructure.Telemetry)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Infrastructure.Telemetry)" Label="ModernSlavery.Infrastructure.Telemetry" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+      </childLayers>
+    </layer>
+    <layer Id="89eabdfd-d5cb-4dc2-9e1b-d91ebda3c4e0" name="Hosts">
+      <dependencyToLayers>
+        <dependencyFromLayerToLayer Id="4b79695e-21ef-47f7-9beb-6f6b004a3e5d" direction="Forward">
+          <layerMoniker Id="7e97ee41-366c-4fff-b380-4adb7a7438b4" />
+        </dependencyFromLayerToLayer>
+        <dependencyFromLayerToLayer Id="c4f801e7-159b-4352-a880-3feeff28ea3a" direction="Forward">
+          <layerMoniker Id="1acbd5d9-66f0-433c-aba6-516bafc4fda4" />
+        </dependencyFromLayerToLayer>
+        <dependencyFromLayerToLayer Id="7c9efe16-b7f8-483f-898e-35c8076fcca7" direction="Forward">
+          <layerMoniker Id="6d4141dd-9802-416c-bc9b-865fd7959af8" />
+        </dependencyFromLayerToLayer>
+        <dependencyFromLayerToLayer Id="02af6780-c5e8-4660-a2be-53c8d4284979" direction="Forward">
+          <layerMoniker Id="490d3608-97a1-4658-a182-3d2fa5d0fff1" />
+        </dependencyFromLayerToLayer>
+      </dependencyToLayers>
+      <childLayers>
+        <layer Id="20d6c119-84eb-47d2-b89b-afbcaee5540c" name="Web">
+          <references>
+            <reference Id="f04cd4bf-99ad-4970-a675-d7ff160a70f4" name="ModernSlavery.Hosts.Web">
+              <ArtifactNode Label="ModernSlavery.Hosts.Web" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Hosts.Web)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Hosts.Web)" Label="ModernSlavery.Hosts.Web" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="5c387664-d60a-4249-a575-ad6bd95a674e" name="IdServer">
+          <references>
+            <reference Id="35c6f2b8-d1e6-4705-adb1-2bb7158e00e3" name="ModernSlavery.Hosts.IdServer">
+              <ArtifactNode Label="ModernSlavery.Hosts.IdServer" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Hosts.IdServer)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Hosts.IdServer)" Label="ModernSlavery.Hosts.IdServer" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+        <layer Id="3a525afe-16c7-478f-90ea-70b555929a47" name="Webjob">
+          <references>
+            <reference Id="ea2d8e41-b83f-4735-82b6-b398a05810e8" name="ModernSlavery.Hosts.Webjob">
+              <ArtifactNode Label="ModernSlavery.Hosts.Webjob" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Hosts.Webjob)" />
+              <ExpandedNode Id="(Namespace=ModernSlavery.Hosts.Webjob)" Label="ModernSlavery.Hosts.Webjob" Category="CodeSchema_Namespace">
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
+      </childLayers>
+    </layer>
+  </layers>
+</layerModel>
