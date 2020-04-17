@@ -19,17 +19,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.BusinessDomain.Admin\ModernSlavery.BusinessDomain.Admin.csproj" />
-    <ProjectReference
-      Include="..\ModernSlavery.BusinessDomain.Registration\ModernSlavery.BusinessDomain.Registration.csproj" />
-    <ProjectReference
-      Include="..\ModernSlavery.BusinessDomain.Submission\ModernSlavery.BusinessDomain.Submission.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Registration\ModernSlavery.BusinessDomain.Registration.csproj" />
+    <ProjectReference Include="..\ModernSlavery.BusinessDomain.Submission\ModernSlavery.BusinessDomain.Submission.csproj" />
     <ProjectReference Include="..\ModernSlavery.BusinessDomain.Viewing\ModernSlavery.BusinessDomain.Viewing.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Database\ModernSlavery.Infrastructure.Database.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
-    <ProjectReference
-      Include="..\ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj" />
-    <ProjectReference
-      Include="..\ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Hosts\ModernSlavery.Infrastructure.Hosts.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Logging\ModernSlavery.Infrastructure.Logging.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Messaging\ModernSlavery.Infrastructure.Messaging.csproj" />
@@ -50,7 +46,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.10.0" />
+    <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.1" />
@@ -108,8 +104,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram"
-                     Link="DependencyValidation1.layerdiagram">
+    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram" Link="DependencyValidation1.layerdiagram">
       <Visible>False</Visible>
     </AdditionalFiles>
   </ItemGroup>
