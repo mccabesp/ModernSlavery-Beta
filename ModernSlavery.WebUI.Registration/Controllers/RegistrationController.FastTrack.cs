@@ -3,14 +3,16 @@ using ModernSlavery.WebUI.Registration.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Controllers;
 
 namespace ModernSlavery.WebUI.Registration.Controllers
 {
-    partial class RegistrationController
+    public partial class RegistrationController : BaseController
     {
         [Authorize]
         [HttpGet("fast-track")]
@@ -37,7 +39,39 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 return View("FastTrack", model);
             }
 
-            return View("FastTrack", model);
+            // TODO James - lockout after 3 attempts
+
+            var organisation = await this._registrationService
+                .OrganisationBusinessLogic
+                .GetOrganisationByEmployerReferenceAndSecurityCodeAsync(model.EmployerReference, model.SecurityCode);
+
+            if (organisation == null)
+            {
+                // fail - no organisation found
+                ModelState.AddModelError(3027); // is this the correct error code?
+                return View("FastTrack", model);
+            }
+            if (organisation.HasSecurityCodeExpired())
+            {
+                // fail - expired
+                ModelState.AddModelError(1144, nameof(FastTrackViewModel.SecurityCode)); // is this the correct error code?
+                return View("FastTrack", model);
+            }
+            // Cant link to org if they are already linked
+            if (organisation.UserOrganisations.Any(uo => uo.User == CurrentUser && uo.PINConfirmedDate == null))
+            {
+                // fail - organisation already registered
+                ModelState.AddModelError(3032); // is this the correct error code? it is duplicated in config
+                return View("FastTrack", model);
+            }
+
+            // success state ?
+
+            // IScopePresenter.CreateOrganisationViewModelAsync - this needs breaking down to be used in registraion
+            // - implies that FastTrackViewModel would need to be EnterCodesViewModel
+            //this._registrationService.ScopeBusinessLogic
+            //StashModel();
+            return RedirectToAction(nameof(ConfirmOrganisation));
         }
     }
 }

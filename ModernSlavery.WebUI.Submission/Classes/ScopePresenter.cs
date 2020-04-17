@@ -17,6 +17,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
     {
         // inteface
         ScopingViewModel CreateScopingViewModel(Organisation org, User currentUser);
+        // TODO James - move to registration presenter
         Task<OrganisationViewModel> CreateOrganisationViewModelAsync(EnterCodesViewModel enterCodes, User currentUser);
         Task<ScopingViewModel> CreateScopingViewModelAsync(EnterCodesViewModel enterCodes, User currentUser);
         Task SaveScopesAsync(ScopingViewModel model, IEnumerable<int> snapshotYears);

@@ -1,11 +1,10 @@
-﻿@inject IWebService WebService
-@model FastTrackViewModel
+﻿@model FastTrackViewModel
 @{
     Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = "Your organisation type - Modern Slavery reporting service";
+    ViewBag.Title = "Find your organisation - Modern Slavery reporting service";
 }
 
-<a id="BackLink" class="link-back" href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.RegistrationAdd))">Back <span class="visuallyhidden"> to the previous question</span></a>
+<a id="BackLink" class="link-back" href="@Url.Action("OrganisationType")">Back <span class="visuallyhidden"> to the previous question</span></a>
 <div id="grid-row">
     <div class="column-two-thirds">
         @using (Html.BeginForm())
@@ -24,28 +23,27 @@
                     If you have received a letter you can enter your employer reference and security code to fast track your organisation`s registration
                 </p>
 
-                @* TODO James - this layout does not seem spaced correctly, find correct markup *@
-                <div class="form-group">
+                <div class="form-group @Html.SetErrorClass(model => model.EmployerReference, "error")">
                     @Html.LabelFor(model => model.EmployerReference)
-
                     @Html.ValidationMessageFor(model => model.EmployerReference, "", new { @class = "error-danger" })
-
-                    @Html.CustomEditorFor(model => model.EmployerReference, new { @class = "form-control" })
+                    <div class="col-md-10">
+                        @Html.CustomEditorFor(model => model.EmployerReference, new { @class = "form-control" })
+                    </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group @Html.SetErrorClass(model => model.SecurityCode, "error")">
                     @Html.LabelFor(model => model.SecurityCode)
-
                     @Html.ValidationMessageFor(model => model.SecurityCode, "", new { @class = "error-danger" })
-
-                    @Html.CustomEditorFor(model => model.SecurityCode, new { @class = "form-control" })
+                    <div class="col-md-10">
+                        @Html.CustomEditorFor(model => model.SecurityCode, new { @class = "form-control" })
+                    </div>
                 </div>
             </div>
 
             <input type="submit" class="button" value="Continue" />
 
             <div>
-                <a href="@(WebService.RouteHelper.Get(UrlRouteOptions.Routes.SubmissionHome))" style="display: inline-block; margin-top: 1em;">Cancel</a>
+                <a href="@Url.Action("ManageOrganisations", "Submission")" style="display: inline-block; margin-top: 1em;">Cancel</a>
             </div>
         }
     </div>

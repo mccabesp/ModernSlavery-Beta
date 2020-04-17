@@ -65,7 +65,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             // TODO James - from GPG, why would form be null? should there by a null check?
             if (Request.Form["SectorType"] == "fasttrack")
-                return RedirectToAction("FastTrack");
+                return RedirectToAction(nameof(FastTrack));
 
             if (!model.SectorType.EqualsI(SectorTypes.Private, SectorTypes.Public))
             {
