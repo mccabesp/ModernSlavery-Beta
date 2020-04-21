@@ -65,12 +65,9 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 return View("FastTrack", model);
             }
 
-            // success state ?
-
-            // IScopePresenter.CreateOrganisationViewModelAsync - this needs breaking down to be used in registraion
-            // - implies that FastTrackViewModel would need to be EnterCodesViewModel
-            //this._registrationService.ScopeBusinessLogic
-            //StashModel();
+            // success state 
+            var vm = await _registrationPresenter.CreateOrganisationViewModelAsync(model, CurrentUser);
+            StashModel(vm);
             return RedirectToAction(nameof(ConfirmOrganisation));
         }
     }
