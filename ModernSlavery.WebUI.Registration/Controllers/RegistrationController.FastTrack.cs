@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.WebUI.Registration.Controllers
 {
@@ -18,11 +19,14 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [HttpGet("fast-track")]
         public async Task<IActionResult> FastTrack()
         {
+            // lockout from spam, return custom error
+            var remainingTime = await GetRetryLockRemainingTimeAsync("lastFastTrackCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
+            if (remainingTime > TimeSpan.Zero)
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
-
-            //TODO James - match functionality from GPG, eg lockout/spam protection
 
             return View("FastTrack", new FastTrackViewModel());
         }
@@ -33,39 +37,48 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [HttpPost("fast-track")]
         public async Task<IActionResult> FastTrack(FastTrackViewModel model)
         {
+            // lockout from spam, return custom error
+            var remainingTime = await GetRetryLockRemainingTimeAsync("lastFastTrackCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
+            if (remainingTime > TimeSpan.Zero)
+                return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+
+            //Ensure user has completed the registration process
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             if (!ModelState.IsValid)
             {
                 this.CleanModelErrors<FastTrackViewModel>();
                 return View("FastTrack", model);
             }
 
-            // TODO James - lockout after 3 attempts
-
             var organisation = await this._registrationService
                 .OrganisationBusinessLogic
                 .GetOrganisationByEmployerReferenceAndSecurityCodeAsync(model.EmployerReference, model.SecurityCode);
 
+            await IncrementRetryCountAsync("lastFastTrackCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
             if (organisation == null)
             {
                 // fail - no organisation found
-                ModelState.AddModelError(3027); // is this the correct error code?
+                ModelState.AddModelError(3027);
                 return View("FastTrack", model);
             }
-            if (organisation.HasSecurityCodeExpired())
+            else if (organisation.HasSecurityCodeExpired())
             {
                 // fail - expired
-                ModelState.AddModelError(1144, nameof(FastTrackViewModel.SecurityCode)); // is this the correct error code?
+                ModelState.AddModelError(1144, nameof(FastTrackViewModel.SecurityCode));
                 return View("FastTrack", model);
             }
-            // Cant link to org if they are already linked
-            if (organisation.UserOrganisations.Any(uo => uo.User == CurrentUser && uo.PINConfirmedDate == null))
+            else if (organisation.UserOrganisations.Any(uo => uo.User == CurrentUser && uo.PINConfirmedDate == null))
             {
-                // fail - organisation already registered
+                // fail - cant link to org if they are already linked
                 ModelState.AddModelError(3032); // is this the correct error code? it is duplicated in config
                 return View("FastTrack", model);
             }
 
             // success state 
+            await ClearRetryLocksAsync("lastFastTrackCode");
+
             var vm = await _registrationPresenter.CreateOrganisationViewModelAsync(model, CurrentUser);
             StashModel(vm);
             return RedirectToAction(nameof(ConfirmOrganisation));

@@ -6,12 +6,15 @@
 
 <a id="BackLink" class="link-back" href="@Url.Action("OrganisationType")">Back <span class="visuallyhidden"> to the previous question</span></a>
 <div id="grid-row">
-    <div class="column-two-thirds">
+    <div class="column-full">
         @using (Html.BeginForm())
         {
             @Html.AntiForgeryToken()
 
-            @await Html.CustomValidationSummaryAsync()
+            @if (ViewContext.ModelState.ErrorCount > 0)
+            {
+                @await Html.PartialAsync("Patterns/ErrorSummary", ViewContext.ModelState)
+            }
 
             <h1 class="heading-large">
                 Fast track registration
@@ -24,19 +27,15 @@
                 </p>
 
                 <div class="form-group @Html.SetErrorClass(model => model.EmployerReference, "error")">
-                    @Html.LabelFor(model => model.EmployerReference)
-                    @Html.ValidationMessageFor(model => model.EmployerReference, "", new { @class = "error-danger" })
-                    <div class="col-md-10">
-                        @Html.CustomEditorFor(model => model.EmployerReference, new { @class = "form-control" })
-                    </div>
+                    @Html.LabelFor(model => model.EmployerReference, new { @class = "form-label" })
+                    @Html.ValidationMessageFor(model => model.EmployerReference, "", new { @class = "error-message" })
+                    @Html.CustomEditorFor(model => model.EmployerReference, new { @class = "form-control" })
                 </div>
 
                 <div class="form-group @Html.SetErrorClass(model => model.SecurityCode, "error")">
-                    @Html.LabelFor(model => model.SecurityCode)
-                    @Html.ValidationMessageFor(model => model.SecurityCode, "", new { @class = "error-danger" })
-                    <div class="col-md-10">
-                        @Html.CustomEditorFor(model => model.SecurityCode, new { @class = "form-control" })
-                    </div>
+                    @Html.LabelFor(model => model.SecurityCode, new { @class = "form-label" })
+                    @Html.ValidationMessageFor(model => model.SecurityCode, "", new { @class = "error-message" })
+                    @Html.CustomEditorFor(model => model.SecurityCode, new { @class = "form-control" })
                 </div>
             </div>
 
