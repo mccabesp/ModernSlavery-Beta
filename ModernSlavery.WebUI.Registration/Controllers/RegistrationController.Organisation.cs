@@ -63,6 +63,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             //TODO validate the submitted fields
             ModelState.Clear();
 
+            // TODO James - from GPG, why would form be null? should there by a null check?
+            if (Request.Form["SectorType"] == "fasttrack")
+                return RedirectToAction(nameof(FastTrack));
+
             if (!model.SectorType.EqualsI(SectorTypes.Private, SectorTypes.Public))
             {
                 AddModelError(3005, "SectorType");
@@ -213,7 +217,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //Go to step 5 with results
             if (Request.Query["fail"].ToBoolean())
-                return RedirectToAction("ChooseOrganisation", "Registration", new {fail = true});
+                return RedirectToAction("ChooseOrganisation", "Registration", new { fail = true });
 
             return RedirectToAction("ChooseOrganisation");
         }
@@ -755,7 +759,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     .Select(o => o.OrganisationId);
                 if (results.Any()) orgIds.AddRange(results);
 
-                
+
                 results = _registrationService.OrganisationBusinessLogic.SearchOrganisations(model.OrganisationName, 49)
                     .Select(o => o.OrganisationId);
                 if (results.Any()) orgIds.AddRange(results);
@@ -1088,7 +1092,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     else
                         model.IsUkAddress = await _registrationService.PostcodeChecker.IsValidPostcode(employer.PostCode)
                             ? true
-                            : (bool?) null;
+                            : (bool?)null;
                 }
 
                 model.SicCodeIds = employer.SicCodeIds;
@@ -1422,7 +1426,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 {
                     org.OrganisationName = newName;
 
-                    var orgName = new OrganisationName {Name = newName, Source = newNameSource};
+                    var orgName = new OrganisationName { Name = newName, Source = newNameSource };
                     SharedBusinessLogic.DataRepository.Insert(orgName);
                     org.OrganisationNames.Add(orgName);
                 }
@@ -1476,7 +1480,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         foreach (var newSicCodeId in newSicCodeIds)
                         {
                             var sicCode = new OrganisationSicCode
-                                {Organisation = org, SicCodeId = newSicCodeId, Source = newSicSource};
+                            { Organisation = org, SicCodeId = newSicCodeId, Source = newSicSource };
                             SharedBusinessLogic.DataRepository.Insert(sicCode);
                             org.OrganisationSicCodes.Add(sicCode);
                         }
@@ -1566,7 +1570,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             if (userOrg == null)
             {
-                userOrg = new UserOrganisation {User = VirtualUser, Organisation = org, Created = now};
+                userOrg = new UserOrganisation { User = VirtualUser, Organisation = org, Created = now };
                 SharedBusinessLogic.DataRepository.Insert(userOrg);
             }
 

@@ -516,7 +516,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 || IsAnyAction(
                     "Registration/ReviewRequest",
                     "Registration/ReviewDUNSNumber",
-                    "Registration /ConfirmCancellation",
+                    "Registration/ConfirmCancellation",
                     "Registration/RequestAccepted",
                     "Registration/RequestCancelled"))
                 return new HttpForbiddenResult($"User {CurrentUser?.EmailAddress} is not an administrator");
@@ -534,7 +534,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 "Registration/AddContact",
                 "Registration/ConfirmOrganisation",
                 "Registration/RequestReceived",
-                "Registration/EnterFasttrackCodes"))
+                "Registration/FastTrack"))
                 return null;
 
             //Always allow users to manage their account

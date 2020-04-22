@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="5.0.0" />
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.447" />
+    <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,6 +49,14 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\assets\stylesheets\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram" Link="DependencyValidation1.layerdiagram">
+      <Visible>False</Visible>
+    </AdditionalFiles>
+    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
+    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
