@@ -22,7 +22,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             //invalid email addess
             Set("Email address").To("invalid");
-            Set("")
+            Set("");
         }
     }
 }
