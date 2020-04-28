@@ -80,6 +80,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             await ClearRetryLocksAsync("lastFastTrackCode");
 
             var vm = await _registrationPresenter.CreateOrganisationViewModelAsync(model, CurrentUser);
+            vm.ConfirmReturnAction = nameof(FastTrack);
             StashModel(vm);
             return RedirectToAction(nameof(ConfirmOrganisation));
         }
