@@ -9,7 +9,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
         [TestMethod]
         public override void RunTest()
         {
-            Run<RogerReportingUserCreatesAccount>();
+            //Run<RogerReportingUserCreatesAccount>();
             LoginAs<RogerReporter>();
 
             Click("Register an organisation");
@@ -27,8 +27,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
             Click("Continue");
 
             //validation messages to be confirmed
-            Expect("Please provide your Employer reference");
-            Expect("Please provide your Security code");            
+            Expect("You must enter an employer reference");
+            Expect("You must enter a security code");            
         }
     }
 }

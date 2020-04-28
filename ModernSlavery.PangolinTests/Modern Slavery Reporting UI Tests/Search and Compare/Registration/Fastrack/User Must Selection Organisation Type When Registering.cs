@@ -9,7 +9,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
         [TestMethod]
         public override void RunTest()
         {
-            Run<RogerReportingUserCreatesAccount>();
+            //Run<RogerReportingUserCreatesAccount>();
             LoginAs<RogerReporter>();
 
             Click("Register an organisation");
@@ -21,8 +21,10 @@ namespace Modern_Slavery_Reporting_UI_Tests
             //clicking continue without selecting a route throws error.
             Click("Continue");
 
-            ExpectHeader("The following errors were detected");
-            BelowHeader("The following errors were detected").Expect("There's a problem");
+            Expect("The following errors were detected");
+            Below("The following errors were detected").Expect("There’s a problem");
+
+            Expect("Please choose your type of organisation");
 
         }
     }

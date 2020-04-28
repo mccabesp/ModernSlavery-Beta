@@ -23,7 +23,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             Click("Continue");
 
-            ExpectHeader("Fast track regitration");
+            ExpectHeader("Fast track registration");
 
             BelowHeader("Fast track registration").ExpectText("If you have received a letter you can enter your employer reference and security code to fast track your organisation`s registration");
 

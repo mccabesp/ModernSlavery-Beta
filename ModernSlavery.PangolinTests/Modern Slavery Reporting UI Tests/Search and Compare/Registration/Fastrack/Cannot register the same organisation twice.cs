@@ -21,7 +21,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ClickLabel("Fast Track");
             Click("Continue");
 
-            ExpectHeader("Fast track regitration");
+            ExpectHeader("Fast track registration");
 
             //organisation already registered as part of pre-condition
             Set("Employer reference").To(Fastrack.ValidEmployerReference);

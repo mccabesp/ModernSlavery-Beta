@@ -9,7 +9,6 @@ namespace Modern_Slavery_Reporting_UI_Tests
         [TestMethod]
         public override void RunTest()
         {
-            Run<RogerReportingUserCreatesAccount>();
             LoginAs<RogerReporter>();
 
             Click("Register an organisation");
@@ -19,7 +18,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ClickLabel("Fast Track");
             Click("Continue");
 
-            ExpectHeader("Fast track regitration");
+            ExpectHeader("Fast track registration");
 
             //validation message to appear with expired security code
             Set("Employer reference").To(Fastrack.ValidEmployerReference);
@@ -27,7 +26,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             Click("Continue");
 
-            Expect("Your Security Code is no longer Valid");
+            Expect("Your Security Code has expired");
         }
     }
 }

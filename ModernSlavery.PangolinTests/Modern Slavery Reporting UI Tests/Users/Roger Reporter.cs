@@ -9,8 +9,12 @@ namespace Modern_Slavery_Reporting_UI_Tests
         [TestMethod]
         public override void RunTest()
         {
+            Goto("/");
+            Click("Sign in");
+            Set("EMail").To("stephen@coolcorner.com");
+            Set("Password").To("Cadence2007");
 
-            Set("EMail").To("...");
+            Click(The.Bottom, "Sign in");
         }
     }
 }

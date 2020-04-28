@@ -9,7 +9,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
         [TestMethod]
         public override void RunTest()
         {
-            Run<RogerReportingUserCreatesAccount>();
+            //Run<RogerReportingUserCreatesAccount>();
             LoginAs<RogerReporter>();
 
             Click("Register an organisation");
@@ -20,7 +20,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ClickLabel("Fast Track");
             Click("Continue");
 
-            ExpectHeader("Fast track regitration");
+            ExpectHeader("Fast track registration");
 
             //todo ensure valid security code added here
             Set("Employer reference").To(Fastrack.InvalidEmployerReference);
@@ -28,7 +28,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             Click("Continue");
 
-            Expect("You have entered an invalid employer reference or security code");
+            Expect("There's a problem with your employer reference or security code");
         }
     }
 }
