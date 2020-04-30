@@ -69,7 +69,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 ModelState.AddModelError(1144, nameof(FastTrackViewModel.SecurityCode));
                 return View("FastTrack", model);
             }
-            else if (organisation.UserOrganisations.Any(uo => uo.User == CurrentUser && uo.PINConfirmedDate == null))
+            else if (organisation.UserOrganisations.Any(uo => uo.User == CurrentUser && uo.PINConfirmedDate != null))
             {
                 // fail - cant link to org if they are already linked
                 ModelState.AddModelError(3032); // is this the correct error code? it is duplicated in config
@@ -80,6 +80,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             await ClearRetryLocksAsync("lastFastTrackCode");
 
             var vm = await _registrationPresenter.CreateOrganisationViewModelAsync(model, CurrentUser);
+            vm.ConfirmReturnAction = nameof(FastTrack);
             StashModel(vm);
             return RedirectToAction(nameof(ConfirmOrganisation));
         }
