@@ -4,11 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class RogerReportingUserCreatesAccount : UITest
+    public class Create_Account_Failure_Existing_Users : UITest
     {
         [TestMethod]
         public override void RunTest()
         {
+            //register account with email already verified in system
             Goto("/");
 
             Click("Sign in");
@@ -20,12 +21,12 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             ExpectHeader("Create an Account");
 
-            Set("Email address").To("roger@uat.co");
-            Set("Confrim your email address").To("roger@uat.co");
+            Set("Email address").To(create_account.existing_email);
+            Set("Confrim your email address").To(create_account.existing_email);
 
-            Set("First name").To("Roger");
-            Set("Last name").To("Reporter");
-            Set("Job title").To("Tester");
+            Set("First name").To("Existing");
+            Set("Last name").To("User");
+            Set("Job title").To("Reporter");
 
             Set("Pasword").To("Test1234");
             Set("Confirm password").To("Test1234");
@@ -35,12 +36,10 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             Click("Continue");
 
-            ExpectHeader("Verify your email address");
 
-            Expect("We have sent a confirmation email to");
-            Expect("roger@uat.co");
-            Expect("Follow the instructions in the email to continue your registration");
-
+            //todo check validation messages
+            Expect("The following errors were detected");
+            Expect("This email address has already been registered. Please enter a different email address or request a password reset.");
         }
     }
 }

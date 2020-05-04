@@ -165,22 +165,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Search and Compare\Registration\Fastrack\Cannot Register organisation with Expired Security Code.cs" />
-    <Compile Include="Search and Compare\Registration\Fastrack\Cannot register organisation with invalid Employer Reference.cs" />
-    <Compile Include="Search and Compare\Registration\Fastrack\Cannot Register Organisation With Invalid Security Code.cs" />
-    <Compile Include="Search and Compare\Registration\Fastrack\Cannot register the same organisation twice.cs" />
-    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack.Constants.cs" />
-    <Compile Include="Search and Compare\Registration\Fastrack\Fast track registration content check.cs" />
-    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack Registration Mandatory Fields Check.cs" />
-    <Compile Include="Search and Compare\Registration\Fastrack\Register Fastrack Organisation.cs" />
-    <Compile Include="Search and Compare\Registration\Fastrack\User Must Selection Organisation Type When Registering.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Spam_Protection_Reset_Count.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registration_Expired.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Invalid_Reference.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Invalid_Security.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Duplicate_Organisation.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\fastrack_constants.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Content_Check.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Mandatory_Fields.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Success.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\Registraion_Mandatory_Organisation_Type.cs" />
     <Compile Include="Search and Compare\Registration\Registration Options Content Check.cs" />
-    <Compile Include="Search and Compare\Sign-in\Create an Account\Create an account Content Check.cs" />
-    <Compile Include="Search and Compare\Sign-in\Create an Account\Create an Account validation check.cs" />
-    <Compile Include="Search and Compare\Sign-in\Create an Account\Roger Reporting User Creates Account.cs" />
-    <Compile Include="Search and Compare\Sign-in\Sign in page content check.cs" />
-    <Compile Include="Search and Compare\Registration\Fastrack\Three different failed registration attempts freeze user.cs" />
-    <Compile Include="Search and Compare\Registration\Fastrack\Three repeated registration attempts freeze user.cs" />
+    <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Failure_Awaiting_Verification_Check.cs" />
+    <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Content_Check.cs" />
+    <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Failure_Existing_User.cs" />
+    <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Password_Rules.cs" />
+    <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Validation_Check.cs" />
+    <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Success.cs" />
+    <Compile Include="Search and Compare\Sign-in\Create an Account\create_account_constants.cs" />
+    <Compile Include="Search and Compare\Sign-in\Sign_In_Content_Check.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Spam_Protection_Different.cs" />
+    <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Spam_Protection_Same.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\Roger Reporter.cs" />
