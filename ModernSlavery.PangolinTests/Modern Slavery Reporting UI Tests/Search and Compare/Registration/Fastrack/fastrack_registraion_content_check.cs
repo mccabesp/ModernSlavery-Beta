@@ -4,12 +4,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class FastTrackRegistrationContentCheck : UITest
+    public class Fastrack_Registraion_Content_Check : UITest
     {
+        [TestCategory("Fasttrack")]
         [TestMethod]
         public override void RunTest()
         {
-            Run<RogerReportingUserCreatesAccount>();
             LoginAs<RogerReporter>();
 
             Click("Register an organisation");

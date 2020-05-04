@@ -4,8 +4,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class FastrackRegistrationMandatoryFieldsCheck : UITest
+    public class Registraion_Mandatory_Organisation_Type : UITest
     {
+        [TestCategory("Fasttrack")]
         [TestMethod]
         public override void RunTest()
         {
@@ -17,18 +18,15 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             ExpectHeader("Registration Options");
 
-            ClickLabel("Fast Track");
 
+            //clicking continue without selecting a route throws error.
             Click("Continue");
 
-            ExpectHeader("Fast track registration");
+            Expect("The following errors were detected");
+            Below("The following errors were detected").Expect("There’s a problem");
 
-            //clicking continue without fields filled in should trigger validation
-            Click("Continue");
+            Expect("Please choose your type of organisation");
 
-            //validation messages to be confirmed
-            Expect("You must enter an employer reference");
-            Expect("You must enter a security code");            
         }
     }
 }

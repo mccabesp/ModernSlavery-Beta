@@ -4,8 +4,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class CannotRegisterOrganisationWithExpiredSecurityCode : UITest
+    public class Fastrack_Registration_Expired : UITest
     {
+        [TestProperty("Work item", "3")]
+        [TestCategory("Fasttrack")]
         [TestMethod]
         public override void RunTest()
         {
@@ -21,12 +23,14 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Fast track registration");
 
             //validation message to appear with expired security code
-            Set("Employer reference").To(Fastrack.ValidEmployerReference);
+            Set("Employer reference").To(Fastrack.ExpiredEmployerReference);
             Set("Security code").To(Fastrack.ExpiredSecurityCode);
 
             Click("Continue");
 
-            Expect("Your Security Code has expired");
+            Expect("3Your Security Code has expired");
+
+            TakeScreenshot("Expired");
         }
     }
 }

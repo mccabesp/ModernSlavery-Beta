@@ -4,15 +4,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class RegisterFastrackOrganisation : UITest
+    public class Fastrack_Registraion_Duplicate_Organisation : UITest
     {
-        [TestProperty("Sprint", "2")]
+        [TestCategory("Fasttrack")]
         [TestMethod]
         public override void RunTest()
-
         {
-            //Run<RogerReportingUserCreatesAccount>();
-
+            //Run<Fastrack_Registraion_Success>();
             LoginAs<RogerReporter>();
 
             Click("Register an organisation");
@@ -43,7 +41,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             Click("Confirm");
             ExpectHeader("You can now publish a Modern Slavery statement on behalf of this organisation.");
 
-            AtLabel("Employer name").Expect("");
+            AtLabel("Employer name").Expect("MILLBROOK HEALTHCARE LTD");
 
             BelowLabel("Employer name").ExpectText("You can also specify whether this employer is in scope of the reporting regulations.");
 
@@ -54,6 +52,25 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectRow("Organisation name");
             AtRow("Organisation name").Column("Organisation Status").Expect("Registration Complete");
 
+            LoginAs<RogerReporter>();
+
+            Click("Register an organisation");
+
+
+            ExpectHeader("Registration Options");
+
+            ClickLabel("Fast Track");
+            Click("Continue");
+
+            ExpectHeader("Fast track registration");
+
+            //organisation already registered as part of pre-condition
+            Set("Employer reference").To(Fastrack.ValidEmployerReference);
+            Set("Security code").To(Fastrack.SecurtiyCode_Millbrook);
+
+            Click("Continue");
+
+            Expect("You have already registered this organisation");
         }
     }
 }

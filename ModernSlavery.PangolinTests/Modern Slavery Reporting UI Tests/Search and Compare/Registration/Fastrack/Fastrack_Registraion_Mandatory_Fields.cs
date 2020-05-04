@@ -4,8 +4,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class CannotRegisterOrganisationWithInvalidEmployerReference : UITest
+    public class Fastrack_Registraion_Mandatory_Fields : UITest
     {
+        [TestCategory("Fasttrack")]
         [TestMethod]
         public override void RunTest()
         {
@@ -18,17 +19,17 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Registration Options");
 
             ClickLabel("Fast Track");
+
             Click("Continue");
 
             ExpectHeader("Fast track registration");
 
-            //todo ensure valid security code added here
-            Set("Employer reference").To(Fastrack.InvalidEmployerReference);
-            Set("Security code").To(Fastrack.ValidSecurityCode);
-
+            //clicking continue without fields filled in should trigger validation
             Click("Continue");
 
-            Expect("There's a problem with your employer reference or security code");
+            //validation messages to be confirmed
+            Expect("You must enter an employer reference");
+            Expect("You must enter a security code");
         }
     }
 }

@@ -4,13 +4,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class CannotRegisterTheSameOrganisationTwice : UITest
+    public class Fastrack_Registraion_Invalid_Security : UITest
     {
+        [TestCategory("Fasttrack")]
         [TestMethod]
         public override void RunTest()
         {
-            Run<RegisterFastrackOrganisation>();
-
+            //Run<RogerReportingUserCreatesAccount>();
             LoginAs<RogerReporter>();
 
             Click("Register an organisation");
@@ -19,17 +19,19 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Registration Options");
 
             ClickLabel("Fast Track");
+
             Click("Continue");
 
             ExpectHeader("Fast track registration");
 
-            //organisation already registered as part of pre-condition
+            //todo ensure valid employer reference added here
             Set("Employer reference").To(Fastrack.ValidEmployerReference);
-            Set("Security code").To(Fastrack.ValidSecurityCode);
+            Set("Security code").To(Fastrack.InvalidSecurityCode);
 
             Click("Continue");
 
-            Expect("You have already registered this organisation");
+            Expect("There's a problem with your employer reference or security code");
+
         }
     }
 }
