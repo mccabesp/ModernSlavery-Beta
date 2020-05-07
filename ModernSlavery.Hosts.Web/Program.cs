@@ -26,7 +26,7 @@ namespace ModernSlavery.Hosts.Web
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static IHostBuilder CreateHostBuilder(string[] args)
+        public static IHostBuilder CreateHostBuilder(params string[] args)
         {
             //Create the web host
             return WebHost.ConfigureWebHostBuilder<DependencyModule>(commandlineArgs: args);

@@ -18,7 +18,7 @@ namespace ModernSlavery.Infrastructure.Configuration
 {
     public class DependencyBuilder : IDisposable, IDependencyBuilder
     {
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; set; }
         private string _assemblyPrefix;
         private IContainer _optionsContainer;
         private readonly bool _autoConfigureOnBuild;
