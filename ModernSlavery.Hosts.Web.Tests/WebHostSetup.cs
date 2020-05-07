@@ -24,18 +24,12 @@ public class WebHostSetup
         //Build the web host using the default dependencies
         var webHostBuilder = ModernSlavery.Hosts.Web.Program.CreateHostBuilder();
 
-        #region Override any default dependencies with test dependencies
-        //Create a temporary dependency builder
-        DependencyBuilder dependencyBuilder = new DependencyBuilder(null);
         webHostBuilder.ConfigureServices((context, serviceCollection) => { 
-            dependencyBuilder.Services = serviceCollection;
-            dependencyBuilder.Configuration = context.Configuration;
+            //Override any dependency services here
         });
-        webHostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) => dependencyBuilder.Autofac = builder);
-
-        //Load the test dependencies
-        dependencyBuilder.RegisterModule<DependencyModule>();
-        #endregion
+        webHostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) => {
+            //Override any autofac services here
+        });
 
         //Build and start the host
         WebTestHost = await webHostBuilder.StartAsync();
