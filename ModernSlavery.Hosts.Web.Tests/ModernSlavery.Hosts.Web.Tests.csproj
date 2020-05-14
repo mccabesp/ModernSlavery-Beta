@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ModernSlavery.Hosts.IdServer\ModernSlavery.Hosts.IdServer.csproj" />
     <ProjectReference Include="..\ModernSlavery.Hosts.Web\ModernSlavery.Hosts.Web.csproj" />
     <ProjectReference Include="..\ModernSlavery.Testing.Helpers\ModernSlavery.Testing.Helpers.csproj" />
   </ItemGroup>

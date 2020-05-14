@@ -16,7 +16,7 @@ namespace ModernSlavery.Infrastructure.Configuration
         public readonly IServiceCollection Services;
         private string _assemblyPrefix;
 
-        public OptionsBinder(IConfiguration configuration, string assemblyPrefix)
+        public OptionsBinder(IConfiguration configuration, string assemblyPrefix=null)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             Services=new ServiceCollection();

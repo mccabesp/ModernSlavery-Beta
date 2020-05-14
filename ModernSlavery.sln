@@ -95,9 +95,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.BusinessDomai
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.StaticFiles", "ModernSlavery.WebUI.StaticFiles\ModernSlavery.WebUI.StaticFiles.csproj", "{45DEB984-07C4-41D7-BE4C-C47C4226D91E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Hosts.Web.Tests", "ModernSlavery.Hosts.Web.Tests\ModernSlavery.Hosts.Web.Tests.csproj", "{CBA75BAF-E989-4EFB-B204-87E365706D34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Hosts.Web.Tests", "ModernSlavery.Hosts.Web.Tests\ModernSlavery.Hosts.Web.Tests.csproj", "{CBA75BAF-E989-4EFB-B204-87E365706D34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Testing.Helpers", "ModernSlavery.Testing.Helpers\ModernSlavery.Testing.Helpers.csproj", "{0C5A16AE-ABF8-495B-A5E3-9FD22FE7B589}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Testing.Helpers", "ModernSlavery.Testing.Helpers\ModernSlavery.Testing.Helpers.csproj", "{0C5A16AE-ABF8-495B-A5E3-9FD22FE7B589}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -22,7 +22,7 @@ public class WebHostSetup
     public async Task RunBeforeAnyTestsAsync()
     {
         //Build the web host using the default dependencies
-        var webHostBuilder = ModernSlavery.Hosts.Web.Program.CreateHostBuilder();
+        var webHostBuilder = ModernSlavery.Hosts.Web.Program.CreateHostBuilder("--environment","Test");
 
         webHostBuilder.ConfigureServices((context, serviceCollection) => { 
             //Override any dependency services here

@@ -1,4 +1,8 @@
 ﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace ModernSlavery.Core.Interfaces
 {
@@ -16,7 +20,9 @@ namespace ModernSlavery.Core.Interfaces
         ///     You can also register other modules using builder.Register<TModule>()
         /// </summary>
         /// <param name="builder">This is the instance of DependencyBuilder for the application host</param>
-        void Register(IDependencyBuilder builder);
+        void ConfigureServices(IServiceCollection services);
+
+        public void ConfigureContainer(ContainerBuilder builder);
 
         /// <summary>
         ///     Place any configuration of your services registered in "Configure" method.
@@ -24,5 +30,7 @@ namespace ModernSlavery.Core.Interfaces
         /// </summary>
         /// <param name="lifetimeScope">The AutoFac scope for resolution of registered dependencies</param>
         public void Configure(ILifetimeScope lifetimeScope);
+
+        public void RegisterModules(IList<Type> modules);
     }
 }

@@ -20,7 +20,18 @@ namespace ModernSlavery.Infrastructure.Hosts
         {
             var hostBuilder = new HostBuilder();
             
-            hostBuilder.ConfigureHost<TStartupModule>(applicationName, contentRoot, autoConfigureOnBuild: true, commandlineArgs:commandlineArgs);
+            //Setup the configuration sources and builder
+            var configBuilder = hostBuilder.ConfigureHost(applicationName, contentRoot, commandlineArgs: commandlineArgs);
+
+            //Load all the IOptions in the domain
+            var optionsBinder = new OptionsBinder(configBuilder.Build());
+            optionsBinder.BindAssemblies();
+
+            var dependencyBuilder = new DependencyBuilder();
+            dependencyBuilder.Build<TStartupModule>(optionsBinder.Services);
+            dependencyBuilder.PopulateHostServices(hostBuilder);
+            dependencyBuilder.PopulateHostContainer(hostBuilder,true);
+
             hostBuilder.ConfigureWebJobs(webjobHostBuilder =>
                 {
                     webjobHostBuilder.AddAzureStorageCoreServices();
@@ -36,8 +47,10 @@ namespace ModernSlavery.Infrastructure.Hosts
                     webjobHostBuilder.AddServiceBus();
                     webjobHostBuilder.AddEventHubs();
                     webjobHostBuilder.AddTimers();
+
+
                 });
-            
+
             return hostBuilder;
         }
     }

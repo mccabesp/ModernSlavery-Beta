@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using Autofac;
@@ -18,6 +19,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
 using ModernSlavery.Infrastructure.CompaniesHouse;
+using ModernSlavery.Infrastructure.Configuration;
 using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
@@ -36,6 +38,7 @@ namespace ModernSlavery.Hosts.Web
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
+
         private readonly SharedOptions _sharedOptions;
         private readonly CompaniesHouseOptions _coHoOptions;
         private readonly ResponseCachingOptions _responseCachingOptions;
@@ -66,16 +69,15 @@ namespace ModernSlavery.Hosts.Web
 
         #endregion
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
- 
             //Allow handler for caching of http responses
-            builder.Services.AddResponseCaching();
+            services.AddResponseCaching();
 
             //Allow creation of a static http context anywhere
-            builder.Services.AddHttpContextAccessor();
+            services.AddHttpContextAccessor();
 
-            var mvcBuilder = builder.Services.AddControllersWithViews(
+            var mvcBuilder = services.AddControllersWithViews(
                     options =>
                     {
                         options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
@@ -97,17 +99,15 @@ namespace ModernSlavery.Hosts.Web
             mvcBuilder.AddRazorClassLibrary<WebUI.Shared.DependencyModule>();
             mvcBuilder.AddRazorClassLibrary<WebUI.GDSDesignSystem.DependencyModule>();
 
-            builder.RegisterModule<WebUI.StaticFiles.DependencyModule>();
-            builder.RegisterModule<WebUI.Account.DependencyModule>();
-            builder.RegisterModule<WebUI.Admin.DependencyModule>();
-            builder.RegisterModule<WebUI.Registration.DependencyModule>();
-            builder.RegisterModule<WebUI.Submission.DependencyModule>();
-            builder.RegisterModule<WebUI.Viewing.DependencyModule>();
+            //Log all the application parts when in development
+            if (_sharedOptions.IsLocal() || _sharedOptions.IsDevelopment())
+                services.AddHostedService<ApplicationPartsLogger>();
 
             // Add controllers, taghelpers, views as services so attribute dependencies can be resolved in their contructors
             mvcBuilder.AddControllersAsServices(); 
             mvcBuilder.AddTagHelpersAsServices();
             mvcBuilder.AddViewComponentsAsServices();
+
 
             // Set the default resolver to use Pascalcase instead of the default camelCase which may break Ajaz responses
             mvcBuilder.AddJsonOptions(options =>
@@ -124,9 +124,9 @@ namespace ModernSlavery.Hosts.Web
                     });
 
             //Add antiforgery token by default to forms
-            builder.Services.AddAntiforgery();
+            services.AddAntiforgery();
 
-            builder.Services.AddRazorPages();
+            services.AddRazorPages();
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
@@ -134,7 +134,7 @@ namespace ModernSlavery.Hosts.Web
             //if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
 
             //Add services needed for sessions
-            builder.Services.AddSession(
+            services.AddSession(
                 o =>
                 {
                     o.Cookie.IsEssential = true; //This is required otherwise session will not load
@@ -151,45 +151,23 @@ namespace ModernSlavery.Hosts.Web
                 });
 
             //Add the distributed cache and data protection
-            builder.Services.AddDistributedCache(_distributedCacheOptions)
+            services.AddDistributedCache(_distributedCacheOptions)
                 .AddDataProtection(_dataProtectionOptions);
 
             //Add app insights tracking
-            builder.Services.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
+            services.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
 
             //This may now be required 
-            builder.Services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
+            services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
 
             //Override any test services
-            ConfigureTestServices?.Invoke(builder.Services);
+            ConfigureTestServices?.Invoke(services);
 
-            //Register the file storage dependencies
-            builder.RegisterModule<FileStorageDependencyModule>();
 
-            //Register the queue storage dependencies
-            builder.RegisterModule<QueueStorageDependencyModule>();
-
-            //Register the queue storage dependencies
-            builder.Autofac.RegisterType<DnBOrgsRepository>().As<IDnBOrgsRepository>().WithParameter("dataPath", _sharedOptions.DataPath).WithAttributeFiltering();
-
-            //Register the log storage dependencies
-            builder.RegisterModule<Infrastructure.Logging.DependencyModule>();
-
-            //Register the search dependencies
-            builder.RegisterModule<Infrastructure.Search.DependencyModule>();
-
-            builder.Autofac.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
-
-            //Register the user audit log repository
-            builder.Autofac.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
-
-            // Register Action helpers
-            builder.Autofac.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
-                .SingleInstance();
 
             #region Configure authentication client
             //Configure the services required for authentication by IdentityServer
-            builder.Services.AddIdentityServerClient(
+            services.AddIdentityServerClient(
                 _sharedOptions.IdentityIssuer,
                 _sharedOptions.SiteAuthority,
                 "ModernSlaveryServiceWebsite",
@@ -197,22 +175,35 @@ namespace ModernSlavery.Hosts.Web
                 BackChannelHandler);
             #endregion
 
-            builder.Autofac.Register(
-                x =>
-                {
-                    var actionContext = x.Resolve<IActionContextAccessor>().ActionContext;
-                    var factory = x.Resolve<IUrlHelperFactory>();
-                    return factory.GetUrlHelper(actionContext);
-                });
-
-            //Register google analytics tracker
-            builder.RegisterModule<GoogleAnalyticsDependencyModule>();
-
             //Register the AutoMapper configurations in all domain assemblies
-            builder.Services.AddAutoMapper(_sharedOptions.IsLocal() || _sharedOptions.IsDevelopment());
+            services.AddAutoMapper(_sharedOptions.IsLocal() || _sharedOptions.IsDevelopment());
+
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            //Register the queue storage dependencies
+            builder.RegisterType<DnBOrgsRepository>().As<IDnBOrgsRepository>().WithParameter("dataPath", _sharedOptions.DataPath).WithAttributeFiltering();
+
+            builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
+
+            //Register the user audit log repository
+            builder.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
+
+            // Register Action helpers
+            builder.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
+                .SingleInstance();
+
+            builder.Register(x =>
+            {
+                var actionContext = x.Resolve<IActionContextAccessor>().ActionContext;
+                var factory = x.Resolve<IUrlHelperFactory>();
+                return factory.GetUrlHelper(actionContext);
+            });
 
             //Override any test services
-            ConfigureTestContainer?.Invoke(builder.Autofac);
+            ConfigureTestContainer?.Invoke(builder);
+
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
@@ -240,7 +231,6 @@ namespace ModernSlavery.Hosts.Web
             app.UseHttpsRedirection();
             //app.UseResponseCompression(); //Disabled to use IIS compression which has better performance (see https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-2.1)
            
-
             app.UseRouting();
             app.UseResponseCaching();
             app.UseSession(); //Must be before UseMvC or any middleware which requires session
@@ -276,6 +266,32 @@ namespace ModernSlavery.Hosts.Web
                     //     may still be in flight. Shutdown will block until this event completes.
                     _logger.LogInformation("Application Stopping");
                 });
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            modules.Add(typeof(WebUI.StaticFiles.DependencyModule));
+            modules.Add(typeof(WebUI.Account.DependencyModule));
+            modules.Add(typeof(WebUI.Admin.DependencyModule));
+            modules.Add(typeof(WebUI.Registration.DependencyModule));
+            modules.Add(typeof(WebUI.Submission.DependencyModule));
+            modules.Add(typeof(WebUI.Viewing.DependencyModule));
+
+            //Register the file storage dependencies
+            modules.Add(typeof(FileStorageDependencyModule));
+
+            //Register the queue storage dependencies
+            modules.Add(typeof(QueueStorageDependencyModule));
+
+            //Register the log storage dependencies
+            modules.Add(typeof(Infrastructure.Logging.DependencyModule));
+
+            //Register the search dependencies
+            modules.Add(typeof(Infrastructure.Search.DependencyModule));
+
+            //Register google analytics tracker
+            modules.Add(typeof(GoogleAnalyticsDependencyModule));
+
         }
     }
 }

@@ -7,8 +7,10 @@ using Autofac;
 using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -16,15 +18,14 @@ using IContainer = Autofac.IContainer;
 
 namespace ModernSlavery.Infrastructure.Configuration
 {
-    public class DependencyBuilder : IDisposable, IDependencyBuilder
+    public class DependencyBuilder : IDisposable
     {
         public IConfiguration Configuration { get; set; }
         private string _assemblyPrefix;
         private IContainer _optionsContainer;
         private readonly bool _autoConfigureOnBuild;
-        public DependencyBuilder(IConfiguration configuration, string assemblyPrefix = null, bool autoConfigureOnBuild=true)
+        public DependencyBuilder(string assemblyPrefix = null, bool autoConfigureOnBuild=true)
         {
-            Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             if (string.IsNullOrWhiteSpace(assemblyPrefix)) assemblyPrefix = nameof(ModernSlavery);
             _assemblyPrefix = assemblyPrefix;
             _autoConfigureOnBuild = autoConfigureOnBuild;
@@ -32,51 +33,32 @@ namespace ModernSlavery.Infrastructure.Configuration
 
         public void Dispose()
         {
-            Services = null;
-            Autofac = null;
+            _serviceActions = null;
+            _containerActions = null;
+            _configActions = null;
             _registeredModules = null;
             _configuredModules = null;
             _registeredAssemblyNames = null;
         }
 
-        public IServiceCollection Services { get; set; }=new ServiceCollection();
-
-        public ContainerBuilder Autofac { get; set; }
         public ILifetimeScope LifetimeScope { get; set; }
-        public AutofacServiceProviderFactory ServiceProviderFactory { get; set; }
 
         private readonly Dictionary<string, Assembly> _loadedAssemblies = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
         private SortedSet<string> _registeredAssemblyNames = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
         private Dictionary<Type, IDependencyModule> _registeredModules = new Dictionary<Type, IDependencyModule>();
         private HashSet<Type> _configuredModules = new HashSet<Type>();
 
-        public void Build<TStartupModule>(ContainerBuilder builder) where TStartupModule : class, IDependencyModule
+
+        private List<Action<IServiceCollection>> _serviceActions = new List<Action<IServiceCollection>>();
+        private List<Action<ContainerBuilder>> _containerActions = new List<Action<ContainerBuilder>>();
+        private List<Action<ILifetimeScope>> _configActions = new List<Action<ILifetimeScope>>();
+
+        public void Build<TStartupModule>(IServiceCollection optionServices) where TStartupModule : class, IDependencyModule
         {
-            //Create the builder for registering all dependency modules
-            Autofac = builder;
-            Autofac.RegisterBuildCallback(lifeTimeScope =>
-            {
-                LifetimeScope = lifeTimeScope;//This full scope will be required later when calling ConfigModules
-
-                //Automatically run the configuration modules
-                if (_autoConfigureOnBuild)ConfigureModules();
-
-            });
-            
-
-            //Load all the IOptions in the domain
-            var optionsBinder = new OptionsBinder(Configuration, _assemblyPrefix);
-            optionsBinder.BindAssemblies();
-
             //Populate the temporary builder for resolving constructors of dependency modules
             var innerBuider = new ContainerBuilder();
-            innerBuider.Populate(Services);
-            innerBuider.Populate(optionsBinder.Services);
+            innerBuider.Populate(optionServices);
             _optionsContainer = innerBuider.Build();
-            Autofac.Populate(optionsBinder.Services);
-
-            //Clear the services otherwise we will get duplicated IHost which cases "Server has already started" exception when host is run.
-            Services = new ServiceCollection();
 
             //Ensure domain assemblies are preloaded
             AppDomain.CurrentDomain.GetAssemblies()
@@ -85,9 +67,6 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             //Register the DependencyModules in the root assembly and all descendent assemblies
             RegisterModules(typeof(TStartupModule).Assembly);
-
-            //Populate the default builder with all the services created using dependency modules by the dependency builder
-            Autofac.Populate(Services);
         }
 
         /// <summary>
@@ -113,46 +92,41 @@ namespace ModernSlavery.Infrastructure.Configuration
 
                 referencedAssembly = _loadedAssemblies[referencedAssemblyName.FullName];
 
+                //Recursiveley load all referenced assemblies and their modules
                 RegisterModules(referencedAssembly);
             }
 
+            //Get alll referenced IDependencyModule class types
             var assemblyModuleTypes = assembly.ExportedTypes.Where(p => p.IsClass && typeof(IDependencyModule).IsAssignableFrom(p)).ToList();
 
+            RegisterModules(assemblyModuleTypes);
+        }
+
+        private void RegisterModules(List<Type> assemblyModuleTypes)
+        {
             foreach (var assemblyModuleType in assemblyModuleTypes)
             {
                 if (_registeredModules.ContainsKey(assemblyModuleType)) continue;
 
                 var moduleName = assemblyModuleType.FullName ?? assemblyModuleType.ToString();
 
-                //If only 1 dependency the load it 
+                //If only 1 dependency then load it 
                 var moduleInstance = CreateInstance(assemblyModuleType);
-                moduleInstance.Register(this);
                 _registeredModules[assemblyModuleType] = moduleInstance;
+
+                var childModules = new List<Type>();
+                moduleInstance.RegisterModules(childModules);
+
+                var badModules = childModules.Where(m => !m.IsClass || !typeof(IDependencyModule).IsAssignableFrom(m)).Select(m=>m.Name);
+                if (badModules.Any()) throw new Exception($"Registered types do not inherit from IDependencyModule: {badModules.ToDelimitedString()}");
+
+                _serviceActions.Add(moduleInstance.ConfigureServices);
+                _containerActions.Add(moduleInstance.ConfigureContainer);
+                _configActions.Add(moduleInstance.Configure);
+
+                if (childModules.Any())RegisterModules(childModules);
             }
         }
-
-
-        /// <summary>
-        ///     Registers all dependencies declared within the Bind method of the specified IDependencyModule
-        /// </summary>
-        /// <typeparam name="TModule">The IDependenciesModule class containing the dependencies</typeparam>
-        public void RegisterModule<TModule>() where TModule : class, IDependencyModule
-        {
-            //Resolve a new instance of the dependencies module
-            RegisterModule(typeof(TModule));
-        }
-
-
-        private void RegisterModule(Type moduleType)
-        {
-            //Check if the dependency module has already been registered
-            if (_registeredModules.ContainsKey(moduleType)) return;
-
-            var moduleInstance = CreateInstance(moduleType);
-            moduleInstance.Register(this);
-            _registeredModules[moduleType] = moduleInstance;
-        }
-
 
         IDependencyModule CreateInstance(Type moduleType)
         {
@@ -197,5 +171,46 @@ namespace ModernSlavery.Infrastructure.Configuration
                     ConfigureModule(innerScope, moduleType);
             }
         }
+
+        public void PopulateHostServices(IHostBuilder hostBuilder)
+        {
+            hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
+            {
+                //Add the services loaded from the dependency modules
+            });
+        }
+
+        public void PopulateHostServices(IWebHostBuilder hostBuilder)
+        {
+            hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
+            {
+                //Register the service actions
+                _serviceActions.ForEach(action => action(serviceCollection));
+            });
+        }
+
+
+        public void PopulateHostContainer(IHostBuilder hostBuilder,bool autoConfigure=false)
+        {
+            hostBuilder.ConfigureContainer<ContainerBuilder>((hostBuilderContext, containerBuilder) =>
+            {
+                //Register the container actions
+                _containerActions.ForEach(action => action(containerBuilder));
+
+                if (autoConfigure) containerBuilder.RegisterBuildCallback((lifetimeScope) => _configActions.ForEach(action => action(lifetimeScope)));
+            });
+        }
+
+        public void ConfigureHost(IWebHostBuilder hostBuilder, ILifetimeScope lifetimeScope=null)
+        {
+            hostBuilder.Configure((appBuilder) =>
+            {
+                //Register the configuration actions
+                lifetimeScope = lifetimeScope ?? appBuilder.ApplicationServices.GetRequiredService<ILifetimeScope>();
+
+                _configActions.ForEach(action => action(lifetimeScope));
+            });
+        }
+
     }
 }

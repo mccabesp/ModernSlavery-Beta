@@ -56,6 +56,7 @@ namespace ModernSlavery.WebUI.StaticFiles
             if (_sharedOptions.IsLocal())
             {
                 var wwwroot = Path.Combine(Directory.GetParent(Environment.CurrentDirectory).FullName, this.GetType().Namespace, "wwwroot");
+                var ass = System.Reflection.Assembly.GetExecutingAssembly();
                 staticFileOptions.FileProvider = new PhysicalFileProvider(wwwroot);
             }
 

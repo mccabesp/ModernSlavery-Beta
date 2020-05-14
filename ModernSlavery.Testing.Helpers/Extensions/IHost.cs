@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.WebUI.Shared.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,5 +26,11 @@ namespace ModernSlavery.Testing.Helpers
         {
             return host.Services.GetRequiredService<IFileRepository>();
         }
+
+        public static IHttpSession GetHttpSession(this IHost host)
+        {
+            return host.Services.GetRequiredService<IHttpSession>();
+        }
+
     }
 }

@@ -1,18 +1,20 @@
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Testing.Helpers;
+using ModernSlavery.WebUI.Shared.Interfaces;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using static ModernSlavery.Core.Extensions.Web;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [SetUpFixture]
+    [TestFixture]
     public class WebHostSampleTest
     {
         private string _webAuthority;
         private IDataRepository _dataRepository;
         private IFileRepository _fileRepository;
+        private IHttpSession _httpSession;
 
         [OneTimeSetUp]
         public void RunBeforeAnyTests()
@@ -25,6 +27,9 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //Get the file repository from the test web host
             _fileRepository = WebHostSetup.WebTestHost.GetFileRepository();
+
+            //Get the http session from the test web host
+            _httpSession = WebHostSetup.WebTestHost.GetHttpSession();
         }
 
         [Test]

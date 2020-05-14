@@ -10,6 +10,7 @@ using System.Threading;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,124 +26,87 @@ namespace ModernSlavery.Infrastructure.Hosts
 {
     public static partial class Extensions
     {
-        private static string _EnvironmentName;
-
-        public static string EnvironmentName
+        public static ConfigBuilder ConfigureHost(this IHostBuilder hostBuilder, string applicationName = null, string contentRoot = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) 
         {
-            get
-            {
-                if (_EnvironmentName == null)
-                {
-                    _EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName))
-                        _EnvironmentName = Environment.GetEnvironmentVariable("ASPNET_ENV");
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName))
-                        _EnvironmentName = Environment.GetEnvironmentVariable("Hosting:Environment");
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName))
-                        _EnvironmentName = Environment.GetEnvironmentVariable("AzureWebJobsEnv");
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName))
-                        _EnvironmentName =
-                            Environment.GetEnvironmentVariable("Environment"); //This is used by webjobs SDK v3 
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName) &&
-                        Environment.GetEnvironmentVariable("DEV_ENVIRONMENT").ToBoolean()) _EnvironmentName = "Local";
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName)) _EnvironmentName = "Local";
-                }
-
-                return _EnvironmentName;
-            }
-            set => _EnvironmentName = value;
-        }
-
-        public static IHostBuilder ConfigureHost<TStartupModule>(this IHostBuilder hostBuilder, string applicationName = null, string contentRoot = null, bool autoConfigureOnBuild=false,Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
-        {
-            //Set the console title to the application name
             if (string.IsNullOrWhiteSpace(applicationName)) applicationName = Assembly.GetEntryAssembly().GetName().Name;
+
+            //Set the console title to the application name
             Console.Title = applicationName;
 
             //Add a handler for unhandled exceptions
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            //Configure the host defaults
-            hostBuilder.UseEnvironment(EnvironmentName);
+            //Build the configuration and save till later
+            var configBuilder = new ConfigBuilder();
+            if (!string.IsNullOrWhiteSpace(applicationName)) configBuilder.AddApplicationName(applicationName);
+            if (!string.IsNullOrWhiteSpace(contentRoot)) configBuilder.AddContentRoot(contentRoot);
+            configBuilder.AddSettings(additionalSettings);
+            configBuilder.AddCommandLineArgs(commandlineArgs);
+
+            //Build the configuration and save till later
+            var config = configBuilder.Build();
+
+            Encryption.SetDefaultEncryptionKey(config["DefaultEncryptionKey"]);
+            Encryption.EncryptEmails = config.GetValueOrDefault("EncryptEmails", true);
+
+            //Initialise the virtual date and time
+            VirtualDateTime.Initialise(config["DateTimeOffset"]);
+
+            //Setup Threads
+            config.SetupThreads();
 
             //Build the host configuration
-            hostBuilder.ConfigureHostConfiguration(configBuilder =>
-                {
-                    configBuilder.AddEnvironmentVariables(prefix: "DOTNET_");
-                    if (additionalSettings==null) additionalSettings=new Dictionary<string, string>();
-                    additionalSettings[HostDefaults.ApplicationKey] = applicationName;
-                    additionalSettings[HostDefaults.ContentRootKey] = string.IsNullOrWhiteSpace(contentRoot)
-                        ? AppContext.BaseDirectory
-                        : contentRoot;
+            configBuilder.ConfigureHost(hostBuilder);
 
-                    configBuilder.AddInMemoryCollection(additionalSettings);
-                    if (commandlineArgs != null && commandlineArgs.Any()) configBuilder.AddCommandLine(commandlineArgs);
-                });
-
-            //Configure the application configuration
-            hostBuilder.ConfigureAppConfiguration((context, builder) =>
-            {
-                //Build the configuration and save till later
-                var config = new ConfigBuilder(builder, EnvironmentName, additionalSettings).Build();
-
-                //Setup Threads
-                config.SetupThreads();
-            });
-
-            //Register the dependencies
-            DependencyBuilder dependencyBuilder = null;
-            hostBuilder.ConfigureServices((context, serviceCollection) =>
-            {
-                dependencyBuilder = new DependencyBuilder(context.Configuration, autoConfigureOnBuild: autoConfigureOnBuild);
-                //Add any registered services to the dependency module builder which may be used by the options builder.
-                dependencyBuilder.Services = serviceCollection;
-            });
-            
-            
             //Register Autofac as the service provider
             var serviceProviderFactory = new AutofacServiceProviderFactory();
             hostBuilder.UseServiceProviderFactory(serviceProviderFactory);
 
-            hostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) =>
+            //Load all the IOptions in the domain
+            var optionsBinder = new OptionsBinder(config);
+            optionsBinder.BindAssemblies();
+
+            hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
             {
-                //Build all the required dependencies
-                dependencyBuilder.Build<TStartupModule>(builder);
-                dependencyBuilder.ServiceProviderFactory = serviceProviderFactory;
-                hostBuilder.Properties.Add("serviceProviderFactory", serviceProviderFactory);
-                hostBuilder.Properties.Add("dependencyBuilder", dependencyBuilder);
+                //Add the configuration
+                serviceCollection.AddSingleton(config);
+
+                //Add the configuration options
+                optionsBinder.Services.ForEach(service => serviceCollection.Add(service));
             });
+
+            hostBuilder.UseConsoleLifetime();
 
             //Add the logging to the web host
             hostBuilder.ConfigureLogging(
-                (hostingContext, logging) =>
+                (hostBuilderContext, loggingBuilder) =>
                 {
                     //Setup the seri logger
-                    hostingContext.Configuration.SetupSerilogLogger();
-                    
+                    hostBuilderContext.Configuration.SetupSerilogLogger();
+
                     var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                     // IMPORTANT: This needs to be added *before* configuration is loaded, this lets
                     // the defaults be overridden by the configuration.
                     if (isWindows)
                     {
                         // Default the EventLogLoggerProvider to warning or above
-                        logging.AddFilter<EventLogLoggerProvider>(level => level >= LogLevel.Warning);
+                        loggingBuilder.AddFilter<EventLogLoggerProvider>(level => level >= LogLevel.Warning);
                     }
 
-                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-                    logging.AddConsole();
-                    logging.AddDebug();
-                    logging.AddEventSourceLogger();
+                    loggingBuilder.AddConfiguration(hostBuilderContext.Configuration.GetSection("Logging"));
+                    loggingBuilder.AddConsole();
+                    loggingBuilder.AddDebug();
+                    loggingBuilder.AddEventSourceLogger();
 
                     // Add the EventLogLoggerProvider on windows machines
-                    if (isWindows) logging.AddEventLog();
+                    if (isWindows) loggingBuilder.AddEventLog();
 
-                    logging.AddAzureQueueLogger(); //Use the custom logger
-                    logging.AddApplicationInsights(); //log to app insights
-                    logging.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
+                    loggingBuilder.AddAzureQueueLogger(); //Use the custom logger
+                    loggingBuilder.AddApplicationInsights(); //log to app insights
+                    loggingBuilder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
                 });
 
-            hostBuilder.UseConsoleLifetime();
-            return hostBuilder;
+            return configBuilder;
         }
 
         /// <summary>
@@ -157,6 +121,7 @@ namespace ModernSlavery.Infrastructure.Hosts
         /// <returns></returns>
         public static IMvcBuilder AddRazorClassLibrary<TModule>(this IMvcBuilder mvcBuilder) where TModule : class
         {
+            return mvcBuilder;
             var partAssembly = typeof(TModule).Assembly;
 
             mvcBuilder.AddApplicationPart(partAssembly);
