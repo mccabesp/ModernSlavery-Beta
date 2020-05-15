@@ -26,25 +26,17 @@ namespace ModernSlavery.Infrastructure.Hosts
 {
     public static partial class Extensions
     {
-        public static ConfigBuilder ConfigureHost(this IHostBuilder hostBuilder, string applicationName = null, string contentRoot = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) 
+        public static DependencyBuilder ConfigureHost<TStartupModule>(this IHostBuilder hostBuilder, string applicationName = null, string contentRoot = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
-            if (string.IsNullOrWhiteSpace(applicationName)) applicationName = Assembly.GetEntryAssembly().GetName().Name;
-
-            //Set the console title to the application name
-            Console.Title = applicationName;
-
             //Add a handler for unhandled exceptions
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            //Build the configuration and save till later
-            var configBuilder = new ConfigBuilder();
-            if (!string.IsNullOrWhiteSpace(applicationName)) configBuilder.AddApplicationName(applicationName);
-            if (!string.IsNullOrWhiteSpace(contentRoot)) configBuilder.AddContentRoot(contentRoot);
-            configBuilder.AddSettings(additionalSettings);
-            configBuilder.AddCommandLineArgs(commandlineArgs);
-
-            //Build the configuration and save till later
+            //Build the configuration 
+            var configBuilder = new ConfigBuilder(applicationName, contentRoot, additionalSettings, commandlineArgs);
             var config = configBuilder.Build();
+
+            //Set the console title to the application name
+            Console.Title = config[HostDefaults.ApplicationKey];
 
             Encryption.SetDefaultEncryptionKey(config["DefaultEncryptionKey"]);
             Encryption.EncryptEmails = config.GetValueOrDefault("EncryptEmails", true);
@@ -55,7 +47,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             //Setup Threads
             config.SetupThreads();
 
-            //Build the host configuration
+            //Register the callback to build the host configuration
             configBuilder.ConfigureHost(hostBuilder);
 
             //Register Autofac as the service provider
@@ -68,12 +60,17 @@ namespace ModernSlavery.Infrastructure.Hosts
 
             hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
             {
-                //Add the configuration
+                //Add the Iconfiguration service
                 serviceCollection.AddSingleton(config);
 
-                //Add the configuration options
+                //Add the configuration Ioption services
                 optionsBinder.Services.ForEach(service => serviceCollection.Add(service));
             });
+
+
+            var dependencyBuilder = new DependencyBuilder();
+            dependencyBuilder.Build<TStartupModule>(optionsBinder.Services);
+            dependencyBuilder.PopulateHostContainer(hostBuilder);
 
             hostBuilder.UseConsoleLifetime();
 
@@ -106,7 +103,7 @@ namespace ModernSlavery.Infrastructure.Hosts
                     loggingBuilder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
                 });
 
-            return configBuilder;
+            return dependencyBuilder;
         }
 
         /// <summary>

@@ -19,18 +19,12 @@ namespace ModernSlavery.Infrastructure.Hosts
         public static IHostBuilder ConfigureWebjobHostBuilder<TStartupModule>(string applicationName=null, string contentRoot = null, string webRoot = null, params string[] commandlineArgs) where TStartupModule: class, IDependencyModule
         {
             var hostBuilder = new HostBuilder();
-            
+
             //Setup the configuration sources and builder
-            var configBuilder = hostBuilder.ConfigureHost(applicationName, contentRoot, commandlineArgs: commandlineArgs);
+            var dependencyBuilder = hostBuilder.ConfigureHost<TStartupModule>(applicationName, contentRoot, commandlineArgs: commandlineArgs);
 
-            //Load all the IOptions in the domain
-            var optionsBinder = new OptionsBinder(configBuilder.Build());
-            optionsBinder.BindAssemblies();
-
-            var dependencyBuilder = new DependencyBuilder();
-            dependencyBuilder.Build<TStartupModule>(optionsBinder.Services);
+            //Register the callback to add dependent services
             dependencyBuilder.PopulateHostServices(hostBuilder);
-            dependencyBuilder.PopulateHostContainer(hostBuilder,true);
 
             hostBuilder.ConfigureWebJobs(webjobHostBuilder =>
                 {

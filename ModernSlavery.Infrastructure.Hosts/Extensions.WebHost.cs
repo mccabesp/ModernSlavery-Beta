@@ -24,24 +24,15 @@ namespace ModernSlavery.Infrastructure.Hosts
 
         public static IHostBuilder ConfigureWebHostBuilder<TStartupModule>(string applicationName = null, string contentRoot = null, string webRoot = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
-            if (string.IsNullOrWhiteSpace(applicationName)) applicationName = Assembly.GetEntryAssembly().GetName().Name;
-
             var hostBuilder = new HostBuilder();
             
             //Setup the configuration sources and builder
-            var configBuilder=hostBuilder.ConfigureHost(applicationName, contentRoot, commandlineArgs: commandlineArgs);
-
-            //Load all the IOptions in the domain
-            var optionsBinder = new OptionsBinder(configBuilder.Build());
-            optionsBinder.BindAssemblies();
-            
-            var dependencyBuilder = new DependencyBuilder();
-            dependencyBuilder.Build<TStartupModule>(optionsBinder.Services);
-            dependencyBuilder.PopulateHostContainer(hostBuilder);
+            var dependencyBuilder = hostBuilder.ConfigureHost<TStartupModule>(applicationName, contentRoot, commandlineArgs: commandlineArgs);
 
             //Configure the host defaults
             hostBuilder.ConfigureWebHostDefaults(webHostBuilder =>
             {
+                //Register the callback to add dependent services - this is required so IWebHostEnvironment is available to services
                 dependencyBuilder.PopulateHostServices(webHostBuilder);
 
                 //Ensure the static assets of any RCL are copied to the consuming app location

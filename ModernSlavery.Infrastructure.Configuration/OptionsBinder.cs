@@ -10,22 +10,35 @@ using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Configuration
 {
-    public class OptionsBinder
+    public class OptionsBinder:IDisposable
     {
-        private readonly IConfiguration _configuration;
-        public readonly IServiceCollection Services;
-        private string _assemblyPrefix;
+        private IConfiguration _configuration;
+        public IServiceCollection Services { get; private set; }
+        private string _assemblyPrefix = nameof(ModernSlavery);
 
         public OptionsBinder(IConfiguration configuration, string assemblyPrefix=null)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             Services=new ServiceCollection();
-            if (string.IsNullOrWhiteSpace(assemblyPrefix)) assemblyPrefix=nameof(ModernSlavery);
-            _assemblyPrefix = assemblyPrefix;
+
+            //Make sure the configuration is available
+
+            Services.AddSingleton(configuration);
+
+            if (!string.IsNullOrWhiteSpace(assemblyPrefix)) _assemblyPrefix= assemblyPrefix;
         }
 
-        private readonly Dictionary<Type, object> _bindings = new Dictionary<Type, object>();
-        private readonly Dictionary<string, Assembly> _loadedAssemblies = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+
+        public void Dispose()
+        {
+            _configuration = null;
+            Services = null;
+            _bindings = null;
+            _loadedAssemblies = null;
+        }
+
+        private Dictionary<Type, object> _bindings = new Dictionary<Type, object>();
+        private Dictionary<string, Assembly> _loadedAssemblies = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
 
         private object Bind(Type optionsType, string configSection = null)
         {
@@ -179,5 +192,6 @@ namespace ModernSlavery.Infrastructure.Configuration
                 }
             }
         }
+
     }
 }
