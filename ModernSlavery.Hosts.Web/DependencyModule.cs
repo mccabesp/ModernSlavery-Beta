@@ -163,8 +163,6 @@ namespace ModernSlavery.Hosts.Web
             //Override any test services
             ConfigureTestServices?.Invoke(services);
 
-
-
             #region Configure authentication client
             //Configure the services required for authentication by IdentityServer
             services.AddIdentityServerClient(

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Features.AttributeFilters;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
 
@@ -13,17 +15,27 @@ namespace ModernSlavery.BusinessDomain.Admin
             //TODO: Add IOptions parameters
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
+        {
+            //TODO: Register service dependencies here
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
         {
             //Add registrations here
-            builder.Autofac.RegisterType<DownloadableFileBusinessLogic>().As<IDownloadableFileBusinessLogic>()
+            builder.RegisterType<DownloadableFileBusinessLogic>().As<IDownloadableFileBusinessLogic>()
                 .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<AdminService>().As<IAdminService>().InstancePerLifetimeScope().WithAttributeFiltering();
+            builder.RegisterType<AdminService>().As<IAdminService>().InstancePerLifetimeScope().WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //TODO: Add configuration here
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
         }
     }
 }

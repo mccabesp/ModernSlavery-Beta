@@ -1,8 +1,11 @@
 ﻿using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using System;
+using System.Collections.Generic;
 
 namespace ModernSlavery.Core
 {
@@ -19,20 +22,30 @@ namespace ModernSlavery.Core
             _sharedOptions = sharedOptions;
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            builder.Autofac.RegisterType<SnapshotDateHelper>().As<ISnapshotDateHelper>().SingleInstance();
+            //TODO: Register service dependencies here
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterType<SnapshotDateHelper>().As<ISnapshotDateHelper>().SingleInstance();
 
             //Register some singletons
-            builder.Autofac.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
+            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
                 .WithParameter("seed", _sharedOptions.ObfuscationSeed);
 
-            builder.Autofac.RegisterType<SourceComparer>().As<ISourceComparer>().SingleInstance();
+            builder.RegisterType<SourceComparer>().As<ISourceComparer>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
         }
     }
 }

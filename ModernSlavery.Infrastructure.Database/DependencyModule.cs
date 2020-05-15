@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Database.Classes;
@@ -18,18 +20,28 @@ namespace ModernSlavery.Infrastructure.Database
             //TODO set any required local IOptions here
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            builder.Autofac.RegisterType<DatabaseContext>().As<IDbContext>().InstancePerLifetimeScope();
+            //TODO: Register service dependencies here
+        }
 
-            builder.Autofac.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerLifetimeScope();
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterType<DatabaseContext>().As<IDbContext>().InstancePerLifetimeScope();
 
-            builder.Autofac.RegisterType<ShortCodesRepository>().As<IShortCodesRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerLifetimeScope();
+
+            builder.RegisterType<ShortCodesRepository>().As<IShortCodesRepository>().InstancePerLifetimeScope();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //TODO: Add configuration here
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
         }
     }
 }

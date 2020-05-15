@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Features.AttributeFilters;
@@ -49,43 +50,39 @@ namespace ModernSlavery.Hosts.Webjob
             _dataProtectionOptions = dataProtectionOptions;
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            builder.Services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
+            services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
 
-            builder.Services.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
+            services.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
 
-            builder.Services.AddSingleton<IJobActivator, AutofacJobActivator>();
+            services.AddSingleton<IJobActivator, AutofacJobActivator>();
+        }
 
-            //Register the file storage dependencies
-            builder.RegisterModule<FileStorageDependencyModule>();
-
-            //Register the log storage dependencies
-            builder.RegisterModule<Infrastructure.Logging.DependencyModule>();
-
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
             //Register the messaging dependencies
-            builder.Autofac.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
-            builder.Autofac.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
+            builder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
+            builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
 
             // Register the email template dependencies
-            builder.Autofac
-                .RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates")))
+            builder.RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates")))
                 .As<IEmailTemplateRepository>().SingleInstance();
 
             //Register some singletons
-            builder.Autofac.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
+            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
                 .WithParameter("seed", _sharedOptions.ObfuscationSeed);
 
             // Register email provider dependencies
-            builder.Autofac.RegisterType<GovNotifyEmailProvider>().SingleInstance().WithAttributeFiltering();
-            builder.Autofac.RegisterType<SmtpEmailProvider>().SingleInstance().WithAttributeFiltering();
-            builder.Autofac.RegisterType<EmailProvider>().SingleInstance().WithAttributeFiltering();
+            builder.RegisterType<GovNotifyEmailProvider>().SingleInstance().WithAttributeFiltering();
+            builder.RegisterType<SmtpEmailProvider>().SingleInstance().WithAttributeFiltering();
+            builder.RegisterType<EmailProvider>().SingleInstance().WithAttributeFiltering();
 
             // Need to register webJob class in Autofac as well
-            builder.Autofac.RegisterType<Functions>().InstancePerDependency();
-            builder.Autofac.RegisterType<DisableWebjobProvider>().SingleInstance();
-
+            builder.RegisterType<Functions>().InstancePerDependency();
+            builder.RegisterType<DisableWebjobProvider>().SingleInstance();
         }
+
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
@@ -148,6 +145,15 @@ namespace ModernSlavery.Hosts.Webjob
                     //     may still be in flight. Shutdown will block until this event completes.
                     _logger.LogInformation("Application Stopping");
                 });
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //Register the file storage dependencies
+            modules.Add(typeof(FileStorageDependencyModule));
+
+            //Register the log storage dependencies
+            modules.Add(typeof(Infrastructure.Logging.DependencyModule));
         }
 
         public class AutofacJobActivator : IJobActivator

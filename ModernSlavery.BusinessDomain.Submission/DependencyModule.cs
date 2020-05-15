@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Features.AttributeFilters;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
 
@@ -13,22 +15,32 @@ namespace ModernSlavery.BusinessDomain.Submission
             //TODO: Add IOptions parameters
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
+        {
+            //TODO: Register service dependencies here
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
         {
             //Add registrations here
-            builder.Autofac.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>()
+            builder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>()
                 .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<SubmissionService>().As<ISubmissionService>()
+            builder.RegisterType<SubmissionService>().As<ISubmissionService>()
                 .InstancePerLifetimeScope().WithAttributeFiltering();
-            builder.Autofac.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>()
+            builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>()
                 .InstancePerLifetimeScope().WithAttributeFiltering();
-            builder.Autofac.RegisterType<DraftFileBusinessLogic>().As<IDraftFileBusinessLogic>()
+            builder.RegisterType<DraftFileBusinessLogic>().As<IDraftFileBusinessLogic>()
                 .SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //TODO: Add configuration here
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
         }
     }
 }

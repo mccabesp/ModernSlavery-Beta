@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
 
@@ -17,14 +19,24 @@ namespace ModernSlavery.Infrastructure.Messaging
             //TODO set any required local IOptions here
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            builder.Autofac.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
+            //TODO: Register service dependencies here
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //TODO: Add configuration here
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
         }
     }
 }

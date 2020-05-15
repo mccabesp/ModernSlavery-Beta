@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Features.AttributeFilters;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
 
@@ -13,25 +15,33 @@ namespace ModernSlavery.BusinessDomain.Registration
             //TODO: Add IOptions parameters
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
+        {
+            //TODO: Register service dependencies here
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
         {
             //Add registrations here
-            builder.Autofac.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>()
+            builder.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>()
                 .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>()
+            builder.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>()
                 .SingleInstance();
-            builder.Autofac.RegisterType<RegistrationService>().As<IRegistrationService>()
+            builder.RegisterType<RegistrationService>().As<IRegistrationService>()
                 .InstancePerLifetimeScope().WithAttributeFiltering();
-            builder.Autofac.RegisterType<RegistrationBusinessLogic>().As<IRegistrationBusinessLogic>()
+            builder.RegisterType<RegistrationBusinessLogic>().As<IRegistrationBusinessLogic>()
                 .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<PinInThePostService>().As<IPinInThePostService>().SingleInstance(); 
-
-
+            builder.RegisterType<PinInThePostService>().As<IPinInThePostService>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //TODO: Add configuration here
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
         }
     }
 }

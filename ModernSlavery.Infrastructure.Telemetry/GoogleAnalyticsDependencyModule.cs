@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using Autofac;
@@ -19,25 +20,16 @@ namespace ModernSlavery.Infrastructure.Telemetry
             _sharedOptions = sharedOptions;
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            if (string.IsNullOrWhiteSpace(_sharedOptions.GoogleAnalyticsAccountId))
-            {
-                if (_sharedOptions.IsProduction())
-                    throw new ArgumentNullException(nameof(_sharedOptions.GoogleAnalyticsAccountId));
-
-                builder.Autofac.RegisterType<FakeWebTracker>().As<IWebTracker>().SingleInstance();
-                return;
-            }
-
             //Add a dedicated httpclient for Google Analytics tracking with exponential retry policy
-            builder.Services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), client =>
-                {
-                    client.BaseAddress = GoogleAnalyticsTracker.BaseUri;
-                    client.DefaultRequestHeaders.Clear();
-                    client.DefaultRequestHeaders.ConnectionClose = false;
-                    ServicePointManager.FindServicePoint(client.BaseAddress).ConnectionLeaseTimeout = 60 * 1000;
-                })
+            services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), client =>
+            {
+                client.BaseAddress = GoogleAnalyticsTracker.BaseUri;
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.ConnectionClose = false;
+                ServicePointManager.FindServicePoint(client.BaseAddress).ConnectionLeaseTimeout = 60 * 1000;
+            })
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10))
                 .AddPolicyHandler(
                     //see https://developers.google.com/analytics/devguides/config/mgmt/v3/errors
@@ -46,9 +38,21 @@ namespace ModernSlavery.Infrastructure.Telemetry
                         .WaitAndRetryAsync(6,
                             retryAttempt => TimeSpan.FromMilliseconds(new Random().Next(1, 1000)) +
                                             TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            if (string.IsNullOrWhiteSpace(_sharedOptions.GoogleAnalyticsAccountId))
+            {
+                if (_sharedOptions.IsProduction())
+                    throw new ArgumentNullException(nameof(_sharedOptions.GoogleAnalyticsAccountId));
+
+                builder.RegisterType<FakeWebTracker>().As<IWebTracker>().SingleInstance();
+                return;
+            }
 
             //Register WebTracker
-            builder.Autofac.RegisterType<GoogleAnalyticsTracker>()
+            builder.RegisterType<GoogleAnalyticsTracker>()
                 .As<IWebTracker>()
                 .SingleInstance()
                 .WithParameter(
@@ -59,7 +63,12 @@ namespace ModernSlavery.Infrastructure.Telemetry
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //TODO: Add configuration here
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
         }
     }
 }

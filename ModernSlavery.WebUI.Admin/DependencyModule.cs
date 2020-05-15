@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
@@ -20,19 +22,19 @@ namespace ModernSlavery.WebUI.Admin
             //TODO set any required local IOptions here
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            //Register references dependency modules
-            builder.RegisterModule<ModernSlavery.BusinessDomain.Admin.DependencyModule>();
-            builder.RegisterModule<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
-            builder.RegisterModule<ModernSlavery.WebUI.Shared.DependencyModule>();
+            //TODO: Register service dependencies here
+        }
 
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
             //Register dependencies here
-            builder.Autofac.RegisterType<AdminSearchService>().As<AdminSearchService>()
+            builder.RegisterType<AdminSearchService>().As<AdminSearchService>()
                 .InstancePerLifetimeScope();
 
             //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
+            builder.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
                 .Where(t => t.IsAssignableTo<Controller>())
                 .InstancePerLifetimeScope()
                 .WithAttributeFiltering();
@@ -41,6 +43,14 @@ namespace ModernSlavery.WebUI.Admin
         public void Configure(ILifetimeScope lifetimeScope)
         {
             //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //Register references dependency modules
+            modules.Add(typeof(ModernSlavery.BusinessDomain.Admin.DependencyModule));
+            modules.Add(typeof(ModernSlavery.BusinessDomain.Shared.DependencyModule));
+            modules.Add(typeof(ModernSlavery.WebUI.Shared.DependencyModule));
         }
     }
 }
