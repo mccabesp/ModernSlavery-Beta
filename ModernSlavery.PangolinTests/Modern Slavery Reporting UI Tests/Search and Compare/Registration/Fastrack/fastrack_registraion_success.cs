@@ -26,8 +26,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Fast track registration");
 
             //register organisation
-            Set("Employer reference").To(Fastrack.EmployerReference_Milbrook);
-            Set("Security code").To(Fastrack.SecurtiyCode_Millbrook);
+            Set("Employer reference").To(Registration.EmployerReference_Milbrook);
+            Set("Security code").To(Registration.SecurtiyCode_Millbrook);
 
             Click("Continue");
 
@@ -35,9 +35,9 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Confirm your organisation’s details");
 
             //expect organisation details
-            AtRow("Organisation name").Expect(Fastrack.OrgName_Millbrook);
-            AtRow("Company number").Expect(Fastrack.CompanyNumber_Millbrook);
-            AtRow("Registered address").Expect(Fastrack.RegisteredAddress_Millbrook);
+            AtRow("Organisation name").Expect(Registration.OrgName_Millbrook);
+            AtRow("Company number").Expect(Registration.CompanyNumber_Millbrook);
+            AtRow("Registered address").Expect(Registration.RegisteredAddress_Millbrook);
             //AtRow("Business Sectors (SIC Codes)").Expect("");
 
             Click("Confirm");

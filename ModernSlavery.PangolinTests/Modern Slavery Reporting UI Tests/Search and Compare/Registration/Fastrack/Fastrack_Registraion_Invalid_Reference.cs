@@ -24,8 +24,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Fast track registration");
 
             //todo ensure valid security code added here
-            Set("Employer reference").To(Fastrack.InvalidEmployerReference);
-            Set("Security code").To(Fastrack.ValidSecurityCode);
+            Set("Employer reference").To(Registration.InvalidEmployerReference);
+            Set("Security code").To(Registration.ValidSecurityCode);
 
             Click("Continue");
 

@@ -4,10 +4,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class Fastrack_Registration_Expired : UITest
+    public class Sign_Out_User_Cannot_Access_Registration_Pages : UITest
     {
-        [TestProperty("Work item", "3")]
-        [TestCategory("Fasttrack")]
         [TestMethod]
         public override void RunTest()
         {
@@ -15,22 +13,32 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             Click("Register an organisation");
 
+
             ExpectHeader("Registration Options");
+            CopyUrl("registration");
 
             ClickLabel("Fast Track");
             Click("Continue");
 
             ExpectHeader("Fast track registration");
+            CopyUrl("Fastrack");
 
-            //validation message to appear with expired security code
-            Set("Employer reference").To(Registration.ExpiredEmployerReference);
-            Set("Security code").To(Registration.ExpiredSecurityCode);
+            ExpectNo("Sign in");
+
+            Click("Sign out");
+
+            Expect("Signed Out");
 
             Click("Continue");
 
-            Expect("3Your Security Code has expired");
+            ExpectHeader("Search and compare Modern Slavery statements");
 
-            TakeScreenshot("Expired");
+            GotoCopiedUrl("registration");
+
+            ExpectHeader("Sign in");
+
+            GotoCopiedUrl("Fastrack");
+            ExpectHeader("Sign in");
         }
     }
 }

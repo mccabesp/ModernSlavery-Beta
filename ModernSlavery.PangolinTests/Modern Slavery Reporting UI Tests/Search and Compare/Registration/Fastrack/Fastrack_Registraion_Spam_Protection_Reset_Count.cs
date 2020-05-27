@@ -46,8 +46,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Fast track registration");
 
             //reset count with valid registration
-            Set("Employer reference").To(Fastrack.EmployerReference_NationalHeritage);
-            Set("Security code").To(Fastrack.SecurtiyCode_NationalHeritage);
+            Set("Employer reference").To(Registration.EmployerReference_NationalHeritage);
+            Set("Security code").To(Registration.SecurtiyCode_NationalHeritage);
 
             Click("Continue");
             ExpectHeader("Confirm your organisation’s details");

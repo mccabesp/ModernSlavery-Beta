@@ -9,7 +9,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
         [TestMethod]
         public override void RunTest()
         {
-            Run<RogerReportingUserCreatesAccount>();
+            Run<Fastrack_Registraion_Success>();
 
             LoginAs<RogerReporter>();
 
@@ -23,7 +23,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             ExpectLabel("Fast Track", Casing.Exact);
             ExpectLabel("Private Limited Company, Charity", Casing.Exact);
-            ExpectLabel("Public Organisation", Casing.Exact);
+            ExpectLabel("Public Sector Organisation", Casing.Exact);
 
             ExpectButton("Continue");
         }

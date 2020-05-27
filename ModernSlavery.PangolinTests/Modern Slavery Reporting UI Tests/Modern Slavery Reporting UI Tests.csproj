@@ -165,12 +165,30 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Search and Compare\Manage Account\Close_Account_Invalid_Password.cs" />
+    <Compile Include="Search and Compare\Manage Account\Close_Account_Mandatory_Fields.cs" />
+    <Compile Include="Search and Compare\Manage Account\Manage Account_Change_Email.cs" />
+    <Compile Include="Search and Compare\Manage Account\Manage_Account_Account_Details_Check.cs" />
+    <Compile Include="Search and Compare\Manage Account\Close_Account.cs" />
+    <Compile Include="Search and Compare\Manage Account\Manage_Account_Change_Personal_Details.cs" />
+    <Compile Include="Search and Compare\Manage Account\Manage_Account_Email_Validation.cs" />
+    <Compile Include="Search and Compare\Manage Account\Manage_Account_Personal_Details_Validation.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Spam_Protection_Reset_Count.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registration_Expired.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Invalid_Reference.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Invalid_Security.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Duplicate_Organisation.cs" />
-    <Compile Include="Search and Compare\Registration\Fastrack\fastrack_constants.cs" />
+    <Compile Include="Search and Compare\Registration\Private LTD, Charity\Registration_Private_Success.cs" />
+    <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Cant_Find_Your_Org_Success.cs" />
+    <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Contact_Details_Mandatory_Fields.cs" />
+    <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Failure_Duplicate_Organisation.cs" />
+    <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Find_Your_Org_Mandatory_Field.cs" />
+    <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_International_Sucess.cs" />
+    <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Start_Reigstration.cs" />
+    <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Success.cs" />
+    <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Failure_Already_Started.cs" />
+    <Compile Include="Search and Compare\Registration\Public LTD\Registration_Pulbic_Address_Mandatory_Fields.cs" />
+    <Compile Include="Search and Compare\Registration\registration_constants.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Content_Check.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Mandatory_Fields.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Success.cs" />
@@ -182,11 +200,13 @@
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Password_Rules.cs" />
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Validation_Check.cs" />
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Success.cs" />
-    <Compile Include="Search and Compare\Sign-in\Create an Account\create_account_constants.cs" />
+    <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Constants.cs" />
+    <Compile Include="Search and Compare\Sign-in\Sign-out\Sign_Out.cs" />
+    <Compile Include="Search and Compare\Sign-in\Sign-out\Sign_Out_User_Cannot_Access_Registration_Pages.cs" />
     <Compile Include="Search and Compare\Sign-in\Sign_In_Content_Check.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Spam_Protection_Different.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Spam_Protection_Same.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="Search and Compare\Sign-in\Sign_In_Failure_Closed_Account.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\Roger Reporter.cs" />
     <Compile Include="Users\Unregistered User.cs" />
@@ -195,10 +215,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Search and Compare\Registration\Private LTD, Charity\" />
-    <Folder Include="Search and Compare\Registration\Public LTD\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -214,9 +231,9 @@
     <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
     <Error Condition="!Exists('..\..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.props'))" />
     <Error Condition="!Exists('..\..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets'))" />
-    <Error Condition="!Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.80.0.3987.10600\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Selenium.WebDriver.ChromeDriver.80.0.3987.10600\build\Selenium.WebDriver.ChromeDriver.targets'))" />
     <Error Condition="!Exists('..\..\packages\Selenium.WebDriver.GeckoDriver.0.26.0\build\Selenium.WebDriver.GeckoDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Selenium.WebDriver.GeckoDriver.0.26.0\build\Selenium.WebDriver.GeckoDriver.targets'))" />
     <Error Condition="!Exists('..\..\packages\Selenium.WebDriver.IEDriver.3.150.1\build\Selenium.WebDriver.IEDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Selenium.WebDriver.IEDriver.3.150.1\build\Selenium.WebDriver.IEDriver.targets'))" />
+    <Error Condition="!Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.83.0.4103.3900\build\Selenium.WebDriver.ChromeDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Selenium.WebDriver.ChromeDriver.83.0.4103.3900\build\Selenium.WebDriver.ChromeDriver.targets'))" />
   </Target>
   <Import Project="..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets" Condition="Exists('..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets')" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
@@ -225,7 +242,7 @@
   <Import Project="..\packages\Selenium.WebDriver.IEDriver.3.150.1\build\Selenium.WebDriver.IEDriver.targets" Condition="Exists('..\packages\Selenium.WebDriver.IEDriver.3.150.1\build\Selenium.WebDriver.IEDriver.targets')" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Import Project="..\..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets" Condition="Exists('..\..\packages\MSTest.TestAdapter.1.3.2\build\net45\MSTest.TestAdapter.targets')" />
-  <Import Project="..\..\packages\Selenium.WebDriver.ChromeDriver.80.0.3987.10600\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.80.0.3987.10600\build\Selenium.WebDriver.ChromeDriver.targets')" />
   <Import Project="..\..\packages\Selenium.WebDriver.GeckoDriver.0.26.0\build\Selenium.WebDriver.GeckoDriver.targets" Condition="Exists('..\..\packages\Selenium.WebDriver.GeckoDriver.0.26.0\build\Selenium.WebDriver.GeckoDriver.targets')" />
   <Import Project="..\..\packages\Selenium.WebDriver.IEDriver.3.150.1\build\Selenium.WebDriver.IEDriver.targets" Condition="Exists('..\..\packages\Selenium.WebDriver.IEDriver.3.150.1\build\Selenium.WebDriver.IEDriver.targets')" />
+  <Import Project="..\..\packages\Selenium.WebDriver.ChromeDriver.83.0.4103.3900\build\Selenium.WebDriver.ChromeDriver.targets" Condition="Exists('..\..\packages\Selenium.WebDriver.ChromeDriver.83.0.4103.3900\build\Selenium.WebDriver.ChromeDriver.targets')" />
 </Project>

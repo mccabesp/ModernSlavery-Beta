@@ -23,8 +23,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Fast track registration");
 
             //register organisation
-            Set("Employer reference").To(Fastrack.ValidEmployerReference);
-            Set("Security code").To(Fastrack.InvalidSecurityCode);
+            Set("Employer reference").To(Registration.ValidEmployerReference);
+            Set("Security code").To(Registration.InvalidSecurityCode);
             Click("Continue");
 
             ExpectHeader("Fast track registration");
@@ -35,8 +35,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Fast track registration");
 
             //register organisation
-            Set("Employer reference").To(Fastrack.ValidEmployerReference);
-            Set("Security code").To(Fastrack.InvalidSecurityCode);
+            Set("Employer reference").To(Registration.ValidEmployerReference);
+            Set("Security code").To(Registration.InvalidSecurityCode);
             Click("Continue");
 
             ExpectHeader("Fast track registration");
@@ -46,8 +46,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Fast track registration");
 
             //register organisation
-            Set("Employer reference").To(Fastrack.ValidEmployerReference);
-            Set("Security code").To(Fastrack.InvalidSecurityCode);
+            Set("Employer reference").To(Registration.ValidEmployerReference);
+            Set("Security code").To(Registration.InvalidSecurityCode);
             Click("Continue");
 
             ExpectHeader("Fast track registration");
@@ -58,8 +58,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Fast track registration");
 
             //register organisation
-            Set("Employer reference").To(Fastrack.ValidEmployerReference);
-            Set("Security code").To(Fastrack.InvalidSecurityCode);
+            Set("Employer reference").To(Registration.ValidEmployerReference);
+            Set("Security code").To(Registration.InvalidSecurityCode);
             Click("Continue");
 
             Expect("Too many attempts");

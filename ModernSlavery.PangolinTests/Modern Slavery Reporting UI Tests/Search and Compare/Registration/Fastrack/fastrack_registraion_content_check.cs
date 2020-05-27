@@ -19,8 +19,6 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             ClickLabel("Fast Track");
 
-            TakeScreenshot("name");
-
             Click("Continue");
 
             ExpectHeader("Fast track registration");
