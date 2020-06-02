@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1000
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modern Slavery Reporting UI Tests", "Modern Slavery Reporting UI Tests\Modern Slavery Reporting UI Tests.csproj", "{4F8B39D5-45DB-4D92-BADA-AD18AAF562BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F8B39D5-45DB-4D92-BADA-AD18AAF562BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F8B39D5-45DB-4D92-BADA-AD18AAF562BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F8B39D5-45DB-4D92-BADA-AD18AAF562BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F8B39D5-45DB-4D92-BADA-AD18AAF562BC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {224073D8-0A8E-4002-B611-C688DF1ED283}
+	EndGlobalSection
+EndGlobal

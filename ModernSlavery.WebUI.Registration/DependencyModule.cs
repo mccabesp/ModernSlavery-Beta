@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Registration.Classes;
+using ModernSlavery.WebUI.Registration.Presenters;
 
 namespace ModernSlavery.WebUI.Registration
 {
@@ -37,6 +38,10 @@ namespace ModernSlavery.WebUI.Registration
             builder.Autofac.RegisterType<PrivateSectorRepository>()
                 .As<IPagedRepository<EmployerRecord>>()
                 .Keyed<IPagedRepository<EmployerRecord>>("Private")
+                .InstancePerLifetimeScope();
+
+            builder.Autofac.RegisterType<RegistrationPresenter>()
+                .As<IRegistrationPresenter>()
                 .InstancePerLifetimeScope();
 
             //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
