@@ -19,7 +19,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             Goto("/");
             Click("Sign in");
             Set("Email").To(create_account.roger_email);
-            Set("Password").To(create_account.roger_passowrd);
+            Set("Password").To(create_account.roger_password);
 
             Click(The.Bottom, "Sign in");
             Expect("There`s a problem with your email address or password");

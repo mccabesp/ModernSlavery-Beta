@@ -28,8 +28,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
             Set("Last name").To(create_account.roger_last);
             Set("Job title").To(create_account.roger_job_title);
 
-            Set("Pasword").To(create_account.roger_passowrd);
-            Set("Confirm password").To(create_account.roger_passowrd);
+            Set("Pasword").To(create_account.roger_password);
+            Set("Confirm password").To(create_account.roger_password);
 
             ClickLabel("I would like to receive information about webinars, events and new guidance");
             ClickLabel("I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys");
