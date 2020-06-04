@@ -122,43 +122,8 @@ namespace ModernSlavery.Core.Extensions
         /// <param name="environmentStackTrace">Environment stack trace, for pulling additional stack frames.</param>
         public static string FullStackTrace(this Exception exception)
         {
-            var environmentStackTraceLines = GetUserStackTraceLines(Environment.StackTrace);
-            if (environmentStackTraceLines.Count > 0) environmentStackTraceLines.RemoveAt(0);
-
-            if (exception != null)
-            {
-                var stackTraceLines = GetStackTraceLines(exception.StackTrace);
-                environmentStackTraceLines.AddRange(stackTraceLines);
-            }
-
-            return exception.Message + Environment.NewLine +
-                   environmentStackTraceLines.ToDelimitedString(Environment.NewLine);
-        }
-
-        /// <summary>
-        ///     Gets a list of stack frame lines, as strings.
-        /// </summary>
-        /// <param name="stackTrace">Stack trace string.</param>
-        private static List<string> GetStackTraceLines(string stackTrace)
-        {
-            return stackTrace.SplitI(Environment.NewLine).ToList();
-        }
-
-        /// <summary>
-        ///     Gets a list of stack frame lines, as strings, only including those for which line number is known.
-        /// </summary>
-        /// <param name="fullStackTrace">Full stack trace, including external code.</param>
-        private static List<string> GetUserStackTraceLines(string fullStackTrace)
-        {
-            var outputList = new List<string>();
-            var regex = new Regex(@"([^\)]*\)) in (.*):line (\d)*$");
-
-            var stackTraceLines = GetStackTraceLines(fullStackTrace);
-            foreach (var stackTraceLine in stackTraceLines)
-                if (regex.IsMatch(stackTraceLine))
-                    outputList.Add(stackTraceLine);
-
-            return outputList;
+            if (exception == null) return null;
+            return exception.InnerException?.FullStackTrace() + exception.Message + Environment.NewLine + exception.StackTrace + Environment.NewLine;
         }
 
         public static Exception GetInnermostException(this Exception ex)
