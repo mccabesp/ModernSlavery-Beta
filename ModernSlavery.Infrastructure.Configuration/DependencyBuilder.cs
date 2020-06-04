@@ -51,8 +51,6 @@ namespace ModernSlavery.Infrastructure.Configuration
         private bool _containerActionsComplete=false;
         private bool _configActionsComplete=false;
 
-        private IServiceCollection _services;
-
         public void Build<TStartupModule>(IServiceCollection optionServices) where TStartupModule : class, IDependencyModule
         {
             //Ensure domain assemblies are preloaded
@@ -144,7 +142,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             return module;
         }
 
-        private void PopulateHostServices(IServiceCollection serviceCollection)
+        public void RegisterDependencyServices(IServiceCollection serviceCollection)
         {
             if (serviceCollection == null) throw new ArgumentNullException(nameof(serviceCollection));
             if (_serviceActionsComplete) return;
@@ -153,53 +151,37 @@ namespace ModernSlavery.Infrastructure.Configuration
             _serviceActions.ForEach(action => action(serviceCollection));
             
             _serviceActionsComplete = true;
-            _services = serviceCollection;
         }
 
-        public void PopulateHostServices(IHostBuilder hostBuilder)
+        public void RegisterDependencyServices(ContainerBuilder containerBuilder)
         {
-            hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
-            {
-                //Register the service actions
-                PopulateHostServices(serviceCollection);
-            });
-        }
-
-        public void PopulateHostServices(IWebHostBuilder hostBuilder)
-        {
-            hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
-            {
-                //Register the service actions
-                PopulateHostServices(serviceCollection);
-            });
-        }
-
-        public void PopulateHostContainer(IHostBuilder hostBuilder)
-        {
+            if (containerBuilder == null) throw new ArgumentNullException(nameof(containerBuilder));
             if (_containerActionsComplete) return;
-            hostBuilder.ConfigureContainer<ContainerBuilder>((hostBuilderContext, containerBuilder) =>
-            {
-                containerBuilder.Populate(_services);
+            
+            //Register the container actions
+            _containerActions.ForEach(action => action(containerBuilder));
 
-                //Register the container actions
-                _containerActions.ForEach(action => action(containerBuilder));
-
-                //Make sure configure actions executed on build
-                containerBuilder.RegisterBuildCallback(Configure);
-            });
             _containerActionsComplete = true;
         }
-
-        public void ConfigureHost(IWebHostBuilder hostBuilder, ILifetimeScope lifetimeScope=null)
+        public void RegisterDependencyServices(ContainerBuilder containerBuilder, bool autoConfigureOnBuild)
         {
-            hostBuilder.Configure((appBuilder) =>
-            {
-                //Register the configuration actions
-                Configure(lifetimeScope ?? appBuilder.ApplicationServices.GetRequiredService<ILifetimeScope>());
-            });
+            RegisterDependencyServices(containerBuilder);
+
+            //Register the callback on build to configure the host
+            if (autoConfigureOnBuild) containerBuilder.RegisterBuildCallback(ConfigureHost);
         }
 
-        private void Configure(ILifetimeScope lifetimeScope)
+        public void ConfigureHost(IApplicationBuilder appBuilder)
+        {
+            var lifetimeScope = appBuilder.ApplicationServices.GetRequiredService<ILifetimeScope>();
+
+            //Only add the appbuildder temporarily
+            using var innerScope = lifetimeScope.BeginLifetimeScope(b => b.RegisterInstance(appBuilder).SingleInstance().ExternallyOwned());
+            
+            ConfigureHost(innerScope);
+        }
+
+        public void ConfigureHost(ILifetimeScope lifetimeScope)
         {
             if (lifetimeScope == null) throw new ArgumentNullException(nameof(lifetimeScope));
             if (_configActionsComplete) return;
@@ -209,5 +191,6 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             _configActionsComplete = true;
         }
+
     }
 }

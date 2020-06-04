@@ -7,9 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="hostsettings.TEST.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram" Link="DependencyValidation1.layerdiagram">
       <Visible>False</Visible>
     </AdditionalFiles>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="hostsettings.TEST.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

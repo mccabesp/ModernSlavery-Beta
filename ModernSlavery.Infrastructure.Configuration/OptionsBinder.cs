@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Attributes;
@@ -13,17 +14,13 @@ namespace ModernSlavery.Infrastructure.Configuration
     public class OptionsBinder:IDisposable
     {
         private IConfiguration _configuration;
-        public IServiceCollection Services { get; private set; }
+        private IServiceCollection _services = null;
         private string _assemblyPrefix = nameof(ModernSlavery);
 
         public OptionsBinder(IConfiguration configuration, string assemblyPrefix=null)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            Services=new ServiceCollection();
-
-            //Make sure the configuration is available
-
-            Services.AddSingleton(configuration);
+            _services=new ServiceCollection();
 
             if (!string.IsNullOrWhiteSpace(assemblyPrefix)) _assemblyPrefix= assemblyPrefix;
         }
@@ -32,7 +29,7 @@ namespace ModernSlavery.Infrastructure.Configuration
         public void Dispose()
         {
             _configuration = null;
-            Services = null;
+            _services = null;
             _bindings = null;
             _loadedAssemblies = null;
         }
@@ -76,7 +73,7 @@ namespace ModernSlavery.Infrastructure.Configuration
                 _configuration.Bind(configSection, instance);
             }
 
-            Services.AddSingleton(optionsType,instance);
+            _services.AddSingleton(optionsType,instance);
 
             _bindings[optionsType] = instance;
 
@@ -118,7 +115,7 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             configSection.Bind(instance);
 
-            Services.AddSingleton(instance);
+            _services.AddSingleton(instance);
 
             _bindings[optionsType] = instance;
 
@@ -142,7 +139,7 @@ namespace ModernSlavery.Infrastructure.Configuration
         ///     Only classes with OptionsAttribute.Key will be bound.
         /// </summary>
         /// <param name="assemblyPrefix"></param>
-        public void BindAssemblies()
+        public IServiceCollection BindAssemblies()
         {
             var type = typeof(IOptions);
 
@@ -151,6 +148,16 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             foreach (var assembly in _loadedAssemblies.Values.ToList())
                 BindAssembly(assembly);
+
+            return _services;
+        }
+
+        public void RegisterOptions(IServiceCollection serviceCollection)
+        {
+            if (serviceCollection == null) throw new ArgumentNullException(nameof(serviceCollection));
+
+            //Register the configuration options
+            _services.ForEach(service=>serviceCollection.Add(service));
         }
 
         /// <summary>
@@ -163,7 +170,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 
             foreach (var childAssembly in GetAssemblies(assembly))
-                BindOptions(childAssembly);
+                BindAssembly(childAssembly);
 
             BindOptions(assembly);
 
@@ -186,9 +193,6 @@ namespace ModernSlavery.Infrastructure.Configuration
                     var childAssembly = Assembly.Load(child);
                     _loadedAssemblies[childAssembly.FullName] = childAssembly;
                     yield return childAssembly;
-
-                    foreach (var grandChildAssembly in GetAssemblies(childAssembly))
-                        yield return grandChildAssembly;
                 }
             }
         }

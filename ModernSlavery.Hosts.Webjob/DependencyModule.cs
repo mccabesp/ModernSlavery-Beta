@@ -87,9 +87,24 @@ namespace ModernSlavery.Hosts.Webjob
         public void Configure(ILifetimeScope lifetimeScope)
         {
             //Add configuration here
-            var app = lifetimeScope.Resolve<IWebJobsBuilder>();
+            var webjobHostBuilder = lifetimeScope.Resolve<IWebJobsBuilder>();
 
-            var lifetime = lifetimeScope.Resolve<IHostApplicationLifetime>(); 
+            webjobHostBuilder.AddAzureStorageCoreServices();
+            webjobHostBuilder.AddAzureStorage(
+                queueConfig =>
+                {
+                    queueConfig.BatchSize = 1; //Process queue messages 1 item per time per job function
+                        },
+                blobConfig =>
+                {
+                            //Configure blobs here
+                });
+
+            webjobHostBuilder.AddServiceBus();
+            webjobHostBuilder.AddEventHubs();
+            webjobHostBuilder.AddTimers();
+
+            var applicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>(); 
             var config = lifetimeScope.Resolve<IConfiguration>();
             var fileRepository = lifetimeScope.Resolve<IFileRepository>();
             var sharedOptions = lifetimeScope.Resolve<SharedOptions>();
@@ -129,7 +144,7 @@ namespace ModernSlavery.Hosts.Webjob
 
             Task.WaitAll(fileRepository.PushRemoteFileAsync(Filenames.SicSectorSynonyms, sharedOptions.DataPath));
 
-            lifetime.ApplicationStarted.Register(
+            applicationLifetime.ApplicationStarted.Register(
                 () =>
                 {
                     // Summary:
@@ -137,7 +152,7 @@ namespace ModernSlavery.Hosts.Webjob
                     //     a graceful shutdown.
                     _logger.LogInformation("Application Started");
                 });
-            lifetime.ApplicationStopping.Register(
+            applicationLifetime.ApplicationStopping.Register(
                 () =>
                 {
                     // Summary:

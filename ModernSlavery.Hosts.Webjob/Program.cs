@@ -19,9 +19,6 @@ namespace ModernSlavery.Hosts.Webjob
             //Create the host
             var host = CreateHostBuilder(args).Build();
             
-            //Show thread availability
-            Console.WriteLine(Extensions.GetThreadCount());
-
             //NOTE: Leave this here to ensure function dependencies resolve on startup rather than when each function method is invoked
             //      It is also also useful when debugging individual jobs locally
             var functions = host.Services.GetService(typeof(Functions));

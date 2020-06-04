@@ -16,9 +16,6 @@ namespace ModernSlavery.Hosts.Web
             //Create the host
             var host = CreateHostBuilder(args).Build();
 
-            //Show thread availability
-            Console.WriteLine(Extensions.GetThreadCount());
-            
             //Run the host
             await host.RunAsync().ConfigureAwait(false);
         }

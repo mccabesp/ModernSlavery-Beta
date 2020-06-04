@@ -8,11 +8,10 @@
     <None Remove="appsettings.DEV.json" />
     <None Remove="appsettings.json" />
     <None Remove="appsettings.loadtest.json" />
-    <None Remove="appsettings.LOCAL.json" />
+    <None Remove="appsettings.development.json" />
     <None Remove="appsettings.PREPROD.json" />
     <None Remove="appsettings.PROD.json" />
     <None Remove="AppSettings.secret.json" />
-    <None Remove="appsettings.TEST.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,7 +29,7 @@
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>never</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.LOCAL.json">
+    <Content Include="appsettings.development.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>never</CopyToPublishDirectory>
@@ -49,11 +48,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
-    <Content Include="appsettings.TEST.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 

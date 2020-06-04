@@ -100,7 +100,7 @@ namespace ModernSlavery.Hosts.Web
             mvcBuilder.AddRazorClassLibrary<WebUI.GDSDesignSystem.DependencyModule>();
 
             //Log all the application parts when in development
-            if (_sharedOptions.IsLocal() || _sharedOptions.IsDevelopment())
+            if (_sharedOptions.IsDevelopment())
                 services.AddHostedService<ApplicationPartsLogger>();
 
             // Add controllers, taghelpers, views as services so attribute dependencies can be resolved in their contructors
@@ -128,10 +128,10 @@ namespace ModernSlavery.Hosts.Web
 
             services.AddRazorPages();
 
-            // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
+            // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Development" for Development dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
             // However this doesnt work on razor class/com,ponent libraries so we instead use a workaround 
-            //if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
+            //if (_sharedOptions.IsDevelopment()) mvcBuilder.AddRazorRuntimeCompilation();
 
             //Add services needed for sessions
             services.AddSession(
@@ -174,7 +174,7 @@ namespace ModernSlavery.Hosts.Web
             #endregion
 
             //Register the AutoMapper configurations in all domain assemblies
-            services.AddAutoMapper(_sharedOptions.IsLocal() || _sharedOptions.IsDevelopment());
+            services.AddAutoMapper(_sharedOptions.IsDevelopment());
 
         }
 
@@ -226,9 +226,9 @@ namespace ModernSlavery.Hosts.Web
                 app.UseStatusCodePagesWithReExecute("/error/{0}");
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection(); This always causes redirect to https://localhost from http://localhost:5000
             //app.UseResponseCompression(); //Disabled to use IIS compression which has better performance (see https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-2.1)
-           
+
             app.UseRouting();
             app.UseResponseCaching();
             app.UseSession(); //Must be before UseMvC or any middleware which requires session
@@ -255,6 +255,7 @@ namespace ModernSlavery.Hosts.Web
                     //     Triggered when the application host has fully started and is about to wait for
                     //     a graceful shutdown.
                     _logger.LogInformation("Application Started");
+                    app.ServerFeatures.LogWebPorts(_logger);
                 });
             hostApplicationLifetime.ApplicationStopping.Register(
                 () =>
@@ -263,6 +264,7 @@ namespace ModernSlavery.Hosts.Web
                     //     Triggered when the application host is performing a graceful shutdown. Requests
                     //     may still be in flight. Shutdown will block until this event completes.
                     _logger.LogInformation("Application Stopping");
+
                 });
         }
 

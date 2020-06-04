@@ -1,109 +1,98 @@
-﻿using System;
+﻿using Autofac;
+using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Infrastructure.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using AutoMapper;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.EventLog;
-using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Infrastructure.Configuration;
-using ModernSlavery.Infrastructure.Logging;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
     public static partial class Extensions
     {
-        public static DependencyBuilder ConfigureHost<TStartupModule>(this IHostBuilder hostBuilder, string applicationName = null, string contentRoot = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
+
+        public static void AddConfigSources(this IConfigurationBuilder configBbuilder, IHostEnvironment env)
         {
+            if (env == null) throw new ArgumentNullException(nameof(env));
+
+            //Make sure we know the environment
+            if (string.IsNullOrWhiteSpace(env.EnvironmentName)) throw new ArgumentNullException(nameof(env.EnvironmentName));
+
+            var config = configBbuilder.Build();
+
+            //Add the azure key vault to configuration
+            var vault = config["Vault"];
+            if (!string.IsNullOrWhiteSpace(vault))
+            {
+                if (!vault.StartsWithI("http")) vault = $"https://{vault}.vault.azure.net/";
+
+                var clientId = config["ClientId"];
+                var clientSecret = config["ClientSecret"];
+                var exceptions = new List<Exception>();
+                if (string.IsNullOrWhiteSpace(clientId))
+                    exceptions.Add(new ArgumentNullException("ClientId is missing"));
+
+                if (string.IsNullOrWhiteSpace(clientSecret))
+                    exceptions.Add(new ArgumentNullException("clientSecret is missing"));
+
+                if (exceptions.Count > 0) throw new AggregateException(exceptions);
+
+                configBbuilder.AddAzureKeyVault(vault, clientId, clientSecret);
+            }
+
+            /* make sure these files are loaded AFTER the vault, so their keys superseed the vaults' values - that way, unit tests will pass because the obfuscation key is whatever the appSettings says it is [and not a hidden secret inside the vault])  */
+            if (Debugger.IsAttached || config.IsDevelopment())configBbuilder.AddJsonFile("appsettings.secret.json", true, true);
+
+            // override using the azure environment variables into the configuration
+            configBbuilder.AddEnvironmentVariables();
+        }
+
+
+        public static void ConfigureHostApplication(this IHostBuilder hostBuilder, IConfiguration appSettings=null)
+        {
+            //Set the console title to the application name
+            Console.Title = appSettings[HostDefaults.ApplicationKey];
+
             //Add a handler for unhandled exceptions
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            //Build the configuration 
-            var configBuilder = new ConfigBuilder(applicationName, contentRoot, additionalSettings, commandlineArgs);
-            var config = configBuilder.Build();
-
-            //Set the console title to the application name
-            Console.Title = config[HostDefaults.ApplicationKey];
-
-            Encryption.SetDefaultEncryptionKey(config["DefaultEncryptionKey"]);
-            Encryption.EncryptEmails = config.GetValueOrDefault("EncryptEmails", true);
+            Encryption.SetDefaultEncryptionKey(appSettings["DefaultEncryptionKey"]);
+            Encryption.EncryptEmails = appSettings.GetValueOrDefault("EncryptEmails", true);
 
             //Initialise the virtual date and time
-            VirtualDateTime.Initialise(config["DateTimeOffset"]);
+            VirtualDateTime.Initialise(appSettings["DateTimeOffset"]);
 
             //Setup Threads
-            config.SetupThreads();
-
-            //Register the callback to build the host configuration
-            configBuilder.ConfigureHost(hostBuilder);
-
-            //Register Autofac as the service provider
-            var serviceProviderFactory = new AutofacServiceProviderFactory();
-            hostBuilder.UseServiceProviderFactory(serviceProviderFactory);
-
-            //Load all the IOptions in the domain
-            var optionsBinder = new OptionsBinder(config);
-            optionsBinder.BindAssemblies();
-
-            hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
-            {
-                //Add the Iconfiguration service
-                serviceCollection.AddSingleton(config);
-
-                //Add the configuration Ioption services
-                optionsBinder.Services.ForEach(service => serviceCollection.Add(service));
-            });
-
-
-            var dependencyBuilder = new DependencyBuilder();
-            dependencyBuilder.Build<TStartupModule>(optionsBinder.Services);
-            dependencyBuilder.PopulateHostContainer(hostBuilder);
+            appSettings.SetupThreads();
 
             hostBuilder.UseConsoleLifetime();
+        }
 
-            //Add the logging to the web host
-            hostBuilder.ConfigureLogging(
-                (hostBuilderContext, loggingBuilder) =>
-                {
-                    //Setup the seri logger
-                    hostBuilderContext.Configuration.SetupSerilogLogger();
+        public static IEnumerable<string> GetKeys(this IConfiguration config)
+        {
+            return config.GetChildren().Select(c => c.Key);
+        }
 
-                    var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                    // IMPORTANT: This needs to be added *before* configuration is loaded, this lets
-                    // the defaults be overridden by the configuration.
-                    if (isWindows)
-                    {
-                        // Default the EventLogLoggerProvider to warning or above
-                        loggingBuilder.AddFilter<EventLogLoggerProvider>(level => level >= LogLevel.Warning);
-                    }
-
-                    loggingBuilder.AddConfiguration(hostBuilderContext.Configuration.GetSection("Logging"));
-                    loggingBuilder.AddConsole();
-                    loggingBuilder.AddDebug();
-                    loggingBuilder.AddEventSourceLogger();
-
-                    // Add the EventLogLoggerProvider on windows machines
-                    if (isWindows) loggingBuilder.AddEventLog();
-
-                    loggingBuilder.AddAzureQueueLogger(); //Use the custom logger
-                    loggingBuilder.AddApplicationInsights(); //log to app insights
-                    loggingBuilder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
-                });
-
-            return dependencyBuilder;
+        public static void LogWebPorts(this IFeatureCollection features, ILogger logger)
+        {
+            var addressFeature = features.Get<IServerAddressesFeature>();
+            foreach (var address in addressFeature.Addresses)
+            {
+                logger.LogInformation("Listening on: " + address.ReplaceI("127.0.0.1:","localhost:"));
+            }
         }
 
         /// <summary>
@@ -118,7 +107,6 @@ namespace ModernSlavery.Infrastructure.Hosts
         /// <returns></returns>
         public static IMvcBuilder AddRazorClassLibrary<TModule>(this IMvcBuilder mvcBuilder) where TModule : class
         {
-            return mvcBuilder;
             var partAssembly = typeof(TModule).Assembly;
 
             mvcBuilder.AddApplicationPart(partAssembly);
@@ -136,13 +124,10 @@ namespace ModernSlavery.Infrastructure.Hosts
         {
             var ex = e.ExceptionObject as Exception;
 
-            Console.WriteLine(
-                $"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
-            Debug.WriteLine(
-                $"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}");
+            var errorMessage = $"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}";
 
-            //Show thread availability
-            Console.WriteLine(Extensions.GetThreadCount());
+            Console.WriteLine(errorMessage);
+            if (Debugger.IsAttached)Debug.WriteLine(errorMessage);
 
             throw ex;
         }
@@ -152,8 +137,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             ThreadPool.GetMinThreads(out var workerMin, out var ioMin);
             ThreadPool.GetMaxThreads(out var workerMax, out var ioMax);
             ThreadPool.GetAvailableThreads(out var workerFree, out var ioFree);
-            return
-                $"Threads (Worker busy:{workerMax - workerFree:N0} min:{workerMin:N0} max:{workerMax:N0}, I/O busy:{ioMax - ioFree:N0} min:{ioMin:N0} max:{ioMax:N0})";
+            return $"Threads (Worker busy:{workerMax - workerFree:N0} min:{workerMin:N0} max:{workerMax:N0}, I/O busy:{ioMax - ioFree:N0} min:{ioMin:N0} max:{ioMax:N0})";
         }
 
         public static void SetupThreads(this IConfiguration config)

@@ -27,8 +27,14 @@ public class WebHostSetup
         webHostBuilder.ConfigureServices((context, serviceCollection) => { 
             //Override any dependency services here
         });
+
         webHostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) => {
             //Override any autofac services here
+
+            builder.RegisterBuildCallback(lifeTimeScope =>
+            {
+                //Override any configuration here
+            });
         });
 
         //Build and start the host
