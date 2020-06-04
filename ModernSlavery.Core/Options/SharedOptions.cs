@@ -145,14 +145,14 @@ namespace ModernSlavery.Core.Models
             return environmentNames.Any(en => Environment.EqualsI(en));
         }
 
-        public bool IsLocal()
-        {
-            return IsEnvironment("LOCAL");
-        }
-
         public bool IsDevelopment()
         {
-            return IsEnvironment("DEV", "DEVELOPMENT");
+            return IsEnvironment("Development");
+        }
+
+        public bool IsDev()
+        {
+            return IsEnvironment("DEV");
         }
 
         public bool IsStaging()

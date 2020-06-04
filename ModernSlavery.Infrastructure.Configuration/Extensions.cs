@@ -32,8 +32,8 @@ namespace ModernSlavery.Infrastructure.Configuration
                         _EnvironmentName =
                             Environment.GetEnvironmentVariable("Environment"); //This is used by webjobs SDK v3 
                     if (string.IsNullOrWhiteSpace(_EnvironmentName) &&
-                        Environment.GetEnvironmentVariable("DEV_ENVIRONMENT").ToBoolean()) _EnvironmentName = "Local";
-                    if (string.IsNullOrWhiteSpace(_EnvironmentName)) _EnvironmentName = "Local";
+                        Environment.GetEnvironmentVariable("DEV_ENVIRONMENT").ToBoolean()) _EnvironmentName = "Development";
+                    if (string.IsNullOrWhiteSpace(_EnvironmentName)) _EnvironmentName = "Development";
                 }
 
                 return _EnvironmentName;
@@ -45,14 +45,14 @@ namespace ModernSlavery.Infrastructure.Configuration
             configuration[HostDefaults.EnvironmentKey] = environmentName;
         }
 
-        public static bool IsLocal(this IConfiguration configuration)
-        {
-            return configuration.IsEnvironment("LOCAL");
-        }
-
         public static bool IsDevelopment(this IConfiguration configuration)
         {
-            return configuration.IsEnvironment("DEV", "DEVELOPMENT");
+            return configuration.IsEnvironment("Development");
+        }
+
+        public static bool IsDev(this IConfiguration configuration)
+        {
+            return configuration.IsEnvironment("DEV");
         }
 
         public static bool IsStaging(this IConfiguration configuration)

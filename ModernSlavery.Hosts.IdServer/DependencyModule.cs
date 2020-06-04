@@ -75,7 +75,7 @@ namespace ModernSlavery.Hosts.IdServer
                 //.AddInMemoryApiResources(Resources.GetApiResources())
                 .AddCustomUserStore();
 
-            if (Debugger.IsAttached || _sharedOptions.IsDevelopment() || _sharedOptions.IsLocal())
+            if (Debugger.IsAttached || _sharedOptions.IsDevelopment())
                 identityServer.AddDeveloperSigningCredential();
             else
                 identityServer.AddSigningCredential(LoadCertificate(_sharedOptions));
@@ -101,10 +101,10 @@ namespace ModernSlavery.Hosts.IdServer
 
             services.AddRazorPages();
 
-            // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Local" for local dev 
+            // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Development" for Development dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
             // However this doesnt work on razor class/com,ponent libraries so we instead use a workaround 
-            //if (_sharedOptions.IsDevelopment() || _sharedOptions.IsLocal()) mvcBuilder.AddRazorRuntimeCompilation();
+            //if (_sharedOptions.IsDevelopment()) mvcBuilder.AddRazorRuntimeCompilation();
 
             //Add services needed for sessions
             services.AddSession(
@@ -138,7 +138,7 @@ namespace ModernSlavery.Hosts.IdServer
 
             
             //Register the AutoMapper configurations in all domain assemblies
-            services.AddAutoMapper(_sharedOptions.IsLocal() || _sharedOptions.IsDevelopment());
+            services.AddAutoMapper(_sharedOptions.IsDevelopment());
         }
 
 
@@ -172,7 +172,7 @@ namespace ModernSlavery.Hosts.IdServer
             lifetimeScope.UseLogEventQueueLogger();
 
             app.UseMiddleware<ExceptionMiddleware>();
-            if (Debugger.IsAttached || _sharedOptions.IsDevelopment() || _sharedOptions.IsLocal())
+            if (Debugger.IsAttached || _sharedOptions.IsDevelopment())
             {
                 IdentityModelEventSource.ShowPII = true;
 

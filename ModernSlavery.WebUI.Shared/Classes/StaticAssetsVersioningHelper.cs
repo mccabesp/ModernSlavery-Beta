@@ -50,7 +50,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
         private string GetStaticFile(string directory, string fileRegex)
         {
-            if (_sharedOptions.IsLocal())
+            if (_sharedOptions.IsDevelopment())
                 // When developing locally, skip the cache
                 return FindMatchingFile(directory, fileRegex);
 
