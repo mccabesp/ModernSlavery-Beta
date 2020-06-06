@@ -1,25 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using Autofac;
 using Autofac.Features.AttributeFilters;
-using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
 using ModernSlavery.Infrastructure.CompaniesHouse;
-using ModernSlavery.Infrastructure.Configuration;
 using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
@@ -85,8 +82,9 @@ namespace ModernSlavery.Hosts.Web
                             new TrimModelBinder()); //Set DisplayMetadata to input empty strings as null
                         options.ModelMetadataDetailsProviders.Add(
                             new DefaultResourceValidationMetadataProvider()); // sets default resource type to use for display text and error messages
-                        _responseCachingOptions.CacheProfiles.ForEach(p =>
-                            options.CacheProfiles.Add(p)); //Load the response cache profiles from options
+                        if (_responseCachingOptions.Enabled)
+                            _responseCachingOptions.CacheProfiles.ForEach(p =>
+                                options.CacheProfiles.Add(p)); //Load the response cache profiles from options
                         options.Filters.Add<ErrorHandlingFilter>();
                     });
 
@@ -230,7 +228,7 @@ namespace ModernSlavery.Hosts.Web
             //app.UseResponseCompression(); //Disabled to use IIS compression which has better performance (see https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-2.1)
 
             app.UseRouting();
-            app.UseResponseCaching();
+            if (_responseCachingOptions.Enabled)app.UseResponseCaching();
             app.UseSession(); //Must be before UseMvC or any middleware which requires session
             app.UseAuthentication(); //Ensure the OIDC IDentity Server authentication services execute on each http request - Must be before UseMVC
             app.UseAuthorization();
@@ -255,7 +253,7 @@ namespace ModernSlavery.Hosts.Web
                     //     Triggered when the application host has fully started and is about to wait for
                     //     a graceful shutdown.
                     _logger.LogInformation("Application Started");
-                    app.ServerFeatures.LogWebPorts(_logger);
+                    app.ServerFeatures.LogHostAddresses(_logger);
                 });
             hostApplicationLifetime.ApplicationStopping.Register(
                 () =>
@@ -270,27 +268,27 @@ namespace ModernSlavery.Hosts.Web
 
         public void RegisterModules(IList<Type> modules)
         {
-            modules.Add(typeof(WebUI.StaticFiles.DependencyModule));
-            modules.Add(typeof(WebUI.Account.DependencyModule));
-            modules.Add(typeof(WebUI.Admin.DependencyModule));
-            modules.Add(typeof(WebUI.Registration.DependencyModule));
-            modules.Add(typeof(WebUI.Submission.DependencyModule));
-            modules.Add(typeof(WebUI.Viewing.DependencyModule));
+            modules.AddDependency<WebUI.StaticFiles.DependencyModule>();
+            modules.AddDependency<WebUI.Account.DependencyModule>();
+            modules.AddDependency<WebUI.Admin.DependencyModule>();
+            modules.AddDependency<WebUI.Registration.DependencyModule>();
+            modules.AddDependency<WebUI.Submission.DependencyModule>();
+            modules.AddDependency<WebUI.Viewing.DependencyModule>();
 
             //Register the file storage dependencies
-            modules.Add(typeof(FileStorageDependencyModule));
+            modules.AddDependency<FileStorageDependencyModule>();
 
             //Register the queue storage dependencies
-            modules.Add(typeof(QueueStorageDependencyModule));
+            modules.AddDependency<QueueStorageDependencyModule>();
 
             //Register the log storage dependencies
-            modules.Add(typeof(Infrastructure.Logging.DependencyModule));
+            modules.AddDependency<Infrastructure.Logging.DependencyModule>();
 
             //Register the search dependencies
-            modules.Add(typeof(Infrastructure.Search.DependencyModule));
+            modules.AddDependency<Infrastructure.Search.DependencyModule>();
 
             //Register google analytics tracker
-            modules.Add(typeof(GoogleAnalyticsDependencyModule));
+            modules.AddDependency<GoogleAnalyticsDependencyModule>();
 
         }
     }

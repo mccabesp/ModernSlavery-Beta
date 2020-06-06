@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
@@ -50,6 +48,11 @@ namespace ModernSlavery.Infrastructure.Configuration
             return configuration.IsEnvironment("Development");
         }
 
+        public static bool IsTest(this IConfiguration configuration)
+        {
+            return configuration.IsEnvironment("Test");
+        }
+
         public static bool IsDev(this IConfiguration configuration)
         {
             return configuration.IsEnvironment("DEV");
@@ -85,6 +88,18 @@ namespace ModernSlavery.Infrastructure.Configuration
             return section.GetChildren().Any();
         }
 
+        public static IEnumerable<KeyValuePair<string, string>> GetChildValues(this IConfiguration config)
+        {
+            var children = config.GetChildren();
+
+            if (children.Any())
+                foreach (var child in children)
+                {
+                    foreach (var childResult in child.GetChildValues())
+                        yield return childResult;
+                }
+        }
+
         public static IEnumerable<KeyValuePair<string, string>> GetChildValues(this IConfigurationSection parent)
         {
             var children = parent.GetChildren();
@@ -97,6 +112,29 @@ namespace ModernSlavery.Infrastructure.Configuration
                     foreach (var childResult in child.GetChildValues())
                         yield return childResult;
                 }
+        }
+
+
+        public static Dictionary<string,string> ToDictionary(this IConfiguration config, string sectionName=null)
+        {
+            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            if (string.IsNullOrWhiteSpace(sectionName))
+            {
+                foreach (var childValue in config.GetChildValues())
+                {
+                    if (!string.IsNullOrWhiteSpace(childValue.Value)) result[childValue.Key] = childValue.Value;
+                }
+            }
+            else
+            {
+                var section = config.GetSection(sectionName);
+                foreach (var childValue in section.GetChildValues())
+                {
+                    if (!string.IsNullOrWhiteSpace(childValue.Value)) result[childValue.Key.Substring(section.Path.Length + 1)] = childValue.Value;
+                }
+            }
+            return result;
         }
 
         #endregion

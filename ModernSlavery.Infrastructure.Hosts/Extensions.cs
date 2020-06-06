@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Configuration;
 using System;
 using System.Collections.Generic;
@@ -86,12 +88,26 @@ namespace ModernSlavery.Infrastructure.Hosts
             return config.GetChildren().Select(c => c.Key);
         }
 
-        public static void LogWebPorts(this IFeatureCollection features, ILogger logger)
+        public static IEnumerable<string> GetHostAddresses(this IHost host)
+        {
+            var kestrelServer = host.Services.GetRequiredService<IServer>();
+            return kestrelServer.Features.GetHostAddresses();
+        }
+
+        public static IEnumerable<string> GetHostAddresses(this IFeatureCollection features)
         {
             var addressFeature = features.Get<IServerAddressesFeature>();
             foreach (var address in addressFeature.Addresses)
             {
-                logger.LogInformation("Listening on: " + address.ReplaceI("127.0.0.1:","localhost:"));
+                yield return address.ReplaceI("127.0.0.1:", "localhost:");
+            }
+        }
+
+        public static void LogHostAddresses(this IFeatureCollection features, ILogger logger)
+        {
+            foreach (var address in features.GetHostAddresses())
+            {
+                logger.LogInformation("Listening on: " + address);
             }
         }
 
@@ -191,6 +207,5 @@ namespace ModernSlavery.Infrastructure.Hosts
             //Add a single mapper to the dependency container
             services.AddSingleton(mapperConfig.CreateMapper());
         }
-
     }
 }

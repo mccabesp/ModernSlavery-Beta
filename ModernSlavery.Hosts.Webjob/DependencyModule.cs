@@ -165,10 +165,10 @@ namespace ModernSlavery.Hosts.Webjob
         public void RegisterModules(IList<Type> modules)
         {
             //Register the file storage dependencies
-            modules.Add(typeof(FileStorageDependencyModule));
+            modules.AddDependency<FileStorageDependencyModule>();
 
             //Register the log storage dependencies
-            modules.Add(typeof(Infrastructure.Logging.DependencyModule));
+            modules.AddDependency<Infrastructure.Logging.DependencyModule>();
         }
 
         public class AutofacJobActivator : IJobActivator

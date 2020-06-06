@@ -89,8 +89,6 @@ namespace ModernSlavery.Core.Models
         public string SecurityCodeChars { get; set; } = "123456789ABCDEFGHKLMNPQRSTUXYZ";
         public int SecurityCodeLength { get; set; } = 8;
         public int SecurityCodeExpiryDays { get; set; } = 90;
-        public bool DisablePageCaching { get; set; }
-
         public string EmployerCodeChars { get; set; }
         public string PasswordRegex { get; set; }
         public string PasswordRegexError { get; set; }

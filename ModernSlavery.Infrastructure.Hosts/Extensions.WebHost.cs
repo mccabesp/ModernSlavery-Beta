@@ -20,7 +20,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             if (!string.IsNullOrWhiteSpace(contentRoot))hostBuilder.UseContentRoot(contentRoot);
 
             //Load the configuration
-            var configBuilder = new ConfigBuilder(additionalSettings);
+            var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
             var appConfig = configBuilder.Build();
 
             hostBuilder.ConfigureAppConfiguration((hostBuilderContext, appConfigBuilder) =>

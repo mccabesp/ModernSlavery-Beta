@@ -65,10 +65,6 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             var controller = context.Controller as Controller;
             controller.ViewData["Controller"] = controller;
 
-            if (SharedBusinessLogic.SharedOptions.DisablePageCaching)
-                //Disable page caching
-                context.HttpContext.DisableResponseCache();
-
             #endregion
 
             //Ensure the session is loaded

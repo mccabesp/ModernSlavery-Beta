@@ -13,11 +13,15 @@ namespace ModernSlavery.Infrastructure.Configuration
 {
     public class ConfigBuilder: IDisposable
     {
-        Dictionary<string, string> _additionalSettings = null; 
+        private Dictionary<string, string> _additionalSettings;
+        private string[] _commandlineArgs;
 
-        public ConfigBuilder(Dictionary<string, string> additionalSettings = null)
+        private IConfiguration _appConfig;
+
+        public ConfigBuilder(Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs)
         {
             _additionalSettings = additionalSettings;
+            _commandlineArgs = commandlineArgs;
         }
 
         public void Dispose()
@@ -28,6 +32,10 @@ namespace ModernSlavery.Infrastructure.Configuration
         public IConfiguration Build()
         {
             var appBuilder = new ConfigurationBuilder();
+            appBuilder.AddEnvironmentVariables();
+            if (_commandlineArgs!=null && _commandlineArgs.Any())appBuilder.AddCommandLine(_commandlineArgs);
+            _appConfig = appBuilder.Build();
+
             //Make sure we know the environment
             var environmentName = GetEnvironmentName();
                 if (string.IsNullOrWhiteSpace(environmentName)) throw new ArgumentNullException(nameof(environmentName));
@@ -39,7 +47,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             appBuilder.AddJsonFile("appsettings.json", false, true);
             appBuilder.AddJsonFile($"appsettings.{environmentName}.json", true, true);
 
-            var _appConfig = appBuilder.Build();
+            _appConfig = appBuilder.Build();
 
             //Add the azure key vault to configuration
             var vault = _appConfig["Vault"];
@@ -62,12 +70,13 @@ namespace ModernSlavery.Infrastructure.Configuration
             }
 
             /* make sure these files are loaded AFTER the vault, so their keys superseed the vaults' values - that way, unit tests will pass because the obfuscation key is whatever the appSettings says it is [and not a hidden secret inside the vault])  */
-            if (Debugger.IsAttached || _appConfig.IsDevelopment())
+            if (Debugger.IsAttached || _appConfig.IsDevelopment() || _appConfig.IsTest())
             {
                 var appAssembly = Misc.GetTopAssembly();
                 if (appAssembly != null) appBuilder.AddUserSecrets(appAssembly, true);
 
                 appBuilder.AddJsonFile("appsettings.secret.json", true, true);
+                appBuilder.AddJsonFile($"appsettings.{environmentName}.secret.json", true, true);
             }
 
             // override using the azure environment variables into the configuration
@@ -85,8 +94,10 @@ namespace ModernSlavery.Infrastructure.Configuration
             if (!_appConfig.IsProduction() && _appConfig.GetValueOrDefault("DUMP_SETTINGS", false))
             {
                 //Console.WriteLine(_appConfig.GetDebugView());
-                foreach (var key in _appConfig.GetChildren().Select(c => c.Key))
-                    Console.WriteLine($@"SETTING[""{key}""]={_appConfig[key]}");
+
+                var configDictionary = _appConfig.ToDictionary();
+                foreach (var key in configDictionary.Keys)
+                    Console.WriteLine($@"[{key}]={configDictionary[key]}");
             }
 
             return _appConfig;
@@ -94,7 +105,10 @@ namespace ModernSlavery.Infrastructure.Configuration
 
         private string GetEnvironmentName()
         {
-            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var environmentName = _appConfig[HostDefaults.EnvironmentKey];
+
+            if (string.IsNullOrWhiteSpace(environmentName))
+                environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             if (string.IsNullOrWhiteSpace(environmentName))
                 environmentName = Environment.GetEnvironmentVariable("ASPNET_ENV");
             if (string.IsNullOrWhiteSpace(environmentName))
@@ -103,6 +117,7 @@ namespace ModernSlavery.Infrastructure.Configuration
                 environmentName = Environment.GetEnvironmentVariable("AzureWebJobsEnv");
             if (string.IsNullOrWhiteSpace(environmentName))environmentName =Environment.GetEnvironmentVariable("Environment"); //This is used by webjobs SDK v3 
             if (string.IsNullOrWhiteSpace(environmentName) && Environment.GetEnvironmentVariable("DEV_ENVIRONMENT").ToBoolean()) environmentName = "Development";
+
             return environmentName;
         }
 

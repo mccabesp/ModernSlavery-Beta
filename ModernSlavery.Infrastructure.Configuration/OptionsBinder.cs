@@ -61,11 +61,8 @@ namespace ModernSlavery.Infrastructure.Configuration
             {
                 var result = instance as Dictionary<string, string>;
 
-                var section=_configuration.GetSection(configSection);
-                foreach (var childValue in section.GetChildValues())
-                {
-                    if (!string.IsNullOrWhiteSpace(childValue.Value))result[childValue.Key.Substring(section.Path.Length+1)] = childValue.Value;
-                }
+                result.AddRange(_configuration.ToDictionary(configSection));
+
                 instance = result;
             }
             else
