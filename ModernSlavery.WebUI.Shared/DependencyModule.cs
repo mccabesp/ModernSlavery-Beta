@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -54,13 +55,6 @@ namespace ModernSlavery.WebUI.Shared
             //Register Email queuers
             builder.RegisterType<SendEmailService>().As<ISendEmailService>().SingleInstance().WithAttributeFiltering();
             builder.RegisterType<NotificationService>().As<INotificationService>().SingleInstance().WithAttributeFiltering();
-
-            ////Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            //builder.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
-            //    .Where(t => t.IsAssignableTo<Controller>())
-            //    .InstancePerLifetimeScope()
-            //    .WithAttributeFiltering();
-
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
@@ -71,8 +65,8 @@ namespace ModernSlavery.WebUI.Shared
         public void RegisterModules(IList<Type> modules)
         {
             //Register references dependency modules
-            modules.Add(typeof(ModernSlavery.BusinessDomain.Shared.DependencyModule));
-            modules.Add(typeof(ModernSlavery.WebUI.GDSDesignSystem.DependencyModule));
+            modules.AddDependency<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            modules.AddDependency<ModernSlavery.WebUI.GDSDesignSystem.DependencyModule>();
 
         }
     }

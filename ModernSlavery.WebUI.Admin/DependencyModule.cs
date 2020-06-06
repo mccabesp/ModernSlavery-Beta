@@ -5,6 +5,7 @@ using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
 
@@ -32,12 +33,6 @@ namespace ModernSlavery.WebUI.Admin
             //Register dependencies here
             builder.RegisterType<AdminSearchService>().As<AdminSearchService>()
                 .InstancePerLifetimeScope();
-
-            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            builder.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
-                .Where(t => t.IsAssignableTo<Controller>())
-                .InstancePerLifetimeScope()
-                .WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
@@ -48,9 +43,9 @@ namespace ModernSlavery.WebUI.Admin
         public void RegisterModules(IList<Type> modules)
         {
             //Register references dependency modules
-            modules.Add(typeof(ModernSlavery.BusinessDomain.Admin.DependencyModule));
-            modules.Add(typeof(ModernSlavery.BusinessDomain.Shared.DependencyModule));
-            modules.Add(typeof(ModernSlavery.WebUI.Shared.DependencyModule));
+            modules.AddDependency<ModernSlavery.BusinessDomain.Admin.DependencyModule>();
+            modules.AddDependency<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            modules.AddDependency<ModernSlavery.WebUI.Shared.DependencyModule>();
         }
     }
 }

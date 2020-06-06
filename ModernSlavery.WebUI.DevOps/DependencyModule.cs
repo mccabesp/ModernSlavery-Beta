@@ -5,6 +5,7 @@ using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.WebUI.DevOps
@@ -28,11 +29,7 @@ namespace ModernSlavery.WebUI.DevOps
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            builder.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
-                .Where(t => t.IsAssignableTo<Controller>())
-                .InstancePerLifetimeScope()
-                .WithAttributeFiltering();
+            //TODO: Register autofac dependencies here
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
@@ -43,8 +40,8 @@ namespace ModernSlavery.WebUI.DevOps
         public void RegisterModules(IList<Type> modules)
         {
             //Register references dependency modules
-            modules.Add(typeof(ModernSlavery.BusinessDomain.Shared.DependencyModule));
-            modules.Add(typeof(ModernSlavery.WebUI.Shared.DependencyModule));
+            modules.AddDependency<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            modules.AddDependency<ModernSlavery.WebUI.Shared.DependencyModule>();
 
         }
     }

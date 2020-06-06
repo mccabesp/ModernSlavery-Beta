@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -216,15 +217,15 @@ namespace ModernSlavery.Hosts.IdServer
 
         public void RegisterModules(IList<Type> modules)
         {
-            modules.Add(typeof(WebUI.StaticFiles.DependencyModule));
-            modules.Add(typeof(ModernSlavery.BusinessDomain.Account.DependencyModule));
-            //modules.Add(typeof(ModernSlavery.Infrastructure.CompaniesHouse.DependencyModule));
+            modules.AddDependency<WebUI.StaticFiles.DependencyModule>();
+            modules.AddDependency<ModernSlavery.BusinessDomain.Account.DependencyModule>();
+            //modules.AddDependency<ModernSlavery.Infrastructure.CompaniesHouse.DependencyModule>();
 
             //Register the file storage dependencies
-            modules.Add(typeof(FileStorageDependencyModule));
+            modules.AddDependency<FileStorageDependencyModule>();
 
             //Register google analytics tracker
-            modules.Add(typeof(GoogleAnalyticsDependencyModule));
+            modules.AddDependency<GoogleAnalyticsDependencyModule>();
 
 
         }

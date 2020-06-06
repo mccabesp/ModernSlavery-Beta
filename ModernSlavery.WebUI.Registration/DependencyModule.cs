@@ -5,6 +5,7 @@ using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Registration.Classes;
@@ -42,15 +43,9 @@ namespace ModernSlavery.WebUI.Registration
                 .Keyed<IPagedRepository<EmployerRecord>>("Private")
                 .InstancePerLifetimeScope();
 
-            builder.Autofac.RegisterType<RegistrationPresenter>()
+            builder.RegisterType<RegistrationPresenter>()
                 .As<IRegistrationPresenter>()
                 .InstancePerLifetimeScope();
-
-            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            builder.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
-                .Where(t => t.IsAssignableTo<Controller>())
-                .InstancePerLifetimeScope()
-                .WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
@@ -61,9 +56,9 @@ namespace ModernSlavery.WebUI.Registration
         public void RegisterModules(IList<Type> modules)
         {
             //Register references dependency modules
-            modules.Add(typeof(ModernSlavery.BusinessDomain.Registration.DependencyModule));
-            modules.Add(typeof(ModernSlavery.BusinessDomain.Shared.DependencyModule));
-            modules.Add(typeof(ModernSlavery.WebUI.Shared.DependencyModule));
+            modules.AddDependency<ModernSlavery.BusinessDomain.Registration.DependencyModule>();
+            modules.AddDependency<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            modules.AddDependency<ModernSlavery.WebUI.Shared.DependencyModule>();
 
         }
     }

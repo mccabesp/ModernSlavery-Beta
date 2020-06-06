@@ -5,6 +5,7 @@ using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Account.Interfaces;
 using ModernSlavery.WebUI.Account.ViewServices;
@@ -40,12 +41,6 @@ namespace ModernSlavery.WebUI.Account
                 .InstancePerLifetimeScope();
             builder.RegisterType<CloseAccountViewService>().As<ICloseAccountViewService>()
                 .InstancePerLifetimeScope();
-
-            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            builder.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
-                .Where(t => t.IsAssignableTo<Controller>())
-                .InstancePerLifetimeScope()
-                .WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
@@ -56,9 +51,9 @@ namespace ModernSlavery.WebUI.Account
         public void RegisterModules(IList<Type> modules)
         {
             //Register references dependency modules
-            modules.Add(typeof(ModernSlavery.BusinessDomain.Account.DependencyModule));
-            modules.Add(typeof(ModernSlavery.BusinessDomain.Shared.DependencyModule));
-            modules.Add(typeof(ModernSlavery.WebUI.Shared.DependencyModule));
+            modules.AddDependency<ModernSlavery.BusinessDomain.Account.DependencyModule>();
+            modules.AddDependency<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            modules.AddDependency<ModernSlavery.WebUI.Shared.DependencyModule>();
         }
     }
 }

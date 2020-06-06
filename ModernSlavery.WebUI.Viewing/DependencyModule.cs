@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Viewing.Presenters;
 
@@ -22,7 +23,7 @@ namespace ModernSlavery.WebUI.Viewing
 
         public void ConfigureServices(IServiceCollection services)
         {
-
+            //TODO: Register service dependencies here
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -33,11 +34,6 @@ namespace ModernSlavery.WebUI.Viewing
             builder.RegisterType<SearchPresenter>().As<ISearchPresenter>().InstancePerLifetimeScope();
             builder.RegisterType<ComparePresenter>().As<IComparePresenter>()
                 .InstancePerLifetimeScope();
-            ////Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            //builder.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
-            //    .Where(t => t.IsAssignableTo<Controller>())
-            //    .InstancePerLifetimeScope()
-            //    .WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
@@ -48,9 +44,9 @@ namespace ModernSlavery.WebUI.Viewing
         public void RegisterModules(IList<Type> modules)
         {
             //TODO: Add any linked dependency modules here
-            modules.Add(typeof(ModernSlavery.BusinessDomain.Viewing.DependencyModule));
-            modules.Add(typeof(ModernSlavery.BusinessDomain.Shared.DependencyModule));
-            modules.Add(typeof(ModernSlavery.WebUI.Shared.DependencyModule));
+            modules.AddDependency<BusinessDomain.Viewing.DependencyModule>();
+            modules.AddDependency<BusinessDomain.Shared.DependencyModule>();
+            modules.AddDependency<Shared.DependencyModule>();
         }
     }
 }
