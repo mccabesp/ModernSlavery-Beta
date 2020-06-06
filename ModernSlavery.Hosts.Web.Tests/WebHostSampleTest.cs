@@ -1,8 +1,13 @@
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using NUnit.Framework;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using static ModernSlavery.Core.Extensions.Web;
 
@@ -14,27 +19,29 @@ namespace ModernSlavery.Hosts.Web.Tests
         private string _webAuthority;
         private IDataRepository _dataRepository;
         private IFileRepository _fileRepository;
-        private IHttpSession _httpSession;
 
         [OneTimeSetUp]
         public void RunBeforeAnyTests()
         {
             //Get the url from the test web host
-            _webAuthority = WebHostSetup.WebTestHost.GetWebAuthority();
+            _webAuthority = WebHostSetup.TestWebHost.GetHostAddresses().FirstOrDefault();
+            if (Debugger.IsAttached)Debug.WriteLine($"Kestrel authority: {_webAuthority}");
+            Console.WriteLine($"Kestrel authority: {_webAuthority}");
 
             //Get the data repository from the test web host
-            _dataRepository = WebHostSetup.WebTestHost.GetDataRepository();
+            _dataRepository = WebHostSetup.TestWebHost.GetDataRepository();
 
             //Get the file repository from the test web host
-            _fileRepository = WebHostSetup.WebTestHost.GetFileRepository();
-
-            //Get the http session from the test web host
-            _httpSession = WebHostSetup.WebTestHost.GetHttpSession();
+            _fileRepository = WebHostSetup.TestWebHost.GetFileRepository();
+            if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
+            Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
         }
 
         [Test]
         public void WebTestHost_Authority_IsValidUrl()
         {
+            TestContext.Out.WriteLine($"Kestrel authority: {_webAuthority}");
+
             //Check we got the url of the test web server
             Assert.That(_webAuthority.IsUrl());
         }
@@ -49,6 +56,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test]
         public void WebTestHost_FileRepository_Exists()
         {
+            TestContext.Out.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
+
             //Check we got the file repository from the test web server
             Assert.IsNotNull(_fileRepository);
         }
@@ -57,7 +66,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task WebTestHost_HttpGet_ReturnsValidResponse()
         {
             //Check we get a response from the test web server
-            var response=await WebRequestAsync(HttpMethods.Get,_webAuthority);
+            var response =await WebRequestAsync(HttpMethods.Get,_webAuthority);
             Assert.That(!string.IsNullOrWhiteSpace(response));
         }
     }

@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
@@ -215,6 +216,12 @@ namespace ModernSlavery.Core.Extensions
             return connectionString.Split(';')
                 .Select(t => t.Split(new[] {'='}, 2))
                 .ToDictionary(t => t[0].Trim(), t => t[1].Trim(), StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        public static void AddRange(this Dictionary<string, string> target, Dictionary<string, string> source)
+        {
+            foreach (var key in source.Keys)
+                target[key] = source[key];
         }
 
 

@@ -1,13 +1,9 @@
-using Autofac;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using ModernSlavery.BusinessDomain.Account;
-using ModernSlavery.Infrastructure.Configuration;
+using ModernSlavery.Testing.Helpers;
 using NUnit.Framework;
-using System.Linq;
 using System.Threading.Tasks;
+using ModernSlavery.Hosts.Web.Tests;
+using System.Diagnostics;
 
 /// <summary>
 /// This class is used by all test fixtures (classes) in this assembly to setup and teardown the websever
@@ -16,38 +12,27 @@ using System.Threading.Tasks;
 [SetUpFixture]
 public class WebHostSetup
 {
-    public static IHost WebTestHost { get; private set; }
+    public static IHost TestWebHost { get; private set; }
 
     [OneTimeSetUp]
     public async Task RunBeforeAnyTestsAsync()
     {
-        //Build the web host using the default dependencies
-        var webHostBuilder = ModernSlavery.Hosts.Web.Program.CreateHostBuilder("--environment","Test");
+        //Create the test host usign the default dependency module and override with a test module
+        TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>();
 
-        webHostBuilder.ConfigureServices((context, serviceCollection) => { 
-            //Override any dependency services here
-        });
-
-        webHostBuilder.ConfigureContainer<ContainerBuilder>((context, builder) => {
-            //Override any autofac services here
-
-            builder.RegisterBuildCallback(lifeTimeScope =>
-            {
-                //Override any configuration here
-            });
-        });
-
-        //Build and start the host
-        WebTestHost = await webHostBuilder.StartAsync();
+        //Start the test host
+        await TestWebHost.StartAsync().ConfigureAwait(false);
     }
 
     [OneTimeTearDown]
     public async Task RunAfterAnyTestsAsync()
     {
+        if (TestWebHost == null) return;
+
         //Stop the webhost
-        await WebTestHost?.StopAsync();
+        await TestWebHost?.StopAsync();
 
         //Release the webhost resources
-        WebTestHost?.Dispose();
+        TestWebHost?.Dispose();
     }
 }

@@ -47,6 +47,8 @@ namespace ModernSlavery.Infrastructure.Configuration
         private List<Action<ContainerBuilder>> _containerActions = new List<Action<ContainerBuilder>>();
         private List<Action<ILifetimeScope>> _configActions = new List<Action<ILifetimeScope>>();
 
+        private List<Type> _moduleTypes = new List<Type>();
+
         private bool _serviceActionsComplete=false;
         private bool _containerActionsComplete=false;
         private bool _configActionsComplete=false;
@@ -72,14 +74,31 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             
             //Register the DependencyModules in the root assembly and all descendent assemblies
-            RegisterModules(optionsContainer, typeof(TStartupModule).Assembly);
+            RegisterAssembly(optionsContainer, typeof(TStartupModule).Assembly);
+
+            //Register the modules again to account for any removals
+            foreach (var moduleType in _moduleTypes.ToList())
+            {
+                var moduleInstance = _registeredModules[moduleType];
+                moduleInstance.RegisterModules(_moduleTypes);
+            }
+
+            //Add the callbacks depth first
+            foreach (var moduleType in _moduleTypes)
+            {
+                var moduleInstance=_registeredModules[moduleType];
+
+                _serviceActions.Add(moduleInstance.ConfigureServices);
+                _containerActions.Add(moduleInstance.ConfigureContainer);
+                _configActions.Add(moduleInstance.Configure);
+            }
         }
 
         /// <summary>
         /// //Register the DependencyModules in the assembly and all descendent assemblies
         /// </summary>
         /// <param name="assembly"></param>
-        private void RegisterModules(IContainer optionsContainer, Assembly assembly)
+        private void RegisterAssembly(IContainer optionsContainer, Assembly assembly)
         {
             if (_registeredAssemblyNames.Contains(assembly.FullName)) return;
             _registeredAssemblyNames.Add(assembly.FullName);
@@ -99,13 +118,14 @@ namespace ModernSlavery.Infrastructure.Configuration
                 referencedAssembly = _loadedAssemblies[referencedAssemblyName.FullName];
 
                 //Recursiveley load all referenced assemblies and their modules
-                RegisterModules(optionsContainer, referencedAssembly);
+                RegisterAssembly(optionsContainer, referencedAssembly);
             }
 
-            //Get alll referenced IDependencyModule class types
+            //Get all referenced IDependencyModule class types
             var assemblyModuleTypes = assembly.ExportedTypes.Where(p => p.IsClass && typeof(IDependencyModule).IsAssignableFrom(p)).ToList();
 
-            RegisterModules(optionsContainer, assemblyModuleTypes);
+            //If only 1 dependency module in the assembly then load it and its dependencies
+            if (assemblyModuleTypes.Count==1)RegisterModules(optionsContainer, assemblyModuleTypes);
         }
 
         private void RegisterModules(IContainer optionsContainer, List<Type> assemblyModuleTypes)
@@ -114,23 +134,20 @@ namespace ModernSlavery.Infrastructure.Configuration
             {
                 if (_registeredModules.ContainsKey(assemblyModuleType)) continue;
 
-                var moduleName = assemblyModuleType.FullName ?? assemblyModuleType.ToString();
-
                 //If only 1 dependency then load it 
                 var moduleInstance = CreateInstance(optionsContainer, assemblyModuleType);
                 _registeredModules[assemblyModuleType] = moduleInstance;
 
-                var childModules = new List<Type>();
-                moduleInstance.RegisterModules(childModules);
+                var childModuleTypes = new List<Type>();
+                moduleInstance.RegisterModules(childModuleTypes);
 
-                var badModules = childModules.Where(m => !m.IsClass || !typeof(IDependencyModule).IsAssignableFrom(m)).Select(m=>m.Name);
+                var badModules = childModuleTypes.Where(m => !m.IsClass || !typeof(IDependencyModule).IsAssignableFrom(m)).Select(m=>m.Name);
                 if (badModules.Any()) throw new Exception($"Registered types do not inherit from IDependencyModule: {badModules.ToDelimitedString()}");
 
-                _serviceActions.Add(moduleInstance.ConfigureServices);
-                _containerActions.Add(moduleInstance.ConfigureContainer);
-                _configActions.Add(moduleInstance.Configure);
+                if (childModuleTypes.Any())RegisterModules(optionsContainer, childModuleTypes);
 
-                if (childModules.Any())RegisterModules(optionsContainer, childModules);
+                childModuleTypes.ForEach(childModuleType => { if (!_moduleTypes.Contains(childModuleType)) _moduleTypes.Add(childModuleType); });
+                if (!_moduleTypes.Contains(assemblyModuleType))_moduleTypes.Add(assemblyModuleType);
             }
         }
 

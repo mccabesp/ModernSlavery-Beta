@@ -30,19 +30,21 @@ namespace ModernSlavery.Infrastructure.Messaging
             if (Enabled)
             {
                 // ensure we have api keys
-                if (string.IsNullOrWhiteSpace(Options.ApiKey))
+                if (!Options.AllowTestKeyOnly && string.IsNullOrWhiteSpace(Options.ApiKey))
                     throw new NullReferenceException(
                         $"{nameof(Options.ApiKey)}: You must supply a production api key for GovNotify");
 
                 if (string.IsNullOrWhiteSpace(Options.ApiTestKey))
                     throw new NullReferenceException(
                         $"{nameof(Options.ApiTestKey)}: You must supply a test api key for GovNotify");
+                else if (!Options.ApiTestKey.StartsWith("test_only-"))
+                    throw new ArgumentException("GovNotify Api Test Key must start with 'test_only-'", nameof(Options.ApiTestKey));
             }
 
             // create the clients
             var httpClient = httpClientFactory.CreateClient(nameof(GovNotifyEmailProvider));
             var notifyHttpWrapper = new HttpClientWrapper(httpClient);
-            ProductionClient = new NotificationClient(notifyHttpWrapper, Options.ApiKey);
+            if (!Options.AllowTestKeyOnly) ProductionClient = new NotificationClient(notifyHttpWrapper, Options.ApiKey);
             TestClient = new NotificationClient(notifyHttpWrapper, Options.ApiTestKey);
         }
 
@@ -60,7 +62,7 @@ namespace ModernSlavery.Infrastructure.Messaging
             mergeParameters["Environment"] = SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] ";
 
             // determine which client to use
-            var client = test ? TestClient : ProductionClient;
+            var client = test || Options.AllowTestKeyOnly ? TestClient : ProductionClient;
 
             // send email
             var response = await client.SendEmailAsync(

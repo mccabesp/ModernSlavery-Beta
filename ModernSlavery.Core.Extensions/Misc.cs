@@ -422,7 +422,7 @@ namespace ModernSlavery.Core.Extensions
             }
         }
 
-        public static MethodBase FindParentWithAttribute<T>(this MethodBase callingMethod, int parentOffset = 0)
+        public static MethodBase FindParentMethodWithAttribute<T>(this MethodBase callingMethod, int parentOffset = 0)
             where T : Attribute
         {
             // Iterate throught all attributes
@@ -439,7 +439,7 @@ namespace ModernSlavery.Core.Extensions
                 }
             }
 
-            return callingMethod;
+            return null;
         }
 
         public static dynamic ToDynamic(this object value)

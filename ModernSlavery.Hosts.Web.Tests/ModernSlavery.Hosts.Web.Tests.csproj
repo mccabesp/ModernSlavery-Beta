@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="hostsettings.TEST.json" />
+    <None Remove="appsettings.Test.secret.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,4 +29,15 @@
     <ProjectReference Include="..\ModernSlavery.Testing.Helpers\ModernSlavery.Testing.Helpers.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="appsettings.Test.secret.json" Condition="Exists('appsettings.Test.secret.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.Test.json</DependentUpon>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.Test.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
