@@ -16,9 +16,10 @@ namespace Modern_Slavery_Reporting_UI_Tests
         public const string roger_job_title = "Company Reporter";
         public const string roger_passowrd = "Test1234!";
 
+        //existing user
         public const string existing_email = "stephen@coolcorner.com";
 
-
+        //edited user
         public const string edited_email = "edited@test.com";
         public const string edited_first = "EditedFirst";
         public const string edited_last = "EditedLast";

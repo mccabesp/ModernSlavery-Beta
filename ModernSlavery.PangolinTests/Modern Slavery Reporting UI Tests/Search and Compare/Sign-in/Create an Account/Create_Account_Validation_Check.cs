@@ -23,6 +23,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             //invalid email address
             Set("Email address").To("invalid");
             Click("Continue");
+            Expect("There`s a problem with your email address");
 
             Expect("Please include an '@' in the email address. 'invalid' is missing an '@'.");
 
@@ -39,7 +40,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             Click("Continue");
 
             //personal details
-
+            //leave blank to test validaition
             //todo check validation messages
             Expect("The following errors were detected");
             Expect("You need to provide a first name");
