@@ -32,6 +32,25 @@ namespace Modern_Slavery_Reporting_UI_Tests
         //codes 1, 84110
         public const string SicCodes_Blackpool = "Public Sector, General public administration activities";
 
+        public const string EmployerReference_InterFloor = "B72GL8R2";
+        public const string OrgName_InterFloor = "InterFloor Limited";
+        public const string RegisteredAddress_InterFloor = "Broadway, Haslingden, Rossendale, BB4 4LS";
+        public const string Address1_InterFloor = "Broadway, Haslingden";
+        public const string Address2_InterFloor = "";
+        public const string Address3_InterFloor = "Rossendale";
+        public const string PostCode_InterFloor = "BB4 4LS";
+        //codes 1, 84110
+        public const string SicCodes_InterFloor = "Public Sector, General public administration activities";
+
+
+        public const string OrgName_CantFind = ""; 
+        public const string CompanyNumber_CantFind = "";
+        public const string CharityNumber_CantFind = "";
+        public const string MutualPartnerShipNumber_CantFind = "";
+        public const string DUNS_CantFind = "";
+
+
+
 
         public const string EmployerReference_NationalHeritage = "MZMGZPMM";
         public const string SecurtiyCode_NationalHeritage = "ABCD1234";
