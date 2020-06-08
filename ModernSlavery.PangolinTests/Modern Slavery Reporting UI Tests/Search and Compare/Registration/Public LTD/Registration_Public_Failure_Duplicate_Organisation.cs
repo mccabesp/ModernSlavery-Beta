@@ -24,8 +24,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             ExpectHeader("Find your organisation");
 
-            Set("Find").To(Registration.OrgName_Blackpool);
-            Click("Search");
+            SetXPath("//input[@id='SearchText']").To(Registration.OrgName_Blackpool);
+            Click(The.Bottom, "Search");
 
 
             ExpectRow("Organisation name and registered address");
@@ -33,7 +33,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectRow(That.Contains, Registration.RegisteredAddress_Blackpool);
 
 
-            AtRow(That.Contains, Registration.OrgName_Blackpool).Click("Choose Organisation");
+
+            ClickButton(That.Contains, "Choose");
 
             //org already registered
             //error should appear

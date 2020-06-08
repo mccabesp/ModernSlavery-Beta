@@ -23,8 +23,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             ExpectHeader("Find your organisation");
 
-            Set("SearchText").To(Registration.OrgName_Blackpool);
-            Click("Search");
+            SetXPath("//input[@id='SearchText']").To(Registration.OrgName_Blackpool);
+            Click(The.Bottom, "Search");
 
 
             ExpectRow("Organisation name and registered address");
@@ -35,7 +35,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectNo(What.Contains, "Showing 1-");
 
 
-            AtRow(That.Contains, Registration.OrgName_Blackpool).Click("Choose Organisation");
+            ClickButton(That.Contains, "Choose");
 
             ExpectHeader("Address of the organisation you`re reporting for");
             ExpectText("Enter the correspondence address for the organisation whose Modern Slavery statement you’re reporting.");

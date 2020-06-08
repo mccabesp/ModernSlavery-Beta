@@ -24,7 +24,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectHeader("Find your organisation");
 
             //clicking search without field filled should cause validaiton
-            Click("Search");
+            Click(The.Bottom, "Search");
 
             Expect("The following errors were detected");
             Expect("There's a problem with your search");

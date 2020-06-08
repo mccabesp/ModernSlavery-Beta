@@ -9,7 +9,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
         [TestMethod]
         public override void RunTest()
         {
-            Run<Create_Account_Success>();
+           // Run<Create_Account_Success>();
 
             LoginAs<RogerReporter>();
 
@@ -23,21 +23,20 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             ExpectHeader("Find your organisation");
 
-            Set("Find").To(Registration.OrgName_Blackpool);
-            Click("Search");
+            SetXPath("//input[@id='SearchText']").To(Registration.OrgName_Blackpool);
+            Click(The.Bottom, "Search");
 
 
             ExpectRow("Organisation name and registered address");
             ExpectRow(That.Contains, Registration.OrgName_Blackpool);
-            ExpectRow(That.Contains, Registration.RegisteredAddress_Blackpool);
+            ExpectRow(That.Contains, "PO Box 4, Blackpool, Lancashire, United Kingdom, FY1 1NA");
 
             //message should not appear with single result 
             ExpectNo(What.Contains, "Showing 1-");
 
 
-            AtRow(That.Contains, Registration.OrgName_Blackpool).Click("Choose Organisation");
-
-            ExpectHeader("Address of the organisation you`re reporting for");
+            ClickButton(That.Contains, "Choose");
+            ExpectHeader("Address of the organisation you're reporting for");
             ExpectText("Enter the correspondence address for the organisation whose Modern Slavery statement you’re reporting.");
 
             //fields pre-populated
