@@ -191,7 +191,7 @@
     <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Success.cs" />
     <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Failure_Already_Started.cs" />
     <Compile Include="Search and Compare\Registration\Public LTD\Registration_Pulbic_Address_Mandatory_Fields.cs" />
-    <Compile Include="Search and Compare\Registration\registration_constants.cs" />
+    <Compile Include="Richer Sumbission\Submission_Constants.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Content_Check.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Mandatory_Fields.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Success.cs" />
