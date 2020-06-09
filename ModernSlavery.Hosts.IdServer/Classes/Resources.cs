@@ -42,7 +42,7 @@ namespace ModernSlavery.Hosts.IdServer.Classes
                     DisplayName = "GPG API",
                     Description = "Access to a GPG API",
                     UserClaims = new List<string> {ClaimTypes.Role},
-                    ApiSecrets = new List<Secret> {new Secret(_sharedOptions.AuthSecret.GetSHA256Checksum())},
+                    ApiSecrets = new List<Secret> {new Secret(_sharedOptions.IdServerSecret.GetSHA256Checksum())},
                     Scopes = new List<Scope> {new Scope("customAPI.read"), new Scope("customAPI.write")}
                 }
             };

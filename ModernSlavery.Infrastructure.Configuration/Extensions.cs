@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
+using Newtonsoft.Json.Linq;
 
 namespace ModernSlavery.Infrastructure.Configuration
 {
@@ -135,6 +137,49 @@ namespace ModernSlavery.Infrastructure.Configuration
                 }
             }
             return result;
+        }
+
+        public static Dictionary<string, string> LoadSettings(string filepath, string sectionName = null)
+        {
+            if (string.IsNullOrWhiteSpace(filepath)) throw new ArgumentNullException(nameof(filepath));
+            if (!File.Exists(filepath)) throw new FileNotFoundException("Cannot find file", filepath);
+            var configBuilder = new ConfigurationBuilder();
+            configBuilder.AddJsonFile(filepath);
+            var config = configBuilder.Build();
+            return config.ToDictionary(sectionName);
+        }
+        public static void SaveSettings(this Dictionary<string, string> settings, string filepath)
+        {
+            if (string.IsNullOrWhiteSpace(filepath)) throw new ArgumentNullException(nameof(filepath));
+
+            JObject jsonObj = File.Exists(filepath)? Newtonsoft.Json.JsonConvert.DeserializeObject<JObject>(File.ReadAllText(filepath)) : new JObject();
+            
+            foreach (var key in settings.Keys)
+                SetValueRecursively(key, jsonObj, settings[key]);
+
+            string output = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
+
+            File.WriteAllText(filepath, output);
+        }
+
+        private static void SetValueRecursively<T>(string sectionPathKey, dynamic jsonObj, T value)
+        {
+            // split the string at the first ':' character
+            var remainingSections = sectionPathKey.Split(":", 2);
+
+            var currentSection = remainingSections[0];
+            if (remainingSections.Length > 1)
+            {
+                // continue with the procress, moving down the tree
+                var nextSection = remainingSections[1];
+                if (jsonObj[currentSection] == null) jsonObj[currentSection] = new JObject();
+                SetValueRecursively(nextSection, jsonObj[currentSection], value);
+            }
+            else
+            {
+                // we've got to the end of the tree, set the value
+                jsonObj[currentSection] = value;
+            }
         }
 
         #endregion

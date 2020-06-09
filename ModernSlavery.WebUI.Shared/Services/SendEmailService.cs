@@ -129,7 +129,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         {
             var orphanOrganisationTemplate = new OrphanOrganisationTemplate
             {
-                RecipientEmailAddress = EmailOptions.GEODistributionList, OrganisationName = organisationName,
+                RecipientEmailAddress = EmailOptions.AdminDistributionList, OrganisationName = organisationName,
                 Test = test
             };
 
@@ -144,7 +144,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         {
             var geoOrganisationRegistrationRequest = new GeoOrganisationRegistrationRequestTemplate
             {
-                RecipientEmailAddress = EmailOptions.GEODistributionList,
+                RecipientEmailAddress = EmailOptions.AdminDistributionList,
                 Test = test,
                 Name = contactName,
                 Org2 = reportingOrg,

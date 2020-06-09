@@ -128,9 +128,6 @@ namespace ModernSlavery.Hosts.IdServer
             services.AddDistributedCache(_distributedCacheOptions)
                 .AddDataProtection(_dataProtectionOptions);
 
-            //Add app insights tracking
-            services.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
-
             //This may now be required 
             services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
 

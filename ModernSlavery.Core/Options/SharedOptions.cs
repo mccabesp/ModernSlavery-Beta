@@ -23,19 +23,13 @@ namespace ModernSlavery.Core.Models
         private int[] _reminderEmailDays;
         public string DefaultEncryptionKey { get; set; }
 
-        public string AuthSecret { get; set; } = "secret";
+        public string IdServerSecret { get; set; } = "secret";
 
         public string AdminEmails { get; set; }
         public string SuperAdminEmails { get; set; }
         public string DatabaseAdminEmails { get; set; }
 
         public int SessionTimeOutMinutes { get; set; } = 20;
-
-        #region App Insights
-
-        public string AppInsights_InstrumentationKey { get; set; }
-
-        #endregion
 
         public int ObfuscationSeed { get; set; } = 127;
 

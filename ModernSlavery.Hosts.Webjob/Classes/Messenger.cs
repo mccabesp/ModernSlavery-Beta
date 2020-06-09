@@ -41,15 +41,15 @@ namespace ModernSlavery.Hosts.Webjob.Classes
         /// <param name="message"></param>
         public async Task<bool> SendGeoMessageAsync(string subject, string message, bool test = false)
         {
-            var emailAddresses = GpgEmailProvider.EmailOptions.GEODistributionList.SplitI(";").ToList();
+            var emailAddresses = GpgEmailProvider.EmailOptions.AdminDistributionList.SplitI(";").ToList();
             emailAddresses = emailAddresses.RemoveI("sender", "recipient");
             if (emailAddresses.Count == 0)
-                throw new ArgumentNullException(nameof(GpgEmailProvider.EmailOptions.GEODistributionList));
+                throw new ArgumentNullException(nameof(GpgEmailProvider.EmailOptions.AdminDistributionList));
 
             if (!emailAddresses.ContainsAllEmails())
                 throw new ArgumentException(
-                    $"{GpgEmailProvider.EmailOptions.GEODistributionList} contains an invalid email address",
-                    nameof(GpgEmailProvider.EmailOptions.GEODistributionList));
+                    $"{GpgEmailProvider.EmailOptions.AdminDistributionList} contains an invalid email address",
+                    nameof(GpgEmailProvider.EmailOptions.AdminDistributionList));
 
             var successCount = 0;
             foreach (var emailAddress in emailAddresses)

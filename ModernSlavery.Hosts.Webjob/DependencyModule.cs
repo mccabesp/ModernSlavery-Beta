@@ -21,7 +21,7 @@ using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.WebUI.Shared.Options;
+using ModernSlavery.Infrastructure.Telemetry;
 using DataProtectionOptions = Microsoft.AspNetCore.DataProtection.DataProtectionOptions;
 using ResponseCachingOptions = Microsoft.AspNetCore.ResponseCaching.ResponseCachingOptions;
 
@@ -53,8 +53,6 @@ namespace ModernSlavery.Hosts.Webjob
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
-
-            services.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
 
             services.AddSingleton<IJobActivator, AutofacJobActivator>();
         }
@@ -169,6 +167,9 @@ namespace ModernSlavery.Hosts.Webjob
 
             //Register the log storage dependencies
             modules.AddDependency<Infrastructure.Logging.DependencyModule>();
+
+            //Register the app insights dependencies
+            modules.AddDependency<ApplicationInsightsDependencyModule>();
         }
 
         public class AutofacJobActivator : IJobActivator

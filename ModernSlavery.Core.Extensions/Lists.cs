@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
@@ -224,6 +225,10 @@ namespace ModernSlavery.Core.Extensions
                 target[key] = source[key];
         }
 
+        public static Dictionary<TKey, TValue> ToDictionary<TKey,TValue>(this ConcurrentDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
+        {
+            return new Dictionary<TKey, TValue>(source, comparer);
+        }
 
         public static void AddRange<T>(this HashSet<T> targetCollection, params T[] pars)
         {

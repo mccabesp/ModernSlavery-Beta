@@ -55,6 +55,26 @@
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
+    <Content Include="appsettings.DEV.secret.json" Condition="Exists('appsettings.DEV.secret.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.QAT.secret.json" Condition="Exists('appsettings.QAT.secret.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.PREPROD.secret.json" Condition="Exists('appsettings.PREPROD.secret.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.PROD.secret.json" Condition="Exists('appsettings.PROD.secret.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

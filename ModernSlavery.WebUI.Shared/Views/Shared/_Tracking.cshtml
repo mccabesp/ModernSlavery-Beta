@@ -1,8 +1,11 @@
 ﻿@using Microsoft.ApplicationInsights.AspNetCore
 @using ModernSlavery.Core.Models
 @using ModernSlavery.WebUI.Shared.Classes.Cookies
+@using ModernSlavery.Core.Options
+
 @inject JavaScriptSnippet snippet
 @inject SharedOptions sharedOptions
+@inject ApplicationInsightsOptions appInsightsOptions
 @{
     var cookieSettings = CookieHelper.GetCookieSettingsCookie(Context.Request);
 }
@@ -74,8 +77,8 @@
 </script>
 
 @if (cookieSettings.ApplicationInsights &&
-     snippet != null &&
-     !string.IsNullOrWhiteSpace(sharedOptions.AppInsights_InstrumentationKey))
+   snippet != null &&
+   !string.IsNullOrWhiteSpace(appInsightsOptions.InstrumentationKey))
 {
     @Html.Raw(snippet.FullScript)
 }
