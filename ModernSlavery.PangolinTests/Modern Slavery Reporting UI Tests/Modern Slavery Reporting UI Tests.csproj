@@ -197,6 +197,7 @@
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Success.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Registraion_Mandatory_Organisation_Type.cs" />
     <Compile Include="Search and Compare\Registration\Registration Options Content Check.cs" />
+    <Compile Include="Search and Compare\Registration\registration_constants.cs" />
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Failure_Awaiting_Verification_Check.cs" />
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Content_Check.cs" />
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Failure_Existing_User.cs" />

@@ -6,7 +6,10 @@ namespace Modern_Slavery_Reporting_UI_Tests
     [TestClass]
     public class Create_Account_Password_Rules : UITest
     {
-        [TestMethod]
+        
+        [TestMethod ]
+        
+
         public override void RunTest()
         {
             Logout();
