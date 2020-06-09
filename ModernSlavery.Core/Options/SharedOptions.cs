@@ -153,9 +153,9 @@ namespace ModernSlavery.Core.Models
             return IsEnvironment("DEV");
         }
 
-        public bool IsStaging()
+        public bool IsQAT()
         {
-            return IsEnvironment("STAGING");
+            return IsEnvironment("QAT");
         }
 
         public bool IsPreProduction()

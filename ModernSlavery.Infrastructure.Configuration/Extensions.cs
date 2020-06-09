@@ -58,9 +58,9 @@ namespace ModernSlavery.Infrastructure.Configuration
             return configuration.IsEnvironment("DEV");
         }
 
-        public static bool IsStaging(this IConfiguration configuration)
+        public static bool IsQAT(this IConfiguration configuration)
         {
-            return configuration.IsEnvironment("STAGING");
+            return configuration.IsEnvironment("QAT");
         }
 
         public static bool IsPreProduction(this IConfiguration configuration)

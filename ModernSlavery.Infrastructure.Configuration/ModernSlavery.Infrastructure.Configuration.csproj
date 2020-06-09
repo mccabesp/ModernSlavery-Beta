@@ -11,6 +11,7 @@
     <None Remove="appsettings.development.json" />
     <None Remove="appsettings.PREPROD.json" />
     <None Remove="appsettings.PROD.json" />
+    <None Remove="appsettings.QAT.json" />
     <None Remove="AppSettings.secret.json" />
   </ItemGroup>
 
@@ -40,6 +41,11 @@
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
     <Content Include="appsettings.PROD.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.QAT.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
