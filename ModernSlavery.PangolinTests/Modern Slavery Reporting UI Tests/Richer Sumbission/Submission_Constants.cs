@@ -23,6 +23,14 @@ namespace Modern_Slavery_Reporting_UI_Tests
         public const string PostCode_Blackpool = "FY1 1NA";
         //codes 1, 84110
         public const string SicCodes_Blackpool = "Public Sector, General public administration activities";
+        public const string Url_Blackpool = "www.test.com";
+        public const string DateFrom_Blackpool = "01/08/2019";
+        public const string DateTo_Blackpool = "31/07/2020";
+        public const string DateApproved_Blackpool = "31/06/2020";
+        public const string FirstName_Blackpool = "FY1 1NA";
+        public const string LastName_Blackpool = "FY1 1NA";
+        public const string JobTitle_Blackpool = "Director";
+
 
         public const string EmployerReference_InterFloor = "B72GL8R2";
         public const string OrgName_InterFloor = "InterFloor Limited";
