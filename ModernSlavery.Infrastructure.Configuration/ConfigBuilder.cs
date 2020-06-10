@@ -46,6 +46,8 @@ namespace ModernSlavery.Infrastructure.Configuration
             //Add the root and environment appsettings files
             appBuilder.AddJsonFile("appsettings.json", false, true);
             appBuilder.AddJsonFile($"appsettings.{environmentName}.json", true, true);
+            if (Debugger.IsAttached || _appConfig.IsDevelopment() || _appConfig.IsTest()) 
+                appBuilder.AddJsonFile($"appsettings.{environmentName}.secret.json", true, true);
 
             _appConfig = appBuilder.Build();
 
