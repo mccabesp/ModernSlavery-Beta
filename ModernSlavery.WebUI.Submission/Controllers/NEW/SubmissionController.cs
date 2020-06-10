@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Submission.Presenters;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,9 +18,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
     // "~/submission/<org-reference>/<year>/<action>/"
     public class SubmissionController : BaseController
     {
-        public SubmissionController(ILogger logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic)
+        readonly INewSubmissionPresenter SubmissionPresenter;
+
+        public SubmissionController(
+            INewSubmissionPresenter submissionPresenter,
+            ILogger logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic)
             : base(logger, webService, sharedBusinessLogic)
         {
+            SubmissionPresenter = submissionPresenter;
         }
 
         #region General notes
@@ -41,7 +49,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
 
         #region Step 1 - Your statement
 
-        [HttpGet("your-statement")]
         public async Task<IActionResult> YourStatement(string identifier) // an ID parameter
         {
             #region check navigation
@@ -161,6 +168,37 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
 
         #region Step 2 - Compliance
 
+        [HttpGet("compliance")]
+        public async Task<IActionResult> Compliance()
+        {
+            // Cant do this on presenter as logic is on basecontroller
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
+            // Query for viewmodel
+            var result = await SubmissionPresenter.TryGetCompliance();
+            return await GetActionResultFromQuery(result);
+        }
+
+        [HttpPost("compliance")]
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Compliance(NewSubmissionViewModel submissionModel)
+        {
+            var result = await SubmissionPresenter.TrySaveCompliance(submissionModel);
+
+            return await GetActionResultFromSave(result, SubmissionStep.Compliance);
+        }
+
+        [HttpPost("cancel-compliance")]
+        public async Task<IActionResult> CancelCompliance()
+        {
+            await SubmissionPresenter.ClearDraftForUser();
+
+            var next = await SubmissionPresenter.GetCancelRedirection();
+            return RedirectToAction(next);
+        }
+
         #endregion
 
         #region Step 3 - Your organisation
@@ -258,7 +296,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
             throw new NotImplementedException();
         }
 
-        [HttpPost("ssave-review")]
+        [HttpPost("save-review")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveReview(/*View model*/ object vm) // submit the viewmodel
@@ -296,6 +334,37 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
             #endregion
 
             throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private async Task<IActionResult> GetActionResultFromQuery(CustomResult<NewSubmissionViewModel> result)
+        {
+            if (result.Failed)
+            {
+                // TODO - What to do here?
+                // redirect?
+                // custom error?
+            }
+
+            // ensure the view has hidden fields for the non editable fields on this page
+            return View(result.Result);
+        }
+
+
+        private async Task<IActionResult> GetActionResultFromSave(CustomResult<NewSubmissionViewModel> result, SubmissionStep step)
+        {
+            if (result.Failed)
+            {
+                ModelState.AddModelError(result.ErrorMessage);
+                return View(result.ErrorRelatedObject);
+            }
+
+            // Redirect location
+            var next = await SubmissionPresenter.GetNextRedirection(step);
+            return RedirectToAction(next);
         }
 
         #endregion
