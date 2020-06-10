@@ -165,8 +165,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Search and Compare\Manage Account\Close Account User Is Set to Retired.cs" />
+    <Compile Include="Richer Sumbission\Submission_Training_Validation_Check.cs" />
+    <Compile Include="Richer Sumbission\Submission_Helpers.cs" />
     <Compile Include="Richer Sumbission\Submission_Six_Areas_Content_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Six_Areas_Mandatory_Field_Check.cs" />
+    <Compile Include="Richer Sumbission\Submission_Training_Content_Check.cs" />
     <Compile Include="Search and Compare\Manage Account\Close_Account_Invalid_Password.cs" />
     <Compile Include="Search and Compare\Manage Account\Close_Account_Mandatory_Fields.cs" />
     <Compile Include="Search and Compare\Manage Account\Closing Account Removes Pending Registrations.cs" />
