@@ -177,13 +177,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
 
             // Query for viewmodel
             var result = await SubmissionPresenter.TryGetCompliance();
+
             return await GetActionResultFromQuery(result);
         }
 
         [HttpPost("compliance")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Compliance(NewSubmissionViewModel submissionModel)
+        public async Task<IActionResult> Compliance(StatementMetadataViewModel submissionModel)
         {
             var result = await SubmissionPresenter.TrySaveCompliance(submissionModel);
 
@@ -340,7 +341,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
 
         #region Private methods
 
-        private async Task<IActionResult> GetActionResultFromQuery(CustomResult<NewSubmissionViewModel> result)
+        private async Task<IActionResult> GetActionResultFromQuery(CustomResult<StatementMetadataViewModel> result)
         {
             if (result.Failed)
             {
@@ -353,8 +354,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
             return View(result.Result);
         }
 
-
-        private async Task<IActionResult> GetActionResultFromSave(CustomResult<NewSubmissionViewModel> result, SubmissionStep step)
+        private async Task<IActionResult> GetActionResultFromSave(CustomResult<StatementMetadataViewModel> result, SubmissionStep step)
         {
             if (result.Failed)
             {
