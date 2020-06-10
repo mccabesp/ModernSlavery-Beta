@@ -13,7 +13,7 @@ namespace ModernSlavery.Infrastructure.Telemetry
 
         public ApplicationInsightsDependencyModule(ApplicationInsightsOptions applicationInsightsOptions)
         {
-            _applicationInsightsOptions = _applicationInsightsOptions;
+            _applicationInsightsOptions = applicationInsightsOptions;
         }
 
         public void ConfigureServices(IServiceCollection services)
