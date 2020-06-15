@@ -35,18 +35,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         Task<CustomResult<StatementMetadataViewModel>> TryGetYourOrganisation(User user, string organisationIdentifier, int year);
 
         Task<CustomResult<StatementMetadataViewModel>> TrySaveYourOrgansation(User user, StatementMetadataViewModel model);
-
-        Task<CustomResult<StatementMetadataViewModel>> TryGetSupplyChainRisk(User user, string organisationIdentifier, int year);
-
-        Task<CustomResult<StatementMetadataViewModel>> TrySaveSupplyChainRisk(User user, StatementMetadataViewModel model);
-
+ 
         Task<CustomResult<StatementMetadataViewModel>> TryGetPolicies(User user, string organisationIdentifier, int year);
 
         Task<CustomResult<StatementMetadataViewModel>> TrySavePolicies(User user, StatementMetadataViewModel model);
 
-        Task<CustomResult<StatementMetadataViewModel>> TryGetDueDiligence(User user, string organisationIdentifier, int year);
+        Task<CustomResult<StatementMetadataViewModel>> TryGetSupplyChainRiskAndDueDiligence(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementMetadataViewModel>> TrySaveDueDiligence(User user, StatementMetadataViewModel model);
+        Task<CustomResult<StatementMetadataViewModel>> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementMetadataViewModel model);
 
         Task<CustomResult<StatementMetadataViewModel>> TryGetTraining(User user, string organisationIdentifier, int year);
 
@@ -155,23 +151,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-        #region Step 4 - Supply chain risks
-
-        public async Task<CustomResult<StatementMetadataViewModel>> TryGetSupplyChainRisk(User user, string organisationIdentifier, int year)
-        {
-            return await TryGetViewModel(user, organisationIdentifier, year);
-        }
-
-        public async Task<CustomResult<StatementMetadataViewModel>> TrySaveSupplyChainRisk(User user, StatementMetadataViewModel model)
-        {
-            await ValidateForDraft(model);
-
-            return await SaveDraftForUser(user, model);
-        }
-
-        #endregion
-
-        #region Step 5 - Policies
+        #region Step 4 - Policies
 
         public async Task<CustomResult<StatementMetadataViewModel>> TryGetPolicies(User user, string organisationIdentifier, int year)
         {
@@ -187,14 +167,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-        #region Step 6 - Due diligence
+        #region Step 5 - Supply chain risks and due diligence
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TryGetDueDiligence(User user, string organisationIdentifier, int year)
+        public async Task<CustomResult<StatementMetadataViewModel>> TryGetSupplyChainRiskAndDueDiligence(User user, string organisationIdentifier, int year)
         {
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TrySaveDueDiligence(User user, StatementMetadataViewModel model)
+        public async Task<CustomResult<StatementMetadataViewModel>> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementMetadataViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -203,7 +183,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-        #region Step 7 - Training
+        #region Step 6 - Training
 
         public async Task<CustomResult<StatementMetadataViewModel>> TryGetTraining(User user, string organisationIdentifier, int year)
         {
@@ -219,7 +199,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-        #region Step 8 - Monitoring progress
+        #region Step 7 - Monitoring progress
 
         public async Task<CustomResult<StatementMetadataViewModel>> TryGetMonitoringInProgress(User user, string organisationIdentifier, int year)
         {
@@ -235,7 +215,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-        #region Step 9 - Review TODO
+        #region Step 8 - Review TODO
         #endregion
 
         private async Task<CustomResult<StatementMetadataViewModel>> TryGetViewModel(User user, string organisationIdentifier, int year)

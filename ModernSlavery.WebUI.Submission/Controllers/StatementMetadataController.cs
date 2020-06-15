@@ -209,27 +209,23 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
 
         #endregion
 
-        #region Step 4 - Supply chain risks
+        #region Step 4 - Policies
 
         #endregion
 
-        #region Step 5 - Policies
+        #region Step 5 - Supply chain risks and due diligence
 
         #endregion
 
-        #region Step 6 - Due diligence
+        #region Step 6 - Training
 
         #endregion
 
-        #region Step 7 - Training
+        #region Step 7 - Monitoring progress
 
         #endregion
 
-        #region Step 8 - Monitoring progress
-
-        #endregion
-
-        #region Step 9 - Review
+        #region Step 8 - Review
 
         [HttpGet("review")]
         public async Task<IActionResult> Review(string identifier) // an ID parameter
