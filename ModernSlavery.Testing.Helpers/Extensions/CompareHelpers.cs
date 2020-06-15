@@ -3,7 +3,7 @@ using System.Diagnostics;
 using ModernSlavery.Core.Extensions;
 using NUnit.Framework;
 
-namespace ModernSlavery.Tests.Common.Classes
+namespace ModernSlavery.Testing.Helpers.Extensions
 {
     public static class CompareHelpers
     {

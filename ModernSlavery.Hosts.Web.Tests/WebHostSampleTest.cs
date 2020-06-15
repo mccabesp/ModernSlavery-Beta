@@ -3,6 +3,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
+using ModernSlavery.Testing.Helpers.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using NUnit.Framework;
@@ -16,7 +17,7 @@ using static ModernSlavery.Core.Extensions.Web;
 namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
-    public class WebHostSampleTest
+    public class WebHostSampleTest: UITest(WebHostSetup.)
     {
         private string _webAuthority;
         private IDataRepository _dataRepository;

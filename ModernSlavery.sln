@@ -99,9 +99,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Hosts.Web.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Testing.Helpers", "ModernSlavery.Testing.Helpers\ModernSlavery.Testing.Helpers.csproj", "{0C5A16AE-ABF8-495B-A5E3-9FD22FE7B589}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Hosts.DevOps.ConsoleApp", "ModernSlavery.Hosts.DevOps.ConsoleApp\ModernSlavery.Hosts.DevOps.ConsoleApp.csproj", "{8EBE4C4A-3789-4B50-B6ED-82D96CFCBF55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Hosts.DevOps.ConsoleApp", "ModernSlavery.Hosts.DevOps.ConsoleApp\ModernSlavery.Hosts.DevOps.ConsoleApp.csproj", "{8EBE4C4A-3789-4B50-B6ED-82D96CFCBF55}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.Infrastructure.DevOps.Cloud", "ModernSlavery.Infrastructure.DevOps.Cloud\ModernSlavery.Infrastructure.DevOps.Cloud.csproj", "{D71BAF93-BD3E-49A0-9CAB-67E2B56629D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure.DevOps.Cloud", "ModernSlavery.Infrastructure.DevOps.Cloud\ModernSlavery.Infrastructure.DevOps.Cloud.csproj", "{D71BAF93-BD3E-49A0-9CAB-67E2B56629D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
