@@ -396,11 +396,10 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         YourStatement = 2,
         Compliance = 3,
         YourOrganisation = 4,
-        SupplyChainRisks = 5,
-        Policies = 6,
-        DueDiligence = 7,
-        Training = 8,
-        MentoringProcess = 9,
-        Review = 10
+        Policies = 5,
+        SupplyChainRisksAndDueDiligence = 6,
+        Training = 7,
+        MentoringProcess = 8,
+        Review = 9
     }
 }

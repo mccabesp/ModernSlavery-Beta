@@ -50,120 +50,34 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
 
         #region Step 1 - Your statement
 
-        [HttpGet("your-statement")]
-        public async Task<IActionResult> YourStatement(string identifier) // an ID parameter
+        [HttpGet("{organisationIdentifier}/{year}/your-statement")]
+        public async Task<IActionResult> YourStatement(string organisationIdentifier, int year)
         {
-            #region check navigation
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
 
-            // This will most likely be in presenter, think polymorphically
-            //var checkResult = await CheckUserRegisteredOkAsync();
-            //if (checkResult != null) return checkResult;
+            var result = await SubmissionPresenter.TryGetCompliance(CurrentUser, organisationIdentifier, year);
 
-            // Redirect to correct page in workflow
-            // var result = presenter.GetStartPage(params);
-
-            // if (result != null)
-            // return redirect(result);
-
-            #endregion
-
-            #region Query domain/repository
-
-            // get data
-            // via presenter and passing identifier
-            // presenter uses identifier (or lack thereof) to query domain
-            // presenter creates VM from result of domain
-
-            #endregion
-
-            #region Authorization
-
-            // Should match POST exactly!
-            // user permission
-            // can the user view your statement (eg role/permissions)
-            // can the user edit the current statement for this organisation
-            // is the statement in a state that can be edited, eg not submitted
-            // any of this fails return 401 unauthorized
-
-            #endregion
-
-            // return view with the vm
-
-            throw new NotImplementedException();
+            return await GetActionResultFromQuery(result);
         }
 
-        [HttpPost("your-statement")]
+        [HttpPost("{organisationIdentifier}/{year}/your-statement")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> YourStatement(/*View model*/ object vm) // submit the viewmodel
+        public async Task<IActionResult> YourStatement(StatementMetadataViewModel submissionModel)
         {
-            #region Authorization
+            var result = await SubmissionPresenter.TrySaveCompliance(CurrentUser, submissionModel);
 
-            // Should match GET exactly!
-            // user permission
-            // can the user view your statement (eg role/permissions)
-            // can the user edit the current statement for this organisation
-            // is the statement in a state that can be edited, eg not submitted
-            // any of this fails return 401 unauthorized
-
-            #endregion
-
-            #region Validation
-
-            // Validate the VM, ModelState.IsValid
-            // error config -> review from old submission and tweak
-            // Validate state from presenter
-            // Any failed validation return the view and ensure error is presented
-
-            #endregion
-
-            #region Persistence
-
-            // Handled by presenter
-            // Persist changes eg file based
-            // How temporary are these?
-            // Should persist on a per user basis?
-            // Dont fully persist as this is what the review step is for
-
-            #endregion
-
-            #region Redirect
-
-            // Redirect to next step?
-            // Or to review?
-
-            #endregion
-
-            throw new NotImplementedException();
+            return await GetActionResultFromSave(result, SubmissionStep.YourStatement);
         }
 
         [HttpPost("cancel-your-statement")]
-        public async Task<IActionResult> CancelYourStatement() // shouldnt need any parameters to cancel
+        public async Task<IActionResult> CancelYourStatement()
         {
-            #region Optional opinion
+            await SubmissionPresenter.ClearDraftForUser();
 
-            // UX wise this might be well suited to a confirmation to leave this page
-
-            #endregion
-
-            #region Handle changes
-
-            // scrap any changes - will they have been persisted anywhere, eg file?
-            // should they be removed from persistence?
-            // should changes to other sections be removed?
-            // edit vs create differences
-
-            #endregion
-
-            #region Redirect
-
-            // what is the appropriate redirect location
-            // is it fixed or static?
-            // will it work via a return url parameter?
-
-            #endregion
-
-            throw new NotImplementedException();
+            var next = await SubmissionPresenter.GetCancelRedirection();
+            return RedirectToAction(next);
         }
 
         #endregion
@@ -173,18 +87,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
         [HttpGet("{organisationIdentifier}/{year}/compliance")]
         public async Task<IActionResult> Compliance(string organisationIdentifier, int year)
         {
-            // Cant do this on presenter as logic is on basecontroller
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            // Query for viewmodel
-            // TODO - how do we get the year?
             var result = await SubmissionPresenter.TryGetCompliance(CurrentUser, organisationIdentifier, year);
 
             return await GetActionResultFromQuery(result);
         }
 
-        [HttpPost("compliance")]
+        [HttpPost("{organisationIdentifier}/{year}/compliance")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Compliance(StatementMetadataViewModel submissionModel)
