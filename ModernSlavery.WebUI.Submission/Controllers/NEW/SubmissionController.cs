@@ -18,10 +18,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
     // "~/submission/<org-reference>/<year>/<action>/"
     public class SubmissionController : BaseController
     {
-        readonly INewSubmissionPresenter SubmissionPresenter;
+        readonly IStatementMetadataPresenter SubmissionPresenter;
 
         public SubmissionController(
-            INewSubmissionPresenter submissionPresenter,
+            IStatementMetadataPresenter submissionPresenter,
             ILogger logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic)
             : base(logger, webService, sharedBusinessLogic)
         {
@@ -49,6 +49,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
 
         #region Step 1 - Your statement
 
+        [HttpGet("your-statement")]
         public async Task<IActionResult> YourStatement(string identifier) // an ID parameter
         {
             #region check navigation
@@ -169,14 +170,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
         #region Step 2 - Compliance
 
         [HttpGet("compliance")]
-        public async Task<IActionResult> Compliance()
+        public async Task<IActionResult> Compliance(string organisationIdentifier, int year)
         {
             // Cant do this on presenter as logic is on basecontroller
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
             // Query for viewmodel
-            var result = await SubmissionPresenter.TryGetCompliance();
+            // TODO - how do we get the year?
+            var result = await SubmissionPresenter.TryGetCompliance(CurrentUser, organisationIdentifier, year);
 
             return await GetActionResultFromQuery(result);
         }
@@ -186,7 +188,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Compliance(StatementMetadataViewModel submissionModel)
         {
-            var result = await SubmissionPresenter.TrySaveCompliance(submissionModel);
+            var result = await SubmissionPresenter.TrySaveCompliance(CurrentUser, submissionModel);
 
             return await GetActionResultFromSave(result, SubmissionStep.Compliance);
         }
@@ -345,7 +347,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
         {
             if (result.Failed)
             {
-                // TODO - What to do here?
+                // interpret error to do correct action
                 // redirect?
                 // custom error?
             }

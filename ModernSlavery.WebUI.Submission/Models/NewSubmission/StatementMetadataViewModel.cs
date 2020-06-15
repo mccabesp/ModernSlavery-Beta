@@ -4,6 +4,7 @@ using System;
 
 namespace ModernSlavery.WebUI.Submission.Presenters
 {
+    [Serializable]
     public class StatementMetadataViewModel
     {
         // DB layer Id
@@ -19,5 +20,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         // Earliest date that the submission can be started
         public DateTime ReportingStartDate { get; set; }
+
+        // This should never go over the wire!
+        public long OrganisationId { get; set; }
+
+        public string OrganisationIdentifier { get; set; }
+
+        public int Year { get; set; }
     }
 }
