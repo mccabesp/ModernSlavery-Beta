@@ -16,11 +16,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
 {
     // Route:
     // "~/submission/<org-reference>/<year>/<action>/"
-    public class SubmissionController : BaseController
+    // TODO - rename to submission when appropriate
+    public class StatementMetadataController : BaseController
     {
         readonly IStatementMetadataPresenter SubmissionPresenter;
 
-        public SubmissionController(
+        public StatementMetadataController(
             IStatementMetadataPresenter submissionPresenter,
             ILogger logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic)
             : base(logger, webService, sharedBusinessLogic)
@@ -169,7 +170,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
 
         #region Step 2 - Compliance
 
-        [HttpGet("compliance")]
+        [HttpGet("{organisationIdentifier}/{year}/compliance")]
         public async Task<IActionResult> Compliance(string organisationIdentifier, int year)
         {
             // Cant do this on presenter as logic is on basecontroller

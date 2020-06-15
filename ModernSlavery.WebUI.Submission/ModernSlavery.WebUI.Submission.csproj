@@ -27,4 +27,8 @@
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\StatementMetadata\" />
+  </ItemGroup>
+
 </Project>
