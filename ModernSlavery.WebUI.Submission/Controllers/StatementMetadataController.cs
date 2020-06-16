@@ -273,7 +273,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers.NEW
             }
 
             // Redirect location
-            var next = await SubmissionPresenter.GetNextRedirection(step);
+            var next = await SubmissionPresenter.GetNextRedirectAction(step);
             return RedirectToAction(next);
         }
 

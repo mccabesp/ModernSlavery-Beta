@@ -148,6 +148,15 @@ namespace ModernSlavery.Core.Entities
         AdminChangeOrganisationPublicSectorClassification = 8
     }
 
+    public enum AffirmationType : byte
+    {
+        Unknown = 0,
+        Yes = 1,
+        No = 2,
+        [Display(Name = "Don't know")]
+        DontKnow = 3
+    }
+
     public enum HashingAlgorithm
     {
         Unhashed = -1,

@@ -7,6 +7,7 @@ using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Submission.Controllers.NEW;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -75,7 +76,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <summary>
         /// Gets the next action in the submission workflow.
         /// </summary>
-        Task<string> GetNextRedirection(SubmissionStep step);
+        Task<string> GetNextRedirectAction(SubmissionStep step);
 
         /// <summary>
         /// Get the redirect action for cancelling.
@@ -85,7 +86,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
     public class StatementMetadataPresenter : IStatementMetadataPresenter
     {
-        // something that should be unique to this class only
+        // class will NOT provide enough uniqueness, think multiple open tabs
+        // the key will have to be constructed out of parameters in the url - org and year
         const string SessionKey = "StatementMetadataPresenter";
 
         readonly IStatementMetadataBusinessLogic StatementMetadataBusinessLogic;
@@ -295,6 +297,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         StatementMetadataViewModel MapToVM(StatementMetadata entity)
         {
+            // TODO JAMES
             throw new NotImplementedException();
         }
 
@@ -331,35 +334,24 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <summary>
         /// 
         /// </summary>
-        public async Task<string> GetNextRedirection(SubmissionStep step)
+        public async Task<string> GetNextRedirectAction(SubmissionStep step)
         {
             switch (step)
             {
                 case SubmissionStep.NotStarted:
-                    break;
+                    return nameof(StatementMetadataController.YourStatement);
                 case SubmissionStep.YourStatement:
-                    break;
+                    return nameof(StatementMetadataController.Compliance);
                 case SubmissionStep.Compliance:
-                    break;
                 case SubmissionStep.YourOrganisation:
-                    break;
-                case SubmissionStep.SupplyChainRisks:
-                    break;
                 case SubmissionStep.Policies:
-                    break;
-                case SubmissionStep.DueDiligence:
-                    break;
+                case SubmissionStep.SupplyChainRisksAndDueDiligence:
                 case SubmissionStep.Training:
-                    break;
                 case SubmissionStep.MentoringProcess:
-                    break;
                 case SubmissionStep.Review:
-                    break;
                 default:
-                    break;
+                    throw new NotImplementedException();
             }
-
-            throw new NotImplementedException();
         }
 
         /// <summary>

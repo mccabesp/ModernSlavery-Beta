@@ -1,6 +1,7 @@
 ﻿using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,55 +20,29 @@ namespace ModernSlavery.BusinessDomain.Submission
             SharedBusinessLogic = sharedBusinessLogic;
         }
 
-        public async Task<StatementMetadata> GetStatementMetadataById(long statementMetadataId)
-        {
-            // example data access
-            return await SharedBusinessLogic.DataRepository
-                .FirstOrDefaultAsync<StatementMetadata>(s => s.StatementMetadataId == statementMetadataId);
-        }
-
         public async Task<StatementMetadata> GetStatementMetadataByOrganisationAndYear(Organisation organisation, int year)
         {
-            throw new NotImplementedException();
+            return await SharedBusinessLogic.DataRepository
+                // Is the accounting year the correct year?
+                .FirstOrDefaultAsync<StatementMetadata>(s => s.OrganisationId == organisation.OrganisationId && s.AccountingDate.Year == year);
         }
 
         public async Task<StatementActionResult> CanAccessStatementMetadata(User user, Organisation organisation, int reportingYear)
         {
             var data = await GetStatementMetadataByOrganisationAndYear(organisation, reportingYear);
 
-            // is the year even valid?
-
-            #region Failure 1: can the user view statements
-
-            if (!organisation.UserOrganisations.Any(uo => uo.User == user))
+            // only assigned users
+            var assignment = organisation.UserOrganisations.FirstOrDefault(uo => uo.User == user);
+            if (assignment == null)
                 return StatementActionResult.Unauthorised;
 
-            #endregion
-
-            #region Failure 2: can the user edit the current statement for this organisation
-
-            #endregion
-
-            #region Failure 3: is the statement in a state that can be edited, eg not submitted
+            // only active/pending/new organisations
+            if (!organisation.Status.IsAny(OrganisationStatuses.Active, OrganisationStatuses.Pending, OrganisationStatuses.New))
+                return StatementActionResult.Unauthorised;
 
             var statement = await GetStatementMetadataByOrganisationAndYear(organisation, reportingYear);
             if (!statement.CanBeEdited)
                 return StatementActionResult.Uneditable;
-
-            #endregion
-
-            #region Failure 4: Another person has this statement metadata locked
-
-            //if ()
-            //    return StatementActionResult.Locked;
-
-            #endregion
-
-            #region Failure 5: should the user be redirected
-
-            // what should happen here?
-
-            #endregion
 
             return StatementActionResult.Success;
         }
@@ -83,15 +58,16 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (statementMetadata.StatementMetadataId == 0)
             {
                 SharedBusinessLogic.DataRepository.Insert(statementMetadata);
+
+                // Add the statement to the org
+                //statementMetadata.Organisation.Statements.Add(statementMetadata);
             }
-            else
-            {
-                // edit?
-            }
+
+            // status, status history
 
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            throw new NotImplementedException();
+            return StatementActionResult.Success;
         }
     }
 }
