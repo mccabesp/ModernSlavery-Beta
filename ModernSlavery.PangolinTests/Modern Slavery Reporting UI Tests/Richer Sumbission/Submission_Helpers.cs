@@ -39,6 +39,20 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ui.Click("Save and continue");
             ui.ExpectHeader("Training");
         }
+        public static void NavigateToSectors(UIContext ui, string Organistion, string Year) {
+            ui.Click("Mange Organisations");
+            ui.ExpectHeader("Select an organisation");
+
+            ui.Click("Organisation");
+            ui.AtRow(Year).Click("Draft report");
+            ui.ExpectHeader("Your modern slavery statement");
+
+            ui.Click("Save and continue");
+            ui.ExpectHeader("Six areas of modern slavery statement");
+
+            ui.Click("Save and continue");
+            ui.ExpectHeader("Your organisation");
+        }
         public static void DateSet(UIContext ui, string Day, string Month, string Year, string Order)
         {
             //order is element number on page
@@ -46,6 +60,23 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ui.SetXPath("(//div//label[contains(text(), 'Year')]/following-sibling::input)[" + Order + "])").To(Year);
             ui.SetXPath("(//div//label[contains(text(), 'Month')]/following-sibling::input)[" + Order + "])").To(Month);
             ui.SetXPath("(//div//label[contains(text(), 'Day')]/following-sibling::input)[" + Order + "])").To(Day);
+        }
+        public static void ExpectSectors(UIContext ui, string[] Sectors)
+        {
+            //expect all sectors in order
+            for (int i = 0; i < Sectors.Length - 1; i++)
+            {
+                ui.BelowLabel(Sectors[i]).ExpectLabel(Sectors[i + 1]);
+            }        
+    }
+
+        public static void ExpectFinancials(UIContext ui, string[] Financials)
+        {
+            //expect all financial options in order
+            for (int i = 0; i < Financials.Length - 1; i++)
+            {
+                ui.BelowLabel(Financials[i]).ExpectLabel(Financials[i + 1]);
+            }
         }
     }
 }

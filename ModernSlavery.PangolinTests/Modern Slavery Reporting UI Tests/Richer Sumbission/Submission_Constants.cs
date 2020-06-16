@@ -42,7 +42,9 @@ namespace Modern_Slavery_Reporting_UI_Tests
         //codes 1, 84110
         public const string SicCodes_InterFloor = "Public Sector, General public administration activities";
 
+        public static readonly string[] Sectors = new string[] { "All", "Administrative and support service activities", "Your organisation", "Agriculture, Forestry and Fishing", "Arts,", "entertainment and recreation", "Construction", "Education", "Electricity, gas, steam and air conditioning supply", "Financial and insurance activities", "Human health and social work activities", "Information and communication", "Manufacturing", "Mining and Quarrying", "Other service activities", "Professional scientific and technical activities", "Public administration and defence", "Public sector", "Real estate activities", "Transportation and storage", "Water supply,", "sewerage, waste management and remediation activities", "Wholesale and retail trade" } ;
 
+        public static readonly string[] Financials = new string[] { "Under £36 million", "£36 million - £60 million", "£60 million - £100 million", "£100 million - £500 million", "£500 million+" };
 
     }
 }
