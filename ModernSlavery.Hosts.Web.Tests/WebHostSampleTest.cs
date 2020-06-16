@@ -17,7 +17,7 @@ using static ModernSlavery.Core.Extensions.Web;
 namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
-    public class WebHostSampleTest: UITest(WebHostSetup.)
+    public class WebHostSampleTest: UITest
     {
         private string _webAuthority;
         private IDataRepository _dataRepository;
@@ -71,6 +71,22 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Check we get a response from the test web server
             var response =await WebRequestAsync(HttpMethods.Get,_webAuthority);
             Assert.That(!string.IsNullOrWhiteSpace(response));
+        }
+
+        [Test]
+        public async Task WebTestHost_SeleniumHelper_TestMethods_OK()
+        {
+            //Go to the landing page
+            Goto(_webAuthority);
+
+            //Check for the landing page header
+            ExpectHeaderContains("Search and compare Modern Slavery statements");
+
+            //Check for the landing page header using Xpath
+            Click("//*[@id='NextStep']");
+
+            //Check for the landing page header using Css
+            Click("#NextStep");
         }
     }
 }

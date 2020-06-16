@@ -16,26 +16,12 @@ namespace ModernSlavery.Testing.Helpers.Classes
 {
     public class UITest
     {
-        #region Private fields
-        private IWebDriver _testWebBrowser;
-        private Process _seleniumProcess;
-        #endregion
-
-        #region Protected properties
-        private Lazy<Task<IHtmlDocument>> _HtmlDocument = null;
-        protected IHtmlDocument HtmlDocument => _HtmlDocument.Value.Result;
-        
-        #endregion
-
         #region Setup and Teardown
         [OneTimeSetUp]
         public async Task SetupBrowser()
         {
-            //Start the selenium browser process
-            _seleniumProcess = WebDriver.StartSelenium();
-
-            //Create the browser driver for selenium
-            _testWebBrowser = WebDriver.CreateWebDriver();
+            //Create the browser driver for selenium and show console if debugging
+            _testWebBrowser = WebDriver.CreateWebDriver(!Debugger.IsAttached);
         }
 
         [OneTimeTearDown]
@@ -45,11 +31,20 @@ namespace ModernSlavery.Testing.Helpers.Classes
             _testWebBrowser?.Close();
             _testWebBrowser?.Quit();
             _testWebBrowser = null;
-            _seleniumProcess?.Close();
-            _seleniumProcess?.Dispose();
-            _seleniumProcess = null;
         }
+
         #endregion
+
+        #region Private fields
+        private IWebDriver _testWebBrowser;
+        #endregion
+
+        #region Protected properties
+        private Lazy<Task<IHtmlDocument>> _HtmlDocument = null;
+        protected IHtmlDocument HtmlDocument => _HtmlDocument.Value.Result;
+        
+        #endregion
+
 
         #region Private methods
 
@@ -72,7 +67,6 @@ namespace ModernSlavery.Testing.Helpers.Classes
 
             //Navigate to the new url
             _testWebBrowser.Url = url;
-            _testWebBrowser.Navigate();
 
             //Reset the Html document ready for reloading
             ResetHtmlDocument();
@@ -81,17 +75,17 @@ namespace ModernSlavery.Testing.Helpers.Classes
         #endregion
 
         #region HtmlElement methods
-        public void Expect(string locator)
+        public void Expect(string selector)
         {
             //Validate the parameters
-            if (string.IsNullOrWhiteSpace(locator)) throw new ArgumentNullException(nameof(locator));
+            if (string.IsNullOrWhiteSpace(selector)) throw new ArgumentNullException(nameof(selector));
 
             //Try and find by xpath than css
-            var nodes = HtmlDocument.GetHtmlNodes(locator);
+            var nodes = HtmlDocument.GetHtmlNodes(selector);
             if (nodes!=null && nodes.Any()) return;
 
             //Throw an assert failure if we cant find
-            Assert.Fail($"Cannot find elements '{locator}' on page '{HtmlDocument.Url}'");
+            Assert.Fail($"Cannot find elements '{selector}' on page '{HtmlDocument.Url}'");
         }
 
         public void ExpectContains(string text)
@@ -120,62 +114,85 @@ namespace ModernSlavery.Testing.Helpers.Classes
 
         #endregion
 
-        public object Set(string locator, params string[] values)
+        public object Set(string selector, params string[] values)
         {
             throw new NotImplementedException();
         }
 
         
-        public void ExpectContains(string locator, params string[] values)
+        public void ExpectContains(string selector, params string[] values)
         {
             throw new NotImplementedException();
         }
 
-        public void ExpectHeader(string locator)
+        public IEnumerable<IHtmlHeadingElement> ExpectHeader(string selector)
         {
             //Validate the parameters
-            if (string.IsNullOrWhiteSpace(locator)) throw new ArgumentNullException(nameof(locator));
+            if (string.IsNullOrWhiteSpace(selector)) throw new ArgumentNullException(nameof(selector));
 
             //Try and find by xpath than css
-            var nodes = HtmlDocument.GetHtmlNodes(locator).OfType<IHtmlHeadingElement>();
-            if (nodes != null && nodes.Any()) return;
+            var headers = HtmlDocument.GetHtmlNodes(selector).OfType<IHtmlHeadingElement>();
 
             //Throw an assert failure if we cant find
-            Assert.Fail($"Cannot find header '{locator}' on page '{HtmlDocument.Url}'");
+            Assert.That(headers != null && headers.Any(),$"Cannot find header '{selector}' on page '{HtmlDocument.Url}'");
+
+            return headers;
         }
-        public void ExpectHeaderContains(string text, StringComparison comparer = StringComparison.OrdinalIgnoreCase)
+
+        public IEnumerable<IHtmlHeadingElement> ExpectHeaderContains(string text, StringComparison comparer = StringComparison.OrdinalIgnoreCase)
         {
             //Validate the parameters
             if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullException(nameof(text));
 
-            var nodes = HtmlDocument.GetHeadings();
-            if (nodes.Any(n => n.TextContent.Contains(text, comparer))) return;
-            
+            var headings = HtmlDocument.GetHeadings().Where(n => n.TextContent.Contains(text, comparer));
+
             //Throw an assert failure if we cant find
-            Assert.Fail($"Cannot find header containing '{text}' on page '{HtmlDocument.Url}'");
+            Assert.That(headings.Any(),$"Cannot find header containing '{text}' on page '{HtmlDocument.Url}'");
+            
+            return headings;
         }
 
-        public object Above(string v)
+        public object Above(string selector)
         {
             throw new NotImplementedException();
         }
-        public object Below(string v)
+        public object Below(string selector)
         {
             throw new NotImplementedException();
         }
-        public object AboveHeader(string v)
+        public object AboveHeader(string selector)
         {
             throw new NotImplementedException();
         }
-        public void BelowHeader(string v)
+        public void BelowHeader(string selector)
         {
             throw new NotImplementedException();
         }
-        public void Click(string locator)
+        
+        public IHtmlElement Click(string selector)
         {
-            throw new NotImplementedException();
+            //Validate the parameters
+            if (string.IsNullOrWhiteSpace(selector)) throw new ArgumentNullException(nameof(selector));
+
+            var nodes = HtmlDocument.GetHtmlNodes(selector);
+
+            //Throw an assert failure if too many
+            var count = nodes.Count();
+            Assert.That(count<2, $"Cannot click {count} elements matching '{selector}' on page '{HtmlDocument.Url}'");
+
+            var element = nodes.SingleOrDefault() as IHtmlElement;
+            Assert.IsNotNull(element, $"Cannot find element matching '{selector}' on page '{HtmlDocument.Url}'");
+            
+            selector = element.GetSelector();
+            var webElement = _testWebBrowser.FindElement(By.CssSelector(selector));
+            Assert.IsNotNull(webElement, $"Cannot find element matching '{selector}' on page '{HtmlDocument.Url}'");
+
+            webElement.Click();
+
+            return element;
         }
-        public void Click(object bottom, string v)
+
+        public void Click(object bottom, string selector)
         {
             throw new NotImplementedException();
         }
@@ -195,33 +212,33 @@ namespace ModernSlavery.Testing.Helpers.Classes
             throw new NotImplementedException();
         }
 
-        public void AssumeDate(string v)
+        public void AssumeDate(string selector)
         {
             throw new NotImplementedException();
         }
 
-        public void AssumeTime(string v)
+        public void AssumeTime(string selector)
         {
             throw new NotImplementedException();
         }
 
 
 
-        public void GotoCopiedUrl(string v)
+        public void GotoCopiedUrl(string selector)
         {
             throw new NotImplementedException();
         }
 
-        public void ExpectNo(string v)
+        public void ExpectNo(string selector)
         {
             throw new NotImplementedException();
         }
-        public void ExpectButton(string v)
+        public void ExpectButton(string selector)
         {
             throw new NotImplementedException();
         }
 
-        public void ExpectLabel(string v)
+        public void ExpectLabel(string selector)
         {
             throw new NotImplementedException();
         }
@@ -230,32 +247,32 @@ namespace ModernSlavery.Testing.Helpers.Classes
             throw new NotImplementedException();
         }
 
-        public void ExpectField(string v)
+        public void ExpectField(string selector)
         {
             throw new NotImplementedException();
         }
 
-        public void ClickLabel(string v)
+        public void ClickLabel(string selector)
         {
             throw new NotImplementedException();
         }
 
-        public void CopyUrl(string v)
+        public void CopyUrl(string selector)
         {
             throw new NotImplementedException();
         }
 
-        public void ClearField(string v)
+        public void ClearField(string selector)
         {
             throw new NotImplementedException();
         }
 
-        public object ExpectFieldContains(string locator,params string[] values)
+        public object ExpectFieldContains(string selector,params string[] values)
         {
             throw new NotImplementedException();
         }
 
-        public void ExpectText(string v)
+        public void ExpectText(string selector)
         {
             throw new NotImplementedException();
         }
@@ -265,12 +282,12 @@ namespace ModernSlavery.Testing.Helpers.Classes
             throw new NotImplementedException();
         }
 
-        public void ClickButton(object contains, string v)
+        public void ClickButton(object contains, string selector)
         {
             throw new NotImplementedException();
         }
 
-        public void ExpectRow(string v)
+        public void ExpectRow(string selector)
         {
             throw new NotImplementedException();
         }
@@ -279,17 +296,17 @@ namespace ModernSlavery.Testing.Helpers.Classes
             throw new NotImplementedException();
         }
 
-        public void TakeScreenshot(string v)
+        public void TakeScreenshot(string selector)
         {
             throw new NotImplementedException();
         }
 
-        public void ClickButton(string v)
+        public void ClickButton(string selector)
         {
             throw new NotImplementedException();
         }
 
-        public object AtRow(string v)
+        public object AtRow(string selector)
         {
             throw new NotImplementedException();
         }
@@ -309,12 +326,12 @@ namespace ModernSlavery.Testing.Helpers.Classes
             throw new NotImplementedException();
         }
 
-        private object AtLabel(string v)
+        private object AtLabel(string selector)
         {
             throw new NotImplementedException();
         }
 
-        private object BelowLabel(string v)
+        private object BelowLabel(string selector)
         {
             throw new NotImplementedException();
         }

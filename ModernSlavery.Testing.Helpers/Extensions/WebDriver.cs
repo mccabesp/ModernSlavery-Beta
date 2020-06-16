@@ -21,6 +21,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
     {
         public static Process StartSelenium()
         {
+            return null;
             var _selenium = new Process
             {
                 StartInfo = new ProcessStartInfo { FileName = "selenium-standalone", Arguments = "start", UseShellExecute = true }
@@ -30,8 +31,13 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             return _selenium;
         }
 
-        public static IWebDriver CreateWebDriver()
+        public static IWebDriver CreateWebDriver(bool hideCommandPromptWindow=false)
         {
+            string driverPath = Directory.GetCurrentDirectory();
+
+            var driverService = ChromeDriverService.CreateDefaultService();
+            driverService.HideCommandPromptWindow = hideCommandPromptWindow;
+            
             var options = new ChromeOptions();
             if (!Debugger.IsAttached)
             {
@@ -40,8 +46,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
             options.AcceptInsecureCertificates = true;
             options.SetLoggingPreference(LogType.Browser, LogLevel.All);
-            string driverPath = Directory.GetCurrentDirectory();
-            var webDriver = new ChromeDriver(driverPath, options);
+            var webDriver = new ChromeDriver(driverService, options);
             return webDriver;
         }
 

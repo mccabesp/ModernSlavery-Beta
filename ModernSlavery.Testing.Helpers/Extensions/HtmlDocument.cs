@@ -18,17 +18,30 @@ namespace ModernSlavery.Testing.Helpers.Extensions
                 throw new ArgumentNullException(nameof(selector));
             }
 
+            IEnumerable<INode> targets = null;
             try
             {
-                List<INode> targets = element.SelectNodes(selector);
-                if (targets.Any())return targets;
-
-                return element.QuerySelectorAll(selector).Cast<INode>().ToList();
+                targets = element.QuerySelectorAll(selector).Cast<INode>().ToList();
             }
-            catch (DomException ex)
+            catch (DomException dex)
             {
-                return null;
             }
+            catch (Exception ex)
+            {
+            }
+
+            if (targets==null || !targets.Any()) 
+                try
+                {
+                    targets = element.SelectNodes(selector);
+                }
+                catch (DomException dex)
+                {
+                }
+                catch (Exception ex)
+                {
+                }
+            return targets;
         }
 
         public static INode GetHtmlNode(this IElement element, string selector)
@@ -50,7 +63,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         {
             return responseDocument.DocumentElement.GetHtmlNodes(selector);
         }
-
+        
         public static string GetHtmlElementValue(this IHtmlDocument responseDocument, string selector, string attributeName = null)
         {
             if (string.IsNullOrWhiteSpace(selector))
@@ -101,16 +114,9 @@ namespace ModernSlavery.Testing.Helpers.Extensions
                 .Concat(document.GetElementsByTagName("h6")).Cast<IHtmlHeadingElement>();
         }
 
-        public static IEnumerable<XmlElement> GetFormFields(this IHtmlDocument content)
+        public static IEnumerable<IHtmlInputElement> GetFormFields(this IHtmlDocument document)
         {
-            var fields = new SortedDictionary<string, string>();
-            foreach (IHtmlFormElement form in content.Forms)
-            {
-                foreach (IHtmlElement element in form.Elements.OfType<IHtmlInputElement>())
-                {
-                    yield return element.ToXmlElement();
-                }
-            }
+            return document.GetElementsByTagName("input").Cast<IHtmlInputElement>();
         }
     }
 }
