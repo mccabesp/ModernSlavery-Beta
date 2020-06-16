@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="app.json" />
     <None Remove="appsettings.Test.secret.json" />
   </ItemGroup>
 
@@ -30,6 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="app.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
     <Content Include="appsettings.Test.secret.json" Condition="Exists('appsettings.Test.secret.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>appsettings.Test.json</DependentUpon>
@@ -37,7 +42,7 @@
     </Content>
     <Content Include="appsettings.Test.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 </Project>

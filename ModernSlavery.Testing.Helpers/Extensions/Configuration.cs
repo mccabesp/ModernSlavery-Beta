@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using ModernSlavery.Infrastructure.Configuration;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,10 +24,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             var configBuilder = new ConfigurationBuilder();
 
             if (filenames == null || !filenames.Any())
-            {
-                configBuilder.AddJsonFile($"{Assembly.GetEntryAssembly().GetName().Name}.json", true, false);
-                configBuilder.AddJsonFile("App.json", true, false);
-            }
+                configBuilder.AddJsonFile("app.json", true, false);
 
             foreach (var filename in filenames)
             {

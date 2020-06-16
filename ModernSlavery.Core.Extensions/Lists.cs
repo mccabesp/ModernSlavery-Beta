@@ -219,7 +219,7 @@ namespace ModernSlavery.Core.Extensions
                 .ToDictionary(t => t[0].Trim(), t => t[1].Trim(), StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public static void AddRange(this Dictionary<string, string> target, Dictionary<string, string> source)
+        public static void AddRange(this IDictionary<string, string> target, IDictionary<string, string> source)
         {
             foreach (var key in source.Keys)
                 target[key] = source[key];

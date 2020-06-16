@@ -6,12 +6,10 @@ using ModernSlavery.Core.Extensions;
 using Newtonsoft.Json;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using System;
+using OpenQA.Selenium.Remote;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,34 +17,29 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 {
     public static class WebDriver
     {
-        public static Process StartSelenium()
+        public static IWebDriver CreateWebDriver(bool headless = false, bool logPerformance=false)
         {
-            return null;
-            var _selenium = new Process
+            var chromeOptions = new ChromeOptions
             {
-                StartInfo = new ProcessStartInfo { FileName = "selenium-standalone", Arguments = "start", UseShellExecute = true }
+                AcceptInsecureCertificates = true,
+                PageLoadStrategy = PageLoadStrategy.Normal,
             };
-            _selenium.Start();
+            chromeOptions.AddArgument("no-sandbox");
 
-            return _selenium;
-        }
-
-        public static IWebDriver CreateWebDriver(bool hideCommandPromptWindow=false)
-        {
-            string driverPath = Directory.GetCurrentDirectory();
-
-            var driverService = ChromeDriverService.CreateDefaultService();
-            driverService.HideCommandPromptWindow = hideCommandPromptWindow;
-            
-            var options = new ChromeOptions();
-            if (!Debugger.IsAttached)
+            if (logPerformance)
             {
-                options.AddArgument("--headless"); //Optional, comment this out if you want to SEE the browser window
+                //This wont work until Selenium 4 or with 4-beta so dont use for now
+                ChromePerformanceLoggingPreferences perfLogPrefs = new ChromePerformanceLoggingPreferences();
+                perfLogPrefs.AddTracingCategories(new string[] { "devtools.network" });
+                chromeOptions.PerformanceLoggingPreferences = perfLogPrefs;
+                chromeOptions.SetLoggingPreference("performance", LogLevel.All);
+                chromeOptions.AddAdditionalCapability(CapabilityType.EnableProfiling, true, true);
             }
-
-            options.AcceptInsecureCertificates = true;
-            options.SetLoggingPreference(LogType.Browser, LogLevel.All);
-            var webDriver = new ChromeDriver(driverService, options);
+            chromeOptions.SetLoggingPreference(LogType.Browser, LogLevel.All);
+            var driverService = ChromeDriverService.CreateDefaultService(Directory.GetCurrentDirectory());
+            driverService.HideCommandPromptWindow = headless;
+            driverService.EnableVerboseLogging = true;
+            var webDriver = new ChromeDriver(driverService, chromeOptions);
             return webDriver;
         }
 
@@ -87,18 +80,21 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             // one of them will contain the Network.responseReceived method
             // and we shall find the "last recorded url" response
             var logs = webDriver.Manage().Logs.GetLog("performance");
-
             var headers = new Dictionary<string, string>();
             foreach (var entry in logs)
             {
                 dynamic json = JsonConvert.DeserializeObject(entry.Message);
+                string method = json?.message?.method;
+                if (method==null || !method.EqualsI("Network.responseReceived")) continue;
+                var response = json?.message?.@params?.response;
+                if (response == null) continue;
 
-                if (!json.method.EqualsI("Network.responseReceived") || !json.method.@params.response.url.EqualsI(currentURL)) continue;
-                    
-                headers["status"]=json.method.@params.response.status;
-
-                foreach (var header in json.method.@params.response.headers)
-                    headers[header.key]=header.value;
+                string url = response?.url;
+                if (!currentURL.EqualsI(url)) continue;
+                headers["status"]=response.status;
+                IDictionary<string, string> dictionary =response.headers.ToObject<IDictionary<string,string>>();
+                headers.AddRange(dictionary);
+                break;
             }
             return headers;
         }

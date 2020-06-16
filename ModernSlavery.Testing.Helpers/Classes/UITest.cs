@@ -1,6 +1,8 @@
-﻿using AngleSharp.Dom;
+﻿using AngleSharp;
+using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Configuration;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
@@ -11,6 +13,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace ModernSlavery.Testing.Helpers.Classes
 {
@@ -21,7 +24,7 @@ namespace ModernSlavery.Testing.Helpers.Classes
         public async Task SetupBrowser()
         {
             //Create the browser driver for selenium and show console if debugging
-            _testWebBrowser = WebDriver.CreateWebDriver(!Debugger.IsAttached);
+            _testWebBrowser = WebDriver.CreateWebDriver(!Debugger.IsAttached, RetrieveHeaders);
         }
 
         [OneTimeTearDown]
@@ -36,23 +39,23 @@ namespace ModernSlavery.Testing.Helpers.Classes
         #endregion
 
         #region Private fields
+        private Lazy<Task<IHtmlDocument>> _HtmlDocument = null;
         private IWebDriver _testWebBrowser;
         #endregion
 
         #region Protected properties
-        private Lazy<Task<IHtmlDocument>> _HtmlDocument = null;
         protected IHtmlDocument HtmlDocument => _HtmlDocument.Value.Result;
-        
+        protected IConfiguration Config { get; private set; } = Extensions.Configuration.GetJsonSettings();
+        private bool RetrieveHeaders => Config.GetValue("Selenium:RetrieveHeaders", false);
         #endregion
 
-
         #region Private methods
-
+       
         private void ResetHtmlDocument()
         {
             _HtmlDocument = new Lazy<Task<IHtmlDocument>>(async () => 
             {
-                return await _testWebBrowser.GetHtmlDocumentAsync(); 
+                return await _testWebBrowser.GetHtmlDocumentAsync(RetrieveHeaders); 
             });
         }
         #endregion
