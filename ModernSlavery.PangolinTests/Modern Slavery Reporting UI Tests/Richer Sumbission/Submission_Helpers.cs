@@ -10,6 +10,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
 {
     class Submission_Helper
     {
+        
+
         public static void NavigateToTraining(UIContext ui, string Organistion, string Year)
         {
             ui.Click("Mange Organisations");
@@ -36,6 +38,14 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             ui.Click("Save and continue");
             ui.ExpectHeader("Training");
+        }
+        public static void DateSet(UIContext ui, string Day, string Month, string Year, string Order)
+        {
+            //order is element number on page
+            //on your submission page 3 present
+            ui.SetXPath("(//div//label[contains(text(), 'Year')]/following-sibling::input)[" + Order + "])").To(Year);
+            ui.SetXPath("(//div//label[contains(text(), 'Month')]/following-sibling::input)[" + Order + "])").To(Month);
+            ui.SetXPath("(//div//label[contains(text(), 'Day')]/following-sibling::input)[" + Order + "])").To(Day);
         }
     }
 }
