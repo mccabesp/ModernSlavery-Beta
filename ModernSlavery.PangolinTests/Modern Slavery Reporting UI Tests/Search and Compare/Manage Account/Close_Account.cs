@@ -27,8 +27,14 @@ namespace Modern_Slavery_Reporting_UI_Tests
             //only user registered for org
             Expect("Closing your account will leave one or more of your registered organisations with no one to submit on their behalf. It can take up to a week to register an organisation");
 
-            Set("Password").To(create_account.roger_password);
+            //Check cancel function
+            Click("Cancel");
+            ExpectHeader("Manage your account");
+            ExpectNoHeader("Close your account");
+            Click("Close your account");
+            ExpectHeader("Close your account");
 
+            Set("Password").To(create_account.roger_password);
             Click("Close your account");
 
             Expect("Your account has been closed");
