@@ -15,6 +15,7 @@ namespace ModernSlavery.Infrastructure.Database
             modelBuilder.Entity<OrganisationReference>().ToTable("OrganisationReferences");
             modelBuilder.Entity<OrganisationScope>().ToTable("OrganisationScopes");
             modelBuilder.Entity<OrganisationSicCode>().ToTable("OrganisationSicCodes");
+            modelBuilder.Entity<StatementMetadata>().ToTable("StatementMetadatas");
             modelBuilder.Entity<Return>().ToTable("Returns");
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<UserStatus>().ToTable("UserStatus");
@@ -452,6 +453,89 @@ namespace ModernSlavery.Infrastructure.Database
                         .WithMany(p => p.ReturnStatuses)
                         .HasForeignKey(d => d.ReturnId)
                         .HasConstraintName("FK_dbo.ReturnStatus_dbo.Returns_ReturnId");
+                });
+
+            #endregion
+
+            #region Statement metadata
+
+            modelBuilder.Entity<StatementMetadata>(
+                entity =>
+                {
+                    entity.HasKey(e => e.StatementMetadataId)
+                        .HasName("PK_dbo.StatementMetadatas");
+
+                    entity.HasIndex(e => e.OrganisationId)
+                        .HasName("IX_OrganisationId");
+
+                    entity.HasIndex(e => e.ReportingStartDate)
+                        .HasName("IX_ReportingStartDate");
+
+                    entity.HasIndex(e => e.ReportingEndDate)
+                        .HasName("IX_ReportingEndDate");
+
+                    entity.HasIndex(e => e.AccountingDate)
+                        .HasName("IX_AccountingDate");
+
+                    entity.Property(e => e.IncludesGoals)
+                        .HasColumnName("IncludesGoalsId");
+
+                    entity.HasIndex(e => e.IncludesGoals)
+                        .HasName("IX_IncludesGoals");
+
+                    entity.HasIndex(e => e.IncludesStructure)
+                        .HasName("IX_IncludesStructure");
+
+                    entity.HasIndex(e => e.IncludesPolicies)
+                        .HasName("IX_IncludesPolicies");
+
+                    entity.HasIndex(e => e.IncludesMethods)
+                        .HasName("IX_IncludesMethods");
+
+                    entity.HasIndex(e => e.IncludesRisks)
+                        .HasName("IX_IncludesRisks");
+
+                    entity.HasIndex(e => e.IncludesEffectiveness)
+                        .HasName("IX_IncludesEffectiveness");
+
+                    entity.HasIndex(e => e.IncludesTraining)
+                        .HasName("IX_IncludesTraining");
+
+                    entity.Property(e => e.Status)
+                        .HasColumnName("StatusId");
+
+                    entity.HasIndex(e => e.Status)
+                        .HasName("IX_StatusId");
+
+                    entity.Property(e => e.StatusDetails)
+                        .HasMaxLength(255);
+
+                    entity.Property(e => e.JobTitle)
+                        .HasMaxLength(100);
+
+                    entity.Property(e => e.FirstName)
+                        .HasMaxLength(50);
+
+                    entity.Property(e => e.LastName)
+                        .HasMaxLength(50);
+
+                    entity.HasIndex(e => e.MinTurnover)
+                        .HasName("IX_MinTurnover");
+
+                    entity.HasIndex(e => e.MaxTurnover)
+                        .HasName("IX_MaxTurnover");
+
+                    entity.Property(e => e.LateReason)
+                        .HasMaxLength(200);
+
+                    entity.Property(e => e.EHRCResponse)
+                        .HasColumnName("EHRCResponse")
+                        .HasDefaultValueSql("((0))");
+
+                    entity.HasOne(d => d.Organisation)
+                        .WithMany(p => p.StatementMetadatas)
+                        .HasForeignKey(d => d.OrganisationId)
+                        .HasConstraintName("FK_dbo.StatementMetadatas_dbo.Organisations_OrganisationId");
                 });
 
             #endregion

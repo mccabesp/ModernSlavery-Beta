@@ -22,7 +22,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <summary>
         /// Save the statement metadata.
         /// </summary>
-        Task<StatementActionResult> SaveStatementMetadata(User user, StatementMetadata statementMetadata);
+        Task<StatementActionResult> SaveStatementMetadata(User user, Organisation organisation, StatementMetadata statementMetadata);
     }
 
     public enum StatementActionResult : byte

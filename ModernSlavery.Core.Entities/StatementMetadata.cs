@@ -72,8 +72,6 @@ namespace ModernSlavery.Core.Entities
 
         public string MeasuringProgress { get; set; }
 
-        public string Modifications { get; set; }
-
         public bool EHRCResponse { get; set; }
 
         public virtual Organisation Organisation { get; set; }

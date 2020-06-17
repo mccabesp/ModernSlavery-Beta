@@ -4,6 +4,7 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -47,17 +48,21 @@ namespace ModernSlavery.BusinessDomain.Submission
             return StatementActionResult.Success;
         }
 
-        public async Task<StatementActionResult> SaveStatementMetadata(User user, StatementMetadata statementMetadata)
+        public async Task<StatementActionResult> SaveStatementMetadata(User user, Organisation organisation, StatementMetadata statement)
         {
-            if (!statementMetadata.CanBeEdited)
+            if (!statement.CanBeEdited)
             {
                 return StatementActionResult.Uneditable;
             }
 
             // Is this check enough?
-            if (statementMetadata.StatementMetadataId == 0)
+            if (statement.StatementMetadataId == 0)
             {
-                SharedBusinessLogic.DataRepository.Insert(statementMetadata);
+                statement.OrganisationId = organisation.OrganisationId;
+                statement.Created = VirtualDateTime.Now;
+                statement.AccountingDate = SharedBusinessLogic.GetAccountingStartDate(organisation.SectorType, VirtualDateTime.Now.Year);
+
+                SharedBusinessLogic.DataRepository.Insert(statement);
 
                 // Add the statement to the org
                 //statementMetadata.Organisation.Statements.Add(statementMetadata);

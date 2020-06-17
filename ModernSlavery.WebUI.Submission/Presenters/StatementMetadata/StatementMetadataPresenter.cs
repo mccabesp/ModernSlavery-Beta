@@ -36,7 +36,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         Task<CustomResult<StatementMetadataViewModel>> TryGetYourOrganisation(User user, string organisationIdentifier, int year);
 
         Task<CustomResult<StatementMetadataViewModel>> TrySaveYourOrgansation(User user, StatementMetadataViewModel model);
- 
+
         Task<CustomResult<StatementMetadataViewModel>> TryGetPolicies(User user, string organisationIdentifier, int year);
 
         Task<CustomResult<StatementMetadataViewModel>> TrySavePolicies(User user, StatementMetadataViewModel model);
@@ -249,18 +249,9 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             // that should query file and DB
             var entity = await StatementMetadataBusinessLogic.GetStatementMetadataByOrganisationAndYear(organisation, year);
 
-            if (entity != null)
-            {
-                // shouldnt need to check it for access as that was already done
-                var vm = MapToVM(entity);
-                return new CustomResult<StatementMetadataViewModel>(vm);
-            }
-
-            // everything else was empty
-            // return a new instance of the viewmodel
-            return new CustomResult<StatementMetadataViewModel>(new StatementMetadataViewModel
-            {
-            });
+            // shouldnt need to check it for access as that was already done
+            var vm = MapToVM(entity);
+            return new CustomResult<StatementMetadataViewModel>(vm);
         }
 
         #region Draft
@@ -274,8 +265,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 // is this the correct form of error?
                 return new CustomResult<StatementMetadataViewModel>(new CustomError(System.Net.HttpStatusCode.Unauthorized, "Unauthorised access"));
 
-            var entity = MapToEntity(model);
-            await StatementMetadataBusinessLogic.SaveStatementMetadata(user, entity);
+            var entity = await MapToEntityAsync(model);
+            await StatementMetadataBusinessLogic.SaveStatementMetadata(user, organisation, entity);
 
             throw new NotImplementedException();
         }
@@ -297,13 +288,35 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         StatementMetadataViewModel MapToVM(StatementMetadata entity)
         {
-            // TODO JAMES
-            throw new NotImplementedException();
+            if (entity == null)
+                return new StatementMetadataViewModel();
+
+            return new StatementMetadataViewModel
+            {
+                OrganisationId = entity.OrganisationId,
+                OrganisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(entity.OrganisationId),
+                ReportingStartDate = entity.ReportingStartDate,
+                StatementMetadataId = entity.StatementMetadataId,
+                StatementMetadataIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(entity.StatementMetadataId),
+                Status = entity.Status,
+                StatusDate = entity.StatusDate,
+                Year = entity.AccountingDate.Year
+            };
         }
 
-        StatementMetadata MapToEntity(StatementMetadataViewModel viewModel)
+        async Task<StatementMetadata> MapToEntityAsync(StatementMetadataViewModel viewModel)
         {
-            throw new NotImplementedException();
+            var id = SharedBusinessLogic.Obfuscator.DeObfuscate(viewModel.OrganisationIdentifier);
+            var organisation = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(x => x.OrganisationId == id);
+
+            var entity = await StatementMetadataBusinessLogic.GetStatementMetadataByOrganisationAndYear(organisation, viewModel.Year);
+
+            if (entity == null)
+                entity = new StatementMetadata { StatementMetadataId = 0 };
+
+
+
+            return entity;
         }
 
         #endregion
