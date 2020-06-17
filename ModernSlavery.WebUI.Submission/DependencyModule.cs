@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Submission.Classes;
+using ModernSlavery.WebUI.Submission.Presenters;
 
 namespace ModernSlavery.WebUI.Submission
 {
@@ -32,6 +33,8 @@ namespace ModernSlavery.WebUI.Submission
         {
             //Register dependencies here
             builder.RegisterType<SubmissionPresenter>().As<ISubmissionPresenter>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<StatementMetadataPresenter>().As<ISubmissionPresenter>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ScopePresenter>().As<IScopePresenter>().InstancePerLifetimeScope();
         }
