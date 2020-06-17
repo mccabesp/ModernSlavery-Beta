@@ -78,5 +78,27 @@ namespace Modern_Slavery_Reporting_UI_Tests
                 ui.BelowLabel(Financials[i]).ExpectLabel(Financials[i + 1]);
             }
         }
+
+        public static void FinancialsInteractionCheck(UIContext ui, string[] Financials)
+        {
+            //expect all financial options in order
+            for (int i = 0; i < Financials.Length; i++)
+            {
+                ui.Set("What was your turnover or budget during the last financial accounting year?").To(Financials[i]);
+            }
+        }
+
+        public static void SectorsInteractionCheck(UIContext ui, string[] Financials)
+        {
+            //expect all financial options in order
+            for (int i = 0; i < Financials.Length; i++)
+            {
+                //select all
+                ui.ClickLabel(Financials[i]);
+
+                //deselect all
+                ui.ClickLabel(Financials[i]);
+            }
+        }
     }
 }
