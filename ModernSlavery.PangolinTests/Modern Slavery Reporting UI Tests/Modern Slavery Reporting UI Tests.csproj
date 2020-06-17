@@ -164,14 +164,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Search and Compare\Manage Account\Close Account User Is Set to Retired.cs" />
     <Compile Include="Search and Compare\Manage Account\Close_Account_Invalid_Password.cs" />
     <Compile Include="Search and Compare\Manage Account\Close_Account_Mandatory_Fields.cs" />
+    <Compile Include="Search and Compare\Manage Account\Closing Account Removes Pending Registrations.cs" />
     <Compile Include="Search and Compare\Manage Account\Manage Account_Change_Email.cs" />
     <Compile Include="Search and Compare\Manage Account\Manage_Account_Account_Details_Check.cs" />
     <Compile Include="Search and Compare\Manage Account\Close_Account.cs" />
     <Compile Include="Search and Compare\Manage Account\Manage_Account_Change_Personal_Details.cs" />
     <Compile Include="Search and Compare\Manage Account\Manage_Account_Email_Validation.cs" />
     <Compile Include="Search and Compare\Manage Account\Manage_Account_Personal_Details_Validation.cs" />
+    <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Director Information Mandatory.cs" />
+    <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Modern Slavery Statement Period Covered Fields.cs" />
+    <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Policies Fields And %27Other%27 Functionality Checks.cs" />
+    <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Statement URL Fields Is Mandatory And Only Accepts Valid Format.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Spam_Protection_Reset_Count.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registration_Expired.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Invalid_Reference.cs" />

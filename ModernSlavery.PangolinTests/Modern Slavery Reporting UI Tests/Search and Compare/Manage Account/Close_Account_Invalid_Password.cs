@@ -19,11 +19,6 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             ExpectHeader("Close your account");
 
-            //Try closing account with no password
-            Click("Close your account");
-            Expect("You need to enter your password before closing your account");
-
-            //check incorrect password is not accepted
             Set("Enter your password to confirm").To("invalid");
             Click("Close your account");
 
