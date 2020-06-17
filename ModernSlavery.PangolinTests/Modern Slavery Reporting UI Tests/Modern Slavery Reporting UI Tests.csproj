@@ -113,13 +113,13 @@
       <HintPath>..\..\packages\Nito.AsyncEx.4.0.1\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
     </Reference>
     <Reference Include="Pangolin, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pangolin.1.0.9\lib\net45\Pangolin.dll</HintPath>
+      <HintPath>..\..\packages\Pangolin.1.0.11\lib\net45\Pangolin.dll</HintPath>
     </Reference>
     <Reference Include="Pangolin.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pangolin.1.0.9\lib\net45\Pangolin.Core.dll</HintPath>
+      <HintPath>..\..\packages\Pangolin.1.0.11\lib\net45\Pangolin.Core.dll</HintPath>
     </Reference>
     <Reference Include="Pangolin.Service, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pangolin.1.0.9\lib\net45\Pangolin.Service.dll</HintPath>
+      <HintPath>..\..\packages\Pangolin.1.0.11\lib\net45\Pangolin.Service.dll</HintPath>
     </Reference>
     <Reference Include="Roslyn.Compilers, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Roslyn.Compilers.Common.1.2.20906.2\lib\net45\Roslyn.Compilers.dll</HintPath>
@@ -166,6 +166,7 @@
   <ItemGroup>
     <Compile Include="Search and Compare\Manage Account\Close Account User Is Set to Retired.cs" />
     <Compile Include="Richer Sumbission\Submission_Sectors_Content_Check.cs" />
+    <Compile Include="Richer Sumbission\Submission_Sectors_Interaction_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Training_Validation_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Helpers.cs" />
     <Compile Include="Richer Sumbission\Submission_Six_Areas_Content_Check.cs" />
@@ -219,6 +220,7 @@
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Success.cs" />
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Constants.cs" />
     <Compile Include="Search and Compare\Sign-in\Sign-out\Sign_Out.cs" />
+    <Compile Include="Search and Compare\Sign-in\Sign-out\Sign_Out_Impersonated_User.cs" />
     <Compile Include="Search and Compare\Sign-in\Sign-out\Sign_Out_User_Cannot_Access_Registration_Pages.cs" />
     <Compile Include="Search and Compare\Sign-in\Sign_In_Content_Check.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Spam_Protection_Different.cs" />

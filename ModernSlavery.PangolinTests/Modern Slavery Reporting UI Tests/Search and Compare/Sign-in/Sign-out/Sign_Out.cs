@@ -17,16 +17,22 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             Click("Sign out");
 
-            Expect("Signed Out");
 
-            //text split so multiple expects requrired
-            Expect(What.Contains, "You are now signed out of the");
-            Expect(What.Contains, "Modern Slavery reporting service");
-            Expect(What.Contains, "Click the button below to return to the ");
-            Expect(What.Contains, "Modern Slavery reporting service");
-            Click("Continue");
+            //this section has been changed for MVP 1
+            //Expect("Signed Out");
 
-            ExpectHeader("Search and compare Modern Slavery statements");
+            ////text split so multiple expects requrired
+            //Expect(What.Contains, "You are now signed out of the");
+            //Expect(What.Contains, "Modern Slavery reporting service");
+            //Expect(What.Contains, "Click the button below to return to the ");
+            //Expect(What.Contains, "Modern Slavery reporting service");
+            //Click("Continue");
+
+            //ExpectHeader("Search and compare Modern Slavery statements");
+
+            Expect("You are signed out");
+
+            ClickButton("Continue");
         }
     }
 }
