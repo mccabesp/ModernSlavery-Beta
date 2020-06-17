@@ -12,18 +12,19 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModernSlavery.WebUI.Submission.Controllers.NEW
+namespace ModernSlavery.WebUI.Submission.Controllers
 {
     // Route:
     // "~/submission/<org-reference>/<year>/<action>/"
     // TODO - rename to submission when appropriate
+    [Route("statement")]
     public class StatementMetadataController : BaseController
     {
         readonly IStatementMetadataPresenter SubmissionPresenter;
 
         public StatementMetadataController(
             IStatementMetadataPresenter submissionPresenter,
-            ILogger logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic)
+            ILogger<StatementMetadataController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic)
             : base(logger, webService, sharedBusinessLogic)
         {
             SubmissionPresenter = submissionPresenter;

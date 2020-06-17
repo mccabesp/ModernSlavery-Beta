@@ -7,7 +7,7 @@ using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
-using ModernSlavery.WebUI.Submission.Controllers.NEW;
+using ModernSlavery.WebUI.Submission.Controllers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
