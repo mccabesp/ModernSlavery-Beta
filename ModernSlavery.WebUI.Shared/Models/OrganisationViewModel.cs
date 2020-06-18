@@ -32,6 +32,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         public string CancellationReason { get; set; }
         public bool IsSecurityCodeExpired { get; set; }
         public bool IsFastTrackAuthorised { get; set; }
+        public bool IsRegistered { get; set; }
 
         public SortedSet<int> GetSicCodeIds()
         {
@@ -58,6 +59,9 @@ namespace ModernSlavery.WebUI.Shared.Models
         }
 
         #region Search details
+
+        [Required(AllowEmptyStrings = false)]
+        public string RegistrationType { get; set; }
 
         [Required(AllowEmptyStrings = false)] public SectorTypes? SectorType { get; set; }
 

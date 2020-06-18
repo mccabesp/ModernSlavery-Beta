@@ -8,6 +8,7 @@ using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Shared.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,6 +39,11 @@ namespace ModernSlavery.WebUI.Registration.Presenters
             var model = new OrganisationViewModel();
             // when SecurityToken is expired then model.SecurityCodeExpired should be true
             model.IsSecurityCodeExpired = org.HasSecurityCodeExpired();
+
+            if (model.IsSecurityCodeExpired)
+                return model;
+
+            model.IsRegistered = org.UserOrganisations.Any(uo => uo.User == currentUser && uo.PINConfirmedDate != null);
 
             model.Employers = new PagedResult<EmployerRecord>();
             model.Employers.Results = new List<EmployerRecord> { _organisationBusinessLogic.CreateEmployerRecord(org) };

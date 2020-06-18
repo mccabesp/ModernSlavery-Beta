@@ -60,16 +60,18 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             model.Employers = m.Employers;
 
-            //TODO validate the submitted fields
             ModelState.Clear();
 
-            // TODO James - from GPG, why would form be null? should there by a null check?
-            if (Request.Form["SectorType"] == "fasttrack")
+            if (model.RegistrationType.Equals("fasttrack"))
                 return RedirectToAction(nameof(FastTrack));
-
-            if (!model.SectorType.EqualsI(SectorTypes.Private, SectorTypes.Public))
+            else if (model.RegistrationType.Equals("private"))
+                model.SectorType = SectorTypes.Private;
+            else if (model.RegistrationType.Equals("public"))
+                model.SectorType = SectorTypes.Public;
+            else
             {
-                AddModelError(3005, "SectorType");
+                // either it is fast track, or sectortype mut be set
+                AddModelError(3005, "RegistrationType");
                 this.CleanModelErrors<OrganisationViewModel>();
                 return View("OrganisationType", model);
             }
