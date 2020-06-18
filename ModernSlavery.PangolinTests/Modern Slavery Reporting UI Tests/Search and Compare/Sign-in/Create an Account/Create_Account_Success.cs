@@ -9,6 +9,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
         [TestMethod]
         public override void RunTest()
         {
+            //succesful create account journey 
             Goto("/");
 
             Click("Sign in");

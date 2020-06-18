@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class Fastrack_Registraion_Content_Check : UITest
+    public class Fastrack_Registration_Content_Check : UITest
     {
         [TestCategory("Fasttrack")]
         [TestMethod]

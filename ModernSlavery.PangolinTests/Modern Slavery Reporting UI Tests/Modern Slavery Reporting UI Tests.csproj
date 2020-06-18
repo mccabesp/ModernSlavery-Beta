@@ -114,13 +114,13 @@
       <HintPath>..\..\packages\Nito.AsyncEx.4.0.1\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
     </Reference>
     <Reference Include="Pangolin, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pangolin.1.0.7\lib\net45\Pangolin.dll</HintPath>
+      <HintPath>..\..\packages\Pangolin.1.0.9\lib\net45\Pangolin.dll</HintPath>
     </Reference>
     <Reference Include="Pangolin.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pangolin.1.0.7\lib\net45\Pangolin.Core.dll</HintPath>
+      <HintPath>..\..\packages\Pangolin.1.0.9\lib\net45\Pangolin.Core.dll</HintPath>
     </Reference>
     <Reference Include="Pangolin.Service, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pangolin.1.0.7\lib\net45\Pangolin.Service.dll</HintPath>
+      <HintPath>..\..\packages\Pangolin.1.0.9\lib\net45\Pangolin.Service.dll</HintPath>
     </Reference>
     <Reference Include="Roslyn.Compilers, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Roslyn.Compilers.Common.1.2.20906.2\lib\net45\Roslyn.Compilers.dll</HintPath>
@@ -178,7 +178,10 @@
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Invalid_Reference.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Invalid_Security.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Duplicate_Organisation.cs" />
+    <Compile Include="Search and Compare\Registration\Private LTD, Charity\Registration_Private_Cant_FInd_Org.cs" />
+    <Compile Include="Search and Compare\Registration\Private LTD, Charity\Registration_Private_Duplicate Org.cs" />
     <Compile Include="Search and Compare\Registration\Private LTD, Charity\Registration_Private_Success.cs" />
+    <Compile Include="Search and Compare\Registration\Private LTD, Charity\Registration_Private_Contact_Details_Mandatory_Fields.cs" />
     <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Cant_Find_Your_Org_Success.cs" />
     <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Contact_Details_Mandatory_Fields.cs" />
     <Compile Include="Search and Compare\Registration\Public LTD\Registration_Public_Failure_Duplicate_Organisation.cs" />

@@ -13,7 +13,6 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             //if creating account for email address used in last 24 hours validation should appear
 
-
             //register account with email roger@test.co again
             Goto("/");
 

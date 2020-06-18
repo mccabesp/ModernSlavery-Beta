@@ -4,13 +4,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class Fastrack_Registraion_Duplicate_Organisation : UITest
+    public class Fastrack_Registration_Duplicate_Organisation : UITest
     {
         [TestCategory("Fasttrack")]
         [TestMethod]
         public override void RunTest()
         {
-            //Run<Fastrack_Registraion_Success>();
+            //Run<Fastrack_Registration_Success>();
             LoginAs<RogerReporter>();
 
             Click("Register an organisation");
@@ -70,6 +70,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             Click("Continue");
 
+            ExpectHeader("There is a problem");
             Expect("You have already registered this organisation");
         }
     }

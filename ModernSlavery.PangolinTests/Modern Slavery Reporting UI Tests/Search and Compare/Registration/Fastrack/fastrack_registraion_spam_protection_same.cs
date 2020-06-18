@@ -5,7 +5,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestCategory("Spam Protection")]
     [TestClass]
-    public class Fastrack_Registraion_Spam_Protection_Same : UITest
+    public class Fastrack_Registration_Spam_Protection_Same : UITest
     {
         [TestCategory("Fasttrack")]
         [TestMethod]

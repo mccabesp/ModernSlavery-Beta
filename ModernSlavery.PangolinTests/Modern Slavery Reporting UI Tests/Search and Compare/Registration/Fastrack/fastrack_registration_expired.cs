@@ -28,9 +28,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             Click("Continue");
 
-            Expect("3Your Security Code has expired");
-
-            TakeScreenshot("Expired");
+            Expect("Your Security Code has expired");
         }
     }
 }
