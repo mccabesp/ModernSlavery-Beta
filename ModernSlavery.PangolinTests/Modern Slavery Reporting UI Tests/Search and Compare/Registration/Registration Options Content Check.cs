@@ -9,7 +9,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
         [TestMethod]
         public override void RunTest()
         {
-            Run<Fastrack_Registraion_Success>();
+            Run<Fastrack_Registration_Success>();
 
             LoginAs<RogerReporter>();
 

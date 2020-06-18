@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class Registraion_Mandatory_Organisation_Type : UITest
+    public class Registration_Mandatory_Organisation_Type : UITest
     {
         [TestCategory("Fasttrack")]
         [TestMethod]

@@ -5,7 +5,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestCategory("Fasttrack")]
     [TestClass]
-    public class Fastrack_Registraion_Success : UITest
+    public class Fastrack_Registration_Success : UITest
     {
         [TestMethod]
         public override void RunTest()
@@ -38,21 +38,21 @@ namespace Modern_Slavery_Reporting_UI_Tests
             AtRow("Organisation name").Expect(Registration.OrgName_Millbrook);
             AtRow("Company number").Expect(Registration.CompanyNumber_Millbrook);
             AtRow("Registered address").Expect(Registration.RegisteredAddress_Millbrook);
-            //AtRow("Business Sectors (SIC Codes)").Expect("");
+            AtRow("Business Sectors (SIC Codes)").Expect("");
 
             Click("Confirm");
             ExpectHeader("You can now publish a Modern Slavery statement on behalf of this organisation.");
 
-            //At("Employer name").Expect("MILLBROOK HEALTHCARE LTD");
+            At("Employer name").Expect(Registration.OrgName_Millbrook);
 
-            //Below("Employer name").ExpectText("You can also specify whether this employer is in scope of the reporting regulations.");
+            Below("Employer name").ExpectText("You can also specify whether this employer is in scope of the reporting regulations.");
 
-            ClickButton("Continue");
+            Click("Continue");
 
             ExpectHeader("Select an organisation");
 
-            ExpectRow("Organisation name");
-            AtRow("Organisation name").Column("Organisation Status").Expect("Registration Complete");
+            ExpectRow(Registration.OrgName_Millbrook);
+            AtRow(Registration.OrgName_Millbrook).Column("Organisation Status").Expect("Registration Complete");
 
         }
 

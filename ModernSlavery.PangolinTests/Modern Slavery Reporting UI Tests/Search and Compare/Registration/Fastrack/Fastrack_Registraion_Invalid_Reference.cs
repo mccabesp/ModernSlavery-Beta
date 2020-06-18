@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class Fastrack_Registraion_Invalid_Reference : UITest
+    public class Fastrack_Registration_Invalid_Reference : UITest
     {
         [TestCategory("Fasttrack")]
         [TestMethod]
@@ -29,6 +29,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             Click("Continue");
 
+            ExpectHeader("There is a problem");
             Expect("There's a problem with your employer reference or security code");
         }
     }
