@@ -52,34 +52,35 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 return View("FastTrack", model);
             }
 
+            var vm = await _registrationPresenter.CreateOrganisationViewModelAsync(model, CurrentUser);
+
             var organisation = await this._registrationService
                 .OrganisationBusinessLogic
                 .GetOrganisationByEmployerReferenceAndSecurityCodeAsync(model.EmployerReference, model.SecurityCode);
 
             await IncrementRetryCountAsync("lastFastTrackCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
-            if (organisation == null)
+            if (vm == null)
             {
                 // fail - no organisation found
                 ModelState.AddModelError(3027);
                 return View("FastTrack", model);
             }
-            else if (organisation.HasSecurityCodeExpired())
+            else if (vm.IsSecurityCodeExpired)
             {
                 // fail - expired
                 ModelState.AddModelError(1144, nameof(FastTrackViewModel.SecurityCode));
                 return View("FastTrack", model);
             }
-            else if (organisation.UserOrganisations.Any(uo => uo.User == CurrentUser && uo.PINConfirmedDate != null))
+            else if (vm.IsRegistered)
             {
                 // fail - cant link to org if they are already linked
-                ModelState.AddModelError(3032); // is this the correct error code? it is duplicated in config
+                ModelState.AddModelError(3032);
                 return View("FastTrack", model);
             }
 
             // success state 
             await ClearRetryLocksAsync("lastFastTrackCode");
 
-            var vm = await _registrationPresenter.CreateOrganisationViewModelAsync(model, CurrentUser);
             vm.ConfirmReturnAction = nameof(FastTrack);
             StashModel(vm);
             return RedirectToAction(nameof(ConfirmOrganisation));
