@@ -54,10 +54,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             var vm = await _registrationPresenter.CreateOrganisationViewModelAsync(model, CurrentUser);
 
-            var organisation = await this._registrationService
-                .OrganisationBusinessLogic
-                .GetOrganisationByEmployerReferenceAndSecurityCodeAsync(model.EmployerReference, model.SecurityCode);
-
             await IncrementRetryCountAsync("lastFastTrackCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
             if (vm == null)
             {
