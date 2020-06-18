@@ -38,7 +38,11 @@ namespace Modern_Slavery_Reporting_UI_Tests
             AtRow("Organisation name").Expect(Registration.OrgName_Millbrook);
             AtRow("Company number").Expect(Registration.CompanyNumber_Millbrook);
             AtRow("Registered address").Expect(Registration.RegisteredAddress_Millbrook);
-            AtRow("Business Sectors (SIC Codes)").Expect("");
+            
+            //using contains due to label including encoded spaces and not being detected properly
+            AtRow(That.Contains, "Business").Expect(Registration.SicCode_Milbrook.Item1);
+            AtRow(That.Contains, "Business").Below(Registration.SicCode_Milbrook.Item1).Expect(Registration.SicCode_Milbrook.Item2);
+            AtRow(That.Contains, "Business").RightOf(Registration.SicCode_Milbrook.Item2).Expect(Registration.SicCode_Milbrook.Item3);
 
             Click("Confirm");
             ExpectHeader("You can now publish a Modern Slavery statement on behalf of this organisation.");

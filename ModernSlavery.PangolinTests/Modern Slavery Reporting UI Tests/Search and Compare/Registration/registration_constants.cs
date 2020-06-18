@@ -21,7 +21,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
         public const string CompanyNumber_Millbrook = "00833987";
         public const string RegisteredAddress_Millbrook = "Nutsey Lane Calmore Ind Estate, Totton, Southampton, Hampshire, United Kingdom, SO40 3XJ";
         public const string SecurtiyCode_Millbrook = "ABCD1234";
-        //public struct KeyValuePair SicCode_Milbrook = new KeyValuePair<string, string> "123", "
+        public static readonly Tuple<string, string, string> SicCode_Milbrook = new Tuple<string, string, string>("Human health and social work activities", "86900", "Other human health activities");
 
         public const string EmployerReference_Blackpool = "NCSQN8T6";
         public const string OrgName_Blackpool = "Blackpool Council";
