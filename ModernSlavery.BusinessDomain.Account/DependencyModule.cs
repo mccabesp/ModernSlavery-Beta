@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
 
@@ -12,16 +14,26 @@ namespace ModernSlavery.BusinessDomain.Account
             //TODO: Add IOptions parameters
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            builder.Autofac.RegisterType<AuthorisationBusinessLogic>().As<IAuthorisationBusinessLogic>().SingleInstance();
-            builder.Autofac.RegisterType<AuthenticationBusinessLogic>().As<IAuthenticationBusinessLogic>().SingleInstance();
-            builder.Autofac.RegisterType<AccountService>().As<IAccountService>().SingleInstance();
+            //TODO: Register service dependencies here
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterType<AuthorisationBusinessLogic>().As<IAuthorisationBusinessLogic>().SingleInstance();
+            builder.RegisterType<AuthenticationBusinessLogic>().As<IAuthenticationBusinessLogic>().SingleInstance();
+            builder.RegisterType<AccountService>().As<IAccountService>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //TODO: Add configuration here
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Features.AttributeFilters;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
 
@@ -13,19 +15,29 @@ namespace ModernSlavery.BusinessDomain.Viewing
             //TODO: Add IOptions parameters
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
+        {
+            //TODO: Register service dependencies here
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
         {
             //Add registrations here
-            builder.Autofac.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance()
+            builder.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().SingleInstance()
                 .WithAttributeFiltering();
-            builder.Autofac.RegisterType<ViewingService>().As<IViewingService>().SingleInstance();
-            builder.Autofac.RegisterType<CompareBusinessLogic>().As<ICompareBusinessLogic>()
+            builder.RegisterType<ViewingService>().As<IViewingService>().SingleInstance();
+            builder.RegisterType<CompareBusinessLogic>().As<ICompareBusinessLogic>()
                 .InstancePerLifetimeScope();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //TODO: Add configuration here
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
         }
     }
 }

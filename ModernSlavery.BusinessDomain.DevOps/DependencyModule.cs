@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.DevOps
@@ -11,14 +13,24 @@ namespace ModernSlavery.BusinessDomain.DevOps
             //TODO: Add IOptions parameters
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            //TODO: Add registrationsd here
+            //TODO: Register service dependencies here
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            //TODO: Configure autofac dependencies here
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //TODO: Add configuration here
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
         }
     }
 }

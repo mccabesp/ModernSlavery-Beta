@@ -6,7 +6,7 @@ using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.WebUI.Shared.Options
 {
-    [Options("DataProtection")]
+    [Options("BasicAuthentication")]
     public class BasicAuthenticationOptions : IOptions
     {
         public bool Enabled { get; set; }

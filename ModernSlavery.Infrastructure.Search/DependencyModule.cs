@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Azure.Search;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 
@@ -16,16 +18,21 @@ namespace ModernSlavery.Infrastructure.Search
             _options = options;
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
+        {
+            //TODO: Register service dependencies here
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
         {
             // Setup azure search
-            builder.Autofac.Register(c =>
+            builder.Register(c =>
                     new SearchServiceClient(_options.AzureServiceName,
                         new SearchCredentials(_options.AzureApiAdminKey)))
                 .As<ISearchServiceClient>()
                 .SingleInstance();
 
-            builder.Autofac.RegisterType<AzureEmployerSearchRepository>()
+            builder.RegisterType<AzureEmployerSearchRepository>()
                 .As<ISearchRepository<EmployerSearchModel>>()
                 .SingleInstance()
                 .WithParameter("serviceName", _options.AzureServiceName)
@@ -33,7 +40,7 @@ namespace ModernSlavery.Infrastructure.Search
                 .WithParameter("adminApiKey", _options.AzureApiAdminKey)
                 .WithParameter("disabled", _options.Disabled).WithAttributeFiltering();
 
-            builder.Autofac.RegisterType<AzureSicCodeSearchRepository>()
+            builder.RegisterType<AzureSicCodeSearchRepository>()
                 .As<ISearchRepository<SicCodeSearchModel>>()
                 .SingleInstance()
                 .WithParameter("indexName", _options.SicCodeIndexName)
@@ -42,7 +49,12 @@ namespace ModernSlavery.Infrastructure.Search
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //TODO: Add configuration here
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
         }
     }
 }

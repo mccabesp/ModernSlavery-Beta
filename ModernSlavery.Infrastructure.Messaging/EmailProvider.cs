@@ -84,7 +84,7 @@ namespace ModernSlavery.Infrastructure.Messaging
                 await SmtpEmailProvider.SendEmailTemplateAsync(
                     new SendEmailTemplate
                     {
-                        RecipientEmailAddress = EmailOptions.GEODistributionList,
+                        RecipientEmailAddress = EmailOptions.AdminDistributionList,
                         Subject = "GPG - GOV NOTIFY ERROR",
                         MessageBody =
                             $"Could not send email to Gov Notify using {emailAddress} due to following error:\n\n{ex.GetDetailsText()}.\n\nWill attempting to resend email using SMTP."

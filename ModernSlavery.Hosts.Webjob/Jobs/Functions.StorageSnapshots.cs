@@ -127,7 +127,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             headers.Add("x-ms-date", dt.ToString("R"));
             headers.Add("x-ms-version", version);
             headers.Add("Authorization", authorizationHeader);
-            var json = await CallApiAsync(HttpMethods.Put, url, headers: headers);
+            var json = await WebRequestAsync(HttpMethods.Put, url, headers: headers);
             return headers["x-ms-snapshot"];
         }
 
@@ -165,7 +165,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             headers.Add("x-ms-date", dt.ToString("R"));
             headers.Add("x-ms-version", version);
             headers.Add("Authorization", authorizationHeader);
-            var response = await CallApiAsync(HttpMethods.Get, url, headers: headers);
+            var response = await WebRequestAsync(HttpMethods.Get, url, headers: headers);
             return response;
         }
 
@@ -206,7 +206,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             headers.Add("x-ms-date", dt.ToString("R"));
             headers.Add("x-ms-version", version);
             headers.Add("Authorization", authorizationHeader);
-            var response = await CallApiAsync(HttpMethods.Delete, url, headers: headers);
+            var response = await WebRequestAsync(HttpMethods.Delete, url, headers: headers);
 
             log.LogDebug($"{nameof(DeleteSnapshotAsync)}: successfully deleted snapshot:{snapshot}");
 

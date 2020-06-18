@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
@@ -217,6 +219,16 @@ namespace ModernSlavery.Core.Extensions
                 .ToDictionary(t => t[0].Trim(), t => t[1].Trim(), StringComparer.InvariantCultureIgnoreCase);
         }
 
+        public static void AddRange(this IDictionary<string, string> target, IDictionary<string, string> source)
+        {
+            foreach (var key in source.Keys)
+                target[key] = source[key];
+        }
+
+        public static Dictionary<TKey, TValue> ToDictionary<TKey,TValue>(this ConcurrentDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
+        {
+            return new Dictionary<TKey, TValue>(source, comparer);
+        }
 
         public static void AddRange<T>(this HashSet<T> targetCollection, params T[] pars)
         {

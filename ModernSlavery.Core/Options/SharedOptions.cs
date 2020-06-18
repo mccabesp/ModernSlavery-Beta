@@ -23,19 +23,13 @@ namespace ModernSlavery.Core.Models
         private int[] _reminderEmailDays;
         public string DefaultEncryptionKey { get; set; }
 
-        public string AuthSecret { get; set; } = "secret";
+        public string IdServerSecret { get; set; } = "secret";
 
         public string AdminEmails { get; set; }
         public string SuperAdminEmails { get; set; }
         public string DatabaseAdminEmails { get; set; }
 
         public int SessionTimeOutMinutes { get; set; } = 20;
-
-        #region App Insights
-
-        public string AppInsights_InstrumentationKey { get; set; }
-
-        #endregion
 
         public int ObfuscationSeed { get; set; } = 127;
 
@@ -89,8 +83,6 @@ namespace ModernSlavery.Core.Models
         public string SecurityCodeChars { get; set; } = "123456789ABCDEFGHKLMNPQRSTUXYZ";
         public int SecurityCodeLength { get; set; } = 8;
         public int SecurityCodeExpiryDays { get; set; } = 90;
-        public bool DisablePageCaching { get; set; }
-
         public string EmployerCodeChars { get; set; }
         public string PasswordRegex { get; set; }
         public string PasswordRegexError { get; set; }
@@ -145,19 +137,19 @@ namespace ModernSlavery.Core.Models
             return environmentNames.Any(en => Environment.EqualsI(en));
         }
 
-        public bool IsLocal()
-        {
-            return IsEnvironment("LOCAL");
-        }
-
         public bool IsDevelopment()
         {
-            return IsEnvironment("DEV", "DEVELOPMENT");
+            return IsEnvironment("Development");
         }
 
-        public bool IsStaging()
+        public bool IsDev()
         {
-            return IsEnvironment("STAGING");
+            return IsEnvironment("DEV");
+        }
+
+        public bool IsQAT()
+        {
+            return IsEnvironment("QAT");
         }
 
         public bool IsPreProduction()

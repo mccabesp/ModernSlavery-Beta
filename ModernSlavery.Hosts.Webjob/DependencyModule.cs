@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Features.AttributeFilters;
@@ -20,7 +21,7 @@ using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.WebUI.Shared.Options;
+using ModernSlavery.Infrastructure.Telemetry;
 using DataProtectionOptions = Microsoft.AspNetCore.DataProtection.DataProtectionOptions;
 using ResponseCachingOptions = Microsoft.AspNetCore.ResponseCaching.ResponseCachingOptions;
 
@@ -49,50 +50,59 @@ namespace ModernSlavery.Hosts.Webjob
             _dataProtectionOptions = dataProtectionOptions;
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            builder.Services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
+            services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
 
-            builder.Services.AddApplicationInsightsTelemetry(_sharedOptions.AppInsights_InstrumentationKey);
+            services.AddSingleton<IJobActivator, AutofacJobActivator>();
+        }
 
-            builder.Services.AddSingleton<IJobActivator, AutofacJobActivator>();
-
-            //Register the file storage dependencies
-            builder.RegisterModule<FileStorageDependencyModule>();
-
-            //Register the log storage dependencies
-            builder.RegisterModule<Infrastructure.Logging.DependencyModule>();
-
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
             //Register the messaging dependencies
-            builder.Autofac.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
-            builder.Autofac.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
+            builder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
+            builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
 
             // Register the email template dependencies
-            builder.Autofac
-                .RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates")))
+            builder.RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates")))
                 .As<IEmailTemplateRepository>().SingleInstance();
 
             //Register some singletons
-            builder.Autofac.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
+            builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
                 .WithParameter("seed", _sharedOptions.ObfuscationSeed);
 
             // Register email provider dependencies
-            builder.Autofac.RegisterType<GovNotifyEmailProvider>().SingleInstance().WithAttributeFiltering();
-            builder.Autofac.RegisterType<SmtpEmailProvider>().SingleInstance().WithAttributeFiltering();
-            builder.Autofac.RegisterType<EmailProvider>().SingleInstance().WithAttributeFiltering();
+            builder.RegisterType<GovNotifyEmailProvider>().SingleInstance().WithAttributeFiltering();
+            builder.RegisterType<SmtpEmailProvider>().SingleInstance().WithAttributeFiltering();
+            builder.RegisterType<EmailProvider>().SingleInstance().WithAttributeFiltering();
 
             // Need to register webJob class in Autofac as well
-            builder.Autofac.RegisterType<Functions>().InstancePerDependency();
-            builder.Autofac.RegisterType<DisableWebjobProvider>().SingleInstance();
-
+            builder.RegisterType<Functions>().InstancePerDependency();
+            builder.RegisterType<DisableWebjobProvider>().SingleInstance();
         }
+
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
             //Add configuration here
-            var app = lifetimeScope.Resolve<IWebJobsBuilder>();
+            var webjobHostBuilder = lifetimeScope.Resolve<IWebJobsBuilder>();
 
-            var lifetime = lifetimeScope.Resolve<IHostApplicationLifetime>(); 
+            webjobHostBuilder.AddAzureStorageCoreServices();
+            webjobHostBuilder.AddAzureStorage(
+                queueConfig =>
+                {
+                    queueConfig.BatchSize = 1; //Process queue messages 1 item per time per job function
+                        },
+                blobConfig =>
+                {
+                            //Configure blobs here
+                });
+
+            webjobHostBuilder.AddServiceBus();
+            webjobHostBuilder.AddEventHubs();
+            webjobHostBuilder.AddTimers();
+
+            var applicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>(); 
             var config = lifetimeScope.Resolve<IConfiguration>();
             var fileRepository = lifetimeScope.Resolve<IFileRepository>();
             var sharedOptions = lifetimeScope.Resolve<SharedOptions>();
@@ -132,7 +142,7 @@ namespace ModernSlavery.Hosts.Webjob
 
             Task.WaitAll(fileRepository.PushRemoteFileAsync(Filenames.SicSectorSynonyms, sharedOptions.DataPath));
 
-            lifetime.ApplicationStarted.Register(
+            applicationLifetime.ApplicationStarted.Register(
                 () =>
                 {
                     // Summary:
@@ -140,7 +150,7 @@ namespace ModernSlavery.Hosts.Webjob
                     //     a graceful shutdown.
                     _logger.LogInformation("Application Started");
                 });
-            lifetime.ApplicationStopping.Register(
+            applicationLifetime.ApplicationStopping.Register(
                 () =>
                 {
                     // Summary:
@@ -148,6 +158,18 @@ namespace ModernSlavery.Hosts.Webjob
                     //     may still be in flight. Shutdown will block until this event completes.
                     _logger.LogInformation("Application Stopping");
                 });
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //Register the file storage dependencies
+            modules.AddDependency<FileStorageDependencyModule>();
+
+            //Register the log storage dependencies
+            modules.AddDependency<Infrastructure.Logging.DependencyModule>();
+
+            //Register the app insights dependencies
+            modules.AddDependency<ApplicationInsightsDependencyModule>();
         }
 
         public class AutofacJobActivator : IJobActivator

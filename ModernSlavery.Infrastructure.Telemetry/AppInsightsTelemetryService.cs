@@ -1,20 +1,19 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.Extensibility.Implementation;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Telemetry
 {
     public class AppInsightsTelemetryService
     {
-        private TelemetryClient _AppInsightsClient;
-
-        public AppInsightsTelemetryService(string instrumentationKey)
+        public AppInsightsTelemetryService(ApplicationInsightsOptions applicationInsightsOptions)
         {
             //Set Application Insights instrumentation key
             //if (!Debugger.IsAttached)
-            if (!string.IsNullOrWhiteSpace(instrumentationKey))
+            if (!string.IsNullOrWhiteSpace(applicationInsightsOptions.InstrumentationKey))
             {
-                TelemetryConfiguration.Active.InstrumentationKey = instrumentationKey;
+                TelemetryConfiguration.Active.InstrumentationKey = applicationInsightsOptions.InstrumentationKey;
 
                 //Disable application insights tracing when debugger is attached
                 //if (!Debugger.IsAttached

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core;
@@ -31,9 +33,14 @@ namespace ModernSlavery.WebUI.StaticFiles
             _responseCachingOptions = responseCachingOptions;
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            //TODO: Register dependencies here
+            //TODO: Register service dependencies here
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            //TODO: Configure autofac dependencies here
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
@@ -41,21 +48,22 @@ namespace ModernSlavery.WebUI.StaticFiles
             var app = lifetimeScope.Resolve<IApplicationBuilder>();
 
             var fileRepository = lifetimeScope.Resolve<IFileRepository>();
-            
+
             //Set the static file options
-            var staticFileOptions=new StaticFileOptions
+            var staticFileOptions = new StaticFileOptions
             {
                 OnPrepareResponse = ctx =>
                 {
                     //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
-                    if (_responseCachingOptions.StaticCacheSeconds > 0)ctx.Context.SetResponseCache(_responseCachingOptions.StaticCacheSeconds);
+                    if (_responseCachingOptions.StaticCacheSeconds > 0) ctx.Context.SetResponseCache(_responseCachingOptions.StaticCacheSeconds);
                 }
             };
 
             // Include un-bundled js + css folders to serve the source files in dev environment
-            if (_sharedOptions.IsLocal())
+            if (_sharedOptions.IsDevelopment())
             {
                 var wwwroot = Path.Combine(Directory.GetParent(Environment.CurrentDirectory).FullName, this.GetType().Namespace, "wwwroot");
+                var ass = System.Reflection.Assembly.GetExecutingAssembly();
                 staticFileOptions.FileProvider = new PhysicalFileProvider(wwwroot);
             }
 
@@ -68,5 +76,13 @@ namespace ModernSlavery.WebUI.StaticFiles
                 fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.DataPath)
             );
         }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //TODO: Add any linked dependency modules here
+        }
+
+
+        
     }
 }

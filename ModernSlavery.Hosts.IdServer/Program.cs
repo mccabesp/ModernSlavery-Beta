@@ -13,9 +13,6 @@ namespace ModernSlavery.Hosts.IdServer
             //Create the host
             var host = CreateHostBuilder(args).Build();
 
-            //Show thread availability
-            Console.WriteLine(Extensions.GetThreadCount());
-
             //Run the host
             await host.RunAsync().ConfigureAwait(false);
         }
@@ -25,7 +22,7 @@ namespace ModernSlavery.Hosts.IdServer
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static IHostBuilder CreateHostBuilder(string[] args)
+        public static IHostBuilder CreateHostBuilder(params string[] args)
         {
             //Create the web host
             return WebHost.ConfigureWebHostBuilder<DependencyModule>(commandlineArgs: args);

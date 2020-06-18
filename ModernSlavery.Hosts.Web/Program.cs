@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Infrastructure.Hosts;
-using ModernSlavery.WebUI;
 
 // ReSharper disable once CheckNamespace
 namespace ModernSlavery.Hosts.Web
@@ -14,9 +13,6 @@ namespace ModernSlavery.Hosts.Web
             //Create the host
             var host = CreateHostBuilder(args).Build();
 
-            //Show thread availability
-            Console.WriteLine(Extensions.GetThreadCount());
-            
             //Run the host
             await host.RunAsync().ConfigureAwait(false);
         }
@@ -26,7 +22,7 @@ namespace ModernSlavery.Hosts.Web
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static IHostBuilder CreateHostBuilder(string[] args)
+        public static IHostBuilder CreateHostBuilder(params string[] args)
         {
             //Create the web host
             return WebHost.ConfigureWebHostBuilder<DependencyModule>(commandlineArgs: args);

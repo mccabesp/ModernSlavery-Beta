@@ -15,7 +15,7 @@ namespace ModernSlavery.Infrastructure.Logging
         {
             Logger log;
 
-            if (config["environment"].EqualsI("LOCAL"))
+            if (config["environment"].EqualsI("Development"))
                 log = new LoggerConfiguration().WriteTo.Console().CreateLogger();
             else
                 log = new LoggerConfiguration().WriteTo.ApplicationInsights(TelemetryConfiguration.Active, TelemetryConverter.Traces)

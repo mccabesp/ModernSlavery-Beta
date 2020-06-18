@@ -7,7 +7,7 @@
       "sslPort": 0
     },
     "iisExpress": {
-      "applicationUrl": "http://localhost:2258/",
+      "applicationUrl": "http://localhost:44365/",
       "sslPort": 44366
     }
   },
@@ -17,7 +17,7 @@
       "launchBrowser": true,
       "launchUrl": "https://localhost:44366/.well-known/openid-configuration",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Local"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "ancmHostingModel": "OutOfProcess",
       "applicationUrl": " http://localhost:5000/"
@@ -25,7 +25,7 @@
     "ModernSlavery.IdentityServer4": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Local"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": " http://localhost:5000/"
     }

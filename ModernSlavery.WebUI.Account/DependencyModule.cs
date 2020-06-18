@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Account.Interfaces;
 using ModernSlavery.WebUI.Account.ViewServices;
@@ -22,31 +25,35 @@ namespace ModernSlavery.WebUI.Account
             //TODO set any required local IOptions here
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            //Register references dependency modules
-            builder.RegisterModule<ModernSlavery.BusinessDomain.Account.DependencyModule>();
-            builder.RegisterModule<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
-            builder.RegisterModule<ModernSlavery.WebUI.Shared.DependencyModule>();
-            //Register dependencies here
-            builder.Autofac.RegisterType<ChangeDetailsViewService>().As<IChangeDetailsViewService>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<ChangeEmailViewService>().As<IChangeEmailViewService>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<ChangePasswordViewService>().As<IChangePasswordViewService>()
-                .InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<CloseAccountViewService>().As<ICloseAccountViewService>()
-                .InstancePerLifetimeScope();
+            //TODO: Register service dependencies here
+        }
 
-            //Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
-                .Where(t => t.IsAssignableTo<Controller>())
-                .InstancePerLifetimeScope()
-                .WithAttributeFiltering();
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            //Register dependencies here
+            builder.RegisterType<ChangeDetailsViewService>().As<IChangeDetailsViewService>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<ChangeEmailViewService>().As<IChangeEmailViewService>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<ChangePasswordViewService>().As<IChangePasswordViewService>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<CloseAccountViewService>().As<ICloseAccountViewService>()
+                .InstancePerLifetimeScope();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //Register references dependency modules
+            modules.AddDependency<ModernSlavery.BusinessDomain.Account.DependencyModule>();
+            modules.AddDependency<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            modules.AddDependency<ModernSlavery.WebUI.Shared.DependencyModule>();
         }
     }
 }

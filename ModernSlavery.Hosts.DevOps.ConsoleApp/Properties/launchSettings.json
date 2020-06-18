@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ModernSlavery.Hosts.DevOps.ConsoleApp": {
+      "commandName": "Project",
+      "commandLineArgs": "KeyVault-Export --tenant=3b94b06f-8504-4e0d-ac62-6f7e3cd68f9c --client=b9197944-8c45-45fa-85d6-21c230e2af8a --secret=2@zKuwYYO68?aNX4a.DWdN_En6j_Tz4C --vault=kv-ModernSlavery-prod -f=appsettings.ppp.json"
+    }
+  }
+}

@@ -305,5 +305,25 @@ namespace ModernSlavery.Core.Classes
         }
 
         #endregion
+
+        #region Dependency Modules
+        public static void AddDependency<T>(this IList<Type> modules) where T : IDependencyModule
+        {
+            var moduleType = typeof(T);
+            var i=modules.IndexOf(moduleType);
+            if (i > -1)
+            {
+                modules.RemoveAt(i);
+                modules.Insert(i, moduleType);
+            }
+            else
+                modules.Add(moduleType);
+        }
+
+        public static bool RemoveDependency<T>(this IList<Type> modules) where T : IDependencyModule
+        {
+            return modules.Remove(typeof(T));
+        }
+        #endregion
     }
 }

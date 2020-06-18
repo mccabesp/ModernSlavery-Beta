@@ -24,9 +24,9 @@ namespace ModernSlavery.Hosts.IdServer.Classes
         public IEnumerable<Client> Get()
         {
             if ((_sharedOptions.IsProduction() || _sharedOptions.IsPreProduction()) &&
-                _sharedOptions.AuthSecret.EqualsI("secret", "", null))
+                _sharedOptions.IdServerSecret.EqualsI("secret", "", null))
                 throw new Exception(
-                    "Invalid ClientSecret for IdentityServer. You must set 'AuthSecret' to a unique key");
+                    "Invalid ClientSecret for IdentityServer. You must set 'IdServerSecret' to a unique key");
 
             return new[]
             {
@@ -34,7 +34,7 @@ namespace ModernSlavery.Hosts.IdServer.Classes
                 {
                     ClientName = "Modern Slavery reporting service",
                     ClientId = "ModernSlaveryServiceWebsite",
-                    ClientSecrets = new List<Secret> {new Secret(_sharedOptions.AuthSecret.GetSHA256Checksum())},
+                    ClientSecrets = new List<Secret> {new Secret(_sharedOptions.IdServerSecret.GetSHA256Checksum())},
                     ClientUri = _sharedOptions.SiteAuthority,
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowAccessTokensViaBrowser = true,

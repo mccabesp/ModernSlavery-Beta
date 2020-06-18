@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:2259",
+      "applicationUrl": "http://localhost:44370/",
       "sslPort": 44371
     }
   },
@@ -11,9 +11,8 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Local"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "ancmHostingModel": "OutOfProcess"
     },
@@ -25,18 +24,21 @@
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     },
-    // To debug razor (.cshtml) you must select IIS express and run Ctrl + F5 (run without debugging) - NOT debug mode
     "Hosts.Web Debug Razor": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "launchBrowser": true,
-      "workingDirectory": "$(ProjectDir)",
       "commandLineArgs": "watch run",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Local"
-      },
+      "workingDirectory": "$(ProjectDir)",
+      "launchBrowser": true,
       "launchUrl": "https://localhost:44371/",
-      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    },
+    "Azure Dev Spaces": {
+      "commandName": "AzureDevSpaces",
+      "launchBrowser": true
     }
   }
 }

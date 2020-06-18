@@ -8,11 +8,11 @@
     <None Remove="appsettings.DEV.json" />
     <None Remove="appsettings.json" />
     <None Remove="appsettings.loadtest.json" />
-    <None Remove="appsettings.LOCAL.json" />
+    <None Remove="appsettings.development.json" />
     <None Remove="appsettings.PREPROD.json" />
     <None Remove="appsettings.PROD.json" />
+    <None Remove="appsettings.QAT.json" />
     <None Remove="AppSettings.secret.json" />
-    <None Remove="appsettings.TEST.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,7 +30,7 @@
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>never</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.LOCAL.json">
+    <Content Include="appsettings.development.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>never</CopyToPublishDirectory>
@@ -45,15 +45,35 @@
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="AppSettings.secret.json">
+    <Content Include="appsettings.QAT.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.secret.json" Condition="Exists('appsettings.secret.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.TEST.json">
+    <Content Include="appsettings.DEV.secret.json" Condition="Exists('appsettings.DEV.secret.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>appsettings.json</DependentUpon>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.QAT.secret.json" Condition="Exists('appsettings.QAT.secret.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.PREPROD.secret.json" Condition="Exists('appsettings.PREPROD.secret.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.PROD.secret.json" Condition="Exists('appsettings.PROD.secret.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 

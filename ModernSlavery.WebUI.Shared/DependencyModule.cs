@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -29,42 +30,44 @@ namespace ModernSlavery.WebUI.Shared
             //TODO set any required local IOptions here
         }
 
-        public void Register(IDependencyBuilder builder)
+        public void ConfigureServices(IServiceCollection services)
         {
-            //Register references dependency modules
-            builder.RegisterModule<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
-            builder.RegisterModule<ModernSlavery.WebUI.GDSDesignSystem.DependencyModule>();
+            //Register StaticAssetsVersioningHelper
+            services.AddSingleton<StaticAssetsVersioningHelper>();
 
+            //Add the custom url helper
+            services.AddSingleton<IUrlHelperFactory,CustomUrlHelperFactory>();
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
             //Register HttpCache and HttpSession
-            builder.Autofac.RegisterType<HttpSession>().As<IHttpSession>().InstancePerLifetimeScope();
-            builder.Autofac.RegisterType<HttpCache>().As<IHttpCache>().SingleInstance();
+            builder.RegisterType<HttpSession>().As<IHttpSession>().InstancePerLifetimeScope();
+            builder.RegisterType<HttpCache>().As<IHttpCache>().SingleInstance();
 
             //Register the web service container
-            builder.Autofac.RegisterType<WebService>().As<IWebService>().InstancePerLifetimeScope();
+            builder.RegisterType<WebService>().As<IWebService>().InstancePerLifetimeScope();
 
             //Register factories
-            builder.Autofac.RegisterType<ErrorViewModelFactory>().As<IErrorViewModelFactory>()
+            builder.RegisterType<ErrorViewModelFactory>().As<IErrorViewModelFactory>()
                 .SingleInstance();
 
             //Register Email queuers
-            builder.Autofac.RegisterType<SendEmailService>().As<ISendEmailService>().SingleInstance().WithAttributeFiltering();
-            builder.Autofac.RegisterType<NotificationService>().As<INotificationService>().SingleInstance().WithAttributeFiltering();
-
-            ////Register all controllers - this is required to ensure KeyFilter is resolved in constructors
-            //builder.Autofac.RegisterAssemblyTypes(typeof(DependencyModule).Assembly)
-            //    .Where(t => t.IsAssignableTo<Controller>())
-            //    .InstancePerLifetimeScope()
-            //    .WithAttributeFiltering();
-
-            //Register StaticAssetsVersioningHelper
-            builder.Services.AddSingleton<StaticAssetsVersioningHelper>();
-
-            //Add the custom url helper
-            builder.Services.AddSingleton<IUrlHelperFactory,CustomUrlHelperFactory>();
+            builder.RegisterType<SendEmailService>().As<ISendEmailService>().SingleInstance().WithAttributeFiltering();
+            builder.RegisterType<NotificationService>().As<INotificationService>().SingleInstance().WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
+            //TODO: Configure dependencies here
+        }
+
+        public void RegisterModules(IList<Type> modules)
+        {
+            //Register references dependency modules
+            modules.AddDependency<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            modules.AddDependency<ModernSlavery.WebUI.GDSDesignSystem.DependencyModule>();
+
         }
     }
 }

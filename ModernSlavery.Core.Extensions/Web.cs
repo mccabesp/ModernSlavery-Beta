@@ -19,7 +19,7 @@ namespace ModernSlavery.Core.Extensions
             Put
         }
 
-        public static async Task<string> CallApiAsync(HttpMethods httpMethod,
+        public static async Task<string> WebRequestAsync(HttpMethods httpMethod,
             string url,
             string username = null,
             string password = null,
