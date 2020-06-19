@@ -33,7 +33,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             AtLabel("to").ExpectField("Month");
             AtLabel("to").ExpectField("Year");
 
-            Expect("Who is the director (or equivalent) that signed off your statement?");
+            Expect("What is the name of the director (or equivalent) that signed off your statement?");
 
             ExpectField("First name");
             ExpectField("Last name");
