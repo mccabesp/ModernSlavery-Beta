@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.Infrastructure.DevOps.Cloud\ModernSlavery.Infrastructure.DevOps.Cloud.csproj" />
+    <ProjectReference Include="..\ModernSlavery.Infrastructure.DevOps.Cloud\ModernSlavery.Infrastructure.Azure.csproj" />
   </ItemGroup>
 
 </Project>
