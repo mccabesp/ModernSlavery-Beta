@@ -60,11 +60,9 @@ namespace ModernSlavery.WebUI.StaticFiles
             };
 
             // Include un-bundled js + css folders to serve the source files in dev environment
-            if (_sharedOptions.IsDevelopment())
+            if (_sharedOptions.IsDevelopment() && !string.IsNullOrWhiteSpace(_sharedOptions.DevelopmentWebroot))
             {
-                var wwwroot = Path.Combine(Directory.GetParent(Environment.CurrentDirectory).FullName, this.GetType().Namespace, "wwwroot");
-                var ass = System.Reflection.Assembly.GetExecutingAssembly();
-                staticFileOptions.FileProvider = new PhysicalFileProvider(wwwroot);
+                staticFileOptions.FileProvider = new PhysicalFileProvider(_sharedOptions.DevelopmentWebroot);
             }
 
             app.UseStaticFiles(staticFileOptions);

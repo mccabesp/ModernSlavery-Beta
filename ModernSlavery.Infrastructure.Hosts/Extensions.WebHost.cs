@@ -9,19 +9,27 @@ using System.Collections.Generic;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Infrastructure.Logging;
+using System.IO;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
     public static class WebHost
     {
-        public static IHostBuilder ConfigureWebHostBuilder<TStartupModule>(string applicationName = null, string contentRoot = null, string webRoot = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
+        public static IHostBuilder ConfigureWebHostBuilder<TStartupModule>(string applicationName = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
             var hostBuilder = Host.CreateDefaultBuilder(commandlineArgs);
-            if (!string.IsNullOrWhiteSpace(contentRoot))hostBuilder.UseContentRoot(contentRoot);
 
             //Load the configuration
             var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
             var appConfig = configBuilder.Build();
+
+            //Set the content root from the confif or environment
+            var contentRoot = appConfig[HostDefaults.ContentRootKey];
+            if (string.IsNullOrWhiteSpace(contentRoot))contentRoot = Directory.GetCurrentDirectory();
+            if (!Directory.Exists(contentRoot)) throw new DirectoryNotFoundException($"Cannot find content root '{contentRoot}'");
+
+            hostBuilder.UseContentRoot(contentRoot);
 
             hostBuilder.ConfigureAppConfiguration((hostBuilderContext, appConfigBuilder) =>
             {
@@ -60,6 +68,8 @@ namespace ModernSlavery.Infrastructure.Hosts
             //Configure the host defaults
             hostBuilder.ConfigureWebHostDefaults(webHostBuilder =>
             {
+                webHostBuilder.UseConfiguration(appConfig);
+
                 //When enabled (or when the Environment is set to Development), the app captures detailed exceptions.
                 if (appConfig.IsDevelopment())webHostBuilder.CaptureStartupErrors(true).UseSetting(WebHostDefaults.DetailedErrorsKey, "true");
 
@@ -70,11 +80,13 @@ namespace ModernSlavery.Infrastructure.Hosts
                         //options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
                     });
 
-                //Specify the root path of the content
-                if (!string.IsNullOrWhiteSpace(contentRoot)) webHostBuilder.UseContentRoot(contentRoot);
-
                 //Specify the root path of the site
-                if (!string.IsNullOrWhiteSpace(webRoot)) webHostBuilder.UseWebRoot(webRoot);
+                var webRoot = appConfig[WebHostDefaults.WebRootKey];
+                if (string.IsNullOrWhiteSpace(webRoot)) webRoot="wwwroot";
+                var fullWebroot = Path.Combine(contentRoot, webRoot);
+                if (!Directory.Exists(fullWebroot)) throw new DirectoryNotFoundException($"Cannot find web root '{fullWebroot}'");
+
+                webHostBuilder.UseWebRoot(webRoot);
 
                 //Register the callback to configure the web application
                 webHostBuilder.Configure(dependencyBuilder.ConfigureHost);

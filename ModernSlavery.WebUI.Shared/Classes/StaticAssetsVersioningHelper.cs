@@ -67,7 +67,8 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
         private string FindMatchingFile(string directory, string fileRegex)
         {
-            var pathToFiles = Path.Combine(_webHostEnvironment.WebRootPath, directory);
+            var webRoot = _sharedOptions.IsDevelopment() && !string.IsNullOrWhiteSpace(_sharedOptions.DevelopmentWebroot) ? _sharedOptions.DevelopmentWebroot : _webHostEnvironment.WebRootPath;
+            var pathToFiles = Path.Combine(webRoot, directory);
 
             var allFilePaths = Directory.GetFiles(pathToFiles);
             var allFileNames = allFilePaths.Select(filePath => Path.GetFileName(filePath)).ToList();

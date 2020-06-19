@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.EnvironmentVariables;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
@@ -32,6 +33,8 @@ namespace ModernSlavery.Infrastructure.Configuration
         public IConfiguration Build()
         {
             var appBuilder = new ConfigurationBuilder();
+            appBuilder.AddEnvironmentVariables("DOTNET_");
+            appBuilder.AddEnvironmentVariables("ASPNETCORE_");
             appBuilder.AddEnvironmentVariables();
             if (_commandlineArgs!=null && _commandlineArgs.Any())appBuilder.AddCommandLine(_commandlineArgs);
             _appConfig = appBuilder.Build();
@@ -44,10 +47,13 @@ namespace ModernSlavery.Infrastructure.Configuration
             appBuilder.SetFileProvider(new PhysicalFileProvider(AppDomain.CurrentDomain.BaseDirectory));
 
             //Add the root and environment appsettings files
-            appBuilder.AddJsonFile("appsettings.json", false, true);
-            appBuilder.AddJsonFile($"appsettings.{environmentName}.json", true, true);
-            if (Debugger.IsAttached || _appConfig.IsDevelopment() || _appConfig.IsTest()) 
-                appBuilder.AddJsonFile($"appsettings.{environmentName}.secret.json", true, true);
+            appBuilder.EnsureJsonFile("appsettings.json", false, true);
+            appBuilder.EnsureJsonFile($"appsettings.{environmentName}.json", true, true);
+            if (Debugger.IsAttached || _appConfig.IsDevelopment() || _appConfig.IsTest())
+            {
+                appBuilder.EnsureJsonFile("appsettings.secret.json", true, true);
+                appBuilder.EnsureJsonFile($"appsettings.{environmentName}.secret.json", true, true);
+            }
 
             _appConfig = appBuilder.Build();
 
@@ -71,22 +77,18 @@ namespace ModernSlavery.Infrastructure.Configuration
                 appBuilder.AddAzureKeyVault(vault, clientId, clientSecret);
             }
 
-            /* make sure these files are loaded AFTER the vault, so their keys superseed the vaults' values - that way, unit tests will pass because the obfuscation key is whatever the appSettings says it is [and not a hidden secret inside the vault])  */
-            if (Debugger.IsAttached || _appConfig.IsDevelopment() || _appConfig.IsTest())
-            {
-                var appAssembly = Misc.GetTopAssembly();
-                if (appAssembly != null) appBuilder.AddUserSecrets(appAssembly, true);
-
-                appBuilder.AddJsonFile("appsettings.secret.json", true, true);
-                appBuilder.AddJsonFile($"appsettings.{environmentName}.secret.json", true, true);
-            }
-
-            // override using the azure environment variables into the configuration
-            appBuilder.AddEnvironmentVariables();
-
             //Add any additional settings source
             if (_additionalSettings != null && _additionalSettings.Any())
                 appBuilder.AddInMemoryCollection(_additionalSettings);
+
+            /* make sure these files are loaded AFTER the vault, so their keys superseed the vaults' values - that way, unit tests will pass because the obfuscation key is whatever the appSettings says it is [and not a hidden secret inside the vault])  */
+            if (Debugger.IsAttached || _appConfig.IsDevelopment() || _appConfig.IsTest())
+            {
+                appBuilder.PromoteConfigSecretSources();
+            }
+
+            // override using the azure environment variables into the configuration
+            appBuilder.PromoteConfigSources<EnvironmentVariablesConfigurationSource>();
 
             _appConfig = appBuilder.Build();
 
