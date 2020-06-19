@@ -221,9 +221,14 @@ namespace ModernSlavery.Hosts.IdServer
             //Register the file storage dependencies
             modules.AddDependency<FileStorageDependencyModule>();
 
+            //Register the queue storage dependencies
+            modules.AddDependency<QueueStorageDependencyModule>();
+
             //Register google analytics tracker
             modules.AddDependency<GoogleAnalyticsDependencyModule>();
 
+            //Register the app insights dependencies
+            modules.AddDependency<ApplicationInsightsDependencyModule>();
 
         }
 

@@ -25,44 +25,6 @@ namespace ModernSlavery.Infrastructure.Hosts
 {
     public static partial class Extensions
     {
-
-        public static void AddConfigSources(this IConfigurationBuilder configBbuilder, IHostEnvironment env)
-        {
-            if (env == null) throw new ArgumentNullException(nameof(env));
-
-            //Make sure we know the environment
-            if (string.IsNullOrWhiteSpace(env.EnvironmentName)) throw new ArgumentNullException(nameof(env.EnvironmentName));
-
-            var config = configBbuilder.Build();
-
-            //Add the azure key vault to configuration
-            var vault = config["Vault"];
-            if (!string.IsNullOrWhiteSpace(vault))
-            {
-                if (!vault.StartsWithI("http")) vault = $"https://{vault}.vault.azure.net/";
-
-                var clientId = config["ClientId"];
-                var clientSecret = config["ClientSecret"];
-                var exceptions = new List<Exception>();
-                if (string.IsNullOrWhiteSpace(clientId))
-                    exceptions.Add(new ArgumentNullException("ClientId is missing"));
-
-                if (string.IsNullOrWhiteSpace(clientSecret))
-                    exceptions.Add(new ArgumentNullException("clientSecret is missing"));
-
-                if (exceptions.Count > 0) throw new AggregateException(exceptions);
-
-                configBbuilder.AddAzureKeyVault(vault, clientId, clientSecret);
-            }
-
-            /* make sure these files are loaded AFTER the vault, so their keys superseed the vaults' values - that way, unit tests will pass because the obfuscation key is whatever the appSettings says it is [and not a hidden secret inside the vault])  */
-            if (Debugger.IsAttached || config.IsDevelopment())configBbuilder.AddJsonFile("appsettings.secret.json", true, true);
-
-            // override using the azure environment variables into the configuration
-            configBbuilder.AddEnvironmentVariables();
-        }
-
-
         public static void ConfigureHostApplication(this IHostBuilder hostBuilder, IConfiguration appSettings=null)
         {
             //Set the console title to the application name

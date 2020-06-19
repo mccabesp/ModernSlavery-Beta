@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
 using Newtonsoft.Json.Linq;
@@ -84,6 +86,7 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             return false;
         }
+        #endregion
 
         public static bool HasChildren(this IConfigurationSection section)
         {
@@ -182,6 +185,35 @@ namespace ModernSlavery.Infrastructure.Configuration
             }
         }
 
-        #endregion
+        //Promotes previous configuration sources to top of stack
+        public static void EnsureJsonFile(this IConfigurationBuilder configBuilder, string path, bool optional, bool reloadOnChange)
+        {
+            var sources = configBuilder.Sources.OfType<JsonConfigurationSource>().ToList();
+
+            var source = sources.FirstOrDefault(s => s.Path == path);
+            if (source == null)
+                configBuilder.AddJsonFile(path, optional, reloadOnChange);
+            else
+            {
+                source.Optional = optional;
+                source.ReloadOnChange = reloadOnChange;
+            }
+        }
+
+        //Promotes previous configuration sources to top of stack
+        public static void PromoteConfigSources<T>(this IConfigurationBuilder configBuilder) where T : IConfigurationSource
+        {
+            var sources = configBuilder.Sources.OfType<T>().ToList();
+            sources.ForEach(s => configBuilder.Sources.Remove(s));
+            sources.ForEach(s => configBuilder.Sources.Add(s));
+        }
+
+        //Promotes previous configuration sources to top of stack
+        public static void PromoteConfigSecretSources(this IConfigurationBuilder configBuilder)
+        {
+            var sources = configBuilder.Sources.OfType<JsonConfigurationSource>().Where(s=>s.Path.ContainsI(".secret")).ToList();
+            sources.ForEach(s => configBuilder.Sources.Remove(s));
+            sources.ForEach(s => configBuilder.Sources.Add(s));
+        }
     }
 }

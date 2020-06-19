@@ -14,6 +14,11 @@ namespace ModernSlavery.Core.Models
         {
 
         }
+        public string ContentRoot { get; set; }
+        public string WebRoot { get; set; }
+        private string _DevelopmentWebroot;
+        public string DevelopmentWebroot { get => _DevelopmentWebroot; set => _DevelopmentWebroot = value!=null && value.StartsWith('.') ? Path.GetFullPath(value) : value; }
+
         public int FirstReportingYear { get; set; } = 2020;
         public DateTime PrivateAccountingDate { get; set; }
         public DateTime PublicAccountingDate { get; set; }
@@ -21,6 +26,7 @@ namespace ModernSlavery.Core.Models
         private string _IdentityIssuer;
 
         private int[] _reminderEmailDays;
+
         public string DefaultEncryptionKey { get; set; }
 
         public string IdServerSecret { get; set; } = "secret";
