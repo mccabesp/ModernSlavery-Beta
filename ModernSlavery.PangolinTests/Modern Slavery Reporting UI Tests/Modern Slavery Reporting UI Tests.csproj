@@ -166,6 +166,7 @@
   <ItemGroup>
     <Compile Include="Search and Compare\Manage Account\Close Account User Is Set to Retired.cs" />
     <Compile Include="Richer Sumbission\Submission_Areas_Back_Button_Check.cs" />
+    <Compile Include="Richer Sumbission\Submission_Areas_Cancel_Unsaved_Data_Save.cs" />
     <Compile Include="Richer Sumbission\Submission_Areas_Cancel_Unsaved_Data_Exit.cs" />
     <Compile Include="Richer Sumbission\Submission_Sectors_Content_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Sectors_Interaction_Check.cs" />

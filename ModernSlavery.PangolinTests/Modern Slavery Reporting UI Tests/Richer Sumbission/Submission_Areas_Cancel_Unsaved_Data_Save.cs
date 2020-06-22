@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Modern_Slavery_Reporting_UI_Tests
 {
     [TestClass]
-    public class Submission_Areas_Cancel_Unsaved_Data_Exit : UITest
+    public class Submission_Areas_Cancel_Usaved_Data_Save : UITest
     {
         [TestMethod]
         public override void RunTest()
@@ -64,7 +64,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             Click("Save and continue");
 
             ExpectHeader("Areas covered by your modern slavery statement");
-            ExpectNo("Here are the details");
+            Expect("Here are the details");
         }
     }
 }
