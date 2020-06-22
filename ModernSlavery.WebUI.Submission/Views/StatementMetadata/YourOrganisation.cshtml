@@ -1,0 +1,88 @@
+﻿@using System.ComponentModel.DataAnnotations
+@{
+
+    Layout = "/Views/GdsLayout.cshtml";
+
+}
+@model ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel
+ 
+<a class="govuk-back-link" href="@Url.Action("compliance")">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            var controller = ViewData["Controller"] as BaseController;
+
+            @await Html.CustomValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+        }
+
+        <h1 class="govuk-heading-l">
+            Your organisation
+        </h1>
+
+        <h2>
+            Which sector does your organisation operate in?
+        </h2>
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    What is this?
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                @*TODO: get content*@
+            </div>
+        </details>
+
+        @{ var organisationSectorOptions =
+                         new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementSectors, Func<object, object>>
+                         {
+                           {
+                             ModernSlavery.WebUI.Submission.Presenters.StatementSectors.Other,
+    @<text>
+        @(Html.GovUkTextInputFor(model => model.OtherSourceText))
+    </text>
+                            }
+                       };
+        }
+
+        @(Html.GovUkCheckboxesFor(
+                    model => model.StatementSectors,
+                    new FieldsetViewModel
+                    {
+                        Legend = new LegendViewModel
+                        {
+                            Classes = "govuk-fieldset__legend--m"
+                        },
+                        Classes = "govuk-!-margin-top-6"
+                    },
+                    new HintViewModel
+                    {
+                        Text = "Select all that apply."
+                    },
+                    organisationSectorOptions
+               ))
+        @(Html.GovUkRadiosFor(
+                    model => model.LastFinancialYearBudget,
+                    new FieldsetViewModel
+                    {
+                        Legend = new LegendViewModel
+                        {
+                            Text = "What was your turnover or budget during the last financial accounting year?",
+                            Classes = "govuk-fieldset__legend--m"
+                        },
+                        Classes = "govuk-!-margin-top-6"
+                    }
+                    ))
+
+        <button class="govuk-button" data-module="govuk-button" type="submit">
+            Continue
+        </button>
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
+            Cancel
+        </button>
+
+    </div>
+
+</div>

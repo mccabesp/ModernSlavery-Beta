@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 namespace ModernSlavery.WebUI.Submission.Presenters
 {
     [Serializable]
-    public class StatementMetadataViewModel
+    public class StatementMetadataViewModel : GovUkViewModel
     {
         // DB layer Id
         public long StatementMetadataId { get; set; }
@@ -69,5 +69,107 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public int IncludedOrganistionCount { get; set; }
 
         public int ExcludedOrganisationCount { get; set; }
+
+        public string OtherSourceText { get; set; }
+
+        public List<StatementSectors> StatementSectors { get; set; }
+
+        public LastFinancialYearBudget? LastFinancialYearBudget { get; set; }
+    }
+    public enum StatementSectors
+    {
+        [GovUkRadioCheckboxLabelText(Text = "All")]
+        All,
+
+        [GovUkRadioCheckboxLabelText(Text = "Accommodation and food service activities")]
+        AccommodationAndFoodServiceActivities,
+
+        [GovUkRadioCheckboxLabelText(Text = "Activities of extraterritorial organisations and bodies")]
+        ActivitiesOfExtraterritorialOrganisationsAndBodies,
+
+        [GovUkRadioCheckboxLabelText(Text = "Activities of households as employers")]
+        ActivitiesOfHouseholdsAsEmployers,
+
+        [GovUkRadioCheckboxLabelText(Text = "Administrative and support service activities")]
+        AdministrativeAndSupportServiceActivities,
+
+        [GovUkRadioCheckboxLabelText(Text = "Agriculture, Forestry and Fishing")]
+        AgricultureForestryAndFishing,
+
+        [GovUkRadioCheckboxLabelText(Text = "Arts, entertainment and recreation")]
+        ArtsEntertainmentAndRecreation,
+
+        [GovUkRadioCheckboxLabelText(Text = "Construction")]
+        Construction,
+
+        [GovUkRadioCheckboxLabelText(Text = "Education")]
+        Education,
+
+        [GovUkRadioCheckboxLabelText(Text = "Electricity, gas, steam and air conditioning supply")]
+        ElectricityGasSteamAndAirConditioningSupply,
+
+        [GovUkRadioCheckboxLabelText(Text = "Financial and insurance activities")]
+        FinancialAndInsuranceActivities,
+
+        [GovUkRadioCheckboxLabelText(Text = "Human health and social work activities")]
+        HumanHealthAndSocialWorkActivities,
+
+        [GovUkRadioCheckboxLabelText(Text = "Information and communication")]
+        InformationAndCommunication,
+
+        [GovUkRadioCheckboxLabelText(Text = "Manufacturing")]
+        Manufacturing,
+
+        [GovUkRadioCheckboxLabelText(Text = "Mining and Quarrying")]
+        MiningAndQuarrying,
+
+
+        [GovUkRadioCheckboxLabelText(Text = "Other service activities")]
+        OtherServiceActivities,
+
+
+        [GovUkRadioCheckboxLabelText(Text = "Professional scientific and technical activities")]
+        ProfessionalScientificAndTechnicalActivities,
+
+        [GovUkRadioCheckboxLabelText(Text = "Public administration and defence")]
+        PublicAdministrationAndDefence,
+
+        [GovUkRadioCheckboxLabelText(Text = "Public sector")]
+        PublicSector,
+
+        [GovUkRadioCheckboxLabelText(Text = "Real estate activities")]
+        RealEstateActivities,
+
+        [GovUkRadioCheckboxLabelText(Text = "Transportation and storage")]
+        TransportationAndStorage,
+
+        [GovUkRadioCheckboxLabelText(Text = "Water supply, sewerage, waste management and remediation activities")]
+        WaterSupplySewerageWasteManagementAndRemediationActivities,
+
+        [GovUkRadioCheckboxLabelText(Text = "Wholesale and retail trade")]
+        WholesaleAndRetailTrade,
+
+        //TODO: should we have this, it's on prototype but not wireframes
+        [GovUkRadioCheckboxLabelText(Text = "Other")]
+        Other
+
+    }
+    public enum LastFinancialYearBudget
+    {
+        [GovUkRadioCheckboxLabelText(Text = "Under £36 million")]
+        Under36Million = 0,
+
+        [GovUkRadioCheckboxLabelText(Text = "£36 million - £60 million")]
+        From36MillionTo60Million = 1,
+
+        [GovUkRadioCheckboxLabelText(Text = "£60 million - £100 million")]
+        From60MillionTo100Million = 2,
+
+        [GovUkRadioCheckboxLabelText(Text = "£100 million - £500 million")]
+        From100MillionTo500Million = 3,
+
+        [GovUkRadioCheckboxLabelText(Text = "£500 million+")]
+        From500MillionUpwards = 4,
+
     }
 }
