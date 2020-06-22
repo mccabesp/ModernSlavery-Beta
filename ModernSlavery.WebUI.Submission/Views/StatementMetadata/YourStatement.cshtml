@@ -1,21 +1,22 @@
 ﻿@using System.ComponentModel.DataAnnotations
 @{
-   
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "/Views/GdsLayout.cshtml";
 }
 @model ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel
+ @*//Where should this navigate back to ?*@
+<a class="govuk-back-link" href="@Url.Action("")">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
+
+        //TODO: add in hidden elements once view model complete
         {
             var controller = ViewData["Controller"] as BaseController;
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            //Where should this navigate back to ?
-            <a class="link-back" href="@Url.Action("")">Back <span class="visuallyhidden"> to the previous step</span></a>
 
-            <h1 class="heading-large">
+            <h1 class="govuk-heading-l">
                 Your modern slavery statement
             </h1>
 
@@ -31,14 +32,14 @@
                 <div class="govuk-details__text">
                     It is a legal requirement that your modern slavery statement is published in a prominent place on your organisation’s website.
                 </div>
-            </details>  
+            </details>
             <div class="govuk-form-group">
                 @Html.SetErrorClass(model => model.StatementUrl, "error")
                 @Html.LabelFor(model => model.StatementUrl, new { @class = "govuk-label" })
                 @Html.ValidationMessageFor(model => model.StatementUrl, "", new { @class = "error-message" })
-                @Html.CustomEditorFor(model => model.StatementUrl, new { @class = "govuk-input govuk-input--width-20" ,type = "text" } )
-             </div>
-         
+                @Html.CustomEditorFor(model => model.StatementUrl, new { @class = "govuk-input govuk-input--width-20", type = "text" })
+            </div>
+
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="reporting-start-hint">
@@ -196,7 +197,7 @@
                     </div>
                 </fieldset>
             </div>
-           
+
             <button class="govuk-button" data-module="govuk-button" type="submit">
                 Save and continue
             </button>
@@ -205,4 +206,4 @@
             </button>
         }
     </div>
-    </div>
+</div>

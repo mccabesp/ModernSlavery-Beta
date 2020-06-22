@@ -1,6 +1,9 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ModernSlavery.WebUI.Submission.Presenters
@@ -31,6 +34,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         public int Year { get; set; }
         [Url]
+        [MaxLength(255, ErrorMessage = "The web address (URL) cannot be longer than 255 characters.")]
         [Display(Name = "URL")]
         public string StatementUrl { get; set; }
         [Display(Name = "Job Title")]
@@ -40,6 +44,30 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
         public DateTime ApprovedDate { get; set; }
+        public AffirmationType IncludesGoals { get; set; }
+        [Required]
+        public bool IncludesStructure { get; set; }
 
+        public string IncludesStructureDetail { get; set; }
+        [Required]
+        public bool IncludesPolicies { get; set; }
+        public string IncludesPoliciesDetail { get; set; }
+        [Required]
+        public bool IncludesMethods { get; set; }
+        public string IncludesMethodsDetail { get; set; }
+        [Required]
+        public bool IncludesRisks { get; set; }
+        public string IncludesRisksDetail { get; set; }
+        [Required]
+        public bool IncludesEffectiveness { get; set; }
+
+        public string IncludedEffectivenessDetail { get; set; }
+        [Required]
+        public bool IncludesTraining { get; set; }
+        public string IncludesTrainingDetail { get; set; }
+
+        public int IncludedOrganistionCount { get; set; }
+
+        public int ExcludedOrganisationCount { get; set; }
     }
 }
