@@ -30,8 +30,6 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public async Task<StatementActionResult> CanAccessStatementMetadata(User user, Organisation organisation, int reportingYear)
         {
-            var data = await GetStatementMetadataByOrganisationAndYear(organisation, reportingYear);
-
             // only assigned users
             var assignment = organisation.UserOrganisations.FirstOrDefault(uo => uo.User == user);
             if (assignment == null)
@@ -42,7 +40,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 return StatementActionResult.Unauthorised;
 
             var statement = await GetStatementMetadataByOrganisationAndYear(organisation, reportingYear);
-            if (!statement.CanBeEdited)
+            if (statement != null && statement.CanBeEdited)
                 return StatementActionResult.Uneditable;
 
             return StatementActionResult.Success;
