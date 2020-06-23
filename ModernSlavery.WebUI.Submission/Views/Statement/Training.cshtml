@@ -1,0 +1,70 @@
+﻿@using System.ComponentModel.DataAnnotations
+@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
+
+<a class="govuk-back-link" href="@Url.Action("due-diligence")">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            var controller = ViewData["Controller"] as BaseController;
+
+            @await Html.CustomValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+        }
+
+        @(Html.GovUkErrorSummary(new[]
+                {
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementTrainings)
+                }))
+
+        <h1 class="govuk-heading-l">
+           Training
+        </h1>
+
+        <h2>
+            Have you provided training on modern slavery and trafficking during the past year, or any other activities to raise awareness? If so, who was this for?
+        </h2>    
+
+        @{ var organisationTrainingOptions =
+                             new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementTrainings, Func<object, object>>
+                             {
+                           {
+                             ModernSlavery.WebUI.Submission.Presenters.StatementTrainings.Other,
+@<text>
+    @(Html.GovUkTextInputFor(model => model.OtherTrainingText))
+    @(Html.LabelFor(model => model.OtherTrainingText, new { @class = "govuk-label" }))
+</text>
+                            }
+                           };
+        }
+
+        @(Html.GovUkCheckboxesFor(
+                    model => model.StatementTrainings,
+                    new FieldsetViewModel
+                    {
+                        Legend = new LegendViewModel
+                        {
+                            Classes = "govuk-fieldset__legend--m"
+                        },
+                        Classes = "govuk-!-margin-top-6"
+                    },
+                    new HintViewModel
+                    {
+                        Text = "Select all that apply."
+                    },
+                    organisationTrainingOptions
+               ))
+
+        <button class="govuk-button" data-module="govuk-button" type="submit">
+            Continue
+        </button>
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
+            Cancel
+        </button>
+
+    </div>
+
+</div>

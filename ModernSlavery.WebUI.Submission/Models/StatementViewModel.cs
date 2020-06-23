@@ -79,6 +79,10 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public List<StatementPolicies> StatementPolicies { get; set; }
         [Display(Name = "Please provide detail")]
         public string OtherPolicyText { get; set; }
+
+        public List<StatementTrainings> StatementTrainings { get; set; }
+        [Display(Name = "Please specify")]
+        public string OtherTrainingText { get; set; }
     }
     public enum StatementSectors
     {
@@ -217,6 +221,31 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         [GovUkRadioCheckboxLabelText(Text = "None of the above")]
         NoneOfTheAbove,
+
+        [GovUkRadioCheckboxLabelText(Text = "Other")]
+        Other
+
+    }
+
+    public enum StatementTrainings
+    {
+        [GovUkRadioCheckboxLabelText(Text = "All")]
+        All,
+
+        [GovUkRadioCheckboxLabelText(Text = "Procurement")]
+        Procurement,
+
+        [GovUkRadioCheckboxLabelText(Text = "Human Resources")]
+        HumanResources,
+
+        [GovUkRadioCheckboxLabelText(Text = "C-Suite")]
+        CSuite,
+
+        [GovUkRadioCheckboxLabelText(Text = "Whole organisation")]
+        WholeOrganisation,
+
+        [GovUkRadioCheckboxLabelText(Text = "Suppliers")]
+        Suppliers,
 
         [GovUkRadioCheckboxLabelText(Text = "Other")]
         Other
