@@ -57,7 +57,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            var result = await SubmissionPresenter.TryGetCompliance(CurrentUser, organisationIdentifier, year);
+            var result = await SubmissionPresenter.TryGetYourStatement(CurrentUser, organisationIdentifier, year);
 
             return await GetActionResultFromQuery(result);
         }
@@ -67,7 +67,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> YourStatement(StatementMetadataViewModel submissionModel)
         {
-            var result = await SubmissionPresenter.TrySaveCompliance(CurrentUser, submissionModel);
+            var result = await SubmissionPresenter.TrySaveYourStatement(CurrentUser, submissionModel);
 
             return await GetActionResultFromSave(result, SubmissionStep.YourStatement);
         }
