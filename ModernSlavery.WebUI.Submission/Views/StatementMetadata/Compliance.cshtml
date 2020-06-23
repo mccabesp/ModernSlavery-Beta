@@ -14,7 +14,17 @@
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
 
-        }        
+        }
+
+        @(Html.GovUkErrorSummary(new[]
+                {
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesStructure),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesPolicies),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesRisks),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesMethods),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesTraining),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesEffectiveness)
+                }))
 
         <h1 class="govuk-heading-l">
             Areas covered by your modern slavery statement
@@ -22,7 +32,7 @@
 
         <h2 class="govuk-heading-m">
             Does your modern slavery statement cover the following areas in relation to slavery and human trafficking?
-        </h2>    
+        </h2>
 
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">

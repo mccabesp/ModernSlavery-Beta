@@ -1,12 +1,10 @@
 ﻿@using System.ComponentModel.DataAnnotations
 @{
-
     Layout = "/Views/GdsLayout.cshtml";
-
 }
 @model ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel
- 
-<a class="govuk-back-link" href="@Url.Action("compliance")">Back</a>
+
+<a class="govuk-back-link" href="@Url.Action("your-organisation")">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
@@ -17,12 +15,17 @@
             @Html.AntiForgeryToken();
         }
 
+        @(Html.GovUkErrorSummary(new[]
+                {
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.StatementPolicies)                   
+                }))
+
         <h1 class="govuk-heading-l">
-            Your organisation
+            Policies
         </h1>
 
         <h2>
-            Which sector does your organisation operate in?
+            Do your organisation`s modern slavery policies or codes include any of the following provisions?
         </h2>
         <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
@@ -35,20 +38,21 @@
             </div>
         </details>
 
-        @{ var organisationSectorOptions =
-                         new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementSectors, Func<object, object>>
-                         {
+        @{ var organisationPolicyOptions =
+                            new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementPolicies, Func<object, object>>
+                            {
                            {
-                             ModernSlavery.WebUI.Submission.Presenters.StatementSectors.Other,
+                             ModernSlavery.WebUI.Submission.Presenters.StatementPolicies.Other,
     @<text>
-        @(Html.GovUkTextInputFor(model => model.OtherSectorText))
+        @(Html.GovUkTextInputFor(model => model.OtherPolicyText))
+        @(Html.LabelFor(model => model.OtherPolicyText, new { @class = "govuk-label" }))
     </text>
                             }
-                       };
+                          };
         }
 
         @(Html.GovUkCheckboxesFor(
-                    model => model.StatementSectors,
+                    model => model.StatementPolicies,
                     new FieldsetViewModel
                     {
                         Legend = new LegendViewModel
@@ -61,20 +65,8 @@
                     {
                         Text = "Select all that apply."
                     },
-                    organisationSectorOptions
+                    organisationPolicyOptions
                ))
-        @(Html.GovUkRadiosFor(
-                    model => model.LastFinancialYearBudget,
-                    new FieldsetViewModel
-                    {
-                        Legend = new LegendViewModel
-                        {
-                            Text = "What was your turnover or budget during the last financial accounting year?",
-                            Classes = "govuk-fieldset__legend--m"
-                        },
-                        Classes = "govuk-!-margin-top-6"
-                    }
-                    ))
 
         <button class="govuk-button" data-module="govuk-button" type="submit">
             Continue

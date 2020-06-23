@@ -70,11 +70,15 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         public int ExcludedOrganisationCount { get; set; }
 
-        public string OtherSourceText { get; set; }
+        public string OtherSectorText { get; set; }
 
         public List<StatementSectors> StatementSectors { get; set; }
 
         public LastFinancialYearBudget? LastFinancialYearBudget { get; set; }
+
+        public List<StatementPolicies> StatementPolicies { get; set; }
+        [Display(Name = "Please provide detail")]
+        public string OtherPolicyText { get; set; }
     }
     public enum StatementSectors
     {
@@ -170,6 +174,52 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         [GovUkRadioCheckboxLabelText(Text = "£500 million+")]
         From500MillionUpwards = 4,
+
+    }
+
+    public enum StatementPolicies
+    {
+        [GovUkRadioCheckboxLabelText(Text = "All")]
+        All,
+
+        [GovUkRadioCheckboxLabelText(Text = "Adherence to local and national laws")]
+        AdherenceToLocalAndNationalLaws,
+
+        [GovUkRadioCheckboxLabelText(Text = "Freedom of workers to terminate employment")]
+        FreedomOfWorkersToTerminateEmployment,
+
+        [GovUkRadioCheckboxLabelText(Text = "Freedom of movement")]
+        FreedomOfMovement,
+
+        [GovUkRadioCheckboxLabelText(Text = "Freedom of association")]
+        FreedomOfAssociation,
+
+        [GovUkRadioCheckboxLabelText(Text = "Prohibits any threat of violence, harassment and intimidation")]
+        ProhibitsAnyThreatOfViolenceHarassmentAndIntimidation,
+
+        [GovUkRadioCheckboxLabelText(Text = "Prohibits the use of worker-paid recruitment fees")]
+        ProhibitsTheUseOfWorkerPaidRecruitmentFees,
+
+        [GovUkRadioCheckboxLabelText(Text = "Prohibits compulsory overtime")]
+        ProhibitsCompulsoryOvertime,
+
+        [GovUkRadioCheckboxLabelText(Text = "ProhibitsChildLabour")]
+        ProhibitsChildLabour,
+
+        [GovUkRadioCheckboxLabelText(Text = "Prohibits discrimination")]
+        ProhibitsDiscrimination,
+
+        [GovUkRadioCheckboxLabelText(Text = "Prohibits confiscation of workers original identification documents")]
+        ProhibitsConfiscationOfWorkersOriginalIdentificationDocuments,
+
+        [GovUkRadioCheckboxLabelText(Text = "Provides access to remedy, compensation and justice for victims of modern slavery")]
+        ProvidesAccessToRemedyCompensationAndJusticeForVictimsOfModernSlavery,
+
+        [GovUkRadioCheckboxLabelText(Text = "None of the above")]
+        NoneOfTheAbove,
+
+        [GovUkRadioCheckboxLabelText(Text = "Other")]
+        Other
 
     }
 }
