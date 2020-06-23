@@ -1,10 +1,13 @@
-﻿@model DisplayReportModel
+﻿@using ModernSlavery.Core.Interfaces
+@model DisplayReportModel
+@inject IObfuscator Obfuscator
 @{
     var reportInfoModel = Model.Report;
     var reportDateFormatter = new GDSDateFormatter(reportInfoModel.ReportingStartDate);
     var linkId = reportDateFormatter.StartYear;
     var organisationId = Model.OrganisationId;
     var scopeRequest = Encryption.EncryptAsParams(organisationId.ToString(), reportDateFormatter.StartYear.ToString());
+    var obfuscatedId = Obfuscator.Obfuscate(Model.OrganisationId);
 }
 <div class="gpg-manage-reports__row">
 
@@ -84,6 +87,10 @@
                 <span>Edit draft report</span>
             </a>
         }
+
+        <a class="button" id="NewReport@(linkId)-@(Model.EncCurrentOrgId)" href="@Url.Action("YourStatement", "StatementMetadata", new { organisationIdentifier = obfuscatedId, year = reportInfoModel.ReportingStartDate.Year })">
+            <span>Your statement</span>
+        </a>
     </div>
 
 </div>
