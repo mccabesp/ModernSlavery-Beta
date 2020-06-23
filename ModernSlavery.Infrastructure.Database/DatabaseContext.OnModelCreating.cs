@@ -208,7 +208,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.Status)
                         .HasName("IX_StatusId");
 
-                    entity.HasIndex(e => new {e.LatestRegistrationUserId, e.LatestRegistrationOrganisationId})
+                    entity.HasIndex(e => new { e.LatestRegistrationUserId, e.LatestRegistrationOrganisationId })
                         .HasName("IX_LatestRegistration_UserId_LatestRegistration_OrganisationId");
 
                     entity.Property(e => e.Status).HasColumnName("StatusId");
@@ -249,7 +249,7 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.HasOne(d => d.LatestRegistration)
                         .WithMany(p => p.Organisations)
-                        .HasForeignKey(d => new {d.LatestRegistrationUserId, d.LatestRegistrationOrganisationId})
+                        .HasForeignKey(d => new { d.LatestRegistrationUserId, d.LatestRegistrationOrganisationId })
                         .HasConstraintName(
                             "FK_dbo.Organisations_dbo.UserOrganisations_LatestRegistration_UserId_LatestRegistration_OrganisationId");
 
@@ -540,6 +540,226 @@ namespace ModernSlavery.Infrastructure.Database
 
             #endregion
 
+            #region StatementDivisionType
+
+            modelBuilder.Entity<StatementDivisionType>(
+                entity =>
+                {
+                    entity.HasKey(e => e.StatementDivisionTypeId)
+                        .HasName("PK_dbo.StatementDivisionTypes");
+
+                    entity.Property(e => e.Description)
+                        .IsRequired()
+                        .HasMaxLength(250);
+                });
+
+            #endregion
+
+            #region StatementTrainingDivision
+
+            modelBuilder.Entity<StatementTrainingDivision>(
+                entity =>
+                {
+                    entity.HasKey(e => new { e.StatementDivisionTypeId, e.StatementId })
+                        .HasName("PK_dbo.StatementTrainingDivisions");
+
+                    entity.HasOne(e => e.StatementDivisionType)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementDivisionTypeId)
+                        .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.StatementDivisionTypes_StatmentDivisionTypeId");
+
+                    entity.HasOne(e => e.Statement)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementId)
+                        .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.StatementMetadatas_StatementMetadataId");
+                });
+
+            #endregion
+
+            #region StatementDiligence
+
+            modelBuilder.Entity<StatementDiligence>(
+                entity =>
+                {
+                    entity.HasKey(e => new { e.StatementDiligenceTypeId, e.StatementId })
+                        .HasName("PK_dbo.StatementDiligences");
+
+                    entity.HasOne(e => e.StatementDiligenceType)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementDiligenceTypeId)
+                        .HasConstraintName("FK_dbo.StatementDiligences_dbo.StatementDiligenceType_StatementDiligenceTypeId");
+
+                    entity.HasOne(e => e.Statement)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementId)
+                        .HasConstraintName("FK_dbo.StatementDiligences_dbo.StatementMetadatas_StatementMetadataId");
+                });
+
+            #endregion
+
+            #region StatementDiligenceType
+
+            modelBuilder.Entity<StatementDiligenceType>(
+                entity =>
+                {
+                    entity.HasKey(e => e.StatementDiligenceTypeId)
+                        .HasName("PK_dbo.StatementDiligenceTypes");
+
+                    entity.Property(e => e.Description)
+                        .IsRequired()
+                        .HasMaxLength(250);
+                });
+
+            #endregion
+
+            #region StatementPolicyType
+
+            modelBuilder.Entity<StatementPolicyType>(
+                entity =>
+                {
+                    entity.HasKey(e => e.StatementPolicyTypeId)
+                        .HasName("PK_dbo.StatementPolicyTypes");
+
+                    entity.Property(e => e.Description)
+                        .IsRequired()
+                        .HasMaxLength(250);
+                });
+
+            #endregion
+
+            #region StatementPolicy
+
+            modelBuilder.Entity<StatementPolicy>(
+                entity =>
+                {
+                    entity.HasKey(e => new { e.StatementPolicyTypeId, e.StatementId })
+                        .HasName("PK_dbo.StatementPolicies");
+
+                    entity.HasOne(e => e.StatementPolicyType)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementPolicyTypeId)
+                        .HasConstraintName("FK_dbo.StatementPolicies_dbo.StatementPolicyType_StatementPolicyTypeId");
+
+                    entity.HasOne(e => e.Statement)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementId)
+                        .HasConstraintName("FK_dbo.StatementPolicies_dbo.StatementMetadatas_StatementMetadataId");
+                });
+
+            #endregion
+
+            #region StatementRisk
+
+            modelBuilder.Entity<StatementRisk>(
+                entity =>
+                {
+                    entity.HasKey(e => new { e.StatementRiskTypeId, e.StatementId })
+                        .HasName("PK_dbo.StatementRisks");
+
+                    entity.HasOne(e => e.StatementRiskType)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementRiskTypeId)
+                        .HasConstraintName("FK_dbo.StatementRisk_dbo.StatementRiskType_StatementRiskTypeId");
+
+                    entity.HasOne(e => e.Statement)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementId)
+                        .HasConstraintName("FK_dbo.StatementRisks_dbo.StatementMetadatas_StatementMetadataId");
+                });
+
+            #endregion
+
+            #region StatementRiskType
+
+            modelBuilder.Entity<StatementRiskType>(
+                entity =>
+                {
+                    entity.HasKey(e => e.StatementRiskTypeId)
+                        .HasName("PK_dbo.StatementRiskTypes");
+
+                    entity.HasOne(e => e.ParentRiskType)
+                        .WithMany()
+                        .HasForeignKey(e => e.ParentRiskTypeId)
+                        .HasConstraintName("FK_dbo.StatementRisks_dbo.StatementRisks_StatementRiskId")
+                        .IsRequired();
+
+                    entity.Property(e => e.Description)
+                        .HasMaxLength(250);
+                });
+
+            #endregion
+
+            #region StatementOrganisation
+
+            modelBuilder.Entity<StatementOrganisation>(
+                entity =>
+                {
+                    entity.HasKey(e => e.StatementOrganisationId)
+                        .HasName("PK_dbo.StatementOrganisations");
+
+                    entity.HasOne(e => e.Statement)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementId)
+                        .HasConstraintName("FK_dbo.StatementOrganisations_dbo.StatementMetadatas_StatementMetadataId");
+
+                    entity.HasOne(e => e.Organisation)
+                        .WithMany()
+                        .HasForeignKey(e => e.OrganisationId)
+                        .HasConstraintName("FK_dbo.StatementOrganisations_dbo.Organisations_OrganisationId")
+                        .IsRequired(false);
+
+                    entity.Property(e => e.OrganisationName)
+                        .HasMaxLength(100)
+                        .IsRequired();
+                });
+
+            #endregion
+
+            #region StatementSectorType
+
+            modelBuilder.Entity<StatementSectorType>(
+                entity =>
+                {
+                    entity.HasKey(e => e.StatementSectorTypeId)
+                        .HasName("PK_dbo.StatementSectorTypes");
+
+                    entity.Property(e => e.Description)
+                        .HasMaxLength(250)
+                        .IsRequired();
+                });
+
+            #endregion
+
+            #region StatementSector
+
+            modelBuilder.Entity<StatementSector>(
+                entity =>
+                {
+                    entity.HasKey(e => new { e.StatementSectorTypeId, e.StatementId })
+                        .HasName("PK_dbo.StatementSectors");
+                });
+
+            #endregion
+
+            #region StatementStatus
+
+            modelBuilder.Entity<StatementStatus>(
+                entity =>
+                {
+                    entity.HasKey(e => new { e.StatementStatusId, e.StatementId })
+                        .HasName("PK_dbo.StatementStatuses");
+
+                    entity.Property(e => e.StatusDetails)
+                        .HasMaxLength(255);
+
+                    entity.HasOne(e => e.ByUser)
+                        .WithMany()
+                        .HasForeignKey(e => e.ByUserId)
+                        .HasConstraintName("FK_dbo.StatementStatuses_dbo.Users_UserId");
+                });
+
+            #endregion
+
             #region SicCode
 
             modelBuilder.Entity<SicCode>(
@@ -592,7 +812,7 @@ namespace ModernSlavery.Infrastructure.Database
             modelBuilder.Entity<UserOrganisation>(
                 entity =>
                 {
-                    entity.HasKey(e => new {e.UserId, e.OrganisationId}).HasName("PK_dbo.UserOrganisations");
+                    entity.HasKey(e => new { e.UserId, e.OrganisationId }).HasName("PK_dbo.UserOrganisations");
 
                     entity.HasIndex(e => e.AddressId)
                         .HasName("IX_AddressId");
@@ -691,7 +911,7 @@ namespace ModernSlavery.Infrastructure.Database
             modelBuilder.Entity<UserSetting>(
                 entity =>
                 {
-                    entity.HasKey(e => new {e.UserId, e.Key}).HasName("PK_dbo.UserSettings");
+                    entity.HasKey(e => new { e.UserId, e.Key }).HasName("PK_dbo.UserSettings");
 
                     entity.HasIndex(e => e.UserId)
                         .HasName("IX_UserId");

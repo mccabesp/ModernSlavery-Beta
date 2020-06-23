@@ -6,7 +6,7 @@ namespace ModernSlavery.Core.Entities
 {
     public class StatementTrainingDivision
     {
-        public short StatmentDivisionTypeId { get; set; }
+        public short StatementDivisionTypeId { get; set; }
 
         public virtual StatementDivisionType StatementDivisionType { get; set; }
 

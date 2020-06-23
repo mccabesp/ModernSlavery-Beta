@@ -11,9 +11,9 @@ namespace ModernSlavery.Core.Entities
 
         public short StatementDiligenceTypeId { get; set; }
 
-        public virtual StatmentDiligenceType StatmentDiligenceType { get; set; }
+        public virtual StatementDiligenceType StatementDiligenceType { get; set; }
 
-        public long StatmentId { get; set; }
+        public long StatementId { get; set; }
 
         public virtual StatementMetadata Statement { get; set; }
 

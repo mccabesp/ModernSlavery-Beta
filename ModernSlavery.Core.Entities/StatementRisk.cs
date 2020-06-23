@@ -9,6 +9,10 @@ namespace ModernSlavery.Core.Entities
     {
         public short StatementRiskId { get; set; }
 
+        public short StatementRiskTypeId { get; set; }
+
+        public virtual StatementRiskType StatementRiskType { get; set; }
+
         public long StatementId { get; set; }
 
         public virtual StatementMetadata Statement { get; set; }

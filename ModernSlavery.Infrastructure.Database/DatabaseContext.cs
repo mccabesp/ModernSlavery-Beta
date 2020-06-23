@@ -210,6 +210,19 @@ namespace ModernSlavery.Infrastructure.Database
         public virtual DbSet<Feedback> Feedback { get; set; }
         public virtual DbSet<AuditLog> AuditLogs { get; set; }
         public virtual DbSet<ReminderEmail> ReminderEmails { get; set; }
+        public virtual DbSet<StatementMetadata> StatementMetadatas { get; set; }
+        public virtual DbSet<StatementDivisionType> StatementDivisionTypes { get; set; }
+        public virtual DbSet<StatementTrainingDivision> StatementTrainingDivisions { get; set; }
+        public virtual DbSet<StatementDiligence> StatementDiligences { get; set; }
+        public virtual DbSet<StatementDiligenceType> StatementDiligenceTypes { get; set; }
+        public virtual DbSet<StatementPolicyType> StatementPolicyTypes { get; set; }
+        public virtual DbSet<StatementPolicy> StatementPolicies { get; set; }
+        public virtual DbSet<StatementRisk> StatementRisks { get; set; }
+        public virtual DbSet<StatementRiskType> StatementRiskTypes { get; set; }
+        public virtual DbSet<StatementOrganisation> StatementOrganisations { get; set; }
+        public virtual DbSet<StatementSectorType> StatementSectorTypes { get; set; }
+        public virtual DbSet<StatementSector> StatementSectors { get; set; }
+        public virtual DbSet<StatementStatus> StatementStatuses { get; set; }
 
         #endregion
 

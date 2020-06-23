@@ -5,9 +5,9 @@ using System.Text;
 
 namespace ModernSlavery.Core.Entities
 {
-    public class StatmentDiligenceType
+    public class StatementDiligenceType
     {
-        public short StatmentDiligenceTypeId { get; set; }
+        public short StatementDiligenceTypeId { get; set; }
 
         public string Description { get; set; }
 
