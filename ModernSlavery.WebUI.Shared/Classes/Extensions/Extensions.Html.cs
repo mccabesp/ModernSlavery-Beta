@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using System.Web.Mvc;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
@@ -51,7 +51,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             string errorClassName,
             string noErrorClassName = null)
         {
-            var expressionText = ExpressionHelper.GetExpressionText(expression);
+            var expressionText = htmlHelper.GetExpressionText(expression);
             var fullHtmlFieldName = htmlHelper.ViewContext.ViewData
                 .TemplateInfo.GetFullHtmlFieldName(expressionText);
 
@@ -117,14 +117,23 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 
             return await helper.PartialAsync("_ValidationSummary");
         }
+        public static string GetExpressionText<TModel, TResult>(
+         this IHtmlHelper<TModel> htmlHelper,
+         Expression<Func<TModel, TResult>> expression)
+        {
+            var expresionProvider = htmlHelper.ViewContext.HttpContext.RequestServices
+                .GetService(typeof(ModelExpressionProvider)) as ModelExpressionProvider;
 
-        private static Dictionary<string, object> CustomAttributesFor<TModel, TProperty>(
+            return expresionProvider.GetExpressionText(expression);
+        }
+
+        private static Dictionary<string, object> CustomAttributesFor<TModel, TProperty>(this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TProperty>> expression,
             object htmlAttributes = null)
         {
             var containerType = typeof(TModel);
 
-            var propertyName = ExpressionHelper.GetExpressionText(expression);
+            var propertyName = htmlHelper.GetExpressionText(expression);
             var propertyInfo = containerType.GetPropertyInfo(propertyName);
 
             var displayNameAttribute =
@@ -233,7 +242,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             Expression<Func<TModel, TProperty>> expression,
             object htmlAttributes = null)
         {
-            var htmlAttr = CustomAttributesFor(expression, htmlAttributes);
+            var htmlAttr = helper.CustomAttributesFor(expression, htmlAttributes);
 
             return helper.EditorFor(expression, null, new {htmlAttributes = htmlAttr});
         }
@@ -243,7 +252,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             object value,
             object htmlAttributes = null)
         {
-            var htmlAttr = CustomAttributesFor(expression, htmlAttributes);
+            var htmlAttr = helper.CustomAttributesFor(expression, htmlAttributes);
 
             return helper.RadioButtonFor(expression, value, htmlAttr);
         }
