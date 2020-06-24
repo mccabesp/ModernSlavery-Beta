@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iis": {
-      "applicationUrl": "http://localhost/ModernSlavery.IdentityServer4",
+      "applicationUrl": "http://localhost/ModernSlavery.Hosts.IdServer",
       "sslPort": 0
     },
     "iisExpress": {
@@ -22,7 +22,7 @@
       "ancmHostingModel": "OutOfProcess",
       "applicationUrl": " http://localhost:5000/"
     },
-    "ModernSlavery.IdentityServer4": {
+    "ModernSlavery.IdServer": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

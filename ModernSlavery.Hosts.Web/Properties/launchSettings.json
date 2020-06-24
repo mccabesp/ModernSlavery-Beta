@@ -16,7 +16,7 @@
       },
       "ancmHostingModel": "OutOfProcess"
     },
-    "ModernSlavery.WebUI": {
+    "ModernSlavery.Hosts.Web": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

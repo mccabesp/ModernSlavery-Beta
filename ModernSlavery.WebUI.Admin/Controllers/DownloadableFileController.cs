@@ -70,7 +70,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("admin/WebsiteLogs")]
         public async Task<IActionResult> WebsiteLogs(string fp)
         {
-            var downloadViewModelToReturn = await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.WebUI");
+            var downloadViewModelToReturn = await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.Hosts.Web");
             return View("WebsiteLogs", downloadViewModelToReturn);
         }
 
@@ -78,7 +78,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public async Task<IActionResult> WebjobLogs(string fp)
         {
             var downloadViewModelToReturn =
-                await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.WebJob");
+                await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.Hosts.Webjob");
             return View("WebjobLogs", downloadViewModelToReturn);
         }
 
@@ -86,7 +86,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public async Task<IActionResult> IdentityLogs(string fp)
         {
             var downloadViewModelToReturn =
-                await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.IdentityServer4");
+                await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.Hosts.IdServer");
             return View("IdentityLogs", downloadViewModelToReturn);
         }
 
