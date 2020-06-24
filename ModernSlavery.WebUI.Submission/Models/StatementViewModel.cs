@@ -22,9 +22,10 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public DateTime StatusDate { get; set; }
 
         // Earliest date that the submission can be started
-        public DateTime StatementStartDate { get; set; }
-
-        public DateTime StatementEndDate { get; set; }
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a date")]
+        public Nullable<DateTime> StatementStartDate { get; set; }
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a date")]
+        public Nullable<DateTime> StatementEndDate { get; set; }
         public DateTime SubmissionDeadline { get; set; }
         // This should never go over the wire!
         public long OrganisationId { get; set; }
@@ -32,17 +33,22 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public string OrganisationIdentifier { get; set; }
 
         public int Year { get; set; }
-        [Url]
+
+        [Url(ErrorMessage = "URL is not valid")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a URL")]
         [MaxLength(255, ErrorMessage = "The web address (URL) cannot be longer than 255 characters.")]
         [Display(Name = "URL")]
         public string StatementUrl { get; set; }
         [Display(Name = "Job Title")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a job title")]
         public string JobTitle { get; set; }
         [Display(Name = "First Name")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a first name")]
         public string FirstName { get; set; }
         [Display(Name = "Last Name")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a last name")]
         public string LastName { get; set; }
-        public DateTime ApprovedDate { get; set; }
+        public Nullable<DateTime> ApprovedDate { get; set; }
         public AffirmationType IncludesGoals { get; set; }
         [Required]
         public bool IncludesStructure { get; set; }

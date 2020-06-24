@@ -3,8 +3,6 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
- @*//Where should this navigate back to ?*@
-<a class="govuk-back-link" href="@Url.Action("")">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
@@ -15,12 +13,28 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
+            @(Html.GovUkErrorSummary(new[]
+                {
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementStartDate),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementEndDate)
+                }))
+            @(Html.GovUkErrorSummary(new[]
+                {
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementUrl)
+
+                }))
+            @(Html.GovUkErrorSummary(new[]
+                {
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.FirstName),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.LastName),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.JobTitle),
+                }))
 
             <h1 class="govuk-heading-l">
                 Your modern slavery statement
             </h1>
 
-            <h2>
+            <h2 class="govuk-heading-m">
                 Provide a link to the modern slavery statement on your organisation's website
             </h2>
             <details class="govuk-details" data-module="govuk-details">
@@ -34,87 +48,77 @@
                 </div>
             </details>
             <div class="govuk-form-group">
-                @Html.SetErrorClass(model => model.StatementUrl, "error")
-                @Html.LabelFor(model => model.StatementUrl, new { @class = "govuk-label" })
-                @Html.ValidationMessageFor(model => model.StatementUrl, "", new { @class = "error-message" })
-                @Html.CustomEditorFor(model => model.StatementUrl, new { @class = "govuk-input govuk-input--width-20", type = "text" })
-            </div>
+                <label asp-for="StatementUrl" class="govuk-label"></label>
+                <input asp-for="StatementUrl" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
+            </div>           
 
-
+            //Todo: clarify format of errors as GDS as errors messages for dates
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="reporting-start-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        <h1 class="govuk-fieldset__heading">
+                        <h1 class="govuk-heading-m">
                             What period does this statement cover?
                         </h1>
                     </legend>
                     <span id="reporting-start-hint" class="govuk-hint">
                         For example, 31 3 1980
                     </span>
-                    <div class="govuk-date-input govuk-grid-column-one-third" id="reporting-start">
-                        <div class="govuk-date-input__item">
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" for="reporting-start-day">
-                                    Day
-                                </label>
-                                @Html.SetErrorClass(model => model.StatementStartDate.Day, "error")">
-                                @Html.ValidationMessageFor(model => model.StatementStartDate.Day, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.StatementStartDate.Day, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                    <div class="govuk-grid-row">
+                        <div class="govuk-date-input govuk-grid-column-one-third" id="reporting-start">
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-start-day">
+                                        Day
+                                    </label>
+                                    <input asp-for="StatementStartDate.Value.Date" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
                             </div>
-                        </div>
-                        <div class="govuk-date-input__item">
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" for="reporting-start-month">
-                                    Month
-                                </label>
-                                @Html.SetErrorClass(model => model.StatementStartDate.Month, "error")">
-                                @Html.ValidationMessageFor(model => model.StatementStartDate.Month, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.StatementStartDate.Month, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-start-month">
+                                        Month
+                                    </label>
+                                    <input asp-for="StatementStartDate.Value.Month" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
                             </div>
-                        </div>
-                        <div class="govuk-date-input__item">
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" for="reporting-start-year">
-                                    Year
-                                </label>
-                                @Html.SetErrorClass(model => model.StatementStartDate.Year, "error")">
-                                @Html.ValidationMessageFor(model => model.StatementStartDate.Year, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.StatementStartDate.Year, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-start-year">
+                                        Year
+                                    </label>
+                                    <input asp-for="StatementStartDate.Value.Year" class="govuk-input govuk-date-input__input govuk-input--width-3" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
                             </div>
-                        </div>
 
-                    </div>
-                    @*<p><span>to</span></p>*@
+                        </div>
+                     
+                        @*<p>to</p>*@
 
-                    <div class="govuk-date-input govuk-grid-column-one-third" id="reporting-end">
-                        <div class="govuk-date-input__item">
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" for="reporting-end-day">
-                                    Day
-                                </label>
-                                @Html.SetErrorClass(model => model.StatementEndDate.Day, "error")">
-                                @Html.ValidationMessageFor(model => model.StatementEndDate.Day, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.StatementEndDate.Day, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                        <div class="govuk-date-input govuk-grid-column-one-third" id="reporting-end">
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">                                  
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-end-day">
+                                        Day
+                                    </label>
+                                    <input asp-for="StatementEndDate.Value.Date" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
                             </div>
-                        </div>
-                        <div class="govuk-date-input__item">
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" for="reporting-end-month">
-                                    Month
-                                </label>
-                                @Html.SetErrorClass(model => model.StatementEndDate.Month, "error")">
-                                @Html.ValidationMessageFor(model => model.StatementEndDate.Month, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.StatementEndDate.Month, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-end-month">
+                                        Month
+                                    </label>
+                                    <input asp-for="StatementEndDate.Value.Date" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
                             </div>
-                        </div>
-                        <div class="govuk-date-input__item">
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" for="reporting-end-year">
-                                    Year
-                                </label>
-                                @Html.SetErrorClass(model => model.StatementEndDate.Year, "error")">
-                                @Html.ValidationMessageFor(model => model.StatementEndDate.Year, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.StatementEndDate.Year, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-end-year">
+                                        Year
+                                    </label>
+                                    <input asp-for="StatementEndDate.Value.Date" class="govuk-input govuk-date-input__input govuk-input--width-3" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -123,55 +127,47 @@
 
             <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                    <h1 class="govuk-fieldset__heading">
-                        Who is the director (or equivalent) that signed off your statement?
+                    <h1 class="govuk-heading-m">
+                        What is the name of the director (or equivalent) that signed off your statement?
                     </h1>
                 </legend>
 
                 <div class="govuk-form-group">
-                    <div class="govuk-form-group @Html.SetErrorClass(model => model.FirstName, "error")">
-                        @Html.LabelFor(model => model.FirstName, new { @class = "govuk-label" })
-                        @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "error-message" })
-                        @Html.CustomEditorFor(model => model.FirstName, new { @class = "govuk-input govuk-input--width-20", type = "text" })
-                    </div>
+                    <label asp-for="FirstName" class="govuk-label"></label>
+                    <input asp-for="FirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="FirstName" class="govuk-error-message"></span>                   
                 </div>
 
                 <div class="govuk-form-group">
-                    <div class="govuk-form-group @Html.SetErrorClass(model => model.LastName, "error")">
-                        @Html.LabelFor(model => model.LastName, new { @class = "govuk-label" })
-                        @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "error-message" })
-                        @Html.CustomEditorFor(model => model.LastName, new { @class = "govuk-input govuk-input--width-20", type = "text" })
-                    </div>
+                    <label asp-for="LastName" class="govuk-label"></label>
+                    <input asp-for="LastName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="LastName" class="govuk-error-message"></span>
                 </div>
 
                 <div class="govuk-form-group">
-                    <div class="govuk-form-group @Html.SetErrorClass(model => model.JobTitle, "error")">
-                        @Html.LabelFor(model => model.JobTitle, new { @class = "govuk-label" })
-                        @Html.ValidationMessageFor(model => model.JobTitle, "", new { @class = "error-message" })
-                        @Html.CustomEditorFor(model => model.JobTitle, new { @class = "govuk-input govuk-input--width-20", type = "text" })
-                    </div>
+                    <label asp-for="JobTitle" class="govuk-label"></label>
+                    <input asp-for="JobTitle" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="JobTitle" class="govuk-error-message"></span>
                 </div>
             </fieldset>
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="statement-approved-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        <h1 class="govuk-fieldset__heading">
+                        <h1 class="govuk-heading-m">
                             What date was your statement approved by the board or equivalent management body?
                         </h1>
                     </legend>
                     <span id="statement-approved-hint" class="govuk-hint">
                         For example, 31 3 1980
-                    </span>
+                    </span>             
                     <div class="govuk-date-input" id="statement-approved">
                         <div class="govuk-date-input__item">
                             <div class="govuk-form-group">
                                 <label class="govuk-label govuk-date-input__label" for="approvedDate-day">
                                     Day
                                 </label>
-                                @Html.SetErrorClass(model => model.ApprovedDate.Day, "error")">
-                                @Html.ValidationMessageFor(model => model.ApprovedDate.Day, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.ApprovedDate.Day, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                                <input asp-for="ApprovedDate.Value.Date" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
                             </div>
                         </div>
                         <div class="govuk-date-input__item">
@@ -179,9 +175,7 @@
                                 <label class="govuk-label govuk-date-input__label" for="approvedDate-month">
                                     Month
                                 </label>
-                                @Html.SetErrorClass(model => model.ApprovedDate.Month, "error")">
-                                @Html.ValidationMessageFor(model => model.ApprovedDate.Month, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.ApprovedDate.Month, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                                <input asp-for="ApprovedDate.Value.Month" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
                             </div>
                         </div>
                         <div class="govuk-date-input__item">
@@ -189,9 +183,7 @@
                                 <label class="govuk-label govuk-date-input__label" for="approvedDate-year">
                                     Year
                                 </label>
-                                @Html.SetErrorClass(model => model.ApprovedDate.Year, "error")">
-                                @Html.ValidationMessageFor(model => model.ApprovedDate.Year, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.ApprovedDate.Year, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                                <input asp-for="ApprovedDate.Value.Year" class="govuk-input govuk-date-input__input govuk-input--width-3" type="text" pattern="[0-9]*" inputmode="numeric">
                             </div>
                         </div>
                     </div>
