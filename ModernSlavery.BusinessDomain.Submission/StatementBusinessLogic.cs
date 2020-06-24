@@ -57,18 +57,13 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (statement.StatementId == 0)
             {
                 statement.OrganisationId = organisation.OrganisationId;
-                statement.Created = VirtualDateTime.Now;
                 statement.SubmissionDeadline = SharedBusinessLogic.GetAccountingStartDate(organisation.SectorType, VirtualDateTime.Now.Year);
-
-                SharedBusinessLogic.DataRepository.Insert(statement);
-
-                // Add the statement to the org
-                //statement.Organisation.Statements.Add(statement);
             }
 
-            // status, status history
+            SharedBusinessLogic.DataRepository.Update(statement);
 
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+            SharedBusinessLogic.DataRepository.CommitTransaction();
 
             return StatementActionResult.Success;
         }

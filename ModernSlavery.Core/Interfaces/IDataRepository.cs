@@ -37,6 +37,8 @@ namespace ModernSlavery.Core.Interfaces
 
         void Insert<TEntity>(TEntity entity) where TEntity : class;
 
+        void Update<TEntity>(TEntity entity) where TEntity : class;
+
         Task SaveChangesAsync();
 
         void UpdateChangesInBulk<TEntity>(IEnumerable<TEntity> listOfOrganisations) where TEntity : class;

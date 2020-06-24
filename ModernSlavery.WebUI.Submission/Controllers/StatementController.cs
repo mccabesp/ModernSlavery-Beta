@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
@@ -101,9 +103,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Compliance(StatementViewModel submissionModel)
         {
-            var result = await SubmissionPresenter.TrySaveCompliance(CurrentUser, submissionModel);
-
-            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.Compliance);
+            throw new NotImplementedException();
         }
 
         [HttpPost("cancel-compliance")]
@@ -265,17 +265,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             return View(result.Result);
         }
 
-        private async Task<IActionResult> GetActionResultFromSave(StatementViewModel viewModel, CustomResult<StatementViewModel> result, SubmissionStep step)
+        private async Task<IActionResult> GetActionResultFromSave(StatementViewModel viewModel, StatementActionResult result, SubmissionStep step)
         {
-            if (result.Failed)
+            if (result != StatementActionResult.Success)
             {
-                ModelState.AddModelError(result.ErrorMessage);
+                ModelState.AddModelError("Failed", "Failed");
                 return View(viewModel);
             }
 
             // Redirect location
             var next = await SubmissionPresenter.GetNextRedirectAction(step);
-            return RedirectToAction(next);
+            return RedirectToAction(next, new { organisationIdentifier = viewModel.OrganisationIdentifier, year = viewModel.Year});
         }
 
         #endregion

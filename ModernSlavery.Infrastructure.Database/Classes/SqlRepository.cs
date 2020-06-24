@@ -94,6 +94,11 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             GetEntities<TEntity>().Add(entity);
         }
 
+        public void Update<TEntity>(TEntity entity) where TEntity : class
+        {
+            GetEntities<TEntity>().Update(entity);
+        }
+
         public void Delete<TEntity>(TEntity entity) where TEntity : class
         {
             GetEntities<TEntity>().Remove(entity);

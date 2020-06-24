@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using ModernSlavery.BusinessDomain.Shared;
@@ -27,31 +28,31 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <summary>
         /// Save the current submission draft which is only visible to the current user.
         /// </summary>
-        Task<CustomResult<StatementViewModel>> TrySaveYourStatement(User user, StatementViewModel model);
+        Task<StatementActionResult> TrySaveYourStatement(User user, StatementViewModel model);
 
         Task<CustomResult<StatementViewModel>> TryGetCompliance(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementViewModel>> TrySaveCompliance(User user, StatementViewModel model);
+        Task<StatementActionResult> TrySaveCompliance(User user, StatementViewModel model);
 
         Task<CustomResult<StatementViewModel>> TryGetYourOrganisation(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementViewModel>> TrySaveYourOrgansation(User user, StatementViewModel model);
+        Task<StatementActionResult> TrySaveYourOrgansation(User user, StatementViewModel model);
 
         Task<CustomResult<StatementViewModel>> TryGetPolicies(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementViewModel>> TrySavePolicies(User user, StatementViewModel model);
+        Task<StatementActionResult> TrySavePolicies(User user, StatementViewModel model);
 
         Task<CustomResult<StatementViewModel>> TryGetSupplyChainRiskAndDueDiligence(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementViewModel>> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementViewModel model);
+        Task<StatementActionResult> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementViewModel model);
 
         Task<CustomResult<StatementViewModel>> TryGetTraining(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementViewModel>> TrySaveTraining(User user, StatementViewModel model);
+        Task<StatementActionResult> TrySaveTraining(User user, StatementViewModel model);
 
         Task<CustomResult<StatementViewModel>> TryGetMonitoringInProgress(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementViewModel>> TrySaveMonitorInProgress(User user, StatementViewModel model);
+        Task<StatementActionResult> TrySaveMonitorInProgress(User user, StatementViewModel model);
 
         /// <summary>
         /// Save and then submit the users current draft for the organisation
@@ -97,11 +98,15 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         readonly ISharedBusinessLogic SharedBusinessLogic;
 
+        readonly IMapper Mapper;
+
         public StatementPresenter(
+            IMapper mapper,
             ISharedBusinessLogic sharedBusinessLogic,
             IStatementBusinessLogic statementBusinessLogic,
             IHttpContextAccessor httpContextAccessor)
         {
+            Mapper = mapper;
             SharedBusinessLogic = sharedBusinessLogic;
             StatementBusinessLogic = statementBusinessLogic;
             HttpContextAccessor = httpContextAccessor;
@@ -114,7 +119,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementViewModel>> TrySaveYourStatement(User user, StatementViewModel model)
+        public async Task<StatementActionResult> TrySaveYourStatement(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -130,7 +135,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementViewModel>> TrySaveCompliance(User user, StatementViewModel model)
+        public async Task<StatementActionResult> TrySaveCompliance(User user, StatementViewModel model)
         {
             return await SaveDraftForUser(user, model);
         }
@@ -144,7 +149,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementViewModel>> TrySaveYourOrgansation(User user, StatementViewModel model)
+        public async Task<StatementActionResult> TrySaveYourOrgansation(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -160,7 +165,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementViewModel>> TrySavePolicies(User user, StatementViewModel model)
+        public async Task<StatementActionResult> TrySavePolicies(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -176,7 +181,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementViewModel>> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementViewModel model)
+        public async Task<StatementActionResult> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -192,7 +197,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementViewModel>> TrySaveTraining(User user, StatementViewModel model)
+        public async Task<StatementActionResult> TrySaveTraining(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -208,7 +213,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementViewModel>> TrySaveMonitorInProgress(User user, StatementViewModel model)
+        public async Task<StatementActionResult> TrySaveMonitorInProgress(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -256,23 +261,20 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Draft
 
-        async Task<CustomResult<StatementViewModel>> SaveDraftForUser(User user, StatementViewModel model)
+        async Task<StatementActionResult> SaveDraftForUser(User user, StatementViewModel model)
         {
             var id = SharedBusinessLogic.Obfuscator.DeObfuscate(model.OrganisationIdentifier);
             var organisation = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(x => x.OrganisationId == id);
-            var actionresult = await StatementBusinessLogic.CanAccessStatement(user, organisation, model.Year);
 
+            var actionresult = await StatementBusinessLogic.CanAccessStatement(user, organisation, model.Year);
             if (actionresult != StatementActionResult.Success)
                 // is this the correct form of error?
-                return new CustomResult<StatementViewModel>(new CustomError(System.Net.HttpStatusCode.Unauthorized, "Unauthorised access"));
+                return actionresult;
 
             var entity = await MapToEntityAsync(model);
             var saveResult = await StatementBusinessLogic.SaveStatement(user, organisation, entity);
 
-            if (saveResult != StatementActionResult.Success)
-                return new CustomResult<StatementViewModel>(new CustomError(System.Net.HttpStatusCode.Unauthorized, "Unauthorised access"));
-
-            return await TryGetYourStatement(user, model.OrganisationIdentifier, model.Year);
+            return actionresult;
         }
 
         public async Task SubmitDraftForOrganisation()
@@ -312,14 +314,9 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             var id = SharedBusinessLogic.Obfuscator.DeObfuscate(viewModel.OrganisationIdentifier);
             var organisation = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(x => x.OrganisationId == id);
 
-            var entity = await StatementBusinessLogic.GetStatementByOrganisationAndYear(organisation, viewModel.Year);
+            var statement = Mapper.Map<Statement>(viewModel);
 
-            if (entity == null)
-                entity = new Statement { StatementId = 0 };
-
-
-
-            return entity;
+            return statement;
         }
 
         #endregion
@@ -405,5 +402,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         Training = 7,
         MentoringProcess = 8,
         Review = 9
+    }
+
+    public class StatementMapperProfile : Profile
+    {
+        public StatementMapperProfile()
+        {
+            CreateMap<StatementViewModel, Statement>();
+        }
     }
 }
