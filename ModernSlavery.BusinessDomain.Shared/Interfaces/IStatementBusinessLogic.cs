@@ -7,22 +7,22 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
-    public interface IStatementMetadataBusinessLogic
+    public interface IStatementBusinessLogic
     {
         /// <summary>
         /// Get the statement metadata from the specified year for the specified organisation.
         /// </summary>
-        Task<StatementMetadata> GetStatementMetadataByOrganisationAndYear(Organisation organisation, int reportingYear);
+        Task<Statement> GetStatementByOrganisationAndYear(Organisation organisation, int reportingYear);
 
         /// <summary>
         /// Check if the user can access the statement of the provided organisation and year.
         /// </summary>
-        Task<StatementActionResult> CanAccessStatementMetadata(User user, Organisation organisation, int reportingYear);
+        Task<StatementActionResult> CanAccessStatement(User user, Organisation organisation, int reportingYear);
 
         /// <summary>
         /// Save the statement metadata.
         /// </summary>
-        Task<StatementActionResult> SaveStatementMetadata(User user, Organisation organisation, StatementMetadata statementMetadata);
+        Task<StatementActionResult> SaveStatement(User user, Organisation organisation, Statement statement);
     }
 
     public enum StatementActionResult : byte

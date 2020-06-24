@@ -16,7 +16,7 @@ namespace ModernSlavery.Core.Entities
             OrganisationStatuses = new HashSet<OrganisationStatus>();
             Returns = new HashSet<Return>();
             UserOrganisations = new HashSet<UserOrganisation>();
-            StatementMetadatas = new HashSet<StatementMetadata>();
+            Statements = new HashSet<Statement>();
         }
 
         public long OrganisationId { get; set; }
@@ -57,7 +57,7 @@ namespace ModernSlavery.Core.Entities
         public virtual ICollection<OrganisationSicCode> OrganisationSicCodes { get; set; }
         public virtual ICollection<OrganisationStatus> OrganisationStatuses { get; set; }
         public virtual ICollection<Return> Returns { get; set; }
-        public virtual ICollection<StatementMetadata> StatementMetadatas { get; set; }
+        public virtual ICollection<Statement> Statements { get; set; }
         public virtual ICollection<UserOrganisation> UserOrganisations { get; set; }
     }
 }

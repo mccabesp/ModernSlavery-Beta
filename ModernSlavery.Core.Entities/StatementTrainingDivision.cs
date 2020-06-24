@@ -12,7 +12,7 @@ namespace ModernSlavery.Core.Entities
 
         public long StatementId { get; set; }
 
-        public virtual StatementMetadata Statement { get; set; }
+        public virtual Statement Statement { get; set; }
 
         public DateTime Created { get; set; }
     }

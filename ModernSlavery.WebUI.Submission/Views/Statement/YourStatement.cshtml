@@ -2,7 +2,7 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel
+@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
  @*//Where should this navigate back to ?*@
 <a class="govuk-back-link" href="@Url.Action("")">Back</a>
 <div class="govuk-grid-row">
@@ -57,9 +57,9 @@
                                 <label class="govuk-label govuk-date-input__label" for="reporting-start-day">
                                     Day
                                 </label>
-                                @Html.SetErrorClass(model => model.ReportingStartDate.Day, "error")">
-                                @Html.ValidationMessageFor(model => model.ReportingStartDate.Day, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.ReportingStartDate.Day, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                                @Html.SetErrorClass(model => model.StatementStartDate.Day, "error")">
+                                @Html.ValidationMessageFor(model => model.StatementStartDate.Day, "", new { @class = "error-message" })
+                                @Html.CustomEditorFor(model => model.StatementStartDate.Day, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
                             </div>
                         </div>
                         <div class="govuk-date-input__item">
@@ -67,9 +67,9 @@
                                 <label class="govuk-label govuk-date-input__label" for="reporting-start-month">
                                     Month
                                 </label>
-                                @Html.SetErrorClass(model => model.ReportingStartDate.Month, "error")">
-                                @Html.ValidationMessageFor(model => model.ReportingStartDate.Month, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.ReportingStartDate.Month, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                                @Html.SetErrorClass(model => model.StatementStartDate.Month, "error")">
+                                @Html.ValidationMessageFor(model => model.StatementStartDate.Month, "", new { @class = "error-message" })
+                                @Html.CustomEditorFor(model => model.StatementStartDate.Month, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
                             </div>
                         </div>
                         <div class="govuk-date-input__item">
@@ -77,9 +77,9 @@
                                 <label class="govuk-label govuk-date-input__label" for="reporting-start-year">
                                     Year
                                 </label>
-                                @Html.SetErrorClass(model => model.ReportingStartDate.Year, "error")">
-                                @Html.ValidationMessageFor(model => model.ReportingStartDate.Year, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.ReportingStartDate.Year, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                                @Html.SetErrorClass(model => model.StatementStartDate.Year, "error")">
+                                @Html.ValidationMessageFor(model => model.StatementStartDate.Year, "", new { @class = "error-message" })
+                                @Html.CustomEditorFor(model => model.StatementStartDate.Year, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
                             </div>
                         </div>
 
@@ -92,9 +92,9 @@
                                 <label class="govuk-label govuk-date-input__label" for="reporting-end-day">
                                     Day
                                 </label>
-                                @Html.SetErrorClass(model => model.ReportingEndDate.Day, "error")">
-                                @Html.ValidationMessageFor(model => model.ReportingEndDate.Day, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.ReportingEndDate.Day, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                                @Html.SetErrorClass(model => model.StatementEndDate.Day, "error")">
+                                @Html.ValidationMessageFor(model => model.StatementEndDate.Day, "", new { @class = "error-message" })
+                                @Html.CustomEditorFor(model => model.StatementEndDate.Day, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
                             </div>
                         </div>
                         <div class="govuk-date-input__item">
@@ -102,9 +102,9 @@
                                 <label class="govuk-label govuk-date-input__label" for="reporting-end-month">
                                     Month
                                 </label>
-                                @Html.SetErrorClass(model => model.ReportingEndDate.Month, "error")">
-                                @Html.ValidationMessageFor(model => model.ReportingEndDate.Month, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.ReportingEndDate.Month, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                                @Html.SetErrorClass(model => model.StatementEndDate.Month, "error")">
+                                @Html.ValidationMessageFor(model => model.StatementEndDate.Month, "", new { @class = "error-message" })
+                                @Html.CustomEditorFor(model => model.StatementEndDate.Month, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
                             </div>
                         </div>
                         <div class="govuk-date-input__item">
@@ -112,9 +112,9 @@
                                 <label class="govuk-label govuk-date-input__label" for="reporting-end-year">
                                     Year
                                 </label>
-                                @Html.SetErrorClass(model => model.ReportingEndDate.Year, "error")">
-                                @Html.ValidationMessageFor(model => model.ReportingEndDate.Year, "", new { @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.ReportingEndDate.Year, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
+                                @Html.SetErrorClass(model => model.StatementEndDate.Year, "error")">
+                                @Html.ValidationMessageFor(model => model.StatementEndDate.Year, "", new { @class = "error-message" })
+                                @Html.CustomEditorFor(model => model.StatementEndDate.Year, new { @class = "govuk-input govuk-date-input__input govuk-input--width-2", type = "text", pattern = "[0-9]*", inputmode = "numeric" })
                             </div>
                         </div>
                     </div>

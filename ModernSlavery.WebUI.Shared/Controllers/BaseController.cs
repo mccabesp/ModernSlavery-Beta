@@ -571,7 +571,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 return null;
 
             // allow statement
-            if (ControllerName == "StatementMetadata")
+            if (ControllerName == "Statement")
                 return null;
 
             // if the user doesn't have a selected an organisation then go to the ManageOrgs page

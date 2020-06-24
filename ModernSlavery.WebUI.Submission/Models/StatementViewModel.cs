@@ -9,13 +9,13 @@ using System.ComponentModel.DataAnnotations;
 namespace ModernSlavery.WebUI.Submission.Presenters
 {
     [Serializable]
-    public class StatementMetadataViewModel : GovUkViewModel
+    public class StatementViewModel : GovUkViewModel
     {
         // DB layer Id
-        public long StatementMetadataId { get; set; }
+        public long StatementId { get; set; }
 
         // Presentation layer Id
-        public string StatementMetadataIdentifier { get; set; }
+        public string StatementIdentifier { get; set; }
 
         public ReturnStatuses Status { get; set; }
 
@@ -23,10 +23,10 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public DateTime StatusDate { get; set; }
 
         // Earliest date that the submission can be started
-        public DateTime ReportingStartDate { get; set; }
+        public DateTime StatementStartDate { get; set; }
 
-        public DateTime ReportingEndDate { get; set; }
-        public DateTime AccountingDate { get; set; }
+        public DateTime StatementEndDate { get; set; }
+        public DateTime SubmissionDeadline { get; set; }
         // This should never go over the wire!
         public long OrganisationId { get; set; }
 

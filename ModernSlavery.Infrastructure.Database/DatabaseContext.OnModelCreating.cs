@@ -15,7 +15,7 @@ namespace ModernSlavery.Infrastructure.Database
             modelBuilder.Entity<OrganisationReference>().ToTable("OrganisationReferences");
             modelBuilder.Entity<OrganisationScope>().ToTable("OrganisationScopes");
             modelBuilder.Entity<OrganisationSicCode>().ToTable("OrganisationSicCodes");
-            modelBuilder.Entity<StatementMetadata>().ToTable("StatementMetadatas");
+            modelBuilder.Entity<Statement>().ToTable("Statements");
             modelBuilder.Entity<Return>().ToTable("Returns");
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<UserStatus>().ToTable("UserStatus");
@@ -457,24 +457,24 @@ namespace ModernSlavery.Infrastructure.Database
 
             #endregion
 
-            #region Statement metadata
+            #region Statement
 
-            modelBuilder.Entity<StatementMetadata>(
+            modelBuilder.Entity<Statement>(
                 entity =>
                 {
-                    entity.HasKey(e => e.StatementMetadataId)
-                        .HasName("PK_dbo.StatementMetadatas");
+                    entity.HasKey(e => e.StatementId)
+                        .HasName("PK_dbo.Statements");
 
                     entity.HasIndex(e => e.OrganisationId)
                         .HasName("IX_OrganisationId");
 
-                    entity.HasIndex(e => e.ReportingStartDate)
+                    entity.HasIndex(e => e.StatementStartDate)
                         .HasName("IX_ReportingStartDate");
 
-                    entity.HasIndex(e => e.ReportingEndDate)
+                    entity.HasIndex(e => e.StatementEndDate)
                         .HasName("IX_ReportingEndDate");
 
-                    entity.HasIndex(e => e.AccountingDate)
+                    entity.HasIndex(e => e.SubmissionDeadline)
                         .HasName("IX_AccountingDate");
 
                     entity.Property(e => e.IncludesGoals)
@@ -533,9 +533,9 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasDefaultValueSql("((0))");
 
                     entity.HasOne(d => d.Organisation)
-                        .WithMany(p => p.StatementMetadatas)
+                        .WithMany(p => p.Statements)
                         .HasForeignKey(d => d.OrganisationId)
-                        .HasConstraintName("FK_dbo.StatementMetadatas_dbo.Organisations_OrganisationId");
+                        .HasConstraintName("FK_dbo.Statements_dbo.Organisations_OrganisationId");
                 });
 
             #endregion
@@ -571,7 +571,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasOne(e => e.Statement)
                         .WithMany()
                         .HasForeignKey(e => e.StatementId)
-                        .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.StatementMetadatas_StatementMetadataId");
+                        .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.Statements_StatementId");
                 });
 
             #endregion
@@ -592,7 +592,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasOne(e => e.Statement)
                         .WithMany()
                         .HasForeignKey(e => e.StatementId)
-                        .HasConstraintName("FK_dbo.StatementDiligences_dbo.StatementMetadatas_StatementMetadataId");
+                        .HasConstraintName("FK_dbo.StatementDiligences_dbo.Statements_StatementId");
                 });
 
             #endregion
@@ -643,7 +643,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasOne(e => e.Statement)
                         .WithMany()
                         .HasForeignKey(e => e.StatementId)
-                        .HasConstraintName("FK_dbo.StatementPolicies_dbo.StatementMetadatas_StatementMetadataId");
+                        .HasConstraintName("FK_dbo.StatementPolicies_dbo.Statements_StatementId");
                 });
 
             #endregion
@@ -664,7 +664,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasOne(e => e.Statement)
                         .WithMany()
                         .HasForeignKey(e => e.StatementId)
-                        .HasConstraintName("FK_dbo.StatementRisks_dbo.StatementMetadatas_StatementMetadataId");
+                        .HasConstraintName("FK_dbo.StatementRisks_dbo.Statements_StatementId");
                 });
 
             #endregion
@@ -681,6 +681,7 @@ namespace ModernSlavery.Infrastructure.Database
                         .WithMany()
                         .HasForeignKey(e => e.ParentRiskTypeId)
                         .HasConstraintName("FK_dbo.StatementRisks_dbo.StatementRisks_StatementRiskId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .IsRequired();
 
                     entity.Property(e => e.Description)
@@ -700,7 +701,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasOne(e => e.Statement)
                         .WithMany()
                         .HasForeignKey(e => e.StatementId)
-                        .HasConstraintName("FK_dbo.StatementOrganisations_dbo.StatementMetadatas_StatementMetadataId");
+                        .HasConstraintName("FK_dbo.StatementOrganisations_dbo.Statements_StatementId");
 
                     entity.HasOne(e => e.Organisation)
                         .WithMany()
@@ -931,7 +932,8 @@ namespace ModernSlavery.Infrastructure.Database
             modelBuilder.Entity<UserStatus>(
                 entity =>
                 {
-                    entity.HasKey(e => e.UserStatusId).HasName("PK_dbo.UserStatus");
+                    entity.HasKey(e => e.UserStatusId)
+                        .HasName("PK_dbo.UserStatus");
 
                     entity.HasIndex(e => e.ByUserId)
                         .HasName("IX_ByUserId");

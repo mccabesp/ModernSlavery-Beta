@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Core.Entities
 {
-    partial class StatementMetadata
+    partial class Statement
     {
         public bool CanBeEdited
             // a stub for checking if this entity is allowed to be edited

@@ -2,7 +2,7 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel
+@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
 
 <a class="govuk-back-link" href="@Url.Action("your-organisation")">Back</a>
 <div class="govuk-grid-row">
@@ -17,7 +17,7 @@
 
         @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.StatementPolicies)                   
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementPolicies)                   
                 }))
 
         <h1 class="govuk-heading-l">

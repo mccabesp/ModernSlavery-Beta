@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\StatementMetadata\" />
+    <Folder Include="Views\Statement\" />
   </ItemGroup>
 
 </Project>

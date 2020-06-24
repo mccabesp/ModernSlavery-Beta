@@ -13,45 +13,46 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace ModernSlavery.WebUI.Submission.Presenters
 {
-    public interface IStatementMetadataPresenter
+    public interface IStatementPresenter
     {
         /// <summary>
         /// Returns the result of trying to get your statement.
         /// The action result will be the view.
         /// </summary>
-        Task<CustomResult<StatementMetadataViewModel>> TryGetYourStatement(User user, string organisationIdentifier, int year);
+        Task<CustomResult<StatementViewModel>> TryGetYourStatement(User user, string organisationIdentifier, int year);
 
         /// <summary>
         /// Save the current submission draft which is only visible to the current user.
         /// </summary>
-        Task<CustomResult<StatementMetadataViewModel>> TrySaveYourStatement(User user, StatementMetadataViewModel model);
+        Task<CustomResult<StatementViewModel>> TrySaveYourStatement(User user, StatementViewModel model);
 
-        Task<CustomResult<StatementMetadataViewModel>> TryGetCompliance(User user, string organisationIdentifier, int year);
+        Task<CustomResult<StatementViewModel>> TryGetCompliance(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementMetadataViewModel>> TrySaveCompliance(User user, StatementMetadataViewModel model);
+        Task<CustomResult<StatementViewModel>> TrySaveCompliance(User user, StatementViewModel model);
 
-        Task<CustomResult<StatementMetadataViewModel>> TryGetYourOrganisation(User user, string organisationIdentifier, int year);
+        Task<CustomResult<StatementViewModel>> TryGetYourOrganisation(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementMetadataViewModel>> TrySaveYourOrgansation(User user, StatementMetadataViewModel model);
+        Task<CustomResult<StatementViewModel>> TrySaveYourOrgansation(User user, StatementViewModel model);
 
-        Task<CustomResult<StatementMetadataViewModel>> TryGetPolicies(User user, string organisationIdentifier, int year);
+        Task<CustomResult<StatementViewModel>> TryGetPolicies(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementMetadataViewModel>> TrySavePolicies(User user, StatementMetadataViewModel model);
+        Task<CustomResult<StatementViewModel>> TrySavePolicies(User user, StatementViewModel model);
 
-        Task<CustomResult<StatementMetadataViewModel>> TryGetSupplyChainRiskAndDueDiligence(User user, string organisationIdentifier, int year);
+        Task<CustomResult<StatementViewModel>> TryGetSupplyChainRiskAndDueDiligence(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementMetadataViewModel>> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementMetadataViewModel model);
+        Task<CustomResult<StatementViewModel>> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementViewModel model);
 
-        Task<CustomResult<StatementMetadataViewModel>> TryGetTraining(User user, string organisationIdentifier, int year);
+        Task<CustomResult<StatementViewModel>> TryGetTraining(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementMetadataViewModel>> TrySaveTraining(User user, StatementMetadataViewModel model);
+        Task<CustomResult<StatementViewModel>> TrySaveTraining(User user, StatementViewModel model);
 
-        Task<CustomResult<StatementMetadataViewModel>> TryGetMonitoringInProgress(User user, string organisationIdentifier, int year);
+        Task<CustomResult<StatementViewModel>> TryGetMonitoringInProgress(User user, string organisationIdentifier, int year);
 
-        Task<CustomResult<StatementMetadataViewModel>> TrySaveMonitorInProgress(User user, StatementMetadataViewModel model);
+        Task<CustomResult<StatementViewModel>> TrySaveMonitorInProgress(User user, StatementViewModel model);
 
         /// <summary>
         /// Save and then submit the users current draft for the organisation
@@ -66,12 +67,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <summary>
         /// Validate the draft, allowing empty entries.
         /// </summary>
-        Task ValidateForDraft(StatementMetadataViewModel model);
+        Task ValidateForDraft(StatementViewModel model);
 
         /// <summary>
         /// Validate the draft and ensure there are no empty field.
         /// </summary>
-        Task ValidateForSubmission(StatementMetadataViewModel model);
+        Task ValidateForSubmission(StatementViewModel model);
 
         /// <summary>
         /// Gets the next action in the submission workflow.
@@ -84,37 +85,37 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         Task<string> GetCancelRedirection();
     }
 
-    public class StatementMetadataPresenter : IStatementMetadataPresenter
+    public class StatementPresenter : IStatementPresenter
     {
         // class will NOT provide enough uniqueness, think multiple open tabs
         // the key will have to be constructed out of parameters in the url - org and year
-        const string SessionKey = "StatementMetadataPresenter";
+        const string SessionKey = "StatementPresenter";
 
-        readonly IStatementMetadataBusinessLogic StatementMetadataBusinessLogic;
+        readonly IStatementBusinessLogic StatementBusinessLogic;
 
         // required for accessing session
         readonly IHttpContextAccessor HttpContextAccessor;
 
         readonly ISharedBusinessLogic SharedBusinessLogic;
 
-        public StatementMetadataPresenter(
+        public StatementPresenter(
             ISharedBusinessLogic sharedBusinessLogic,
-            IStatementMetadataBusinessLogic statementMetadataBusinessLogic,
+            IStatementBusinessLogic statementBusinessLogic,
             IHttpContextAccessor httpContextAccessor)
         {
             SharedBusinessLogic = sharedBusinessLogic;
-            StatementMetadataBusinessLogic = statementMetadataBusinessLogic;
+            StatementBusinessLogic = statementBusinessLogic;
             HttpContextAccessor = httpContextAccessor;
         }
 
         #region Step 1 - Your statement
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TryGetYourStatement(User user, string organisationIdentifier, int year)
+        public async Task<CustomResult<StatementViewModel>> TryGetYourStatement(User user, string organisationIdentifier, int year)
         {
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TrySaveYourStatement(User user, StatementMetadataViewModel model)
+        public async Task<CustomResult<StatementViewModel>> TrySaveYourStatement(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -125,12 +126,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Step 2 - Compliance
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TryGetCompliance(User user, string organisationIdentifier, int year)
+        public async Task<CustomResult<StatementViewModel>> TryGetCompliance(User user, string organisationIdentifier, int year)
         {
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TrySaveCompliance(User user, StatementMetadataViewModel model)
+        public async Task<CustomResult<StatementViewModel>> TrySaveCompliance(User user, StatementViewModel model)
         {
             return await SaveDraftForUser(user, model);
         }
@@ -139,12 +140,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Step 3 - Your organisation
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TryGetYourOrganisation(User user, string organisationIdentifier, int year)
+        public async Task<CustomResult<StatementViewModel>> TryGetYourOrganisation(User user, string organisationIdentifier, int year)
         {
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TrySaveYourOrgansation(User user, StatementMetadataViewModel model)
+        public async Task<CustomResult<StatementViewModel>> TrySaveYourOrgansation(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -155,12 +156,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Step 4 - Policies
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TryGetPolicies(User user, string organisationIdentifier, int year)
+        public async Task<CustomResult<StatementViewModel>> TryGetPolicies(User user, string organisationIdentifier, int year)
         {
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TrySavePolicies(User user, StatementMetadataViewModel model)
+        public async Task<CustomResult<StatementViewModel>> TrySavePolicies(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -171,12 +172,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Step 5 - Supply chain risks and due diligence
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TryGetSupplyChainRiskAndDueDiligence(User user, string organisationIdentifier, int year)
+        public async Task<CustomResult<StatementViewModel>> TryGetSupplyChainRiskAndDueDiligence(User user, string organisationIdentifier, int year)
         {
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementMetadataViewModel model)
+        public async Task<CustomResult<StatementViewModel>> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -187,12 +188,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Step 6 - Training
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TryGetTraining(User user, string organisationIdentifier, int year)
+        public async Task<CustomResult<StatementViewModel>> TryGetTraining(User user, string organisationIdentifier, int year)
         {
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TrySaveTraining(User user, StatementMetadataViewModel model)
+        public async Task<CustomResult<StatementViewModel>> TrySaveTraining(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -203,12 +204,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Step 7 - Monitoring progress
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TryGetMonitoringInProgress(User user, string organisationIdentifier, int year)
+        public async Task<CustomResult<StatementViewModel>> TryGetMonitoringInProgress(User user, string organisationIdentifier, int year)
         {
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<CustomResult<StatementMetadataViewModel>> TrySaveMonitorInProgress(User user, StatementMetadataViewModel model)
+        public async Task<CustomResult<StatementViewModel>> TrySaveMonitorInProgress(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -220,15 +221,15 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         #region Step 8 - Review TODO
         #endregion
 
-        private async Task<CustomResult<StatementMetadataViewModel>> TryGetViewModel(User user, string organisationIdentifier, int year)
+        private async Task<CustomResult<StatementViewModel>> TryGetViewModel(User user, string organisationIdentifier, int year)
         {
             var id = SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
             var organisation = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(x => x.OrganisationId == id);
 
-            var actionresult = await StatementMetadataBusinessLogic.CanAccessStatementMetadata(user, organisation, year);
+            var actionresult = await StatementBusinessLogic.CanAccessStatement(user, organisation, year);
             if (actionresult != StatementActionResult.Success)
                 // is this the correct form of error?
-                return new CustomResult<StatementMetadataViewModel>(new CustomError(System.Net.HttpStatusCode.Unauthorized, "Unauthorised access"));
+                return new CustomResult<StatementViewModel>(new CustomError(System.Net.HttpStatusCode.Unauthorized, "Unauthorised access"));
 
             // check session stashed vm
             var sessionVm = GetSessionVM();
@@ -239,7 +240,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 // if it does not, do NOT return it
                 if (sessionVm.OrganisationId == organisation.OrganisationId && sessionVm.Year != year)
                     // everything is valid, return from session
-                    return new CustomResult<StatementMetadataViewModel>(sessionVm);
+                    return new CustomResult<StatementViewModel>(sessionVm);
 
                 // session is invalid in some way and has to be cleared
                 DeleteSessionVM();
@@ -247,28 +248,32 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
             // Check business logic layer
             // that should query file and DB
-            var entity = await StatementMetadataBusinessLogic.GetStatementMetadataByOrganisationAndYear(organisation, year);
+            var entity = await StatementBusinessLogic.GetStatementByOrganisationAndYear(organisation, year);
 
             // shouldnt need to check it for access as that was already done
             var vm = MapToVM(entity);
-            return new CustomResult<StatementMetadataViewModel>(vm);
+            return new CustomResult<StatementViewModel>(vm);
         }
 
         #region Draft
 
-        async Task<CustomResult<StatementMetadataViewModel>> SaveDraftForUser(User user, StatementMetadataViewModel model)
+        async Task<CustomResult<StatementViewModel>> SaveDraftForUser(User user, StatementViewModel model)
         {
-            var organisation = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(x => x.OrganisationId == model.OrganisationId);
-            var actionresult = await StatementMetadataBusinessLogic.CanAccessStatementMetadata(user, organisation, model.Year);
+            var id = SharedBusinessLogic.Obfuscator.DeObfuscate(model.OrganisationIdentifier);
+            var organisation = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(x => x.OrganisationId == id);
+            var actionresult = await StatementBusinessLogic.CanAccessStatement(user, organisation, model.Year);
 
             if (actionresult != StatementActionResult.Success)
                 // is this the correct form of error?
-                return new CustomResult<StatementMetadataViewModel>(new CustomError(System.Net.HttpStatusCode.Unauthorized, "Unauthorised access"));
+                return new CustomResult<StatementViewModel>(new CustomError(System.Net.HttpStatusCode.Unauthorized, "Unauthorised access"));
 
             var entity = await MapToEntityAsync(model);
-            await StatementMetadataBusinessLogic.SaveStatementMetadata(user, organisation, entity);
+            var saveResult = await StatementBusinessLogic.SaveStatement(user, organisation, entity);
 
-            throw new NotImplementedException();
+            if (saveResult != StatementActionResult.Success)
+                return new CustomResult<StatementViewModel>(new CustomError(System.Net.HttpStatusCode.Unauthorized, "Unauthorised access"));
+
+            return await TryGetYourStatement(user, model.OrganisationIdentifier, model.Year);
         }
 
         public async Task SubmitDraftForOrganisation()
@@ -278,7 +283,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         public async Task ClearDraftForUser()
         {
-            throw new NotImplementedException();
             DeleteSessionVM();
         }
 
@@ -286,33 +290,33 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Mapping
 
-        StatementMetadataViewModel MapToVM(StatementMetadata entity)
+        StatementViewModel MapToVM(Statement entity)
         {
             if (entity == null)
-                return new StatementMetadataViewModel();
+                return new StatementViewModel();
 
-            return new StatementMetadataViewModel
+            return new StatementViewModel
             {
                 OrganisationId = entity.OrganisationId,
                 OrganisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(entity.OrganisationId),
-                ReportingStartDate = entity.ReportingStartDate,
-                StatementMetadataId = entity.StatementMetadataId,
-                StatementMetadataIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(entity.StatementMetadataId),
+                StatementStartDate = entity.StatementStartDate,
+                StatementId = entity.StatementId,
+                StatementIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(entity.StatementId),
                 Status = entity.Status,
                 StatusDate = entity.StatusDate,
-                Year = entity.AccountingDate.Year
+                Year = entity.SubmissionDeadline.Year
             };
         }
 
-        async Task<StatementMetadata> MapToEntityAsync(StatementMetadataViewModel viewModel)
+        async Task<Statement> MapToEntityAsync(StatementViewModel viewModel)
         {
             var id = SharedBusinessLogic.Obfuscator.DeObfuscate(viewModel.OrganisationIdentifier);
             var organisation = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(x => x.OrganisationId == id);
 
-            var entity = await StatementMetadataBusinessLogic.GetStatementMetadataByOrganisationAndYear(organisation, viewModel.Year);
+            var entity = await StatementBusinessLogic.GetStatementByOrganisationAndYear(organisation, viewModel.Year);
 
             if (entity == null)
-                entity = new StatementMetadata { StatementMetadataId = 0 };
+                entity = new Statement { StatementId = 0 };
 
 
 
@@ -326,18 +330,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         // Validation should happen at lower levels,
         // eg SubmissionService/SubmissionBusinessLogic
 
-        public async Task ValidateForDraft(StatementMetadataViewModel model)
+        public Task ValidateForDraft(StatementViewModel model)
         {
-            // properties with no data should not be validated
-
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
-        public async Task ValidateForSubmission(StatementMetadataViewModel model)
+        public Task ValidateForSubmission(StatementViewModel model)
         {
-            // Validate everything
-
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         #endregion
@@ -352,9 +352,9 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             switch (step)
             {
                 case SubmissionStep.NotStarted:
-                    return nameof(StatementMetadataController.YourStatement);
+                    return nameof(StatementController.YourStatement);
                 case SubmissionStep.YourStatement:
-                    return nameof(StatementMetadataController.Compliance);
+                    return nameof(StatementController.Compliance);
                 case SubmissionStep.Compliance:
                 case SubmissionStep.YourOrganisation:
                 case SubmissionStep.Policies:
@@ -377,13 +377,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-        private StatementMetadataViewModel GetSessionVM()
+        private StatementViewModel GetSessionVM()
         {
             // originally taken from BaseController.UnstashModel
             var json = HttpContextAccessor.HttpContext.Session.GetString(SessionKey + ":Model");
             var result = string.IsNullOrWhiteSpace(json)
                 ? null
-                : JsonConvert.DeserializeObject<StatementMetadataViewModel>(json);
+                : JsonConvert.DeserializeObject<StatementViewModel>(json);
 
             return result;
         }

@@ -14,17 +14,14 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.WebUI.Submission.Controllers
 {
-    // Route:
-    // "~/submission/<org-reference>/<year>/<action>/"
-    // TODO - rename to submission when appropriate
     [Route("statement")]
-    public class StatementMetadataController : BaseController
+    public class StatementController : BaseController
     {
-        readonly IStatementMetadataPresenter SubmissionPresenter;
+        readonly IStatementPresenter SubmissionPresenter;
 
-        public StatementMetadataController(
-            IStatementMetadataPresenter submissionPresenter,
-            ILogger<StatementMetadataController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic)
+        public StatementController(
+            IStatementPresenter submissionPresenter,
+            ILogger<StatementController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic)
             : base(logger, webService, sharedBusinessLogic)
         {
             SubmissionPresenter = submissionPresenter;
@@ -65,8 +62,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/your-statement")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> YourStatement(StatementMetadataViewModel submissionModel)
+        public async Task<IActionResult> YourStatement(StatementViewModel submissionModel)
         {
+            if (!ModelState.IsValid)
+                return View(submissionModel);
+
             var result = await SubmissionPresenter.TrySaveYourStatement(CurrentUser, submissionModel);
 
             return await GetActionResultFromSave(result, SubmissionStep.YourStatement);
@@ -99,7 +99,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/compliance")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Compliance(StatementMetadataViewModel submissionModel)
+        public async Task<IActionResult> Compliance(StatementViewModel submissionModel)
         {
             var result = await SubmissionPresenter.TrySaveCompliance(CurrentUser, submissionModel);
 
@@ -252,7 +252,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         #region Private methods
 
-        private async Task<IActionResult> GetActionResultFromQuery(CustomResult<StatementMetadataViewModel> result)
+        private async Task<IActionResult> GetActionResultFromQuery(CustomResult<StatementViewModel> result)
         {
             if (result.Failed)
             {
@@ -265,7 +265,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             return View(result.Result);
         }
 
-        private async Task<IActionResult> GetActionResultFromSave(CustomResult<StatementMetadataViewModel> result, SubmissionStep step)
+        private async Task<IActionResult> GetActionResultFromSave(CustomResult<StatementViewModel> result, SubmissionStep step)
         {
             if (result.Failed)
             {

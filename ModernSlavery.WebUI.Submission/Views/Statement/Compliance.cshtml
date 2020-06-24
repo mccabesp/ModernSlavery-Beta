@@ -3,7 +3,7 @@
 
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel
+@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
     <a class="govuk-back-link" href="@Url.Action("your-statment")">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
@@ -18,12 +18,12 @@
 
         @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesStructure),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesPolicies),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesRisks),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesMethods),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesTraining),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementMetadataViewModel.IncludesEffectiveness)
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesStructure),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesPolicies),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesRisks),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesMethods),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesTraining),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesEffectiveness)
                 }))
 
         <h1 class="govuk-heading-l">

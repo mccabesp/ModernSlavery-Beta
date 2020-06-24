@@ -88,7 +88,7 @@
             </a>
         }
 
-        <a class="button" id="NewReport@(linkId)-@(Model.EncCurrentOrgId)" href="@Url.Action("YourStatement", "StatementMetadata", new { organisationIdentifier = obfuscatedId, year = reportInfoModel.ReportingStartDate.Year })">
+        <a class="button" id="NewReport@(linkId)-@(Model.EncCurrentOrgId)" href="@Url.Action("YourStatement", "Statement", new { organisationIdentifier = obfuscatedId, year = reportInfoModel.ReportingStartDate.Year })">
             <span>Your statement</span>
         </a>
     </div>

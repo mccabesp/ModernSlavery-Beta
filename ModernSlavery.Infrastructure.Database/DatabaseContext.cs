@@ -210,7 +210,7 @@ namespace ModernSlavery.Infrastructure.Database
         public virtual DbSet<Feedback> Feedback { get; set; }
         public virtual DbSet<AuditLog> AuditLogs { get; set; }
         public virtual DbSet<ReminderEmail> ReminderEmails { get; set; }
-        public virtual DbSet<StatementMetadata> StatementMetadatas { get; set; }
+        public virtual DbSet<Statement> Statements { get; set; }
         public virtual DbSet<StatementDivisionType> StatementDivisionTypes { get; set; }
         public virtual DbSet<StatementTrainingDivision> StatementTrainingDivisions { get; set; }
         public virtual DbSet<StatementDiligence> StatementDiligences { get; set; }

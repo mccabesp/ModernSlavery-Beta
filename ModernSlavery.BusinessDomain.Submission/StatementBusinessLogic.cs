@@ -12,23 +12,23 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.BusinessDomain.Submission
 {
-    partial class StatementMetadataBusinessLogic : IStatementMetadataBusinessLogic
+    partial class StatementBusinessLogic : IStatementBusinessLogic
     {
         readonly ISharedBusinessLogic SharedBusinessLogic;
 
-        public StatementMetadataBusinessLogic(ISharedBusinessLogic sharedBusinessLogic)
+        public StatementBusinessLogic(ISharedBusinessLogic sharedBusinessLogic)
         {
             SharedBusinessLogic = sharedBusinessLogic;
         }
 
-        public async Task<StatementMetadata> GetStatementMetadataByOrganisationAndYear(Organisation organisation, int year)
+        public async Task<Statement> GetStatementByOrganisationAndYear(Organisation organisation, int year)
         {
             return await SharedBusinessLogic.DataRepository
                 // Is the accounting year the correct year?
-                .FirstOrDefaultAsync<StatementMetadata>(s => s.OrganisationId == organisation.OrganisationId && s.AccountingDate.Year == year);
+                .FirstOrDefaultAsync<Statement>(s => s.OrganisationId == organisation.OrganisationId && s.SubmissionDeadline.Year == year);
         }
 
-        public async Task<StatementActionResult> CanAccessStatementMetadata(User user, Organisation organisation, int reportingYear)
+        public async Task<StatementActionResult> CanAccessStatement(User user, Organisation organisation, int reportingYear)
         {
             // only assigned users
             var assignment = organisation.UserOrganisations.FirstOrDefault(uo => uo.User == user);
@@ -39,14 +39,14 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (!organisation.Status.IsAny(OrganisationStatuses.Active, OrganisationStatuses.Pending, OrganisationStatuses.New))
                 return StatementActionResult.Unauthorised;
 
-            var statement = await GetStatementMetadataByOrganisationAndYear(organisation, reportingYear);
+            var statement = await GetStatementByOrganisationAndYear(organisation, reportingYear);
             if (statement != null && statement.CanBeEdited)
                 return StatementActionResult.Uneditable;
 
             return StatementActionResult.Success;
         }
 
-        public async Task<StatementActionResult> SaveStatementMetadata(User user, Organisation organisation, StatementMetadata statement)
+        public async Task<StatementActionResult> SaveStatement(User user, Organisation organisation, Statement statement)
         {
             if (!statement.CanBeEdited)
             {
@@ -54,16 +54,16 @@ namespace ModernSlavery.BusinessDomain.Submission
             }
 
             // Is this check enough?
-            if (statement.StatementMetadataId == 0)
+            if (statement.StatementId == 0)
             {
                 statement.OrganisationId = organisation.OrganisationId;
                 statement.Created = VirtualDateTime.Now;
-                statement.AccountingDate = SharedBusinessLogic.GetAccountingStartDate(organisation.SectorType, VirtualDateTime.Now.Year);
+                statement.SubmissionDeadline = SharedBusinessLogic.GetAccountingStartDate(organisation.SectorType, VirtualDateTime.Now.Year);
 
                 SharedBusinessLogic.DataRepository.Insert(statement);
 
                 // Add the statement to the org
-                //statementMetadata.Organisation.Statements.Add(statementMetadata);
+                //statement.Organisation.Statements.Add(statement);
             }
 
             // status, status history

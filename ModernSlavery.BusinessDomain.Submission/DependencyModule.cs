@@ -27,7 +27,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             builder.RegisterType<SubmissionService>().As<ISubmissionService>().InstancePerLifetimeScope().WithAttributeFiltering();
             builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerLifetimeScope().WithAttributeFiltering();
             builder.RegisterType<DraftFileBusinessLogic>().As<IDraftFileBusinessLogic>().SingleInstance();
-            builder.RegisterType<StatementMetadataBusinessLogic>().As<IStatementMetadataBusinessLogic>()
+            builder.RegisterType<StatementBusinessLogic>().As<IStatementBusinessLogic>()
                 .InstancePerLifetimeScope().WithAttributeFiltering();
         }
 

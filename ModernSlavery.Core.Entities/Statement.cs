@@ -4,20 +4,20 @@ using System.Text;
 
 namespace ModernSlavery.Core.Entities
 {
-    public partial class StatementMetadata
+    public partial class Statement
     {
-        public long StatementMetadataId { get; set; }
+        public long StatementId { get; set; }
 
         public long OrganisationId { get; set; }
 
         // Earliest date that the submission can be started
-        public DateTime ReportingStartDate { get; set; }
+        public DateTime StatementStartDate { get; set; }
 
         // Latest date that the submission can be started
-        public DateTime ReportingEndDate { get; set; }
+        public DateTime StatementEndDate { get; set; }
 
         // reporting deadline
-        public DateTime AccountingDate { get; set; }
+        public DateTime SubmissionDeadline { get; set; }
 
         public string StatementUrl { get; set; }
 
