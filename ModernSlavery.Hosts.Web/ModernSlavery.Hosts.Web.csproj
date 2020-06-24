@@ -82,11 +82,10 @@
     </Content>
   </ItemGroup>
 
-  <!-- *** THIS IS REQUIRED TO EXCLUDE Web.*.config from Publish folder *** -->
+    <!-- *** THIS IS REQUIRED TO EXCLUDE Web.*.config from Publish folder *** -->
   <ItemGroup>
     <Content Remove="Web.*.config" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="Web.*.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -105,10 +104,6 @@
     </AdditionalFiles>
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <!-- *** THIS IS REQUIRED TO DEPLY WebjobS WITH WEBUI ON AZURE *** -->

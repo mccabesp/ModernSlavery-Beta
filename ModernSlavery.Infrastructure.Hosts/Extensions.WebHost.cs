@@ -24,9 +24,13 @@ namespace ModernSlavery.Infrastructure.Hosts
             var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
             var appConfig = configBuilder.Build();
 
+            //Set the content root to the bin folder if in development mode
+            if (appConfig.IsDevelopment()) appConfig[HostDefaults.ContentRootKey] = System.AppDomain.CurrentDomain.BaseDirectory;
+
             //Set the content root from the confif or environment
             var contentRoot = appConfig[HostDefaults.ContentRootKey];
-            if (string.IsNullOrWhiteSpace(contentRoot))contentRoot = Directory.GetCurrentDirectory();
+
+            if (string.IsNullOrWhiteSpace(contentRoot))contentRoot = System.AppDomain.CurrentDomain.BaseDirectory;
             if (!Directory.Exists(contentRoot)) throw new DirectoryNotFoundException($"Cannot find content root '{contentRoot}'");
 
             hostBuilder.UseContentRoot(contentRoot);
