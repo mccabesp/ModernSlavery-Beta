@@ -70,7 +70,7 @@ namespace ModernSlavery.Infrastructure.Configuration
                     exceptions.Add(new ArgumentNullException("ClientId is missing"));
 
                 if (string.IsNullOrWhiteSpace(clientSecret))
-                    exceptions.Add(new ArgumentNullException("clientSecret is missing"));
+                    exceptions.Add(new ArgumentNullException("ClientSecret is missing"));
 
                 if (exceptions.Count > 0) throw new AggregateException(exceptions);
 

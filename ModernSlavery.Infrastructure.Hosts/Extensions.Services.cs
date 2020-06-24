@@ -21,7 +21,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             {
                 case "redis":
                     if (string.IsNullOrWhiteSpace(cacheOptions.AzureConnectionString))
-                        throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
+                        throw new Exception("Cannot find 'DistributedCache:AzureConnectionString'");
 
                     services.AddStackExchangeRedisCache(options =>
                     {
