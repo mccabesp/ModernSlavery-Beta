@@ -208,7 +208,7 @@ namespace ModernSlavery.Core.Entities
 
         public OrganisationScope GetLatestScope()
         {
-            return OrganisationScopes.OrderByDescending(s=>s.SnapshotDate).FirstOrDefault(orgScope =>
+            return OrganisationScopes.OrderByDescending(s=>s.SubmissionDeadline).FirstOrDefault(orgScope =>
                 orgScope.Status == ScopeRowStatuses.Active);
         }
 
@@ -216,7 +216,7 @@ namespace ModernSlavery.Core.Entities
         public OrganisationScope GetScope(DateTime accountingStartDate)
         {
             return OrganisationScopes.FirstOrDefault(s =>
-                s.Status == ScopeRowStatuses.Active && s.SnapshotDate == accountingStartDate);
+                s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline == accountingStartDate);
         }
 
 
@@ -231,7 +231,7 @@ namespace ModernSlavery.Core.Entities
         {
             return OrganisationScopes.FirstOrDefault(orgScope =>
                 orgScope.Status == ScopeRowStatuses.Active
-                && orgScope.SnapshotDate.Year == snapshotYear);
+                && orgScope.SubmissionDeadline.Year == snapshotYear);
         }
 
         public OrganisationScope GetScopeOrThrow(int snapshotYear)

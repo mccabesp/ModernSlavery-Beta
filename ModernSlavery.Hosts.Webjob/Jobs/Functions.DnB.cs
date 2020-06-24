@@ -208,7 +208,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                     ScopeStatus = ScopeStatuses.PresumedInScope,
                                     ScopeStatusDate = VirtualDateTime.Now,
                                     Status = ScopeRowStatuses.Active,
-                                    SnapshotDate = _snapshotDateHelper.GetReportingStartDate(dbOrg.SectorType)
+                                    SubmissionDeadline = _snapshotDateHelper.GetReportingStartDate(dbOrg.SectorType)
                                 };
                                 _SharedBusinessLogic.DataRepository.Insert(newScope);
                                 dbOrg.OrganisationScopes.Add(newScope);
@@ -220,7 +220,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                     ScopeStatus = ScopeStatuses.PresumedOutOfScope,
                                     ScopeStatusDate = VirtualDateTime.Now,
                                     Status = ScopeRowStatuses.Active,
-                                    SnapshotDate = newScope.SnapshotDate.AddYears(-1)
+                                    SubmissionDeadline = newScope.SubmissionDeadline.AddYears(-1)
                                 };
                                 _SharedBusinessLogic.DataRepository.Insert(oldScope);
                                 dbOrg.OrganisationScopes.Add(oldScope);

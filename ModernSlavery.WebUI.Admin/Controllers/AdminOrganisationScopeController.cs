@@ -97,7 +97,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 ContactLastname = currentOrganisationScope.ContactLastname,
                 ContactEmailAddress = currentOrganisationScope.ContactEmailAddress,
                 Reason = viewModel.Reason,
-                SnapshotDate = currentOrganisationScope.SnapshotDate,
+                SubmissionDeadline = currentOrganisationScope.SubmissionDeadline,
                 StatusDetails = "Changed by Admin",
                 Status = ScopeRowStatuses.Active
             };
@@ -127,7 +127,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             var organisationScopesForCurrentSnapshotDate =
                 organisation.OrganisationScopes
-                    .Where(scope => scope.SnapshotDate.Year == year);
+                    .Where(scope => scope.SubmissionDeadline.Year == year);
 
             foreach (var organisationScope in organisationScopesForCurrentSnapshotDate)
                 organisationScope.Status = ScopeRowStatuses.Retired;

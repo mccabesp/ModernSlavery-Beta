@@ -69,7 +69,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             var result = await SubmissionPresenter.TrySaveYourStatement(CurrentUser, submissionModel);
 
-            return await GetActionResultFromSave(result, SubmissionStep.YourStatement);
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.YourStatement);
         }
 
         [HttpPost("cancel-your-statement")]
@@ -103,7 +103,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             var result = await SubmissionPresenter.TrySaveCompliance(CurrentUser, submissionModel);
 
-            return await GetActionResultFromSave(result, SubmissionStep.Compliance);
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.Compliance);
         }
 
         [HttpPost("cancel-compliance")]
@@ -265,12 +265,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             return View(result.Result);
         }
 
-        private async Task<IActionResult> GetActionResultFromSave(CustomResult<StatementViewModel> result, SubmissionStep step)
+        private async Task<IActionResult> GetActionResultFromSave(StatementViewModel viewModel, CustomResult<StatementViewModel> result, SubmissionStep step)
         {
             if (result.Failed)
             {
                 ModelState.AddModelError(result.ErrorMessage);
-                return View(result.ErrorRelatedObject);
+                return View(viewModel);
             }
 
             // Redirect location

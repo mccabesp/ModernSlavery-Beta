@@ -96,7 +96,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             // query against scopes and filter by basket ids
             var dbScopesQuery = _DataRepository.GetAll<OrganisationScope>()
-                .Where(os => os.Status == ScopeRowStatuses.Active && os.SnapshotDate.Year == year)
+                .Where(os => os.Status == ScopeRowStatuses.Active && os.SubmissionDeadline.Year == year)
                 .Where(r => basketOrgIds.Contains(r.OrganisationId)).ToList();
 
             // query submitted returns for current year

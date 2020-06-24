@@ -24,7 +24,7 @@ namespace ModernSlavery.Core.Entities
         public bool? ReadGuidance { get; set; }
         public string Reason { get; set; }
         public string CampaignId { get; set; }
-        public DateTime SnapshotDate { get; set; }
+        public DateTime SubmissionDeadline { get; set; }
         public ScopeRowStatuses Status { get; set; }
         public string StatusDetails { get; set; }
 

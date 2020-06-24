@@ -281,7 +281,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.ScopeStatus)
                         .HasName("IX_ScopeStatusId");
 
-                    entity.HasIndex(e => e.SnapshotDate)
+                    entity.HasIndex(e => e.SubmissionDeadline)
                         .HasName("IX_SnapshotDate");
 
                     entity.HasIndex(e => e.Status)
@@ -301,7 +301,7 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.Property(e => e.Reason).HasMaxLength(1000);
 
-                    entity.Property(e => e.SnapshotDate).HasDefaultValueSql("('1900-01-01T00:00:00.000')");
+                    entity.Property(e => e.SubmissionDeadline).HasDefaultValueSql("('1900-01-01T00:00:00.000')");
 
                     entity.Property(e => e.StatusDetails).HasMaxLength(255);
 

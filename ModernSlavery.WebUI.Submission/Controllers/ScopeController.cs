@@ -477,7 +477,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 ScopeStatus = model.ScopeStatus.Value,
                 Status = ScopeRowStatuses.Active,
                 ScopeStatusDate = VirtualDateTime.Now,
-                SnapshotDate = model.SnapshotDate
+                SubmissionDeadline = model.SnapshotDate
             };
 
             //Save the new declared scopes

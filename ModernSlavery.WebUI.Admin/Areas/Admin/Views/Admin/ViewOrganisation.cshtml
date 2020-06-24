@@ -191,12 +191,12 @@
             @{
                 var scopes = Model.OrganisationScopes
                     .Where(s => s.Status == ScopeRowStatuses.Active)
-                    .OrderByDescending(s => s.SnapshotDate);
+                    .OrderByDescending(s => s.SubmissionDeadline);
             }
             @foreach (var scope in scopes)
             {
                 <b>
-                    @(ReportingPeriodHelper.FormatReportingPeriod(scope.SnapshotDate.Year)):
+                    @(ReportingPeriodHelper.FormatReportingPeriod(scope.SubmissionDeadline.Year)):
                 </b>
                 @(scope.ScopeStatus)
                 <br/>

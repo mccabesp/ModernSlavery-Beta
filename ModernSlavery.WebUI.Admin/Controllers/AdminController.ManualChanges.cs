@@ -458,7 +458,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     var hasBeenWillBe = test ? "will be" : "has been";
                     writer.WriteLine(
-                        $"{i}: {employerRef}: {hasBeenWillBe} set as '{outOfScopeOutcome.Result.ScopeStatus}' for snapshotYear '{outOfScopeOutcome.Result.SnapshotDate.Year}' with comment '{outOfScopeOutcome.Result.Reason}'");
+                        $"{i}: {employerRef}: {hasBeenWillBe} set as '{outOfScopeOutcome.Result.ScopeStatus}' for snapshotYear '{outOfScopeOutcome.Result.SubmissionDeadline.Year}' with comment '{outOfScopeOutcome.Result.Reason}'");
                     if (!test)
                         await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel
@@ -562,7 +562,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             subCount = 0;
             foreach (var org in orgs)
             {
-                var latestScope = org.OrganisationScopes.OrderByDescending(o => o.SnapshotDate)
+                var latestScope = org.OrganisationScopes.OrderByDescending(o => o.SubmissionDeadline)
                     .FirstOrDefault(o => o.ScopeStatus != ScopeStatuses.Unknown);
                 if (latestScope != null)
                 {
@@ -1620,7 +1620,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var badScopeDates = false;
                 foreach (var scope in org.OrganisationScopes)
                 {
-                    var oldDate = scope.SnapshotDate;
+                    var oldDate = scope.SubmissionDeadline;
                     var newDate = _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
@@ -1710,12 +1710,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     if (badScopeDates)
                         foreach (var scope in org.OrganisationScopes)
                         {
-                            var oldDate = scope.SnapshotDate;
+                            var oldDate = scope.SubmissionDeadline;
                             var newDate =
                                 _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
-                            scope.SnapshotDate = newDate;
+                            scope.SubmissionDeadline = newDate;
                             if (!test)
                                 await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
@@ -1724,7 +1724,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         CurrentUser.EmailAddress,
                                         nameof(scope.OrganisationScopeId),
                                         scope.OrganisationScopeId.ToString(),
-                                        nameof(scope.SnapshotDate),
+                                        nameof(scope.SubmissionDeadline),
                                         oldDate.ToString(),
                                         newDate.ToString(),
                                         comment));
@@ -1801,7 +1801,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var badScopeDates = false;
                 foreach (var scope in org.OrganisationScopes)
                 {
-                    var oldDate = scope.SnapshotDate;
+                    var oldDate = scope.SubmissionDeadline;
                     var newDate = _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
@@ -1901,12 +1901,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     if (badScopeDates)
                         foreach (var scope in org.OrganisationScopes)
                         {
-                            var oldDate = scope.SnapshotDate;
+                            var oldDate = scope.SubmissionDeadline;
                             var newDate =
                                 _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
-                            scope.SnapshotDate = newDate;
+                            scope.SubmissionDeadline = newDate;
                             if (!test)
                                 await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
@@ -1915,7 +1915,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         CurrentUser.EmailAddress,
                                         nameof(scope.OrganisationScopeId),
                                         scope.OrganisationScopeId.ToString(),
-                                        nameof(scope.SnapshotDate),
+                                        nameof(scope.SubmissionDeadline),
                                         oldDate.ToString(),
                                         newDate.ToString(),
                                         comment));
