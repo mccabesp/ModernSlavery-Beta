@@ -10,7 +10,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
 
-namespace ModernSlavery.WebUI.Shared.Services
+namespace ModernSlavery.BusinessDomain.Shared.Classes
 {
     public class SendEmailService : ISendEmailService
     {
@@ -37,14 +37,15 @@ namespace ModernSlavery.WebUI.Shared.Services
         public async Task<bool> SendGeoMessageAsync(string subject, string message, bool test = false)
         {
             return await QueueEmailAsync(new QueueWrapper(new SendGeoMessageModel
-                {subject = subject, message = message, test = test}));
+            { subject = subject, message = message, test = test }));
         }
 
         public async Task<bool> SendCreateAccountPendingVerificationAsync(string verifyUrl, string emailAddress)
         {
             var createAccountPendingTemplate = new CreateAccountPendingVerificationTemplate
             {
-                Url = verifyUrl, RecipientEmailAddress = emailAddress,
+                Url = verifyUrl,
+                RecipientEmailAddress = emailAddress,
                 Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
@@ -55,7 +56,8 @@ namespace ModernSlavery.WebUI.Shared.Services
         {
             var changeEmailPendingTemplate = new ChangeEmailPendingVerificationTemplate
             {
-                Url = verifyUrl, RecipientEmailAddress = emailAddress,
+                Url = verifyUrl,
+                RecipientEmailAddress = emailAddress,
                 Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
@@ -66,7 +68,8 @@ namespace ModernSlavery.WebUI.Shared.Services
         {
             var changeEmailCompletedVerification = new ChangeEmailCompletedVerificationTemplate
             {
-                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress,
+                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changeEmailCompletedVerification);
@@ -76,7 +79,8 @@ namespace ModernSlavery.WebUI.Shared.Services
         {
             var changeEmailCompletedNotification = new ChangeEmailCompletedNotificationTemplate
             {
-                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress,
+                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changeEmailCompletedNotification);
@@ -86,7 +90,8 @@ namespace ModernSlavery.WebUI.Shared.Services
         {
             var changePasswordCompleted = new ChangePasswordCompletedTemplate
             {
-                RecipientEmailAddress = emailAddress, Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress,
+                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changePasswordCompleted);
@@ -120,7 +125,7 @@ namespace ModernSlavery.WebUI.Shared.Services
         public async Task<bool> SendAccountClosedNotificationAsync(string emailAddress, bool test)
         {
             var closeAccountCompleted = new CloseAccountCompletedTemplate
-                {RecipientEmailAddress = emailAddress, Test = test};
+            { RecipientEmailAddress = emailAddress, Test = test };
 
             return await QueueEmailAsync(closeAccountCompleted);
         }
@@ -129,7 +134,8 @@ namespace ModernSlavery.WebUI.Shared.Services
         {
             var orphanOrganisationTemplate = new OrphanOrganisationTemplate
             {
-                RecipientEmailAddress = EmailOptions.AdminDistributionList, OrganisationName = organisationName,
+                RecipientEmailAddress = EmailOptions.AdminDistributionList,
+                OrganisationName = organisationName,
                 Test = test
             };
 

@@ -9,7 +9,7 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 
-namespace ModernSlavery.WebUI.Shared.Services
+namespace ModernSlavery.BusinessDomain.Shared.Classes
 {
     public class NotificationService : INotificationService
     {
@@ -47,7 +47,8 @@ namespace ModernSlavery.WebUI.Shared.Services
 
             var notifyEmail = new SendEmailRequest
             {
-                EmailAddress = emailAddress, TemplateId = EmailTemplates.SendSuccessfulSubmissionEmail,
+                EmailAddress = emailAddress,
+                TemplateId = EmailTemplates.SendSuccessfulSubmissionEmail,
                 Personalisation = personalisation
             };
 
@@ -65,7 +66,9 @@ namespace ModernSlavery.WebUI.Shared.Services
 
             var notifyEmail = new SendEmailRequest
             {
-                EmailAddress = emailAddress, TemplateId = EmailTemplates.SendPinEmail, Personalisation = personalisation
+                EmailAddress = emailAddress,
+                TemplateId = EmailTemplates.SendPinEmail,
+                Personalisation = personalisation
             };
 
             await AddEmailToQueue(notifyEmail);
@@ -83,7 +86,8 @@ namespace ModernSlavery.WebUI.Shared.Services
 
             var notifyEmail = new SendEmailRequest
             {
-                EmailAddress = emailAddress, TemplateId = EmailTemplates.UserAddedToOrganisationEmail,
+                EmailAddress = emailAddress,
+                TemplateId = EmailTemplates.UserAddedToOrganisationEmail,
                 Personalisation = personalisation
             };
 
@@ -102,7 +106,8 @@ namespace ModernSlavery.WebUI.Shared.Services
 
             var notifyEmail = new SendEmailRequest
             {
-                EmailAddress = emailAddress, TemplateId = EmailTemplates.RemovedUserFromOrganisationEmail,
+                EmailAddress = emailAddress,
+                TemplateId = EmailTemplates.RemovedUserFromOrganisationEmail,
                 Personalisation = personalisation
             };
 
@@ -119,7 +124,8 @@ namespace ModernSlavery.WebUI.Shared.Services
 
             var notifyEmail = new SendEmailRequest
             {
-                EmailAddress = emailAddress, TemplateId = EmailTemplates.ScopeChangeInEmail,
+                EmailAddress = emailAddress,
+                TemplateId = EmailTemplates.ScopeChangeInEmail,
                 Personalisation = personalisation
             };
 
@@ -136,7 +142,8 @@ namespace ModernSlavery.WebUI.Shared.Services
 
             var notifyEmail = new SendEmailRequest
             {
-                EmailAddress = emailAddress, TemplateId = EmailTemplates.ScopeChangeOutEmail,
+                EmailAddress = emailAddress,
+                TemplateId = EmailTemplates.ScopeChangeOutEmail,
                 Personalisation = personalisation
             };
 
@@ -174,12 +181,12 @@ namespace ModernSlavery.WebUI.Shared.Services
             {
                 await SendNotifyEmailQueue.AddMessageAsync(notifyEmail);
 
-                CustomLogger.Information("Successfully added message to SendNotifyEmail Queue", new {notifyEmail});
+                CustomLogger.Information("Successfully added message to SendNotifyEmail Queue", new { notifyEmail });
                 return true;
             }
             catch (Exception ex)
             {
-                CustomLogger.Error("Failed to add message to SendNotifyEmail Queue", new {Exception = ex});
+                CustomLogger.Error("Failed to add message to SendNotifyEmail Queue", new { Exception = ex });
             }
 
             return false;
