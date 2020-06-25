@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Hosts.Webjob.Jobs;
 using ModernSlavery.Infrastructure.Hosts;
@@ -21,8 +22,8 @@ namespace ModernSlavery.Hosts.Webjob
             
             //NOTE: Leave this here to ensure function dependencies resolve on startup rather than when each function method is invoked
             //      It is also also useful when debugging individual jobs locally
-            var functions = host.Services.GetService(typeof(Functions));
-
+            var functions = host.Services.GetService<Functions>();
+            
             //Run the host
             await host.RunAsync().ConfigureAwait(false);
         }

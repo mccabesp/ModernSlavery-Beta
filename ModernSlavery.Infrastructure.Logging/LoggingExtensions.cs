@@ -16,9 +16,8 @@ namespace ModernSlavery.Infrastructure.Logging
         {
             if (string.IsNullOrWhiteSpace(fileName)) throw new ArgumentNullException(nameof(fileName));
 
-            var applicationName = AppDomain.CurrentDomain.FriendlyName;
-
             builder.RegisterType<AuditLogger>()
+                .As<IAuditLogger>()
                 .Keyed<IAuditLogger>(fileName)
                 .SingleInstance()
                 .WithParameter("applicationName", AppDomain.CurrentDomain.FriendlyName)

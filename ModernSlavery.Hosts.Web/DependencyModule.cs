@@ -290,6 +290,8 @@ namespace ModernSlavery.Hosts.Web
             //Register the app insights dependencies
             modules.AddDependency<ApplicationInsightsDependencyModule>();
 
+            //Register the Companies House dependencies
+            modules.AddDependency<Infrastructure.CompaniesHouse.DependencyModule>();
         }
     }
 }

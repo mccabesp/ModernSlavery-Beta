@@ -15,13 +15,15 @@ namespace ModernSlavery.Core.Interfaces
     public interface IDependencyModule
     {
         /// <summary>
-        ///     Place all your dependency registrations in here using builder.ContainerBuilder (Autofac IContainer) or
-        ///     builder.Services (IServiceCollection)
-        ///     You can also register other modules using builder.Register<TModule>()
+        ///     Place all your dependency service registrations in here 
         /// </summary>
-        /// <param name="builder">This is the instance of DependencyBuilder for the application host</param>
+        /// <param name="services">The service collection to Add your dependencies to</param>
         void ConfigureServices(IServiceCollection services);
 
+        /// <summary>
+        ///     Place all your autofac service registrations in here 
+        /// </summary>
+        /// <param name="builder">The ContainerBuilder to Register your dependencies with</param>
         public void ConfigureContainer(ContainerBuilder builder);
 
         /// <summary>

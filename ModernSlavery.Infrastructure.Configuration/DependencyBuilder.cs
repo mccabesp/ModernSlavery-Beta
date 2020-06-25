@@ -52,7 +52,6 @@ namespace ModernSlavery.Infrastructure.Configuration
         private bool _serviceActionsComplete=false;
         private bool _containerActionsComplete=false;
         private bool _configActionsComplete=false;
-
         public void Build<TStartupModule>(IServiceCollection optionServices) where TStartupModule : class, IDependencyModule
         {
             //Ensure domain assemblies are preloaded
@@ -179,24 +178,13 @@ namespace ModernSlavery.Infrastructure.Configuration
             _containerActions.ForEach(action => action(containerBuilder));
 
             _containerActionsComplete = true;
-        }
-        public void RegisterDependencyServices(ContainerBuilder containerBuilder, bool autoConfigureOnBuild)
-        {
-            RegisterDependencyServices(containerBuilder);
 
             //Register the callback on build to configure the host
-            if (autoConfigureOnBuild) containerBuilder.RegisterBuildCallback(ConfigureHost);
+            if (Container_OnBuild != null) containerBuilder.RegisterBuildCallback((lifetimeScope)=>Container_OnBuild(lifetimeScope));
         }
 
-        public void ConfigureHost(IApplicationBuilder appBuilder)
-        {
-            var lifetimeScope = appBuilder.ApplicationServices.GetRequiredService<ILifetimeScope>();
-
-            //Only add the appbuildder temporarily
-            using var innerScope = lifetimeScope.BeginLifetimeScope(b => b.RegisterInstance(appBuilder).SingleInstance().ExternallyOwned());
-            
-            ConfigureHost(innerScope);
-        }
+        public delegate void OnContainerBuildEventHandler(ILifetimeScope lifetimeScope);
+        public event OnContainerBuildEventHandler Container_OnBuild;
 
         public void ConfigureHost(ILifetimeScope lifetimeScope)
         {

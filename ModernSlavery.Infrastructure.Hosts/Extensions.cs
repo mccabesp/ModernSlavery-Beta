@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -19,30 +20,67 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using ModernSlavery.Infrastructure.Logging;
 using System.Threading;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
     public static partial class Extensions
     {
-        public static void ConfigureHostApplication(this IHostBuilder hostBuilder, IConfiguration appSettings=null)
+        public static (IHostBuilder HostBuilder, DependencyBuilder DependencyBuilder, IConfiguration AppConfig) CreateGenericHost<TStartupModule>(string applicationName = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
-            //Set the console title to the application name
-            Console.Title = appSettings[HostDefaults.ApplicationKey];
+            var hostBuilder = Host.CreateDefaultBuilder(commandlineArgs);
 
-            //Add a handler for unhandled exceptions
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            //Load the configuration
+            var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
+            var appConfig = configBuilder.Build();
 
-            Encryption.SetDefaultEncryptionKey(appSettings["DefaultEncryptionKey"]);
-            Encryption.EncryptEmails = appSettings.GetValueOrDefault("EncryptEmails", true);
+            //Set the content root to the bin folder if in development mode
+            if (appConfig.IsDevelopment()) appConfig[HostDefaults.ContentRootKey] = System.AppDomain.CurrentDomain.BaseDirectory;
 
-            //Initialise the virtual date and time
-            VirtualDateTime.Initialise(appSettings["DateTimeOffset"]);
+            //Set the content root from the confif or environment
+            var contentRoot = appConfig[HostDefaults.ContentRootKey];
 
-            //Setup Threads
-            appSettings.SetupThreads();
+            if (string.IsNullOrWhiteSpace(contentRoot)) contentRoot = System.AppDomain.CurrentDomain.BaseDirectory;
+            if (!Directory.Exists(contentRoot)) throw new DirectoryNotFoundException($"Cannot find content root '{contentRoot}'");
 
-            hostBuilder.UseConsoleLifetime();
+            hostBuilder.UseContentRoot(contentRoot);
+
+            hostBuilder.ConfigureAppConfiguration((hostBuilderContext, appConfigBuilder) =>
+            {
+                appConfigBuilder.AddConfiguration(appConfig);
+            });
+
+            //Load the configuration options
+            var optionsBinder = new OptionsBinder(appConfig);
+            var configOptions = optionsBinder.BindAssemblies();
+
+            hostBuilder.ConfigureServices(optionsBinder.RegisterOptions);
+
+            //Load all the dependency actions
+            var dependencyBuilder = new DependencyBuilder();
+            dependencyBuilder.Build<TStartupModule>(configOptions);
+
+            //Register the callback to add dependent services - this is required here so IWebHostEnvironment is available to services
+            hostBuilder.ConfigureServices(dependencyBuilder.RegisterDependencyServices);
+
+            //Create the callback to register autofac dependencies only
+            hostBuilder.ConfigureContainer<ContainerBuilder>(dependencyBuilder.RegisterDependencyServices);
+
+            hostBuilder.ConfigureLogging((hostBuilderContext, loggingBuilder) =>
+            {
+                //Setup the seri logger
+                hostBuilderContext.Configuration.SetupSerilogLogger();
+
+                loggingBuilder.AddAzureQueueLogger(); //Use the custom logger
+                loggingBuilder.AddApplicationInsights(); //log to app insights
+                loggingBuilder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
+            });
+
+            //Register Autofac as the service provider
+            hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
+            return (hostBuilder, dependencyBuilder, appConfig);
         }
 
         public static IEnumerable<string> GetKeys(this IConfiguration config)
