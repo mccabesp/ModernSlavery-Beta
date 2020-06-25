@@ -40,7 +40,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 return StatementActionResult.Unauthorised;
 
             var statement = await GetStatementByOrganisationAndYear(organisation, reportingYear);
-            if (statement != null && statement.CanBeEdited)
+            if (statement != null && !statement.CanBeEdited)
                 return StatementActionResult.Uneditable;
 
             return StatementActionResult.Success;
