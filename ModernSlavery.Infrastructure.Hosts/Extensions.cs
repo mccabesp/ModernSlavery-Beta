@@ -41,7 +41,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             //Set the content root from the confif or environment
             var contentRoot = appConfig[HostDefaults.ContentRootKey];
 
-            if (string.IsNullOrWhiteSpace(contentRoot)) contentRoot = System.AppDomain.CurrentDomain.BaseDirectory;
+            if (string.IsNullOrWhiteSpace(contentRoot)) contentRoot = (appConfig[HostDefaults.ContentRootKey]=System.AppDomain.CurrentDomain.BaseDirectory);
             if (!Directory.Exists(contentRoot)) throw new DirectoryNotFoundException($"Cannot find content root '{contentRoot}'");
 
             hostBuilder.UseContentRoot(contentRoot);

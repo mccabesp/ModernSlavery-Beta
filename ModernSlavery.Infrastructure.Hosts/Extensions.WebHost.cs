@@ -39,7 +39,7 @@ namespace ModernSlavery.Infrastructure.Hosts
                 //Specify the root path of the site
                 var webRoot = genericHost.AppConfig[WebHostDefaults.WebRootKey];
                 var contentRoot = genericHost.AppConfig[WebHostDefaults.ContentRootKey];
-                if (string.IsNullOrWhiteSpace(webRoot)) webRoot = "wwwroot";
+                if (string.IsNullOrWhiteSpace(webRoot)) webRoot = (genericHost.AppConfig[WebHostDefaults.WebRootKey]="wwwroot");
                 var fullWebroot = Path.Combine(contentRoot, webRoot);
                 if (!Directory.Exists(fullWebroot)) throw new DirectoryNotFoundException($"Cannot find web root '{fullWebroot}'");
 
