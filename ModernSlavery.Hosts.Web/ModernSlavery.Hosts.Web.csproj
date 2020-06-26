@@ -102,13 +102,9 @@
       CopyWebjobs;
     </MSDeployPackagePublishDependsOn>
 
-    <WebjobProjects>$(MSBuildProjectDirectory)\..\ModernSlavery.Hosts.Webjob\ModernSlavery.Hosts.Webjob.csproj</WebjobProjects>
-
-    <LangVersion>8.0</LangVersion>
-
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
 
-    <AssemblyName>ModernSlavery.Hosts.Web</AssemblyName>
+    <WebjobProjects>$(MSBuildProjectDirectory)\..\ModernSlavery.Hosts.Webjob\ModernSlavery.Hosts.Webjob.csproj</WebjobProjects>
 
   </PropertyGroup>
 

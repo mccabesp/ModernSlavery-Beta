@@ -59,14 +59,17 @@ namespace ModernSlavery.WebUI.StaticFiles
                 }
             };
 
+
+            //When in Development mode StaticWebAssetBasePath should be is obtained from "**\obj\**\staticwebassets\ModernSlavery.Hosts.Web.StaticWebAssets.xml" but its not working
             // Include un-bundled js + css folders to serve the source files in dev environment
             if (_sharedOptions.IsDevelopment() && !string.IsNullOrWhiteSpace(_sharedOptions.DevelopmentWebroot))
             {
                 staticFileOptions.FileProvider = new PhysicalFileProvider(_sharedOptions.DevelopmentWebroot);
             }
 
-            app.UseStaticFiles(staticFileOptions);
 
+            app.UseStaticFiles(staticFileOptions);
+            
             //Ensure ShortCodes, SicCodes and SicSections exist on remote 
             Task.WaitAll(
                 fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.DataPath),
