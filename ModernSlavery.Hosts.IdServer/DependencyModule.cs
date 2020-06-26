@@ -76,10 +76,13 @@ namespace ModernSlavery.Hosts.IdServer
                 //.AddInMemoryApiResources(Resources.GetApiResources())
                 .AddCustomUserStore();
 
-            if (Debugger.IsAttached || _sharedOptions.IsDevelopment())
+            if (string.IsNullOrWhiteSpace(_sharedOptions.Website_Load_Certificates))
+            {
                 identityServer.AddDeveloperSigningCredential();
+                if (_sharedOptions.IsProduction())_logger.LogWarning("No certificate thumbprint found. Developer certificate used Production environment. Please add certificate thumbprint to setting 'WEBSITE_LOAD_CERTIFICATES'");
+            }
             else
-                identityServer.AddSigningCredential(LoadCertificate(_sharedOptions));
+                identityServer.AddSigningCredential(LoadCertificate(_sharedOptions.Website_Load_Certificates, _sharedOptions.CertExpiresWarningDays));
 
             #endregion
 
@@ -232,45 +235,21 @@ namespace ModernSlavery.Hosts.IdServer
 
         }
 
-        private X509Certificate2 LoadCertificate(SharedOptions sharedOptions)
+        private X509Certificate2 LoadCertificate(string certThumprint, int certExpiresWarningDays)
         {
+            if (string.IsNullOrWhiteSpace(certThumprint)) throw new ArgumentNullException(nameof(certThumprint));
+
             //Load the site certificate
-            var certThumprint = sharedOptions.Website_Load_Certificates.SplitI(";").FirstOrDefault();
-            if (string.IsNullOrWhiteSpace(certThumprint))
-                certThumprint = _sharedOptions.CertThumprint.SplitI(";").FirstOrDefault();
+            var cert = HttpsCertificate.LoadCertificateFromThumbprint(certThumprint);
 
-            X509Certificate2 cert = null;
-            if (!string.IsNullOrWhiteSpace(certThumprint))
-            {
-                cert = HttpsCertificate.LoadCertificateFromThumbprint(certThumprint);
-                _logger.LogInformation(
-                    $"Successfully loaded certificate '{cert.FriendlyName}' expiring '{cert.GetExpirationDateString()}' from thumbprint '{certThumprint}'");
-            }
+            var expires = cert.GetExpirationDateString().ToDateTime();
+            var remainingTime = expires - VirtualDateTime.Now;
+            if (expires < VirtualDateTime.UtcNow)
+                _logger.LogError($"Certificate '{cert.FriendlyName}' from thumbprint '{certThumprint}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
+            else if (expires < VirtualDateTime.UtcNow.AddDays(certExpiresWarningDays))
+                 _logger.LogWarning($"Certificate '{cert.FriendlyName}' from thumbprint '{certThumprint}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
             else
-            {
-                var certPath = Path.Combine(Directory.GetCurrentDirectory(), @"LocalHost.pfx");
-                cert = HttpsCertificate.LoadCertificateFromFile(certPath, "LocalHost");
-                _logger.LogInformation(
-                    $"Successfully loaded certificate '{cert.FriendlyName}' expiring '{cert.GetExpirationDateString()}' from file '{certPath}'");
-            }
-
-            if (sharedOptions.CertExpiresWarningDays > 0)
-            {
-                var expires = cert.GetExpirationDateString().ToDateTime();
-                if (expires < VirtualDateTime.UtcNow)
-                {
-                    _logger.LogError(
-                        $"The website certificate for '{sharedOptions.ExternalHost}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
-                }
-                else
-                {
-                    var remainingTime = expires - VirtualDateTime.Now;
-
-                    if (expires < VirtualDateTime.UtcNow.AddDays(sharedOptions.CertExpiresWarningDays))
-                        _logger.LogWarning(
-                            $"The website certificate for '{sharedOptions.SiteAuthority}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
-                }
-            }
+                _logger.LogInformation($"Successfully loaded certificate '{cert.FriendlyName}' from thumbprint '{certThumprint}' and expires '{cert.GetExpirationDateString()}'");
 
             return cert;
         }
