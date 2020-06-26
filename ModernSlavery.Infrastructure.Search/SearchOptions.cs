@@ -7,9 +7,9 @@ namespace ModernSlavery.Infrastructure.Search
     [Options("Search")]
     public class SearchOptions : IOptions
     {
-        public string AzureServiceName { get; set; }
-        public string AzureApiAdminKey { get; set; }
-        public string AzureApiQueryKey { get; set; }
+        public string ServiceName { get; set; }
+        public string ApiAdminKey { get; set; }
+        public string ApiQueryKey { get; set; }
         public string EmployerIndexName { get; set; } = nameof(EmployerSearchModel);
         public string SicCodeIndexName { get; set; } = nameof(SicCodeSearchModel);
         public bool Disabled { get; set; }
