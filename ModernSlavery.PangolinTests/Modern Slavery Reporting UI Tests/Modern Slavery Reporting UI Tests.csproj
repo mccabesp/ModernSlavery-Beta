@@ -174,6 +174,10 @@
     <Compile Include="Richer Sumbission\Submission_Training_Content_Check.cs" />
     <Compile Include="Richer Sumbission\Your_Modern_Slavery_Statement_Content_Check.cs" />
     <Compile Include="Richer Sumbission\Your_Modern_Slavery_Statement_Date_Validation.cs" />
+    <Compile Include="Search and Compare\Contact Us\User Checks Contact Us Page Navigation Is Correct.cs" />
+    <Compile Include="Search and Compare\Contact Us\User Checks Navigation To New Tab Guidance Link.cs" />
+    <Compile Include="Search and Compare\Contact Us\User Uses Email Function Of Contact Us.cs" />
+    <Compile Include="Search and Compare\Manage Account\Close Account User Is Set to Retired.cs" />
     <Compile Include="Search and Compare\Manage Account\Close_Account_Invalid_Password.cs" />
     <Compile Include="Search and Compare\Manage Account\Close_Account_Mandatory_Fields.cs" />
     <Compile Include="Search and Compare\Manage Account\Closing Account Removes Pending Registrations.cs" />
@@ -183,7 +187,10 @@
     <Compile Include="Search and Compare\Manage Account\Manage_Account_Change_Personal_Details.cs" />
     <Compile Include="Search and Compare\Manage Account\Manage_Account_Email_Validation.cs" />
     <Compile Include="Search and Compare\Manage Account\Manage_Account_Personal_Details_Validation.cs" />
+    <Compile Include="Search and Compare\Manage Organisation\Remove Users 1 User.cs" />
+    <Compile Include="Search and Compare\Manage Organisation\Remove Users Page For Multiple Users.cs" />
     <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Director Information Mandatory.cs" />
+    <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Manage Organisation Landing Page.cs" />
     <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Modern Slavery Statement Period Covered Fields.cs" />
     <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Policies Fields And %27Other%27 Functionality Checks.cs" />
     <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Statement URL Fields Is Mandatory And Only Accepts Valid Format.cs" />
