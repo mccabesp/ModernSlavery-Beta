@@ -120,7 +120,7 @@ namespace ModernSlavery.Hosts.IdServer
                     o.Cookie.HttpOnly = false; //Always use https cookies
                     o.Cookie.SameSite = SameSiteMode.Strict;
                     o.Cookie.Domain =
-                        _sharedOptions.ExternalHost
+                        _sharedOptions.WEBSITE_HOSTNAME
                             .BeforeFirst(":"); //Domain cannot be an authority and contain a port number
                     o.IdleTimeout =
                         TimeSpan.FromMinutes(_sharedOptions

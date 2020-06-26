@@ -59,9 +59,9 @@ namespace ModernSlavery.Core.Models
         public int EmailVerificationMinResendHours { get; set; }
         public int EmployerCodeLength { get; set; }
         public int EmployerPageSize { get; set; }
-        public string ExternalHost { get; set; }
+        public string WEBSITE_HOSTNAME { get; set; }
 
-        public string SiteAuthority => $"https://{ExternalHost}/";
+        public string SiteAuthority => $"https://{WEBSITE_HOSTNAME}/";
 
         public string IdentityIssuer
         {
