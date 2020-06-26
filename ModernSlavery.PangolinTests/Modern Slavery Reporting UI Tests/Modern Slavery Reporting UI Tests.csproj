@@ -168,6 +168,8 @@
     <Compile Include="Richer Sumbission\Submission_Areas_Back_Button_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Areas_Cancel_Unsaved_Data_Save.cs" />
     <Compile Include="Richer Sumbission\Submission_Areas_Cancel_Unsaved_Data_Exit.cs" />
+    <Compile Include="Richer Sumbission\Submission_Complete_All_Sections.cs" />
+    <Compile Include="Richer Sumbission\Submission_Complete_Mandatory_Sections.cs" />
     <Compile Include="Richer Sumbission\Submission_Sectors_Content_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Sectors_Interaction_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Training_Validation_Check.cs" />
@@ -175,6 +177,7 @@
     <Compile Include="Richer Sumbission\Submission_Areas_Content_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Areas_Mandatory_Field_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Training_Content_Check.cs" />
+    <Compile Include="Richer Sumbission\Sumbission_Submit_Report_Mandatory_Fields_Only.cs" />
     <Compile Include="Richer Sumbission\Your_Modern_Slavery_Statement_Content_Check.cs" />
     <Compile Include="Richer Sumbission\Your_Modern_Slavery_Statement_Date_Validation.cs" />
     <Compile Include="Search and Compare\Contact Us\User Checks Contact Us Page Navigation Is Correct.cs" />

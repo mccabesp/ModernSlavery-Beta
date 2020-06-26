@@ -10,7 +10,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 {
     class Submission_Helper
     {
-        
+
 
         public static void NavigateToTraining(UIContext ui, string Organistion, string Year)
         {
@@ -61,14 +61,50 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ui.SetXPath("(//div//label[contains(text(), 'Month')]/following-sibling::input)[" + Order + "])").To(Month);
             ui.SetXPath("(//div//label[contains(text(), 'Day')]/following-sibling::input)[" + Order + "])").To(Day);
         }
+
+        public static void NavigateToSubmission(UIContext ui, string Organistion, string YearFrom, string YearTo)
+        {
+            ui.Click("Mange Organisations");
+            ui.ExpectHeader("Select an organisation");
+
+            ui.Click("Organisation");
+            ui.AtRow(YearFrom + "/" + YearTo.Substring(YearTo.Length - 4)).Click("Draft report");
+            ui.ExpectHeader("Your modern slavery statement");
+
+            ui.Click("Save and continue");
+            ui.ExpectHeader("Six areas of modern slavery statement");
+
+            ui.Click("Save and continue");
+            ui.ExpectHeader("Your organisation");
+
+            ui.Click("Save and continue");
+            ui.ExpectHeader("Supply chain risk");
+
+            ui.Click("Save and continue");
+            ui.ExpectHeader("Policies");
+
+            ui.Click("Save and continue");
+            ui.ExpectHeader("Due diligence");
+
+            ui.Click("Save and continue");
+            ui.ExpectHeader("Training");
+
+            ui.Click("Continue");
+            ui.ExpectHeader("Monitoring progress");
+
+            ui.Click("Continue");
+            ui.ExpectHeader("Review " + YearFrom + " to " + YearTo + " group report for" + Organistion);
+
+
+        }
         public static void ExpectSectors(UIContext ui, string[] Sectors)
         {
             //expect all sectors in order
             for (int i = 0; i < Sectors.Length - 1; i++)
             {
                 ui.BelowLabel(Sectors[i]).ExpectLabel(Sectors[i + 1]);
-            }        
-    }
+            }
+        }
 
         public static void ExpectFinancials(UIContext ui, string[] Financials)
         {
@@ -100,5 +136,56 @@ namespace Modern_Slavery_Reporting_UI_Tests
                 ui.ClickLabel(Financials[i]);
             }
         }
+
+        public static void ExpandSection(UIContext ui, string SectionName, string SectionOrder = "1")
+        {
+            //todo define how to expand/colaspe section based on section name and order
+            ui.ClickXPath("...");
+
+        }
+
+        public static void ColapseSection(UIContext ui, string SectionName, string SectionOrder = "1")
+        {
+            //todo define how to expand/colaspe section based on section name and order
+            ui.ClickXPath("...");
+        }
+
+        public static void CountrySelect (UIContext ui, string Continent, string[] Countries) 
+        {
+            foreach (var Country in Countries)
+            {
+                ui.BelowHeader(Continent).ClickLabel(Country);
+            }
+
+            ui.NearHeader(Continent).Expect(Countries.Length + " Selected");
+
+        }
+
+        public  static void ChekcboxSelector(UIContext ui, string SectionName, string[] SelectedOptions, string SectionOrder = "1", string OtherOption = null, string OtherFieldLabel = null, string OtherDetails = null, bool NeedExpand = true)
+        {
+            if (NeedExpand)
+            {
+                Submission_Helper.ExpandSection(ui, SectionName, SectionOrder);
+
+            }
+
+            foreach (var Option in SelectedOptions)
+            {
+                ui.NearHeader(SectionName).ClickLabel(Option);
+
+                if (Option == OtherOption)
+                {
+                    ui.Set(OtherFieldLabel).To(OtherDetails);
+                    }
+            }
+            ui.NearHeader(SectionName).Expect(SelectedOptions.Length + " Selected");
+
+            if (NeedExpand)
+            {
+                Submission_Helper.ColapseSection(ui, SectionName, SectionOrder);
+
+            }
+        }
     }
-}
+    }
+

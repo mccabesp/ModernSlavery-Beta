@@ -46,5 +46,68 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
         public static readonly string[] Financials = new string[] { "Under £36 million", "£36 million - £60 million", "£60 million - £100 million", "£100 million - £500 million", "£500 million+" };
 
+        public const string YourMSStatement_URL = "https://bing.com";
+        public const string YourMSStatement_Date_Day = "1";
+        public const string YourMSStatement_Date_Month = "02";
+        public const string YourMSStatement_Date_Year = "2019";
+        public const string YourMSStatement_To_Day = "31";
+        public const string YourMSStatement_To_Month = "01";
+        public const string YourMSStatement_To_Year = "2020";
+        public const string YourMSStatement_First = "Roger";
+        public const string YourMSStatement_Last = "Reporter";
+        public const string YourMSStatement_JobTitle = "Modern Slavery Officer";
+        public const string YourMSStatement_ApprovalDate_Day = "27";
+        public const string YourMSStatement_ApprovalDate_Month = "06";
+        public const string YourMSStatement_ApprovalDate_Year = "2020";
+
+        public static readonly string[] YourOrganisation_Sectors = new string[] { "Administrative and support service activities", "Your organisation", "Agriculture, Forestry and Fishing", "Arts,","Electricity, gas, steam and air conditioning supply", "Financial and insurance activities", "trade" };
+        public const string YourOrganisation_Turnover = "£60 million - £100 million";
+
+        public static readonly string[] Policies_SelectedPolicies = new string[] { "Freedom of association", "Prohibits discrimination", "Other" };
+        public  const string Policies_OtherDetails = "We have many other policies in place";
+
+
+        public static readonly string[] SupplyChainRisks_SelectedGoodsAndServices = new string[] { "Goods not for resale", "Services for sale"};
+
+        public static readonly string[] SupplyChainRisks_SelectedVulnerableGroups = new string[] { "Migrants", "Children", "Other vulnerable groups" };
+        public const string SupplyChainRisks_OtherVulernableGroupsDetails = "People who are at risk.";
+
+        public static readonly string[] SupplyChainRisks_SelectedTypeOfWorks = new string[] { "Seasonal work", "Hazardous work", "Other type of work" };
+        public const string SupplyChainRisks_OtherTypeOfWorkDetails = "Voluntary work";
+
+        public static readonly string[] SupplyChainRisks_SelectedSectors = new string[] { "Manufacturing", "Personal services", "Mining and quarrying", "Other sector" };
+        public const string SupplyChainRisks_OtherSectorDetails = "Voluntary sector";
+        public const string SuppliChainRisks_OtherArea = "These are details about an additional area not mentioned above";
+
+        public static readonly string[] SupplyChainRisks_SelectedCountriesAfrica = new string[] { "Benin, Republic of", "Reunion", "Burkina Faso" };
+        public static readonly string[] SupplyChainRisks_SelectedCountriesAsia = new string[] { "Afghanistan, Islamic Republic of", "Japan", "Mongolia", "Turkmenistan", "United Nations Neutral Zone" };
+        public static readonly string[] SupplyChainRisks_SelectedCountriesEurope = new string[] { "Georgia", "Reunion", "United Kingdom of Great Britain & Northern Ireland" };
+        public static readonly string[] SupplyChainRisks_SelectedCountriesNorthAmerica = new string[] { "Anguilla", "Martinique", "Cuba, Republic of" };
+        public static readonly string[] SupplyChainRisks_SelectedCountriesOceania = new string[] { "New Zealand"};
+        public static readonly string[] SupplyChainRisks_SelectedCountriesSouthAmerica = new string[] { "French Guiana", "Peru, Republic of"};
+        public static readonly string[] SupplyChainRisks_SelectedCountriesAntarctica= new string[] { "Antarctica (the territory South of 60 deg S)", "Bouvet Island (Bouvetoya)", "South Georgia and the South Sandwich Islands", "Heard Island and McDonald Islands" };
+
+        public static readonly string[] SupplyChainRisks_SelectedPartnerships = new string[] { "with civil society organisations", "with central or local government", "with multi-stakeholder initiatives" };
+
+        public static readonly string[] SupplyChainRisks_SelectedSocialAudits= new string[] { "by a third party", "other"};
+        public const string SupplyChainRisks_OtherSocialAudits = "Another audit";
+
+        public static readonly string[] SupplyChainRisks_SelectedGrievanceMechanisms = new string[] { "whistleblowing services", "worker voice technology"};
+
+        public const string SupplyChainRisks_IndicatorDetails = "There have been signs.";
+
+        public const string SupplyChainRisks_InStanceDetails = "A few here and there.";
+
+        public static readonly string[] SupplyChainRisks_SelectedRemediationActions = new string[] { "repayment of recruitment fees", "other" };
+
+        public static readonly string[] SelectedTrainings = new string[] { "C-Suite", "Whole organisation", "Suppliers", "other" };
+        public const string OtherTrainings = "We had a group session.";
+
+        public const string MonitoringProgress = "Keeping detailed notes";
+        public const string MonitoringAchievements = "We didn't have any";
+
+
+
+
     }
 }
