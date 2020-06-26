@@ -4,7 +4,7 @@ using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Search
 {
-    [Options("Search")]
+    [Options("SearchService")]
     public class SearchOptions : IOptions
     {
         public string ServiceName { get; set; }
