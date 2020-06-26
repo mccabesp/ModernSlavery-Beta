@@ -29,8 +29,10 @@ namespace ModernSlavery.Infrastructure.Hosts
     {
         public static (IHostBuilder HostBuilder, DependencyBuilder DependencyBuilder, IConfiguration AppConfig) CreateGenericHost<TStartupModule>(string applicationName = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
-            var hostBuilder = Host.CreateDefaultBuilder(commandlineArgs);
+            //Create an unhandled exception handler forthe app domain
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
+            var hostBuilder = Host.CreateDefaultBuilder(commandlineArgs);
             //Load the configuration
             var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
             var appConfig = configBuilder.Build();
@@ -139,8 +141,8 @@ namespace ModernSlavery.Infrastructure.Hosts
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             var ex = e.ExceptionObject as Exception;
-
-            var errorMessage = $"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}";
+            
+            var errorMessage = $"{(e.IsTerminating ? "FATAL " : "")}UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}";
 
             Console.WriteLine(errorMessage);
             if (Debugger.IsAttached)Debug.WriteLine(errorMessage);
