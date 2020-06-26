@@ -138,7 +138,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
                
                     if (Sector == "Other sector")
                     {
-                    Set("Please specify the other sector and explain why").To(Submission.SupplyChainRisks_OtherSectorDetai
+                    Set("Please specify the other sector and explain why").To(Submission.SupplyChainRisks_OtherSectorDetails);
                     }            
             }
 
