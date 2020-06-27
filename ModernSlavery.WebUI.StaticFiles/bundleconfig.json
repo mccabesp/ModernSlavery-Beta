@@ -1,5 +1,5 @@
 [
-  // bundle css
+  // bundle css for DfeTemplate layout
   {
     "outputFileName": "wwwroot/assets/stylesheets/application.min.css",
     "inputFiles": [ "wwwroot/assets/stylesheets/**/!(*.min).css" ],
@@ -7,10 +7,19 @@
       "enabled": true
     }
   },
-  // bundle js
+  // bundle js for DfeTemplate layout
   {
     "outputFileName": "wwwroot/assets/javascripts/application.min.js",
     "inputFiles": [ "wwwroot/assets/javascripts/**/!(*.min).js" ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    }
+  },
+  // bundle js  for GdsTemplate layout
+  {
+    "outputFileName": "wwwroot/scripts/app.min.js",
+    "inputFiles": [ "wwwroot/scripts/**/!(*.min).js" ],
     "minify": {
       "enabled": true,
       "renameLocals": true

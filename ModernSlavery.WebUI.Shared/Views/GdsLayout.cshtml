@@ -25,12 +25,22 @@
     <link rel="apple-touch-icon" sizes="152x152" href="@(assetsPath)/govuk-apple-touch-icon-152x152.png">
     <link rel="apple-touch-icon" href="@(assetsPath)/govuk-apple-touch-icon.png">
 
-    <!--[if !IE 8]><!-->
-    <link asp-href-include="~/compiled/**/app-*.css" asp-href-exclude="~/compiled/**/app-ie8-*.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
-    <!--<![endif]-->
-    <!--[if IE 8]>
-        <link asp-href-include="~/compiled/**/app-ie8-*.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
-    <![endif]-->
+    <environment exclude="Development, DEV, TEST">
+        <!--[if !IE 8]><!-->
+        <link href="~/styles/app-all.min.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
+        <!--<![endif]-->
+        <!--[if IE 8]>
+            <link href="~/styles/app-ie8.min.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
+        <![endif]-->
+    </environment>
+    <environment include="Development, DEV, TEST">
+        <!--[if !IE 8]><!-->
+        <link href="~/styles/app-all.css" rel="stylesheet" type="text/css" media="all" />
+        <!--<![endif]-->
+        <!--[if IE 8]>
+            <link href="~/styles/app-ie8.css" rel="stylesheet" type="text/css" media="all" />
+        <![endif]-->
+    </environment>
 
     <meta property="og:image" content="@(assetsPath)/govuk-opengraph-image.png">
 
@@ -38,23 +48,23 @@
 </head>
 
 <body class="govuk-template__body app-body-class">
-<script>
-    document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
-</script>
+    <script>
+        document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
+    </script>
 
-@if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request) && !ViewContext.RouteData.Values["action"].Equals("CookieSettings"))
-{
-    await Html.RenderPartialAsync("~/Views/Components/CookieBanner.cshtml");
-}
-
-<a href="#main-content" class="govuk-skip-link">Skip to main content</a>
-
-@{
-    List<HeaderNavigationViewModel> headerNavigationLinks;
-    if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
+    @if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request) && !ViewContext.RouteData.Values["action"].Equals("CookieSettings"))
     {
-        headerNavigationLinks = new List<HeaderNavigationViewModel>
+        await Html.RenderPartialAsync("~/Views/Components/CookieBanner.cshtml");
+    }
+
+    <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+
+    @{
+        List<HeaderNavigationViewModel> headerNavigationLinks;
+        if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
         {
+            headerNavigationLinks = new List<HeaderNavigationViewModel>
+{
             new HeaderNavigationViewModel
             {
                 Text = "Search",
@@ -71,11 +81,11 @@
                 Href = Url.Action("ManageOrganisations", "Submission")
             }
         };
-    }
-    else
-    {
-        headerNavigationLinks = new List<HeaderNavigationViewModel>
+        }
+        else
         {
+            headerNavigationLinks = new List<HeaderNavigationViewModel>
+{
             new HeaderNavigationViewModel
             {
                 Text = "Search and compare",
@@ -92,38 +102,38 @@
                 Href = Url.Action("Overview", "ActionsHub")
             }
         };
-    }
+        }
 
-    var controllerName = ViewContext.RouteData.Values["Controller"].ToString();
-    if (controllerName.StartsWith("Admin"))
-    {
-        headerNavigationLinks.Add(new HeaderNavigationViewModel
+        var controllerName = ViewContext.RouteData.Values["Controller"].ToString();
+        if (controllerName.StartsWith("Admin"))
         {
-            Text = "Admin",
-            Href = Url.Action("Home", "Admin")
-        });
-    }
+            headerNavigationLinks.Add(new HeaderNavigationViewModel
+            {
+                Text = "Admin",
+                Href = Url.Action("Home", "Admin")
+            });
+        }
 
-    if (User.Identity.IsAuthenticated)
-    {
-        headerNavigationLinks.Add(new HeaderNavigationViewModel
+        if (User.Identity.IsAuthenticated)
         {
-            Text = "Sign out",
-            Href = Url.Action("SignOut", "Account"),
-            Classes = "sign-out-link"
-        });
-    }
-    else
-    {
-        headerNavigationLinks.Add(new HeaderNavigationViewModel
+            headerNavigationLinks.Add(new HeaderNavigationViewModel
+            {
+                Text = "Sign out",
+                Href = Url.Action("SignOut", "Account"),
+                Classes = "sign-out-link"
+            });
+        }
+        else
         {
-            Text = "Sign in",
-            Href = Url.Action("ManageOrganisations", "Submission"),
-            Classes = "sign-out-link"
-        });
-    }
+            headerNavigationLinks.Add(new HeaderNavigationViewModel
+            {
+                Text = "Sign in",
+                Href = Url.Action("ManageOrganisations", "Submission"),
+                Classes = "sign-out-link"
+            });
+        }
 
-    @(Html.GovUkHeader(new HeaderViewModel
+        @(Html.GovUkHeader(new HeaderViewModel
     {
         ServiceName = "Modern Slavery Reporting service",
         AssetsPath = assetsPath,
@@ -132,23 +142,23 @@
         Navigation = headerNavigationLinks
     }))
 
-}
+    }
 
-<div class="govuk-width-container">
+    <div class="govuk-width-container">
 
-    @(Html.GovUkPhaseBanner(new PhaseBannerViewModel
+        @(Html.GovUkPhaseBanner(new PhaseBannerViewModel
     {
         Phase = "DISCOVERY",
         Html = @<text>This is a new service – your <a class="govuk-link" asp-action="SendFeedback" asp-controller="shared">feedback</a> will help us to improve it.</text>
     }))
-    @(RenderSection("BeforeMain", false))
+        @(RenderSection("BeforeMain", false))
 
-    <main class="govuk-main-wrapper" id="main-content" role="main">
-        @RenderBody()
-    </main>
-</div>
+        <main class="govuk-main-wrapper" id="main-content" role="main">
+            @RenderBody()
+        </main>
+    </div>
 
-@(Html.GovUkFooter(new FooterViewModel
+    @(Html.GovUkFooter(new FooterViewModel
 {
     MetaNavigation = new FooterMetaNavigationViewModel
     {
@@ -178,9 +188,14 @@
     }
 }))
 
-<script asp-src-include="~/compiled/**/app-*.js" type="text/javascript" asp-append-version="true"></script>
+    <environment exclude="Development, DEV, TEST">
+        <script src="~/scripts/app.min.js" type="text/javascript" asp-append-version="true"></script>
+    </environment>
+    <environment include="Development, DEV, TEST">
+        <script asp-src-include="~/scripts/**/*.js" asp-src-exclude="~/assets/javascripts/**/*.min.js" type="text/javascript"></script>
+    </environment>
 
-<script>window.GOVUKFrontend.initAll()</script>
-@RenderSection("AfterLoadedCompiledScripts", false)
+    <script>window.GOVUKFrontend.initAll()</script>
+    @RenderSection("AfterLoadedCompiledScripts", false)
 </body>
 </html>

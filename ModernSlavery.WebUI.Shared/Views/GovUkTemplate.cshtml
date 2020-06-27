@@ -68,12 +68,22 @@
 
     @if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request))
     {
-        <!--[if !IE 8]><!-->
-        <link asp-href-include="~/compiled/**/app-*.css" asp-href-exclude="~/compiled/**/app-ie8-*.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
-        <!--<![endif]-->
-        <!--[if IE 8]>
-            <link asp-href-include="~/compiled/**/app-ie8-*.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
-        <![endif]-->
+        <environment exclude="Development, DEV, TEST">
+            <!--[if !IE 8]><!-->
+            <link href="~/styles/app-all.min.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
+            <!--<![endif]-->
+            <!--[if IE 8]>
+                <link href="~/styles/app-ie8.min.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
+            <![endif]-->
+        </environment>
+        <environment include="Development, DEV, TEST">
+            <!--[if !IE 8]><!-->
+            <link href="~/styles/app-all.css" rel="stylesheet" type="text/css" media="all" />
+            <!--<![endif]-->
+            <!--[if IE 8]>
+                <link href="~/styles/app-ie8.css" rel="stylesheet" type="text/css" media="all" />
+            <![endif]-->
+        </environment>
     }
 </head>
 <body class="@(ViewBag.bodyClasses)">

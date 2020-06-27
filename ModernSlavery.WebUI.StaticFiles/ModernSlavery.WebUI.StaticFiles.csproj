@@ -11,6 +11,10 @@
     <StaticWebAssetBasePath Condition="$(StaticWebAssetBasePath) == ''">/</StaticWebAssetBasePath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="compilerconfig.json" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -19,6 +23,7 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="5.0.0" />
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.447" />
+    <PackageReference Include="BuildWebCompiler" Version="1.12.394" />
     <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" />
   </ItemGroup>
 
@@ -43,18 +48,24 @@
     </AdditionalFiles>
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Include="compilerconfig.json" />
+    <None Include="wwwroot\styles\app-ie8.scss" />
+    <None Include="wwwroot\styles\app-all.scss" />
+    <None Include="wwwroot\styles\components\_admin-search-box.scss" />
+    <None Include="wwwroot\styles\components\_cookie-banner.scss" />
+    <None Include="wwwroot\styles\components\_header.scss" />
+    <None Include="wwwroot\styles\components\_hero-banner.scss" />
+    <None Include="wwwroot\styles\components\_pagination-link.scss" />
+    <None Include="wwwroot\styles\components\_searchbar.scss" />
+    <None Include="wwwroot\styles\components\_step-by-step-navigation-gpg.scss" />
+    <None Include="wwwroot\styles\components\_step-by-step-navigation.scss" />
+    <None Include="wwwroot\styles\pages\_cookie-settings.scss" />
+    <None Include="wwwroot\styles\_gender-pay-gap-custom.scss" />
+    <None Include="wwwroot\styles\_reset.scss" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="npm install&#xD;&#xA;npm rebuild" />
   </Target>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="npm run build" />
-  </Target>
-
 
 </Project>

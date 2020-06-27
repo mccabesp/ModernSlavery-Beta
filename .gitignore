@@ -5,6 +5,8 @@
 **/wwwroot/assets/javascripts/application.min.js
 **/wwwroot/assets/stylesheets/application.min.css
 **/wwwroot/compiled
+**/wwwroot/scripts/*.min.js
+**/wwwroot/styles/*.css
 
 # User-specific files
 *.jfm
