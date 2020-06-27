@@ -3,7 +3,7 @@
 @import "_reset";
 
 /* Imported from Gov.UK Frontend */
-@import "../../node_modules/govuk-frontend/govuk/all";
+@import "../../../node_modules/govuk-frontend/govuk/all-ie8";
 
 /* Modern Slavery Reporting service custom styles */
-@import "_gender-pay-gap-custom";
+@import "_gender-pay-gap-custom.scss";

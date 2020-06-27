@@ -18,8 +18,8 @@
   },
   // bundle js  for GdsTemplate layout
   {
-    "outputFileName": "wwwroot/scripts/app.min.js",
-    "inputFiles": [ "wwwroot/scripts/**/!(*.min).js" ],
+    "outputFileName": "wwwroot/assets/scripts/app.min.js",
+    "inputFiles": [ "wwwroot/assets/scripts/**/!(*.min).js" ],
     "minify": {
       "enabled": true,
       "renameLocals": true

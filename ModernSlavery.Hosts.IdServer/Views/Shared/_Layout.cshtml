@@ -1,8 +1,5 @@
 ﻿@{
     Layout = "_GovTemplate";
-    var govukToolkitAssetPath = Url.Content("~/public/assets/govuk_frontend_toolkit");
-    var govukAppAssetPath = Url.Content("~/public/assets/application");
-    var cacheBreaker = ViewData["cacheBreaker"] = "0.0.0";
 }
 
 @section PageTop{
@@ -10,8 +7,8 @@
 }
 
 @section Head {
-    <link rel="stylesheet" media="screen" href="@(govukAppAssetPath)/stylesheets/application.css?@(cacheBreaker)"/>
-    <link rel="stylesheet" media="print" href="@(govukAppAssetPath)/stylesheets/application-print.css?@(cacheBreaker)"/>
+    <link rel="stylesheet" media="screen" href="/assets/public/assets/application/stylesheets/application.css" asp-append-version="true" asp-append-version="true" />
+    <link rel="stylesheet" media="print" href="/assets/public/assets/application/stylesheets/application-print.css" asp-append-version="true"/>
     <meta name="google-site-verification" content="uRt7CAkfClOB8Jig6Pw2-DELUWuuyG2kYKip0UThxhg"/>
     <script type="text/javascript">
         var uri = window.location.toString();
@@ -74,7 +71,7 @@
                 }
             });
     </script>
-    <script src="@(govukToolkitAssetPath)/javascripts/govuk_toolkit.js?@(cacheBreaker)"></script>
+    <script src="/assets/public/assets/govuk_frontend_toolkit/javascripts/govuk_toolkit.js" asp-append-version="true"></script>
 
     @RenderSection("scripts", false)
 }

@@ -3391,8 +3391,8 @@ ol { list-style-type: none; }
 }
 
 .js-accordion-with-descriptions .subsection__icon {
-    background: url(/public/images/icons-plus-minus.png), linear-gradient(transparent, transparent);
-    background-image: url(/public/images/icons-plus-minus.png);
+    background: url(/assets/public/images/icons-plus-minus.png), linear-gradient(transparent, transparent);
+    background-image: url(/assets/public/images/icons-plus-minus.png);
     background-position: 0 -16px;
     background-repeat: no-repeat;
     height: 16px;

@@ -244,12 +244,12 @@ ul.tabs li {
 }
 
 .print-link {
-    background: url(/img/icon-print.png) no-repeat 0 50%;
+    background: url(/assets/images/icon-print.png) no-repeat 0 50%;
     padding: 0.5em 0 0.5em 28px
 }
 
 .email-link {
-    background: url(/img/icon-email.png) no-repeat 0 50%;
+    background: url(/assets/images/icon-email.png) no-repeat 0 50%;
     border: none;
     color: #005ea5;
     cursor: pointer;
@@ -576,7 +576,7 @@ ul.tabs li {
 }
 
 .js-enabled .finder .govuk-option-select.js-collapsible button {
-    background: url(/public/images/option-select-toggle-sprite.png) no-repeat right 5px;
+    background: url(/assets/public/images/option-select-toggle-sprite.png) no-repeat right 5px;
     background-color: #dee0e2;
     border: none;
     cursor: pointer;
@@ -591,7 +591,7 @@ ul.tabs li {
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20/10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
     .js-enabled .finder .govuk-option-select.js-collapsible button {
-        background: url(/public/images/option-select-toggle-sprite.png) no-repeat right 5px;
+        background: url(/assets/public/images/option-select-toggle-sprite.png) no-repeat right 5px;
         background-size: 32px 50px;
     }
 }
@@ -842,7 +842,7 @@ ul.tabs li {
     -moz-box-shadow: none;
     -webkit-border-radius: 0;
     -webkit-box-shadow: none;
-    background: #005ea5 url(/public/images/search-button.png) no-repeat -12.5% 50%;
+    background: #005ea5 url(/assets/public/images/search-button.png) no-repeat -12.5% 50%;
     border: none;
     border-radius: 0;
     bottom: 0;
@@ -1056,7 +1056,7 @@ ul.tabs li {
 }
 
 .pagination-container .pagination-prev a:before {
-    background: transparent url(/public/images/arrow-sprite.png) no-repeat -20px -11px;
+    background: transparent url(/assets/public/images/arrow-sprite.png) no-repeat -20px -11px;
     content: " ";
     display: block;
     float: left;
@@ -1066,7 +1066,7 @@ ul.tabs li {
 }
 
 .pagination-container .pagination-next a:before {
-    background: transparent url(/public/images/arrow-sprite.png) no-repeat -102px -11px;
+    background: transparent url(/assets/public/images/arrow-sprite.png) no-repeat -102px -11px;
     content: " ";
     display: block;
     float: right;
@@ -1358,7 +1358,7 @@ ul.tabs li {
 }
 
 .icon-effective {
-    background-image: url("/img/effective64x64.png");
+    background-image: url("/assets/images/effective64x64.png");
     background-size: 100%;
     height: 45px;
     width: 45px;
@@ -1368,7 +1368,7 @@ ul.tabs li {
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20/10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
     .icon-effective {
-        background-image: url("/img/effective32x32.png");
+        background-image: url("/assets/images/effective32x32.png");
         background-size: 100%;
     }
 }
@@ -1401,7 +1401,7 @@ ul.tabs li {
 
 
 .icon-promising {
-    background-image: url("/img/promising64x64.png");
+    background-image: url("/assets/images/promising64x64.png");
     background-size: 100%;
     height: 45px;
     width: 45px;
@@ -1409,7 +1409,7 @@ ul.tabs li {
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20/10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
     .icon-promising {
-        background-image: url("/img/promising32x32.png");
+        background-image: url("/assets/images/promising32x32.png");
         background-size: 100%;
     }
 }
@@ -1439,7 +1439,7 @@ ul.tabs li {
 .icon-promising ~ ul { padding-left: 80px }
 
 .icon-mixed {
-    background-image: url("/img/mixed64x64.png");
+    background-image: url("/assets/images/mixed64x64.png");
     background-size: 100%;
     height: 45px;
     width: 45px;
@@ -1447,7 +1447,7 @@ ul.tabs li {
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 20/10), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) {
     .icon-mixed {
-        background-image: url("/img/mixed32x32.png");
+        background-image: url("/assets/images/mixed32x32.png");
         background-size: 100%;
     }
 }

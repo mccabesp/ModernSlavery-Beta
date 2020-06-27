@@ -6,7 +6,7 @@
 
     <!--
     When in Development mode StaticWebAssetBasePath is objtained from "**\obj\**\staticwebassets\ModernSlavery.Hosts.Web.StaticWebAssets.xml" 
-    In production this will normally default to '_content/ModernSlavery.WebUI.StaticFiles/' under wwwroot . This ensures files are looked for in the wwwRoot\
+    In production this will normally default to '_content/ModernSlavery.WebUI.assets/' under wwwroot . This ensures files are looked for in the wwwRoot\
     -->
     <StaticWebAssetBasePath Condition="$(StaticWebAssetBasePath) == ''">/</StaticWebAssetBasePath>
   </PropertyGroup>
@@ -48,20 +48,6 @@
     </AdditionalFiles>
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
-    <None Include="compilerconfig.json" />
-    <None Include="wwwroot\styles\app-ie8.scss" />
-    <None Include="wwwroot\styles\app-all.scss" />
-    <None Include="wwwroot\styles\components\_admin-search-box.scss" />
-    <None Include="wwwroot\styles\components\_cookie-banner.scss" />
-    <None Include="wwwroot\styles\components\_header.scss" />
-    <None Include="wwwroot\styles\components\_hero-banner.scss" />
-    <None Include="wwwroot\styles\components\_pagination-link.scss" />
-    <None Include="wwwroot\styles\components\_searchbar.scss" />
-    <None Include="wwwroot\styles\components\_step-by-step-navigation-gpg.scss" />
-    <None Include="wwwroot\styles\components\_step-by-step-navigation.scss" />
-    <None Include="wwwroot\styles\pages\_cookie-settings.scss" />
-    <None Include="wwwroot\styles\_gender-pay-gap-custom.scss" />
-    <None Include="wwwroot\styles\_reset.scss" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
