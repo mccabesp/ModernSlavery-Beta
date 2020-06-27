@@ -68,14 +68,7 @@ namespace ModernSlavery.WebUI.StaticFiles
             }
 
 
-            app.UseStaticFiles(staticFileOptions);
-            
-            //Ensure ShortCodes, SicCodes and SicSections exist on remote 
-            Task.WaitAll(
-                fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.DataPath),
-                fileRepository.PushRemoteFileAsync(Filenames.SicCodes, _sharedOptions.DataPath),
-                fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.DataPath)
-            );
+            app.UseStaticFiles(staticFileOptions);            
         }
 
         public void RegisterModules(IList<Type> modules)

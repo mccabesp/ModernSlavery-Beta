@@ -27,27 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="App_Data\GPG-ShortCodes.csv" />
-    <None Remove="App_Data\SicCodes.csv" />
-    <None Remove="App_Data\SicSections.csv" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="App_Data\GPG-ShortCodes.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Include="App_Data\SicCodes.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Include="App_Data\SicSections.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="wwwroot\**\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
@@ -70,7 +49,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="npm rebuild" />
+    <Exec Command="npm install&#xD;&#xA;npm rebuild" />
   </Target>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
