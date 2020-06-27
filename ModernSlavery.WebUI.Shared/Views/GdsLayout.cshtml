@@ -4,7 +4,6 @@
 @using ModernSlavery.WebUI.Shared.Options
 @inject SharedOptions sharedOptions
 @inject FeatureSwitchOptions featureSwitchOptions
-@inject StaticAssetsVersioningHelper staticAssetsVersioningHelper
 @inject IWebService WebService
 @{
     var assetsPath = "/assets/images";
@@ -12,14 +11,14 @@
 <!DOCTYPE html>
 <html lang="en" class="govuk-template app-html-class">
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" />
     <title>@(ViewBag.Title ?? "Modern Slavery Reporting service")</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="blue"/>
+    <meta name="theme-color" content="blue" />
 
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="@(assetsPath)/favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="@(assetsPath)/favicon.ico" type="image/x-icon" />
     <link rel="mask-icon" href="@(assetsPath)/govuk-mask-icon.svg" color="blue">
     <link rel="apple-touch-icon" sizes="180x180" href="@(assetsPath)/govuk-apple-touch-icon-180x180.png">
     <link rel="apple-touch-icon" sizes="167x167" href="@(assetsPath)/govuk-apple-touch-icon-167x167.png">
@@ -27,10 +26,10 @@
     <link rel="apple-touch-icon" href="@(assetsPath)/govuk-apple-touch-icon.png">
 
     <!--[if !IE 8]><!-->
-    <link href="@(staticAssetsVersioningHelper.GetAppCssFilename())" rel="stylesheet" type="text/css"/>
+    <link asp-href-include="~/compiled/**/app-*.css" asp-href-exclude="~/compiled/**/app-ie8-*.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
     <!--<![endif]-->
     <!--[if IE 8]>
-        <link href="@(staticAssetsVersioningHelper.GetAppIe8CssFilename())" rel="stylesheet" />
+        <link asp-href-include="~/compiled/**/app-ie8-*.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
     <![endif]-->
 
     <meta property="og:image" content="@(assetsPath)/govuk-opengraph-image.png">
@@ -179,7 +178,8 @@
     }
 }))
 
-<script src="@(staticAssetsVersioningHelper.GetAppJsFilename())"></script>
+<script asp-src-include="~/compiled/**/app-*.js" type="text/javascript" asp-append-version="true"></script>
+
 <script>window.GOVUKFrontend.initAll()</script>
 @RenderSection("AfterLoadedCompiledScripts", false)
 </body>

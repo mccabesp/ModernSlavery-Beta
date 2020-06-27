@@ -3,7 +3,6 @@
 @using ModernSlavery.WebUI.Shared.Interfaces
 @using ModernSlavery.WebUI.Shared.Options
 @inject SharedOptions sharedOptions
-@inject StaticAssetsVersioningHelper staticAssetsVersioningHelper
 @inject FeatureSwitchOptions featureSwitchOptions
 @inject IWebService WebService
 @{
@@ -70,10 +69,10 @@
     @if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request))
     {
         <!--[if !IE 8]><!-->
-        <link href="@(staticAssetsVersioningHelper.GetAppCssFilename())" rel="stylesheet" />
+        <link asp-href-include="~/compiled/**/app-*.css" asp-href-exclude="~/compiled/**/app-ie8-*.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
         <!--<![endif]-->
         <!--[if IE 8]>
-            <link href="@(staticAssetsVersioningHelper.GetAppIe8CssFilename())" rel="stylesheet" />
+            <link asp-href-include="~/compiled/**/app-ie8-*.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
         <![endif]-->
     }
 </head>

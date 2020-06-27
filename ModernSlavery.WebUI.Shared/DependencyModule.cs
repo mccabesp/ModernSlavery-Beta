@@ -26,9 +26,6 @@ namespace ModernSlavery.WebUI.Shared
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //Register StaticAssetsVersioningHelper
-            services.AddSingleton<StaticAssetsVersioningHelper>();
-
             //Add the custom url helper
             services.AddSingleton<IUrlHelperFactory,CustomUrlHelperFactory>();
         }
