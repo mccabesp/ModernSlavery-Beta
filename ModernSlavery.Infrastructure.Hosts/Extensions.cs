@@ -36,6 +36,9 @@ namespace ModernSlavery.Infrastructure.Hosts
             //Load the configuration
             var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
             var appConfig = configBuilder.Build();
+            
+            //Setup the threads to use the current culture from config or en-GB by default
+            appConfig.SetupThreadCulture();
 
             //Set the content root to the bin folder if in development mode
             if (appConfig.IsDevelopment()) appConfig[HostDefaults.ContentRootKey] = System.AppDomain.CurrentDomain.BaseDirectory;
@@ -158,7 +161,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             return $"Threads (Worker busy:{workerMax - workerFree:N0} min:{workerMin:N0} max:{workerMax:N0}, I/O busy:{ioMax - ioFree:N0} min:{ioMin:N0} max:{ioMax:N0})";
         }
 
-        public static void SetupThreads(this IConfiguration config)
+        public static void SetupThreadCulture(this IConfiguration config)
         {
             //Culture is required so UK dates can be parsed correctly
             Thread.CurrentThread.CurrentCulture = new CultureInfo(config.GetValue("Culture", "en-GB"));
