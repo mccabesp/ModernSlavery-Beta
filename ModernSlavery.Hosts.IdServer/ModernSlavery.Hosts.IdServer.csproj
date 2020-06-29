@@ -12,10 +12,8 @@
   <!-- This is required to auto recompile during development -->
   <!-- To debug razor (.cshtml) you must select IIS express and run Ctrl + F5 (run without debugging) - NOT debug mode -->
   <ItemGroup>
-    <Watch Include="..\ModernSlavery.WebUI.*\**\*.cshtml" />
     <Watch Include="..\ModernSlavery.Hosts.IdServer\*\**\*.cshtml" />
   </ItemGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning;</WarningsAsErrors>
   </PropertyGroup>

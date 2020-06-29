@@ -22,6 +22,7 @@ using System.Linq;
 using System.Reflection;
 using ModernSlavery.Infrastructure.Logging;
 using System.Threading;
+using System.Runtime.Loader;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
@@ -126,18 +127,21 @@ namespace ModernSlavery.Infrastructure.Hosts
         /// <typeparam name="TModule">The entry class within the Razor Class library</typeparam>
         /// <param name="mvcBuilder">The mvcBuilder</param>
         /// <returns></returns>
-        public static IMvcBuilder AddRazorClassLibrary<TModule>(this IMvcBuilder mvcBuilder) where TModule : class
+        public static IMvcBuilder AddApplicationPart<TModule>(this IMvcBuilder mvcBuilder) where TModule : class
         {
             var partAssembly = typeof(TModule).Assembly;
 
-            mvcBuilder.AddApplicationPart(partAssembly);
-
-            var razorAssemblyPath = Path.GetDirectoryName(partAssembly.Location);
-            var razorAssemblyLocation = Path.Combine(razorAssemblyPath,$"{Path.GetFileNameWithoutExtension(partAssembly.Location)}.Views{Path.GetExtension(partAssembly.Location)}");
-            var razorAssembly = Assembly.LoadFile(razorAssemblyLocation);
-            mvcBuilder.PartManager.ApplicationParts.Add(new CompiledRazorAssemblyPart(razorAssembly));
-
-
+            var partFactory = ApplicationPartFactory.GetApplicationPartFactory(partAssembly);
+            foreach (var part in partFactory.GetApplicationParts(partAssembly))
+                mvcBuilder.PartManager.ApplicationParts.Add(part);
+            
+            var relatedAssemblies = RelatedAssemblyAttribute.GetRelatedAssemblies(partAssembly, throwOnError: true);
+            foreach (var assembly in relatedAssemblies)
+            {
+                partFactory = ApplicationPartFactory.GetApplicationPartFactory(assembly);
+                foreach (var part in partFactory.GetApplicationParts(assembly))
+                    mvcBuilder.PartManager.ApplicationParts.Add(part);
+            }
             return mvcBuilder;
         }
 

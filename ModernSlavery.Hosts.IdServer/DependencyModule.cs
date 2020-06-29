@@ -94,9 +94,9 @@ namespace ModernSlavery.Hosts.IdServer
 
             var mvcBuilder = services.AddControllersWithViews();
 
-            mvcBuilder.AddRazorClassLibrary<DependencyModule>();
-            mvcBuilder.AddRazorClassLibrary<WebUI.Shared.DependencyModule>();
-            mvcBuilder.AddRazorClassLibrary<WebUI.GDSDesignSystem.DependencyModule>();
+            mvcBuilder.AddApplicationPart<DependencyModule>();
+            mvcBuilder.AddApplicationPart<WebUI.Shared.DependencyModule>();
+            mvcBuilder.AddApplicationPart<WebUI.GDSDesignSystem.DependencyModule>();
 
             // Add controllers, taghelpers, views as services so attribute dependencies can be resolved in their contructors
             mvcBuilder.AddControllersAsServices();

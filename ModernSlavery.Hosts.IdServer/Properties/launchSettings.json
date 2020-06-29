@@ -22,8 +22,10 @@
       "ancmHostingModel": "OutOfProcess",
       "applicationUrl": " http://localhost:5000/"
     },
-    "ModernSlavery.IdServer": {
+    "ModernSlavery.Hosts.IdServer": {
       "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "https://localhost:44366/.well-known/openid-configuration",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
+using System.Runtime.Loader;
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
@@ -88,14 +92,13 @@ namespace ModernSlavery.Hosts.Web
                         options.Filters.Add<ErrorHandlingFilter>();
                     });
 
-            mvcBuilder.AddRazorClassLibrary<WebUI.Account.DependencyModule>();
-            mvcBuilder.AddRazorClassLibrary<WebUI.Admin.DependencyModule>();
-            mvcBuilder.AddRazorClassLibrary<WebUI.Registration.DependencyModule>();
-            mvcBuilder.AddRazorClassLibrary<WebUI.Submission.DependencyModule>();
-            mvcBuilder.AddRazorClassLibrary<WebUI.Viewing.DependencyModule>();
-
-            mvcBuilder.AddRazorClassLibrary<WebUI.Shared.DependencyModule>();
-            mvcBuilder.AddRazorClassLibrary<WebUI.GDSDesignSystem.DependencyModule>();
+            mvcBuilder.AddApplicationPart<WebUI.Account.DependencyModule>();
+            mvcBuilder.AddApplicationPart<WebUI.Admin.DependencyModule>();
+            mvcBuilder.AddApplicationPart<WebUI.Registration.DependencyModule>();
+            mvcBuilder.AddApplicationPart<WebUI.Submission.DependencyModule>();
+            mvcBuilder.AddApplicationPart<WebUI.Viewing.DependencyModule>();
+            mvcBuilder.AddApplicationPart<WebUI.Shared.DependencyModule>();
+            mvcBuilder.AddApplicationPart<WebUI.GDSDesignSystem.DependencyModule>();
 
             //Log all the application parts when in development
             if (_sharedOptions.IsDevelopment())
@@ -105,7 +108,6 @@ namespace ModernSlavery.Hosts.Web
             mvcBuilder.AddControllersAsServices(); 
             mvcBuilder.AddTagHelpersAsServices();
             mvcBuilder.AddViewComponentsAsServices();
-
 
             // Set the default resolver to use Pascalcase instead of the default camelCase which may break Ajaz responses
             mvcBuilder.AddJsonOptions(options =>
@@ -128,8 +130,8 @@ namespace ModernSlavery.Hosts.Web
 
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Development" for Development dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
-            // However this doesnt work on razor class/com,ponent libraries so we instead use a workaround 
-            //if (_sharedOptions.IsDevelopment()) mvcBuilder.AddRazorRuntimeCompilation();
+            // However this doesnt work on razor class/component libraries so we instead use a workaround 
+            if (_sharedOptions.IsDevelopment()) mvcBuilder.AddRazorRuntimeCompilation();
 
             //Add services needed for sessions
             services.AddSession(
