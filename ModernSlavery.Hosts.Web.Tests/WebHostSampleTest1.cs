@@ -97,8 +97,14 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Check for the landing page header using Xpath
             ClickXPath("//*[@id='NextStep']");
 
-            //Check for the landing page header using Css
-            ClickCSS("#NextStep");
+            //Go to the landing page
+            Goto(_webAuthority);
+
+            //Check for the landing page header
+            ExpectHeader("Search and compare Modern Slavery statements");
+
+            //Check for the landing page header using Xpath
+            ClickXPath("//*[@id='NextStep']");
         }
     }
 }
