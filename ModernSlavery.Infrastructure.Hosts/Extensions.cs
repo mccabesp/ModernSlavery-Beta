@@ -23,6 +23,9 @@ using System.Reflection;
 using ModernSlavery.Infrastructure.Logging;
 using System.Threading;
 using System.Runtime.Loader;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Razor.Hosting;
+using Microsoft.Extensions.FileProviders;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
@@ -130,19 +133,47 @@ namespace ModernSlavery.Infrastructure.Hosts
         public static IMvcBuilder AddApplicationPart<TModule>(this IMvcBuilder mvcBuilder) where TModule : class
         {
             var partAssembly = typeof(TModule).Assembly;
+            return mvcBuilder.AddApplicationPart(partAssembly);
+        }
 
+        public static IMvcBuilder AddApplicationPart(this IMvcBuilder mvcBuilder, Assembly partAssembly)
+        {
             var partFactory = ApplicationPartFactory.GetApplicationPartFactory(partAssembly);
-            foreach (var part in partFactory.GetApplicationParts(partAssembly))
-                mvcBuilder.PartManager.ApplicationParts.Add(part);
-            
+            foreach (var applicationPart in partFactory.GetApplicationParts(partAssembly))
+                mvcBuilder.PartManager.ApplicationParts.Add(applicationPart);
+
             var relatedAssemblies = RelatedAssemblyAttribute.GetRelatedAssemblies(partAssembly, throwOnError: true);
-            foreach (var assembly in relatedAssemblies)
-            {
-                partFactory = ApplicationPartFactory.GetApplicationPartFactory(assembly);
-                foreach (var part in partFactory.GetApplicationParts(assembly))
-                    mvcBuilder.PartManager.ApplicationParts.Add(part);
-            }
+            foreach (var relatedAssembly in relatedAssemblies)
+                AddApplicationPart(mvcBuilder, relatedAssembly);
+
             return mvcBuilder;
+        }
+
+        public static void AddApplicationPartsRuntimeCompilation(this IMvcBuilder mvcBuilder)
+        {
+            mvcBuilder.AddRazorRuntimeCompilation(mvcBuilder.PartManager.ApplicationParts.OfType<CompiledRazorAssemblyPart>().Select(p=>$"..\\{p.Name.BeforeLast(".Views")}").ToArray());
+        }
+
+        public static void AddRazorRuntimeCompilation(this IMvcBuilder mvcBuilder, params string[] folders)
+        {
+            var refsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "refs");
+            if (!Directory.Exists(refsDirectory)) throw new DirectoryNotFoundException($"Cannot find reference directory '{refsDirectory}'");
+            if (!folders.Any()) throw new ArgumentNullException(nameof(folders));
+
+            Parallel.For(0,folders.Length,i =>
+            {
+                if (!Path.IsPathRooted(folders[i])) folders[i] = Path.Combine(Environment.CurrentDirectory, folders[i]);
+                if (!Directory.Exists(folders[i])) throw new DirectoryNotFoundException($"Cannot find source directory '{folders[i]}'");
+            });
+
+            var refFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll").ToHashSet();
+            refFiles.AddRange(Directory.GetFiles(refsDirectory));
+
+            mvcBuilder.AddRazorRuntimeCompilation(options =>
+            {
+                folders.ForEach(f=>options.FileProviders.Add(new PhysicalFileProvider(f)));
+                foreach (var refFile in refFiles) options.AdditionalReferencePaths.Add(refFile);
+            });
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

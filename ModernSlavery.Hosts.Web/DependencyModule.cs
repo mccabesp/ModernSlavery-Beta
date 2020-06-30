@@ -100,6 +100,11 @@ namespace ModernSlavery.Hosts.Web
             mvcBuilder.AddApplicationPart<WebUI.Shared.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.GDSDesignSystem.DependencyModule>();
 
+            // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Development" for Development dev 
+            // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
+            // However this doesnt work on razor class/component libraries so we instead use this workaround 
+            if (_sharedOptions.IsDevelopment()) mvcBuilder.AddApplicationPartsRuntimeCompilation();
+
             //Log all the application parts when in development
             if (_sharedOptions.IsDevelopment())
                 services.AddHostedService<ApplicationPartsLogger>();
@@ -127,11 +132,6 @@ namespace ModernSlavery.Hosts.Web
             services.AddAntiforgery();
 
             services.AddRazorPages();
-
-            // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Development" for Development dev 
-            // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
-            // However this doesnt work on razor class/component libraries so we instead use a workaround 
-            if (_sharedOptions.IsDevelopment()) mvcBuilder.AddRazorRuntimeCompilation();
 
             //Add services needed for sessions
             services.AddSession(

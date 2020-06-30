@@ -196,6 +196,29 @@ namespace ModernSlavery.Core.Extensions
         }
 
         /// <summary>
+        ///     Returns all characters before the last occurrence of a string
+        /// </summary>
+        public static string BeforeLast(this string text,
+            string separator,
+            StringComparison comparisionType = StringComparison.OrdinalIgnoreCase,
+            bool inclusive = false,
+            bool includeWhenNoSeparator = true)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return text;
+            }
+
+            int i = text.LastIndexOf(separator, text.Length - 1, comparisionType);
+            if (i > -1)
+            {
+                return text.Substring(0, inclusive ? i + 1 : i);
+            }
+
+            return includeWhenNoSeparator ? text : null;
+        }
+
+        /// <summary>
         ///     Returns all characters after the first occurrence of a string
         /// </summary>
         public static string AfterFirst(this string text,

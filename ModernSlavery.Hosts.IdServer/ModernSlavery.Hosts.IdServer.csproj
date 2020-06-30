@@ -7,15 +7,8 @@
     <Copyright>Crown Copyright © $([System.DateTime]::UtcNow.Year) ($([System.DateTime]::UtcNow.ToLocalTime()))</Copyright>
     <ProjectGuid>F0DBFCDC-2EC9-4181-BF63-1B8F3D585A4E</ProjectGuid>
     <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
-
-  <!-- This is required to auto recompile during development -->
-  <!-- To debug razor (.cshtml) you must select IIS express and run Ctrl + F5 (run without debugging) - NOT debug mode -->
-  <ItemGroup>
-    <Watch Include="..\ModernSlavery.Hosts.IdServer\*\**\*.cshtml" />
-  </ItemGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning;</WarningsAsErrors>
+    <!-- This is required otherwise refs folder (only needed during runtime compilation) is published -->
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
   </PropertyGroup>
 
   <ItemGroup>
