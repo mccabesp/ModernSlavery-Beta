@@ -11,34 +11,60 @@ namespace Modern_Slavery_Reporting_UI_Tests
     class Submission_Helper
     {
 
-
-        public static void NavigateToTraining(UIContext ui, string Organistion, string Year)
+        public static void NavigateYourMSStatement(UIContext ui, string Organistion, string Year)
         {
             ui.Click("Mange Organisations");
             ui.ExpectHeader("Select an organisation");
-
-            ui.Click("Organisation");
-            ui.AtRow(Year).Click("Draft report");
-            ui.ExpectHeader("Your modern slavery statement");
-
-            ui.Click("Save and continue");
-            ui.ExpectHeader("Six areas of modern slavery statement");
-
-            ui.Click("Save and continue");
+        }
+        public static void NavigateToAreasCovered(UIContext ui, string Organistion, string Year)
+        {
+            NavigateYourMSStatement(ui, Organistion, Year);
+            ui.Click("Continue");
+            ui.ExpectHeader("Areas covered by your modern slavery statement");
+        }
+        public static void NavigateToYourOrganisation(UIContext ui, string Organistion, string Year)
+        {
+            NavigateToAreasCovered(ui, Organistion, Year);
+            ui.Click("Continue");
             ui.ExpectHeader("Your organisation");
-
-            ui.Click("Save and continue");
-            ui.ExpectHeader("Supply chain risk");
-
-            ui.Click("Save and continue");
+        }
+        public static void NavigateToPolicies(UIContext ui, string Organistion, string Year)
+        {
+            NavigateToYourOrganisation(ui, Organistion, Year);
+            ui.Click("Continue");
             ui.ExpectHeader("Policies");
-
-            ui.Click("Save and continue");
-            ui.ExpectHeader("Due diligence");
-
-            ui.Click("Save and continue");
+        }
+        public static void NavigateToSupplyChainRisks1(UIContext ui, string Organistion, string Year)
+        {
+            NavigateToPolicies(ui, Organistion, Year);
+            ui.Click("Continue");
+            ui.ExpectHeader("Supply Chain Risks and due diligence");
+            //ensure we are on the correct part of this section
+            //there are 2
+            ui.Expect("Part 1");
+        }
+        public static void NavigateToSupplyChainRisks2(UIContext ui, string Organistion, string Year)
+        {
+            NavigateToSupplyChainRisks1(ui, Organistion, Year);
+            ui.Click("Continue");
+            ui.ExpectHeader("Supply Chain Risks and due diligence");
+            //ensure we are on the correct part of this section
+            //there are 2
+            ui.Expect("Part 2");
+        }
+        public static void NavigateToTraining(UIContext ui, string Organistion, string Year)
+        {
+            NavigateToSupplyChainRisks2(ui, Organistion, Year);
+            ui.Click("Continue");
             ui.ExpectHeader("Training");
         }
+        public static void NavigateToMonitoringProgress(UIContext ui, string Organistion, string Year)
+        {
+            NavigateToTraining(ui, Organistion, Year);
+            ui.Click("Continue");
+            ui.ExpectHeader("Monitoring progress");
+        }
+
         public static void NavigateToSectors(UIContext ui, string Organistion, string Year) {
             ui.Click("Mange Organisations");
             ui.ExpectHeader("Select an organisation");

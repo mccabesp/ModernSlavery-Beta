@@ -13,7 +13,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
 
             LoginAs<RogerReporter>();
 
-            Submission_Helper.NavigateToSectors(this, Submission.OrgName_Blackpool, "2019/2020");
+            Submission_Helper.NavigateToYourOrganisation(this, Submission.OrgName_Blackpool, "2019/2020");
 
             ExpectHeader("Your organisation");
 
