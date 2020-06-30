@@ -1,24 +1,25 @@
-using ModernSlavery.Core.Classes.ErrorMessages;
+using Geeks.Pangolin;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
-using ModernSlavery.Testing.Helpers.Classes;
-using ModernSlavery.WebUI.Admin.Models;
-using ModernSlavery.WebUI.Shared.Interfaces;
 using NUnit.Framework;
 using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using static ModernSlavery.Core.Extensions.Web;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
-    public class WebHostSampleTest: UITest
+    [Parallelizable]
+    public class WebHostSampleTest1: UITest
     {
+        public WebHostSampleTest1():base(TestRunSetup.WebDriverService)
+        {
+            
+        }
+
         private string _webAuthority;
         private IDataRepository _dataRepository;
         private IFileRepository _fileRepository;
@@ -27,19 +28,30 @@ namespace ModernSlavery.Hosts.Web.Tests
         public void RunBeforeAnyTests()
         {
             //Get the url from the test web host
-            _webAuthority = WebHostSetup.TestWebHost.GetHostAddresses().FirstOrDefault();
+            _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
             if (Debugger.IsAttached)Debug.WriteLine($"Kestrel authority: {_webAuthority}");
             Console.WriteLine($"Kestrel authority: {_webAuthority}");
 
             //Get the data repository from the test web host
-            _dataRepository = WebHostSetup.TestWebHost.GetDataRepository();
+            _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
 
             //Get the file repository from the test web host
-            _fileRepository = WebHostSetup.TestWebHost.GetFileRepository();
+            _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
             if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
             Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
         }
 
+        [SetUp]
+        public void SetupTest()
+        {
+            this.SetupTest(TestContext.CurrentContext.Test.Name);
+        }
+
+        [TearDown]
+        public void TearDownTest()
+        {
+            this.TeardownTest();
+        }
         [Test]
         public void WebTestHost_Authority_IsValidUrl()
         {
@@ -80,13 +92,13 @@ namespace ModernSlavery.Hosts.Web.Tests
             Goto(_webAuthority);
 
             //Check for the landing page header
-            ExpectHeaderContains("Search and compare Modern Slavery statements");
+            ExpectHeader("Search and compare Modern Slavery statements");
 
             //Check for the landing page header using Xpath
-            Click("//*[@id='NextStep']");
+            ClickXPath("//*[@id='NextStep']");
 
             //Check for the landing page header using Css
-            Click("#NextStep");
+            ClickCSS("#NextStep");
         }
     }
 }

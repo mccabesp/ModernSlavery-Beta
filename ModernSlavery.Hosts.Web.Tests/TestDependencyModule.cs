@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Azure.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Database;
-using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Testing.Helpers;
-using Moq;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {

@@ -97,6 +97,12 @@ namespace ModernSlavery.Infrastructure.Hosts
             return config.GetChildren().Select(c => c.Key);
         }
 
+        public static string GetHostAddress(this IHost host)
+        {
+            var kestrelServer = host.Services.GetRequiredService<IServer>();
+            return kestrelServer.Features.GetHostAddresses().FirstOrDefault();
+        }
+
         public static IEnumerable<string> GetHostAddresses(this IHost host)
         {
             var kestrelServer = host.Services.GetRequiredService<IServer>();
