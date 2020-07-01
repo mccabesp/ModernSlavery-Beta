@@ -84,6 +84,12 @@ namespace ModernSlavery.Core.Extensions
             return new Regex(matchPattern).Matches(text)?.FirstOrDefault()?.Groups[1]?.Value;
         }
 
+        /// <summary>
+        /// Resolves all variables using pattern $(key) from a dictionary
+        /// </summary>
+        /// <param name="dictionary">The dictionary containing the keys and replacement values</param>
+        /// <param name="text">The source text containing the variable declarations $(key)</param>
+        /// <returns>The source text with all variable declarations replaced</returns>
         public static string ResolveVariableNames(this IDictionary<string, string> dictionary, string text)
         {
             if (dictionary == null) throw new ArgumentNullException(nameof(dictionary));
@@ -93,7 +99,7 @@ namespace ModernSlavery.Core.Extensions
             {
                 var key = m.Groups[1].Value;
                 if (dictionary.ContainsKey(key))
-                    text = text.Replace(m.Groups[0].Value, dictionary[key]);
+                    text = text.Replace(m.Groups[0].Value, dictionary[key],StringComparison.OrdinalIgnoreCase);
                 else
                     badKeys.Add(key);
             }

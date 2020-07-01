@@ -108,14 +108,17 @@ namespace ModernSlavery.Infrastructure.Configuration
             _appConfig = appBuilder.Build();
 
             _appConfig[HostDefaults.EnvironmentKey] = environmentName;
-            
+
+            //Resolve all the variable names in the configuration
+            var configDictionary = _appConfig.ToDictionary();
+            foreach (var key in configDictionary.Keys)
+                _appConfig[key] = configDictionary.ResolveVariableNames(configDictionary[key]);
+
             //Dump the settings to the console
             if (_appConfig.GetValueOrDefault("DUMP_SETTINGS", false))
             {
                 var dumpPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{AppDomain.CurrentDomain.FriendlyName}.SETTINGS.json");
                 Console.WriteLine($@"AppSettings Dumped to file: {dumpPath}");
-
-                var configDictionary = _appConfig.ToDictionary();
                 File.WriteAllLines(dumpPath, configDictionary.Keys.Select(key=>$@"[{key}]={configDictionary[key]}"));
             }
 

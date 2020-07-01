@@ -70,7 +70,6 @@ namespace ModernSlavery.Hosts.IdServer
             {
                 var client = Clients[i];
                 if (string.IsNullOrWhiteSpace(client.ClientUri)) client.ClientUri=_sharedOptions.SiteAuthority;
-                client.ClientUri = Resolve(client.ClientUri);
 
                 if (client.RedirectUris != null)
                     client.RedirectUris = client.RedirectUris.Select(uri => RootUri(uri, client.ClientUri)).ToList();
@@ -80,16 +79,9 @@ namespace ModernSlavery.Hosts.IdServer
             }
         }
 
-        private string RootUri(string uri, string authority)
+        private static string RootUri(string uri, string authority)
         {
-            uri = Resolve(uri);
-            if (!uri.StartsWithI("http")) uri=$"{authority.TrimEnd("/\\".ToCharArray())}/{uri.TrimStart("/\\".ToCharArray())}";
-            return uri;
-        }
-
-        private string Resolve(string text)
-        {
-            return _configurationDictionary.ResolveVariableNames(text);
+            return uri.StartsWithI("http") ? uri : $"{authority.TrimEnd("/\\".ToCharArray())}/{uri.TrimStart("/\\".ToCharArray())}";
         }
     }
 }
