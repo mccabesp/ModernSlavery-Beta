@@ -2,5 +2,6 @@
 {
     public interface IOptions
     {
+        public void Validate() { }
     }
 }

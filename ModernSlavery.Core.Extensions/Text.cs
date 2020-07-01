@@ -70,6 +70,9 @@ namespace ModernSlavery.Core.Extensions
             return false;
         }
 
+        private const string variablePattern = @"\$\((.*?)\)";
+        private static readonly Regex variableRegex = new Regex(variablePattern, RegexOptions.IgnoreCase);
+
         /// <summary>
         ///     Returns the name of the variable between $( and )
         /// </summary>
@@ -79,6 +82,24 @@ namespace ModernSlavery.Core.Extensions
         public static string GetVariableName(this string text, string matchPattern = @"^\$\((.*)\)$")
         {
             return new Regex(matchPattern).Matches(text)?.FirstOrDefault()?.Groups[1]?.Value;
+        }
+
+        public static string ResolveVariableNames(this IDictionary<string, string> dictionary, string text)
+        {
+            if (dictionary == null) throw new ArgumentNullException(nameof(dictionary));
+            if (string.IsNullOrWhiteSpace(text)) return text;
+            var badKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (Match m in variableRegex.Matches(text))
+            {
+                var key = m.Groups[1].Value;
+                if (dictionary.ContainsKey(key))
+                    text = text.Replace(m.Groups[0].Value, dictionary[key]);
+                else
+                    badKeys.Add(key);
+            }
+
+            if (badKeys.Any()) throw new KeyNotFoundException($"Cannot find variables '{badKeys.ToDelimitedString(", ")}'");
+            return text;
         }
 
         public static string TrimI(this string source, string trimChars)
