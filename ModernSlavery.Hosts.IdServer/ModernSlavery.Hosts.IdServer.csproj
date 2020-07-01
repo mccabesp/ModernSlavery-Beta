@@ -31,19 +31,9 @@
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Hosts\ModernSlavery.Infrastructure.Hosts.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Logging\ModernSlavery.Infrastructure.Logging.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Telemetry\ModernSlavery.Infrastructure.Telemetry.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.Identity\ModernSlavery.WebUI.Identity.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.StaticFiles\ModernSlavery.WebUI.StaticFiles.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="App_Data\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="App_Data\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>

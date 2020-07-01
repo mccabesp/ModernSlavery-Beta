@@ -26,11 +26,11 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Hosts.IdServer.Models;
+using ModernSlavery.WebUI.Identity.Models;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
-namespace ModernSlavery.Hosts.IdServer.Controllers
+namespace ModernSlavery.WebUI.Identity.Controllers
 {
     /// <summary>
     ///     This sample controller implements a typical login/logout/provision workflow for local and external accounts.
@@ -84,7 +84,7 @@ namespace ModernSlavery.Hosts.IdServer.Controllers
         /// <summary>
         ///     Shows the error page
         /// </summary>
-        [Route("~/error/{errorId?}")]
+        [Route("~/identity/error/{errorId?}")]
         public async Task<IActionResult> Error(string errorId = null)
         {
             var errorCode = errorId.ToInt32();

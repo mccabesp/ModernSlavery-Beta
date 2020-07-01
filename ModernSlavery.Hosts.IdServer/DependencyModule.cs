@@ -34,17 +34,19 @@ namespace ModernSlavery.Hosts.IdServer
         public static Action<ContainerBuilder> ConfigureTestContainer;
         
         private readonly ILogger _logger;
+        private readonly IdentityServerOptions _identityServerOptions;
         private readonly SharedOptions _sharedOptions;
         private readonly StorageOptions _storageOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
         private readonly DistributedCacheOptions _distributedCacheOptions; 
         private readonly ResponseCachingOptions _responseCachingOptions;
 
-        public DependencyModule(ILogger<DependencyModule> logger, SharedOptions sharedOptions,
+        public DependencyModule(ILogger<DependencyModule> logger, IdentityServerOptions identityServerOptions,SharedOptions sharedOptions,
             StorageOptions storageOptions, DistributedCacheOptions distributedCacheOptions,
             DataProtectionOptions dataProtectionOptions, ResponseCachingOptions responseCachingOptions)
         {
             _logger = logger;
+            _identityServerOptions = identityServerOptions;
             _sharedOptions = sharedOptions;
             _storageOptions = storageOptions;
             _distributedCacheOptions = distributedCacheOptions;
@@ -58,7 +60,6 @@ namespace ModernSlavery.Hosts.IdServer
 
             services.AddSingleton<IEventSink, AuditEventSink>();
 
-            var clients = new Clients(_sharedOptions);
             var resources = new Resources(_sharedOptions);
 
             var identityServer = services.AddIdentityServer(
@@ -69,9 +70,9 @@ namespace ModernSlavery.Hosts.IdServer
                         options.Events.RaiseErrorEvents = true;
                         options.UserInteraction.LoginUrl = "/sign-in";
                         options.UserInteraction.LogoutUrl = "/sign-out";
-                        options.UserInteraction.ErrorUrl = "/error";
+                        options.UserInteraction.ErrorUrl = "/identity/error";
                     })
-                .AddInMemoryClients(clients.Get())
+                .AddInMemoryClients(_identityServerOptions.Clients)
                 .AddInMemoryIdentityResources(resources.GetIdentityResources())
                 //.AddInMemoryApiResources(Resources.GetApiResources())
                 .AddCustomUserStore();
@@ -94,7 +95,7 @@ namespace ModernSlavery.Hosts.IdServer
 
             var mvcBuilder = services.AddControllersWithViews();
 
-            mvcBuilder.AddApplicationPart<DependencyModule>();
+            mvcBuilder.AddApplicationPart<WebUI.Identity.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Shared.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.GDSDesignSystem.DependencyModule>();
 
