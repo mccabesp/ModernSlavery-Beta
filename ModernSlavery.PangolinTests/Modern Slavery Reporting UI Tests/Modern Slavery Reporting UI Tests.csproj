@@ -180,6 +180,9 @@
     <Compile Include="Richer Sumbission\Submission_Areas_Mandatory_Field_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Training_Content_Check.cs" />
     <Compile Include="Richer Sumbission\Sumbission_Submit_Report_Mandatory_Fields_Only.cs" />
+    <Compile Include="Richer Sumbission\Supply_Chain_Part1_Mandatory_Field_Check.cs" />
+    <Compile Include="Richer Sumbission\Supply_Chain_Risks_Part1_Q1_Interaction_Check.cs" />
+    <Compile Include="Richer Sumbission\Supply_Chain_Risks_Part1_Q2_Interaction_Check.cs" />
     <Compile Include="Richer Sumbission\Your_Modern_Slavery_Statement_Content_Check.cs" />
     <Compile Include="Richer Sumbission\Your_Modern_Slavery_Statement_Date_Validation.cs" />
     <Compile Include="Search and Compare\Contact Us\User Checks Contact Us Page Navigation Is Correct.cs" />
