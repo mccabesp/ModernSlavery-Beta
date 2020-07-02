@@ -29,49 +29,53 @@ namespace Modern_Slavery_Reporting_UI_Tests
             foreach (var VulnerableGroup in Submission.VulnerableGroups)
             {
                 NearHeader("Vulnerable groups").ClickLabel(VulnerableGroup);
-                if (VulnerableGroup == "Other vulnerable groups")                {
+                if (VulnerableGroup == "Other vulnerable groups")
+                {
                     Set("Please specify the vulnerable group and explain why").To(Submission.SupplyChainRisks_OtherVulernableGroupsDetails);
-                
+
+                }
+                NearHeader("Vulnerable groups").Expect(Submission.SupplyChainRisks_SelectedVulnerableGroups.Length + " Selected");
+
+                Submission_Helper.ColapseSection(this, "Goods and Services", "1");
+
+
+                //Type of work
+                Submission_Helper.ExpandSection(this, "Type of work", "1");
+
+                foreach (var TypeOfWork in Submission.TypesOfWork)
+                {
+                    NearHeader("Type of work").ClickLabel(TypeOfWork);
+                    if (TypeOfWork == "Other type of work")
+                    {
+                        Set("Please specify the other type of work and explain why").To(Submission.SupplyChainRisks_OtherTypeOfWorkDetails);
+
+                    }
+                    NearHeader("Type of work").Expect(Submission.SupplyChainRisks_SelectedTypeOfWorks.Length + " Selected");
+
+                    Submission_Helper.ColapseSection(this, "Type of work", "1");
+
+                    //Sectors
+                    Submission_Helper.ExpandSection(this, "Sectors", "1");
+
+                    foreach (var Sector in Submission.SupplyChainSectors)
+                    {
+                        NearHeader("Sectors").ClickLabel(Sector);
+
+                        if (Sector == "Other sector")
+                            Set("Please specify the other sector and explain why").To(Submission.SupplyChainRisks_OtherSectorDetails);
+
+                    }
+
+                    Set("If you want to specify an area not mentioned above, please provide details").To(Submission.SuppliChainRisks_OtherArea);
+
+
+                    NearHeader("Sectors").Expect(Submission.SupplyChainRisks_SelectedSectors.Length + " Selected");
+
+
+
+                    Submission_Helper.ColapseSection(this, "Type of work", "1");
+                }
             }
-            NearHeader("Vulnerable groups").Expect(Submission.SupplyChainRisks_SelectedVulnerableGroups.Length + " Selected");
-
-            Submission_Helper.ColapseSection(this, "Goods and Services", "1");
-
-
-            //Type of work
-            Submission_Helper.ExpandSection(this, "Type of work", "1");
-
-            foreach (var TypeOfWork in Submission.TypesOfWork)
-            {
-                NearHeader("Type of work").ClickLabel(TypeOfWork);
-                if (TypeOfWork == "Other type of work")                {
-                    Set("Please specify the other type of work and explain why").To(Submission.SupplyChainRisks_OtherTypeOfWorkDetails);
-                
-            }
-            NearHeader("Type of work").Expect(Submission.SupplyChainRisks_SelectedTypeOfWorks.Length + " Selected");
-
-            Submission_Helper.ColapseSection(this, "Type of work", "1");
-
-            //Sectors
-            Submission_Helper.ExpandSection(this, "Sectors", "1");
-
-            foreach (var Sector in Submission.SupplyChainSectors)
-            {
-                NearHeader("Sectors").ClickLabel(Sector);
-
-                if (Sector == "Other sector")                
-                    Set("Please specify the other sector and explain why").To(Submission.SupplyChainRisks_OtherSectorDetails);
-              
-            }
-
-            Set("If you want to specify an area not mentioned above, please provide details").To(Submission.SuppliChainRisks_OtherArea);
-
-
-            NearHeader("Sectors").Expect(Submission.SupplyChainRisks_SelectedSectors.Length + " Selected");
-
-
-
-            Submission_Helper.ColapseSection(this, "Type of work", "1");
         }
     }
 }
