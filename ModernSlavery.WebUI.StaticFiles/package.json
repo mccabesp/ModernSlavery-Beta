@@ -1,12 +1,5 @@
 {
   "dependencies": {
-    "govuk-frontend": "^3.6.0",
-    "node-sass": "^4.13.1",
-    "readline": "^1.3.0",
-    "uglify-js": "^3.8.0"
-  },
-  "scripts": {
-    "build": "node compile-sass-and-js.js",
-    "watch": "node compile-sass-and-js.js --watch"
+    "govuk-frontend": "^3.6.0"
   }
 }

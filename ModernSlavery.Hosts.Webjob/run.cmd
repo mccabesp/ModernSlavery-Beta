@@ -1,1 +1,1 @@
-"%ProgramFiles%\dotnet\dotnet.exe" ModernSlavery.WebJob.dll %*
+"%ProgramFiles%\dotnet\dotnet.exe" ModernSlavery.Hosts.WebJob.dll %*

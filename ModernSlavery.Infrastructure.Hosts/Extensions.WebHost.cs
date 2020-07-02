@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.Infrastructure.Logging;
 using System.IO;
 using ModernSlavery.Core.Extensions;
+using Microsoft.AspNetCore.Builder;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
@@ -18,60 +19,15 @@ namespace ModernSlavery.Infrastructure.Hosts
     {
         public static IHostBuilder ConfigureWebHostBuilder<TStartupModule>(string applicationName = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
-            var hostBuilder = Host.CreateDefaultBuilder(commandlineArgs);
-
-            //Load the configuration
-            var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
-            var appConfig = configBuilder.Build();
-
-            //Set the content root from the confif or environment
-            var contentRoot = appConfig[HostDefaults.ContentRootKey];
-            if (string.IsNullOrWhiteSpace(contentRoot))contentRoot = Directory.GetCurrentDirectory();
-            if (!Directory.Exists(contentRoot)) throw new DirectoryNotFoundException($"Cannot find content root '{contentRoot}'");
-
-            hostBuilder.UseContentRoot(contentRoot);
-
-            hostBuilder.ConfigureAppConfiguration((hostBuilderContext, appConfigBuilder) =>
-            {
-                appConfigBuilder.AddConfiguration(appConfig);
-            });
-
-            //Load the configuration options
-            var optionsBinder = new OptionsBinder(appConfig);
-            var configOptions = optionsBinder.BindAssemblies();
-
-            hostBuilder.ConfigureServices(optionsBinder.RegisterOptions);
-
-            //Load all the dependency actions
-            var dependencyBuilder = new DependencyBuilder();
-            dependencyBuilder.Build<TStartupModule>(configOptions);
-
-            //Register the callback to add dependent services - this is required here so IWebHostEnvironment is available to services
-            hostBuilder.ConfigureServices(dependencyBuilder.RegisterDependencyServices);
-
-            //Create the callback to register autofac dependencies only
-            hostBuilder.ConfigureContainer<ContainerBuilder>(dependencyBuilder.RegisterDependencyServices);
-
-            hostBuilder.ConfigureLogging((hostBuilderContext,loggingBuilder) =>
-            {
-                //Setup the seri logger
-                hostBuilderContext.Configuration.SetupSerilogLogger();
-
-                loggingBuilder.AddAzureQueueLogger(); //Use the custom logger
-                loggingBuilder.AddApplicationInsights(); //log to app insights
-                loggingBuilder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
-            });
-
-            //Register Autofac as the service provider
-            hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+            var genericHost = Extensions.CreateGenericHost<TStartupModule>(applicationName, additionalSettings, commandlineArgs);
 
             //Configure the host defaults
-            hostBuilder.ConfigureWebHostDefaults(webHostBuilder =>
+            genericHost.HostBuilder.ConfigureWebHostDefaults(webHostBuilder =>
             {
-                webHostBuilder.UseConfiguration(appConfig);
+                webHostBuilder.UseConfiguration(genericHost.AppConfig);
 
                 //When enabled (or when the Environment is set to Development), the app captures detailed exceptions.
-                if (appConfig.IsDevelopment())webHostBuilder.CaptureStartupErrors(true).UseSetting(WebHostDefaults.DetailedErrorsKey, "true");
+                if (genericHost.AppConfig.IsDevelopment()) webHostBuilder.CaptureStartupErrors(true).UseSetting(WebHostDefaults.DetailedErrorsKey, "true");
 
                 //Configure the kestrel server
                 webHostBuilder.ConfigureKestrel((context, options) =>
@@ -81,18 +37,32 @@ namespace ModernSlavery.Infrastructure.Hosts
                     });
 
                 //Specify the root path of the site
-                var webRoot = appConfig[WebHostDefaults.WebRootKey];
-                if (string.IsNullOrWhiteSpace(webRoot)) webRoot="wwwroot";
+                var webRoot = genericHost.AppConfig[WebHostDefaults.WebRootKey];
+                var contentRoot = genericHost.AppConfig[WebHostDefaults.ContentRootKey];
+                if (string.IsNullOrWhiteSpace(webRoot)) webRoot = (genericHost.AppConfig[WebHostDefaults.WebRootKey]="wwwroot");
                 var fullWebroot = Path.Combine(contentRoot, webRoot);
                 if (!Directory.Exists(fullWebroot)) throw new DirectoryNotFoundException($"Cannot find web root '{fullWebroot}'");
 
                 webHostBuilder.UseWebRoot(webRoot);
 
                 //Register the callback to configure the web application
-                webHostBuilder.Configure(dependencyBuilder.ConfigureHost);
+                webHostBuilder.Configure(appBuilder => {
+                    ConfigureHost(genericHost.DependencyBuilder, appBuilder);
+                });
             });
 
-            return hostBuilder;
+            return genericHost.HostBuilder;
         }
+
+        private static void ConfigureHost(DependencyBuilder dependencyBuilder, IApplicationBuilder appBuilder)
+        {
+            var lifetimeScope = appBuilder.ApplicationServices.GetRequiredService<ILifetimeScope>();
+
+            //Only add the appbuildder temporarily
+            using var innerScope = lifetimeScope.BeginLifetimeScope(b => b.RegisterInstance(appBuilder).SingleInstance().ExternallyOwned());
+
+            dependencyBuilder.ConfigureHost(innerScope);
+        }
+
     }
 }

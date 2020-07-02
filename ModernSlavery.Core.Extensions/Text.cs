@@ -70,6 +70,9 @@ namespace ModernSlavery.Core.Extensions
             return false;
         }
 
+        private const string variablePattern = @"\$\((.*?)\)";
+        private static readonly Regex variableRegex = new Regex(variablePattern, RegexOptions.IgnoreCase);
+
         /// <summary>
         ///     Returns the name of the variable between $( and )
         /// </summary>
@@ -79,6 +82,30 @@ namespace ModernSlavery.Core.Extensions
         public static string GetVariableName(this string text, string matchPattern = @"^\$\((.*)\)$")
         {
             return new Regex(matchPattern).Matches(text)?.FirstOrDefault()?.Groups[1]?.Value;
+        }
+
+        /// <summary>
+        /// Resolves all variables using pattern $(key) from a dictionary
+        /// </summary>
+        /// <param name="dictionary">The dictionary containing the keys and replacement values</param>
+        /// <param name="text">The source text containing the variable declarations $(key)</param>
+        /// <returns>The source text with all variable declarations replaced</returns>
+        public static string ResolveVariableNames(this IDictionary<string, string> dictionary, string text)
+        {
+            if (dictionary == null) throw new ArgumentNullException(nameof(dictionary));
+            if (string.IsNullOrWhiteSpace(text)) return text;
+            var badKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (Match m in variableRegex.Matches(text))
+            {
+                var key = m.Groups[1].Value;
+                if (dictionary.ContainsKey(key))
+                    text = text.Replace(m.Groups[0].Value, dictionary[key],StringComparison.OrdinalIgnoreCase);
+                else
+                    badKeys.Add(key);
+            }
+
+            if (badKeys.Any()) throw new KeyNotFoundException($"Cannot find variables '{badKeys.ToDelimitedString(", ")}'");
+            return text;
         }
 
         public static string TrimI(this string source, string trimChars)
@@ -191,6 +218,29 @@ namespace ModernSlavery.Core.Extensions
 
             var i = text.IndexOf(separator, 0, comparisionType);
             if (i > -1) return text.Substring(0, inclusive ? i + 1 : i);
+
+            return includeWhenNoSeparator ? text : null;
+        }
+
+        /// <summary>
+        ///     Returns all characters before the last occurrence of a string
+        /// </summary>
+        public static string BeforeLast(this string text,
+            string separator,
+            StringComparison comparisionType = StringComparison.OrdinalIgnoreCase,
+            bool inclusive = false,
+            bool includeWhenNoSeparator = true)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return text;
+            }
+
+            int i = text.LastIndexOf(separator, text.Length - 1, comparisionType);
+            if (i > -1)
+            {
+                return text.Substring(0, inclusive ? i + 1 : i);
+            }
 
             return includeWhenNoSeparator ? text : null;
         }

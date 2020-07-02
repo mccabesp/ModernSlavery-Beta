@@ -4,7 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.Configuration.EnvironmentVariables;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
@@ -65,16 +68,28 @@ namespace ModernSlavery.Infrastructure.Configuration
 
                 var clientId = _appConfig["ClientId"];
                 var clientSecret = _appConfig["ClientSecret"];
-                var exceptions = new List<Exception>();
-                if (string.IsNullOrWhiteSpace(clientId))
-                    exceptions.Add(new ArgumentNullException("ClientId is missing"));
 
-                if (string.IsNullOrWhiteSpace(clientSecret))
-                    exceptions.Add(new ArgumentNullException("clientSecret is missing"));
+                if (string.IsNullOrWhiteSpace(clientId) && string.IsNullOrWhiteSpace(clientSecret))
+                {
+                    //Create Managed Service Identity token provider
+                    var tokenProvider = new AzureServiceTokenProvider();
 
-                if (exceptions.Count > 0) throw new AggregateException(exceptions);
+                    //Create the Key Vault client
+                    var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                    var kvClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+                    
+                    //Add Key Vault to configuration pipeline
+                    appBuilder.AddAzureKeyVault(vault, kvClient, new DefaultKeyVaultSecretManager());
+                }
+                else if (string.IsNullOrWhiteSpace(clientId))
+                    throw new ArgumentNullException("ClientId is missing");
 
-                appBuilder.AddAzureKeyVault(vault, clientId, clientSecret);
+                else if (string.IsNullOrWhiteSpace(clientSecret))
+                    throw new ArgumentNullException("ClientSecret is missing");
+                else
+                    appBuilder.AddAzureKeyVault(vault, clientId, clientSecret);
+
+                Console.WriteLine($@"Using KeyVault: {vault}");
             }
 
             //Add any additional settings source
@@ -94,14 +109,17 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             _appConfig[HostDefaults.EnvironmentKey] = environmentName;
 
-            //Dump the settings to the console
-            if (!_appConfig.IsProduction() && _appConfig.GetValueOrDefault("DUMP_SETTINGS", false))
-            {
-                //Console.WriteLine(_appConfig.GetDebugView());
+            //Resolve all the variable names in the configuration
+            var configDictionary = _appConfig.ToDictionary();
+            foreach (var key in configDictionary.Keys)
+                _appConfig[key] = configDictionary.ResolveVariableNames(configDictionary[key]);
 
-                var configDictionary = _appConfig.ToDictionary();
-                foreach (var key in configDictionary.Keys)
-                    Console.WriteLine($@"[{key}]={configDictionary[key]}");
+            //Dump the settings to the console
+            if (_appConfig.GetValueOrDefault("DUMP_SETTINGS", false))
+            {
+                var dumpPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{AppDomain.CurrentDomain.FriendlyName}.SETTINGS.json");
+                Console.WriteLine($@"AppSettings Dumped to file: {dumpPath}");
+                File.WriteAllLines(dumpPath, configDictionary.Keys.Select(key=>$@"[{key}]={configDictionary[key]}"));
             }
 
             return _appConfig;

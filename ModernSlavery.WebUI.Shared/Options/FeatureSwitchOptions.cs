@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ModernSlavery.Core.Attributes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Options;

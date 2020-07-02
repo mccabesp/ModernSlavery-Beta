@@ -27,17 +27,17 @@ namespace ModernSlavery.Infrastructure.Search
         {
             // Setup azure search
             builder.Register(c =>
-                    new SearchServiceClient(_options.AzureServiceName,
-                        new SearchCredentials(_options.AzureApiAdminKey)))
+                    new SearchServiceClient(_options.ServiceName,
+                        new SearchCredentials(_options.AdminApiKey)))
                 .As<ISearchServiceClient>()
                 .SingleInstance();
 
             builder.RegisterType<AzureEmployerSearchRepository>()
                 .As<ISearchRepository<EmployerSearchModel>>()
                 .SingleInstance()
-                .WithParameter("serviceName", _options.AzureServiceName)
+                .WithParameter("serviceName", _options.ServiceName)
                 .WithParameter("indexName", _options.EmployerIndexName)
-                .WithParameter("adminApiKey", _options.AzureApiAdminKey)
+                .WithParameter("adminApiKey", _options.AdminApiKey)
                 .WithParameter("disabled", _options.Disabled).WithAttributeFiltering();
 
             builder.RegisterType<AzureSicCodeSearchRepository>()

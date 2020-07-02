@@ -42,9 +42,9 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public string GetColumnSortIcon(string columnName)
         {
             if (SortColumn == columnName)
-                return SortAscending ? "/img/sort-glyph-up-white.png" : "/img/sort-glyph-down-white.png";
+                return SortAscending ? "/assets/images/sort-glyph-up-white.png" : "/assets/images/sort-glyph-down-white.png";
 
-            return "/img/sort-glyph-noSort.png";
+            return "/assets/images/sort-glyph-noSort.png";
         }
     }
 }

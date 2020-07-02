@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Infrastructure.Hosts;
 
@@ -12,7 +13,7 @@ namespace ModernSlavery.Hosts.Web
         {
             //Create the host
             var host = CreateHostBuilder(args).Build();
-
+            
             //Run the host
             await host.RunAsync().ConfigureAwait(false);
         }

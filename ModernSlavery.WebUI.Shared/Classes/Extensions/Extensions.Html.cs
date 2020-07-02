@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using System.Web.Mvc;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
@@ -20,7 +23,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
     {
         public static SharedOptions GetSharedOptions(this IHtmlHelper htmlHelper)
         {
-            return (SharedOptions) htmlHelper.ViewContext.HttpContext.RequestServices.GetService(typeof(SharedOptions));
+            return (SharedOptions)htmlHelper.ViewContext.HttpContext.RequestServices.GetService(typeof(SharedOptions));
         }
 
 
@@ -51,7 +54,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             string errorClassName,
             string noErrorClassName = null)
         {
-            var expressionText = ExpressionHelper.GetExpressionText(expression);
+            var expressionText = htmlHelper.GetExpressionText(expression);
             var fullHtmlFieldName = htmlHelper.ViewContext.ViewData
                 .TemplateInfo.GetFullHtmlFieldName(expressionText);
 
@@ -88,23 +91,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             return new HtmlString(string.Join("\r\n", hidden));
         }
 
-        #region Asset Bundles
-
-        public static HtmlString UnpackBundle(this IHtmlHelper htmlHelper, string bundlePath, string media = "")
-        {
-            var bundle = Bundle.ReadBundleFile("bundleconfig.json", bundlePath);
-            if (bundle == null) return null;
-
-            var outputString = bundlePath.EndsWith(".js")
-                ? bundle.InputFiles.Select(inputFile => $"<script src='/{inputFile}' type='text/javascript'></script>")
-                : bundle.InputFiles.Select(inputFile =>
-                    $"<link rel='stylesheet' type='text/css' media='{media}' href='/{inputFile}' />");
-
-            return new HtmlString(string.Join("\n", outputString));
-        }
-
-        #endregion
-
         #region Validation messages
 
         public static async Task<IHtmlContent> CustomValidationSummaryAsync(this IHtmlHelper helper,
@@ -117,14 +103,23 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 
             return await helper.PartialAsync("_ValidationSummary");
         }
+        public static string GetExpressionText<TModel, TResult>(
+         this IHtmlHelper<TModel> htmlHelper,
+         Expression<Func<TModel, TResult>> expression)
+        {
+            var expresionProvider = htmlHelper.ViewContext.HttpContext.RequestServices
+                .GetService(typeof(ModelExpressionProvider)) as ModelExpressionProvider;
 
-        private static Dictionary<string, object> CustomAttributesFor<TModel, TProperty>(
+            return expresionProvider.GetExpressionText(expression);
+        }
+
+        private static Dictionary<string, object> CustomAttributesFor<TModel, TProperty>(this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TProperty>> expression,
             object htmlAttributes = null)
         {
             var containerType = typeof(TModel);
 
-            var propertyName = ExpressionHelper.GetExpressionText(expression);
+            var propertyName = htmlHelper.GetExpressionText(expression);
             var propertyInfo = containerType.GetPropertyInfo(propertyName);
 
             var displayNameAttribute =
@@ -184,12 +179,12 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                     else if (attribute is RangeAttribute)
                     {
                         altAttr = "data-val-range-alt";
-                        par1 = ((RangeAttribute) attribute).Minimum.ToString();
-                        par2 = ((RangeAttribute) attribute).Maximum.ToString();
+                        par1 = ((RangeAttribute)attribute).Minimum.ToString();
+                        par2 = ((RangeAttribute)attribute).Maximum.ToString();
                     }
                     else if (attribute is DataTypeAttribute)
                     {
-                        var type = ((DataTypeAttribute) attribute).DataType.ToString().ToLower();
+                        var type = ((DataTypeAttribute)attribute).DataType.ToString().ToLower();
                         switch (type)
                         {
                             case "password":
@@ -207,18 +202,18 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                     else if (attribute is MinLengthAttribute)
                     {
                         altAttr = "data-val-minlength-alt";
-                        par1 = ((MinLengthAttribute) attribute).Length.ToString();
+                        par1 = ((MinLengthAttribute)attribute).Length.ToString();
                     }
                     else if (attribute is MaxLengthAttribute)
                     {
                         altAttr = "data-val-maxlength-alt";
-                        par1 = ((MaxLengthAttribute) attribute).Length.ToString();
+                        par1 = ((MaxLengthAttribute)attribute).Length.ToString();
                     }
                     else if (attribute is StringLengthAttribute)
                     {
                         altAttr = "data-val-length-alt";
-                        par1 = ((StringLengthAttribute) attribute).MinimumLength.ToString();
-                        par2 = ((StringLengthAttribute) attribute).MaximumLength.ToString();
+                        par1 = ((StringLengthAttribute)attribute).MinimumLength.ToString();
+                        par2 = ((StringLengthAttribute)attribute).MaximumLength.ToString();
                     }
 
                     htmlAttr[altAttr.TrimSuffix("-alt")] =
@@ -233,9 +228,9 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             Expression<Func<TModel, TProperty>> expression,
             object htmlAttributes = null)
         {
-            var htmlAttr = CustomAttributesFor(expression, htmlAttributes);
+            var htmlAttr = helper.CustomAttributesFor(expression, htmlAttributes);
 
-            return helper.EditorFor(expression, null, new {htmlAttributes = htmlAttr});
+            return helper.EditorFor(expression, null, new { htmlAttributes = htmlAttr });
         }
 
         public static IHtmlContent CustomRadioButtonFor<TModel, TProperty>(this IHtmlHelper<TModel> helper,
@@ -243,7 +238,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             object value,
             object htmlAttributes = null)
         {
-            var htmlAttr = CustomAttributesFor(expression, htmlAttributes);
+            var htmlAttr = helper.CustomAttributesFor(expression, htmlAttributes);
 
             return helper.RadioButtonFor(expression, value, htmlAttr);
         }

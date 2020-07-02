@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -19,35 +20,87 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using ModernSlavery.Infrastructure.Logging;
 using System.Threading;
+using System.Runtime.Loader;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Razor.Hosting;
+using Microsoft.Extensions.FileProviders;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
     public static partial class Extensions
     {
-        public static void ConfigureHostApplication(this IHostBuilder hostBuilder, IConfiguration appSettings=null)
+        public static (IHostBuilder HostBuilder, DependencyBuilder DependencyBuilder, IConfiguration AppConfig) CreateGenericHost<TStartupModule>(string applicationName = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
-            //Set the console title to the application name
-            Console.Title = appSettings[HostDefaults.ApplicationKey];
-
-            //Add a handler for unhandled exceptions
+            //Create an unhandled exception handler forthe app domain
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            Encryption.SetDefaultEncryptionKey(appSettings["DefaultEncryptionKey"]);
-            Encryption.EncryptEmails = appSettings.GetValueOrDefault("EncryptEmails", true);
+            var hostBuilder = Host.CreateDefaultBuilder(commandlineArgs);
+            //Load the configuration
+            var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
+            var appConfig = configBuilder.Build();
+            
+            //Setup the threads to use the current culture from config or en-GB by default
+            appConfig.SetupThreadCulture();
 
-            //Initialise the virtual date and time
-            VirtualDateTime.Initialise(appSettings["DateTimeOffset"]);
+            //Set the content root to the bin folder if in development mode
+            if (appConfig.IsDevelopment()) appConfig[HostDefaults.ContentRootKey] = System.AppDomain.CurrentDomain.BaseDirectory;
 
-            //Setup Threads
-            appSettings.SetupThreads();
+            //Set the content root from the confif or environment
+            var contentRoot = appConfig[HostDefaults.ContentRootKey];
 
-            hostBuilder.UseConsoleLifetime();
+            if (string.IsNullOrWhiteSpace(contentRoot)) contentRoot = (appConfig[HostDefaults.ContentRootKey]=System.AppDomain.CurrentDomain.BaseDirectory);
+            if (!Directory.Exists(contentRoot)) throw new DirectoryNotFoundException($"Cannot find content root '{contentRoot}'");
+
+            hostBuilder.UseContentRoot(contentRoot);
+
+            hostBuilder.ConfigureAppConfiguration((hostBuilderContext, appConfigBuilder) =>
+            {
+                appConfigBuilder.AddConfiguration(appConfig);
+            });
+
+            //Load the configuration options
+            var optionsBinder = new OptionsBinder(appConfig);
+            var configOptions = optionsBinder.BindAssemblies();
+
+            hostBuilder.ConfigureServices(optionsBinder.RegisterOptions);
+
+            //Load all the dependency actions
+            var dependencyBuilder = new DependencyBuilder();
+            dependencyBuilder.Build<TStartupModule>(configOptions);
+
+            //Register the callback to add dependent services - this is required here so IWebHostEnvironment is available to services
+            hostBuilder.ConfigureServices(dependencyBuilder.RegisterDependencyServices);
+
+            //Create the callback to register autofac dependencies only
+            hostBuilder.ConfigureContainer<ContainerBuilder>(dependencyBuilder.RegisterDependencyServices);
+
+            hostBuilder.ConfigureLogging((hostBuilderContext, loggingBuilder) =>
+            {
+                //Setup the seri logger
+                hostBuilderContext.Configuration.SetupSerilogLogger();
+
+                loggingBuilder.AddAzureQueueLogger(); //Use the custom logger
+                loggingBuilder.AddApplicationInsights(); //log to app insights
+                loggingBuilder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
+            });
+
+            //Register Autofac as the service provider
+            hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
+            return (hostBuilder, dependencyBuilder, appConfig);
         }
 
         public static IEnumerable<string> GetKeys(this IConfiguration config)
         {
             return config.GetChildren().Select(c => c.Key);
+        }
+
+        public static string GetHostAddress(this IHost host)
+        {
+            var kestrelServer = host.Services.GetRequiredService<IServer>();
+            return kestrelServer.Features.GetHostAddresses().FirstOrDefault();
         }
 
         public static IEnumerable<string> GetHostAddresses(this IHost host)
@@ -83,26 +136,57 @@ namespace ModernSlavery.Infrastructure.Hosts
         /// <typeparam name="TModule">The entry class within the Razor Class library</typeparam>
         /// <param name="mvcBuilder">The mvcBuilder</param>
         /// <returns></returns>
-        public static IMvcBuilder AddRazorClassLibrary<TModule>(this IMvcBuilder mvcBuilder) where TModule : class
+        public static IMvcBuilder AddApplicationPart<TModule>(this IMvcBuilder mvcBuilder) where TModule : class
         {
             var partAssembly = typeof(TModule).Assembly;
+            return mvcBuilder.AddApplicationPart(partAssembly);
+        }
 
-            mvcBuilder.AddApplicationPart(partAssembly);
+        public static IMvcBuilder AddApplicationPart(this IMvcBuilder mvcBuilder, Assembly partAssembly)
+        {
+            var partFactory = ApplicationPartFactory.GetApplicationPartFactory(partAssembly);
+            foreach (var applicationPart in partFactory.GetApplicationParts(partAssembly))
+                mvcBuilder.PartManager.ApplicationParts.Add(applicationPart);
 
-            var razorAssemblyPath = Path.GetDirectoryName(partAssembly.Location);
-            var razorAssemblyLocation = Path.Combine(razorAssemblyPath,$"{Path.GetFileNameWithoutExtension(partAssembly.Location)}.Views{Path.GetExtension(partAssembly.Location)}");
-            var razorAssembly = Assembly.LoadFile(razorAssemblyLocation);
-            mvcBuilder.PartManager.ApplicationParts.Add(new CompiledRazorAssemblyPart(razorAssembly));
-
+            var relatedAssemblies = RelatedAssemblyAttribute.GetRelatedAssemblies(partAssembly, throwOnError: true);
+            foreach (var relatedAssembly in relatedAssemblies)
+                AddApplicationPart(mvcBuilder, relatedAssembly);
 
             return mvcBuilder;
+        }
+
+        public static void AddApplicationPartsRuntimeCompilation(this IMvcBuilder mvcBuilder)
+        {
+            mvcBuilder.AddRazorRuntimeCompilation(mvcBuilder.PartManager.ApplicationParts.OfType<CompiledRazorAssemblyPart>().Select(p=>$"..\\{p.Name.BeforeLast(".Views")}").ToArray());
+        }
+
+        public static void AddRazorRuntimeCompilation(this IMvcBuilder mvcBuilder, params string[] folders)
+        {
+            var refsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "refs");
+            if (!Directory.Exists(refsDirectory)) throw new DirectoryNotFoundException($"Cannot find reference directory '{refsDirectory}'");
+            if (!folders.Any()) throw new ArgumentNullException(nameof(folders));
+
+            Parallel.For(0,folders.Length,i =>
+            {
+                if (!Path.IsPathRooted(folders[i])) folders[i] = Path.Combine(Environment.CurrentDirectory, folders[i]);
+                if (!Directory.Exists(folders[i])) throw new DirectoryNotFoundException($"Cannot find source directory '{folders[i]}'");
+            });
+
+            var refFiles = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll").ToHashSet();
+            refFiles.AddRange(Directory.GetFiles(refsDirectory));
+
+            mvcBuilder.AddRazorRuntimeCompilation(options =>
+            {
+                folders.ForEach(f=>options.FileProviders.Add(new PhysicalFileProvider(f)));
+                foreach (var refFile in refFiles) options.AdditionalReferencePaths.Add(refFile);
+            });
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             var ex = e.ExceptionObject as Exception;
-
-            var errorMessage = $"UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}";
+            
+            var errorMessage = $"{(e.IsTerminating ? "FATAL " : "")}UNHANDLED EXCEPTION ({Console.Title}): {ex.Message}{Environment.NewLine}{ex.GetDetailsText()}";
 
             Console.WriteLine(errorMessage);
             if (Debugger.IsAttached)Debug.WriteLine(errorMessage);
@@ -118,7 +202,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             return $"Threads (Worker busy:{workerMax - workerFree:N0} min:{workerMin:N0} max:{workerMax:N0}, I/O busy:{ioMax - ioFree:N0} min:{ioMin:N0} max:{ioMax:N0})";
         }
 
-        public static void SetupThreads(this IConfiguration config)
+        public static void SetupThreadCulture(this IConfiguration config)
         {
             //Culture is required so UK dates can be parsed correctly
             Thread.CurrentThread.CurrentCulture = new CultureInfo(config.GetValue("Culture", "en-GB"));

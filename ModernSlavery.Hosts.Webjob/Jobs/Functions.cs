@@ -1,10 +1,8 @@
 ﻿using System;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
-using ModernSlavery.BusinessDomain.Admin;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;

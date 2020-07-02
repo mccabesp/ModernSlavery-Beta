@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Autofac;
+using Autofac.Core.Activators;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Attributes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Options;
@@ -36,12 +39,14 @@ namespace ModernSlavery.Infrastructure.Configuration
 
         private Dictionary<Type, object> _bindings = new Dictionary<Type, object>();
         private Dictionary<string, Assembly> _loadedAssemblies = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+        private HashSet<Type> _optionTypes = new HashSet<Type>();
 
-        private object Bind(Type optionsType, string configSection = null)
+
+        private object Bind(object instance, string configSection = null)
         {
+            var optionsType = instance.GetType();
             if (_bindings.ContainsKey(optionsType)) return _bindings[optionsType];
 
-            var instance = Activator.CreateInstance(optionsType);
             var raw = false;
             if (string.IsNullOrWhiteSpace(configSection))
             {
@@ -144,7 +149,9 @@ namespace ModernSlavery.Infrastructure.Configuration
                 a => { _loadedAssemblies[a.FullName] = a; });
 
             foreach (var assembly in _loadedAssemblies.Values.ToList())
-                BindAssembly(assembly);
+                FindAssemblyOptions(assembly);
+
+            BindOptions();
 
             return _services;
         }
@@ -162,23 +169,23 @@ namespace ModernSlavery.Infrastructure.Configuration
         ///     Only classes with OptionsAttribute.Key will be bound.
         /// </summary>
         /// <param name="assembly"></param>
-        public void BindAssembly(Assembly assembly)
+        public void FindAssemblyOptions(Assembly assembly)
         {
             if (assembly == null) throw new ArgumentNullException(nameof(assembly));
 
             foreach (var childAssembly in GetAssemblies(assembly))
-                BindAssembly(childAssembly);
+                FindAssemblyOptions(childAssembly);
 
-            BindOptions(assembly);
+            FindOptions(assembly);
 
-            void BindOptions(Assembly assembly)
+            void FindOptions(Assembly assembly)
             {
                 var type = typeof(IOptions);
 
                 var optionsTypes = assembly.ExportedTypes.Where(p => p.IsClass && type.IsAssignableFrom(p));
 
                 foreach (var optionsType in optionsTypes)
-                    Bind(optionsType);
+                    _optionTypes.Add(optionsType);
             }
 
             IEnumerable<Assembly> GetAssemblies(Assembly assembly)
@@ -192,6 +199,37 @@ namespace ModernSlavery.Infrastructure.Configuration
                     yield return childAssembly;
                 }
             }
+        }
+
+        /// <summary>
+        ///     Bind all classes implementing IOptions in the specified assembly
+        ///     Only classes with OptionsAttribute.Key will be bound.
+        /// </summary>
+        /// <param name="assembly"></param>
+        public void BindOptions()
+        {
+            //Populate the temporary builder for resolving constructors of dependency modules
+            var innerBuider = new ContainerBuilder();
+            innerBuider.RegisterInstance(_configuration).SingleInstance();
+
+            foreach (var optionsType in _optionTypes)
+                innerBuider.RegisterType(optionsType).SingleInstance();
+
+            using var optionsContainer = innerBuider.Build();
+
+            using var innerScope = optionsContainer.BeginLifetimeScope();
+            foreach (var optionsType in _optionTypes)
+            {
+                var options = innerScope.Resolve(optionsType);
+                Bind(options);
+            }
+
+            ValidateOptions();
+        }
+
+        void ValidateOptions()
+        {
+             Parallel.ForEach(_bindings.Values.Cast<IOptions>(), option => option.Validate());
         }
 
     }

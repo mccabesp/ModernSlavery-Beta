@@ -27,7 +27,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 #region WebServer Logs
 
-                var webServerlogPath = Path.Combine(_SharedBusinessLogic.SharedOptions.LogPath, "ModernSlavery.WebUI");
+                var webServerlogPath = Path.Combine(_SharedBusinessLogic.SharedOptions.LogPath, "ModernSlavery.Hosts.Web");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "WarningLog"));
@@ -43,7 +43,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 #region IdentityServer Logs
 
                 var identityServerlogPath = Path.Combine(_SharedBusinessLogic.SharedOptions.LogPath,
-                    "ModernSlavery.IdentityServer4");
+                    "ModernSlavery.Hosts.IdServer");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "WarningLog"));
@@ -53,7 +53,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 #region Webjob Logs
 
-                var webJoblogPath = Path.Combine(_SharedBusinessLogic.SharedOptions.LogPath, "ModernSlavery.WebJob");
+                var webJoblogPath = Path.Combine(_SharedBusinessLogic.SharedOptions.LogPath, "ModernSlavery.Hosts.WebJob");
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "WarningLog"));

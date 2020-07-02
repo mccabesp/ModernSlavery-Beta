@@ -4,12 +4,12 @@ using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Search
 {
-    [Options("Search")]
+    [Options("SearchService")]
     public class SearchOptions : IOptions
     {
-        public string AzureServiceName { get; set; }
-        public string AzureApiAdminKey { get; set; }
-        public string AzureApiQueryKey { get; set; }
+        public string ServiceName { get; set; }
+        public string AdminApiKey { get; set; }
+        public string QueryApiKey { get; set; }
         public string EmployerIndexName { get; set; } = nameof(EmployerSearchModel);
         public string SicCodeIndexName { get; set; } = nameof(SicCodeSearchModel);
         public bool Disabled { get; set; }

@@ -1,5 +1,7 @@
 ﻿using Autofac;
+using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.DependencyInjection;
+using ModernSlavery.BusinessDomain.Shared.Classes;
 using ModernSlavery.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -23,6 +25,10 @@ namespace ModernSlavery.BusinessDomain.Shared
             builder.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().SingleInstance();
             builder.RegisterType<UpdateFromCompaniesHouseService>()
                 .As<UpdateFromCompaniesHouseService>().InstancePerLifetimeScope();
+
+            //Register Email queuers
+            builder.RegisterType<SendEmailService>().As<ISendEmailService>().SingleInstance().WithAttributeFiltering();
+            builder.RegisterType<NotificationService>().As<INotificationService>().SingleInstance().WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

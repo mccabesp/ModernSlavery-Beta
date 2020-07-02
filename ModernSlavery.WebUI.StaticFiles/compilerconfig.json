@@ -1,0 +1,14 @@
+﻿[
+  {
+    "outputFile": "wwwroot/assets/styles/app-all.css",
+    "inputFile": "wwwroot/assets/styles/app-all.scss",
+    "includeInProject": false,
+    "options": { "sourceMap": true }
+  },
+  {
+    "outputFile": "wwwroot/assets/styles/app-ie8.css",
+    "inputFile": "wwwroot/assets/styles/app-ie8.scss",
+    "includeInProject": false,
+    "options": { "sourceMap": true }
+  }
+]

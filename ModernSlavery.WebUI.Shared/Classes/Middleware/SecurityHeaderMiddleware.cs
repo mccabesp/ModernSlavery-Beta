@@ -24,16 +24,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
                 () =>
                 {
                     foreach (var key in _securityHeaders.Keys)
-                    {
-                        var value = _securityHeaders[key];
-
-                        //Lookup the same value from another header
-                        var varName = value.GetVariableName();
-                        if (!string.IsNullOrWhiteSpace(varName) && _securityHeaders.ContainsKey(varName))
-                            value = _securityHeaders[varName];
-
-                        httpContext.SetResponseHeader(key, value);
-                    }
+                        httpContext.SetResponseHeader(key, _securityHeaders[key]);
 
                     return Task.CompletedTask;
                 });

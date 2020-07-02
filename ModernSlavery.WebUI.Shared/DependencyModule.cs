@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Autofac;
-using Autofac.Features.AttributeFilters;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Shared.Classes;
-using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Models;
-using ModernSlavery.WebUI.Shared.Services;
 
 namespace ModernSlavery.WebUI.Shared
 {
@@ -32,9 +26,6 @@ namespace ModernSlavery.WebUI.Shared
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //Register StaticAssetsVersioningHelper
-            services.AddSingleton<StaticAssetsVersioningHelper>();
-
             //Add the custom url helper
             services.AddSingleton<IUrlHelperFactory,CustomUrlHelperFactory>();
         }
@@ -51,10 +42,6 @@ namespace ModernSlavery.WebUI.Shared
             //Register factories
             builder.RegisterType<ErrorViewModelFactory>().As<IErrorViewModelFactory>()
                 .SingleInstance();
-
-            //Register Email queuers
-            builder.RegisterType<SendEmailService>().As<ISendEmailService>().SingleInstance().WithAttributeFiltering();
-            builder.RegisterType<NotificationService>().As<INotificationService>().SingleInstance().WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

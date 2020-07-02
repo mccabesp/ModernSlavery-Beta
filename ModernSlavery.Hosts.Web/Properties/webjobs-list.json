@@ -2,7 +2,7 @@
   "$schema": "http://schemastore.org/schemas/json/webjobs-list.json",
   "WebJobs": [
     {
-      "filePath": "../ModernSlavery.WebJob/ModernSlavery.WebJob.csproj"
+      "filePath": "../ModernSlavery.Hosts.Webjob/ModernSlavery.Hosts.Webjob.csproj"
     }
   ]
 }

@@ -17,37 +17,25 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Hosts.Webjob.Classes;
 using ModernSlavery.Hosts.Webjob.Jobs;
-using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.Infrastructure.Telemetry;
-using DataProtectionOptions = Microsoft.AspNetCore.DataProtection.DataProtectionOptions;
-using ResponseCachingOptions = Microsoft.AspNetCore.ResponseCaching.ResponseCachingOptions;
+using ModernSlavery.Infrastructure.Storage.FileRepositories;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ModernSlavery.Hosts.Webjob
 {
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
-        private readonly CompaniesHouseOptions _coHoOptions;
-        private readonly DataProtectionOptions _dataProtectionOptions;
-        private readonly DistributedCacheOptions _distributedCacheOptions;
-        private readonly ResponseCachingOptions _responseCachingOptions;
         private readonly SharedOptions _sharedOptions;
 
         public DependencyModule(
             ILogger<DependencyModule> logger, 
-            SharedOptions sharedOptions, CompaniesHouseOptions coHoOptions,
-            ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions,
-            DataProtectionOptions dataProtectionOptions)
+            SharedOptions sharedOptions)
         {
             _logger = logger;
             _sharedOptions = sharedOptions;
-            _coHoOptions = coHoOptions;
-            _responseCachingOptions = responseCachingOptions;
-            _distributedCacheOptions = distributedCacheOptions;
-            _dataProtectionOptions = dataProtectionOptions;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -55,10 +43,16 @@ namespace ModernSlavery.Hosts.Webjob
             services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider));
 
             services.AddSingleton<IJobActivator, AutofacJobActivator>();
+
+            //Register the AutoMapper configurations in all domain assemblies
+            services.AddAutoMapper(_sharedOptions.IsDevelopment());
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
+            //Register the queue storage dependencies
+            builder.RegisterType<DnBOrgsRepository>().As<IDnBOrgsRepository>().WithParameter("dataPath", _sharedOptions.DataPath).WithAttributeFiltering();
+
             //Register the messaging dependencies
             builder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
             builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
@@ -162,28 +156,41 @@ namespace ModernSlavery.Hosts.Webjob
 
         public void RegisterModules(IList<Type> modules)
         {
+            //Register references dependency modules
+            modules.AddDependency<ModernSlavery.BusinessDomain.Account.DependencyModule>();
+            modules.AddDependency<ModernSlavery.BusinessDomain.Registration.DependencyModule>();
+            modules.AddDependency<ModernSlavery.BusinessDomain.Submission.DependencyModule>();
+            modules.AddDependency<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
+            modules.AddDependency<ModernSlavery.BusinessDomain.Viewing.DependencyModule>();
+
             //Register the file storage dependencies
             modules.AddDependency<FileStorageDependencyModule>();
+
+            //Register the queue storage dependencies
+            modules.AddDependency<QueueStorageDependencyModule>();
 
             //Register the log storage dependencies
             modules.AddDependency<Infrastructure.Logging.DependencyModule>();
 
-            //Register the app insights dependencies
-            modules.AddDependency<ApplicationInsightsDependencyModule>();
+            //Register the search dependencies
+            modules.AddDependency<Infrastructure.Search.DependencyModule>();
+            
+            //Register the Companies House dependencies
+            modules.AddDependency<Infrastructure.CompaniesHouse.DependencyModule>();
         }
 
         public class AutofacJobActivator : IJobActivator
         {
-            private readonly IContainer _container;
+            private readonly IServiceProvider _serviceProvider;
 
-            public AutofacJobActivator(IContainer container)
+            public AutofacJobActivator(IServiceProvider serviceProvider)
             {
-                _container = container;
+                _serviceProvider = serviceProvider;
             }
 
             public T CreateInstance<T>()
             {
-                return _container.Resolve<T>();
+                return _serviceProvider.GetService<T>();
             }
         }
     }
