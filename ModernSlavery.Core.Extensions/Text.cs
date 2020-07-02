@@ -71,7 +71,7 @@ namespace ModernSlavery.Core.Extensions
         }
 
         private const string variablePattern = @"\$\((.*?)\)";
-        private static readonly Regex variableRegex = new Regex(variablePattern, RegexOptions.IgnoreCase);
+        public static readonly Regex VariableRegex = new Regex(variablePattern, RegexOptions.IgnoreCase);
 
         /// <summary>
         ///     Returns the name of the variable between $( and )
@@ -95,7 +95,7 @@ namespace ModernSlavery.Core.Extensions
             if (dictionary == null) throw new ArgumentNullException(nameof(dictionary));
             if (string.IsNullOrWhiteSpace(text)) return text;
             var badKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (Match m in variableRegex.Matches(text))
+            foreach (Match m in VariableRegex.Matches(text))
             {
                 var key = m.Groups[1].Value;
                 if (dictionary.ContainsKey(key))

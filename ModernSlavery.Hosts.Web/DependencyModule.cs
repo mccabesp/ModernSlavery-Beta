@@ -33,6 +33,7 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Classes.Providers;
 using ModernSlavery.WebUI.Shared.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace ModernSlavery.Hosts.Web
 {
@@ -46,12 +47,14 @@ namespace ModernSlavery.Hosts.Web
         private readonly DistributedCacheOptions _distributedCacheOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
         private readonly BasicAuthenticationOptions _basicAuthenticationOptions;
+        private readonly IdentityClientOptions _identityClientOptions;
 
         public DependencyModule(
             ILogger<DependencyModule> logger,
             SharedOptions sharedOptions, CompaniesHouseOptions coHoOptions,
             ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions,
-            DataProtectionOptions dataProtectionOptions, BasicAuthenticationOptions basicAuthenticationOptions)
+            DataProtectionOptions dataProtectionOptions, BasicAuthenticationOptions basicAuthenticationOptions,
+            IdentityClientOptions identityClientOptions)
         {
             _logger = logger;
             _sharedOptions = sharedOptions;
@@ -60,7 +63,8 @@ namespace ModernSlavery.Hosts.Web
             _distributedCacheOptions = distributedCacheOptions;
             _dataProtectionOptions = dataProtectionOptions;
             _basicAuthenticationOptions = basicAuthenticationOptions;
-        }
+            _identityClientOptions = identityClientOptions;
+    }
 
         #region Static properties
 
@@ -163,10 +167,10 @@ namespace ModernSlavery.Hosts.Web
             #region Configure authentication client
             //Configure the services required for authentication by IdentityServer
             services.AddIdentityServerClient(
-                _sharedOptions.IdentityIssuer,
-                _sharedOptions.SiteAuthority,
-                "ModernSlaveryServiceWebsite",
-                _sharedOptions.IdServerSecret,
+                _identityClientOptions.AuthorityUri,
+                _identityClientOptions.ClientId,
+                _identityClientOptions.ClientSecret,
+                _identityClientOptions.SignOutUri,
                 BackChannelHandler);
             #endregion
 

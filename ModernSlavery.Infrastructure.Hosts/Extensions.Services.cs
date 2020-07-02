@@ -102,9 +102,9 @@ namespace ModernSlavery.Infrastructure.Hosts
         /// <param name="services"></param>
         public static IServiceCollection AddIdentityServerClient(this IServiceCollection services,
             string authority,
-            string signedOutRedirectUri,
             string clientId,
-            string clientSecret = null,
+            string clientSecret,
+            string signedOutRedirectUri,
             HttpMessageHandler backchannelHttpHandler = null)
         {
             //Turn off the JWT claim type mapping to allow well-known claims (e.g. ‘sub’ and ‘idp’) to flow through unmolested

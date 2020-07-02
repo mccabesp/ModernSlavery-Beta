@@ -29,8 +29,6 @@ namespace ModernSlavery.Core.Models
 
         public string DefaultEncryptionKey { get; set; }
 
-        public string IdServerSecret { get; set; } = "secret";
-
         public string AdminEmails { get; set; }
         public string SuperAdminEmails { get; set; }
         public string DatabaseAdminEmails { get; set; }
@@ -62,12 +60,6 @@ namespace ModernSlavery.Core.Models
         public string WEBSITE_HOSTNAME { get; set; }
 
         public string SiteAuthority => $"https://{WEBSITE_HOSTNAME}/";
-
-        public string IdentityIssuer
-        {
-            get => string.IsNullOrWhiteSpace(_IdentityIssuer) ? $"{SiteAuthority}/account" : _IdentityIssuer;
-            set => _IdentityIssuer = value;
-        }
 
         public int LevenshteinDistance { get; set; } = 5;
         public int LockoutMinutes { get; set; }
@@ -128,7 +120,6 @@ namespace ModernSlavery.Core.Models
             set => _reminderEmailDays = value.OrderBy(d => d).ToArray();
         }
 
-        public string IdentityApiScope { get; set; }
         public bool PinInPostTestMode { get; set; }
         public bool ShowEmailVerifyLink { get; set; }
         public string GoogleAnalyticsAccountId { get; set; }

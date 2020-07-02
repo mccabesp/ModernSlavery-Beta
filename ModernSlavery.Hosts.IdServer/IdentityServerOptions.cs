@@ -11,6 +11,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Hosts.IdServer
 {
@@ -20,14 +21,10 @@ namespace ModernSlavery.Hosts.IdServer
     {
         private const string DefaultClientSecret = "Secret";
         private readonly SharedOptions _sharedOptions;
-        private readonly IConfiguration _configuration;
-        private readonly Dictionary<string,string> _configurationDictionary;
 
-        public IdentityServerOptions(SharedOptions sharedOptions, IConfiguration configuration)
+        public IdentityServerOptions(SharedOptions sharedOptions)
         {
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _configurationDictionary = _configuration.ToDictionary();
         }
 
         public Client[] Clients { get; set; }
@@ -58,6 +55,8 @@ namespace ModernSlavery.Hosts.IdServer
 
                     if ((_sharedOptions.IsProduction() || _sharedOptions.IsPreProduction()) && secret.Value.ContainsI(DefaultClientSecret))
                         throw new ConfigurationException($"Identity Server client secret cannot contain '{DefaultClientSecret}' in configuration 'IdentityServer:Clients:{i}:ClientSecrets:{s}:Value'");
+
+                        clientSecrets[s].Value = secret.Value.GetSHA256Checksum();
                 }
             }
         }
@@ -69,7 +68,7 @@ namespace ModernSlavery.Hosts.IdServer
             for (var i = 0; i < Clients.Length; i++)
             {
                 var client = Clients[i];
-                if (string.IsNullOrWhiteSpace(client.ClientUri)) client.ClientUri=_sharedOptions.SiteAuthority;
+                if (!client.ClientUri.IsUrl()) throw new ConfigurationException($"Invalid Uri in configuration 'IdentityServer:Clients:{i}:ClientUri'");
 
                 if (client.RedirectUris != null)
                     client.RedirectUris = client.RedirectUris.Select(uri => RootUri(uri, client.ClientUri)).ToList();

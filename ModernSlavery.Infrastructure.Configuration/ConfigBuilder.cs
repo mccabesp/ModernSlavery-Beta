@@ -110,9 +110,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             _appConfig[HostDefaults.EnvironmentKey] = environmentName;
 
             //Resolve all the variable names in the configuration
-            var configDictionary = _appConfig.ToDictionary();
-            foreach (var key in configDictionary.Keys)
-                _appConfig[key] = configDictionary.ResolveVariableNames(configDictionary[key]);
+            var configDictionary=_appConfig.ResolveVariableNames();
 
             //Dump the settings to the console
             if (_appConfig.GetValueOrDefault("DUMP_SETTINGS", false))

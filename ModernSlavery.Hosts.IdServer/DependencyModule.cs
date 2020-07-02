@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using Autofac;
+using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -60,8 +62,6 @@ namespace ModernSlavery.Hosts.IdServer
 
             services.AddSingleton<IEventSink, AuditEventSink>();
 
-            var resources = new Resources(_sharedOptions);
-
             var identityServer = services.AddIdentityServer(
                     options =>
                     {
@@ -73,8 +73,12 @@ namespace ModernSlavery.Hosts.IdServer
                         options.UserInteraction.ErrorUrl = "/identity/error";
                     })
                 .AddInMemoryClients(_identityServerOptions.Clients)
-                .AddInMemoryIdentityResources(resources.GetIdentityResources())
-                //.AddInMemoryApiResources(Resources.GetApiResources())
+                .AddInMemoryIdentityResources(new List<IdentityResource>
+                {
+                    new IdentityResources.OpenId(),
+                    new IdentityResources.Profile(),
+                    new IdentityResource {Name = "roles", UserClaims = new List<string> {ClaimTypes.Role}}
+                })
                 .AddCustomUserStore();
 
             if (string.IsNullOrWhiteSpace(_sharedOptions.Website_Load_Certificates))
