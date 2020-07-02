@@ -425,7 +425,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (!User.Identity.IsAuthenticated)
             {
                 //Allow anonymous users when starting registration
-                if (IsAnyAction("SignUp/AboutYou", "SignUp/VerifyEmail")) return null;
+                if (IsAnyAction("NewAccount/AboutYou", "NewAccount/VerifyEmail")) return null;
 
                 //Allow anonymous users when resetting password
                 if (IsAnyAction("Account/PasswordReset", "Account/NewPassword")) return null;
@@ -449,7 +449,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 //If email not sent
                 if (VirtualUser.EmailVerifySendDate.EqualsI(null, DateTime.MinValue))
                 {
-                    if (IsAnyAction("SignUp/VerifyEmail")) return null;
+                    if (IsAnyAction("NewAccount/VerifyEmail")) return null;
 
                     //Tell them to verify email
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1100));
@@ -459,7 +459,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 if (VirtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions
                     .EmailVerificationExpiryHours) < VirtualDateTime.Now)
                 {
-                    if (IsAnyAction("SignUp/VerifyEmail")) return null;
+                    if (IsAnyAction("NewAccount/VerifyEmail")) return null;
 
                     //prompt user to click to request a new one
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1101));
@@ -473,7 +473,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 if (remainingTime > TimeSpan.Zero)
                 {
                     //Process the code if there is one
-                    if (IsAnyAction("SignUp/VerifyEmail") && !string.IsNullOrWhiteSpace(Request.Query["code"]))
+                    if (IsAnyAction("NewAccount/VerifyEmail") && !string.IsNullOrWhiteSpace(Request.Query["code"]))
                         return null;
 
                     //tell them to wait
@@ -483,7 +483,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 //if the code is still valid but min sent time has elapsed
-                if (IsAnyAction("SignUp/VerifyEmail", "SignUp/EmailConfirmed")) return null;
+                if (IsAnyAction("NewAccount/VerifyEmail", "NewAccount/EmailConfirmed")) return null;
 
                 //Prompt user to request a new verification code
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1103));
@@ -493,7 +493,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
             {
                 if (IsAnyAction(
-                    "SignUp/VerifyEmail",
+                    "NewAccount/VerifyEmail",
                     "Registration/EmailConfirmed",
                     "Registration/ReviewRequest",
                     "Registration/ConfirmCancellation",
@@ -519,7 +519,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
             //Allow all steps from email confirmed to organisation chosen
             if (IsAnyAction(
-                "SignUp/EmailConfirmed",
+                "NewAccount/EmailConfirmed",
                 "Registration/OrganisationType",
                 "Registration/OrganisationSearch",
                 "Registration/ChooseOrganisation",

@@ -65,6 +65,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         #endregion
 
         #region Home
+        [HttpGet]
+        public async Task<IActionResult> Redirect()
+        {
+            await TrackPageViewAsync();
+
+            return RedirectToActionPermanent("AboutYou","Account");
+        }
 
         #endregion
 

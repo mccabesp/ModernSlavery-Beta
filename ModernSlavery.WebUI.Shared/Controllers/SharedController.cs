@@ -290,7 +290,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         }
 
         [HttpGet("~/cookie-details")]
-        public IActionResult CookieDetails()
+        public IActionResult c()
         {
             return View("CookieDetails");
         }
