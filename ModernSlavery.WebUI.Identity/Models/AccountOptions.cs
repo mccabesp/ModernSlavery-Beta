@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Server.IISIntegration;
 
 namespace ModernSlavery.WebUI.Identity.Models
 {
-    public class AccountOptions
+    public class IdentityOptions
     {
         public static bool AllowLocalLogin = true;
         public static bool AllowRememberLogin = false;

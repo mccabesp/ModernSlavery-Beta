@@ -39,7 +39,8 @@ namespace ModernSlavery.WebUI.Identity.Controllers
     ///     The interaction service provides a way for the UI to communicate with identityserver for validation and context
     ///     retrieval
     /// </summary>
-    public class AccountController : BaseController
+    [Route("Identity")]
+    public class IdentityController : BaseController
     {
         private readonly IClientStore _clientStore;
         private readonly IEventService _events;
@@ -48,24 +49,24 @@ namespace ModernSlavery.WebUI.Identity.Controllers
 
         private readonly IUserRepository _userRepository;
 
-        public AccountController(
+        public IdentityController(
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
             IEventService events,
             IUserRepository userRepository,
-            ILogger<AccountController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(
+            ILogger<IdentityController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(
             logger, webService, sharedBusinessLogic)
         {
             _userRepository = userRepository;
             _interaction = interaction;
             _clientStore = clientStore;
-            _schemeProvider = schemeProvider;
-            _events = events;
+            _schemeProvider = schemeProvider; 
+             _events = events;
         }
 
         #region Ping 
-        [Route("~/ping")]
+        [HttpGet("ping")]
         public IActionResult Ping()
         {
             return new OkResult(); // OK = 200
@@ -73,7 +74,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         #endregion
 
         #region Home
-        [Route("~/")]
+        [HttpGet]
         public IActionResult Redirect()
         {
             return RedirectToAction(nameof(Login));
@@ -84,7 +85,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         /// <summary>
         ///     Shows the error page
         /// </summary>
-        [Route("~/identity/error/{errorId?}")]
+        [HttpGet("error/{errorId?}")]
         public async Task<IActionResult> Error(string errorId = null)
         {
             var errorCode = errorId.ToInt32();
@@ -129,8 +130,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         /// <summary>
         ///     Show login page
         /// </summary>
-        [HttpGet]
-        [Route("~/sign-in")]
+        [HttpGet("sign-in")]
         public async Task<IActionResult> Login(string returnUrl)
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
@@ -155,9 +155,8 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         /// <summary>
         ///     Handle postback from username/password login
         /// </summary>
-        [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("~/sign-in")]
+        [HttpPost("sign-in")]
         public async Task<IActionResult> Login(LoginInputModel model, string button)
         {
             var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
@@ -195,7 +194,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                             UserStatuses.New,
                             UserStatuses.Active);
                     else
-                        ModelState.AddModelError("", AccountOptions.CannotVerifyEmailUsingDifferentAccount);
+                        ModelState.AddModelError("", IdentityOptions.CannotVerifyEmailUsingDifferentAccount);
                 }
                 else
                 {
@@ -209,15 +208,15 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                     {
                         await _events.RaiseAsync(
                             new UserLoginFailureEvent(model.Username,
-                                AccountOptions.TooManySigninAttemptsErrorMessage));
+                                IdentityOptions.TooManySigninAttemptsErrorMessage));
                         ModelState.AddModelError(
                             "",
-                            $"{AccountOptions.TooManySigninAttemptsErrorMessage}<br/>Please try again in {SharedBusinessLogic.AuthenticationBusinessLogic.GetUserLoginLockRemaining(user).ToFriendly(maxParts: 2)}.");
+                            $"{IdentityOptions.TooManySigninAttemptsErrorMessage}<br/>Please try again in {SharedBusinessLogic.AuthenticationBusinessLogic.GetUserLoginLockRemaining(user).ToFriendly(maxParts: 2)}.");
                     }
                     else if (await _userRepository.CheckPasswordAsync(user, model.Password) == false)
                     {
                         await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "Wrong password"));
-                        ModelState.AddModelError("", AccountOptions.InvalidCredentialsErrorMessage);
+                        ModelState.AddModelError("", IdentityOptions.InvalidCredentialsErrorMessage);
                     }
                     else
                     {
@@ -227,11 +226,11 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                         // only set explicit expiration here if user chooses "remember me". 
                         // otherwise we rely upon expiration configured in cookie middleware.
                         AuthenticationProperties props = null;
-                        if (AccountOptions.AllowRememberLogin && model.RememberLogin)
+                        if (IdentityOptions.AllowRememberLogin && model.RememberLogin)
                             props = new AuthenticationProperties
                             {
                                 IsPersistent = true,
-                                ExpiresUtc = DateTimeOffset.UtcNow.Add(AccountOptions.RememberMeLoginDuration)
+                                ExpiresUtc = DateTimeOffset.UtcNow.Add(IdentityOptions.RememberMeLoginDuration)
                             };
 
                         // set the user role
@@ -275,15 +274,15 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                     {
                         await _events.RaiseAsync(
                             new UserLoginFailureEvent(model.Username,
-                                AccountOptions.TooManySigninAttemptsErrorMessage));
+                                IdentityOptions.TooManySigninAttemptsErrorMessage));
                         ModelState.AddModelError(
                             "",
-                            $"{AccountOptions.TooManySigninAttemptsErrorMessage}<br/>Please try again in {lockRemaining.ToFriendly(maxParts: 2)}.");
+                            $"{IdentityOptions.TooManySigninAttemptsErrorMessage}<br/>Please try again in {lockRemaining.ToFriendly(maxParts: 2)}.");
                     }
                     else
                     {
                         await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "Invalid user"));
-                        ModelState.AddModelError("", AccountOptions.InvalidCredentialsErrorMessage);
+                        ModelState.AddModelError("", IdentityOptions.InvalidCredentialsErrorMessage);
                         loginAttempts++;
                         await WebService.Cache.AddAsync($"{model.Username}:login",
                             $"{VirtualDateTime.Now}|{loginAttempts}",
@@ -302,8 +301,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         /// <summary>
         ///     Show logout page
         /// </summary>
-        [HttpGet]
-        [Route("~/sign-out")]
+        [HttpGet("sign-out")]
         public async Task<IActionResult> Logout(string logoutId)
         {
             //If there is no logoutid then sign-out via webui
@@ -324,9 +322,8 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         /// <summary>
         ///     Handle logout page postback
         /// </summary>
-        [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("~/sign-out")]
+        [HttpPost("sign-out")]
         public async Task<IActionResult> Logout(LogoutInputModel model)
         {
             // build a model so the logged out page knows what to display
@@ -380,7 +377,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             var providers = schemes
                 .Where(
                     x => x.DisplayName != null
-                         || x.Name.Equals(AccountOptions.WindowsAuthenticationSchemeName,
+                         || x.Name.Equals(IdentityOptions.WindowsAuthenticationSchemeName,
                              StringComparison.OrdinalIgnoreCase))
                 .Select(x => new ExternalProvider {DisplayName = x.DisplayName, AuthenticationScheme = x.Name})
                 .ToList();
@@ -402,8 +399,8 @@ namespace ModernSlavery.WebUI.Identity.Controllers
 
             return new LoginViewModel
             {
-                AllowRememberLogin = AccountOptions.AllowRememberLogin,
-                EnableLocalLogin = allowLocal && AccountOptions.AllowLocalLogin,
+                AllowRememberLogin = IdentityOptions.AllowRememberLogin,
+                EnableLocalLogin = allowLocal && IdentityOptions.AllowLocalLogin,
                 ReturnUrl = returnUrl,
                 Username = context?.LoginHint,
                 ExternalProviders = providers.ToArray()
@@ -426,8 +423,8 @@ namespace ModernSlavery.WebUI.Identity.Controllers
 
             var vm = new LogoutViewModel
             {
-                ShowLogoutPrompt = AccountOptions.ShowLogoutPrompt,
-                AutomaticRedirectAfterSignOut = AccountOptions.AutomaticRedirectAfterSignOut,
+                ShowLogoutPrompt = IdentityOptions.ShowLogoutPrompt,
+                AutomaticRedirectAfterSignOut = IdentityOptions.AutomaticRedirectAfterSignOut,
                 PostLogoutRedirectUri = logout?.PostLogoutRedirectUri,
                 ClientId = logout.ClientId,
                 ClientName = string.IsNullOrEmpty(logout?.ClientName) ? logout?.ClientId : logout?.ClientName,
@@ -438,10 +435,10 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             var client = await _clientStore.FindClientByIdAsync(vm.ClientId);
             if (client.Properties.ContainsKey("AutomaticRedirectAfterSignOut"))
                 vm.AutomaticRedirectAfterSignOut = client.Properties["AutomaticRedirectAfterSignOut"]
-                    .ToBoolean(AccountOptions.AutomaticRedirectAfterSignOut);
+                    .ToBoolean(IdentityOptions.AutomaticRedirectAfterSignOut);
 
             if (client.Properties.ContainsKey("ShowLogoutPrompt"))
-                vm.ShowLogoutPrompt = client.Properties["ShowLogoutPrompt"].ToBoolean(AccountOptions.ShowLogoutPrompt);
+                vm.ShowLogoutPrompt = client.Properties["ShowLogoutPrompt"].ToBoolean(IdentityOptions.ShowLogoutPrompt);
 
             if (User?.Identity.IsAuthenticated != true)
             {
@@ -469,7 +466,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
 
             var vm = new LoggedOutViewModel
             {
-                AutomaticRedirectAfterSignOut = AccountOptions.AutomaticRedirectAfterSignOut,
+                AutomaticRedirectAfterSignOut = IdentityOptions.AutomaticRedirectAfterSignOut,
                 PostLogoutRedirectUri = logout?.PostLogoutRedirectUri,
                 ClientId = logout.ClientId,
                 ClientName = string.IsNullOrEmpty(logout?.ClientName) ? logout?.ClientId : logout?.ClientName,
@@ -482,7 +479,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
 
             if (client.Properties.ContainsKey("AutomaticRedirectAfterSignOut"))
                 vm.AutomaticRedirectAfterSignOut = client.Properties["AutomaticRedirectAfterSignOut"]
-                    .ToBoolean(AccountOptions.AutomaticRedirectAfterSignOut);
+                    .ToBoolean(IdentityOptions.AutomaticRedirectAfterSignOut);
 
             if (User?.Identity.IsAuthenticated == true)
             {
@@ -509,7 +506,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         private async Task<IActionResult> ProcessWindowsLoginAsync(string returnUrl)
         {
             // see if windows auth has already been requested and succeeded
-            var result = await HttpContext.AuthenticateAsync(AccountOptions.WindowsAuthenticationSchemeName);
+            var result = await HttpContext.AuthenticateAsync(IdentityOptions.WindowsAuthenticationSchemeName);
             if (result?.Principal is WindowsPrincipal wp)
             {
                 // we will issue the external cookie and then redirect the
@@ -518,15 +515,15 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                 var props = new AuthenticationProperties
                 {
                     RedirectUri = Url.Action("ExternalLoginCallback"),
-                    Items = {{"returnUrl", returnUrl}, {"scheme", AccountOptions.WindowsAuthenticationSchemeName}}
+                    Items = {{"returnUrl", returnUrl}, {"scheme", IdentityOptions.WindowsAuthenticationSchemeName}}
                 };
 
-                var id = new ClaimsIdentity(AccountOptions.WindowsAuthenticationSchemeName);
+                var id = new ClaimsIdentity(IdentityOptions.WindowsAuthenticationSchemeName);
                 id.AddClaim(new Claim(JwtClaimTypes.Subject, wp.Identity.Name));
                 id.AddClaim(new Claim(JwtClaimTypes.Name, wp.Identity.Name));
 
                 // add the groups as claims -- be careful if the number of groups is too large
-                if (AccountOptions.IncludeWindowsGroups)
+                if (IdentityOptions.IncludeWindowsGroups)
                 {
                     var wi = wp.Identity as WindowsIdentity;
                     var groups = wi.Groups.Translate(typeof(NTAccount));
@@ -544,7 +541,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             // trigger windows auth
             // since windows auth don't support the redirect uri,
             // this URL is re-triggered when we call challenge
-            return Challenge(AccountOptions.WindowsAuthenticationSchemeName);
+            return Challenge(IdentityOptions.WindowsAuthenticationSchemeName);
         }
 
         private async Task<(User user, string provider, string providerUserId, IEnumerable<Claim> claims)>
@@ -632,11 +629,10 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         /// <summary>
         ///     initiate roundtrip to external authentication provider
         /// </summary>
-        [HttpGet]
-        [Route("~/external-login")]
+        [HttpGet("external-login")]
         public async Task<IActionResult> ExternalLogin(string provider, string returnUrl)
         {
-            if (AccountOptions.WindowsAuthenticationSchemeName == provider)
+            if (IdentityOptions.WindowsAuthenticationSchemeName == provider)
                 // windows authentication needs special handling
                 return await ProcessWindowsLoginAsync(returnUrl);
 
@@ -652,8 +648,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         /// <summary>
         ///     Post processing of external authentication
         /// </summary>
-        [HttpGet]
-        [Route("~/external-login-callback")]
+        [HttpGet("external-login-callback")]
         public async Task<IActionResult> ExternalLoginCallback()
         {
             // read external identity from the temporary cookie

@@ -37,18 +37,22 @@ namespace ModernSlavery.WebUI.Identity
             for (var i = 0; i < Clients.Length; i++)
             {
                 var client = Clients[i];
+
+                client.AllowedScopes = client.AllowedScopes?.Select(s => s?.ToLower()).ToList();
+                client.AllowedGrantTypes = client.AllowedGrantTypes?.Select(s => s?.ToLower()).ToList();
+
                 if (client.ClientSecrets == null || !client.ClientSecrets.Any())
-                    throw new ConfigurationException($"No Identity Server client secret found in configuration 'IdentityServer:Clients:{i}:ClientSecrets'");
+                    throw new ConfigurationErrorsException($"No Identity Server client secret found in configuration 'IdentityServer:Clients:{i}:ClientSecrets'");
 
                 var clientSecrets = client.ClientSecrets.ToArray();
                 for (var s = 0; s < clientSecrets.Length; s++)
                 {
                     var secret = clientSecrets[s];
                     if (secret == null || string.IsNullOrWhiteSpace(secret.Value))
-                        throw new ConfigurationException($"No Identity Server client secret found in configuration 'IdentityServer:Clients:{i}:ClientSecrets:{s}:Value'");
+                        throw new ConfigurationErrorsException($"No Identity Server client secret found in configuration 'IdentityServer:Clients:{i}:ClientSecrets:{s}:Value'");
 
                     if ((_sharedOptions.IsProduction() || _sharedOptions.IsPreProduction()) && secret.Value.ContainsI(DefaultClientSecret))
-                        throw new ConfigurationException($"Identity Server client secret cannot contain '{DefaultClientSecret}' in configuration 'IdentityServer:Clients:{i}:ClientSecrets:{s}:Value'");
+                        throw new ConfigurationErrorsException($"Identity Server client secret cannot contain '{DefaultClientSecret}' in configuration 'IdentityServer:Clients:{i}:ClientSecrets:{s}:Value'");
 
                     clientSecrets[s].Value = secret.Value.GetSHA256Checksum();
                 }
@@ -62,7 +66,7 @@ namespace ModernSlavery.WebUI.Identity
             for (var i = 0; i < Clients.Length; i++)
             {
                 var client = Clients[i];
-                if (!client.ClientUri.IsUrl()) throw new ConfigurationException($"Invalid Uri in configuration 'IdentityServer:Clients:{i}:ClientUri'");
+                if (!client.ClientUri.IsUrl()) throw new ConfigurationErrorsException($"Invalid Uri in configuration 'IdentityServer:Clients:{i}:ClientUri'");
 
                 if (client.RedirectUris != null)
                     client.RedirectUris = client.RedirectUris.Select(uri => RootUri(uri, client.ClientUri)).ToList();

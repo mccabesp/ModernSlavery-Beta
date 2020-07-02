@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using Autofac;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
@@ -43,8 +44,8 @@ namespace ModernSlavery.WebUI.Identity
                         options.Events.RaiseSuccessEvents = true;
                         options.Events.RaiseFailureEvents = true;
                         options.Events.RaiseErrorEvents = true;
-                        options.UserInteraction.LoginUrl = "/sign-in";
-                        options.UserInteraction.LogoutUrl = "/sign-out";
+                        options.UserInteraction.LoginUrl = "/identity/sign-in";
+                        options.UserInteraction.LogoutUrl = "/identity/sign-out";
                         options.UserInteraction.ErrorUrl = "/identity/error";
                     })
                 .AddInMemoryClients(_identityServerOptions.Clients)
@@ -55,10 +56,10 @@ namespace ModernSlavery.WebUI.Identity
                     new IdentityResource {Name = "roles", UserClaims = new List<string> {ClaimTypes.Role}}
                 })
                 .AddResourceOwnerValidator<CustomResourceOwnerPasswordValidator>();
-                //.AddProfileService<CustomProfileService>();
+            //.AddProfileService<CustomProfileService>();
 
             //identityServer.Services.AddScoped<IUserRepository, UserRepository>();
-
+            
             if (string.IsNullOrWhiteSpace(_sharedOptions.Website_Load_Certificates))
             {
                 identityServer.AddDeveloperSigningCredential();
@@ -79,7 +80,9 @@ namespace ModernSlavery.WebUI.Identity
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-
+            //Add configuration here
+            var app = lifetimeScope.Resolve<IApplicationBuilder>();
+            app.UseIdentityServer();
         }
 
         public void RegisterModules(IList<Type> modules)

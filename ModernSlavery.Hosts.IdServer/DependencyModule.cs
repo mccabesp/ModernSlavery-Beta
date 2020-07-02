@@ -26,9 +26,6 @@ namespace ModernSlavery.Hosts.IdServer
 {
     public class DependencyModule : IDependencyModule
     {
-        public static Action<IServiceCollection> ConfigureTestServices;
-        public static Action<ContainerBuilder> ConfigureTestContainer;
-        
         private readonly ILogger _logger;
         private readonly SharedOptions _sharedOptions;
         private readonly StorageOptions _storageOptions;
@@ -97,9 +94,6 @@ namespace ModernSlavery.Hosts.IdServer
 
             //This may now be required 
             services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
-
-            //Override any test services
-            ConfigureTestServices?.Invoke(services);
             
             //Register the AutoMapper configurations in all domain assemblies
             services.AddAutoMapper(_sharedOptions.IsDevelopment());
@@ -123,9 +117,6 @@ namespace ModernSlavery.Hosts.IdServer
             // Register Action helpers
             builder.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
                 .SingleInstance();
-
-            //Override any test services
-            ConfigureTestContainer?.Invoke(builder);
         }
 
 

@@ -59,14 +59,6 @@ namespace ModernSlavery.Hosts.Web
             _identityClientOptions = identityClientOptions;
     }
 
-        #region Static properties
-
-        public static Action<IServiceCollection> ConfigureTestServices;
-        public static Action<ContainerBuilder> ConfigureTestContainer;
-        public static HttpMessageHandler BackChannelHandler { get; set; }
-
-        #endregion
-
         public void ConfigureServices(IServiceCollection services)
         {
             //Allow handler for caching of http responses
@@ -89,6 +81,7 @@ namespace ModernSlavery.Hosts.Web
                         options.Filters.Add<ErrorHandlingFilter>();
                     });
 
+            mvcBuilder.AddApplicationPart<WebUI.Identity.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Account.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Admin.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Registration.DependencyModule>();
@@ -100,12 +93,12 @@ namespace ModernSlavery.Hosts.Web
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Development" for Development dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
             // However this doesnt work on razor class/component libraries so we instead use this workaround 
-            if (Debugger.IsAttached && _sharedOptions.IsDevelopment()) mvcBuilder.AddApplicationPartsRuntimeCompilation();
+            //if (Debugger.IsAttached && _sharedOptions.IsDevelopment()) mvcBuilder.AddApplicationPartsRuntimeCompilation();
 
             //Log all the application parts when in development
             if (_sharedOptions.IsDevelopment())
                 services.AddHostedService<ApplicationPartsLogger>();
-
+            
             // Add controllers, taghelpers, views as services so attribute dependencies can be resolved in their contructors
             mvcBuilder.AddControllersAsServices(); 
             mvcBuilder.AddTagHelpersAsServices();
@@ -154,17 +147,13 @@ namespace ModernSlavery.Hosts.Web
             //This may now be required 
             services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
 
-            //Override any test services
-            ConfigureTestServices?.Invoke(services);
-
             #region Configure Identity Client
             //Configure the services required for authentication by IdentityServer
             services.AddIdentityServerClient(
-                _identityClientOptions.AuthorityUri,
+                _identityClientOptions.IssuerUri,
                 _identityClientOptions.ClientId,
                 _identityClientOptions.ClientSecret,
-                _identityClientOptions.SignOutUri,
-                BackChannelHandler);
+                _identityClientOptions.SignOutUri);
             #endregion
 
             //Register the AutoMapper configurations in all domain assemblies
@@ -192,10 +181,6 @@ namespace ModernSlavery.Hosts.Web
                 var factory = x.Resolve<IUrlHelperFactory>();
                 return factory.GetUrlHelper(actionContext);
             });
-
-            //Override any test services
-            ConfigureTestContainer?.Invoke(builder);
-
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
@@ -205,7 +190,6 @@ namespace ModernSlavery.Hosts.Web
             var hostApplicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>();
 
             lifetimeScope.UseLogEventQueueLogger();
-
             app.UseMiddleware<ExceptionMiddleware>();
             if (_sharedOptions.UseDeveloperExceptions)
             {
@@ -225,6 +209,7 @@ namespace ModernSlavery.Hosts.Web
 
             app.UseRouting();
             if (_responseCachingOptions.Enabled)app.UseResponseCaching();
+
             app.UseSession(); //Must be before UseMvC or any middleware which requires session
             app.UseAuthentication(); //Ensure the OIDC IDentity Server authentication services execute on each http request - Must be before UseMVC
             app.UseAuthorization();
@@ -264,6 +249,7 @@ namespace ModernSlavery.Hosts.Web
 
         public void RegisterModules(IList<Type> modules)
         {
+            modules.AddDependency<WebUI.Identity.DependencyModule>();
             modules.AddDependency<WebUI.StaticFiles.DependencyModule>();
             modules.AddDependency<WebUI.Account.DependencyModule>();
             modules.AddDependency<WebUI.Admin.DependencyModule>();
