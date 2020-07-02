@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics;
 using System.Net.Http;
-using System.Runtime.Loader;
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
@@ -20,7 +17,6 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
-using ModernSlavery.Infrastructure.CompaniesHouse;
 using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
@@ -33,7 +29,6 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Classes.Providers;
 using ModernSlavery.WebUI.Shared.Options;
-using Microsoft.Extensions.Configuration;
 
 namespace ModernSlavery.Hosts.Web
 {
@@ -42,7 +37,6 @@ namespace ModernSlavery.Hosts.Web
         private readonly ILogger _logger;
 
         private readonly SharedOptions _sharedOptions;
-        private readonly CompaniesHouseOptions _coHoOptions;
         private readonly ResponseCachingOptions _responseCachingOptions;
         private readonly DistributedCacheOptions _distributedCacheOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
@@ -51,14 +45,13 @@ namespace ModernSlavery.Hosts.Web
 
         public DependencyModule(
             ILogger<DependencyModule> logger,
-            SharedOptions sharedOptions, CompaniesHouseOptions coHoOptions,
+            SharedOptions sharedOptions, 
             ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions,
             DataProtectionOptions dataProtectionOptions, BasicAuthenticationOptions basicAuthenticationOptions,
             IdentityClientOptions identityClientOptions)
         {
             _logger = logger;
             _sharedOptions = sharedOptions;
-            _coHoOptions = coHoOptions;
             _responseCachingOptions = responseCachingOptions;
             _distributedCacheOptions = distributedCacheOptions;
             _dataProtectionOptions = dataProtectionOptions;
@@ -107,7 +100,7 @@ namespace ModernSlavery.Hosts.Web
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Development" for Development dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
             // However this doesnt work on razor class/component libraries so we instead use this workaround 
-            if (_sharedOptions.IsDevelopment()) mvcBuilder.AddApplicationPartsRuntimeCompilation();
+            if (Debugger.IsAttached && _sharedOptions.IsDevelopment()) mvcBuilder.AddApplicationPartsRuntimeCompilation();
 
             //Log all the application parts when in development
             if (_sharedOptions.IsDevelopment())
@@ -164,7 +157,7 @@ namespace ModernSlavery.Hosts.Web
             //Override any test services
             ConfigureTestServices?.Invoke(services);
 
-            #region Configure authentication client
+            #region Configure Identity Client
             //Configure the services required for authentication by IdentityServer
             services.AddIdentityServerClient(
                 _identityClientOptions.AuthorityUri,

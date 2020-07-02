@@ -3,7 +3,7 @@ using IdentityServer4.Events;
 using IdentityServer4.Services;
 using Microsoft.Extensions.Logging;
 
-namespace ModernSlavery.Hosts.IdServer.Classes
+namespace ModernSlavery.WebUI.Identity.Classes
 {
     public class AuditEventSink : IEventSink
     {

@@ -18,21 +18,21 @@ namespace ModernSlavery.Core.Interfaces
         ///     Place all your dependency service registrations in here 
         /// </summary>
         /// <param name="services">The service collection to Add your dependencies to</param>
-        void ConfigureServices(IServiceCollection services);
+        public void ConfigureServices(IServiceCollection services) { }
 
         /// <summary>
         ///     Place all your autofac service registrations in here 
         /// </summary>
         /// <param name="builder">The ContainerBuilder to Register your dependencies with</param>
-        public void ConfigureContainer(ContainerBuilder builder);
+        public void ConfigureContainer(ContainerBuilder builder) { }
 
         /// <summary>
         ///     Place any configuration of your services registered in "Configure" method.
         ///     Use lifetimeScope to resolve previously registered dependencies.
         /// </summary>
         /// <param name="lifetimeScope">The AutoFac scope for resolution of registered dependencies</param>
-        public void Configure(ILifetimeScope lifetimeScope);
+        public void Configure(ILifetimeScope lifetimeScope) { }
 
-        public void RegisterModules(IList<Type> modules);
+        public void RegisterModules(IList<Type> modules) { }
     }
 }

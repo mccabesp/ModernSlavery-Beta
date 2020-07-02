@@ -1,19 +1,13 @@
 ﻿using IdentityServer4.Models;
-using Microsoft.Extensions.Configuration;
 using ModernSlavery.Core.Attributes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
-using ModernSlavery.Infrastructure.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using ModernSlavery.Core.Extensions;
 
-namespace ModernSlavery.Hosts.IdServer
+namespace ModernSlavery.WebUI.Identity
 {
 
     [Options("IdentityServer")]
@@ -38,9 +32,9 @@ namespace ModernSlavery.Hosts.IdServer
 
         private void CheckClientSecrets()
         {
-            if (Clients==null) return;
+            if (Clients == null) return;
 
-            for(var i=0;i<Clients.Length;i++)
+            for (var i = 0; i < Clients.Length; i++)
             {
                 var client = Clients[i];
                 if (client.ClientSecrets == null || !client.ClientSecrets.Any())
@@ -56,7 +50,7 @@ namespace ModernSlavery.Hosts.IdServer
                     if ((_sharedOptions.IsProduction() || _sharedOptions.IsPreProduction()) && secret.Value.ContainsI(DefaultClientSecret))
                         throw new ConfigurationException($"Identity Server client secret cannot contain '{DefaultClientSecret}' in configuration 'IdentityServer:Clients:{i}:ClientSecrets:{s}:Value'");
 
-                        clientSecrets[s].Value = secret.Value.GetSHA256Checksum();
+                    clientSecrets[s].Value = secret.Value.GetSHA256Checksum();
                 }
             }
         }

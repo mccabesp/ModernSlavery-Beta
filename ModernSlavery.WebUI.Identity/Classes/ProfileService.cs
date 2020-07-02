@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 
-namespace ModernSlavery.Hosts.IdServer.Classes
+namespace ModernSlavery.WebUI.Identity.Classes
 {
     public class CustomProfileService : IProfileService
     {
