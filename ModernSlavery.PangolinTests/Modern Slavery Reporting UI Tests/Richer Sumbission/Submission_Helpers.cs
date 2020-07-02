@@ -14,30 +14,41 @@ namespace Modern_Slavery_Reporting_UI_Tests
         public static void NavigateYourMSStatement(UIContext ui, string Organistion, string Year)
         {
             ui.Click("Mange Organisations");
+            ui.ExpectHeader("Submit a modern slavery statement");
             ui.ExpectHeader("Select an organisation");
         }
         public static void NavigateToAreasCovered(UIContext ui, string Organistion, string Year)
         {
             NavigateYourMSStatement(ui, Organistion, Year);
             ui.Click("Continue");
+            ui.ExpectHeader("Submit a modern slavery statement");
+
             ui.ExpectHeader("Areas covered by your modern slavery statement");
         }
         public static void NavigateToYourOrganisation(UIContext ui, string Organistion, string Year)
         {
             NavigateToAreasCovered(ui, Organistion, Year);
             ui.Click("Continue");
+            ui.ExpectHeader("Submit a modern slavery statement");
+
             ui.ExpectHeader("Your organisation");
         }
         public static void NavigateToPolicies(UIContext ui, string Organistion, string Year)
         {
             NavigateToYourOrganisation(ui, Organistion, Year);
             ui.Click("Continue");
+            ui.ExpectHeader("Submit a modern slavery statement");
+
+            ui.ExpectHeader("Submit a modern slavery statement");
+
             ui.ExpectHeader("Policies");
         }
         public static void NavigateToSupplyChainRisks1(UIContext ui, string Organistion, string Year)
         {
             NavigateToPolicies(ui, Organistion, Year);
             ui.Click("Continue");
+            ui.ExpectHeader("Submit a modern slavery statement");
+
             ui.ExpectHeader("Supply Chain Risks and due diligence");
             //ensure we are on the correct part of this section
             //there are 2
@@ -47,6 +58,8 @@ namespace Modern_Slavery_Reporting_UI_Tests
         {
             NavigateToSupplyChainRisks1(ui, Organistion, Year);
             ui.Click("Continue");
+            ui.ExpectHeader("Submit a modern slavery statement");
+
             ui.ExpectHeader("Supply Chain Risks and due diligence");
             //ensure we are on the correct part of this section
             //there are 2
@@ -56,12 +69,16 @@ namespace Modern_Slavery_Reporting_UI_Tests
         {
             NavigateToSupplyChainRisks2(ui, Organistion, Year);
             ui.Click("Continue");
+            ui.ExpectHeader("Submit a modern slavery statement");
+
             ui.ExpectHeader("Training");
         }
         public static void NavigateToMonitoringProgress(UIContext ui, string Organistion, string Year)
         {
             NavigateToTraining(ui, Organistion, Year);
             ui.Click("Continue");
+            ui.ExpectHeader("Submit a modern slavery statement");
+
             ui.ExpectHeader("Monitoring progress");
         }
 
