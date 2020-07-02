@@ -237,6 +237,7 @@
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Validation_Check.cs" />
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Success.cs" />
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Constants.cs" />
+    <Compile Include="Search and Compare\Sign-in\MVP 1 Header Content Check.cs" />
     <Compile Include="Search and Compare\Sign-in\Sign-out\Sign_Out.cs" />
     <Compile Include="Search and Compare\Sign-in\Sign-out\Sign_Out_Impersonated_User.cs" />
     <Compile Include="Search and Compare\Sign-in\Sign-out\Sign_Out_User_Cannot_Access_Registration_Pages.cs" />
