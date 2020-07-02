@@ -6,6 +6,7 @@
  */
 
 using System.Linq;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Classes
@@ -299,6 +300,8 @@ namespace ModernSlavery.Core.Classes
         public string TwoLetterCode { get; }
         public string ThreeLetterCode { get; }
         public string NumericCode { get; }
+
+        public Continent Continent { get; set; }
 
         public static string FindTwoLetterCode(string country)
         {

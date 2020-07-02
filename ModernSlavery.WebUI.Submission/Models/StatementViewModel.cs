@@ -88,7 +88,63 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public List<StatementTrainings> StatementTrainings { get; set; }
         [Display(Name = "Please specify")]
         public string OtherTrainingText { get; set; }
+
+        public List<StatementRisk> StatementRisks { get; set; }
+
+        public List<StatementRiskType> StatementRiskTypes { get; set; }
+
+        public string OtherRiskText { get; set; }
+
+        public List<Continent> Continents { get; set; }
+
+        public List<Core.Classes.Country> Countries { get; set; }
+
+        public List<StatementDiligence> StatementDiligences { get; set; }
+        public List<StatementDiligenceType> StatementDiligenceTypes { get; set; }
+
+        //need to find corresponsing model property
+        public AnyIdicatorsInSupplyChain? AnyIdicatorsInSupplyChain { get; set; }
+
+        //need to find corresponsing model property
+
+        public string IndicatorDetails { get; set; }
+
+        //need to find corresponsing model property
+        public List<AnyInstancesInSupplyChain> AnyInstancesInSupplyChain { get; set; }
+
+        //need to find corresponsing model property
+        public string InstanceDetails { get; set; }
+
+        public List<StatementRemediation> StatementRemediations { get; set; }
+
+        public string OtherRemediationText { get; set; }
     }
+
+    public enum StatementRemediation
+    {
+        [GovUkRadioCheckboxLabelText(Text = "repayment of recruitment fees")]
+        repaymentOfRecruitmentFees,
+
+        [GovUkRadioCheckboxLabelText(Text = "change in policy")]
+        changeInPolicy,
+
+        [GovUkRadioCheckboxLabelText(Text = "Other")]
+        Other
+
+        //etc
+    }
+
+    public enum AnyIdicatorsInSupplyChain
+    {
+        Yes,
+        No
+    }
+    public enum AnyInstancesInSupplyChain
+    {
+        Yes,
+        No
+    }
+
     public enum StatementSectors
     {
         [GovUkRadioCheckboxLabelText(Text = "All")]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -16,7 +17,8 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
             IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TProperty>> propertyLambdaExpression,
             FieldsetViewModel fieldsetOptions = null,
-            HintViewModel hintOptions = null)
+            HintViewModel hintOptions = null,
+            Dictionary<TProperty, Func<object, object>> conditionalOptions = null)
             where TModel : GovUkViewModel
         {
             var property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
@@ -38,7 +40,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
                     var isEnumValueCurrentlySelected = enumValue.ToString() == currentlySelectedValue.ToString();
                     var radioLabelText = GetRadioLabelText(enumType, enumValue);
 
-                    return new RadioItemViewModel
+                    var radioItemViewModel = new RadioItemViewModel
                     {
                         Value = enumValue.ToString(),
                         Id = $"GovUk_Radio_{propertyName}_{enumValue}",
@@ -48,6 +50,11 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
                             Text = radioLabelText
                         }
                     };
+
+                    if (conditionalOptions != null && conditionalOptions.TryGetValue((TProperty)enumValue, out var conditionalHtml)
+                   ) radioItemViewModel.Conditional = new Conditional { Html = conditionalHtml };
+
+                    return radioItemViewModel;
                 })
                 .Cast<ItemViewModel>()
                 .ToList();
