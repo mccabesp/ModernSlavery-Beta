@@ -49,7 +49,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a last name")]
         public string LastName { get; set; }
         public Nullable<DateTime> ApprovedDate { get; set; }
-        public AffirmationType IncludesGoals { get; set; }
+        public bool IncludesGoals { get; set; }
         [Required]
         public bool IncludesStructure { get; set; }
 
@@ -118,6 +118,25 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public List<StatementRemediation> StatementRemediations { get; set; }
 
         public string OtherRemediationText { get; set; }
+        [MaxLength(500)]
+        [Display(Name = "How is your organisation measuring progress towards these goals?")]
+        public string MeasuringProgress { get; set; }
+        [MaxLength(500)]
+        [Display(Name = "What were your key achievements in relation to reducing modern slavery during the period covered by this statement?")]
+        public string KeyAchievements { get; set; }
+
+        public List<NumberOfYearsOfStatements> NumberOfYearsOfStatements { get; set; }
+
+    }
+    public enum NumberOfYearsOfStatements
+    {
+        [GovUkRadioCheckboxLabelText(Text = "This is the first time")]
+        thisIsTheFirstTime = 0,
+        [GovUkRadioCheckboxLabelText(Text = "1 - 5 years")]
+        from1To5Years = 1,
+        [GovUkRadioCheckboxLabelText(Text = "More than 5 years")]
+        moreThan5Years = 2,
+
     }
 
     public enum StatementRemediation

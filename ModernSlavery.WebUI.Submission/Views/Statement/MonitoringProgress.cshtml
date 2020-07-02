@@ -1,0 +1,81 @@
+﻿@using System.ComponentModel.DataAnnotations
+@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
+<a class="govuk-back-link" href="@Url.Action("DueDiligence")">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            var controller = ViewData["Controller"] as BaseController;
+
+            @await Html.CustomValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+        }
+
+        @(Html.GovUkErrorSummary(new[]
+                {
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesGoals),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.MeasuringProgress),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.KeyAchievements),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.NumberOfYearsOfStatements),
+                }))
+
+        <h1 class="govuk-heading-l">
+            Monitoring progress
+        </h1>
+        @(Html.GovUkRadiosFor(
+        m => m.IncludesGoals,
+        new FieldsetViewModel
+        {
+            Legend = new LegendViewModel
+            {
+                Text = "Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?",
+                Classes = "govuk-fieldset__legend--m"
+            },
+            Classes = "govuk-!-margin-top-6"
+        }));
+
+        <div class="govuk-form-group">
+            <h1 class="govuk-label-wrapper">
+                <label asp-for="MeasuringProgress" class="govuk-label govuk-label--l" for="measuring-progress">
+                </label>
+            </h1>
+            <textarea asp-for="MeasuringProgress" class="govuk-textarea" id="more-detail" name="measuring-progress" rows="5"></textarea>
+        </div>
+
+        <div class="govuk-form-group">
+            <h1 class="govuk-label-wrapper">
+                <label asp-for="KeyAchievements" class="govuk-label govuk-label--l" for="key-achievements">
+                </label>
+            </h1>
+            <textarea asp-for="KeyAchievements" class="govuk-textarea" id="more-detail" name="key-achievements" rows="5"></textarea>
+        </div>
+
+
+        @(Html.GovUkRadiosFor(
+                    m => m.NumberOfYearsOfStatements,
+                    new FieldsetViewModel
+                    {
+                        Legend = new LegendViewModel
+                        {
+                            Text = "How many years has your organisation been producing modern slavery statements?",
+                            Classes = "govuk-fieldset__legend--m"
+                        },
+                        Classes = "govuk-!-margin-top-6"
+                    },
+                    new HintViewModel
+                    {
+                        Text = "If your statement is for a group of organisations, please select the answer that applies to the organisation with the longest history of producing statements."
+                    }))
+
+
+        <button class="govuk-button" data-module="govuk-button" type="submit">
+            Continue
+        </button>
+        <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
+            Cancel
+        </button>
+    </div>
+</div>
