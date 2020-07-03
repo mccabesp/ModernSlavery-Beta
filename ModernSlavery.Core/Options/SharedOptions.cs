@@ -109,7 +109,7 @@ namespace ModernSlavery.Core.Models
         public string Website_Instance_Id { get; set; }
         public string Website_Load_Certificates { get; set; }
 
-        public string Website_Run_Rom_Package { get; set; }
+        public string Website_Run_From_Package { get; set; }
         public string LocalAppData { get; set; }
         public string CertThumprint { get; set; }
 

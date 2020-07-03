@@ -59,18 +59,18 @@ namespace ModernSlavery.Hosts.Web
             _basicAuthenticationOptions = basicAuthenticationOptions;
             _identityClientOptions = identityClientOptions;
 
-            if (_sharedOptions.Website_Run_Rom_Package == "1")
+            if (_sharedOptions.Website_Run_From_Package == "1")
             {
                 if (string.IsNullOrWhiteSpace(_sharedOptions.LocalAppData))
                 {
                     Directory.SetCurrentDirectory(_sharedOptions.LocalAppData);
-                    Console.WriteLine($"Set CurrentDirectory to [LOCALAPPDATA]:{_sharedOptions.LocalAppData} when deployment is readonly");
-                    logger.LogInformation($"Set CurrentDirectory to [LOCALAPPDATA]:{_sharedOptions.LocalAppData} when deployment is readonly");
+                    Console.WriteLine($"Set CurrentDirectory to [LOCALAPPDATA]:{_sharedOptions.LocalAppData} when [WEBSITE_RUN_FROM_PACKAGE]=1");
+                    logger.LogInformation($"Set CurrentDirectory to [LOCALAPPDATA]:{_sharedOptions.LocalAppData} when [WEBSITE_RUN_FROM_PACKAGE]=1");
                 }
                 else
                 {
-                    Console.WriteLine($"Cannot set CurrentDirectory to empty [LOCALAPPDATA] is empty when deployment is readonly");
-                    logger.LogError($"Cannot set CurrentDirectory to empty [LOCALAPPDATA] is empty when deployment is readonly");
+                    Console.WriteLine($"Cannot set CurrentDirectory to empty [LOCALAPPDATA] is empty when [WEBSITE_RUN_FROM_PACKAGE]=1");
+                    logger.LogError($"Cannot set CurrentDirectory to empty [LOCALAPPDATA] is empty when [WEBSITE_RUN_FROM_PACKAGE]=1");
                 }
             }
         }
