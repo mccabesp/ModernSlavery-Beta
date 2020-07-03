@@ -133,8 +133,8 @@ namespace ModernSlavery.Infrastructure.Configuration
             if (_appConfig.GetValueOrDefault("DUMP_SETTINGS", false))
             {
                 var dumpPath = Path.Combine(Directory.GetCurrentDirectory(), $"{AppDomain.CurrentDomain.FriendlyName}.SETTINGS.json");
-                Console.WriteLine($@"AppSettings Dumped to file: {dumpPath}");
                 File.WriteAllLines(dumpPath, configDictionary.Keys.Select(key=>$@"[{key}]={configDictionary[key]}"));
+                Console.WriteLine($@"AppSettings Dumped to file: {dumpPath}");
             }
 
             return _appConfig;
