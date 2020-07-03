@@ -47,15 +47,15 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             if (_appConfig["WEBSITE_RUN_FROM_PACKAGE"] == "1")
             {
-                var localAppData = _appConfig["LOCALAPPDATA"];
-                if (string.IsNullOrWhiteSpace(localAppData))
+                var appData = _appConfig["APPDATA"];
+                if (string.IsNullOrWhiteSpace(appData))
                 {
-                    Directory.SetCurrentDirectory(localAppData);
-                    Console.WriteLine($"Set CurrentDirectory to [LOCALAPPDATA]:{localAppData} when [WEBSITE_RUN_FROM_PACKAGE]=1");
+                    Directory.SetCurrentDirectory(appData);
+                    Console.WriteLine($"Set CurrentDirectory to [APPDATA]:{appData} when [WEBSITE_RUN_FROM_PACKAGE]=1");
                 }
                 else
                 {
-                    Console.WriteLine($"Cannot set CurrentDirectory to empty [LOCALAPPDATA] is empty when [WEBSITE_RUN_FROM_PACKAGE]=1");
+                    Console.WriteLine($"Cannot set CurrentDirectory to empty [APPDATA] is empty when [WEBSITE_RUN_FROM_PACKAGE]=1");
                 }
             }
 
