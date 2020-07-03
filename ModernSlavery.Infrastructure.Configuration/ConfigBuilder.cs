@@ -48,7 +48,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             if (_appConfig["WEBSITE_RUN_FROM_PACKAGE"] == "1")
             {
                 var appData = _appConfig["APPDATA"];
-                if (string.IsNullOrWhiteSpace(appData))
+                if (!string.IsNullOrWhiteSpace(appData))
                 {
                     Directory.SetCurrentDirectory(appData);
                     Console.WriteLine($"Set CurrentDirectory to [APPDATA]:{appData} when [WEBSITE_RUN_FROM_PACKAGE]=1");
