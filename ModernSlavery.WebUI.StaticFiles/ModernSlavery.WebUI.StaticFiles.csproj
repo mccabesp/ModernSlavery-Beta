@@ -5,16 +5,11 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 
     <!--
-    When in Development mode StaticWebAssetBasePath is objtained from "**\obj\**\staticwebassets\ModernSlavery.Hosts.Web.StaticWebAssets.xml" 
+    When in Development mode StaticWebAssetBasePath is obtained from "**\obj\**\staticwebassets\ModernSlavery.Hosts.Web.StaticWebAssets.xml" 
     In production this will normally default to '_content/ModernSlavery.WebUI.assets/' under wwwroot . This ensures files are looked for in the wwwRoot\
     -->
     <StaticWebAssetBasePath Condition="$(StaticWebAssetBasePath) == ''">/</StaticWebAssetBasePath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Remove="compilerconfig.json" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -33,10 +28,6 @@
 
   <ItemGroup>
     <Content Update="wwwroot\**\*.*">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Update="bundleconfig.json"><!-- Used to find unbundled css and js files -->
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
