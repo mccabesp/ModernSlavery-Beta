@@ -42,6 +42,20 @@ namespace ModernSlavery.Infrastructure.Configuration
             if (_commandlineArgs!=null && _commandlineArgs.Any())appBuilder.AddCommandLine(_commandlineArgs);
             _appConfig = appBuilder.Build();
 
+            if (_appConfig["WEBSITE_RUN_FROM_PACKAGE"] == "1")
+            {
+                var localAppData = _appConfig["LOCALAPPDATA"];
+                if (string.IsNullOrWhiteSpace(localAppData))
+                {
+                    Directory.SetCurrentDirectory(localAppData);
+                    Console.WriteLine($"Set CurrentDirectory to [LOCALAPPDATA]:{localAppData} when [WEBSITE_RUN_FROM_PACKAGE]=1");
+                }
+                else
+                {
+                    Console.WriteLine($"Cannot set CurrentDirectory to empty [LOCALAPPDATA] is empty when [WEBSITE_RUN_FROM_PACKAGE]=1");
+                }
+            }
+
             //Make sure we know the environment
             var environmentName = GetEnvironmentName();
                 if (string.IsNullOrWhiteSpace(environmentName)) throw new ArgumentNullException(nameof(environmentName));

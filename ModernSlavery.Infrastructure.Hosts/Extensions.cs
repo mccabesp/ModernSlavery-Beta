@@ -40,7 +40,11 @@ namespace ModernSlavery.Infrastructure.Hosts
             //Load the configuration
             var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
             var appConfig = configBuilder.Build();
-            
+
+            //Set the virtual date and time
+            if (!appConfig.IsProduction() && !string.IsNullOrWhiteSpace(appConfig["DateTimeOffset"]))
+                VirtualDateTime.Initialise(appConfig["DateTimeOffset"]);
+
             //Setup the threads to use the current culture from config or en-GB by default
             appConfig.SetupThreadCulture();
 

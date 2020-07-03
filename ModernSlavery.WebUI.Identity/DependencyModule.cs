@@ -60,13 +60,13 @@ namespace ModernSlavery.WebUI.Identity
 
             //identityServer.Services.AddScoped<IUserRepository, UserRepository>();
             
-            if (string.IsNullOrWhiteSpace(_sharedOptions.Website_Load_Certificates))
+            if (string.IsNullOrWhiteSpace(_sharedOptions.CertThumprint))
             {
                 identityServer.AddDeveloperSigningCredential();
-                if (_sharedOptions.IsProduction()) _logger.LogWarning("No certificate thumbprint found. Developer certificate used Production environment. Please add certificate thumbprint to setting 'WEBSITE_LOAD_CERTIFICATES'");
+                if (_sharedOptions.IsProduction()) _logger.LogWarning("No certificate thumbprint found. Developer certificate used Production environment. Please add certificate thumbprint to setting 'CertThumprint'");
             }
             else
-                identityServer.AddSigningCredential(LoadCertificate(_sharedOptions.Website_Load_Certificates, _sharedOptions.CertExpiresWarningDays));
+                identityServer.AddSigningCredential(LoadCertificate(_sharedOptions.CertThumprint, _sharedOptions.CertExpiresWarningDays));
 
             #endregion
         }
