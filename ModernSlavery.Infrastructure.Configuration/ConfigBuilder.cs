@@ -42,16 +42,13 @@ namespace ModernSlavery.Infrastructure.Configuration
             if (_commandlineArgs!=null && _commandlineArgs.Any())appBuilder.AddCommandLine(_commandlineArgs);
             _appConfig = appBuilder.Build();
 
-            Console.WriteLine($"[WEBSITE_RUN_FROM_PACKAGE]='{_appConfig["WEBSITE_RUN_FROM_PACKAGE"]}'");
-            Console.WriteLine($"Environment([WEBSITE_RUN_FROM_PACKAGE])='{Environment.GetEnvironmentVariable("WEBSITE_RUN_FROM_PACKAGE")}'");
-
             if (_appConfig["WEBSITE_RUN_FROM_PACKAGE"] == "1")
             {
                 var appData = _appConfig["APPDATA"];
                 if (!string.IsNullOrWhiteSpace(appData))
                 {
                     Directory.SetCurrentDirectory(appData);
-                    Console.WriteLine($"Set CurrentDirectory to [APPDATA]:{appData} when [WEBSITE_RUN_FROM_PACKAGE]=1");
+                    Console.WriteLine($"CurrentDirectory set to [APPDATA]:{appData} when [WEBSITE_RUN_FROM_PACKAGE]=1");
                 }
                 else
                 {
