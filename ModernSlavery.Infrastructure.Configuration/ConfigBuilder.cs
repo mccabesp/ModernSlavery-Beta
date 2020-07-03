@@ -42,6 +42,9 @@ namespace ModernSlavery.Infrastructure.Configuration
             if (_commandlineArgs!=null && _commandlineArgs.Any())appBuilder.AddCommandLine(_commandlineArgs);
             _appConfig = appBuilder.Build();
 
+            Console.WriteLine($"[WEBSITE_RUN_FROM_PACKAGE]='{_appConfig["WEBSITE_RUN_FROM_PACKAGE"]}'");
+            Console.WriteLine($"Environment([WEBSITE_RUN_FROM_PACKAGE])='{Environment.GetEnvironmentVariable("WEBSITE_RUN_FROM_PACKAGE")}'");
+
             if (_appConfig["WEBSITE_RUN_FROM_PACKAGE"] == "1")
             {
                 var localAppData = _appConfig["LOCALAPPDATA"];
