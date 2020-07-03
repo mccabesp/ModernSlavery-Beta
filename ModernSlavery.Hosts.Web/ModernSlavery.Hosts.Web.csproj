@@ -9,6 +9,8 @@
     <LangVersion>8.0</LangVersion>
     <!-- This is required otherwise refs folder (only needed during runtime compilation) is published -->
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <!-- Removes all the satellite language folders from theoutput directory-->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
