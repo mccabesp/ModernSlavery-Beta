@@ -4,6 +4,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -41,17 +42,24 @@ namespace ModernSlavery.Hosts.Web.Tests
             Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
         }
 
+        private bool TestRunFailed=false;
+
         [SetUp]
-        public void SetupTest()
+        public void SetUp()
         {
-            this.SetupTest(TestContext.CurrentContext.Test.Name);
+            if (TestRunFailed) 
+                Assert.Inconclusive("Previous test failed");
+            else
+                SetupTest(TestContext.CurrentContext.Test.Name);
         }
 
         [TearDown]
-        public void TearDownTest()
+        public void TearDown()
         {
-            this.TeardownTest();
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
+            TeardownTest();
         }
+
         [Test]
         public void WebTestHost_Authority_IsValidUrl()
         {
