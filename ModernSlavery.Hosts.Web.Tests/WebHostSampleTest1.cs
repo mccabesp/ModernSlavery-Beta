@@ -89,7 +89,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task WebTestHost_HttpGet_ReturnsValidResponse()
         {
             //Check we get a response from the test web server
-            var response =await WebRequestAsync(HttpMethods.Get,_webAuthority);
+            var response =await WebRequestAsync(HttpMethods.Get,_webAuthority, validateCertificate:false);
             Assert.That(!string.IsNullOrWhiteSpace(response));
         }
 
