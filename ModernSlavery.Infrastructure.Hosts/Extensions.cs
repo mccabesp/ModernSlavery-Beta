@@ -126,6 +126,7 @@ namespace ModernSlavery.Infrastructure.Hosts
         {
             foreach (var address in features.GetHostAddresses())
             {
+                Console.WriteLine("Listening on: " + address);
                 logger.LogInformation("Listening on: " + address);
             }
         }
