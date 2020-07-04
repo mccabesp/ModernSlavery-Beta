@@ -7,6 +7,9 @@
 **/wwwroot/assets/scripts/*.min.js
 **/wwwroot/assets/styles/*.css
 
+tempkey.rsa
+**/*.Settings.json
+
 # User-specific files
 *.jfm
 *.suo
