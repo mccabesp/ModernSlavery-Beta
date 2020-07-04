@@ -6,6 +6,8 @@
     <PublishChromeDriver>true</PublishChromeDriver>
     <PublishIEDriver>true</PublishIEDriver>
     <PublishGeckoDriver>true</PublishGeckoDriver>
+    <!-- Removes all the satellite language folders from theoutput directory-->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +22,9 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
     <PackageReference Include="Pangolin.Standard" Version="1.0.0-alpha" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="83.0.4103.3900" />
+    <PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.26.0.1" />
+    <PackageReference Include="Selenium.WebDriver.IEDriver" Version="3.150.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,18 +41,6 @@
     <Content Include="appsettings.Test.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="C:\Users\mccab\.nuget\packages\pangolin.standard\1.0.0-alpha\contentFiles\any\netstandard2.0\chromedriver.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="C:\Users\mccab\.nuget\packages\pangolin.standard\1.0.0-alpha\contentFiles\any\netstandard2.0\geckodriver.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="C:\Users\mccab\.nuget\packages\pangolin.standard\1.0.0-alpha\contentFiles\any\netstandard2.0\IEDriverServer.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 </Project>
