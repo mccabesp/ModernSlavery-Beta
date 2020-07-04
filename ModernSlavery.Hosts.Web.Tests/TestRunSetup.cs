@@ -7,6 +7,7 @@ using Geeks.Pangolin.Service.DriverService;
 using Geeks.Pangolin;
 using ModernSlavery.Infrastructure.Hosts;
 using NUnit.Framework.Interfaces;
+using System.Net;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -23,6 +24,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task RunBeforeAnyTestsAsync()
         {
+            //Allow self-signed https certificates
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+
             //Create the test host usign the default dependency module and override with a test module
             TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>();
 
