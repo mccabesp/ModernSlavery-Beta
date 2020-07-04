@@ -13,6 +13,7 @@ using ModernSlavery.WebUI.Shared.Classes;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
+    [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
     public class AdminOrganisationSectorController : Controller

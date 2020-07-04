@@ -6,6 +6,7 @@ using ModernSlavery.WebUI.Admin.Models;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
+    [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
     public class AdminSearchController : Controller

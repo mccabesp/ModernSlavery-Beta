@@ -39,6 +39,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
     ///     The interaction service provides a way for the UI to communicate with identityserver for validation and context
     ///     retrieval
     /// </summary>
+    [Area("Identity")]
     [Route("Identity")]
     public class IdentityController : BaseController
     {

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Options;
 
@@ -40,7 +41,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> SubmissionCompletePost(string command)
         {
             var doneUrl = Url.Action("Done");
-            if (string.IsNullOrWhiteSpace(doneUrl)) doneUrl = Url.Action("Index", "Viewing");
+            if (string.IsNullOrWhiteSpace(doneUrl)) doneUrl = Url.ActionArea("Index", "Viewing", "Viewing");
 
             return await LogoutUser(doneUrl);
         }

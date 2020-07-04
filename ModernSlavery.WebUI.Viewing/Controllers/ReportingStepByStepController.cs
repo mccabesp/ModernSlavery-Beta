@@ -3,6 +3,7 @@ using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Viewing.Controllers
 {
+    [Area("Viewing")]
     public class ReportingStepByStepController : Controller
     {
         [HttpGet("reporting-step-by-step")]

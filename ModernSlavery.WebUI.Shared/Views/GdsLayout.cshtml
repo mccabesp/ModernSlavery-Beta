@@ -66,17 +66,17 @@
             new HeaderNavigationViewModel
             {
                 Text = "Search",
-                Href = Url.Action("SearchResults", "Viewing")
+                Href = Url.ActionArea("SearchResults", "Viewing", "Viewing")
             },
             new HeaderNavigationViewModel
             {
                 Text = "Guidance",
-                Href = Url.Action("StepByStepStandalone", "ReportingStepByStep")
+                Href = Url.ActionArea("StepByStepStandalone", "ReportingStepByStep", "Viewing")
             },
             new HeaderNavigationViewModel
             {
                 Text = "Submit",
-                Href = Url.Action("ManageOrganisations", "Submission")
+                Href = Url.ActionArea("ManageOrganisations", "Submission", "Submission")
             }
         };
         }
@@ -87,17 +87,17 @@
             new HeaderNavigationViewModel
             {
                 Text = "Search and compare",
-                Href = Url.Action("SearchResults", "Viewing")
+                Href = Url.ActionArea("SearchResults", "Viewing", "Viewing")
             },
             new HeaderNavigationViewModel
             {
                 Text = "Download",
-                Href = Url.Action("Download", "Viewing")
+                Href = Url.ActionArea("Download", "Viewing", "Viewing")
             },
             new HeaderNavigationViewModel
             {
                 Text = "Close the gap",
-                Href = Url.Action("Overview", "ActionsHub")
+                Href = Url.ActionArea("Overview", "ActionsHub", "Viewing")
             }
         };
         }
@@ -108,7 +108,7 @@
             headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
                 Text = "Admin",
-                Href = Url.Action("Home", "Admin")
+                Href = Url.ActionArea("Home", "Admin","Admin")
             });
         }
 
@@ -117,7 +117,7 @@
             headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
                 Text = "Sign out",
-                Href = Url.Action("SignOut", "Account"),
+                Href = Url.ActionArea("SignOut", "Account", "Account"),
                 Classes = "sign-out-link"
             });
         }
@@ -126,7 +126,7 @@
             headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
                 Text = "Sign in",
-                Href = Url.Action("ManageOrganisations", "Submission"),
+                Href = Url.ActionArea("ManageOrganisations", "Submission", "Submission"),
                 Classes = "sign-out-link"
             });
         }

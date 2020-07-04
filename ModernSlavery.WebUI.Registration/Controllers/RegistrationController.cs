@@ -10,12 +10,14 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Registration.Presenters;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Registration.Controllers
 {
+    [Area("Registration")]
     [Route("Register")]
     public partial class RegistrationController : BaseController
     {
@@ -70,7 +72,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             await TrackPageViewAsync();
 
-            return RedirectToActionPermanent("AboutYou","Account");
+            return RedirectToActionAreaPermanent("AboutYou","Account", "Account");
         }
 
         #endregion
@@ -118,7 +120,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     else
                     {
                         // Try and send the PIN in post
-                        var returnUrl = Url.Action("ManageOrganisations", "Submission", null, "https");
+                        var returnUrl = Url.ActionArea("ManageOrganisations", "Submission", "Submission", null, "https");
                         if (_registrationService.PinInThePostService.SendPinInThePost(userOrg, pin, returnUrl,
                             out var letterId))
                         {

@@ -13,7 +13,7 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
-    [Route("~/")]
+    [Area("Admin")]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class DownloadableFileController : BaseController
     {

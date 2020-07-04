@@ -45,7 +45,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
 
             var doneUrl = Url.Action("Done");
-            if (string.IsNullOrWhiteSpace(doneUrl))doneUrl= Url.Action("Index", "Viewing");
+            if (string.IsNullOrWhiteSpace(doneUrl))doneUrl= Url.ActionArea("Index", "Viewing", "Viewing");
 
             return Redirect(doneUrl);
         }

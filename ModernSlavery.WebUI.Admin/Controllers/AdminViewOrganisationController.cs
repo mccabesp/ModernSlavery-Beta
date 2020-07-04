@@ -6,6 +6,7 @@ using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
+    [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
     public class AdminViewOrganisationController : Controller

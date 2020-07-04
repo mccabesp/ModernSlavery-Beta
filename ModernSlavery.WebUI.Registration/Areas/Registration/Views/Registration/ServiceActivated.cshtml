@@ -1,0 +1,29 @@
+﻿@inject IWebService WebService
+@{
+    Layout = "~/Views/DfeTemplate.cshtml";
+    ViewBag.Title = "Service activated - Modern Slavery reporting service";
+}
+<div class="grid-row">
+    <div class="column-two-thirds">
+        <div class="govuk-box-highlight">
+            <h1 class="bold-large">You can now publish a Modern Slavery statement on behalf of this organisation.</h1>
+        </div>
+        <div class="subsection">
+            <dl class="govuk-check-your-answers cya-questions-short">
+                <div>
+                    <dt class="cya-question">
+                        Employer name
+                    </dt>
+                    <dd class="cya-answer">
+                        @ViewBag.OrganisationName
+                    </dd>
+                </div>
+            </dl>
+        </div>
+        <p>You can also specify whether this employer is in scope of the reporting regulations.</p>
+        <br/>
+        <p>
+            <a class="button" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Continue</a>
+        </p>
+    </div>
+</div>

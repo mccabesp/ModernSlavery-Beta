@@ -94,7 +94,7 @@ namespace ModernSlavery.Hosts.Web
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Development" for Development dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
             // However this doesnt work on razor class/component libraries so we instead use this workaround 
-            //if (Debugger.IsAttached && _sharedOptions.IsDevelopment()) mvcBuilder.AddApplicationPartsRuntimeCompilation();
+            if (Debugger.IsAttached && _sharedOptions.IsDevelopment()) mvcBuilder.AddApplicationPartsRuntimeCompilation();
 
             //Log all the application parts when in development
             if (_sharedOptions.IsDevelopment())

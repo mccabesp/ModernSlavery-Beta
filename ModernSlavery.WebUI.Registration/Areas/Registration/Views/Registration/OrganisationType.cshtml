@@ -1,0 +1,69 @@
+﻿@inject IWebService WebService
+@model OrganisationViewModel
+@{
+    Layout = "~/Views/DfeTemplate.cshtml";
+    ViewBag.Title = "Your organisation type - Modern Slavery reporting service";
+}
+
+<a id="BackLink" class="link-back" href="@Model.BackAction">Back <span class="visuallyhidden"> to the previous question</span></a>
+<div id="grid-row">
+    <div class="column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+
+            @Html.HiddenFor(m => m.SearchText)
+
+            @await Html.CustomValidationSummaryAsync()
+
+            <h1 class="heading-large">
+                Registration options
+            </h1>
+
+            <p>
+                If you have received a letter please select Fast track option
+            </p>
+
+            <div id="SectorTypeGroup" class="form-group @Html.SetErrorClass(model => model.RegistrationType, "error")">
+                <fieldset>
+                    <legend>
+                        <h1 class="heading-medium" style="margin-top: 15px">
+                            Select which type of organisation you would like to register
+                        </h1>
+                        @Html.ValidationMessageFor(model => model.RegistrationType, null, new { @class = "error-danger" })
+                    </legend>
+
+                    <div class="multiple-choice">
+                        <input id="fasttrack" type="radio" name="RegistrationType" value="fasttrack">
+                        <label for="fasttrack">
+                            Fast track
+                        </label>
+                    </div>
+                    <div class="multiple-choice">
+                        <input id="private" type="radio" name="RegistrationType" value="private">
+                        <label for="private">
+                            Private limited company,<br />
+                            Limited liability partnership,<br />
+                            Charity,<br />
+                            Public limited company
+                        </label>
+                    </div>
+                    <div class="multiple-choice">
+                        <input id="public" type="radio" name="RegistrationType" value="public">
+                        <label for="public">
+                            Public sector organisation
+                        </label>
+                    </div>
+                </fieldset>
+            </div>
+            <br />
+
+            <input type="submit" class="button" value="Continue" />
+
+            <div>
+                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" style="display: inline-block; margin-top: 1em;">Cancel</a>
+            </div>
+        }
+    </div>
+</div>

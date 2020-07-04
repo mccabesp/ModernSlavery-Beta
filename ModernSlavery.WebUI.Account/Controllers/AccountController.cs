@@ -16,6 +16,7 @@ using ModernSlavery.WebUI.Shared.Resources;
 
 namespace ModernSlavery.WebUI.Account.Controllers
 {
+    [Area("Account")]
     [Route("manage-account")]
     public class AccountController : BaseController
     {

@@ -13,6 +13,7 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Account.Controllers
 {
+    [Area("Account")]
     [Route("manage-account")]
     public class ChangeEmailController : BaseController
     {

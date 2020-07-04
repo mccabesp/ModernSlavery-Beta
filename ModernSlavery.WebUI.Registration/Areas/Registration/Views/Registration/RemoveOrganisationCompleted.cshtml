@@ -1,0 +1,39 @@
+﻿@inject IWebService WebService
+@model RemoveOrganisationModel
+@{
+    Layout = "~/Views/DfeTemplate.cshtml";
+    ViewBag.Title = "Remove organisation reason - Modern Slavery reporting service";
+    var controller = ViewData["Controller"] as BaseController;
+    var userId = Encryption.DecryptQuerystring(Model.EncUserId).ToInt64();
+}
+<div class="grid-row">
+    <div class="column-two-thirds">
+        <div class="govuk-box-highlight">
+            <h1 class="heading-xlarge">
+                Removal Complete
+            </h1>
+        </div>
+
+        @if (controller.CurrentUser.UserId == userId && controller.IsImpersonatingUser == false)
+        {
+            <p>
+                You have successfully removed yourself from reporting Modern Slavery statement for @Model.OrganisationName. You will receive an email notification shortly.
+            </p>
+        }
+        else
+        {
+            <p>
+                You have successfully removed @Model.UserName from reporting Modern Slavery statement for @Model.OrganisationName. They will receive an email notification shortly.
+            </p>
+        }
+
+        <div class="form-group">
+            <div class="bold-small">
+                More options
+            </div>
+            <p>
+                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission")">Manage Organisations</a>
+            </p>
+        </div>
+    </div>
+</div>

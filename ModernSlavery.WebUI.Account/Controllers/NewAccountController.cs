@@ -16,6 +16,7 @@ using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Account.Controllers
 {
+    [Area("Account")]
     [Route("sign-up")]
     public class NewAccountController : BaseController
     {
@@ -225,7 +226,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             //If its an administrator go to admin home
             if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
-                return RedirectToAction("Home","Admin");
+                return RedirectToActionArea("Home","Admin","Admin");
 
             return View("EmailConfirmed");
         }
@@ -276,7 +277,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             if (VirtualUser != null && !VirtualUser.EmailVerifiedDate.EqualsI(null, DateTime.MinValue))
             {
                 if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
-                    return RedirectToAction("Home", "Admin");
+                    return RedirectToActionArea("Home", "Admin","Admin");
 
                 return RedirectToAction("EmailConfirmed");
             }

@@ -8,6 +8,7 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Viewing.Controllers
 {
+    [Area("Viewing")]
     [Route("actions-to-close-the-gap")]
     public partial class ActionHubController : BaseController
     {
@@ -40,13 +41,13 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         {
             //This is required so the tagHelper looks up based on this action name not the actual OverviewAction
             RouteData.Values.Add("SitemapAction", "Overview2");
-            return View("/Views/ActionHub2/Overview.cshtml");
+            return View("Overview");
         }
 
         [HttpGet("leadership-and-accountability")]
         public IActionResult Leadership()
         {
-            if (UseNewActionHub()) return View("/Views/ActionHub2/Leadership.cshtml");
+            if (UseNewActionHub()) return View("Leadership");
 
             return new HttpNotFoundResult();
         }
@@ -54,7 +55,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("hiring-and-selection")]
         public IActionResult Hiring()
         {
-            if (UseNewActionHub()) return View("/Views/ActionHub2/Hiring.cshtml");
+            if (UseNewActionHub()) return View("Hiring");
 
             return new HttpNotFoundResult();
         }
@@ -62,7 +63,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("talent-management-learning-and-development")]
         public IActionResult Talent()
         {
-            if (UseNewActionHub()) return View("/Views/ActionHub2/Talent.cshtml");
+            if (UseNewActionHub()) return View("Talent");
 
             return new HttpNotFoundResult();
         }
@@ -70,7 +71,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("workplace-flexibility")]
         public IActionResult Workplace()
         {
-            if (UseNewActionHub()) return View("/Views/ActionHub2/Workplace.cshtml");
+            if (UseNewActionHub()) return View("Workplace");
 
             return new HttpNotFoundResult();
         }
@@ -78,7 +79,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("further-reading")]
         public IActionResult Reading()
         {
-            if (UseNewActionHub()) return View("/Views/ActionHub2/Reading.cshtml");
+            if (UseNewActionHub()) return View("Reading");
 
             return new HttpNotFoundResult();
         }

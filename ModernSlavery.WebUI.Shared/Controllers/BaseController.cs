@@ -144,7 +144,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 ImpersonatedUserId = 0;
                 OriginalUser = null;
-                return RedirectToAction("ManageOrganisations", "Submission");
+                return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
             }
 
             //otherwise actually logout
@@ -310,6 +310,18 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 result.RouteValues = new RouteValueDictionary {{areaAttr.RouteKey, areaAttr.RouteValue}};
 
             return result;
+        }
+
+        [NonAction]
+        public IActionResult RedirectToActionArea(string actionName, string controllerName, string areaName, object routeValues=null, string fragment=null)
+        {
+            return Redirect(Url.ActionArea(actionName, controllerName, areaName, routeValues, fragment: fragment));
+        }
+
+        [NonAction]
+        public IActionResult RedirectToActionAreaPermanent(string actionName, string controllerName, string areaName, object routeValues = null, string fragment = null)
+        {
+            return RedirectPermanent(Url.ActionArea(actionName, controllerName, areaName, routeValues, fragment: fragment));
         }
 
         #endregion
@@ -502,7 +514,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     "Registration/ReviewDUNSNumber"))
                     return null;
 
-                return RedirectToAction("Home","Admin");
+                return RedirectToActionArea("Home", "Admin", "Admin");
                 //return View("CustomError", WebService.ErrorViewModelFactory.Create(1117));
             }
 
@@ -566,7 +578,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 Logger.LogWarning(
                     $"Cannot find UserOrganisation for user {VirtualUser.UserId} and organisation {ReportingOrganisationId}");
 
-                return RedirectToAction("ManageOrganisations", "Submission");
+                return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
             }
 
             if (userOrg.Organisation.SectorType == SectorTypes.Private)
@@ -577,7 +589,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     {
                         if (IsAnyAction("Registration/PINSent", "Registration/RequestPIN")) return null;
 
-                        return RedirectToAction("PINSent","Registration");
+                        return RedirectToActionArea("PINSent","Registration", "Registration");
                     }
 
                     //If PIN sent and expired then prompt to request a new pin
@@ -604,7 +616,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
                     if (IsAnyAction("Registration/ActivateService")) return null;
 
-                    return RedirectToAction("ActivateService","Registration");
+                    return RedirectToActionArea("ActivateService", "Registration", "Registration");
                 }
 
             //Ensure user has completed the registration process
@@ -624,7 +636,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 Logger.LogWarning(
                     $"UserOrganisation for user {userOrg.UserId} and organisation {userOrg.OrganisationId} PIN is not confirmed");
-                return RedirectToAction("ManageOrganisations", "Submission");
+                return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
             }
 
             return null;

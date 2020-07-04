@@ -218,7 +218,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
             }
 
-            return RedirectToAction("ManageOrganisations", "Submission");
+            return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
         }
 
         #endregion
@@ -286,7 +286,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             CookieHelper.SetCookieSettingsCookie(Response, cookieSettings);
             CookieHelper.SetSeenCookieMessageCookie(Response);
 
-            return RedirectToAction("Index", "Viewing");
+            return RedirectToActionArea("Index", "Viewing", "Viewing");
         }
 
         [HttpGet("~/cookie-details")]
