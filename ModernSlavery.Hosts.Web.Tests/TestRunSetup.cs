@@ -28,7 +28,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Start the test host
             await TestWebHost.StartAsync().ConfigureAwait(false);
 
-            WebDriverService = UITest.SetupWebDriverService(baseUrl: TestWebHost.GetHostAddress());
+            var baseUrl = TestWebHost.GetHostAddress();
+            TestContext.WriteLine($"Test Host started on endpoint: {baseUrl}");
+            WebDriverService = UITest.SetupWebDriverService(baseUrl: baseUrl);
         }
 
         [OneTimeTearDown]
