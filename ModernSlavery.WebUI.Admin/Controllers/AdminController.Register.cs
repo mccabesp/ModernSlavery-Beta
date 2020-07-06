@@ -569,7 +569,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (!SharedBusinessLogic.SharedOptions.IsProduction()) emailAddress = CurrentUser.EmailAddress;
 
             //Send an acceptance link to the email address
-            var returnUrl = Url.Action("ManageOrganisations", "Submission", null, "https");
+            var returnUrl = Url.ActionArea("ManageOrganisations", "Submission", "Submission", null, "https");
             return await _adminService.SharedBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(returnUrl,
                 emailAddress, test);
         }

@@ -246,7 +246,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 && !VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
                 await _SubmissionService.SharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
                     "GPG Data Submission Notification",
-                    $"GPG data was submitted for first time in {postedReturn.AccountingDate.Year} by '{postedReturn.Organisation.OrganisationName}' on {postedReturn.StatusDate.ToShortDateString()}\n\n See {Url.Action("Report", "Viewing",new {employerIdentifier = postedReturnViewModel.EncryptedOrganisationId, year = postedReturn.AccountingDate.Year})}",
+                    $"GPG data was submitted for first time in {postedReturn.AccountingDate.Year} by '{postedReturn.Organisation.OrganisationName}' on {postedReturn.StatusDate.ToShortDateString()}\n\n See {Url.ActionArea("Report", "Viewing", "Viewing", new {employerIdentifier = postedReturnViewModel.EncryptedOrganisationId, year = postedReturn.AccountingDate.Year})}",
                     VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
 
             _SubmissionService.SharedBusinessLogic.NotificationService.SendSuccessfulSubmissionEmailToRegisteredUsers(

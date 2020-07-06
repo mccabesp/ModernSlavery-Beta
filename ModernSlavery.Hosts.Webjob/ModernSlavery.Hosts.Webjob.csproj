@@ -10,6 +10,8 @@
     <AutoGenerateBindingRedirects Condition="'$(AutoGenerateBindingRedirects)' == ''">true</AutoGenerateBindingRedirects>
     <Copyright>Crown Copyright © $([System.DateTime]::UtcNow.Year) ($([System.DateTime]::UtcNow.ToLocalTime()))</Copyright>
     <ProjectGuid>1DF71C5E-2C26-43ED-80EA-79317303909F</ProjectGuid>
+    <!-- Removes all the satellite language folders from theoutput directory-->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
 

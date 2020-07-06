@@ -10,12 +10,14 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
+    [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
     public class AdminUserResendVerificationEmailController : BaseController
@@ -82,7 +84,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             user.EmailVerifySendDate = VirtualDateTime.Now;
             SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
-            var verifyUrl = Url.Action("VerifyEmail", "Account",new {vcode = verifyCode},"https");
+            var verifyUrl = Url.ActionArea("VerifyEmail", "Account","Account",new {vcode = verifyCode},"https");
 
             if (!_adminService.SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, user.EmailAddress).Result)
             {

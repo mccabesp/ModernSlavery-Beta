@@ -23,10 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TagHelpers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
   </ItemGroup>
 

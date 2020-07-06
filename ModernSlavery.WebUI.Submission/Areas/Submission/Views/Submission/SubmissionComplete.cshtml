@@ -1,0 +1,26 @@
+﻿@{
+    Layout = "~/Views/DfeTemplate.cshtml";
+}
+@inject IWebService WebService
+@model ModernSlavery.BusinessDomain.Shared.Models.ReturnViewModel
+<div class="grid-row">
+    <div class="column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => Model.AccountingDate)
+
+            @await Html.CustomValidationSummaryAsync()
+            <div class="govuk-box-highlight">
+                <h1 class="bold-large">You've submitted your Modern Slavery statement for @(Model.AccountingDate.Year) to @(Model.AccountingDate.AddYears(1).Year)</h1>
+            </div>
+            <p>
+                <a href="@Url.ActionArea("Employer", "Viewing", "Viewing", new {employerIdentifier = Model.EncryptedOrganisationId})" target="_blank">See your Modern Slavery statement</a>
+            </p>
+            <p>
+                <a href="@Url.Action(nameof(SubmissionController.ManageOrganisations))">Manage organisations</a>
+            </p>
+            <button id="NextStep" type="submit" class="button" name="command">Finish and sign out</button>
+        }
+    </div>
+</div>

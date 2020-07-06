@@ -34,6 +34,7 @@ using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
+    [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
     public partial class AdminController : BaseController
@@ -1052,7 +1053,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             OriginalUser = currentUser;
 
             //Refresh page to ensure identity is passed in cookie
-            return RedirectToAction("ManageOrganisations", "Submission");
+            return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
         }
 
         #endregion

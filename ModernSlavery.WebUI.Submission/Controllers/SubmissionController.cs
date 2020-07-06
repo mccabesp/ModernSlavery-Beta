@@ -18,6 +18,7 @@ using ModernSlavery.WebUI.Submission.Models;
 
 namespace ModernSlavery.WebUI.Submission.Controllers
 {
+    [Area("Submission")]
     [Authorize]
     [Route("Submit")]
     public partial class SubmissionController : BaseController

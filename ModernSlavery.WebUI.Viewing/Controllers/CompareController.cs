@@ -18,6 +18,7 @@ using ModernSlavery.WebUI.Viewing.Presenters;
 
 namespace ModernSlavery.WebUI.Viewing.Controllers
 {
+    [Area("Viewing")]
     [Route("viewing")]
     public class CompareController : BaseController
     {

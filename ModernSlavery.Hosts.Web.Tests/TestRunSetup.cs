@@ -6,6 +6,8 @@ using ModernSlavery.Hosts.Web.Tests;
 using Geeks.Pangolin.Service.DriverService;
 using Geeks.Pangolin;
 using ModernSlavery.Infrastructure.Hosts;
+using NUnit.Framework.Interfaces;
+using System.Net;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -28,7 +30,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Start the test host
             await TestWebHost.StartAsync().ConfigureAwait(false);
 
-            WebDriverService = UITest.SetupWebDriverService(baseUrl: TestWebHost.GetHostAddress());
+            var baseUrl = TestWebHost.GetHostAddress();
+            TestContext.Out.WriteLine($"Test Host started on endpoint: {baseUrl}");
+            WebDriverService = UITest.SetupWebDriverService(baseUrl: baseUrl);
         }
 
         [OneTimeTearDown]

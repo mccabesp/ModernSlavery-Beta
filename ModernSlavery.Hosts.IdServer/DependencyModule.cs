@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Autofac;
-using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -18,7 +14,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
-using ModernSlavery.Hosts.IdServer.Classes;
+using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Storage;
@@ -30,23 +26,18 @@ namespace ModernSlavery.Hosts.IdServer
 {
     public class DependencyModule : IDependencyModule
     {
-        public static Action<IServiceCollection> ConfigureTestServices;
-        public static Action<ContainerBuilder> ConfigureTestContainer;
-        
         private readonly ILogger _logger;
-        private readonly IdentityServerOptions _identityServerOptions;
         private readonly SharedOptions _sharedOptions;
         private readonly StorageOptions _storageOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
         private readonly DistributedCacheOptions _distributedCacheOptions; 
         private readonly ResponseCachingOptions _responseCachingOptions;
 
-        public DependencyModule(ILogger<DependencyModule> logger, IdentityServerOptions identityServerOptions,SharedOptions sharedOptions,
+        public DependencyModule(ILogger<DependencyModule> logger, SharedOptions sharedOptions,
             StorageOptions storageOptions, DistributedCacheOptions distributedCacheOptions,
             DataProtectionOptions dataProtectionOptions, ResponseCachingOptions responseCachingOptions)
         {
             _logger = logger;
-            _identityServerOptions = identityServerOptions;
             _sharedOptions = sharedOptions;
             _storageOptions = storageOptions;
             _distributedCacheOptions = distributedCacheOptions;
@@ -56,37 +47,6 @@ namespace ModernSlavery.Hosts.IdServer
 
         public void ConfigureServices(IServiceCollection services)
         {
-            #region Configure authentication server
-
-            services.AddSingleton<IEventSink, AuditEventSink>();
-
-            var resources = new Resources(_sharedOptions);
-
-            var identityServer = services.AddIdentityServer(
-                    options =>
-                    {
-                        options.Events.RaiseSuccessEvents = true;
-                        options.Events.RaiseFailureEvents = true;
-                        options.Events.RaiseErrorEvents = true;
-                        options.UserInteraction.LoginUrl = "/sign-in";
-                        options.UserInteraction.LogoutUrl = "/sign-out";
-                        options.UserInteraction.ErrorUrl = "/identity/error";
-                    })
-                .AddInMemoryClients(_identityServerOptions.Clients)
-                .AddInMemoryIdentityResources(resources.GetIdentityResources())
-                //.AddInMemoryApiResources(Resources.GetApiResources())
-                .AddCustomUserStore();
-
-            if (string.IsNullOrWhiteSpace(_sharedOptions.Website_Load_Certificates))
-            {
-                identityServer.AddDeveloperSigningCredential();
-                if (_sharedOptions.IsProduction())_logger.LogWarning("No certificate thumbprint found. Developer certificate used Production environment. Please add certificate thumbprint to setting 'WEBSITE_LOAD_CERTIFICATES'");
-            }
-            else
-                identityServer.AddSigningCredential(LoadCertificate(_sharedOptions.Website_Load_Certificates, _sharedOptions.CertExpiresWarningDays));
-
-            #endregion
-
             //Allow caching of http responses
             services.AddResponseCaching();
 
@@ -107,7 +67,7 @@ namespace ModernSlavery.Hosts.IdServer
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Development" for Development dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
             // However this doesnt work on razor class/component libraries so we instead use this workaround 
-            if (_sharedOptions.IsDevelopment()) mvcBuilder.AddApplicationPartsRuntimeCompilation();
+            if (Debugger.IsAttached && _sharedOptions.IsDevelopment()) mvcBuilder.AddApplicationPartsRuntimeCompilation();
 
             services.AddRazorPages();
 
@@ -134,10 +94,6 @@ namespace ModernSlavery.Hosts.IdServer
 
             //This may now be required 
             services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
-
-            //Override any test services
-            ConfigureTestServices?.Invoke(services);
-
             
             //Register the AutoMapper configurations in all domain assemblies
             services.AddAutoMapper(_sharedOptions.IsDevelopment());
@@ -152,15 +108,15 @@ namespace ModernSlavery.Hosts.IdServer
             builder.Register(c => new LogRecordQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>()))
                 .SingleInstance();
 
+            //Register the user audit log repository
+            builder.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
+
             // Register log records (without key filtering)
             builder.RegisterType<UserAuditLogger>().As<IUserLogger>().SingleInstance();
 
             // Register Action helpers
             builder.RegisterType<ActionContextAccessor>().As<IActionContextAccessor>()
                 .SingleInstance();
-
-            //Override any test services
-            ConfigureTestContainer?.Invoke(builder);
         }
 
 
@@ -220,7 +176,6 @@ namespace ModernSlavery.Hosts.IdServer
         {
             modules.AddDependency<WebUI.StaticFiles.DependencyModule>();
             modules.AddDependency<ModernSlavery.BusinessDomain.Account.DependencyModule>();
-            //modules.AddDependency<ModernSlavery.Infrastructure.CompaniesHouse.DependencyModule>();
 
             //Register the file storage dependencies
             modules.AddDependency<FileStorageDependencyModule>();
@@ -236,23 +191,6 @@ namespace ModernSlavery.Hosts.IdServer
 
         }
 
-        private X509Certificate2 LoadCertificate(string certThumprint, int certExpiresWarningDays)
-        {
-            if (string.IsNullOrWhiteSpace(certThumprint)) throw new ArgumentNullException(nameof(certThumprint));
-
-            //Load the site certificate
-            var cert = HttpsCertificate.LoadCertificateFromThumbprint(certThumprint);
-
-            var expires = cert.GetExpirationDateString().ToDateTime();
-            var remainingTime = expires - VirtualDateTime.Now;
-            if (expires < VirtualDateTime.UtcNow)
-                _logger.LogError($"Certificate '{cert.FriendlyName}' from thumbprint '{certThumprint}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
-            else if (expires < VirtualDateTime.UtcNow.AddDays(certExpiresWarningDays))
-                 _logger.LogWarning($"Certificate '{cert.FriendlyName}' from thumbprint '{certThumprint}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
-            else
-                _logger.LogInformation($"Successfully loaded certificate '{cert.FriendlyName}' from thumbprint '{certThumprint}' and expires '{cert.GetExpirationDateString()}'");
-
-            return cert;
-        }
+       
     }
 }

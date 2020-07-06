@@ -17,7 +17,8 @@
       "launchBrowser": true,
       "launchUrl": "https://localhost:44366/.well-known/openid-configuration",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
       },
       "ancmHostingModel": "OutOfProcess",
       "applicationUrl": " http://localhost:5000/"
@@ -27,7 +28,8 @@
       "launchBrowser": true,
       "launchUrl": "https://localhost:44366/.well-known/openid-configuration",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
       },
       "applicationUrl": " http://localhost:5000/"
     }

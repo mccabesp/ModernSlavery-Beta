@@ -1,4 +1,5 @@
 User-agent: *
+Disallow: /.well-known/openid-configuration
 Disallow: /admin/
 Disallow: /home/
 Disallow: /register/

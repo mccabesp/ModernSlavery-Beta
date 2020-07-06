@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Extensions
@@ -48,10 +50,21 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             return helper.Action<TDestController>(action, new RouteValueDictionary(values), "https");
         }
 
+
         public static string Action<TDestController>(this IUrlHelper helper, string action)
             where TDestController : BaseController
         {
             return helper.Action<TDestController>(action, null);
+        }
+        public static string ActionArea(this IUrlHelper helper, string actionName, string controllerName, string areaName, object routeValues=null, string protocol=null, string host=null, string fragment = null)
+        {
+            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentNullException(nameof(actionName));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrWhiteSpace(areaName)) throw new ArgumentNullException(nameof(areaName));
+
+            IDictionary<string, object> routeData = routeValues?.ToDynamic() ?? new Dictionary<string, object>();
+            routeData["Area"] = areaName;
+            return helper.Action(actionName, controllerName, routeData ,protocol, host, fragment);
         }
     }
 }

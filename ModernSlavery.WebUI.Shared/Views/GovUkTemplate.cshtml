@@ -123,38 +123,38 @@
                             @if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
                             {
                                 <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action("SearchResults", "Viewing"))">Search</a>
+                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">Search</a>
                                 </li>
                                 <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action("StepByStepStandalone", "ReportingStepByStep"))">Guidance</a>
+                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("StepByStepStandalone", "ReportingStepByStep", "Viewing"))">Guidance</a>
                                 </li>
                                 <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@Url.Action("ManageOrganisations", "Submission")">Submit</a>
+                                    <a rel="track" data-track-category="Header Link Clicked" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Submit</a>
                                 </li>
                             }
                             else
                             {
                                 <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action("SearchResults", "Viewing"))">Search and compare</a>
+                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">Search and compare</a>
                                 </li>
                                 <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.Action("Download", "Viewing"))">Download</a>
+                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("Download", "Viewing", "Viewing"))">Download</a>
                                 </li>
                                 <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="/actions-to-close-the-gap">Close the gap</a>
+                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("ActionHub", "Overview", "Viewing"))">Close the gap</a>
                                 </li>
                             }
 
                             @if (User.Identity.IsAuthenticated)
                             {
                                 <li id="login-links" class="nowrap">
-                                    <a href="@Url.Action("SignOut", "Account")">Sign out</a>
+                                    <a asp-action="SignOut" asp-controller="Account" asp-area="Account">Sign out</a>
                                 </li>
                             }
                             else
                             {
                                 <li id="login-links" class="nowrap">
-                                    <a href="@Url.Action("ManageOrganisations", "Submission")">Sign in</a>
+                                    <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Sign in</a>
                                 </li>
                             }
                         </ul>
@@ -209,7 +209,7 @@
                             <a asp-page="/ContactUs">Contact Us</a>
                         </li>
                         <li>
-                            <a asp-action="Cookies" asp-controller="Shared">Cookies</a>
+                            <a asp-action="CookieSettings" asp-controller="Shared">Cookies</a>
                         </li>
                         <li>
                             <a asp-action="PrivacyPolicy" asp-controller="Shared">Privacy Policy</a>

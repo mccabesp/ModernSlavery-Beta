@@ -472,7 +472,7 @@ namespace ModernSlavery.Infrastructure.Search
 
             if (await serviceClient.Indexes.ExistsAsync(indexName)) return;
 
-            var index = new Index {Name = indexName, Fields = FieldBuilder.BuildForType<EmployerSearchModel>()};
+            var index = new Index {Name = indexName, Fields = FieldBuilder.BuildForType<AzureEmployerSearchModel>()};
 
             index.Suggesters = new List<Suggester>
             {

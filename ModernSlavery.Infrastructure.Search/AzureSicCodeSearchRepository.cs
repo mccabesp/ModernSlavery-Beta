@@ -389,7 +389,7 @@ namespace ModernSlavery.Infrastructure.Search
             var index = new Index
             {
                 Name = sicCodesIndexName,
-                Fields = FieldBuilder.BuildForType<SicCodeSearchModel>(),
+                Fields = FieldBuilder.BuildForType<AzureSicCodeSearchModel>(),
                 Suggesters = new List<Suggester>
                 {
                     new Suggester(

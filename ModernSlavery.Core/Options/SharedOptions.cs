@@ -14,8 +14,6 @@ namespace ModernSlavery.Core.Models
         {
 
         }
-        public string ContentRoot { get; set; }
-        public string WebRoot { get; set; }
         private string _DevelopmentWebroot;
         public string DevelopmentWebroot { get => _DevelopmentWebroot; set => _DevelopmentWebroot = value!=null && value.StartsWith('.') ? Path.GetFullPath(value) : value; }
 
@@ -23,13 +21,9 @@ namespace ModernSlavery.Core.Models
         public DateTime PrivateAccountingDate { get; set; }
         public DateTime PublicAccountingDate { get; set; }
 
-        private string _IdentityIssuer;
-
         private int[] _reminderEmailDays;
 
         public string DefaultEncryptionKey { get; set; }
-
-        public string IdServerSecret { get; set; } = "secret";
 
         public string AdminEmails { get; set; }
         public string SuperAdminEmails { get; set; }
@@ -44,12 +38,9 @@ namespace ModernSlavery.Core.Models
         public string TrustedIpDomains { get; set; }
 
         public bool UseDeveloperExceptions { get; set; }
-        public string StartUrl { get; set; }
-        public string DoneUrl { get; set; } = "https://www.gov.uk/";
 
         public bool EnableSubmitAlerts { get; set; } = true;
 
-        public bool EncryptEmails { get; set; } = true;
         public bool MaintenanceMode { get; set; }
         public bool StickySessions { get; set; } = true;
 
@@ -62,12 +53,6 @@ namespace ModernSlavery.Core.Models
         public string WEBSITE_HOSTNAME { get; set; }
 
         public string SiteAuthority => $"https://{WEBSITE_HOSTNAME}/";
-
-        public string IdentityIssuer
-        {
-            get => string.IsNullOrWhiteSpace(_IdentityIssuer) ? $"{SiteAuthority}/account" : _IdentityIssuer;
-            set => _IdentityIssuer = value;
-        }
 
         public int LevenshteinDistance { get; set; } = 5;
         public int LockoutMinutes { get; set; }
@@ -115,9 +100,8 @@ namespace ModernSlavery.Core.Models
         public bool SendGoogleAnalyticsDataToGovUk { get; set; }
 
         public string Website_Instance_Id { get; set; }
-        public string Website_Load_Certificates { get; set; }
-        public string CertThumprint { get; set; }
 
+        public string CertThumprint { get; set; }
 
         public bool SkipSpamProtection { get; set; }
         public int MaxNumCallsCompaniesHouseApiPerFiveMins { get; set; } = 500;
@@ -128,11 +112,9 @@ namespace ModernSlavery.Core.Models
             set => _reminderEmailDays = value.OrderBy(d => d).ToArray();
         }
 
-        public string IdentityApiScope { get; set; }
         public bool PinInPostTestMode { get; set; }
         public bool ShowEmailVerifyLink { get; set; }
         public string GoogleAnalyticsAccountId { get; set; }
-        public string DateTimeOffset { get; set; }
 
         #region Environment
 

@@ -9,7 +9,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [NonAction]
         public IActionResult Overview1()
         {
-            if (!UseNewActionHub()) return View("/Views/ActionHub1/Overview.cshtml");
+            if (!UseNewActionHub()) return View("/Areas/Viewing/Views/ActionHub/Old/Overview.cshtml");
 
             return new HttpNotFoundResult();
         }
@@ -17,7 +17,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("effective-actions")]
         public IActionResult Effective()
         {
-            if (!UseNewActionHub()) return View("/Views/ActionHub1/Effective.cshtml");
+            if (!UseNewActionHub()) return View("/Areas/Viewing/Views/ActionHub/Old/Effective.cshtml");
 
             return new HttpNotFoundResult();
         }
@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("promising-actions")]
         public IActionResult Promising()
         {
-            if (!UseNewActionHub()) return View("/Views/ActionHub1/Promising.cshtml");
+            if (!UseNewActionHub()) return View("/Areas/Viewing/Views/ActionHub/Old/Promising.cshtml");
 
             return new HttpNotFoundResult();
         }
@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("actions-with-mixed-results")]
         public IActionResult MixedResult()
         {
-            if (!UseNewActionHub()) return View("/Views/ActionHub1/MixedResult.cshtml");
+            if (!UseNewActionHub()) return View("/Areas/Viewing/Views/ActionHub/Old/MixedResult.cshtml");
 
             return new HttpNotFoundResult();
         }

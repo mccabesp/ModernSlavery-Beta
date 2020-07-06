@@ -16,10 +16,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 if (_SharedBusinessLogic.SharedOptions.CertExpiresWarningDays > 0)
                 {
                     //Get the cert thumbprint
-                    var certThumprint = _SharedBusinessLogic.SharedOptions.Website_Load_Certificates.SplitI(";")
+                    var certThumprint = _SharedBusinessLogic.SharedOptions.CertThumprint.SplitI(";")
                         .FirstOrDefault();
-                    if (string.IsNullOrWhiteSpace(certThumprint))
-                        certThumprint = _SharedBusinessLogic.SharedOptions.CertThumprint.SplitI(";").FirstOrDefault();
 
                     if (!string.IsNullOrWhiteSpace(certThumprint))
                     {

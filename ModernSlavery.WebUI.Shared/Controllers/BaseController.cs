@@ -144,7 +144,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 ImpersonatedUserId = 0;
                 OriginalUser = null;
-                return RedirectToAction("ManageOrganisations", "Submission");
+                return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
             }
 
             //otherwise actually logout
@@ -312,6 +312,18 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             return result;
         }
 
+        [NonAction]
+        public IActionResult RedirectToActionArea(string actionName, string controllerName, string areaName, object routeValues=null, string fragment=null)
+        {
+            return Redirect(Url.ActionArea(actionName, controllerName, areaName, routeValues, fragment: fragment));
+        }
+
+        [NonAction]
+        public IActionResult RedirectToActionAreaPermanent(string actionName, string controllerName, string areaName, object routeValues = null, string fragment = null)
+        {
+            return RedirectPermanent(Url.ActionArea(actionName, controllerName, areaName, routeValues, fragment: fragment));
+        }
+
         #endregion
 
         #region Properties
@@ -425,7 +437,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (!User.Identity.IsAuthenticated)
             {
                 //Allow anonymous users when starting registration
-                if (IsAnyAction("SignUp/AboutYou", "SignUp/VerifyEmail")) return null;
+                if (IsAnyAction("NewAccount/AboutYou", "NewAccount/VerifyEmail")) return null;
 
                 //Allow anonymous users when resetting password
                 if (IsAnyAction("Account/PasswordReset", "Account/NewPassword")) return null;
@@ -449,7 +461,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 //If email not sent
                 if (VirtualUser.EmailVerifySendDate.EqualsI(null, DateTime.MinValue))
                 {
-                    if (IsAnyAction("SignUp/VerifyEmail")) return null;
+                    if (IsAnyAction("NewAccount/VerifyEmail")) return null;
 
                     //Tell them to verify email
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1100));
@@ -459,7 +471,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 if (VirtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions
                     .EmailVerificationExpiryHours) < VirtualDateTime.Now)
                 {
-                    if (IsAnyAction("SignUp/VerifyEmail")) return null;
+                    if (IsAnyAction("NewAccount/VerifyEmail")) return null;
 
                     //prompt user to click to request a new one
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1101));
@@ -473,7 +485,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 if (remainingTime > TimeSpan.Zero)
                 {
                     //Process the code if there is one
-                    if (IsAnyAction("SignUp/VerifyEmail") && !string.IsNullOrWhiteSpace(Request.Query["code"]))
+                    if (IsAnyAction("NewAccount/VerifyEmail") && !string.IsNullOrWhiteSpace(Request.Query["code"]))
                         return null;
 
                     //tell them to wait
@@ -483,7 +495,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 //if the code is still valid but min sent time has elapsed
-                if (IsAnyAction("SignUp/VerifyEmail", "SignUp/EmailConfirmed")) return null;
+                if (IsAnyAction("NewAccount/VerifyEmail", "NewAccount/EmailConfirmed")) return null;
 
                 //Prompt user to request a new verification code
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1103));
@@ -493,7 +505,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
             {
                 if (IsAnyAction(
-                    "SignUp/VerifyEmail",
+                    "NewAccount/VerifyEmail",
                     "Registration/EmailConfirmed",
                     "Registration/ReviewRequest",
                     "Registration/ConfirmCancellation",
@@ -502,7 +514,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     "Registration/ReviewDUNSNumber"))
                     return null;
 
-                return RedirectToAction("Home","Admin");
+                return RedirectToActionArea("Home", "Admin", "Admin");
                 //return View("CustomError", WebService.ErrorViewModelFactory.Create(1117));
             }
 
@@ -519,7 +531,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
             //Allow all steps from email confirmed to organisation chosen
             if (IsAnyAction(
-                "SignUp/EmailConfirmed",
+                "NewAccount/EmailConfirmed",
                 "Registration/OrganisationType",
                 "Registration/OrganisationSearch",
                 "Registration/ChooseOrganisation",
@@ -566,7 +578,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 Logger.LogWarning(
                     $"Cannot find UserOrganisation for user {VirtualUser.UserId} and organisation {ReportingOrganisationId}");
 
-                return RedirectToAction("ManageOrganisations", "Submission");
+                return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
             }
 
             if (userOrg.Organisation.SectorType == SectorTypes.Private)
@@ -577,7 +589,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     {
                         if (IsAnyAction("Registration/PINSent", "Registration/RequestPIN")) return null;
 
-                        return RedirectToAction("PINSent","Registration");
+                        return RedirectToActionArea("PINSent","Registration", "Registration");
                     }
 
                     //If PIN sent and expired then prompt to request a new pin
@@ -604,7 +616,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
                     if (IsAnyAction("Registration/ActivateService")) return null;
 
-                    return RedirectToAction("ActivateService","Registration");
+                    return RedirectToActionArea("ActivateService", "Registration", "Registration");
                 }
 
             //Ensure user has completed the registration process
@@ -624,7 +636,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 Logger.LogWarning(
                     $"UserOrganisation for user {userOrg.UserId} and organisation {userOrg.OrganisationId} PIN is not confirmed");
-                return RedirectToAction("ManageOrganisations", "Submission");
+                return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
             }
 
             return null;
