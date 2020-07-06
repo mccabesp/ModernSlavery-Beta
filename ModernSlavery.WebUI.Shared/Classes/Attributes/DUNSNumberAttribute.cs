@@ -8,12 +8,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
     public class DUNSNumberAttribute : RegularExpressionAttribute
     {
         private const string pattern = @"^[0-9]{9}$";
-        private readonly SharedOptions _sharedOptions;
+        public static SharedOptions SharedOptions;
 
         public DUNSNumberAttribute() : base(pattern)
         {
-            _sharedOptions = Activator.CreateInstance<SharedOptions>();
-            ErrorMessage = _sharedOptions.CompanyNumberRegexError;
+            ErrorMessage = SharedOptions.CompanyNumberRegexError;
         }
     }
 }

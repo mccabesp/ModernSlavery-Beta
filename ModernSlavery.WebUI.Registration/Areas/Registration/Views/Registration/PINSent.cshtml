@@ -21,12 +21,7 @@
                 </div>
                 @if (!string.IsNullOrWhiteSpace(ViewBag.PinCode))
                 {
-                    <p>
-                        <b>
-                            Your test pin code is @ViewBag.PinCode
-                        </b><br/>
-                        <a href="@Url.Action("ActivateService", new {id = Model})">Click here to activate</a>
-                    </p>
+                    <p style="color:red;">Your test pin code is <b>@ViewBag.PinCode</b></p>
                 }
                 <div class="bold-small">What happens next.</div>
                 <p>Your PIN should arrive within 7 days.</p>

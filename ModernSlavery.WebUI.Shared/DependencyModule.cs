@@ -6,7 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Models;
 
@@ -15,13 +17,14 @@ namespace ModernSlavery.WebUI.Shared
     public class DependencyModule: IDependencyModule
     {
         private readonly ILogger _logger;
+        private readonly SharedOptions _sharedOptions;
         public DependencyModule(
-            ILogger<DependencyModule> logger
-        //TODO Add any required IOptions here
+            ILogger<DependencyModule> logger,
+            SharedOptions sharedOptions
         )
         {
             _logger = logger;
-            //TODO set any required local IOptions here
+            _sharedOptions = sharedOptions;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -46,7 +49,12 @@ namespace ModernSlavery.WebUI.Shared
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //TODO: Configure dependencies here
+            //Configure dependencies here
+            PasswordAttribute.SharedOptions = _sharedOptions;
+            CompanyNumberAttribute.SharedOptions = _sharedOptions;
+            DUNSNumberAttribute.SharedOptions = _sharedOptions;
+            PinAttribute.SharedOptions = _sharedOptions;
+            SpamProtectionAttribute.SharedOptions = _sharedOptions;
         }
 
         public void RegisterModules(IList<Type> modules)

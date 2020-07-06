@@ -485,7 +485,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 if (remainingTime > TimeSpan.Zero)
                 {
                     //Process the code if there is one
-                    if (IsAnyAction("NewAccount/VerifyEmail") && !string.IsNullOrWhiteSpace(Request.Query["code"]))
+                    if (IsAnyAction("NewAccount/VerifyEmail") && Request.RouteValues.ContainsKey("code") && !string.IsNullOrWhiteSpace(Request.RouteValues["code"].ToString()))
                         return null;
 
                     //tell them to wait

@@ -27,7 +27,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         Task SetUniqueEmployerReferencesAsync();
         Task SetUniqueEmployerReferenceAsync(Organisation organisation);
         string GenerateEmployerReference();
-        string GeneratePINCode(bool isTestUser);
+        string GeneratePINCode();
 
         Task<CustomResult<OrganisationScope>> SetAsScopeAsync(string employerRef,
             int changeScopeToSnapshotYear,

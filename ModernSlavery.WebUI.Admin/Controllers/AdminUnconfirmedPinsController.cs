@@ -61,8 +61,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (userOrganisation.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays) <
                 VirtualDateTime.Now)
             {
-                var newPin = _adminService.OrganisationBusinessLogic.GeneratePINCode(false);
+                var newPin = _adminService.OrganisationBusinessLogic.GeneratePINCode();
                 userOrganisation.PIN = newPin;
+                userOrganisation.PINHash = Crypto.GetSHA512Checksum(newPin);
             }
 
             userOrganisation.PINSentDate = VirtualDateTime.Now;

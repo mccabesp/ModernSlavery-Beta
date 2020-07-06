@@ -31,7 +31,7 @@ namespace ModernSlavery.Infrastructure.Telemetry
         {
             _Logger = logger;
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _httpClient = httpClient;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             googleTrackingId = trackingId;
         }
 

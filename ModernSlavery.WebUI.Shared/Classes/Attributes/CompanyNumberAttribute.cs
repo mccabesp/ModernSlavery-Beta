@@ -8,12 +8,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
     public class CompanyNumberAttribute : RegularExpressionAttribute
     {
         private const string pattern = @"^[0-9A-Za-z]{8}$";
-        private readonly SharedOptions _sharedOptions;
+        public static SharedOptions SharedOptions;
 
         public CompanyNumberAttribute() : base(pattern)
         {
-            _sharedOptions = Activator.CreateInstance<SharedOptions>();
-            ErrorMessage = _sharedOptions.CompanyNumberRegexError;
+            ErrorMessage = SharedOptions.CompanyNumberRegexError;
         }
     }
 }
