@@ -113,13 +113,13 @@
       <HintPath>..\..\packages\Nito.AsyncEx.4.0.1\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
     </Reference>
     <Reference Include="Pangolin, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pangolin.1.0.11\lib\net45\Pangolin.dll</HintPath>
+      <HintPath>..\..\packages\Pangolin.1.0.9\lib\net45\Pangolin.dll</HintPath>
     </Reference>
     <Reference Include="Pangolin.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pangolin.1.0.11\lib\net45\Pangolin.Core.dll</HintPath>
+      <HintPath>..\..\packages\Pangolin.1.0.9\lib\net45\Pangolin.Core.dll</HintPath>
     </Reference>
     <Reference Include="Pangolin.Service, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pangolin.1.0.11\lib\net45\Pangolin.Service.dll</HintPath>
+      <HintPath>..\..\packages\Pangolin.1.0.9\lib\net45\Pangolin.Service.dll</HintPath>
     </Reference>
     <Reference Include="Roslyn.Compilers, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Roslyn.Compilers.Common.1.2.20906.2\lib\net45\Roslyn.Compilers.dll</HintPath>
@@ -165,30 +165,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Search and Compare\Manage Account\Close Account User Is Set to Retired.cs" />
-    <Compile Include="Richer Sumbission\Review_And_Edit_Link_Navigation.cs" />
-    <Compile Include="Richer Sumbission\Review_And_Submit_Cannot_Submit_Report_Without_Mandatory_Sections.cs" />
-    <Compile Include="Richer Sumbission\Submission_Areas_Back_Button_Check.cs" />
-    <Compile Include="Richer Sumbission\Submission_Areas_Cancel_Unsaved_Data_Save.cs" />
-    <Compile Include="Richer Sumbission\Submission_Areas_Cancel_Unsaved_Data_Exit.cs" />
-    <Compile Include="Richer Sumbission\Submission_Complete_All_Sections.cs" />
-    <Compile Include="Richer Sumbission\Submission_Complete_Mandatory_Sections.cs" />
     <Compile Include="Richer Sumbission\Submission_Sectors_Content_Check.cs" />
-    <Compile Include="Richer Sumbission\Submission_Sectors_Interaction_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Training_Validation_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Helpers.cs" />
-    <Compile Include="Richer Sumbission\Submission_Areas_Content_Check.cs" />
-    <Compile Include="Richer Sumbission\Submission_Areas_Mandatory_Field_Check.cs" />
+    <Compile Include="Richer Sumbission\Submission_Six_Areas_Content_Check.cs" />
+    <Compile Include="Richer Sumbission\Submission_Six_Areas_Mandatory_Field_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Training_Content_Check.cs" />
-    <Compile Include="Richer Sumbission\Sumbission_Submit_Report_Mandatory_Fields_Only.cs" />
-    <Compile Include="Richer Sumbission\Supply_Chain_Part1_Mandatory_Field_Check.cs" />
-    <Compile Include="Richer Sumbission\Supply_Chain_Risks_Part1_Q1_Interaction_Check.cs" />
-    <Compile Include="Richer Sumbission\Supply_Chain_Risks_Part1_Q2_Interaction_Check.cs" />
     <Compile Include="Richer Sumbission\Your_Modern_Slavery_Statement_Content_Check.cs" />
     <Compile Include="Richer Sumbission\Your_Modern_Slavery_Statement_Date_Validation.cs" />
-    <Compile Include="Search and Compare\Contact Us\User Checks Contact Us Page Navigation Is Correct.cs" />
-    <Compile Include="Search and Compare\Contact Us\User Checks Navigation To New Tab Guidance Link.cs" />
-    <Compile Include="Search and Compare\Contact Us\User Uses Email Function Of Contact Us.cs" />
-    <Compile Include="Search and Compare\Manage Account\Close Account User Is Set to Retired.cs" />
     <Compile Include="Search and Compare\Manage Account\Close_Account_Invalid_Password.cs" />
     <Compile Include="Search and Compare\Manage Account\Close_Account_Mandatory_Fields.cs" />
     <Compile Include="Search and Compare\Manage Account\Closing Account Removes Pending Registrations.cs" />
@@ -198,10 +182,7 @@
     <Compile Include="Search and Compare\Manage Account\Manage_Account_Change_Personal_Details.cs" />
     <Compile Include="Search and Compare\Manage Account\Manage_Account_Email_Validation.cs" />
     <Compile Include="Search and Compare\Manage Account\Manage_Account_Personal_Details_Validation.cs" />
-    <Compile Include="Search and Compare\Manage Organisation\Remove Users 1 User.cs" />
-    <Compile Include="Search and Compare\Manage Organisation\Remove Users Page For Multiple Users.cs" />
     <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Director Information Mandatory.cs" />
-    <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Manage Organisation Landing Page.cs" />
     <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Modern Slavery Statement Period Covered Fields.cs" />
     <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Policies Fields And %27Other%27 Functionality Checks.cs" />
     <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Statement URL Fields Is Mandatory And Only Accepts Valid Format.cs" />
@@ -237,9 +218,7 @@
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Validation_Check.cs" />
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Success.cs" />
     <Compile Include="Search and Compare\Sign-in\Create an Account\Create_Account_Constants.cs" />
-    <Compile Include="Search and Compare\Sign-in\MVP 1 Header Content Check.cs" />
     <Compile Include="Search and Compare\Sign-in\Sign-out\Sign_Out.cs" />
-    <Compile Include="Search and Compare\Sign-in\Sign-out\Sign_Out_Impersonated_User.cs" />
     <Compile Include="Search and Compare\Sign-in\Sign-out\Sign_Out_User_Cannot_Access_Registration_Pages.cs" />
     <Compile Include="Search and Compare\Sign-in\Sign_In_Content_Check.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Spam_Protection_Different.cs" />
