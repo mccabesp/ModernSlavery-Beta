@@ -24,9 +24,6 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task RunBeforeAnyTestsAsync()
         {
-            //Allow self-signed https certificates
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-
             //Create the test host usign the default dependency module and override with a test module
             TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>();
 
