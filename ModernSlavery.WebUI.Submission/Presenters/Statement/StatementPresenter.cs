@@ -413,6 +413,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.Organisation, opt => opt.Ignore())
                 .ForMember(dest => dest.StatusDetails, opt => opt.Ignore())
                 // These need to be mapped but cause a run time error currently, so just ignore
+                .ForMember(dest => dest.IncludesGoals, opt => opt.Ignore())
                 .ForMember(dest => dest.MinTurnover, opt => opt.Ignore())
                 .ForMember(dest => dest.MaxTurnover, opt => opt.Ignore())
                 .ForMember(dest => dest.LateReason, opt => opt.Ignore())
