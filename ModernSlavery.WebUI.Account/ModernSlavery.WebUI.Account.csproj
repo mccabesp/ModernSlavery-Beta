@@ -27,10 +27,4 @@
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Areas\Account\Views\Shared\" />
-    <Folder Include="NewFolder\" />
-  </ItemGroup>
-
-
 </Project>
