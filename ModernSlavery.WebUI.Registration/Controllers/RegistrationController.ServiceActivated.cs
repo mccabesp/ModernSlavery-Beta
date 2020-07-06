@@ -86,7 +86,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             model.Remaining = remaining.ToFriendly(maxParts: 2);
 
             //If the email address is a test email then simulate sending
-            if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            if (SharedBusinessLogic.SharedOptions.PinInPostTestMode || userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
                 model.PIN = "ABCDEF";
 
             //Show the PIN textbox and button
