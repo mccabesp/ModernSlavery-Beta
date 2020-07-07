@@ -66,5 +66,12 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             routeData["Area"] = areaName;
             return helper.Action(actionName, controllerName, routeData ,protocol, host, fragment);
         }
+
+        public static bool IsAction(this IUrlHelper helper, string actionName, string controllerName=null, string areaName=null)
+        {
+            var currentUrl= helper.ActionContext.HttpContext.Request.Path.Value;
+            var testUrl = string.IsNullOrWhiteSpace(areaName) ? helper.Action(actionName, controllerName) : helper.ActionArea(actionName, controllerName, areaName);
+            return currentUrl.EqualsI(testUrl);
+        }
     }
 }

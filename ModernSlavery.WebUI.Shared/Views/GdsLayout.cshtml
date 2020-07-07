@@ -118,7 +118,7 @@
                 Classes = "sign-out-link"
             });
         }
-        else
+        else if (!Url.IsAction("Login", "Identity", "Identity"))
         {
             headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
@@ -151,36 +151,34 @@
             @RenderBody()
         </main>
     </div>
+    @{
+        var links = new List<FooterLinksViewModel>();
 
-    @(Html.GovUkFooter(new FooterViewModel
-{
-    MetaNavigation = new FooterMetaNavigationViewModel
-    {
-        Links = new[]
+        links.Add(new FooterLinksViewModel
         {
-            new FooterLinksViewModel
-            {
-                Text = "Contact Us",
-                Href = Url.Page("/ContactUs")
-            },
-            new FooterLinksViewModel
-            {
-                Text = "Cookies",
-                Href = Url.Action("CookieSettings","Shared")
-            },
-            new FooterLinksViewModel
-            {
-                Text = "Privacy Policy",
-                Href = Url.Action("PrivacyPolicy","Shared")
-            },
-            new FooterLinksViewModel
+            Text = "Contact Us",
+            Href = Url.Page("/ContactUs")
+        });
+
+        links.Add(new FooterLinksViewModel
+        {
+            Text = "Cookies",
+            Href = Url.Action("CookieSettings", "Shared")
+        });
+        links.Add(new FooterLinksViewModel
+        {
+            Text = "Privacy Policy",
+            Href = Url.Action("PrivacyPolicy", "Shared")
+        });
+        if (featureSwitchOptions.IsEnabled("ReportConcernsLink"))
+            links.Add(new FooterLinksViewModel
             {
                 Text = "Report Concerns",
-                Href = Url.Action("ReportConcerns","Shared")
-            }
-        }
+                Href = Url.Action("ReportConcerns", "Shared")
+            });
+
     }
-}))
+    @(Html.GovUkFooter(new FooterViewModel { MetaNavigation = new FooterMetaNavigationViewModel() { Links = links.ToArray() } }))
 
     <environment exclude="Development, DEV, TEST">
         <script src="/assets/scripts/app.min.js" type="text/javascript" asp-append-version="true"></script>

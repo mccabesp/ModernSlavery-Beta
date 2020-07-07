@@ -12,15 +12,15 @@ namespace ModernSlavery.WebUI.Shared.Classes
     public class CustomUrlHelper : IUrlHelper
     {
         private IUrlHelper _originalUrlHelper;
-        private readonly UrlRoutesOptions _urlRoutesOptions;
+        private readonly StaticRoutesOptions _staticRoutesOptions;
 
         public ActionContext ActionContext { get; private set; }
 
-        public CustomUrlHelper(ActionContext actionContext, IUrlHelper originalUrlHelper, UrlRoutesOptions urlRoutesOptions)
+        public CustomUrlHelper(ActionContext actionContext, IUrlHelper originalUrlHelper, StaticRoutesOptions staticRoutesOptions)
         {
             ActionContext = actionContext;
             _originalUrlHelper = originalUrlHelper;
-            _urlRoutesOptions = urlRoutesOptions;
+            _staticRoutesOptions = staticRoutesOptions;
         }
 
         public string Action(UrlActionContext urlActionContext)
@@ -52,7 +52,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
         private string FindRoute(UrlActionContext urlActionContext)
         {
-            if (!_urlRoutesOptions.Any()) return null;
+            if (!_staticRoutesOptions.Any()) return null;
 
             var keys = new List<string>();
 
@@ -69,9 +69,9 @@ namespace ModernSlavery.WebUI.Shared.Classes
             while (keys.Any())
             {
                 var key = keys.ToDelimitedString(":");
-                if (_urlRoutesOptions.ContainsKey(key))
+                if (_staticRoutesOptions.ContainsKey(key))
                 {
-                    var value = _urlRoutesOptions[key];
+                    var value = _staticRoutesOptions[key];
                     if (!string.IsNullOrWhiteSpace(value)) {
                         if (value.StartsWith("~")) value=_originalUrlHelper.ActionContext.HttpContext.ResolveUrl(value);
                         if (urlActionContext.Values!=null && value.Contains('{') && value.Contains('}')) value = urlActionContext.Values.Resolve(value);
@@ -87,8 +87,8 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
     public class CustomUrlHelperFactory : IUrlHelperFactory
     {
-        private readonly UrlRoutesOptions _urlRoutesOptions;
-        public CustomUrlHelperFactory(UrlRoutesOptions urlRoutesOptions)
+        private readonly StaticRoutesOptions _urlRoutesOptions;
+        public CustomUrlHelperFactory(StaticRoutesOptions urlRoutesOptions)
         {
             _urlRoutesOptions = urlRoutesOptions;
         }
