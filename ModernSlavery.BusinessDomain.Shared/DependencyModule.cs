@@ -22,9 +22,8 @@ namespace ModernSlavery.BusinessDomain.Shared
         public void ConfigureContainer(ContainerBuilder builder)
         {
             //Add registrations here
-            builder.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().SingleInstance();
-            builder.RegisterType<UpdateFromCompaniesHouseService>()
-                .As<UpdateFromCompaniesHouseService>().InstancePerLifetimeScope();
+            builder.RegisterType<SharedBusinessLogic>().As<ISharedBusinessLogic>().InstancePerLifetimeScope();
+            builder.RegisterType<UpdateFromCompaniesHouseService>().As<UpdateFromCompaniesHouseService>().InstancePerLifetimeScope();
 
             //Register Email queuers
             builder.RegisterType<SendEmailService>().As<ISendEmailService>().SingleInstance().WithAttributeFiltering();
