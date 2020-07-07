@@ -119,8 +119,7 @@
                     <nav id="proposition-menu" aria-label="proposition menu">
                         <a href="~/" id="proposition-name">Modern Slavery Reporting service</a>
                         <ul id="proposition-links">
-
-                            @if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
+                            @*@if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
                             {
                                 <li>
                                     <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">Search</a>
@@ -143,7 +142,7 @@
                                 <li>
                                     <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("ActionHub", "Overview", "Viewing"))">Close the gap</a>
                                 </li>
-                            }
+                            }*@
 
                             @if (User.Identity.IsAuthenticated)
                             {
@@ -163,6 +162,7 @@
             </div>
         </div>
     </header>
+
     <!--end header-->
     <div role="complementary">
         @RenderSection("AfterHeader", false)
