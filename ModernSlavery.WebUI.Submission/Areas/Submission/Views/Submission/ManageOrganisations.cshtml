@@ -1,4 +1,4 @@
-﻿@inject ISnapshotDateHelper SnapshotDateHelper
+﻿@inject IReportingDeadlineHelper SnapshotDateHelper
 @inject IWebService WebService
 @using ModernSlavery.Core.Interfaces
 @model IEnumerable<UserOrganisation>
@@ -36,7 +36,7 @@
             {
                 // include the currrent user in the count but dont show a count to pending users
                 var assocUserCount = userOrg.GetAssociatedUsers().Count();
-                var accountingDate = SnapshotDateHelper.GetSnapshotDate(userOrg.Organisation.SectorType);
+                var accountingDate = SnapshotDateHelper.GetReportingStartDate(userOrg.Organisation.SectorType);
                 var accountingStartYear = accountingDate.Year;
                 var accountingEndYear = (accountingDate.Year + 1).ToString();
 

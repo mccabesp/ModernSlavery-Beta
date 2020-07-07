@@ -20,8 +20,8 @@ namespace ModernSlavery.Core.Models
         public string DevelopmentWebroot { get => _DevelopmentWebroot; set => _DevelopmentWebroot = value!=null && value.StartsWith('.') ? Path.GetFullPath(value) : value; }
 
         public int FirstReportingYear { get; set; } = 2020;
-        public DateTime PrivateAccountingDate { get; set; }
-        public DateTime PublicAccountingDate { get; set; }
+        public DateTime PrivateReportingDeadline { get; set; }
+        public DateTime PublicReportingDeadline { get; set; }
 
         private int[] _reminderEmailDays;
 
@@ -181,6 +181,18 @@ namespace ModernSlavery.Core.Models
                 if (string.IsNullOrWhiteSpace(CertThumprint)) exceptions.Add(new ConfigurationErrorsException("CertThumprint cannot be empty in Production environment."));
             }
 
+            if (FirstReportingYear == 0 || FirstReportingYear > VirtualDateTime.Now.Year) exceptions.Add(new ConfigurationErrorsException($"Invalid FirstReportingYear: {FirstReportingYear}."));
+            if (PrivateReportingDeadline == DateTime.MinValue)
+                exceptions.Add(new ConfigurationErrorsException($"Invalid PrivateReportingDeadline: {PrivateReportingDeadline}."));
+            else
+                while (PrivateReportingDeadline.Date.AddDays(1) < VirtualDateTime.Now)
+                    PrivateReportingDeadline=new DateTime(PrivateReportingDeadline.Year+1, PrivateReportingDeadline.Month, PrivateReportingDeadline.Day);
+
+            if (PublicReportingDeadline == DateTime.MinValue) 
+                exceptions.Add(new ConfigurationErrorsException($"Invalid PublicReportingDeadline: {PublicReportingDeadline}."));
+            else
+                while (PublicReportingDeadline.Date.AddDays(1) < VirtualDateTime.Now)
+                    PublicReportingDeadline = new DateTime(PublicReportingDeadline.Year + 1, PublicReportingDeadline.Month, PublicReportingDeadline.Day);
 
             if (exceptions.Count > 0)
             {

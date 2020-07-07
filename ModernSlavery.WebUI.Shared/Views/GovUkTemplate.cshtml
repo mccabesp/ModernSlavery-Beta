@@ -117,7 +117,14 @@
                 <div class="content">
                     <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
                     <nav id="proposition-menu" aria-label="proposition menu">
-                        <a href="~/" id="proposition-name">Modern Slavery Reporting service</a>
+                        @if (featureSwitchOptions.IsEnabled("NavigationLinks"))
+                        {
+                            <a href="~/" id="proposition-name">Modern Slavery Reporting service</a>
+                        }
+                        else
+                        {
+                            <span id="proposition-name">Modern Slavery Reporting service</span>
+                        }
                         <ul id="proposition-links">
                             @if (featureSwitchOptions.IsEnabled("NavigationLinks"))
                             {

@@ -63,7 +63,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             var prefix = fileName.BeforeFirst("_");
             var datePart = fileName.AfterLast("_", includeWhenNoSeparator: false);
 
-            var endYear = _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private).Year;
+            var endYear = _snapshotDateHelper.GetReportingStartDate(SectorTypes.Private).Year;
             var startYear = _SharedBusinessLogic.SharedOptions.FirstReportingYear;
             if (!string.IsNullOrWhiteSpace(datePart))
             {

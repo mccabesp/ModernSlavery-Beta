@@ -132,7 +132,7 @@
          {
              ServiceName = "Modern Slavery Reporting service",
              HomepageUrl = "https://www.gov.uk",
-             ServiceUrl = "/",
+             ServiceUrl = featureSwitchOptions.IsEnabled("NavigationLinks") ? "/" : null,
              Navigation = headerNavigationLinks
          }))
 
