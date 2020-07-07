@@ -52,7 +52,7 @@ namespace ModernSlavery.Infrastructure.Configuration
         private bool _serviceActionsComplete=false;
         private bool _containerActionsComplete=false;
         private bool _configActionsComplete=false;
-        public void Build<TStartupModule>(IServiceCollection optionServices) where TStartupModule : class, IDependencyModule
+        public void Build<TStartupModule>(IServiceCollection optionServices, IConfiguration configuration) where TStartupModule : class, IDependencyModule
         {
             //Ensure domain assemblies are preloaded
             AppDomain.CurrentDomain.GetAssemblies()
@@ -69,6 +69,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             //Populate the temporary builder for resolving constructors of dependency modules
             var innerBuider = new ContainerBuilder();
             innerBuider.Populate(optionServices);
+            innerBuider.RegisterInstance(configuration).As<IConfiguration>().SingleInstance();
             using var optionsContainer = innerBuider.Build();
 
             

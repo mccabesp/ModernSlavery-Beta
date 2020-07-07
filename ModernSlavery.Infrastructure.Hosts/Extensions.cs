@@ -22,9 +22,7 @@ using System.Linq;
 using System.Reflection;
 using ModernSlavery.Infrastructure.Logging;
 using System.Threading;
-using System.Runtime.Loader;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Razor.Hosting;
 using Microsoft.Extensions.FileProviders;
 
 namespace ModernSlavery.Infrastructure.Hosts
@@ -37,6 +35,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             var hostBuilder = Host.CreateDefaultBuilder(commandlineArgs);
+            
             //Load the configuration
             var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
             var appConfig = configBuilder.Build();
@@ -72,7 +71,7 @@ namespace ModernSlavery.Infrastructure.Hosts
 
             //Load all the dependency actions
             var dependencyBuilder = new DependencyBuilder();
-            dependencyBuilder.Build<TStartupModule>(configOptions);
+            dependencyBuilder.Build<TStartupModule>(configOptions,appConfig);
 
             //Register the callback to add dependent services - this is required here so IWebHostEnvironment is available to services
             hostBuilder.ConfigureServices(dependencyBuilder.RegisterDependencyServices);

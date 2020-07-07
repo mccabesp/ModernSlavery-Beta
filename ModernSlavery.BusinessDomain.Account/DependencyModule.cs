@@ -23,7 +23,7 @@ namespace ModernSlavery.BusinessDomain.Account
         {
             builder.RegisterType<AuthorisationBusinessLogic>().As<IAuthorisationBusinessLogic>().SingleInstance();
             builder.RegisterType<AuthenticationBusinessLogic>().As<IAuthenticationBusinessLogic>().SingleInstance();
-            builder.RegisterType<AccountService>().As<IAccountService>().SingleInstance();
+            builder.RegisterType<AccountService>().As<IAccountService>().InstancePerLifetimeScope();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

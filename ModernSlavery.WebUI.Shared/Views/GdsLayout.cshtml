@@ -58,48 +58,45 @@
     <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
     @{
-        List<HeaderNavigationViewModel> headerNavigationLinks;
-        if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
+        var headerNavigationLinks = new List<HeaderNavigationViewModel>();
+        if (featureSwitchOptions.IsEnabled("NavigationLinks"))
         {
-            headerNavigationLinks = new List<HeaderNavigationViewModel>
-{
-            new HeaderNavigationViewModel
+            if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
             {
-                Text = "Search",
-                Href = Url.ActionArea("SearchResults", "Viewing", "Viewing")
-            },
-            new HeaderNavigationViewModel
-            {
-                Text = "Guidance",
-                Href = Url.ActionArea("StepByStepStandalone", "ReportingStepByStep", "Viewing")
-            },
-            new HeaderNavigationViewModel
-            {
-                Text = "Submit",
-                Href = Url.ActionArea("ManageOrganisations", "Submission", "Submission")
+                headerNavigationLinks.Add(new HeaderNavigationViewModel
+                {
+                    Text = "Search",
+                    Href = Url.ActionArea("SearchResults", "Viewing", "Viewing")
+                });
+                headerNavigationLinks.Add(new HeaderNavigationViewModel
+                {
+                    Text = "Guidance",
+                    Href = Url.ActionArea("StepByStepStandalone", "ReportingStepByStep", "Viewing")
+                });
+                headerNavigationLinks.Add(new HeaderNavigationViewModel
+                {
+                    Text = "Submit",
+                    Href = Url.ActionArea("ManageOrganisations", "Submission", "Submission")
+                });
             }
-        };
-        }
-        else
-        {
-            headerNavigationLinks = new List<HeaderNavigationViewModel>
-{
-            new HeaderNavigationViewModel
+            else
             {
-                Text = "Search and compare",
-                Href = Url.ActionArea("SearchResults", "Viewing", "Viewing")
-            },
-            new HeaderNavigationViewModel
-            {
-                Text = "Download",
-                Href = Url.ActionArea("Download", "Viewing", "Viewing")
-            },
-            new HeaderNavigationViewModel
-            {
-                Text = "Close the gap",
-                Href = Url.ActionArea("Overview", "ActionsHub", "Viewing")
+                headerNavigationLinks.Add(new HeaderNavigationViewModel
+                {
+                    Text = "Search and compare",
+                    Href = Url.ActionArea("SearchResults", "Viewing", "Viewing")
+                });
+                headerNavigationLinks.Add(new HeaderNavigationViewModel
+                {
+                    Text = "Download",
+                    Href = Url.ActionArea("Download", "Viewing", "Viewing")
+                });
+                headerNavigationLinks.Add(new HeaderNavigationViewModel
+                {
+                    Text = "Close the gap",
+                    Href = Url.ActionArea("Overview", "ActionsHub", "Viewing")
+                });
             }
-        };
         }
 
         var controllerName = ViewContext.RouteData.Values["Controller"].ToString();
@@ -108,7 +105,7 @@
             headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
                 Text = "Admin",
-                Href = Url.ActionArea("Home", "Admin","Admin")
+                Href = Url.ActionArea("Home", "Admin", "Admin")
             });
         }
 
@@ -132,21 +129,21 @@
         }
 
         @(Html.GovUkHeader(new HeaderViewModel
-    {
-        ServiceName = "Modern Slavery Reporting service",
-        HomepageUrl = "https://www.gov.uk",
-        ServiceUrl = "/",
-        Navigation = headerNavigationLinks
-    }))
+         {
+             ServiceName = "Modern Slavery Reporting service",
+             HomepageUrl = "https://www.gov.uk",
+             ServiceUrl = "/",
+             Navigation = headerNavigationLinks
+         }))
 
     }
 
     <div class="govuk-width-container">
 
         @(Html.GovUkPhaseBanner(new PhaseBannerViewModel
-    {
-        Phase = "DISCOVERY",
-        Html = @<text>This is a new service – your <a class="govuk-link" asp-action="SendFeedback" asp-controller="shared">feedback</a> will help us to improve it.</text>
+         {
+             Phase = "DISCOVERY",
+             Html = @<text>This is a new service – your <a class="govuk-link" asp-action="SendFeedback" asp-controller="shared">feedback</a> will help us to improve it.</text>
     }))
         @(RenderSection("BeforeMain", false))
 

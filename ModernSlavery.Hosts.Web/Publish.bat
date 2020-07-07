@@ -1,2 +1,2 @@
 REM dotnet publish ModernSlavery.Hosts.Web.csproj /p:PackageAsSingleFile=true /p:WebPublishMethod=Package /p:PublishProfile=Default /p:Configuration=Debug
-dotnet publish ModernSlavery.Hosts.Web.csproj /p:DeployDefaultTarget=WebPublish /p:WebPublishMethod=File /p:publishUrl="$(System.DefaultWorkingDirectory)\WebAppContent" /p:Configuration=Debug --runtime win-x64 --no-self-contained
+dotnet publish ModernSlavery.Hosts.Web.csproj /p:Configuration=Debug
