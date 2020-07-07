@@ -127,7 +127,38 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         public List<NumberOfYearsOfStatements> NumberOfYearsOfStatements { get; set; }
 
+        //this will come from organisation
+        public string CompanyName { get; set; }
+
+        //to review how review list will be handled? - for now boolean for each section that can be handled in controller
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Your modern slavery statement")]
+        public bool IsStatementSectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Areas covered by your modern slavery statement")]
+        public bool IsAreasCoveredSectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Your organisation")]
+        public bool IsOrganisationSectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Policies")]
+        public bool IsPoliciesSectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Supply chain risks and due diligence (part 1)")]
+        public bool IsSupplyChainRiskAndDiligencPart1SectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Supply chain risks and due diligence (part 2)")]
+        public bool IsSupplyChainRiskAndDiligencPart2SectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Training")]
+        public bool IsTrainingSectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Monitoring Progress")]
+        public bool IsMonitoringProgressSectionCompleted { get; set; }
+
     }
+
+
     public enum NumberOfYearsOfStatements
     {
         [GovUkRadioCheckboxLabelText(Text = "This is the first time")]
