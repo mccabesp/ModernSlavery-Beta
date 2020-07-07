@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Core.Interfaces
 {
-    public interface IDataRepository : IDisposable, IDataTransaction
+    public interface IDataRepository : IDataTransaction
     {
         void Delete<TEntity>(TEntity entity) where TEntity : class;
 

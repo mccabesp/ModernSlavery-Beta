@@ -111,11 +111,6 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             DbContext.UpdateChangesInBulk(listOfOrganisations);
         }
 
-        public void Dispose()
-        {
-            DbContext?.Dispose();
-        }
-
         public async Task BeginTransactionAsync(Func<Task> delegateAction)
         {
             if (Transaction != null) throw new Exception("Another transaction has already been started");
