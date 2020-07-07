@@ -35,9 +35,9 @@
 
         <div style="margin-bottom: 20px;">
             <span>
-                <partial name="EmployerDetails/Parts/_ReportStatusBadge" model="new ReportStatusBadgeViewModel {IsLateSubmission = Model.IsLateSubmission, IsVoluntarySubmission = Model.IsVoluntarySubmission}"/>
+                <partial name="Parts/_ReportStatusBadge" model="new ReportStatusBadgeViewModel {IsLateSubmission = Model.IsLateSubmission, IsVoluntarySubmission = Model.IsVoluntarySubmission}"/>
             </span>
-            <partial name="~/Views/Compare/AddRemoveEmployer.cshtml" model="viewModel"/>
+            <partial name="../../Compare/AddRemoveEmployer.cshtml" model="viewModel"/>
         </div>
 
     </div>
@@ -104,14 +104,14 @@
     </div>
 </div>
 
-<partial name="EmployerDetails/HourlyRate/HourlyRateSection" model="Model"/>
+<partial name="HourlyRate/HourlyRateSection" model="Model"/>
 
-<partial name="EmployerDetails/Quartiles/QuartilesSection" model="Model"/>
+<partial name="Quartiles/QuartilesSection" model="Model"/>
 
-<partial name="EmployerDetails/BonusPay/BonusPaySection" model="Model"/>
+<partial name="BonusPay/BonusPaySection" model="Model"/>
 
 <hr style="background: black; border: 1px solid black;"/>
-<partial name="~/Views/Viewing/Launchpad/Parts/ServiceSurveyIntroAndLink.cshtml"/>
+<partial name="~/Views/Shared/ServiceSurveyIntroAndLink.cshtml"/>
 
 @section Scripts {
     <script>

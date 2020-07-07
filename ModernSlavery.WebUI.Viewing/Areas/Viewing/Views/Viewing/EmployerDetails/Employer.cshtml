@@ -27,7 +27,7 @@
     var viewModel = new AddRemoveButtonViewModel {OrganisationIdEncrypted = employerIdentifier, OrganisationName = organisation.OrganisationName};
 }
 
-<partial name="~/Views/Compare/ComparisonBasket.cshtml" model="ViewBag.BasketViewModel"/>
+<partial name="../../Compare/ComparisonBasket.cshtml" model="ViewBag.BasketViewModel"/>
 <div class="grid-row">
     <div class="column-full">
         <div class="grid-row">
@@ -59,7 +59,7 @@
                         <dd class="metadata-text-value">@organisation.GetLatestSicSectorsString()</dd>
                     </div>
                 </dl>
-                <partial name="~/Views/Compare/AddRemoveEmployer.cshtml" model="viewModel"/>
+                <partial name="../../Compare/AddRemoveEmployer.cshtml" model="viewModel"/>
                 <hr>
             </div>
         </div>
@@ -95,7 +95,7 @@
                                 <span class="heading-small">@report.GetReportingPeriod()</span>
                             </td>
                             <td style="border-bottom: none;">
-                                <partial name="EmployerDetails/Parts/_ReportStatusBadge" model="new ReportStatusBadgeViewModel {IsLateSubmission = report.IsLateSubmission, IsVoluntarySubmission = report.IsVoluntarySubmission()}"/>
+                                <partial name="Parts/_ReportStatusBadge.cshtml" model="new ReportStatusBadgeViewModel {IsLateSubmission = report.IsLateSubmission, IsVoluntarySubmission = report.IsVoluntarySubmission()}"/>
                             </td>
                         </tr>
                         @if (report.ReturnId == 0)
@@ -153,7 +153,7 @@
             </div>
         }
         <hr style="background: black; border: 1px solid black;"/>
-        <partial name="~/Views/Viewing/Launchpad/Parts/ServiceSurveyIntroAndLink.cshtml"/>
+        <partial name="~/Views/Shared/ServiceSurveyIntroAndLink.cshtml"/>
         <hr/>
     </div>
 </div>
