@@ -20,25 +20,17 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
     {
         private readonly string _apiKey;
 
+        private readonly CompaniesHouseOptions _options;
+        private readonly SharedOptions _sharedOptions;
         private readonly HttpClient _httpClient;
-        private readonly Uri BaseUri;
 
-        private readonly CompaniesHouseOptions Options;
-        private readonly SharedOptions SharedOptions;
-
-        public CompaniesHouseAPI(CompaniesHouseOptions options, SharedOptions sharedOptions)
+        public CompaniesHouseAPI(CompaniesHouseOptions options, SharedOptions sharedOptions, HttpClient httpClient)
         {
-            Options = options ?? throw new ArgumentNullException("You must provide the companies house options",
-                nameof(CompaniesHouseOptions));
-            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
-            BaseUri = new Uri(Options.ApiServer);
-            _apiKey = Options.ApiKey;
-            MaxRecords = Options.MaxRecords;
-        }
-
-        public CompaniesHouseAPI(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
+            _options = options ?? throw new ArgumentNullException("You must provide the companies house options",nameof(CompaniesHouseOptions));
+            _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(sharedOptions));
+            _apiKey = _options.ApiKey;
+            MaxRecords = _options.MaxRecords;
         }
 
         public int MaxRecords { get; }
@@ -61,7 +53,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                 var id = Numeric.Rand(100000, int.MaxValue - 1);
                 var employer = new EmployerRecord
                 {
-                    OrganisationName = SharedOptions.TestPrefix + "_Ltd_" + id,
+                    OrganisationName = _sharedOptions.TestPrefix + "_Ltd_" + id,
                     CompanyNumber = ("_" + id).Left(10),
                     Address1 = "Test Address 1",
                     Address2 = "Test Address 2",

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using ModernSlavery.Core.Attributes;
@@ -163,5 +165,29 @@ namespace ModernSlavery.Core.Models
 
         public string SaveDraftPath { get; set; }
         #endregion
+
+        public void Validate() 
+        {
+            var exceptions = new List<Exception>();
+            //Check security settings for production environment
+            if (IsProduction())
+            {
+                if (ShowEmailVerifyLink) exceptions.Add(new ConfigurationErrorsException("ShowEmailVerifyLink is not permitted in Production environment"));
+                if (PinInPostTestMode) exceptions.Add(new ConfigurationErrorsException("PinInPostTestMode is not permitted in Production environment"));
+                if (SkipSpamProtection) exceptions.Add(new ConfigurationErrorsException("SkipSpamProtection is not permitted in Production environment"));
+                if (string.IsNullOrWhiteSpace(DefaultEncryptionKey)) exceptions.Add(new ConfigurationErrorsException("DefaultEncryptionKey cannot be empty in Production environment"));
+                if (DefaultEncryptionKey==Encryption.DefaultEncryptionKey) exceptions.Add(new ConfigurationErrorsException("DefaultEncryptionKey cannot use default value in Production environment"));
+                if (ObfuscationSeed.IsAny(0,127)) exceptions.Add(new ConfigurationErrorsException("ObfuscationSeed cannot use default value in Production environment"));
+                if (string.IsNullOrWhiteSpace(CertThumprint)) exceptions.Add(new ConfigurationErrorsException("CertThumprint cannot be empty in Production environment."));
+            }
+
+
+            if (exceptions.Count > 0)
+            {
+                if (exceptions.Count == 1) throw exceptions[0];
+                throw new AggregateException(exceptions);
+            }
+        }
+
     }
 }

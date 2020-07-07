@@ -31,7 +31,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             //Ensure the stash is cleared
             ClearStash();
 
-            ReportingOrganisationId = model.OrganisationId;
             ViewBag.OrganisationName = ReportingOrganisation.OrganisationName;
 
             //Show the confirmation view
@@ -61,9 +60,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 throw new Exception(
                     $"Attempt to activate organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}' for {VirtualUser.EmailAddress} by '{(OriginalUser == null ? VirtualUser.EmailAddress : OriginalUser.EmailAddress)}' which has already been activated");
 
-            // begin ActivateService journey
-            ReportingOrganisationId = organisationId;
-
             //Ensure they havent entered wrong pin too many times
             var remaining = userOrg.ConfirmAttemptDate == null
                 ? TimeSpan.Zero
@@ -85,10 +81,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             model.AllowResend = remaining <= TimeSpan.Zero;
             model.Remaining = remaining.ToFriendly(maxParts: 2);
 
-            //If the email address is a test email then simulate sending
-            if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-                model.PIN = "ABCDEF";
-
             //Show the PIN textbox and button
             return View("ActivateService", model);
         }
@@ -96,8 +88,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [PreventDuplicatePost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        [HttpPost("activate-service")]
-        public async Task<IActionResult> ActivateService(CompleteViewModel model)
+        [HttpPost("activate-service/{id}")]
+        public async Task<IActionResult> ActivateService(CompleteViewModel model, string id)
         {
             //Ensure user has completed the registration process
 
@@ -112,8 +104,16 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             //Get the user organisation
-            var userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo =>
-                uo.UserId == VirtualUser.UserId && uo.OrganisationId == ReportingOrganisationId);
+            
+            // Decrypt org id
+            if (!id.DecryptToId(out var organisationId))
+                return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
+
+            // Check the user has permission for this organisation
+            var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            if (userOrg == null)
+                return new HttpForbiddenResult(
+                    $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
 
             ActionResult result1;
 

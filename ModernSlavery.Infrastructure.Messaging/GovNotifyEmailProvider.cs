@@ -9,13 +9,15 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using Notify.Client;
 using Notify.Interfaces;
+using Polly;
+using Polly.Extensions.Http;
 
 namespace ModernSlavery.Infrastructure.Messaging
 {
     public class GovNotifyEmailProvider : BaseEmailProvider
     {
         public GovNotifyEmailProvider(
-            IHttpClientFactory httpClientFactory,
+            HttpClient httpClient,
             IEmailTemplateRepository emailTemplateRepo,
             GovNotifyOptions govNotifyOptions,
             SharedOptions sharedOptions,
@@ -42,7 +44,6 @@ namespace ModernSlavery.Infrastructure.Messaging
             }
 
             // create the clients
-            var httpClient = httpClientFactory.CreateClient(nameof(GovNotifyEmailProvider));
             var notifyHttpWrapper = new HttpClientWrapper(httpClient);
             if (!Options.AllowTestKeyOnly) ProductionClient = new NotificationClient(notifyHttpWrapper, Options.ApiKey);
             TestClient = new NotificationClient(notifyHttpWrapper, Options.ApiTestKey);
@@ -93,5 +94,16 @@ namespace ModernSlavery.Infrastructure.Messaging
         public GovNotifyOptions Options { get; }
 
         #endregion
+
+        public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+        {
+            return HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .WaitAndRetryAsync(
+                    3,
+                    retryAttempt =>
+                        TimeSpan.FromMilliseconds(new Random().Next(1, 1000)) +
+                        TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+        }
     }
 }

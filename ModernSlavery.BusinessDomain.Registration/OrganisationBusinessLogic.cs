@@ -135,10 +135,8 @@ namespace ModernSlavery.BusinessDomain.Registration
                 _sharedBusinessLogic.SharedOptions.EmployerCodeLength);
         }
 
-        public virtual string GeneratePINCode(bool isTestUser)
+        public virtual string GeneratePINCode()
         {
-            if (isTestUser) return "ABCDEFG";
-
             return Crypto.GeneratePasscode(_sharedBusinessLogic.SharedOptions.PinChars.ToCharArray(),
                 _sharedBusinessLogic.SharedOptions.PinLength);
         }

@@ -98,22 +98,18 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 {
                     var now = VirtualDateTime.Now;
 
-                    // Check if we are a test user (for load testing)
-                    var thisIsATestUser =
-                        userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix);
-                    var pinInPostTestMode = SharedBusinessLogic.SharedOptions.PinInPostTestMode;
-
                     // Generate a new pin
-                    var pin = _registrationService.OrganisationBusinessLogic.GeneratePINCode(thisIsATestUser);
+                    var pin = _registrationService.OrganisationBusinessLogic.GeneratePINCode();
 
                     // Save the PIN and confirm code
                     userOrg.PIN = pin;
-                    userOrg.PINHash = null;
+                    userOrg.PINHash = Crypto.GetSHA512Checksum(pin);
                     userOrg.PINSentDate = now;
                     userOrg.Method = RegistrationMethods.PinInPost;
                     await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-                    if (thisIsATestUser || pinInPostTestMode)
+                    // Check if we are a test user (for load testing)
+                    if (SharedBusinessLogic.SharedOptions.PinInPostTestMode || userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
                     {
                         ViewBag.PinCode = pin;
                     }
