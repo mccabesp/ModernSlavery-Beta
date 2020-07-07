@@ -119,11 +119,11 @@
                     <nav id="proposition-menu" aria-label="proposition menu">
                         @if (featureSwitchOptions.IsEnabled("NavigationLinks"))
                         {
-                            <a href="~/" id="proposition-name">Modern Slavery Reporting service</a>
+                            <a href="~/" id="proposition-name">@sharedOptions.ServiceName</a>
                         }
                         else
                         {
-                            <span id="proposition-name">Modern Slavery Reporting service</span>
+                            <span id="proposition-name">@sharedOptions.ServiceName</span>
                         }
                         <ul id="proposition-links">
                             @if (featureSwitchOptions.IsEnabled("NavigationLinks"))

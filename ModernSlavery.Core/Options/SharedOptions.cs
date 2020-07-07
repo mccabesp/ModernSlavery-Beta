@@ -16,6 +16,8 @@ namespace ModernSlavery.Core.Models
         {
 
         }
+
+        public string ServiceName { get; set; }
         private string _DevelopmentWebroot;
         public string DevelopmentWebroot { get => _DevelopmentWebroot; set => _DevelopmentWebroot = value!=null && value.StartsWith('.') ? Path.GetFullPath(value) : value; }
 

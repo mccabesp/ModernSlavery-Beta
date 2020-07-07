@@ -129,12 +129,12 @@
         }
 
         @(Html.GovUkHeader(new HeaderViewModel
-         {
-             ServiceName = "Modern Slavery Reporting service",
-             HomepageUrl = "https://www.gov.uk",
-             ServiceUrl = featureSwitchOptions.IsEnabled("NavigationLinks") ? "/" : null,
-             Navigation = headerNavigationLinks
-         }))
+    {
+        ServiceName = sharedOptions.ServiceName,
+        HomepageUrl = "https://www.gov.uk",
+        ServiceUrl = featureSwitchOptions.IsEnabled("NavigationLinks") ? "/" : null,
+        Navigation = headerNavigationLinks
+    }))
 
     }
 
