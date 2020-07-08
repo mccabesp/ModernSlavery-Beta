@@ -282,7 +282,7 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasName("IX_ScopeStatusId");
 
                     entity.HasIndex(e => e.SubmissionDeadline)
-                        .HasName("IX_SnapshotDate");
+                        .HasName("IX_SubmissionDeadline");
 
                     entity.HasIndex(e => e.Status)
                         .HasName("IX_StatusId");
@@ -301,7 +301,9 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.Property(e => e.Reason).HasMaxLength(1000);
 
-                    entity.Property(e => e.SubmissionDeadline).HasDefaultValueSql("('1900-01-01T00:00:00.000')");
+                    entity.Property(e => e.SubmissionDeadline)
+                        .HasColumnType("date")
+                        .HasDefaultValueSql("('1900-01-01T00:00:00.000')");
 
                     entity.Property(e => e.StatusDetails).HasMaxLength(255);
 
@@ -474,8 +476,11 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementEndDate)
                         .HasName("IX_ReportingEndDate");
 
+                    entity.Property(e => e.SubmissionDeadline)
+                        .HasColumnType("Date");
+
                     entity.HasIndex(e => e.SubmissionDeadline)
-                        .HasName("IX_AccountingDate");
+                        .HasName("IX_SubmissionDeadline");
 
                     entity.Property(e => e.IncludesGoals)
                         .HasColumnName("IncludesGoalsId");
