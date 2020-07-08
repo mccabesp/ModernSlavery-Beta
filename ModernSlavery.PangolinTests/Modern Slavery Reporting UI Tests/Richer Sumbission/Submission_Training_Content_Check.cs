@@ -10,7 +10,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
         public override void RunTest()
         {
 
-            //Run<Fastrack_Registraion_Success>();
+            //Run<Fastrack_Registration_Success>();
 
             LoginAs<RogerReporter>();
 
@@ -35,7 +35,7 @@ namespace Modern_Slavery_Reporting_UI_Tests
             ExpectField("Please specify");
 
             ExpectButton("Save and continue");
-            ExpectButton("Cancel"); Run<Fastrack_Registraion_Success>();
+            ExpectButton("Cancel"); Run<Fastrack_Registration_Success>();
 
             LoginAs<RogerReporter>();
 
