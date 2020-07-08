@@ -336,11 +336,19 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 case SubmissionStep.YourStatement:
                     return nameof(StatementController.Compliance);
                 case SubmissionStep.Compliance:
+                    return nameof(StatementController.YourOrganisation);
                 case SubmissionStep.YourOrganisation:
+                    return nameof(StatementController.Policies);
                 case SubmissionStep.Policies:
-                case SubmissionStep.SupplyChainRisksAndDueDiligence:
+                    return nameof(StatementController.SupplyChainRisks);
+                case SubmissionStep.SupplyChainRisks:
+                    return nameof(StatementController.DueDiligence);
+                case SubmissionStep.DueDiligence:
+                    return nameof(StatementController.Training);
                 case SubmissionStep.Training:
-                case SubmissionStep.MentoringProcess:
+                    return nameof(StatementController.MonitoringProgress);
+                case SubmissionStep.MonitoringProgress:
+                    return nameof(StatementController.Review);
                 case SubmissionStep.Review:
                 default:
                     throw new NotImplementedException();
@@ -382,10 +390,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         Compliance = 3,
         YourOrganisation = 4,
         Policies = 5,
-        SupplyChainRisksAndDueDiligence = 6,
-        Training = 7,
-        MentoringProcess = 8,
-        Review = 9
+        SupplyChainRisks = 6,
+        DueDiligence = 7,
+        Training = 8,
+        MonitoringProgress = 9,
+        Review = 10,
+        Complete = 11
+
     }
 
     public class StatementMapperProfile : Profile
@@ -396,7 +407,10 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.StatementTrainingDivisions, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
-                .ForMember(dest => dest.IncludesGoals, opt => opt.Ignore());
+                .ForMember(dest => dest.IncludesGoals, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementStartDate, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementEndDate, opt => opt.Ignore());
+
 
             CreateMap<StatementModel, StatementViewModel>()
                 .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
@@ -405,13 +419,33 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.StatementIdentifier, opt => opt.Ignore())
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.OrganisationIdentifier, opt => opt.Ignore())
-                .ForMember(dest => dest.ApprovedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedDay, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedMonth, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedYear, opt => opt.Ignore())
                 .ForMember(dest => dest.LastFinancialYearBudget, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementTrainings, opt => opt.Ignore())
                 .ForMember(dest => dest.AnyIdicatorsInSupplyChain, opt => opt.Ignore())
                 .ForMember(dest => dest.AnyInstancesInSupplyChain, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementRemediations, opt => opt.Ignore())
-                .ForMember(dest => dest.NumberOfYearsOfStatements, opt => opt.Ignore());
+                .ForMember(dest => dest.NumberOfYearsOfStatements, opt => opt.Ignore())
+                .ForMember(dest => dest.CompanyName, opt => opt.Ignore())
+                .ForMember(dest => dest.IsStatementSectionCompleted, opt => opt.Ignore())
+                .ForMember(dest => dest.IsAreasCoveredSectionCompleted, opt => opt.Ignore())
+                .ForMember(dest => dest.IsOrganisationSectionCompleted, opt => opt.Ignore())
+                .ForMember(dest => dest.IsPoliciesSectionCompleted, opt => opt.Ignore())
+                .ForMember(dest => dest.IsSupplyChainRiskAndDiligencPart1SectionCompleted, opt => opt.Ignore())
+                .ForMember(dest => dest.IsSupplyChainRiskAndDiligencPart2SectionCompleted, opt => opt.Ignore())
+                .ForMember(dest => dest.IsTrainingSectionCompleted, opt => opt.Ignore())
+                .ForMember(dest => dest.IsMonitoringProgressSectionCompleted, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementStartDay, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementStartMonth, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementStartYear, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementEndDay, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementEndMonth, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementEndYear, opt => opt.Ignore());
+
+
+
 
             //CreateMap<StatementViewModel, StatementModel>()
             //    .ForMember(dest => dest.Created, opt => opt.Ignore())

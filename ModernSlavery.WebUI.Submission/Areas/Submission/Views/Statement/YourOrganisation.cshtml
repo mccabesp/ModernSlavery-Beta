@@ -15,14 +15,14 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-        }
+     
 
         <h1 class="govuk-heading-l">
             Your organisation
         </h1>
 
-        <h2>
-            Which sector does your organisation operate in?
+        <h2 class="govuk-heading-m">
+            Which sector does your organisation operate in? 
         </h2>
         <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
@@ -35,7 +35,7 @@
             </div>
         </details>
 
-        @{ var organisationSectorOptions =
+         var organisationSectorOptions =
                          new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementSectors, Func<object, object>>
                          {
                            {
@@ -45,7 +45,7 @@
     </text>
                             }
                        };
-        }
+        
 
         @(Html.GovUkCheckboxesFor(
                     model => model.StatementSectors,
@@ -82,7 +82,6 @@
         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
             Cancel
         </button>
-
+            }
     </div>
-
 </div>

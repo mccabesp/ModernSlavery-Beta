@@ -14,10 +14,10 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-        }
+
 
         @(Html.GovUkErrorSummary(new[]
-            {
+        {
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementDiligences),
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementDiligenceTypes),
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementRemediations),
@@ -75,7 +75,7 @@
             For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?
         </h1>
 
-        @{var anyIndicatorsInSupplyChainConditionalOptions = new Dictionary<ModernSlavery.WebUI.Submission.Presenters.AnyIdicatorsInSupplyChain, Func<object, object>>
+        var anyIndicatorsInSupplyChainConditionalOptions = new Dictionary<ModernSlavery.WebUI.Submission.Presenters.AnyIdicatorsInSupplyChain, Func<object, object>>
             {
               {
                     ModernSlavery.WebUI.Submission.Presenters.AnyIdicatorsInSupplyChain.Yes,
@@ -84,7 +84,7 @@
     </text>
               }
           };
-        }
+        
 
         @*TODO: get these to work*@
         @*@(Html.GovUkRadiosFor(
@@ -104,7 +104,7 @@
 
 
 
-        @{var anyInstancesInSupplyChainConditionalOptions = new Dictionary<ModernSlavery.WebUI.Submission.Presenters.AnyInstancesInSupplyChain, Func<object, object>>
+        var anyInstancesInSupplyChainConditionalOptions = new Dictionary<ModernSlavery.WebUI.Submission.Presenters.AnyInstancesInSupplyChain, Func<object, object>>
             {
               {
                     ModernSlavery.WebUI.Submission.Presenters.AnyInstancesInSupplyChain.Yes,
@@ -113,7 +113,7 @@
     </text>
               }
           };
-        }
+        
 
         @*@(Html.GovUkRadiosFor(
         m => m.AnyInstancesInSupplyChain,
@@ -130,7 +130,7 @@
         anyInstancesInSupplyChainConditionalOptions
         ))*@;
 
-        @{var remediationChainConditionalOptions = new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementRemediation, Func<object, object>>
+        var remediationChainConditionalOptions = new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementRemediation, Func<object, object>>
             {
               {
                     ModernSlavery.WebUI.Submission.Presenters.StatementRemediation.Other,
@@ -139,22 +139,22 @@
     </text>
               }
           };
-        }
+        
 
         @(Html.GovUkCheckboxesFor(
-                    m => m.StatementRemediations,
-                    new FieldsetViewModel
-                    {
-                        Legend = new LegendViewModel
-                        {
-                            Text = "What remediation action did your organisation take in response?",
-                            Classes = "govuk-fieldset__legend--m"
-                        },
-                        Classes = "govuk-!-margin-top-6"
-                    },
-                    null,
-                    remediationChainConditionalOptions
-                    ));
+                                m => m.StatementRemediations,
+                                new FieldsetViewModel
+                                {
+                                    Legend = new LegendViewModel
+                                    {
+                                        Text = "What remediation action did your organisation take in response?",
+                                        Classes = "govuk-fieldset__legend--m"
+                                    },
+                                    Classes = "govuk-!-margin-top-6"
+                                },
+                                null,
+                                remediationChainConditionalOptions
+                                ));
 
 
         <button class="govuk-button" data-module="govuk-button" type="submit">
@@ -163,7 +163,7 @@
         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
             Cancel
         </button>
-
+            }
     </div>
 
 </div>

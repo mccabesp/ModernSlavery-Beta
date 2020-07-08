@@ -55,6 +55,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/your-statement")]
         public async Task<IActionResult> YourStatement(string organisationIdentifier, int year)
         {
+            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
@@ -68,6 +70,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> YourStatement(StatementViewModel submissionModel)
         {
+            // Redirect location
+            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.YourStatement);
+            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+
             if (!ModelState.IsValid)
                 return View(submissionModel);
 
@@ -92,6 +98,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/compliance")]
         public async Task<IActionResult> Compliance(string organisationIdentifier, int year)
         {
+            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
@@ -105,7 +113,16 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Compliance(StatementViewModel submissionModel)
         {
-            throw new NotImplementedException();
+            // Redirect location
+            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.Compliance);
+            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+
+            if (!ModelState.IsValid)
+                return View(submissionModel);
+
+            var result = await SubmissionPresenter.TrySaveYourStatement(CurrentUser, submissionModel);
+
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.YourStatement);
         }
 
         [HttpPost("cancel-compliance")]
@@ -121,25 +138,228 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         #region Step 3 - Your organisation
 
+        [HttpGet("{organisationIdentifier}/{year}/your-organisation")]
+        public async Task<IActionResult> YourOrganisation(string organisationIdentifier, int year)
+        {
+            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
+            var result = await SubmissionPresenter.TryGetYourOrganisation(CurrentUser, organisationIdentifier, year);
+
+            return await GetActionResultFromQuery(result);
+        }
+
+        [HttpPost("{organisationIdentifier}/{year}/your-organisation")]
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> YourOrganisation(StatementViewModel submissionModel)
+        {
+            // Redirect location
+            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.YourOrganisation);
+            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+
+        }
+
+        [HttpPost("cancel-your-organisation")]
+        public async Task<IActionResult> CancelYourOrganisation()
+        {
+            await SubmissionPresenter.ClearDraftForUser();
+
+            var next = await SubmissionPresenter.GetCancelRedirection();
+            return RedirectToAction(next);
+        }
+
         #endregion
 
         #region Step 4 - Policies
+
+        [HttpGet("{organisationIdentifier}/{year}/policies")]
+        public async Task<IActionResult> Policies(string organisationIdentifier, int year)
+        {
+            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
+            var result = await SubmissionPresenter.TryGetPolicies(CurrentUser, organisationIdentifier, year);
+
+            return await GetActionResultFromQuery(result);
+        }
+
+        [HttpPost("{organisationIdentifier}/{year}/policies")]
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Policies(StatementViewModel submissionModel)
+        {
+            // Redirect location
+            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.Policies);
+            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+
+        }
+
+        [HttpPost("cancel-policies")]
+        public async Task<IActionResult> CancelPolicies()
+        {
+            await SubmissionPresenter.ClearDraftForUser();
+
+            var next = await SubmissionPresenter.GetCancelRedirection();
+            return RedirectToAction(next);
+        }
 
         #endregion
 
         #region Step 5 - Supply chain risks and due diligence
 
+        [HttpGet("{organisationIdentifier}/{year}/supply-chain-risks")]
+        public async Task<IActionResult> SupplyChainRisks(string organisationIdentifier, int year)
+        {
+            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
+            var result = await SubmissionPresenter.TryGetSupplyChainRiskAndDueDiligence(CurrentUser, organisationIdentifier, year);
+
+            return await GetActionResultFromQuery(result);
+        }
+
+        [HttpPost("{organisationIdentifier}/{year}/supply-chain-risks")]
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SupplyChainRisks(StatementViewModel submissionModel)
+        {
+            // Redirect location
+            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.SupplyChainRisks);
+            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+
+        }
+
+        [HttpPost("cancel-supply-chain-risks")]
+        public async Task<IActionResult> CancelSupplyChainRisks()
+        {
+            await SubmissionPresenter.ClearDraftForUser();
+
+            var next = await SubmissionPresenter.GetCancelRedirection();
+            return RedirectToAction(next);
+        }
+
         #endregion
 
-        #region Step 6 - Training
+        #region Step 6 - Due Diligence
+
+        [HttpGet("{organisationIdentifier}/{year}/due-diligence")]
+        public async Task<IActionResult> DueDiligence(string organisationIdentifier, int year)
+        {
+            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
+            var result = await SubmissionPresenter.TryGetSupplyChainRiskAndDueDiligence(CurrentUser, organisationIdentifier, year);
+
+            return await GetActionResultFromQuery(result);
+        }
+
+        [HttpPost("{organisationIdentifier}/{year}/due-diligence")]
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DueDiligence(StatementViewModel submissionModel)
+        {
+            // Redirect location
+            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.DueDiligence);
+            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+
+        }
+
+        [HttpPost("cancel-due-diligence")]
+        public async Task<IActionResult> CancelDueDiligence()
+        {
+            await SubmissionPresenter.ClearDraftForUser();
+
+            var next = await SubmissionPresenter.GetCancelRedirection();
+            return RedirectToAction(next);
+        }
 
         #endregion
 
-        #region Step 7 - Monitoring progress
+        #region Step 7 - Training
+
+        [HttpGet("{organisationIdentifier}/{year}/training")]
+        public async Task<IActionResult> Training(string organisationIdentifier, int year)
+        {
+            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
+            var result = await SubmissionPresenter.TryGetTraining(CurrentUser, organisationIdentifier, year);
+
+            return await GetActionResultFromQuery(result);
+        }
+
+        [HttpPost("{organisationIdentifier}/{year}/training")]
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Training(StatementViewModel submissionModel)
+        {
+            // Redirect location
+            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.Training);
+            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+
+        }
+
+        [HttpPost("cancel-training")]
+        public async Task<IActionResult> CancelTraining()
+        {
+            await SubmissionPresenter.ClearDraftForUser();
+
+            var next = await SubmissionPresenter.GetCancelRedirection();
+            return RedirectToAction(next);
+        }
 
         #endregion
 
-        #region Step 8 - Review
+
+        #region Step 8 - Monitoring progress
+
+        [HttpGet("{organisationIdentifier}/{year}/monitor-progress")]
+        public async Task<IActionResult> MonitorProgress(string organisationIdentifier, int year)
+        {
+            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
+            var result = await SubmissionPresenter.TryGetMonitoringInProgress(CurrentUser, organisationIdentifier, year);
+
+            return await GetActionResultFromQuery(result);
+        }
+
+        [HttpPost("{organisationIdentifier}/{year}/monitoring-progress")]
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MonitoringProgress(StatementViewModel submissionModel)
+        {
+            // Redirect location
+            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.MonitoringProgress);
+            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+
+        }
+
+        [HttpPost("cancel-monitoring-progress")]
+        public async Task<IActionResult> CancelMonitoringProgress()
+        {
+            await SubmissionPresenter.ClearDraftForUser();
+
+            var next = await SubmissionPresenter.GetCancelRedirection();
+            return RedirectToAction(next);
+        }
+
+        #endregion
+
+        #region Step 9 - Review
 
         [HttpGet("review")]
         public async Task<IActionResult> Review(string identifier) // an ID parameter
@@ -277,7 +497,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             // Redirect location
             var next = await SubmissionPresenter.GetNextRedirectAction(step);
-            return RedirectToAction(next, new { organisationIdentifier = viewModel.OrganisationIdentifier, year = viewModel.Year});
+            return RedirectToAction(next, new { organisationIdentifier = viewModel.OrganisationIdentifier, year = viewModel.Year });
         }
 
         #endregion

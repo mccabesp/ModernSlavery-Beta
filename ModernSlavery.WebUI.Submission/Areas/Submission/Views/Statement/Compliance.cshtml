@@ -4,7 +4,7 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
-    <a class="govuk-back-link" href="@Url.Action("your-statment")">Back</a>
+    <a class="govuk-back-link" href="@Url.Action("your-statement")">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
@@ -14,7 +14,7 @@
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
 
-        }
+       
 
         @(Html.GovUkErrorSummary(new[]
                 {
@@ -37,9 +37,9 @@
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                    <h1 class="govuk-fieldset__heading">
+                    <h2 class="govuk-fieldset__heading">
                         Your organisation’s structure, business and supply chains
-                    </h1>
+                    </h2>
                 </legend>
                 <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                     <div class="govuk-radios__item">
@@ -70,9 +70,9 @@
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                    <h1 class="govuk-fieldset__heading">
+                    <h2 class="govuk-fieldset__heading">
                         Policies
-                    </h1>
+                    </h2>
                 </legend>
                 <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                     <div class="govuk-radios__item">
@@ -102,9 +102,9 @@
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                    <h1 class="govuk-fieldset__heading">
+                    <h2 class="govuk-fieldset__heading">
                         Risk assessment and management
-                    </h1>
+                    </h2>
                 </legend>
                 <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                     <div class="govuk-radios__item">
@@ -134,9 +134,9 @@
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                    <h1 class="govuk-fieldset__heading">
+                    <h2 class="govuk-fieldset__heading">
                         Due diligence processes
-                    </h1>
+                    </h2>
                 </legend>
                 <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                     <div class="govuk-radios__item">
@@ -166,9 +166,9 @@
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                    <h1 class="govuk-fieldset__heading">
+                    <h2 class="govuk-fieldset__heading">
                         Staff training about slavery and human trafficking
-                    </h1>
+                    </h2>
                 </legend>
                 <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                     <div class="govuk-radios__item">
@@ -198,9 +198,9 @@
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                    <h1 class="govuk-fieldset__heading">
+                    <h2 class="govuk-fieldset__heading">
                         Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions
-                    </h1>
+                    </h2>
                 </legend>
 
                 <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
@@ -230,11 +230,12 @@
             </fieldset>
         </div>
 
-        <button class="govuk-button" data-module="govuk-button" type="submit">
+        <button class="govuk-button" data-module="govuk-button" type="submit"  >
             Continue
         </button>
         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
             Cancel
         </button>
+        }
     </div>
 </div>

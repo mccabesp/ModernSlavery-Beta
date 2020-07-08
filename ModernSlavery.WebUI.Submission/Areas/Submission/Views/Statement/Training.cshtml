@@ -13,7 +13,7 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-        }
+
 
         @(Html.GovUkErrorSummary(new[]
                 {
@@ -28,7 +28,7 @@
             Have you provided training on modern slavery and trafficking during the past year, or any other activities to raise awareness? If so, who was this for?
         </h2>    
 
-        @{ var organisationTrainingOptions =
+         var organisationTrainingOptions =
                              new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementTrainings, Func<object, object>>
                              {
                            {
@@ -39,7 +39,7 @@
 </text>
                             }
                            };
-        }
+        
 
         @(Html.GovUkCheckboxesFor(
                     model => model.StatementTrainings,
@@ -64,7 +64,7 @@
         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
             Cancel
         </button>
-
+            }
     </div>
 
 </div>
