@@ -1,4 +1,5 @@
 using Geeks.Pangolin;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -108,6 +109,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             var discoveryAuthority = $"{_webAuthority}/.well-known/openid-configuration";
             Trace.TraceInformation($"4.1 Discovery authority: {discoveryAuthority}");
             TestContext.Progress.WriteLine($"5 Discovery authority: {discoveryAuthority}");
+            Debugger.Log((int)LogLevel.Information, TestContext.CurrentContext.Test.Name, $"6 Discovery authority: {discoveryAuthority}");
 
             var response = await WebRequestAsync(HttpMethods.Get, discoveryAuthority, validateCertificate: false);
             Trace.TraceInformation(response);
