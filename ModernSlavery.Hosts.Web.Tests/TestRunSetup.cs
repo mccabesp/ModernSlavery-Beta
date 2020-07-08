@@ -61,6 +61,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Dispose of the webdriver service
             WebDriverService?.DisposeService();
 
+            //NOTE: these dont seem yet to upload so using DevOps task to publish instead till we can get working
             //Publish all log files on failure
             if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
             {
