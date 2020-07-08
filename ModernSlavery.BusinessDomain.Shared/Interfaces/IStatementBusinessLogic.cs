@@ -1,5 +1,6 @@
 ﻿using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,17 +13,20 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <summary>
         /// Get the statement metadata from the specified year for the specified organisation.
         /// </summary>
-        Task<Statement> GetStatementByOrganisationAndYear(Organisation organisation, int reportingYear);
+        Task<StatementModel> GetStatementByOrganisationAndYear(Organisation organisation, int reportingYear);
 
         /// <summary>
         /// Check if the user can access the statement of the provided organisation and year.
         /// </summary>
         Task<StatementActionResult> CanAccessStatement(User user, Organisation organisation, int reportingYear);
 
+
+        Task<StatementActionResult> SaveDraftStatement(User user, StatementModel statementModel);
+
         /// <summary>
         /// Save the statement metadata.
         /// </summary>
-        Task<StatementActionResult> SaveStatement(User user, Organisation organisation, Statement statement);
+        Task<StatementActionResult> SaveStatement(User user, StatementModel statement);
     }
 
     public enum StatementActionResult : byte

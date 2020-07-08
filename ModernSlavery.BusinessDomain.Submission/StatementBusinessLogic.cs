@@ -1,7 +1,9 @@
-﻿using ModernSlavery.BusinessDomain.Shared;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,6 +11,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,30 +20,42 @@ namespace ModernSlavery.BusinessDomain.Submission
     partial class StatementBusinessLogic : IStatementBusinessLogic
     {
         readonly ISharedBusinessLogic SharedBusinessLogic;
+        readonly IMapper Mapper;
 
-        public StatementBusinessLogic(ISharedBusinessLogic sharedBusinessLogic)
+        public StatementBusinessLogic(IMapper mapper, ISharedBusinessLogic sharedBusinessLogic)
         {
+            Mapper = mapper;
             SharedBusinessLogic = sharedBusinessLogic;
         }
 
-        public async Task<Statement> GetStatementByOrganisationAndYear(Organisation organisation, int year)
+        async Task<Statement> FindStatementAsync(StatementModel model)
+            => await FindStatementAsync(model.OrganisationId, model.Year);
+
+        async Task<Statement> FindStatementAsync(Organisation organisation, int year)
+            => await FindStatementAsync(organisation.OrganisationId, year);
+
+        async Task<Statement> FindStatementAsync(long organisationId, int year)
         {
-            var dataResult = await SharedBusinessLogic.DataRepository
-                // Is the accounting year the correct year?
-                .FirstOrDefaultAsync<Statement>(s => s.OrganisationId == organisation.OrganisationId && s.SubmissionDeadline.Year == year);
+            return await SharedBusinessLogic.DataRepository
+                .FirstOrDefaultAsync<Statement>(s => s.OrganisationId == organisationId && s.SubmissionDeadline.Year == year);
+        }
 
-            if (dataResult != null)
-                return dataResult;
-
+        public async Task<StatementModel> GetStatementByOrganisationAndYear(Organisation organisation, int year)
+        {
             var path = GetFileName(organisation.OrganisationId, year);
-            if (!await SharedBusinessLogic.FileRepository.GetFileExistsAsync(path))
-                return null;
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(path))
+            {
+                var content = await SharedBusinessLogic.FileRepository.ReadAsync(path);
 
-            var content = await SharedBusinessLogic.FileRepository.ReadAsync(path);
+                var fileResult = JsonConvert.DeserializeObject<StatementModel>(content);
 
-            var fileResult = JsonConvert.DeserializeObject<Statement>(content);
+                return fileResult;
+            }
 
-            return fileResult;
+            var statement = await FindStatementAsync(organisation, year);
+
+            var dataResult = Mapper.Map<StatementModel>(statement);
+            return dataResult;
         }
 
         public async Task<StatementActionResult> CanAccessStatement(User user, Organisation organisation, int reportingYear)
@@ -54,14 +69,14 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (!organisation.Status.IsAny(OrganisationStatuses.Active, OrganisationStatuses.Pending, OrganisationStatuses.New))
                 return StatementActionResult.Unauthorised;
 
-            var statement = await GetStatementByOrganisationAndYear(organisation, reportingYear);
+            var statement = await FindStatementAsync(organisation, reportingYear);
             if (statement != null && !statement.CanBeEdited)
                 return StatementActionResult.Uneditable;
 
             return StatementActionResult.Success;
         }
 
-        private async Task SaveToFile(Organisation organisation, Statement statement)
+        private async Task SaveToFile(StatementModel statement)
         {
             var settings = new JsonSerializerSettings
             {
@@ -70,32 +85,44 @@ namespace ModernSlavery.BusinessDomain.Submission
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
             var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(statement, Formatting.Indented, settings));
-            var fileName = GetFileName(organisation.OrganisationId, statement.SubmissionDeadline.Year);
+            var fileName = GetFileName(statement.OrganisationId, statement.SubmissionDeadline.Year);
             await SharedBusinessLogic.FileRepository.WriteAsync(fileName, data);
         }
 
         private string GetFileName(long organisationId, int reportingYear)
             => $"{organisationId}_{reportingYear}.json";
 
-        public async Task<StatementActionResult> SaveStatement(User user, Organisation organisation, Statement statement)
+        public async Task<StatementActionResult> SaveDraftStatement(User user, StatementModel statementModel)
         {
+            var statement = await SharedBusinessLogic.DataRepository
+                .FirstOrDefaultAsync<Statement>(s => s.OrganisationId == statementModel.OrganisationId && s.SubmissionDeadline.Year == statementModel.Year);
+
             if (!statement.CanBeEdited)
             {
                 return StatementActionResult.Uneditable;
             }
 
-            if (statement.Status == ReturnStatuses.Draft)
-            {
-                await SaveToFile(organisation, statement);
+            // not been saved to DB
+            await SaveToFile(statementModel);
+            return StatementActionResult.Success;
+        }
 
-                return StatementActionResult.Success;
+        public async Task<StatementActionResult> SaveStatement(User user, StatementModel statementModel)
+        {
+            var statement = await FindStatementAsync(statementModel);
+
+            if (!statement.CanBeEdited)
+            {
+                return StatementActionResult.Uneditable;
             }
 
             // Is this check enough?
-            if (statement.StatementId == 0)
+            if (!statementModel.StatementId.HasValue)
             {
-                statement.OrganisationId = organisation.OrganisationId;
-                statement.SubmissionDeadline = SharedBusinessLogic.GetAccountingStartDate(organisation.SectorType, VirtualDateTime.Now.Year);
+                var org = await SharedBusinessLogic.DataRepository
+                    .FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == statementModel.OrganisationId);
+                statement.OrganisationId = statementModel.OrganisationId;
+                statement.SubmissionDeadline = SharedBusinessLogic.GetAccountingStartDate(org.SectorType, VirtualDateTime.Now.Year);
             }
 
             SharedBusinessLogic.DataRepository.Update(statement);
@@ -104,6 +131,40 @@ namespace ModernSlavery.BusinessDomain.Submission
             SharedBusinessLogic.DataRepository.CommitTransaction();
 
             return StatementActionResult.Success;
+        }
+    }
+
+    public class StatementMapperProfile : Profile
+    {
+        public StatementMapperProfile()
+        {
+            CreateMap<Statement, StatementModel>()
+                .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.SubmissionDeadline.Year))
+                // These should be added to the entity
+                .ForMember(dest => dest.IncludesGoals, opt => opt.Ignore())
+                .ForMember(dest => dest.IncludesStructureDetail, opt => opt.Ignore())
+                .ForMember(dest => dest.IncludesPoliciesDetail, opt => opt.Ignore())
+                .ForMember(dest => dest.IncludesMethodsDetail, opt => opt.Ignore())
+                .ForMember(dest => dest.IncludesRisksDetail, opt => opt.Ignore())
+                .ForMember(dest => dest.IncludedEffectivenessDetail, opt => opt.Ignore())
+                .ForMember(dest => dest.IncludesTrainingDetail, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherSectorText, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherPolicyText, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementTrainingDivisions, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherTrainingText, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementRiskTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherRiskText, opt => opt.Ignore())
+                .ForMember(dest => dest.Continents, opt => opt.Ignore())
+                .ForMember(dest => dest.Countries, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementDiligences, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementDiligenceTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.IndicatorDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.InstanceDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherRemediationText, opt => opt.Ignore())
+                .ForMember(dest => dest.KeyAchievements, opt => opt.Ignore());
         }
     }
 }

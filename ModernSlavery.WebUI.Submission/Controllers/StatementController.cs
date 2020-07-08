@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.WebUI.Submission.Controllers
 {
+    [Area("Submission")]
     [Route("statement")]
     public class StatementController : BaseController
     {
