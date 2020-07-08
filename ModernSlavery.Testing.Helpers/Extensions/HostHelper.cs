@@ -27,6 +27,11 @@ namespace ModernSlavery.Testing.Helpers
             return testWebHostBuilder.Build();
         }
 
+        public static T GetDependency<T>(this IHost host)
+        {
+            return host.Services.GetRequiredService<T>();
+        }
+
         public static IDataRepository GetDataRepository(this IHost host)
         {
             return host.Services.GetRequiredService<IDataRepository>();

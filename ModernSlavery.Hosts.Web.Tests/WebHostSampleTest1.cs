@@ -1,6 +1,7 @@
 using Geeks.Pangolin;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
 using NUnit.Framework;
@@ -24,6 +25,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         private string _webAuthority;
         private IDataRepository _dataRepository;
         private IFileRepository _fileRepository;
+        private SharedOptions _sharedOptions;
 
         [OneTimeSetUp]
         public void RunBeforeAnyTests()
@@ -38,6 +40,10 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //Get the file repository from the test web host
             _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
+
+            //Get the shared options
+            _sharedOptions = TestRunSetup.TestWebHost.GetDependency<SharedOptions>();
+
             if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
             Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
         }
@@ -100,19 +106,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             Goto(_webAuthority);
 
             //Check for the landing page header
-            ExpectHeader("Search and compare Modern Slavery statements");
+            Expect(What.Contains,_sharedOptions.ServiceName);
 
-            //Check for the landing page header using Xpath
-            ClickXPath("//*[@id='NextStep']");
-
-            //Go to the landing page
-            Goto(_webAuthority);
-
-            //Check for the landing page header
-            ExpectHeader("Search and compare Modern Slavery statements");
-
-            //Check for the landing page header using Xpath
-            ClickXPath("//*[@id='NextStep']");
+            Expect("It may take up to a week to register your organisation");
         }
     }
 }
