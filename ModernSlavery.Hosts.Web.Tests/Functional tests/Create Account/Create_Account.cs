@@ -9,6 +9,8 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using static ModernSlavery.Core.Extensions.Web;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -20,12 +22,28 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             
         }
-
         private string _webAuthority;
         private IDataRepository _dataRepository;
         private IFileRepository _fileRepository;
+        private string URL;
 
-        private bool TestRunFailed=false;
+        [OneTimeSetUp]
+        public void RunBeforeAnyTests()
+        {
+            //Get the url from the test web host
+            _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
+            if (Debugger.IsAttached) Debug.WriteLine($"Kestrel authority: {_webAuthority}");
+            Console.WriteLine($"Kestrel authority: {_webAuthority}");
+
+            //Get the data repository from the test web host
+            _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
+
+            //Get the file repository from the test web host
+            _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
+            if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
+            Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
+        }
+        private bool TestRunFailed = false;
 
         [SetUp]
         public void SetUp()
@@ -91,6 +109,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectButton("Continue");
         }
+
         [Test, Order(2)]
         public void Create_Account_Success()
         {
@@ -125,16 +144,21 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Verify your email address");
 
-            Expect("We have sent a confirmation email to");
-            Expect("roger@uat.co");
-            Expect("Follow the instructions in the email to continue your registration");
+            
+
+            Expect(What.Contains,"We have sent you a confirmation email to");
+            Expect(What.Contains, Create_Account.roger_email);
+            Expect(What.Contains, "Follow the instructions in the email to continue your sign up.");
+
+
+            //get email verification link
+            URL = WebDriver.FindElement(By.LinkText(Create_Account.roger_email)).GetAttribute("href");
         }
 
         [Test, Order(3) ]
         public void Create_Account_Awaiting_Verification_Check()
         {
             //if creating account for email address used in last 24 hours validation should appear
-
             //register account with email roger@test.co again
             Goto("/");
 
@@ -145,7 +169,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             BelowHeader("No account yet?");
             Click("Create an account");
 
-            ExpectHeader("Create an Account");
+            ExpectHeader("Create an Account");            
 
             Set("Email address").To("roger@uat.co");
             Set("Confirm your email address").To("roger@uat.co");
@@ -163,16 +187,41 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Continue");
 
             Expect("The following errors were detected");
-            Expect("This email address is awaiting confirmation. Please enter a different email address or try again in 23 hours");
+            Expect("There's a problem with your registration");
+            Expect("This email address is awaiting confirmation. Please enter a different email address or try again in 23 hours and 59 minutes");
         }
 
 
         [Test, Order(5)]
+        public void Create_Account_Verify_Email()
+        {
+            
+            //verify roger's email
+            Goto(URL);
+
+            Set("Email").To(Create_Account.roger_email);
+            Set("Password").To(Create_Account.roger_password);
+
+            Click(The.Bottom, "Sign In");
+            ExpectHeader("You've confirmed your email address");
+
+            Expect("To complete the registration process for Modern Slavery reporting please continue.");
+            Click("Continue");
+
+            ExpectHeader("Privacy Policy");
+            
+            Click("Continue");
+
+            ExpectHeader("Select an organisation");
+            Logout();
+
+        }
+        [Test, Order(6)]
         public void Create_Account_Failure_Existing_User()
         {
             //roger already registered in the system
             Goto("/");
-
+            
             Click("Sign in");
 
             ExpectHeader("Sign in");
@@ -200,85 +249,88 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //todo check validation messages
             Expect("The following errors were detected");
-            Expect("This email address has already been registered. Please enter a different email address or request a password reset.");
+           // Expect("This email address has already been registered. Please enter a different email address or request a password reset.");
+
+            Expect("This email address has already been registered. Please sign in or enter a different email address");
+
         }
 
-        [Test, Parallelizable]
-        public void Create_Account_Password_Rules()
-        {
-            //roger already registered in the system
-            Goto("/");
+        //[Test, Parallelizable]
+        //public void Create_Account_Password_Rules()
+        //{
+        //    //roger already registered in the system
+        //    Goto("/");
 
-            Click("Sign in");
+        //    Click("Sign in");
 
-            ExpectHeader("Sign in");
+        //    ExpectHeader("Sign in");
 
-            BelowHeader("No account yet?");
-            Click("Create an account");
+        //    BelowHeader("No account yet?");
+        //    Click("Create an account");
 
-            ExpectHeader("Create an Account");
+        //    ExpectHeader("Create an Account");
 
-            Set("Email address").To(Create_Account.existing_email);
-            Set("Confirm your email address").To(Create_Account.existing_email);
+        //    Set("Email address").To(Create_Account.existing_email);
+        //    Set("Confirm your email address").To(Create_Account.existing_email);
 
-            Set("First name").To("Existing");
-            Set("Last name").To("User");
-            Set("Job title").To("Reporter");
+        //    Set("First name").To("Existing");
+        //    Set("Last name").To("User");
+        //    Set("Job title").To("Reporter");
 
-            Set("Password").To("Test1234");
-            Set("Confirm password").To("Test1234");
+        //    Set("Password").To("Test1234");
+        //    Set("Confirm password").To("Test1234");
 
-            ClickLabel("I would like to receive information about webinars, events and new guidance");
-            ClickLabel("I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys");
+        //    ClickLabel("I would like to receive information about webinars, events and new guidance");
+        //    ClickLabel("I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys");
 
-            Click("Continue");
+        //    Click("Continue");
 
 
-            //todo check validation messages
-            Expect("The following errors were detected");
-            Expect("This email address has already been registered. Please enter a different email address or request a password reset.");
-        }
-        [Test, Parallelizable]
-        public void Create_Account_Validation_Check()
-        {
-            Goto("/");
+        //    //todo check validation messages
+        //    Expect("The following errors were detected");
+        //    Expect("This email address has already been registered. Please enter a different email address or request a password reset.");
+        //}
+        //[Test, Parallelizable]
+        //public void Create_Account_Validation_Check()
+        //{
+        //    Goto("/");
 
-            Click("Sign in");
+        //    Click("Sign in");
 
-            ExpectHeader("Sign in");
+        //    ExpectHeader("Sign in");
 
-            BelowHeader("No account yet?");
-            Click("Create an account");
+        //    BelowHeader("No account yet?");
+        //    Click("Create an account");
 
-            ExpectHeader("Create an Account");
+        //    ExpectHeader("Create an Account");
 
-            //invalid email address
-            Set("Email address").To("invalid");
-            Click("Continue");
-            //Expect("There`s a problem with your email address");
+        //    //invalid email address
+        //    Set("Email address").To("invalid");
+        //    Click("Continue");
+        //    //Expect("There`s a problem with your email address");
 
-            //Expect("Please include an '@' in the email address. 'invalid' is missing an '@'.");
-            Expect(What.Contains, "Please include");
+        //    //Expect("Please include an '@' in the email address. 'invalid' is missing an '@'.");
+        //    Expect(What.Contains, "Please include");
 
-            //different email addresses
-            Set("Email address").To("test@test.test");
-            Set("Confirm email address").To("test2@test.test");
-            Click("Continue");
+        //    //different email addresses
+        //    Set("Email address").To("test@test.test");
+        //    Set("Confirm email address").To("test2@test.test");
+        //    Click("Continue");
 
-            Expect("The following errors were detected");
-            Expect("The email address and confirmation do not match");
+        //    Expect("The following errors were detected");
+        //    Expect("The email address and confirmation do not match");
 
-            Set("Confirm email address").To("test@test.test");
+        //    Set("Confirm email address").To("test@test.test");
 
-            Click("Continue");
+        //    Click("Continue");
 
-            //personal details
-            //leave blank to test validaition
-            //todo check validation messages
-            Expect("The following errors were detected");
-            Expect("You need to provide a first name");
-            Expect("You need to provide a last name");
-            Expect("You need to provide a job title");
-        }
+        //    //personal details
+        //    //leave blank to test validaition
+        //    //todo check validation messages
+        //    Expect("The following errors were detected");
+        //    Expect("You need to provide a first name");
+        //    Expect("You need to provide a last name");
+        //    Expect("You need to provide a job title");
+        //}
     }
 }
