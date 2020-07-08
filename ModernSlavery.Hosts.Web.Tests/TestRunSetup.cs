@@ -47,7 +47,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             TestWebHost?.Dispose();
 
             //Dispose of the webdriver service
-            WebDriverService?.DisposeService();
+            //WebDriverService?.DisposeService();
         }
     }
 }
