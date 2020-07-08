@@ -69,7 +69,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test]
         public void WebTestHost_Authority_IsValidUrl()
         {
-            TestContext.Out.WriteLine($"Kestrel authority: {_webAuthority}");
+            TestContext.Out.WriteLine($"0 Kestrel authority: {_webAuthority}");
+            Console.WriteLine($"1 Kestrel authority: {_webAuthority}");
+            TestContext.WriteLine($"2 Kestrel authority: {_webAuthority}");
+            Debug.WriteLine($"3 Kestrel authority: {_webAuthority}");
 
             //Check we got the url of the test web server
             Assert.That(_webAuthority.IsUrl());
