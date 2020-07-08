@@ -197,10 +197,6 @@ namespace ModernSlavery.Infrastructure.Configuration
             _configActions.ForEach(action => action(lifetimeScope));
 
             _configActionsComplete = true;
-
-            //Allow self-signed https certificates
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-
         }
 
     }

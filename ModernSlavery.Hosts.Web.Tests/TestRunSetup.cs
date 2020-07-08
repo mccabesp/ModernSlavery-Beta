@@ -8,6 +8,8 @@ using Geeks.Pangolin;
 using ModernSlavery.Infrastructure.Hosts;
 using NUnit.Framework.Interfaces;
 using System.Net;
+using System.IO;
+using System;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -24,8 +26,15 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task RunBeforeAnyTestsAsync()
         {
-            //Allow self-signed https certificates
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+            //Delete all previous log files
+            var logs = Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LogFiles"), "*.*", SearchOption.AllDirectories);
+            foreach (var log in logs)
+                File.Delete(log);
+
+            //Delete all previous screenshots
+            var screenshots = Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots"), "*.*", SearchOption.AllDirectories);
+            foreach (var screenshot in screenshots)
+                File.Delete(screenshot);
 
             //Create the test host usign the default dependency module and override with a test module
             TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>();
@@ -34,7 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             await TestWebHost.StartAsync().ConfigureAwait(false);
 
             var baseUrl = TestWebHost.GetHostAddress();
-            TestContext.Out.WriteLine($"Test Host started on endpoint: {baseUrl}");
+            TestContext.Progress.WriteLine($"Test Host started on endpoint: {baseUrl}");
             WebDriverService = UITest.SetupWebDriverService(baseUrl: baseUrl);
         }
 
@@ -51,6 +60,27 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //Dispose of the webdriver service
             WebDriverService?.DisposeService();
+
+            //Publish all log files on failure
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
+            {
+                var logs = Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LogFiles"), "*.*", SearchOption.AllDirectories);
+                foreach (var log in logs)
+                {
+                    var filename = Path.GetFileName(log);
+                    TestContext.AddTestAttachment(log, $"[LOG]: {filename}");
+                    TestContext.Progress.WriteLine($"Added test attachment: {filename}");
+                }
+            }
+
+            //Publish all screenshots
+            var screenshots = Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Screenshots"), "*.*", SearchOption.AllDirectories);
+            foreach (var screenshot in screenshots)
+            {
+                var filename = Path.GetFileName(screenshot);
+                TestContext.AddTestAttachment(screenshot, $"[SCREENSHOT]: {filename}");
+                TestContext.Progress.WriteLine($"Added test attachment: {filename}");
+            }
         }
     }
 }

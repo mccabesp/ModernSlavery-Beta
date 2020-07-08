@@ -32,13 +32,15 @@ namespace ModernSlavery.WebUI.Identity.Classes
             else
                 switch (evt.EventType)
                 {
-                    case EventTypes.Error:
-                        break;
                     case EventTypes.Failure:
+                        Logger.LogCritical(evt.Message);
+                        break;
+                    case EventTypes.Error:
+                        Logger.LogError(evt.Message);
                         break;
                     case EventTypes.Information:
-                        break;
                     case EventTypes.Success:
+                        Logger.LogInformation(evt.Message);
                         break;
                 }
 

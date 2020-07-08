@@ -121,7 +121,7 @@ namespace ModernSlavery.Infrastructure.Hosts
                     {
                         options.SignInScheme = "Cookies";
                         options.Authority = authority;
-                        options.RequireHttpsMetadata = false;
+                        options.RequireHttpsMetadata = true;
                         options.ClientId = clientId;
                         if (!string.IsNullOrWhiteSpace(clientSecret))
                             options.ClientSecret = clientSecret.GetSHA256Checksum();
