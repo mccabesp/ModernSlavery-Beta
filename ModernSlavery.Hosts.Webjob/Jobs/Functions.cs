@@ -29,7 +29,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         public readonly ISearchBusinessLogic SearchBusinessLogic;
         private readonly IGovNotifyAPI govNotifyApi;
         private readonly UpdateFromCompaniesHouseService _updateFromCompaniesHouseService;
-        private readonly ISnapshotDateHelper _snapshotDateHelper;
+        private readonly IReportingDeadlineHelper _snapshotDateHelper;
         private readonly IAuthorisationBusinessLogic _authorisationBusinessLogic;
         #endregion
         public Functions(

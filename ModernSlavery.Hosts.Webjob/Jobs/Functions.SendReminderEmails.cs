@@ -44,7 +44,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     .Where(
                         o =>
                             o.LatestReturn == null
-                            || o.LatestReturn.AccountingDate != _snapshotDateHelper.GetSnapshotDate(o.SectorType)
+                            || o.LatestReturn.AccountingDate != _snapshotDateHelper.GetReportingStartDate(o.SectorType)
                             || o.LatestReturn.Status != ReturnStatuses.Submitted)
                     .ToList();
 
@@ -99,11 +99,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             {
                 {
                     "DeadlineDate",
-                    _snapshotDateHelper.GetSnapshotDate(sectorType).AddYears(1).AddDays(-1).ToString("d MMMM yyyy")
+                    _snapshotDateHelper.GetReportingStartDate(sectorType).AddYears(1).AddDays(-1).ToString("d MMMM yyyy")
                 },
                 {
                     "DaysUntilDeadline",
-                    _snapshotDateHelper.GetSnapshotDate(sectorType).AddYears(1).AddDays(-1)
+                    _snapshotDateHelper.GetReportingStartDate(sectorType).AddYears(1).AddDays(-1)
                         .Subtract(VirtualDateTime.Now).Days
                 },
                 {"OrganisationNames", GetOrganisationNameString(organisations)},
@@ -193,7 +193,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         private DateTime GetDeadlineDate(SectorTypes sectorType)
         {
-            return _snapshotDateHelper.GetSnapshotDate(sectorType).AddYears(1);
+            return _snapshotDateHelper.GetReportingStartDate(sectorType).AddYears(1);
         }
     }
 }

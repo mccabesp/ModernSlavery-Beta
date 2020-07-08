@@ -23,14 +23,10 @@ namespace ModernSlavery.BusinessDomain.Submission
         public void ConfigureContainer(ContainerBuilder builder)
         {
             //Add registrations here
-            builder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<SubmissionService>().As<ISubmissionService>()
-                .InstancePerLifetimeScope().WithAttributeFiltering();
-            builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>()
-                .InstancePerLifetimeScope().WithAttributeFiltering();
-            builder.RegisterType<DraftFileBusinessLogic>().As<IDraftFileBusinessLogic>()
-                .SingleInstance();
+            builder.RegisterType<ScopeBusinessLogic>().As<IScopeBusinessLogic>().InstancePerLifetimeScope();
+            builder.RegisterType<SubmissionService>().As<ISubmissionService>().InstancePerLifetimeScope().WithAttributeFiltering();
+            builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerLifetimeScope().WithAttributeFiltering();
+            builder.RegisterType<DraftFileBusinessLogic>().As<IDraftFileBusinessLogic>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

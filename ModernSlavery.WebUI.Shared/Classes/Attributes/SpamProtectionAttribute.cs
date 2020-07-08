@@ -8,12 +8,10 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
     public class SpamProtectionAttribute : ActionFilterAttribute
     {
         private readonly int _minimumSeconds;
-        private readonly SharedOptions _sharedOptions;
+        public static SharedOptions SharedOptions;
 
         public SpamProtectionAttribute(int minimumSeconds = 10)
         {
-            _sharedOptions = Activator.CreateInstance<SharedOptions>();
-
             _minimumSeconds = minimumSeconds;
         }
 
@@ -34,7 +32,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
             {
             }
 
-            if (_sharedOptions.SkipSpamProtection) return;
+            if (SharedOptions.SkipSpamProtection) return;
 
             throw new HttpException(429, "Too Many Requests");
         }

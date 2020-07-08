@@ -30,7 +30,7 @@ namespace ModernSlavery.BusinessDomain.Shared
 
     public class SharedBusinessLogic : ISharedBusinessLogic
     {
-        private readonly ISnapshotDateHelper _snapshotDateHelper;
+        private readonly IReportingDeadlineHelper _snapshotDateHelper;
         public IObfuscator Obfuscator { get; }
         public SharedOptions SharedOptions { get; }
         public IFileRepository FileRepository { get; }
@@ -41,7 +41,7 @@ namespace ModernSlavery.BusinessDomain.Shared
         public IAuthorisationBusinessLogic AuthorisationBusinessLogic { get; }
         public IAuthenticationBusinessLogic AuthenticationBusinessLogic { get; }
 
-        public SharedBusinessLogic(SharedOptions sharedOptions, ISnapshotDateHelper snapshotDateHelper,
+        public SharedBusinessLogic(SharedOptions sharedOptions, IReportingDeadlineHelper snapshotDateHelper,
             ISourceComparer sourceComparer,
             ISendEmailService sendEmailService, 
             INotificationService notificationService, 
@@ -69,7 +69,7 @@ namespace ModernSlavery.BusinessDomain.Shared
         /// <returns></returns>
         public DateTime GetAccountingStartDate(SectorTypes sectorType, int year = 0)
         {
-            return _snapshotDateHelper.GetSnapshotDate(sectorType, year);
+            return _snapshotDateHelper.GetReportingStartDate(sectorType, year);
         }
     }
 }

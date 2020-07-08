@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using ModernSlavery.Core.Attributes;
@@ -14,12 +16,14 @@ namespace ModernSlavery.Core.Models
         {
 
         }
+
+        public string ServiceName { get; set; }
         private string _DevelopmentWebroot;
         public string DevelopmentWebroot { get => _DevelopmentWebroot; set => _DevelopmentWebroot = value!=null && value.StartsWith('.') ? Path.GetFullPath(value) : value; }
 
         public int FirstReportingYear { get; set; } = 2020;
-        public DateTime PrivateAccountingDate { get; set; }
-        public DateTime PublicAccountingDate { get; set; }
+        public DateTime PrivateReportingDeadline { get; set; }
+        public DateTime PublicReportingDeadline { get; set; }
 
         private int[] _reminderEmailDays;
 
@@ -163,5 +167,41 @@ namespace ModernSlavery.Core.Models
 
         public string SaveDraftPath { get; set; }
         #endregion
+
+        public void Validate() 
+        {
+            var exceptions = new List<Exception>();
+            //Check security settings for production environment
+            if (IsProduction())
+            {
+                if (ShowEmailVerifyLink) exceptions.Add(new ConfigurationErrorsException("ShowEmailVerifyLink is not permitted in Production environment"));
+                if (PinInPostTestMode) exceptions.Add(new ConfigurationErrorsException("PinInPostTestMode is not permitted in Production environment"));
+                if (SkipSpamProtection) exceptions.Add(new ConfigurationErrorsException("SkipSpamProtection is not permitted in Production environment"));
+                if (string.IsNullOrWhiteSpace(DefaultEncryptionKey)) exceptions.Add(new ConfigurationErrorsException("DefaultEncryptionKey cannot be empty in Production environment"));
+                if (DefaultEncryptionKey==Encryption.DefaultEncryptionKey) exceptions.Add(new ConfigurationErrorsException("DefaultEncryptionKey cannot use default value in Production environment"));
+                if (ObfuscationSeed.IsAny(0,127)) exceptions.Add(new ConfigurationErrorsException("ObfuscationSeed cannot use default value in Production environment"));
+                if (string.IsNullOrWhiteSpace(CertThumprint)) exceptions.Add(new ConfigurationErrorsException("CertThumprint cannot be empty in Production environment."));
+            }
+
+            if (FirstReportingYear == 0 || FirstReportingYear > VirtualDateTime.Now.Year) exceptions.Add(new ConfigurationErrorsException($"Invalid FirstReportingYear: {FirstReportingYear}."));
+            if (PrivateReportingDeadline == DateTime.MinValue)
+                exceptions.Add(new ConfigurationErrorsException($"Invalid PrivateReportingDeadline: {PrivateReportingDeadline}."));
+            else
+                while (PrivateReportingDeadline.Date.AddDays(1) < VirtualDateTime.Now)
+                    PrivateReportingDeadline=new DateTime(PrivateReportingDeadline.Year+1, PrivateReportingDeadline.Month, PrivateReportingDeadline.Day);
+
+            if (PublicReportingDeadline == DateTime.MinValue) 
+                exceptions.Add(new ConfigurationErrorsException($"Invalid PublicReportingDeadline: {PublicReportingDeadline}."));
+            else
+                while (PublicReportingDeadline.Date.AddDays(1) < VirtualDateTime.Now)
+                    PublicReportingDeadline = new DateTime(PublicReportingDeadline.Year + 1, PublicReportingDeadline.Month, PublicReportingDeadline.Day);
+
+            if (exceptions.Count > 0)
+            {
+                if (exceptions.Count == 1) throw exceptions[0];
+                throw new AggregateException(exceptions);
+            }
+        }
+
     }
 }

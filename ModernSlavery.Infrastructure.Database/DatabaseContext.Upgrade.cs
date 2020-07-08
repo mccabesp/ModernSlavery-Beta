@@ -18,7 +18,7 @@ namespace ModernSlavery.Infrastructure.Database
         private RelationalDatabaseCreator DatabaseCreator =>
             this.GetService<IDatabaseCreator>() as RelationalDatabaseCreator;
 
-        private bool DatabaseExists => DatabaseCreator.Exists();
+        private bool DatabaseExists => DatabaseCreator==null ? false : DatabaseCreator.Exists();
 
         private void EnsureMigrated()
         {

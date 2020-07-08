@@ -9,11 +9,11 @@ namespace ModernSlavery.Core.Models
     [Serializable]
     public class DnBOrgsModel
     {
-        private readonly ISnapshotDateHelper _snapshotDateHelper;
+        private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
 
-        public DnBOrgsModel(ISnapshotDateHelper snapshotDateHelper)
+        public DnBOrgsModel(IReportingDeadlineHelper snapshotDateHelper)
         {
-            _snapshotDateHelper = snapshotDateHelper;
+            _reportingDeadlineHelper = snapshotDateHelper;
         }
 
         public string DUNSNumber { get; set; }
@@ -75,7 +75,7 @@ namespace ModernSlavery.Core.Models
         public bool GetIsDissolved()
         {
             return DateOfCessation != null &&
-                   DateOfCessation < _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private);
+                   DateOfCessation < _reportingDeadlineHelper.GetReportingStartDate(SectorTypes.Private);
         }
 
         public SortedSet<int> GetSicCodesIds()

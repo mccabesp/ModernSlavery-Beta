@@ -117,33 +117,41 @@
                 <div class="content">
                     <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
                     <nav id="proposition-menu" aria-label="proposition menu">
-                        <a href="~/" id="proposition-name">Modern Slavery Reporting service</a>
+                        @if (featureSwitchOptions.IsEnabled("NavigationLinks"))
+                        {
+                            <a href="~/" id="proposition-name">@sharedOptions.ServiceName</a>
+                        }
+                        else
+                        {
+                            <span id="proposition-name">@sharedOptions.ServiceName</span>
+                        }
                         <ul id="proposition-links">
-
-                            @if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
+                            @if (featureSwitchOptions.IsEnabled("NavigationLinks"))
                             {
-                                <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">Search</a>
-                                </li>
-                                <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("StepByStepStandalone", "ReportingStepByStep", "Viewing"))">Guidance</a>
-                                </li>
-                                <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Submit</a>
-                                </li>
-                            }
-                            else
-                            {
-                                <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">Search and compare</a>
-                                </li>
-                                <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("Download", "Viewing", "Viewing"))">Download</a>
-                                </li>
-                                <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("ActionHub", "Overview", "Viewing"))">Close the gap</a>
-                                </li>
-                            }
+                                @if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
+                                {
+                                    <li>
+                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">Search</a>
+                                    </li>
+                                    <li>
+                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("StepByStepStandalone", "ReportingStepByStep", "Viewing"))">Guidance</a>
+                                    </li>
+                                    <li>
+                                        <a rel="track" data-track-category="Header Link Clicked" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Submit</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">Search and compare</a>
+                                    </li>
+                                    <li>
+                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("Download", "Viewing", "Viewing"))">Download</a>
+                                    </li>
+                                    <li>
+                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("ActionHub", "Overview", "Viewing"))">Close the gap</a>
+                                    </li>
+                                }}
 
                             @if (User.Identity.IsAuthenticated)
                             {
@@ -151,7 +159,7 @@
                                     <a asp-action="SignOut" asp-controller="Account" asp-area="Account">Sign out</a>
                                 </li>
                             }
-                            else
+                            else if (!Url.IsAction("Login", "Identity", "Identity"))
                             {
                                 <li id="login-links" class="nowrap">
                                     <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Sign in</a>
@@ -163,6 +171,7 @@
             </div>
         </div>
     </header>
+
     <!--end header-->
     <div role="complementary">
         @RenderSection("AfterHeader", false)
@@ -214,9 +223,12 @@
                         <li>
                             <a asp-action="PrivacyPolicy" asp-controller="Shared">Privacy Policy</a>
                         </li>
-                        <li>
-                            <a asp-action="ReportConcerns" asp-controller="Shared">Report Concerns</a>
-                        </li>
+                        @if (featureSwitchOptions.IsEnabled("ReportConcernsLink"))
+                        {
+                            <li>
+                                <a asp-action="ReportConcerns" asp-controller="Shared">Report Concerns</a>
+                            </li>
+                        }
                         @if (VirtualDateTime.Offset != TimeSpan.Zero)
                         {
                             <li style="font-size: smaller">@(VirtualDateTime.Now)</li>

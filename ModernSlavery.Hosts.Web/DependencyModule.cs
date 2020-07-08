@@ -42,6 +42,7 @@ namespace ModernSlavery.Hosts.Web
         private readonly DistributedCacheOptions _distributedCacheOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
         private readonly BasicAuthenticationOptions _basicAuthenticationOptions;
+        private readonly DynamicRoutesOptions _dynamicRoutesOptions;
         private readonly IdentityClientOptions _identityClientOptions;
 
         public DependencyModule(
@@ -49,6 +50,7 @@ namespace ModernSlavery.Hosts.Web
             SharedOptions sharedOptions, 
             ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions,
             DataProtectionOptions dataProtectionOptions, BasicAuthenticationOptions basicAuthenticationOptions,
+            DynamicRoutesOptions dynamicRoutesOptions,
             IdentityClientOptions identityClientOptions)
         {
             _logger = logger;
@@ -57,6 +59,7 @@ namespace ModernSlavery.Hosts.Web
             _distributedCacheOptions = distributedCacheOptions;
             _dataProtectionOptions = dataProtectionOptions;
             _basicAuthenticationOptions = basicAuthenticationOptions;
+            _dynamicRoutesOptions = dynamicRoutesOptions;
             _identityClientOptions = identityClientOptions;
         }
 
@@ -223,7 +226,8 @@ namespace ModernSlavery.Hosts.Web
             if (_basicAuthenticationOptions.Enabled) app.UseMiddleware<BasicAuthenticationMiddleware>(_basicAuthenticationOptions.Username, _basicAuthenticationOptions.Password);
 
             //app.UseMvcWithDefaultRoute();
-            app.UseEndpoints(endpoints => { 
+            app.UseEndpoints(endpoints => {
+                _dynamicRoutesOptions.MapDynamicRoutes(endpoints);
                 endpoints.MapControllers();
                 endpoints.MapRazorPages();
             });

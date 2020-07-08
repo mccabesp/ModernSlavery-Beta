@@ -72,7 +72,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 // Cache the latest unregistered organisations
                 var unregisteredOrganisations = await GetOrphanOrganisationsAsync();
 
-                var year = _snapshotDateHelper.GetSnapshotDate(SectorTypes.Private).Year;
+                var year = _snapshotDateHelper.GetReportingStartDate(SectorTypes.Private).Year;
 
                 // Write yearly records to csv files
                 await WriteRecordsForYearAsync(
@@ -149,7 +149,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         var countryCode = Country.FindTwoLetterCode(latestAddress.Country);
 
                         // Retrieve the SectorType reporting snapshot date (d MMMM yyyy)
-                        var expires = _snapshotDateHelper.GetSnapshotDate(org.SectorType).AddYears(1).AddDays(-1)
+                        var expires = _snapshotDateHelper.GetReportingStartDate(org.SectorType).AddYears(1).AddDays(-1)
                             .ToString("d MMMM yyyy");
 
                         // Generate csv row

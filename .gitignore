@@ -8,7 +8,7 @@
 **/wwwroot/assets/styles/*.css
 
 tempkey.rsa
-**/*.Settings.json
+**/LogFiles/*
 
 # User-specific files
 *.jfm
