@@ -78,6 +78,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Trace.TraceInformation($"4.1 Kestrel authority: {_webAuthority}");
             Trace.TraceWarning($"4.2 Kestrel authority: {_webAuthority}");
             Trace.TraceError($"4.3 Kestrel authority: {_webAuthority}");
+            TestContext.Progress.WriteLine($"5 Kestrel authority: {_webAuthority}");
 
             //Check we got the url of the test web server
             Assert.That(_webAuthority.IsUrl());
@@ -106,6 +107,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Check we get a response from the test web server
             var discoveryAuthority = $"{_webAuthority}/.well-known/openid-configuration";
             Trace.TraceInformation($"4.1 Discovery authority: {discoveryAuthority}");
+            TestContext.Progress.WriteLine($"5 Discovery authority: {discoveryAuthority}");
+
             var response = await WebRequestAsync(HttpMethods.Get, discoveryAuthority, validateCertificate: false);
             Trace.TraceInformation(response);
 
