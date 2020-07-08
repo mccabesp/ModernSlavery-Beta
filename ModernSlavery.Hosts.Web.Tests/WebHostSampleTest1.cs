@@ -91,6 +91,17 @@ namespace ModernSlavery.Hosts.Web.Tests
             Assert.IsNotNull(_fileRepository);
         }
 
+
+        [Test]
+        public async Task WebTestHost_HttpGet_ReturnsIdentityDiscovery()
+        {
+            //Check we get a response from the test web server
+            var discoveryAuthority = $"{_webAuthority}/.well-known/openid-configuration";
+            var response = await WebRequestAsync(HttpMethods.Get, discoveryAuthority, validateCertificate: false);
+            Assert.That(!string.IsNullOrWhiteSpace(response));
+        }
+
+
         [Test]
         public async Task WebTestHost_HttpGet_ReturnsValidResponse()
         {
