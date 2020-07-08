@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace ModernSlavery.Core.Models
+namespace ModernSlavery.BusinessDomain.Submission
 {
     [Serializable]
     public class StatementModel
