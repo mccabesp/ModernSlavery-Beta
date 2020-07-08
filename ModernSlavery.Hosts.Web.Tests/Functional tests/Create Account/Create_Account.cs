@@ -255,41 +255,93 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
-        //[Test, Parallelizable]
-        //public void Create_Account_Password_Rules()
-        //{
-        //    //roger already registered in the system
-        //    Goto("/");
+        [Test, Parallelizable]
+        public void Create_Account_Password_Rules()
+        {
+            //roger already registered in the system
+            Goto("/");
 
-        //    Click("Sign in");
+            Click("Sign in");
 
-        //    ExpectHeader("Sign in");
+            ExpectHeader("Sign in");
 
-        //    BelowHeader("No account yet?");
-        //    Click("Create an account");
+            BelowHeader("No account yet?");
+            Click("Create an account");
 
-        //    ExpectHeader("Create an Account");
+            ExpectHeader("Create an Account");
 
-        //    Set("Email address").To(Create_Account.existing_email);
-        //    Set("Confirm your email address").To(Create_Account.existing_email);
+            var time = (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds.ToString();
 
-        //    Set("First name").To("Existing");
-        //    Set("Last name").To("User");
-        //    Set("Job title").To("Reporter");
+            //use time to ensure email unique
+            Set("Email address").To("test@uat.co" +time);
+            Set("Confirm your email address").To("test@uat.co" + time);
 
-        //    Set("Password").To("Test1234");
-        //    Set("Confirm password").To("Test1234");
+            Set("First name").To("Existing");
+            Set("Last name").To("User");
+            Set("Job title").To("Reporter");
 
-        //    ClickLabel("I would like to receive information about webinars, events and new guidance");
-        //    ClickLabel("I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys");
+            ClickLabel("I would like to receive information about webinars, events and new guidance");
+            ClickLabel("I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys");
 
-        //    Click("Continue");
+            //password must be 8 characters
+            Set("Password").To("test");
+            Set("Confirm password").To("test");           
+
+            Click("Continue");
+
+            Expect("The following errors were detected");
+            AtLabel("Password").Expect("The Password must be at least 8 characters long.");
+            
+            //must contain upper lower digit
+            Set("Password").To("testtest");
+            Set("Confirm password").To("testtest");
+
+            Click("Continue");
+
+            
+            Expect("The following errors were detected");
+            AtLabel("Password").Expect("Password must contain at least one upper case, 1 lower case character and 1 digit");
+
+            //must contain upper digit
+            Set("Password").To("testtest");
+            Set("Confirm password").To("testtest");
+
+            Click("Continue");
 
 
-        //    //todo check validation messages
-        //    Expect("The following errors were detected");
-        //    Expect("This email address has already been registered. Please enter a different email address or request a password reset.");
-        //}
+            Expect("The following errors were detected");
+            AtLabel("Password").Expect("Password must contain at least one upper case, 1 lower case character and 1 digit");
+
+            //must contain lower digit
+            Set("Password").To("TESTTEST");
+            Set("Confirm password").To("TESTTEST");
+
+            Click("Continue");
+
+
+            Expect("The following errors were detected");
+            AtLabel("Password").Expect("Password must contain at least one upper case, 1 lower case character and 1 digit");
+
+            //must contain digit
+            Set("Password").To("Testtest");
+            Set("Confirm password").To("Testtest");
+
+            Click("Continue");
+
+
+            Expect("The following errors were detected");
+            AtLabel("Password").Expect("Password must contain at least one upper case, 1 lower case character and 1 digit");
+
+            //passwords must match
+            Set("Password").To("Test1234");
+            Set("Confirm password").To("Test2345");
+
+            Click("Continue");
+
+
+            Expect("The following errors were detected");
+            AtLabel("Confirm password").Expect("The password and confirmation password do not match.");
+        }
         //[Test, Parallelizable]
         //public void Create_Account_Validation_Check()
         //{
