@@ -129,11 +129,12 @@ namespace ModernSlavery.Hosts.IdServer
 
             lifetimeScope.UseLogEventQueueLogger();
 
+            //Show PII errors in logs except in production environment
+            IdentityModelEventSource.ShowPII = !_sharedOptions.IsProduction();
+
             app.UseMiddleware<ExceptionMiddleware>();
             if (Debugger.IsAttached || _sharedOptions.IsDevelopment())
             {
-                IdentityModelEventSource.ShowPII = true;
-
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }

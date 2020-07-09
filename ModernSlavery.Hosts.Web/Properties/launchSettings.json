@@ -12,6 +12,7 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
+        "WEBSITE_HOSTNAME": "localhost:44371",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
       },
@@ -21,10 +22,11 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
+        "WEBSITE_HOSTNAME": "127.0.0.1:5001",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"
       },
-      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+      "applicationUrl": "https://127.0.0.1:5001;http://127.0.0.1:5000"
     }
   }
 }

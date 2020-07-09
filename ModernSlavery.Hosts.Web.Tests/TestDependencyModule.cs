@@ -7,16 +7,21 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Testing.Helpers;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using Microsoft.Extensions.Hosting;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
     public class TestDependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
+        private readonly IConfiguration _configuration;
 
-        public TestDependencyModule(ILogger<TestDependencyModule> logger)
+        public TestDependencyModule(ILogger<TestDependencyModule> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -44,6 +49,10 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
+            //Send logs to file for later upload to DevOps as test attachments
+            var loggerFactory = lifetimeScope.Resolve<ILoggerFactory>();
+            var logFilepath = Path.Combine(_configuration["Filepaths:LogFiles"], $"{AppDomain.CurrentDomain.FriendlyName}.{_configuration[HostDefaults.EnvironmentKey]}.log");
+            loggerFactory.AddFile(logFilepath);
         }
 
         public void RegisterModules(IList<Type> modules)

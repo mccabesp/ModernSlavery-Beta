@@ -208,7 +208,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                     ScopeStatus = ScopeStatuses.PresumedInScope,
                                     ScopeStatusDate = VirtualDateTime.Now,
                                     Status = ScopeRowStatuses.Active,
-                                    SnapshotDate = _snapshotDateHelper.GetSnapshotDate(dbOrg.SectorType)
+                                    SnapshotDate = _snapshotDateHelper.GetReportingStartDate(dbOrg.SectorType)
                                 };
                                 _SharedBusinessLogic.DataRepository.Insert(newScope);
                                 dbOrg.OrganisationScopes.Add(newScope);

@@ -169,7 +169,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             dnbFullName = "Chief Executive";
 
                         // Retrieve the SectorType reporting snapshot date (d MMMM yyyy)
-                        var expires = _snapshotDateHelper.GetSnapshotDate(vo.SectorType).AddYears(1).AddDays(-1)
+                        var expires = _snapshotDateHelper.GetReportingStartDate(vo.SectorType).AddYears(1).AddDays(-1)
                             .ToString("d MMMM yyyy");
 
                         // Generate csv row

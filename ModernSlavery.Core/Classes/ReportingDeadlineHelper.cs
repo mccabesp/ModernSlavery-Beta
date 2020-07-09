@@ -6,13 +6,13 @@ using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Core.Classes
 {
-    public class SnapshotDateHelper : ISnapshotDateHelper
+    public class ReportingDeadlineHelper : IReportingDeadlineHelper
     {
         private readonly SharedOptions _sharedOptions;
 
         private int? _firstReportingYear;
 
-        public SnapshotDateHelper(SharedOptions sharedOptions)
+        public ReportingDeadlineHelper(SharedOptions sharedOptions)
         {
             _sharedOptions= sharedOptions;
         }
@@ -32,11 +32,11 @@ namespace ModernSlavery.Core.Classes
             }
         }
 
-        public DateTime PrivateAccountingDate => _sharedOptions.PrivateAccountingDate;
-        public DateTime PublicAccountingDate=> _sharedOptions.PublicAccountingDate;
-        public int CurrentSnapshotYear => GetSnapshotDate(SectorTypes.Private).Year;
+        public DateTime PrivateReportingDeadline => _sharedOptions.PrivateReportingDeadline;
+        public DateTime PublicReportingDeadline => _sharedOptions.PublicReportingDeadline;
+        public int CurrentSnapshotYear => GetReportingStartDate(SectorTypes.Private).Year;
 
-        public DateTime GetSnapshotDate(SectorTypes sectorType, int year = 0)
+        public DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0)
         {
             var tempDay = 0;
             var tempMonth = 0;
@@ -46,12 +46,12 @@ namespace ModernSlavery.Core.Classes
             switch (sectorType)
             {
                 case SectorTypes.Private:
-                    tempDay = PrivateAccountingDate.Day;
-                    tempMonth = PrivateAccountingDate.Month;
+                    tempDay = PrivateReportingDeadline.Day;
+                    tempMonth = PrivateReportingDeadline.Month;
                     break;
                 case SectorTypes.Public:
-                    tempDay = PublicAccountingDate.Day;
-                    tempMonth = PublicAccountingDate.Month;
+                    tempDay = PublicReportingDeadline.Day;
+                    tempMonth = PublicReportingDeadline.Month;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(sectorType), sectorType,
@@ -60,9 +60,9 @@ namespace ModernSlavery.Core.Classes
 
             if (year == 0) year = now.Year;
 
-            var tempDate = new DateTime(year, tempMonth, tempDay);
+            var reportingStartDate = new DateTime(year, tempMonth, tempDay).Date.AddDays(1);
 
-            return now > tempDate ? tempDate : tempDate.AddYears(-1);
+            return reportingStartDate< now ? reportingStartDate.AddYears(-1) : reportingStartDate;
         }
     }
 }

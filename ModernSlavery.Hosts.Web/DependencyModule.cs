@@ -42,6 +42,7 @@ namespace ModernSlavery.Hosts.Web
         private readonly DistributedCacheOptions _distributedCacheOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
         private readonly BasicAuthenticationOptions _basicAuthenticationOptions;
+        private readonly DynamicRoutesOptions _dynamicRoutesOptions;
         private readonly IdentityClientOptions _identityClientOptions;
 
         public DependencyModule(
@@ -49,6 +50,7 @@ namespace ModernSlavery.Hosts.Web
             SharedOptions sharedOptions, 
             ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions,
             DataProtectionOptions dataProtectionOptions, BasicAuthenticationOptions basicAuthenticationOptions,
+            DynamicRoutesOptions dynamicRoutesOptions,
             IdentityClientOptions identityClientOptions)
         {
             _logger = logger;
@@ -57,6 +59,7 @@ namespace ModernSlavery.Hosts.Web
             _distributedCacheOptions = distributedCacheOptions;
             _dataProtectionOptions = dataProtectionOptions;
             _basicAuthenticationOptions = basicAuthenticationOptions;
+            _dynamicRoutesOptions = dynamicRoutesOptions;
             _identityClientOptions = identityClientOptions;
         }
 
@@ -99,9 +102,9 @@ namespace ModernSlavery.Hosts.Web
             //Log all the application parts when in development
             if (_sharedOptions.IsDevelopment())
                 services.AddHostedService<ApplicationPartsLogger>();
-            
+
             // Add controllers, taghelpers, views as services so attribute dependencies can be resolved in their contructors
-            mvcBuilder.AddControllersAsServices(); 
+            mvcBuilder.AddControllersAsServices();
             mvcBuilder.AddTagHelpersAsServices();
             mvcBuilder.AddViewComponentsAsServices();
 
@@ -154,7 +157,8 @@ namespace ModernSlavery.Hosts.Web
                 _identityClientOptions.IssuerUri,
                 _identityClientOptions.ClientId,
                 _identityClientOptions.ClientSecret,
-                _identityClientOptions.SignOutUri);
+                _identityClientOptions.SignOutUri,
+                _identityClientOptions.AllowInvalidServerCertificates);
             #endregion
 
             //Register the AutoMapper configurations in all domain assemblies
@@ -223,7 +227,8 @@ namespace ModernSlavery.Hosts.Web
             if (_basicAuthenticationOptions.Enabled) app.UseMiddleware<BasicAuthenticationMiddleware>(_basicAuthenticationOptions.Username, _basicAuthenticationOptions.Password);
 
             //app.UseMvcWithDefaultRoute();
-            app.UseEndpoints(endpoints => { 
+            app.UseEndpoints(endpoints => {
+                _dynamicRoutesOptions.MapDynamicRoutes(endpoints);
                 endpoints.MapControllers();
                 endpoints.MapRazorPages();
             });

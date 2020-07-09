@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using Autofac;
@@ -8,7 +9,6 @@ using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -56,14 +56,14 @@ namespace ModernSlavery.WebUI.Identity
                     new IdentityResource {Name = "roles", UserClaims = new List<string> {ClaimTypes.Role}}
                 })
                 .AddResourceOwnerValidator<CustomResourceOwnerPasswordValidator>();
-            //.AddProfileService<CustomProfileService>();
+                //.AddProfileService<CustomProfileService>();
 
-            //identityServer.Services.AddScoped<IUserRepository, UserRepository>();
-            
-            if (string.IsNullOrWhiteSpace(_sharedOptions.CertThumprint))
-                identityServer.AddDeveloperSigningCredential();
-            else
+            if (!string.IsNullOrWhiteSpace(_sharedOptions.CertThumprint))
                 identityServer.AddSigningCredential(LoadCertificate(_sharedOptions.CertThumprint, _sharedOptions.CertExpiresWarningDays));
+            else if (!string.IsNullOrWhiteSpace(_sharedOptions.CertFilepath) && !string.IsNullOrWhiteSpace(_sharedOptions.CertPassword))
+                identityServer.AddSigningCredential(LoadCertificate(_sharedOptions.CertFilepath, _sharedOptions.CertPassword, _sharedOptions.CertExpiresWarningDays));
+            else
+                identityServer.AddDeveloperSigningCredential();
 
             #endregion
         }
@@ -102,6 +102,26 @@ namespace ModernSlavery.WebUI.Identity
                 _logger.LogWarning($"Certificate '{cert.FriendlyName}' from thumbprint '{certThumprint}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
             else
                 _logger.LogInformation($"Successfully loaded certificate '{cert.FriendlyName}' from thumbprint '{certThumprint}' and expires '{cert.GetExpirationDateString()}'");
+
+            return cert;
+        }
+
+        private X509Certificate2 LoadCertificate(string filepath, string password, int certExpiresWarningDays)
+        {
+            if (string.IsNullOrWhiteSpace(filepath)) throw new ArgumentNullException(nameof(filepath));
+            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentNullException(nameof(password));
+
+            //Load the site certificate
+            var cert = HttpsCertificate.LoadCertificateFromFile(filepath, password);
+
+            var expires = cert.GetExpirationDateString().ToDateTime();
+            var remainingTime = expires - VirtualDateTime.Now;
+            if (expires < VirtualDateTime.UtcNow)
+                _logger.LogError($"Certificate '{cert.FriendlyName}' from file '{filepath}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
+            else if (expires < VirtualDateTime.UtcNow.AddDays(certExpiresWarningDays))
+                _logger.LogWarning($"Certificate '{cert.FriendlyName}' from file '{filepath}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
+            else
+                _logger.LogInformation($"Successfully loaded certificate '{cert.FriendlyName}' from file '{filepath}' and expires '{cert.GetExpirationDateString()}'");
 
             return cert;
         }

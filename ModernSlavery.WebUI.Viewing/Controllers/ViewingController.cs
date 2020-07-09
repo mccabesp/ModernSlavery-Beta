@@ -92,7 +92,6 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             return new EmptyResult();
         }
 
-        [HttpGet("~/")]
         public IActionResult Index()
         {
             //Clear the default back url of the employer hub pages

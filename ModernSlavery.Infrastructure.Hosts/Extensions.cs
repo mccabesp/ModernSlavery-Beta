@@ -117,7 +117,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             var addressFeature = features.Get<IServerAddressesFeature>();
             foreach (var address in addressFeature.Addresses)
             {
-                yield return address.ReplaceI("127.0.0.1:", "localhost:");
+                yield return address.Replace("127.0.0.1","localhost");
             }
         }
 

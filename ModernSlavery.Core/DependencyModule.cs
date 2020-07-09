@@ -29,7 +29,7 @@ namespace ModernSlavery.Core
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterType<SnapshotDateHelper>().As<ISnapshotDateHelper>().SingleInstance();
+            builder.RegisterType<ReportingDeadlineHelper>().As<IReportingDeadlineHelper>().SingleInstance();
 
             //Register some singletons
             builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()

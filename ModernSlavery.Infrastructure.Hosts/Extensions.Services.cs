@@ -105,7 +105,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             string clientId,
             string clientSecret,
             string signedOutRedirectUri,
-            HttpMessageHandler backchannelHttpHandler = null)
+            bool allowInvalidServerCertificates=false)
         {
             //Turn off the JWT claim type mapping to allow well-known claims (e.g. ‘sub’ and ‘idp’) to flow through unmolested
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -123,9 +123,7 @@ namespace ModernSlavery.Infrastructure.Hosts
                         options.Authority = authority;
                         options.RequireHttpsMetadata = true;
                         options.ClientId = clientId;
-                        if (!string.IsNullOrWhiteSpace(clientSecret))
-                            options.ClientSecret = clientSecret.GetSHA256Checksum();
-
+                        options.ClientSecret = clientSecret;
                         options.Scope.Add("openid");
                         options.Scope.Add("profile");
                         options.Scope.Add("roles");
@@ -139,7 +137,13 @@ namespace ModernSlavery.Infrastructure.Hosts
 
                             return Task.CompletedTask;
                         };
-                        options.BackchannelHttpHandler = backchannelHttpHandler;
+
+                        //Ignore self-signed or invalid certificates from identity server
+                        var clientHandler = new HttpClientHandler();
+                        if (allowInvalidServerCertificates)
+                            clientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+
+                        options.BackchannelHttpHandler = clientHandler;
                     })
                 .AddCookie(
                     "Cookies",
