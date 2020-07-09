@@ -1,0 +1,34 @@
+﻿@using System.ComponentModel.DataAnnotations
+@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
+<div class="govuk-grid-row">
+    <div class="govuk-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            var controller = ViewData["Controller"] as BaseController;
+
+            @await Html.CustomValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+
+
+            <div class="govuk-panel govuk-panel--confirmation">
+                <h1 class="govuk-panel__title">
+                    Application complete
+                </h1>
+                <div class="govuk-panel__body">
+                    You've submitted your Modern Slavery Statement for @Model.Year
+                </div>
+            </div>
+
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Finish and Sign Out
+            </button>
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Manage Organisations
+            </button>
+        }
+
+    </div>
+</div>

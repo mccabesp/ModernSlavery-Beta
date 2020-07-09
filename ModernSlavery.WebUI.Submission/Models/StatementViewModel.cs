@@ -22,10 +22,18 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public DateTime StatusDate { get; set; }
 
         // Earliest date that the submission can be started
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a date")]
-        public Nullable<DateTime> StatementStartDate { get; set; }
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a date")]
-        public Nullable<DateTime> StatementEndDate { get; set; }
+        public int? StatementStartDay { get; set; }
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a start month")]
+        public int? StatementStartMonth { get; set; }
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a start year")]
+        public int? StatementStartYear { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter an end day")]
+        public int? StatementEndDay { get; set; }
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter an end month")]
+        public int? StatementEndMonth { get; set; }
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter an end year")]
+        public int? StatementEndYear { get; set; }
         public DateTime SubmissionDeadline { get; set; }
         // This should never go over the wire!
         public long OrganisationId { get; set; }
@@ -48,27 +56,29 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         [Display(Name = "Last Name")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a last name")]
         public string LastName { get; set; }
-        public Nullable<DateTime> ApprovedDate { get; set; }
+        public int? ApprovedDay { get; set; }
+        public int? ApprovedMonth { get; set; }
+        public int? ApprovedYear { get; set; }
         public bool IncludesGoals { get; set; }
         [Required]
-        public bool IncludesStructure { get; set; }
+        public bool? IncludesStructure { get; set; }
 
         public string IncludesStructureDetail { get; set; }
         [Required]
-        public bool IncludesPolicies { get; set; }
+        public bool? IncludesPolicies { get; set; }
         public string IncludesPoliciesDetail { get; set; }
         [Required]
-        public bool IncludesMethods { get; set; }
+        public bool? IncludesMethods { get; set; }
         public string IncludesMethodsDetail { get; set; }
         [Required]
-        public bool IncludesRisks { get; set; }
+        public bool? IncludesRisks { get; set; }
         public string IncludesRisksDetail { get; set; }
         [Required]
-        public bool IncludesEffectiveness { get; set; }
+        public bool? IncludesEffectiveness { get; set; }
 
         public string IncludedEffectivenessDetail { get; set; }
         [Required]
-        public bool IncludesTraining { get; set; }
+        public bool? IncludesTraining { get; set; }
         public string IncludesTrainingDetail { get; set; }
 
         public int IncludedOrganistionCount { get; set; }
@@ -127,7 +137,38 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         public List<NumberOfYearsOfStatements> NumberOfYearsOfStatements { get; set; }
 
+        //this will come from organisation
+        public string CompanyName { get; set; }
+
+        //to review how review list will be handled? - for now boolean for each section that can be handled in controller
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Your modern slavery statement")]
+        public bool IsStatementSectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Areas covered by your modern slavery statement")]
+        public bool IsAreasCoveredSectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Your organisation")]
+        public bool IsOrganisationSectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Policies")]
+        public bool IsPoliciesSectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Supply chain risks and due diligence (part 1)")]
+        public bool IsSupplyChainRiskAndDiligencPart1SectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Supply chain risks and due diligence (part 2)")]
+        public bool IsSupplyChainRiskAndDiligencPart2SectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Training")]
+        public bool IsTrainingSectionCompleted { get; set; }
+        [UIHint("CompletedNotCompleted")]
+        [Display(Name = "Monitoring Progress")]
+        public bool IsMonitoringProgressSectionCompleted { get; set; }
+
     }
+
+
     public enum NumberOfYearsOfStatements
     {
         [GovUkRadioCheckboxLabelText(Text = "This is the first time")]

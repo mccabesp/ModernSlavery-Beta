@@ -13,115 +13,115 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-        }
 
-        @(Html.GovUkErrorSummary(new[]
+            @(Html.GovUkErrorSummary(new[]
                 {
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementRisks)
                 }))
 
-        <h2>Part 1</h2>
+            <h2>Part 1</h2>
 
-        <h1 class="govuk-heading-l">
-            Supply Chain Risks and due diligence
-        </h1>
+            <h1 class="govuk-heading-l">
+                Supply Chain Risks and due diligence
+            </h1>
 
-        <h2>
-            Which areas are relevant to your organisation when assessing your supply chains for modern slavery risks?
-        </h2>
-        <h2>
-            Select all that apply
-        </h2>
+            <h2>
+                Which areas are relevant to your organisation when assessing your supply chains for modern slavery risks?
+            </h2>
+            <h2>
+                Select all that apply
+            </h2>
 
-        <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-            @foreach (var item in Model.StatementRiskTypes)
-            {
-                <div class="govuk-accordion__section ">
-                    <div class="govuk-accordion__section-header">
-                        <h2 class="govuk-accordion__section-heading">
-                            <span class="govuk-accordion__section-button" id="accordion-default-heading">
-                                @item.Description
-                            </span>
-                        </h2>
-                    </div>
-                    <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
-                        <div class="govuk-form-group">
-                            <fieldset class="govuk-fieldset">
-                                <div class="govuk-checkboxes">
-                                    @foreach (var subitem in Model.StatementRisks.Where(x => x.StatementRiskType == item))
-                                    {
-                                        <div class="govuk-checkboxes__item">
-                                            <input class="govuk-checkboxes__input" id="waste" name="waste" type="checkbox" value="carcasses">
-                                            <label class="govuk-label govuk-checkboxes__label" for="waste">
-                                                @subitem @*TODO: need to add description to model*@
-                                            </label>
-                                        </div>
-                                    }
-                                </div>
-                            </fieldset>
+            <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+                @foreach (var item in Model.StatementRiskTypes)
+                {
+                    <div class="govuk-accordion__section ">
+                        <div class="govuk-accordion__section-header">
+                            <h2 class="govuk-accordion__section-heading">
+                                <span class="govuk-accordion__section-button" id="accordion-default-heading">
+                                    @item.Description
+                                </span>
+                            </h2>
+                        </div>
+                        <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <div class="govuk-checkboxes">
+                                        @foreach (var subitem in Model.StatementRisks.Where(x => x.StatementRiskType == item))
+                                        {
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" id="waste" name="waste" type="checkbox" value="carcasses">
+                                                <label class="govuk-label govuk-checkboxes__label" for="waste">
+                                                    @subitem @*TODO: need to add description to model*@
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </fieldset>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
 
-        <div class="govuk-form-group">
-            <label class="govuk-label" for="address-town">
-                If you want to specify an area not mentioned above, please provide details
-            </label>
-            <textarea asp-for="OtherRiskText" class="govuk-textarea" rows="5"></textarea>
-        </div>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="address-town">
+                    If you want to specify an area not mentioned above, please provide details
+                </label>
+                <textarea asp-for="OtherRiskText" class="govuk-textarea" rows="5"></textarea>
+            </div>
 
-        <h1 class="govuk-heading-l">
-            Which areas of your supply chains do you consider to have the highest risk of modern slavery?
-        </h1>
-        <h2>
-            Select all that apply
-        </h2>
-        @*TODO: need to clarify the 2nd set of accordions*@
+            <h1 class="govuk-heading-l">
+                Which areas of your supply chains do you consider to have the highest risk of modern slavery?
+            </h1>
+            <h2>
+                Select all that apply
+            </h2>
+            @*TODO: need to clarify the 2nd set of accordions*@
 
-        <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-            @foreach (var item in Model.Continents)
-            {
-                //TODO:make these partial views and test chechbox counts
-                <div class="govuk-accordion__section accordion-with-counts">
-                    <div class="govuk-accordion__section-header">
-                        <h2 class="govuk-accordion__section-heading">
-                            <span class="govuk-accordion__section-button" id="accordion-default-heading">
-                                @item.Name
-                            </span>                         
-                        </h2>
-                    </div>
-                    <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
-                        <div class="govuk-form-group">
-                            <fieldset class="govuk-fieldset">
-                                <div class="govuk-checkboxes">
-                                    @foreach (var subitem in Model.Countries.Where(x => x.Continent == item))
-                                    {
-                                        <div class="govuk-checkboxes__item">
-                                            <input class="govuk-checkboxes__input" id="risk" name="risk" type="checkbox" value="carcasses">
-                                            <label class="govuk-label govuk-checkboxes__label" for="risk">
-                                                @subitem.Name @*TODO: need to add description to model*@
-                                            </label>
-                                        </div>
-                                    }
-                                </div>
-                                <span class="checkbox-count">Selected</span>  @*using css counters for checkbox counts*, will just need to be styled*@
-                            </fieldset>
+            <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+                @foreach (var item in Model.Continents)
+                {
+                    //TODO:make these partial views and test chechbox counts
+                    <div class="govuk-accordion__section accordion-with-counts">
+                        <div class="govuk-accordion__section-header">
+                            <h2 class="govuk-accordion__section-heading">
+                                <span class="govuk-accordion__section-button" id="accordion-default-heading">
+                                    @item.Name
+                                </span>
+                            </h2>
+                        </div>
+                        <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <div class="govuk-checkboxes">
+                                        @foreach (var subitem in Model.Countries.Where(x => x.Continent == item))
+                                        {
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" id="risk" name="risk" type="checkbox" value="carcasses">
+                                                <label class="govuk-label govuk-checkboxes__label" for="risk">
+                                                    @subitem.Name @*TODO: need to add description to model*@
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                    <span class="checkbox-count">Selected</span>  @*using css counters for checkbox counts*, will just need to be styled*@
+                                </fieldset>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
 
 
 
-        <button class="govuk-button" data-module="govuk-button" type="submit">
-            Continue
-        </button>
-        <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
-            Cancel
-        </button>
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Continue
+            </button>
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
+                Cancel
+            </button>
+        }
 
     </div>
 
