@@ -4,6 +4,7 @@ using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
 
 namespace ModernSlavery.WebUI.Submission.Presenters
 {
@@ -21,12 +22,58 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         // Date the status last changed
         public DateTime StatusDate { get; set; }
 
+        public DateTime? StatementStartDate
+        {
+            get
+            {
+                return ParseDate(StatementStartYear, StatementStartMonth, StatementStartDay);
+            }
+            set
+            {
+                if (value == null)
+                {
+                    StatementStartYear = null;
+                    StatementStartMonth = null;
+                    StatementStartDay = null;
+                }
+                else
+                {
+                    StatementStartYear = value.Value.Year;
+                    StatementStartMonth = value.Value.Month;
+                    StatementStartDay = value.Value.Day;
+                }
+            }
+        }
+
         // Earliest date that the submission can be started
         public int? StatementStartDay { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a start month")]
         public int? StatementStartMonth { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a start year")]
         public int? StatementStartYear { get; set; }
+
+        public DateTime? StatementEndDate
+        {
+            get
+            {
+                return ParseDate(StatementEndYear, StatementEndMonth, StatementEndDay);
+            }
+            set
+            {
+                if (value == null)
+                {
+                    StatementEndYear = null;
+                    StatementEndMonth = null;
+                    StatementEndDay = null;
+                }
+                else
+                {
+                    StatementEndYear = value.Value.Year;
+                    StatementEndMonth = value.Value.Month;
+                    StatementEndDay = value.Value.Day;
+                }
+            }
+        }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter an end day")]
         public int? StatementEndDay { get; set; }
@@ -56,9 +103,34 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         [Display(Name = "Last Name")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a last name")]
         public string LastName { get; set; }
+
+        public DateTime? ApprovedDate
+        {
+            get
+            {
+                return ParseDate(ApprovedYear, ApprovedMonth, ApprovedDay);
+            }
+            set
+            {
+                if (value == null)
+                {
+                    ApprovedYear = null;
+                    ApprovedMonth = null;
+                    ApprovedDay = null;
+                }
+                else
+                {
+                    ApprovedYear = value.Value.Year;
+                    ApprovedMonth = value.Value.Month;
+                    ApprovedDay = value.Value.Day;
+                }
+            }
+        }
+
         public int? ApprovedDay { get; set; }
         public int? ApprovedMonth { get; set; }
         public int? ApprovedYear { get; set; }
+
         public bool IncludesGoals { get; set; }
         [Required]
         public bool? IncludesStructure { get; set; }
@@ -166,6 +238,18 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         [Display(Name = "Monitoring Progress")]
         public bool IsMonitoringProgressSectionCompleted { get; set; }
 
+
+        private DateTime? ParseDate(int? year, int? month, int? day)
+        {
+            if (!year.HasValue || !month.HasValue || !day.HasValue)
+                return null;
+
+            DateTime result;
+            if (DateTime.TryParse($"{year}-{month}-{day}", out result))
+                return result;
+
+            return null;
+        }
     }
 
 

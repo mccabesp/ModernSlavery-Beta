@@ -97,7 +97,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var statement = await SharedBusinessLogic.DataRepository
                 .FirstOrDefaultAsync<Statement>(s => s.OrganisationId == statementModel.OrganisationId && s.SubmissionDeadline.Year == statementModel.Year);
 
-            if (!statement.CanBeEdited)
+            if (!statement?.CanBeEdited ?? false)
             {
                 return StatementActionResult.Uneditable;
             }
@@ -111,7 +111,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         {
             var statement = await FindStatementAsync(statementModel);
 
-            if (!statement.CanBeEdited)
+            if (!statement?.CanBeEdited ?? false)
             {
                 return StatementActionResult.Uneditable;
             }
@@ -141,7 +141,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             // name things same as DB
             CreateMap<Statement, StatementModel>()
                 .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.SubmissionDeadline.Year))
-                .ForMember(dest => dest.StatementSectors, opt => opt.MapFrom(src => src.Sectors.Select(s => new KeyValuePair<int,string>(s.StatementSectorTypeId, s.StatementSectorType.Description))))
+                .ForMember(dest => dest.StatementSectors, opt => opt.MapFrom(src => src.Sectors.Select(s => new KeyValuePair<int, string>(s.StatementSectorTypeId, s.StatementSectorType.Description))))
                 .ForMember(dest => dest.OtherSectorText, opt => opt.MapFrom(src => src.OtherSector))
                 .ForMember(dest => dest.StatementPolicies, opt => opt.MapFrom(src => src.Policies.Select(p => new KeyValuePair<int, string>(p.StatementPolicyTypeId, p.StatementPolicyType.Description))))
                 .ForMember(dest => dest.OtherPolicyText, opt => opt.MapFrom(src => src.OtherPolicy))

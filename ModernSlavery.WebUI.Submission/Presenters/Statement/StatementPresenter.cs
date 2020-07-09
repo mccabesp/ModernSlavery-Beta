@@ -284,7 +284,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 return actionresult;
 
             var model = MapToModel(viewmodel);
-            var saveResult = await StatementBusinessLogic.SaveStatement(user, model);
+            var saveResult = await StatementBusinessLogic.SaveDraftStatement(user, model);
 
             return actionresult;
         }
@@ -413,7 +413,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
     {
         public StatementMapperProfile()
         {
-
+            CreateMap<StatementViewModel, StatementModel>()
+                .ForMember(dest => dest.OtherDiligenceText, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementTrainingDivisions, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementDiligenceTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementRiskTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
+                .ForMember(dest => dest.Countries, opt => opt.Ignore());
 
             CreateMap<StatementModel, StatementViewModel>()
                 // These need obfuscating
@@ -421,9 +428,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.OrganisationIdentifier, opt => opt.Ignore())
                 // These need to change on VM to come from DB
                 .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
-                .ForMember(dest => dest.ApprovedDay, opt => opt.Ignore())
-                .ForMember(dest => dest.ApprovedMonth, opt => opt.Ignore())
-                .ForMember(dest => dest.ApprovedYear, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementTrainings, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementRisks, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
@@ -455,12 +459,16 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.IsSupplyChainRiskAndDiligencPart2SectionCompleted, opt => opt.Ignore())
                 .ForMember(dest => dest.IsTrainingSectionCompleted, opt => opt.Ignore())
                 .ForMember(dest => dest.IsMonitoringProgressSectionCompleted, opt => opt.Ignore())
+                // Date components are set directly from the date field
                 .ForMember(dest => dest.StatementStartDay, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementStartMonth, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementStartYear, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementEndDay, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementEndMonth, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementEndYear, opt => opt.Ignore());
+                .ForMember(dest => dest.StatementEndYear, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedDay, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedMonth, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedYear, opt => opt.Ignore());
         }
     }
 }
