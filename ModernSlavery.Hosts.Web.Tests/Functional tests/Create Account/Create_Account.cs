@@ -61,7 +61,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //TeardownTest();
         }
 
-        [Test, Parallelizable]
+        [Test, Order(1)]
         public void Create_Account_ContentCheck()
         {
             TestContext.Out.WriteLine($"Kestrel authority: {_webAuthority}");
@@ -192,7 +192,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
 
-        [Test, Order(5)]
+        [Test, Order(4)]
         public void Create_Account_Verify_Email()
         {
             
@@ -216,7 +216,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Logout();
 
         }
-        [Test, Order(6)]
+        [Test, Order(5)]
         public void Create_Account_Failure_Existing_User()
         {
             //roger already registered in the system
@@ -255,7 +255,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
-        [Test, Parallelizable]
+        [Test, Order(6)]
         public void Create_Account_Password_Rules()
         {
             //roger already registered in the system
