@@ -257,6 +257,15 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             // that should query file and DB
             var entity = await StatementBusinessLogic.GetStatementByOrganisationAndYear(organisation, year);
 
+            if (entity == null)
+            {
+                return new CustomResult<StatementViewModel>(new StatementViewModel
+                {
+                    OrganisationIdentifier = organisationIdentifier,
+                    Year = year
+                });
+            }
+
             // shouldnt need to check it for access as that was already done
             var vm = MapToVM(entity);
             return new CustomResult<StatementViewModel>(vm);
