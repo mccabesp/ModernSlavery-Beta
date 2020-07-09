@@ -12,6 +12,8 @@ namespace ModernSlavery.BusinessDomain.Submission
     {
         public long? StatementId { get; set; }
 
+        public ReturnStatuses Status { get; set; }
+
         public DateTime? StatusDate { get; set; }
 
         public DateTime SubmissionDeadline { get; set; }
@@ -61,11 +63,9 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public string IncludesTrainingDetail { get; set; }
 
-        //public bool IncludesGoals { get; set; }
+        public bool IncludesMethods { get; set; }
 
-        //public bool IncludesMethods { get; set; }
-
-        //public string IncludesMethodsDetail { get; set; }
+        public string IncludesMethodsDetail { get; set; }
 
         #endregion
 
@@ -81,7 +81,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 4 - Policies
 
-        public List<StatementPolicy> StatementPolicies { get; set; }
+        public List<KeyValuePair<int, string>> StatementPolicies { get; set; }
 
         public string OtherPolicyText { get; set; }
 
@@ -110,6 +110,8 @@ namespace ModernSlavery.BusinessDomain.Submission
         #endregion
 
         #region Step 7 - Monitoring progress
+
+        public bool IncludesGoals { get; set; }
 
         [MaxLength(500)]
         public string MeasuringProgress { get; set; }

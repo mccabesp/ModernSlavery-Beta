@@ -138,6 +138,7 @@ namespace ModernSlavery.BusinessDomain.Submission
     {
         public StatementMapperProfile()
         {
+            // name things same as DB
             CreateMap<Statement, StatementModel>()
                 .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.SubmissionDeadline.Year))
                 .ForMember(dest => dest.StatementSectors, opt => opt.MapFrom(src => src.Sectors.Select(s => new KeyValuePair<int,string>(s.StatementSectorTypeId, s.StatementSectorType.Description))))
@@ -150,7 +151,9 @@ namespace ModernSlavery.BusinessDomain.Submission
                 .ForMember(dest => dest.OtherRiskText, opt => opt.MapFrom(src => src.OtherRisk))
                 .ForMember(dest => dest.StatementDiligenceTypes, opt => opt.MapFrom(src => src.Diligences.Select(d => new KeyValuePair<int, string>(d.StatementDiligenceTypeId, d.StatementDiligenceType.Description))))
                 // These should be added to the entity
+                .ForMember(dest => dest.IncludesGoals, opt => opt.Ignore())
                 .ForMember(dest => dest.OtherDiligenceText, opt => opt.Ignore())
+                .ForMember(dest => dest.IncludesMethodsDetail, opt => opt.Ignore())
                 .ForMember(dest => dest.IncludesStructureDetail, opt => opt.Ignore())
                 .ForMember(dest => dest.IncludesPoliciesDetail, opt => opt.Ignore())
                 .ForMember(dest => dest.IncludesRisksDetail, opt => opt.Ignore())
