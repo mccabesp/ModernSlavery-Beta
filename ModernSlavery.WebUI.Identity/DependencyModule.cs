@@ -56,12 +56,8 @@ namespace ModernSlavery.WebUI.Identity
                     new IdentityResource {Name = "roles", UserClaims = new List<string> {ClaimTypes.Role}}
                 })
                 .AddResourceOwnerValidator<CustomResourceOwnerPasswordValidator>();
-            //.AddProfileService<CustomProfileService>();
+                //.AddProfileService<CustomProfileService>();
 
-            //identityServer.Services.AddScoped<IUserRepository, UserRepository>();
-            ServicePointManager.ServerCertificateValidationCallback = (message, cert, chain, errors) => true;
-
-            
             if (!string.IsNullOrWhiteSpace(_sharedOptions.CertThumprint))
                 identityServer.AddSigningCredential(LoadCertificate(_sharedOptions.CertThumprint, _sharedOptions.CertExpiresWarningDays));
             else if (!string.IsNullOrWhiteSpace(_sharedOptions.CertFilepath) && !string.IsNullOrWhiteSpace(_sharedOptions.CertPassword))

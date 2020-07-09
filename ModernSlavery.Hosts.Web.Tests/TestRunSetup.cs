@@ -23,18 +23,27 @@ namespace ModernSlavery.Hosts.Web.Tests
         public static IHost TestWebHost { get; private set; }
         public static SeleniumWebDriverService WebDriverService { get; private set; }
 
+        private static string LogsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LogFiles");
+        private static string ScreenshotsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots");
+
         [OneTimeSetUp]
         public async Task RunBeforeAnyTestsAsync()
         {
             //Delete all previous log files
-            var logs = Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LogFiles"), "*.*", SearchOption.AllDirectories);
-            foreach (var log in logs)
-                File.Delete(log);
+            if (Directory.Exists(LogsFilepath))
+            {
+                var logs = Directory.GetFiles(LogsFilepath, "*.*", SearchOption.AllDirectories);
+                foreach (var log in logs)
+                    File.Delete(log);
+            }
 
             //Delete all previous screenshots
-            var screenshots = Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots"), "*.*", SearchOption.AllDirectories);
-            foreach (var screenshot in screenshots)
-                File.Delete(screenshot);
+            if (Directory.Exists(ScreenshotsFilepath))
+            {
+                var screenshots = Directory.GetFiles(ScreenshotsFilepath, "*.*", SearchOption.AllDirectories);
+                foreach (var screenshot in screenshots)
+                    File.Delete(screenshot);
+            }
 
             //Create the test host usign the default dependency module and override with a test module
             TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>();
@@ -63,9 +72,10 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //NOTE: these dont seem yet to upload so using DevOps task to publish instead till we can get working
             //Publish all log files on failure
-            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed
+               && Directory.Exists(LogsFilepath))
             {
-                var logs = Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LogFiles"), "*.*", SearchOption.AllDirectories);
+                var logs = Directory.GetFiles(LogsFilepath, "*.*", SearchOption.AllDirectories);
                 foreach (var log in logs)
                 {
                     var filename = Path.GetFileName(log);
@@ -75,12 +85,15 @@ namespace ModernSlavery.Hosts.Web.Tests
             }
 
             //Publish all screenshots
-            var screenshots = Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Screenshots"), "*.*", SearchOption.AllDirectories);
-            foreach (var screenshot in screenshots)
+            if (Directory.Exists(ScreenshotsFilepath))
             {
-                var filename = Path.GetFileName(screenshot);
-                TestContext.AddTestAttachment(screenshot, $"[SCREENSHOT]: {filename}");
-                TestContext.Progress.WriteLine($"Added test attachment: {filename}");
+                var screenshots = Directory.GetFiles(ScreenshotsFilepath, "*.*", SearchOption.AllDirectories);
+                foreach (var screenshot in screenshots)
+                {
+                    var filename = Path.GetFileName(screenshot);
+                    TestContext.AddTestAttachment(screenshot, $"[SCREENSHOT]: {filename}");
+                    TestContext.Progress.WriteLine($"Added test attachment: {filename}");
+                }
             }
         }
     }
