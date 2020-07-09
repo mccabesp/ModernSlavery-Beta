@@ -106,6 +106,8 @@ namespace ModernSlavery.Core.Models
         public string Website_Instance_Id { get; set; }
 
         public string CertThumprint { get; set; }
+        public string CertFilepath { get; set; }
+        public string CertPassword { get; set; }
 
         public bool SkipSpamProtection { get; set; }
         public int MaxNumCallsCompaniesHouseApiPerFiveMins { get; set; } = 500;
@@ -182,6 +184,9 @@ namespace ModernSlavery.Core.Models
                 if (ObfuscationSeed.IsAny(0,127)) exceptions.Add(new ConfigurationErrorsException("ObfuscationSeed cannot use default value in Production environment"));
                 if (string.IsNullOrWhiteSpace(CertThumprint)) exceptions.Add(new ConfigurationErrorsException("CertThumprint cannot be empty in Production environment."));
             }
+
+            if (string.IsNullOrWhiteSpace(CertFilepath) && !string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing CertFilepath"));
+            if (!string.IsNullOrWhiteSpace(CertFilepath) && string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing CertPassword"));
 
             if (FirstReportingYear == 0 || FirstReportingYear > VirtualDateTime.Now.Year) exceptions.Add(new ConfigurationErrorsException($"Invalid FirstReportingYear: {FirstReportingYear}."));
             if (PrivateReportingDeadline == DateTime.MinValue)

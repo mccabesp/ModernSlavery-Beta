@@ -96,6 +96,13 @@
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="localhost.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
   <!-- *** THIS IS REQUIRED TO DEPLY WebjobS WITH WEBUI ON AZURE *** -->
   <PropertyGroup>
     <MSDeployPackagePublishDependsOn>
