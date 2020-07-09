@@ -6,6 +6,15 @@ namespace ModernSlavery.Core.Entities
 {
     public partial class Statement
     {
+        public Statement()
+        {
+            Sectors = new HashSet<StatementSector>();
+            Policies = new HashSet<StatementPolicy>();
+            TrainingDivisions = new HashSet<StatementTrainingDivision>();
+            Risks = new HashSet<StatementRisk>();
+            Diligences = new HashSet<StatementDiligence>();
+        }
+
         public long StatementId { get; set; }
 
         public long OrganisationId { get; set; }
@@ -75,5 +84,11 @@ namespace ModernSlavery.Core.Entities
         public bool EHRCResponse { get; set; }
 
         public virtual Organisation Organisation { get; set; }
+
+        public virtual ICollection<StatementSector> Sectors { get; set; }
+        public virtual ICollection<StatementPolicy> Policies { get; set; }
+        public virtual ICollection<StatementTrainingDivision> TrainingDivisions { get; set; }
+        public virtual ICollection<StatementRisk> Risks { get; set; }
+        public virtual ICollection<StatementDiligence> Diligences { get; set; }
     }
 }

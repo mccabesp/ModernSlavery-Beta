@@ -395,8 +395,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             CreateMap<StatementViewModel, StatementModel>()
                 .ForMember(dest => dest.StatementTrainingDivisions, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
-                .ForMember(dest => dest.IncludesGoals, opt => opt.Ignore());
+                .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore());
 
             CreateMap<StatementModel, StatementViewModel>()
                 .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())

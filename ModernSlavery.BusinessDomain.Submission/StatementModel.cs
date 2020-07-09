@@ -14,18 +14,20 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public DateTime? StatusDate { get; set; }
 
-        public DateTime? StatementStartDate { get; set; }
-
-        public DateTime? StatementEndDate { get; set; }
-
         public DateTime SubmissionDeadline { get; set; }
 
         public long OrganisationId { get; set; }
 
         public int Year { get; set; }
 
+        #region Step 1 - your statement
+
         [MaxLength(255)]
         public string StatementUrl { get; set; }
+
+        public DateTime? StatementStartDate { get; set; }
+
+        public DateTime? StatementEndDate { get; set; }
 
         public string JobTitle { get; set; }
 
@@ -33,7 +35,11 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public string LastName { get; set; }
 
-        public bool IncludesGoals { get; set; }
+        public DateTime? ApprovedDate { get; set; }
+
+        #endregion
+
+        #region Step 2 - Compliance
 
         public bool IncludesStructure { get; set; }
 
@@ -42,10 +48,6 @@ namespace ModernSlavery.BusinessDomain.Submission
         public bool IncludesPolicies { get; set; }
 
         public string IncludesPoliciesDetail { get; set; }
-
-        public bool IncludesMethods { get; set; }
-
-        public string IncludesMethodsDetail { get; set; }
 
         public bool IncludesRisks { get; set; }
 
@@ -59,41 +61,55 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public string IncludesTrainingDetail { get; set; }
 
-        public int IncludedOrganistionCount { get; set; }
+        //public bool IncludesGoals { get; set; }
 
-        public int ExcludedOrganisationCount { get; set; }
+        //public bool IncludesMethods { get; set; }
+
+        //public string IncludesMethodsDetail { get; set; }
+
+        #endregion
+
+        #region Step 3 - Your organisation
+
+        public List<KeyValuePair<int, string>> StatementSectors { get; set; }
 
         public string OtherSectorText { get; set; }
 
-        public List<StatementSector> StatementSectors { get; set; }
+        // turnover ?
+
+        #endregion
+
+        #region Step 4 - Policies
 
         public List<StatementPolicy> StatementPolicies { get; set; }
 
         public string OtherPolicyText { get; set; }
 
-        public List<StatementTrainingDivision> StatementTrainingDivisions { get; set; }
+        #endregion
 
-        public string OtherTrainingText { get; set; }
+        #region Step 5 - Supply chain risks and due diligence
 
-        public List<StatementRisk> StatementRisks { get; set; }
+        public List<KeyValuePair<int, string>> StatementDiligenceTypes { get; set; }
 
-        public List<StatementRiskType> StatementRiskTypes { get; set; }
+        public string OtherDiligenceText { get; set; }
+
+        public List<KeyValuePair<int, string>> StatementRiskTypes { get; set; }
 
         public string OtherRiskText { get; set; }
 
-        public List<Continent> Continents { get; set; }
+        public List<KeyValuePair<int, string>> Countries { get; set; }
 
-        public List<Core.Classes.Country> Countries { get; set; }
+        #endregion
 
-        public List<StatementDiligence> StatementDiligences { get; set; }
+        #region Step 6 - Training
 
-        public List<StatementDiligenceType> StatementDiligenceTypes { get; set; }
+        public List<KeyValuePair<int, string>> StatementTrainingDivisions { get; set; }
 
-        public string IndicatorDetails { get; set; }
+        public string OtherTrainingText { get; set; }
 
-        public string InstanceDetails { get; set; }
+        #endregion
 
-        public string OtherRemediationText { get; set; }
+        #region Step 7 - Monitoring progress
 
         [MaxLength(500)]
         public string MeasuringProgress { get; set; }
@@ -101,6 +117,6 @@ namespace ModernSlavery.BusinessDomain.Submission
         [MaxLength(500)]
         public string KeyAchievements { get; set; }
 
-        // turnover? Relational types?
+        #endregion
     }
 }
