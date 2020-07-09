@@ -102,9 +102,9 @@ namespace ModernSlavery.Hosts.Web
             //Log all the application parts when in development
             if (_sharedOptions.IsDevelopment())
                 services.AddHostedService<ApplicationPartsLogger>();
-            
+
             // Add controllers, taghelpers, views as services so attribute dependencies can be resolved in their contructors
-            mvcBuilder.AddControllersAsServices(); 
+            mvcBuilder.AddControllersAsServices();
             mvcBuilder.AddTagHelpersAsServices();
             mvcBuilder.AddViewComponentsAsServices();
 
@@ -157,7 +157,8 @@ namespace ModernSlavery.Hosts.Web
                 _identityClientOptions.IssuerUri,
                 _identityClientOptions.ClientId,
                 _identityClientOptions.ClientSecret,
-                _identityClientOptions.SignOutUri);
+                _identityClientOptions.SignOutUri,
+                _identityClientOptions.AllowInvalidServerCertificates);
             #endregion
 
             //Register the AutoMapper configurations in all domain assemblies
