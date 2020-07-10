@@ -1,19 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk;Microsoft.NET.Sdk.Publish">
-
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <IsWebjobProject>true</IsWebjobProject>
-    <WebjobName>$(MsBuildProjectName)</WebjobName>
-    <WebjobType>Continuous</WebjobType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <AutoGenerateBindingRedirects Condition="'$(AutoGenerateBindingRedirects)' == ''">true</AutoGenerateBindingRedirects>
     <Copyright>Crown Copyright © $([System.DateTime]::UtcNow.Year) ($([System.DateTime]::UtcNow.ToLocalTime()))</Copyright>
     <ProjectGuid>1DF71C5E-2C26-43ED-80EA-79317303909F</ProjectGuid>
+    <!-- This is required otherwise refs folder (only needed during runtime compilation) is published required Sdk="Microsoft.NET.Sdk.Web"-->
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
     <!-- Removes all the satellite language folders from theoutput directory-->
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
-
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning;</WarningsAsErrors>
@@ -33,7 +28,6 @@
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Messaging\ModernSlavery.Infrastructure.Messaging.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Search\ModernSlavery.Infrastructure.Search.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Storage\ModernSlavery.Infrastructure.Storage.csproj" />
-    <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -73,7 +67,5 @@
       <Visible>False</Visible>
     </AdditionalFiles>
   </ItemGroup>
-
-  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>
