@@ -17,12 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram" Link="DependencyValidation1.layerdiagram">
-      <Visible>False</Visible>
-    </AdditionalFiles>
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="App_Data\GPG-ShortCodes.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
@@ -35,6 +29,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram" Link="DependencyValidation1.layerdiagram">
+      <Visible>False</Visible>
+    </AdditionalFiles>
+    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
+    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
   </ItemGroup>
 
   <ItemGroup>

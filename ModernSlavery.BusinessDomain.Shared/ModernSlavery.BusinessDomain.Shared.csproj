@@ -5,13 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram" Link="DependencyValidation1.layerdiagram">
       <Visible>False</Visible>
     </AdditionalFiles>
+    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
+    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
