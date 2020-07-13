@@ -20,14 +20,13 @@ namespace ModernSlavery.Core.Entities
         public long StatementId { get; set; }
 
         public long OrganisationId { get; set; }
+
         public virtual Organisation Organisation { get; set; }
 
-        // reporting deadline
         public DateTime SubmissionDeadline { get; set; }
 
         public StatementStatus Status { get; set; }
 
-        // Date the status last changed
         public DateTime StatusDate { get; set; }
 
         public string StatusDetails { get; set; }
@@ -41,6 +40,7 @@ namespace ModernSlavery.Core.Entities
         #endregion
 
         #region Statement Page
+
         public string StatementUrl { get; set; }
 
         // Earliest date that the submission can be started
@@ -52,8 +52,11 @@ namespace ModernSlavery.Core.Entities
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
+
         public string JobTitle { get; set; }
+
         public DateTime ApprovedDate { get; set; }
+
         #endregion
 
         #region Compliance Areas Covered Page
@@ -61,44 +64,31 @@ namespace ModernSlavery.Core.Entities
         //Organisation’s structure, business and supply chains
         public bool IncludesStructure { get; set; }
 
-        //TODO: Create StructureDetails
-        //public string StructureDetails { get; set; }
+        public string StructureDetails { get; set; }
 
-        //Policies
         public bool IncludesPolicies { get; set; }
 
-        //TODO: Create PolicyDetails
-        //public string PolicyDetails { get; set; }
+        public string PolicyDetails { get; set; }
 
         //Risk assessment and management
         public bool IncludesRisks { get; set; }
 
-        //TODO: Create RisksDetails
-        //public string RisksDetails { get; set; }
+        public string RisksDetails { get; set; }
 
-        //TODO: Rename to IncludesDueDiligence
         //Due diligence processes
-        public bool IncludesMethods { get; set; }
+        public bool IncludesDueDiligence { get; set; }
 
-        //TODO: Create DueDiligenceDetails
-        //public string DueDiligenceDetails { get; set; }
+        public string DueDiligenceDetails { get; set; }
 
         //Staff training about slavery and human trafficking
         public bool IncludesTraining { get; set; }
 
-        //TODO: Create TrainingDetails
-        //public string TrainingDetails { get; set; }
+        public string TrainingDetails { get; set; }
 
-        //TODO: Change type to boolean
         //Goals and key performance indicators (KPIs)
-        public AffirmationType IncludesGoals { get; set; }
+        public bool IncludesGoals { get; set; }
 
-        //TODO: Create GoalsDetails
-        //public string GoalsDetails { get; set; }
-
-        //TODO: Remove - no longer needed
-        [Obsolete("Remove - no longer needed")]
-        public bool IncludesEffectiveness { get; set; }
+        public string GoalsDetails { get; set; }
 
         #endregion
 

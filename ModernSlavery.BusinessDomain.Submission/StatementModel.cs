@@ -45,27 +45,27 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public bool IncludesStructure { get; set; }
 
-        public string IncludesStructureDetail { get; set; }
+        public string StructureDetails { get; set; }
 
         public bool IncludesPolicies { get; set; }
 
-        public string IncludesPoliciesDetail { get; set; }
+        public string PolicyDetails { get; set; }
 
         public bool IncludesRisks { get; set; }
 
-        public string IncludesRisksDetail { get; set; }
+        public string RisksDetails { get; set; }
 
-        public bool IncludesEffectiveness { get; set; }
+        public bool IncludesDueDiligence { get; set; }
 
-        public string IncludedEffectivenessDetail { get; set; }
+        public string DueDiligenceDetails { get; set; }
 
         public bool IncludesTraining { get; set; }
 
-        public string IncludesTrainingDetail { get; set; }
+        public string TrainingDetails { get; set; }
 
-        public bool IncludesMethods { get; set; }
+        public bool IncludesGoals { get; set; }
 
-        public string IncludesMethodsDetail { get; set; }
+        public string GoalsDetails { get; set; }
 
         #endregion
 
@@ -110,8 +110,6 @@ namespace ModernSlavery.BusinessDomain.Submission
         #endregion
 
         #region Step 7 - Monitoring progress
-
-        public bool IncludesGoals { get; set; }
 
         [MaxLength(500)]
         public string MeasuringProgress { get; set; }

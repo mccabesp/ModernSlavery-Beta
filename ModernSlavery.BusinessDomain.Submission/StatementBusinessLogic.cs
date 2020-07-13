@@ -148,19 +148,9 @@ namespace ModernSlavery.BusinessDomain.Submission
                 .ForMember(dest => dest.StatementTrainingDivisions, opt => opt.MapFrom(src => src.TrainingDivisions.Select(t => new KeyValuePair<int, string>(t.StatementDivisionTypeId, t.StatementDivisionType.Description))))
                 .ForMember(dest => dest.OtherTrainingText, opt => opt.MapFrom(src => src.OtherTrainingDivision))
                 .ForMember(dest => dest.StatementRiskTypes, opt => opt.MapFrom(src => src.Risks.Select(r => new KeyValuePair<int, string>(r.StatementRiskTypeId, r.StatementRiskType.Description))))
-                .ForMember(dest => dest.OtherRiskText, opt => opt.MapFrom(src => src.OtherRisk))
                 .ForMember(dest => dest.StatementDiligenceTypes, opt => opt.MapFrom(src => src.Diligences.Select(d => new KeyValuePair<int, string>(d.StatementDiligenceTypeId, d.StatementDiligenceType.Description))))
                 // These should be added to the entity
-                .ForMember(dest => dest.IncludesGoals, opt => opt.Ignore())
-                .ForMember(dest => dest.OtherDiligenceText, opt => opt.Ignore())
-                .ForMember(dest => dest.IncludesMethodsDetail, opt => opt.Ignore())
-                .ForMember(dest => dest.IncludesStructureDetail, opt => opt.Ignore())
-                .ForMember(dest => dest.IncludesPoliciesDetail, opt => opt.Ignore())
-                .ForMember(dest => dest.IncludesRisksDetail, opt => opt.Ignore())
-                .ForMember(dest => dest.IncludedEffectivenessDetail, opt => opt.Ignore())
-                .ForMember(dest => dest.IncludesTrainingDetail, opt => opt.Ignore())
-                .ForMember(dest => dest.Countries, opt => opt.Ignore())
-                .ForMember(dest => dest.KeyAchievements, opt => opt.Ignore());
+                .ForMember(dest => dest.Countries, opt => opt.Ignore());
         }
     }
 }

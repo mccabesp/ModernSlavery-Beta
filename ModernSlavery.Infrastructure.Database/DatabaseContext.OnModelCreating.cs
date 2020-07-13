@@ -482,29 +482,41 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.SubmissionDeadline)
                         .HasName("IX_SubmissionDeadline");
 
-                    entity.Property(e => e.IncludesGoals)
-                        .HasColumnName("IncludesGoalsId");
-
                     entity.HasIndex(e => e.IncludesGoals)
                         .HasName("IX_IncludesGoals");
+
+                    entity.Property(e => e.GoalsDetails)
+                        .HasMaxLength(250);
 
                     entity.HasIndex(e => e.IncludesStructure)
                         .HasName("IX_IncludesStructure");
 
+                    entity.Property(e => e.StructureDetails)
+                        .HasMaxLength(250);
+
                     entity.HasIndex(e => e.IncludesPolicies)
                         .HasName("IX_IncludesPolicies");
 
-                    entity.HasIndex(e => e.IncludesMethods)
-                        .HasName("IX_IncludesMethods");
+                    entity.Property(e => e.PolicyDetails)
+                        .HasMaxLength(250);
+
+                    entity.HasIndex(e => e.IncludesDueDiligence)
+                        .HasName("IX_IncludesDueDiligence");
+
+                    entity.Property(e => e.DueDiligenceDetails)
+                        .HasMaxLength(250);
 
                     entity.HasIndex(e => e.IncludesRisks)
                         .HasName("IX_IncludesRisks");
 
-                    entity.HasIndex(e => e.IncludesEffectiveness)
-                        .HasName("IX_IncludesEffectiveness");
+                    entity.Property(e => e.RisksDetails)
+                        .HasMaxLength(250);
 
                     entity.HasIndex(e => e.IncludesTraining)
                         .HasName("IX_IncludesTraining");
+
+                    entity.Property(e => e.TrainingDetails)
+                        .HasMaxLength(250);
 
                     entity.Property(e => e.Status)
                         .HasColumnName("StatusId");
