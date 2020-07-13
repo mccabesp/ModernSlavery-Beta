@@ -11,7 +11,7 @@ namespace ModernSlavery.Core.Entities
             Sectors = new HashSet<StatementSector>();
             Policies = new HashSet<StatementPolicy>();
             TrainingDivisions = new HashSet<StatementTrainingDivision>();
-            Risks = new HashSet<StatementRisk>();
+            RelevantRisks = new HashSet<StatementRisk>();
             Diligences = new HashSet<StatementDiligence>();
         }
 
@@ -93,6 +93,7 @@ namespace ModernSlavery.Core.Entities
         #endregion
 
         #region Your organisation page
+
         public virtual ICollection<StatementSector> Sectors { get; set; }
 
         //HACK: Keep this for now as it may be required later since no provision in the UI
@@ -105,31 +106,31 @@ namespace ModernSlavery.Core.Entities
         #endregion
 
         #region Policies page
+
         public virtual ICollection<StatementPolicy> Policies { get; set; }
 
-        //TODO: Rename to OtherPolicies
-        public string OtherPolicy { get; set; }
+        public string OtherPolicies { get; set; }
 
         #endregion
 
         #region Supply chain risks and due diligence page 1
 
-        //TODO: Rename to OtherRelevantRisks
-        public string OtherRisks { get; set; }
-
         //TODO: Rename to RelevantRisks and just put the relevent risks here. 
         //NOTE: Regions/countries can just be represented in the DB Parents/Child RelevantRisks
-        public virtual ICollection<StatementRisk> Risks { get; set; }
+        public virtual ICollection<StatementRisk> RelevantRisks { get; set; }
+
+        public string OtherRelavantRisks { get; set; }
 
         //TODO: Create another table for HighRisks
-        //TODO: public virtual ICollection<StatementRisk> HighRisks { get; set; }
+        public virtual ICollection<StatementHighRisk> HighRisks { get; set; }
 
         //TODO: Create to OtherHighRisks
-        //TODO: public string OtherHighRisks { get; set; }
+        public string OtherHighRisks { get; set; }
 
         #endregion
 
         #region Supply chain risks and due diligence page 2
+
         //NOTE: I have added a new StatementDiligenceType.StatementDiligenceParentTypeId so we can have a hierarchy of DueDiligence to store Parnerships, Social Audits and Anonymous greievance mechanisms
         //NOTE: I have also added a new StatementDiligence.Description so we store "Other" categories of due diligence
         public virtual ICollection<StatementDiligence> Diligences { get; set; }

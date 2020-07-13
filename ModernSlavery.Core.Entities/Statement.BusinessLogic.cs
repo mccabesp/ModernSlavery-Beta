@@ -19,14 +19,14 @@ namespace ModernSlavery.Core.Entities
             // But what about the ViewModel? There will most likely be overlap
             // Are data annotations enough for the view model?
 
-            if (Status == ReturnStatuses.Draft)
-            {
-                // fields can be null
-            }
-            else
-            {
-                // fields are not allowed to be null
-            }
+            //if (Status == ReturnStatuses.Draft)
+            //{
+            //    // fields can be null
+            //}
+            //else
+            //{
+            //    // fields are not allowed to be null
+            //}
 
             throw new NotImplementedException();
         }

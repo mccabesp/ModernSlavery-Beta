@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ModernSlavery.Core.Entities
 {
-    public class StatementRisk
+    public class StatementHighRisk
     {
         public short StatementRiskId { get; set; }
 

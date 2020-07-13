@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Entities.Views;
+using System.Linq;
 
 namespace ModernSlavery.Infrastructure.Database
 {
@@ -527,6 +528,9 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.Property(e => e.StatusDetails)
                         .HasMaxLength(255);
 
+                    entity.Property(e => e.OtherRelavantRisks)
+                        .HasMaxLength(250);
+
                     entity.Property(e => e.JobTitle)
                         .HasMaxLength(100);
 
@@ -679,9 +683,30 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasConstraintName("FK_dbo.StatementRisk_dbo.StatementRiskType_StatementRiskTypeId");
 
                     entity.HasOne(e => e.Statement)
-                        .WithMany()
+                        .WithMany(e => e.RelevantRisks)
                         .HasForeignKey(e => e.StatementId)
                         .HasConstraintName("FK_dbo.StatementRisks_dbo.Statements_StatementId");
+                });
+
+            #endregion
+
+            #region StatementHighRisk
+
+            modelBuilder.Entity<StatementHighRisk>(
+                entity =>
+                {
+                    entity.HasKey(e => new { e.StatementRiskTypeId, e.StatementId })
+                        .HasName("PK_dbo.StatementHighRisks");
+
+                    entity.HasOne(e => e.StatementRiskType)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementRiskTypeId)
+                        .HasConstraintName("FK_dbo.StatementHighRisks_dbo.StatementRiskType_StatementRiskTypeId");
+
+                    entity.HasOne(e => e.Statement)
+                        .WithMany(e => e.HighRisks)
+                        .HasForeignKey(e => e.StatementId)
+                        .HasConstraintName("FK_dbo.StatementHighRisks_dbo.Statements_StatementId");
                 });
 
             #endregion
@@ -755,6 +780,11 @@ namespace ModernSlavery.Infrastructure.Database
                 {
                     entity.HasKey(e => new { e.StatementSectorTypeId, e.StatementId })
                         .HasName("PK_dbo.StatementSectors");
+
+                    entity.HasOne(e => e.Statement)
+                        .WithMany(e => e.Sectors)
+                        .HasForeignKey(e => e.StatementId)
+                        .HasConstraintName("FK_dbo.StatementSectors_dbo.Statements_StatementId");
                 });
 
             #endregion
