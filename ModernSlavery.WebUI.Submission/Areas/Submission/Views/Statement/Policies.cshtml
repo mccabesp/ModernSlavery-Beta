@@ -16,7 +16,7 @@
 
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementPolicies)
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.Policies)
                 }))
 
             <h1 class="govuk-heading-l">
@@ -37,21 +37,21 @@
                 </div>
             </details>
 
-             var organisationPolicyOptions =
-                                 new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementPolicies, Func<object, object>>
-                                 {
+            var organisationPolicyOptions =
+                                new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementPolicies, Func<object, object>>
+                                {
                            {
                              ModernSlavery.WebUI.Submission.Presenters.StatementPolicies.Other,
-    @<text>
-        @(Html.GovUkTextInputFor(model => model.OtherPolicyText))
-        @(Html.LabelFor(model => model.OtherPolicyText, new { @class = "govuk-label" }))
-    </text>
+@<text>
+    @(Html.GovUkTextInputFor(model => model.OtherPolicies))
+    @(Html.LabelFor(model => model.OtherPolicies, new { @class = "govuk-label" }))
+</text>
                             }
-                               };
-            
+                                          };
 
-            @(Html.GovUkCheckboxesFor(
-                    model => model.StatementPolicies,
+
+                @(Html.GovUkCheckboxesFor(
+                    model => model.Policies,
                     new FieldsetViewModel
                     {
                         Legend = new LegendViewModel
@@ -67,13 +67,13 @@
                     organisationPolicyOptions
                ))
 
-            <button class="govuk-button" data-module="govuk-button" type="submit">
-                Continue
-            </button>
-            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
-                Cancel
-            </button>
-        }
+                <button class="govuk-button" data-module="govuk-button" type="submit">
+                    Continue
+                </button>
+                <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
+                    Cancel
+                </button>
+            }
 
     </div>
 

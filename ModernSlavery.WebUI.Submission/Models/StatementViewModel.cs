@@ -22,6 +22,29 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         // Date the status last changed
         public DateTime StatusDate { get; set; }
 
+        public DateTime SubmissionDeadline { get; set; }
+        // This should never go over the wire!
+        public long OrganisationId { get; set; }
+
+        public string OrganisationIdentifier { get; set; }
+
+        public int Year { get; set; }
+
+        public int IncludedOrganistionCount { get; set; }
+
+        public int ExcludedOrganisationCount { get; set; }
+
+
+
+
+
+        #region Statement Page
+
+        [Url(ErrorMessage = "URL is not valid")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a URL")]
+        [MaxLength(255, ErrorMessage = "The web address (URL) cannot be longer than 255 characters.")]
+        [Display(Name = "URL")]
+        public string StatementUrl { get; set; }
         public DateTime? StatementStartDate
         {
             get
@@ -44,14 +67,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 }
             }
         }
-
         // Earliest date that the submission can be started
         public int? StatementStartDay { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a start month")]
         public int? StatementStartMonth { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a start year")]
         public int? StatementStartYear { get; set; }
-
         public DateTime? StatementEndDate
         {
             get
@@ -74,26 +95,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 }
             }
         }
-
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter an end day")]
         public int? StatementEndDay { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter an end month")]
         public int? StatementEndMonth { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter an end year")]
         public int? StatementEndYear { get; set; }
-        public DateTime SubmissionDeadline { get; set; }
-        // This should never go over the wire!
-        public long OrganisationId { get; set; }
-
-        public string OrganisationIdentifier { get; set; }
-
-        public int Year { get; set; }
-
-        [Url(ErrorMessage = "URL is not valid")]
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a URL")]
-        [MaxLength(255, ErrorMessage = "The web address (URL) cannot be longer than 255 characters.")]
-        [Display(Name = "URL")]
-        public string StatementUrl { get; set; }
         [Display(Name = "Job Title")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a job title")]
         public string JobTitle { get; set; }
@@ -103,7 +110,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         [Display(Name = "Last Name")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a last name")]
         public string LastName { get; set; }
-
         public DateTime? ApprovedDate
         {
             get
@@ -126,97 +132,116 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 }
             }
         }
-
         public int? ApprovedDay { get; set; }
         public int? ApprovedMonth { get; set; }
         public int? ApprovedYear { get; set; }
 
-        public bool IncludesGoals { get; set; }
+        #endregion
+
+        #region Compliance Page
+
         [Required]
         public bool? IncludesStructure { get; set; }
-
-        public string IncludesStructureDetail { get; set; }
+        public string StructureDetails { get; set; }
         [Required]
         public bool? IncludesPolicies { get; set; }
-        public string IncludesPoliciesDetail { get; set; }
-        [Required]
-        public bool? IncludesMethods { get; set; }
-        public string IncludesMethodsDetail { get; set; }
+        public string PolicyDetails { get; set; }
         [Required]
         public bool? IncludesRisks { get; set; }
-        public string IncludesRisksDetail { get; set; }
+        public string RisksDetails { get; set; }
         [Required]
-        public bool? IncludesEffectiveness { get; set; }
-
-        public string IncludedEffectivenessDetail { get; set; }
+        public bool? IncludesDueDiligence { get; set; }
+        public string DueDiligenceDetails { get; set; }
         [Required]
         public bool? IncludesTraining { get; set; }
-        public string IncludesTrainingDetail { get; set; }
+        public string TrainingDetails { get; set; }
+        [Required]
+        public bool? IncludesGoals { get; set; }
+        public string GoalsDetails { get; set; }
 
-        public int IncludedOrganistionCount { get; set; }
+        #endregion
 
-        public int ExcludedOrganisationCount { get; set; }
-
-        public string OtherSectorText { get; set; }
-
-        public List<StatementSectors> StatementSectors { get; set; }
-
+        #region Your organisation Page
+        //TODO: bind StatementSector to this enum with attribute GovUkRadioCheckboxLabelText for the labels
+        public List<StatementSectors> Sectors { get; set; }
+        public string OtherSector { get; set; }
         public LastFinancialYearBudget? LastFinancialYearBudget { get; set; }
 
-        public List<StatementPolicies> StatementPolicies { get; set; }
+        #endregion
+
+        #region Policies Page
+        public List<StatementPolicies> Policies { get; set; }
         [Display(Name = "Please provide detail")]
-        public string OtherPolicyText { get; set; }
+        public string OtherPolicies { get; set; }
 
-        public List<StatementTrainings> StatementTrainings { get; set; }
-        [Display(Name = "Please specify")]
-        public string OtherTrainingText { get; set; }
+        #endregion
 
-        public List<StatementRisk> StatementRisks { get; set; }
+        #region Supply chain risks and due diligence Page 1
 
-        public List<StatementRiskType> StatementRiskTypes { get; set; }
+        public List<StatementRisk> RelevantRisks { get; set; }
 
-        public string OtherRiskText { get; set; }
+        public List<StatementRiskType> RelevantRiskTypes { get; set; }
 
-        public List<Continent> Continents { get; set; }
+        public string OtherRelevantRisks { get; set; }
+        public List<StatementRisk> HighRisks { get; set; }
+        public List<StatementRiskType> HighRiskTypes { get; set; }
+        public string OtherHighRisks { get; set; }
 
-        public List<Core.Classes.Country> Countries { get; set; }
+        #endregion
 
-        public List<StatementDiligence> StatementDiligences { get; set; }
-        public List<StatementDiligenceType> StatementDiligenceTypes { get; set; }
+        #region Supply chain risks and due diligence Page 2
 
-        //need to find corresponsing model property
-        public AnyIdicatorsInSupplyChain? AnyIdicatorsInSupplyChain { get; set; }
+        public List<StatementDiligence> Diligences { get; set; }
+        public List<StatementDiligenceType> DiligenceTypes { get; set; }
+        //TODO: clarify mapping to model
+        public AnyIdicatorsInSupplyChain? ForcedLabour { get; set; }
 
-        //need to find corresponsing model property
+        public string ForcedLabourDetails { get; set; }
 
-        public string IndicatorDetails { get; set; }
+        //TODO: clarify mapping to model
+        public AnyInstancesInSupplyChain? SlaveryInstance { get; set; }
 
-        //need to find corresponsing model property
-        public List<AnyInstancesInSupplyChain> AnyInstancesInSupplyChain { get; set; }
-
-        //need to find corresponsing model property
-        public string InstanceDetails { get; set; }
+        public string SlaveryInstanceDetails { get; set; }
 
         public List<StatementRemediation> StatementRemediations { get; set; }
-
-        public string OtherRemediationText { get; set; }
+        //TODO: clarify mapping to model
+        public string SlaveryInstanceRemediation { get; set; }
         [MaxLength(500)]
+
+        #endregion
+
+        #region Training Page
+
+        public List<StatementTrainings> TrainingTypes { get; set; }
+        [Display(Name = "Please specify")]
+        public string OtherTrainingType { get; set; }
+
+        #endregion
+
+        #region Monitoring progress Page
+
+        public bool IncludesMeasuringProgress { get; set; }
+
         [Display(Name = "How is your organisation measuring progress towards these goals?")]
         public string MeasuringProgress { get; set; }
         [MaxLength(500)]
         [Display(Name = "What were your key achievements in relation to reducing modern slavery during the period covered by this statement?")]
         public string KeyAchievements { get; set; }
 
-        public List<NumberOfYearsOfStatements> NumberOfYearsOfStatements { get; set; }
+        public NumberOfYearsOfStatements? NumberOfYearsOfStatements { get; set; }
+
+        #endregion
+
+
 
         //this will come from organisation
         public string CompanyName { get; set; }
 
         //to review how review list will be handled? - for now boolean for each section that can be handled in controller
-        [UIHint("CompletedNotCompleted")]
+
         [Display(Name = "Your modern slavery statement")]
         public bool IsStatementSectionCompleted { get; set; }
-        [UIHint("CompletedNotCompleted")]
+
         [Display(Name = "Areas covered by your modern slavery statement")]
         public bool IsAreasCoveredSectionCompleted { get; set; }
         [UIHint("CompletedNotCompleted")]
@@ -291,81 +316,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
     public enum StatementSectors
     {
-        [GovUkRadioCheckboxLabelText(Text = "All")]
-        All,
-
-        [GovUkRadioCheckboxLabelText(Text = "Accommodation and food service activities")]
-        AccommodationAndFoodServiceActivities,
-
-        [GovUkRadioCheckboxLabelText(Text = "Activities of extraterritorial organisations and bodies")]
-        ActivitiesOfExtraterritorialOrganisationsAndBodies,
-
-        [GovUkRadioCheckboxLabelText(Text = "Activities of households as employers")]
-        ActivitiesOfHouseholdsAsEmployers,
-
-        [GovUkRadioCheckboxLabelText(Text = "Administrative and support service activities")]
-        AdministrativeAndSupportServiceActivities,
-
-        [GovUkRadioCheckboxLabelText(Text = "Agriculture, Forestry and Fishing")]
-        AgricultureForestryAndFishing,
-
-        [GovUkRadioCheckboxLabelText(Text = "Arts, entertainment and recreation")]
-        ArtsEntertainmentAndRecreation,
-
-        [GovUkRadioCheckboxLabelText(Text = "Construction")]
-        Construction,
-
-        [GovUkRadioCheckboxLabelText(Text = "Education")]
-        Education,
-
-        [GovUkRadioCheckboxLabelText(Text = "Electricity, gas, steam and air conditioning supply")]
-        ElectricityGasSteamAndAirConditioningSupply,
-
-        [GovUkRadioCheckboxLabelText(Text = "Financial and insurance activities")]
-        FinancialAndInsuranceActivities,
-
-        [GovUkRadioCheckboxLabelText(Text = "Human health and social work activities")]
-        HumanHealthAndSocialWorkActivities,
-
-        [GovUkRadioCheckboxLabelText(Text = "Information and communication")]
-        InformationAndCommunication,
-
-        [GovUkRadioCheckboxLabelText(Text = "Manufacturing")]
-        Manufacturing,
-
-        [GovUkRadioCheckboxLabelText(Text = "Mining and Quarrying")]
-        MiningAndQuarrying,
-
-
-        [GovUkRadioCheckboxLabelText(Text = "Other service activities")]
-        OtherServiceActivities,
-
-
-        [GovUkRadioCheckboxLabelText(Text = "Professional scientific and technical activities")]
-        ProfessionalScientificAndTechnicalActivities,
-
-        [GovUkRadioCheckboxLabelText(Text = "Public administration and defence")]
-        PublicAdministrationAndDefence,
-
-        [GovUkRadioCheckboxLabelText(Text = "Public sector")]
-        PublicSector,
-
-        [GovUkRadioCheckboxLabelText(Text = "Real estate activities")]
-        RealEstateActivities,
-
-        [GovUkRadioCheckboxLabelText(Text = "Transportation and storage")]
-        TransportationAndStorage,
-
-        [GovUkRadioCheckboxLabelText(Text = "Water supply, sewerage, waste management and remediation activities")]
-        WaterSupplySewerageWasteManagementAndRemediationActivities,
-
-        [GovUkRadioCheckboxLabelText(Text = "Wholesale and retail trade")]
-        WholesaleAndRetailTrade,
-
-        //TODO: should we have this, it's on prototype but not wireframes
-        [GovUkRadioCheckboxLabelText(Text = "Other")]
-        Other
-
+        Other = 0
+    }
+    public enum IncludesGoals
+    {
+        Yes = 0,
+        No = 1
     }
     public enum LastFinancialYearBudget
     {
@@ -456,4 +412,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         Other
 
     }
+
+
 }

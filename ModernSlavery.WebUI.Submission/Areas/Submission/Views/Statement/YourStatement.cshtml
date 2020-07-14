@@ -55,7 +55,7 @@
                 <label asp-for="StatementUrl" class="govuk-label"></label>
                 <input asp-for="StatementUrl" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
                 <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
-            </div>           
+            </div>
 
             //Todo: clarify format of errors as GDS as errors messages for dates
             <div class="govuk-form-group">
@@ -96,12 +96,12 @@
                             </div>
 
                         </div>
-                     
-                        @*<p>to</p>*@
+
 
                         <div class="govuk-date-input govuk-grid-column-one-third" id="reporting-end">
+                            <div><p>to</p></div>
                             <div class="govuk-date-input__item">
-                                <div class="govuk-form-group">                                  
+                                <div class="govuk-form-group">
                                     <label class="govuk-label govuk-date-input__label" for="reporting-end-day">
                                         Day
                                     </label>
@@ -139,7 +139,7 @@
                 <div class="govuk-form-group">
                     <label asp-for="FirstName" class="govuk-label"></label>
                     <input asp-for="FirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
-                    <span asp-validation-for="FirstName" class="govuk-error-message"></span>                   
+                    <span asp-validation-for="FirstName" class="govuk-error-message"></span>
                 </div>
 
                 <div class="govuk-form-group">
@@ -164,7 +164,7 @@
                     </legend>
                     <span id="statement-approved-hint" class="govuk-hint">
                         For example, 31 3 1980
-                    </span>             
+                    </span>
                     <div class="govuk-date-input" id="statement-approved">
                         <div class="govuk-date-input__item">
                             <div class="govuk-form-group">
@@ -195,7 +195,7 @@
             </div>
 
             <button class="govuk-button" data-module="govuk-button" type="submit">
-               Continue
+                Continue
             </button>
             <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
                 Cancel

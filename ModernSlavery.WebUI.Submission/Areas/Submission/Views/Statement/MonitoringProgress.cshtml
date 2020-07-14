@@ -12,21 +12,21 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-     
 
-        @(Html.GovUkErrorSummary(new[]
+
+            @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesGoals),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesMeasuringProgress),
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.MeasuringProgress),
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.KeyAchievements),
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.NumberOfYearsOfStatements),
                 }))
 
-        <h1 class="govuk-heading-l">
-            Monitoring progress
-        </h1>
-        @(Html.GovUkRadiosFor(
-        m => m.IncludesGoals,
+            <h1 class="govuk-heading-l">
+                Monitoring progress
+            </h1>
+            @(Html.GovUkRadiosFor(
+        m => m.IncludesMeasuringProgress,
         new FieldsetViewModel
         {
             Legend = new LegendViewModel
@@ -37,24 +37,24 @@
             Classes = "govuk-!-margin-top-6"
         }));
 
-        <div class="govuk-form-group">
-            <h1 class="govuk-label-wrapper">
-                <label asp-for="MeasuringProgress" class="govuk-label govuk-label--l" for="measuring-progress">
-                </label>
-            </h1>
-            <textarea asp-for="MeasuringProgress" class="govuk-textarea" id="more-detail" name="measuring-progress" rows="5"></textarea>
-        </div>
+            <div class="govuk-form-group">
+                <h1 class="govuk-label-wrapper">
+                    <label asp-for="MeasuringProgress" class="govuk-label govuk-label--l" for="measuring-progress">
+                    </label>
+                </h1>
+                <textarea asp-for="MeasuringProgress" class="govuk-textarea" id="more-detail" name="measuring-progress" rows="5"></textarea>
+            </div>
 
-        <div class="govuk-form-group">
-            <h1 class="govuk-label-wrapper">
-                <label asp-for="KeyAchievements" class="govuk-label govuk-label--l" for="key-achievements">
-                </label>
-            </h1>
-            <textarea asp-for="KeyAchievements" class="govuk-textarea" id="more-detail" name="key-achievements" rows="5"></textarea>
-        </div>
+            <div class="govuk-form-group">
+                <h1 class="govuk-label-wrapper">
+                    <label asp-for="KeyAchievements" class="govuk-label govuk-label--l" for="key-achievements">
+                    </label>
+                </h1>
+                <textarea asp-for="KeyAchievements" class="govuk-textarea" id="more-detail" name="key-achievements" rows="5"></textarea>
+            </div>
 
 
-        @(Html.GovUkRadiosFor(
+            @(Html.GovUkRadiosFor(
                     m => m.NumberOfYearsOfStatements,
                     new FieldsetViewModel
                     {
@@ -71,12 +71,12 @@
                     }))
 
 
-        <button class="govuk-button" data-module="govuk-button" type="submit">
-            Continue
-        </button>
-        <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
-            Cancel
-        </button>
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Continue
+            </button>
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
+                Cancel
+            </button>
         }
     </div>
 </div>

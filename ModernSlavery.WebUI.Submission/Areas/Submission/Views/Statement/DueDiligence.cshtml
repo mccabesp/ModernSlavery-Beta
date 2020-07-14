@@ -16,130 +16,142 @@
             @Html.AntiForgeryToken();
 
 
-        @(Html.GovUkErrorSummary(new[]
+            @(Html.GovUkErrorSummary(new[]
         {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementDiligences),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementDiligenceTypes),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.Diligences),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.DiligenceTypes),
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementRemediations),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.OtherRemediationText),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IndicatorDetails),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.InstanceDetails)
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.SlaveryInstanceRemediation),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.ForcedLabourDetails),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.SlaveryInstanceDetails)
                 }))
 
-        <h2>Part 2</h2>
+            <h2>Part 2</h2>
 
-        <h1 class="govuk-heading-l">
-            Supply Chain and Due diligence
-        </h1>
+            <h1 class="govuk-heading-l">
+                Supply Chain and Due diligence
+            </h1>
 
-        <h2>
-            What methods does your organisation use to monitor working conditions in your operations and supply chain?
-        </h2>
+            <h2 class="govuk-heading-m">
+                What methods does your organisation use to monitor working conditions in your operations and supply chain?
+            </h2>
 
-        @*TODO: make into a partial view with checkbox counts*@
+            @*TODO: make into a partial view with checkbox counts*@
 
-        <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-            @foreach (var item in Model.StatementDiligenceTypes)
-            {
-                <div class="govuk-accordion__section ">
-                    <div class="govuk-accordion__section-header">
-                        <h2 class="govuk-accordion__section-heading">
-                            <span class="govuk-accordion__section-button" id="accordion-default-heading">
-                                @item.Description
-                            </span>
-                        </h2>
-                    </div>
-                    <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
-                        <div class="govuk-form-group">
-                            <fieldset class="govuk-fieldset">
-                                <div class="govuk-checkboxes">
-                                    @foreach (var subitem in Model.StatementDiligences.Where(x => x.StatementDiligenceType == item))
-                                    {
-                                        <div class="govuk-checkboxes__item">
-                                            <input class="govuk-checkboxes__input" id="waste" name="waste" type="checkbox" value="carcasses">
-                                            <label class="govuk-label govuk-checkboxes__label" for="waste">
-                                                @subitem @*TODO: need to add description to model*@
-                                            </label>
-                                        </div>
-                                    }
-                                </div>
-                            </fieldset>
+            <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+                @foreach (var group in Model.DiligenceTypes.GroupBy(x => x.StatementDiligenceParent))
+                {
+                    <div class="govuk-accordion__section ">
+                        <div class="govuk-accordion__section-header">
+                            <h2 class="govuk-accordion__section-heading">
+                                <span class="govuk-accordion__section-button" id="accordion-default-heading">
+                                    @group.Key.StatementDiligenceParent.Description
+                                </span>
+                            </h2>
+                        </div>
+                        <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <div class="govuk-checkboxes">
+                                        @foreach (var item in group)
+                                        {
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" id="conditional" name="supply-risk" type="checkbox" data-aria-controls="conditional-conditional">
+                                                <label class="govuk-label govuk-checkboxes__label" for="conditional">
+                                                    @item.Description
+                                                </label>
+                                            </div>
+                                            //TODO: only have this visible for some of the options
+                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional">
+                                                <div class="govuk-form-group">
+                                                    <label class="govuk-label" for="other">
+                                                        Please specify other
+                                                    </label>
+                                                    @*TODO:need to bind to parent risk details*@
+                                                    <input @*asp-for=""*@ class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="other" type="text">
+                                                </div>
+                                                }
+                                            </div>
+
+                                        }
+                                    </div>
+                                </fieldset>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
 
 
-        <h1 class="govuk-heading-l">
-            For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?
-        </h1>
+            <h2 class="govuk-heading-l">
+                For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?
+            </h2>
 
-        var anyIndicatorsInSupplyChainConditionalOptions = new Dictionary<ModernSlavery.WebUI.Submission.Presenters.AnyIdicatorsInSupplyChain, Func<object, object>>
-            {
+            var anyIndicatorsInSupplyChainConditionalOptions = new Dictionary<ModernSlavery.WebUI.Submission.Presenters.AnyIdicatorsInSupplyChain, Func<object, object>>
+        {
               {
                     ModernSlavery.WebUI.Submission.Presenters.AnyIdicatorsInSupplyChain.Yes,
-    @<text>
-        @(Html.GovUkTextInputFor(m => m.IndicatorDetails))
-    </text>
+@<text>
+    @(Html.GovUkTextInputFor(m => m.ForcedLabourDetails))
+</text>
               }
           };
-        
-
-        @*TODO: get these to work*@
-        @*@(Html.GovUkRadiosFor(
-        m => m.AnyIdicatorsInSupplyChain,
-        new FieldsetViewModel
-        {
-            Legend = new LegendViewModel
-            {
-                Text = "Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.",
-                Classes = "govuk-fieldset__legend--m"
-            },
-            Classes = "govuk-!-margin-top-6"
-        },
-        null,
-        anyIndicatorsInSupplyChainConditionalOptions
-        ));*@
 
 
+                //TODO: get these to work
+                @*@(Html.GovUkRadiosFor(
+                    m => m.AnyIdicatorsInSupplyChain,
+                    new FieldsetViewModel
+                    {
+                        Legend = new LegendViewModel
+                        {
+                            Text = "Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.",
+                            Classes = "govuk-fieldset__legend--m"
+                        },
+                        Classes = "govuk-!-margin-top-6"
+                    },
+                    null
+                    anyIndicatorsInSupplyChainConditionalOptions
+                    ));*@
 
-        var anyInstancesInSupplyChainConditionalOptions = new Dictionary<ModernSlavery.WebUI.Submission.Presenters.AnyInstancesInSupplyChain, Func<object, object>>
+
+
+                var anyInstancesInSupplyChainConditionalOptions = new Dictionary<ModernSlavery.WebUI.Submission.Presenters.AnyInstancesInSupplyChain, Func<object, object>>
             {
               {
                     ModernSlavery.WebUI.Submission.Presenters.AnyInstancesInSupplyChain.Yes,
-    @<text>
-        @(Html.GovUkTextInputFor(m => m.InstanceDetails))
-    </text>
+@<text>
+    @(Html.GovUkTextInputFor(m => m.SlaveryInstanceDetails))
+</text>
               }
           };
-        
+
 
         @*@(Html.GovUkRadiosFor(
-        m => m.AnyInstancesInSupplyChain,
-        new FieldsetViewModel
-        {
-            Legend = new LegendViewModel
+            m => m.AnyInstancesInSupplyChain,
+            new FieldsetViewModel
             {
-                Text = "Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?",
-                Classes = "govuk-fieldset__legend--m"
+                Legend = new LegendViewModel
+                {
+                    Text = "Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?",
+                    Classes = "govuk-fieldset__legend--m"
+                },
+                Classes = "govuk-!-margin-top-6"
             },
-            Classes = "govuk-!-margin-top-6"
-        },
-        null,
-        anyInstancesInSupplyChainConditionalOptions
-        ))*@;
+            null
+            anyInstancesInSupplyChainConditionalOptions
+            ));*@
 
         var remediationChainConditionalOptions = new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementRemediation, Func<object, object>>
-            {
+    {
               {
                     ModernSlavery.WebUI.Submission.Presenters.StatementRemediation.Other,
-    @<text>
-        @(Html.GovUkTextInputFor(m => m.OtherRemediationText))
-    </text>
+@<text>
+    @(Html.GovUkTextInputFor(m => m.SlaveryInstanceRemediation))
+</text>
               }
           };
-        
+
 
         @(Html.GovUkCheckboxesFor(
                                 m => m.StatementRemediations,
@@ -163,7 +175,7 @@
         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
             Cancel
         </button>
-            }
+    }
     </div>
 
 </div>

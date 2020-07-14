@@ -149,8 +149,13 @@ namespace ModernSlavery.BusinessDomain.Submission
                 .ForMember(dest => dest.OtherTrainingText, opt => opt.MapFrom(src => src.OtherTrainingTypes))
                 .ForMember(dest => dest.StatementRiskTypes, opt => opt.MapFrom(src => src.RelevantRisks.Select(r => new KeyValuePair<int, string>(r.StatementRiskTypeId, r.StatementRiskType.Description))))
                 .ForMember(dest => dest.StatementDiligenceTypes, opt => opt.MapFrom(src => src.Diligences.Select(d => new KeyValuePair<int, string>(d.StatementDiligenceTypeId, d.StatementDiligenceType.Description))))
-                // These should be added to the entity
-                .ForMember(dest => dest.Countries, opt => opt.Ignore());
+                .ForMember(dest => dest.OtherDiligenceText, opt => opt.MapFrom(src => src.OtherPolicies))
+                .ForMember(dest => dest.OtherRiskText, opt => opt.MapFrom(src => src.OtherPolicies))
+                .ForMember(dest => dest.MeasuringProgress, opt => opt.MapFrom(src => src.ProgressMeasures))
+                 .ForMember(dest => dest.Status, opt => opt.Ignore());
+
+            // These should be added to the entity
+
         }
     }
 }

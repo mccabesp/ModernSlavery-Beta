@@ -97,8 +97,6 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public string OtherRiskText { get; set; }
 
-        public List<KeyValuePair<int, string>> Countries { get; set; }
-
         #endregion
 
         #region Step 6 - Training

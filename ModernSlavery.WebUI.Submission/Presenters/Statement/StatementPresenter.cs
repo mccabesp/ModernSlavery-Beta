@@ -358,7 +358,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 case SubmissionStep.Training:
                     return nameof(StatementController.MonitoringProgress);
                 case SubmissionStep.MonitoringProgress:
-                    return nameof(StatementController.Review);
+                    return nameof(StatementController.ReviewAndEdit);
                 case SubmissionStep.Review:
                 default:
                     throw new NotImplementedException();
@@ -413,6 +413,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
     {
         public StatementMapperProfile()
         {
+
             CreateMap<StatementViewModel, StatementModel>()
                 .ForMember(dest => dest.OtherDiligenceText, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementTrainingDivisions, opt => opt.Ignore())
@@ -420,32 +421,52 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.StatementDiligenceTypes, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementRiskTypes, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
-                .ForMember(dest => dest.Countries, opt => opt.Ignore());
+
+
+                .ForMember(dest => dest.StructureDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.PolicyDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.RisksDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.IncludesDueDiligence, opt => opt.Ignore())
+                .ForMember(dest => dest.DueDiligenceDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.TrainingDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.GoalsDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherSectorText, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherPolicyText, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherRiskText, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherTrainingText, opt => opt.Ignore());
 
             CreateMap<StatementModel, StatementViewModel>()
                 // These need obfuscating
                 .ForMember(dest => dest.StatementIdentifier, opt => opt.Ignore())
                 .ForMember(dest => dest.OrganisationIdentifier, opt => opt.Ignore())
                 // These need to change on VM to come from DB
-                .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementTrainings, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementRisks, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementDiligences, opt => opt.Ignore())
+                .ForMember(dest => dest.Policies, opt => opt.Ignore())
+                .ForMember(dest => dest.TrainingTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.Sectors, opt => opt.Ignore())
+                .ForMember(dest => dest.Diligences, opt => opt.Ignore())
                 // These need mapping for correct type on vm
-                .ForMember(dest => dest.StatementRiskTypes, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementDiligenceTypes, opt => opt.Ignore())
-                .ForMember(dest => dest.Countries, opt => opt.Ignore())
+                .ForMember(dest => dest.RelevantRiskTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.DiligenceTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherSector, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherPolicies, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherRelevantRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.HighRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.HighRiskTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherHighRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherTrainingType, opt => opt.Ignore())
+                 .ForMember(dest => dest.IncludesMeasuringProgress, opt => opt.Ignore())
+
+
                 // Work out storage of these
                 .ForMember(dest => dest.IncludedOrganistionCount, opt => opt.Ignore())
                 .ForMember(dest => dest.ExcludedOrganisationCount, opt => opt.Ignore())
-                .ForMember(dest => dest.Continents, opt => opt.Ignore())
-                .ForMember(dest => dest.AnyIdicatorsInSupplyChain, opt => opt.Ignore())
-                .ForMember(dest => dest.IndicatorDetails, opt => opt.Ignore())
-                .ForMember(dest => dest.AnyInstancesInSupplyChain, opt => opt.Ignore())
-                .ForMember(dest => dest.InstanceDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.ForcedLabour, opt => opt.Ignore())
+                .ForMember(dest => dest.ForcedLabourDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.SlaveryInstance, opt => opt.Ignore())
+                .ForMember(dest => dest.SlaveryInstanceDetails, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementRemediations, opt => opt.Ignore())
-                .ForMember(dest => dest.OtherRemediationText, opt => opt.Ignore())
+                .ForMember(dest => dest.SlaveryInstanceRemediation, opt => opt.Ignore())
                 .ForMember(dest => dest.NumberOfYearsOfStatements, opt => opt.Ignore())
                 .ForMember(dest => dest.LastFinancialYearBudget, opt => opt.Ignore())
                 .ForMember(dest => dest.NumberOfYearsOfStatements, opt => opt.Ignore())
@@ -468,7 +489,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.StatementEndYear, opt => opt.Ignore())
                 .ForMember(dest => dest.ApprovedDay, opt => opt.Ignore())
                 .ForMember(dest => dest.ApprovedMonth, opt => opt.Ignore())
-                .ForMember(dest => dest.ApprovedYear, opt => opt.Ignore());
+                .ForMember(dest => dest.ApprovedYear, opt => opt.Ignore())
+
+
+                ;
+
+
+
         }
     }
 }
