@@ -417,9 +417,19 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.Training, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
                 .ForMember(dest => dest.Diligences, opt => opt.Ignore())
-                .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
-                .ForMember(dest => dest.LocationRisks, opt => opt.Ignore());
+                .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.HighRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.LocationRisks, opt => opt.Ignore())
+                // Fill these in appropriately
+                .ForMember(dest => dest.MinStatementYears, opt => opt.Ignore())
+                .ForMember(dest => dest.MaxStatementYears, opt => opt.Ignore())
+                .ForMember(dest => dest.MinTurnover, opt => opt.Ignore())
+                .ForMember(dest => dest.MaxTurnover, opt => opt.Ignore())
+                // TODO - James/Charlotte update VM to handle these
+                .ForMember(dest => dest.ForcedLabourDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.SlaveryInstanceDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.SlaveryInstanceRemediation, opt => opt.Ignore());
 
             CreateMap<StatementModel, StatementViewModel>()
                 // These need obfuscating

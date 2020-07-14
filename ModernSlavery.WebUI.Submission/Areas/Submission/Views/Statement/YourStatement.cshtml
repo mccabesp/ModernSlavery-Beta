@@ -29,9 +29,9 @@
                 }))
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.FirstName),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.LastName),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.JobTitle),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.ApproverFirstName),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.ApproverLastName),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.ApproverJobTitle),
                 }))
 
             <h1 class="govuk-heading-l">
@@ -137,21 +137,21 @@
                 </legend>
 
                 <div class="govuk-form-group">
-                    <label asp-for="FirstName" class="govuk-label"></label>
-                    <input asp-for="FirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
-                    <span asp-validation-for="FirstName" class="govuk-error-message"></span>                   
+                    <label asp-for="ApproverFirstName" class="govuk-label"></label>
+                    <input asp-for="ApproverFirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="ApproverFirstName" class="govuk-error-message"></span>                   
                 </div>
 
                 <div class="govuk-form-group">
-                    <label asp-for="LastName" class="govuk-label"></label>
-                    <input asp-for="LastName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
-                    <span asp-validation-for="LastName" class="govuk-error-message"></span>
+                    <label asp-for="ApproverLastName" class="govuk-label"></label>
+                    <input asp-for="ApproverLastName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="ApproverLastName" class="govuk-error-message"></span>
                 </div>
 
                 <div class="govuk-form-group">
-                    <label asp-for="JobTitle" class="govuk-label"></label>
-                    <input asp-for="JobTitle" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
-                    <span asp-validation-for="JobTitle" class="govuk-error-message"></span>
+                    <label asp-for="ApproverJobTitle" class="govuk-label"></label>
+                    <input asp-for="ApproverJobTitle" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="ApproverJobTitle" class="govuk-error-message"></span>
                 </div>
             </fieldset>
 

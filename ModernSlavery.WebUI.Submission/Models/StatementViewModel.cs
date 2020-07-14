@@ -96,13 +96,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public string StatementUrl { get; set; }
         [Display(Name = "Job Title")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a job title")]
-        public string JobTitle { get; set; }
+        public string ApproverJobTitle { get; set; }
         [Display(Name = "First Name")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a first name")]
-        public string FirstName { get; set; }
+        public string ApproverFirstName { get; set; }
         [Display(Name = "Last Name")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a last name")]
-        public string LastName { get; set; }
+        public string ApproverLastName { get; set; }
 
         public DateTime? ApprovedDate
         {
@@ -131,51 +131,53 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public int? ApprovedMonth { get; set; }
         public int? ApprovedYear { get; set; }
 
-        public bool IncludesGoals { get; set; }
+        public bool IncludesMeasuringProgress { get; set; }
         [Required]
         public bool? IncludesStructure { get; set; }
 
-        public string IncludesStructureDetail { get; set; }
+        public string StructureDetails { get; set; }
         [Required]
         public bool? IncludesPolicies { get; set; }
-        public string IncludesPoliciesDetail { get; set; }
+        public string PolicyDetails { get; set; }
         [Required]
-        public bool? IncludesMethods { get; set; }
-        public string IncludesMethodsDetail { get; set; }
+        public bool? IncludesDueDiligence { get; set; }
+        public string DueDiligenceDetails { get; set; }
         [Required]
         public bool? IncludesRisks { get; set; }
-        public string IncludesRisksDetail { get; set; }
+        public string RisksDetails { get; set; }
         [Required]
-        public bool? IncludesEffectiveness { get; set; }
+        public bool? IncludesGoals { get; set; }
 
-        public string IncludedEffectivenessDetail { get; set; }
+        public string GoalsDetails { get; set; }
         [Required]
         public bool? IncludesTraining { get; set; }
-        public string IncludesTrainingDetail { get; set; }
+        public string TrainingDetails { get; set; }
 
         public int IncludedOrganistionCount { get; set; }
 
         public int ExcludedOrganisationCount { get; set; }
 
-        public string OtherSectorText { get; set; }
-
         public List<StatementSectors> StatementSectors { get; set; }
+
+        public string OtherSector { get; set; }
 
         public LastFinancialYearBudget? LastFinancialYearBudget { get; set; }
 
         public List<StatementPolicies> StatementPolicies { get; set; }
         [Display(Name = "Please provide detail")]
-        public string OtherPolicyText { get; set; }
+        public string OtherPolicies { get; set; }
 
         public List<StatementTrainings> StatementTrainings { get; set; }
         [Display(Name = "Please specify")]
-        public string OtherTrainingText { get; set; }
+        public string OtherTraining { get; set; }
 
         public List<StatementRelevantRisk> StatementRisks { get; set; }
 
         public List<StatementRiskType> StatementRiskTypes { get; set; }
 
-        public string OtherRiskText { get; set; }
+        public string OtherRelevantRisks { get; set; }
+
+        public string OtherHighRisks { get; set; }
 
         public List<Continent> Continents { get; set; }
 
@@ -202,7 +204,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public string OtherRemediationText { get; set; }
         [MaxLength(500)]
         [Display(Name = "How is your organisation measuring progress towards these goals?")]
-        public string MeasuringProgress { get; set; }
+        public string ProgressMeasures { get; set; }
         [MaxLength(500)]
         [Display(Name = "What were your key achievements in relation to reducing modern slavery during the period covered by this statement?")]
         public string KeyAchievements { get; set; }

@@ -21,9 +21,9 @@
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesStructure),
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesPolicies),
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesRisks),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesMethods),
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesDueDiligence),
                     nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesTraining),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesEffectiveness)
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesGoals)
                 }))
 
         <h1 class="govuk-heading-l">
@@ -59,7 +59,7 @@
                             <label class="govuk-label" for="include-structure-detail">
                                 Please provide detail
                             </label>
-                            <textarea asp-for="IncludesStructureDetail" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-structure-detail" name="include-structure-detail" type="text"> </textarea>
+                            <textarea asp-for="StructureDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-structure-detail" name="include-structure-detail" type="text"> </textarea>
 
                         </div>
                     </div>
@@ -92,7 +92,7 @@
                             <label class="govuk-label" for="include-policies-detail">
                                 Please provide detail
                             </label>
-                            <textarea asp-for="IncludesPoliciesDetail" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-policies-detail" name="include-policies-detail" type="text"></textarea>
+                            <textarea asp-for="PolicyDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-policies-detail" name="include-policies-detail" type="text"></textarea>
                         </div>
                     </div>
                 </div>
@@ -124,7 +124,7 @@
                             <label class="govuk-label" for="include-risks-detail">
                                 Please provide detail
                             </label>
-                            <textarea asp-for="IncludesRisksDetail" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-risks-detail" name="include-risks-detail" type="text"></textarea>
+                            <textarea asp-for="RisksDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-risks-detail" name="include-risks-detail" type="text"></textarea>
                         </div>
                     </div>
                 </div>
@@ -140,13 +140,13 @@
                 </legend>
                 <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                     <div class="govuk-radios__item">
-                        <input asp-for="IncludesMethods" value="true" class="govuk-radios__input" id="include-methods" name="include-methods" type="radio">
+                        <input asp-for="IncludesDueDiligence" value="true" class="govuk-radios__input" id="include-methods" name="include-methods" type="radio">
                         <label class="govuk-label govuk-radios__label">
                             Yes
                         </label>
                     </div>
                     <div class="govuk-radios__item">
-                        <input asp-for="IncludesMethods" value="false" class="govuk-radios__input" id="include-methods-conditional" name="include-methods" type="radio" data-aria-controls="conditional-include-methods-conditional">
+                        <input asp-for="IncludesDueDiligence" value="false" class="govuk-radios__input" id="include-methods-conditional" name="include-methods" type="radio" data-aria-controls="conditional-include-methods-conditional">
                         <label class="govuk-label govuk-radios__label" for="include-methods-conditional">
                             No
                         </label>
@@ -156,7 +156,7 @@
                             <label class="govuk-label" for="include-methods-detail">
                                 Please provide detail
                             </label>
-                            <textarea asp-for="IncludesMethodsDetail" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-methods-detail" name="include-methods-detail" type="text"></textarea>
+                            <textarea asp-for="DueDiligenceDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-methods-detail" name="include-methods-detail" type="text"></textarea>
                         </div>
                     </div>
                 </div>
@@ -188,7 +188,7 @@
                             <label class="govuk-label" for="include-training-detail">
                                 Please provide detail
                             </label>
-                            <textarea asp-for="IncludesTrainingDetail" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-training-detail" name="include-training-detail" type="text"></textarea>
+                            <textarea asp-for="TrainingDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-training-detail" name="include-training-detail" type="text"></textarea>
                         </div>
                     </div>
                 </div>
@@ -205,14 +205,14 @@
 
                 <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                     <div class="govuk-radios__item">
-                        <input asp-for="IncludesEffectiveness" value="true" class="govuk-radios__input" id="include-effectiveness" name="include-effectiveness" type="radio">
+                        <input asp-for="IncludesGoals" value="true" class="govuk-radios__input" id="include-effectiveness" name="include-effectiveness" type="radio">
                         <label class="govuk-label govuk-radios__label">
                             Yes
                         </label>
                     </div>
 
                     <div class="govuk-radios__item">
-                        <input asp-for="IncludesEffectiveness" value="false" class="govuk-radios__input" id="include-effectiveness-conditional" name="include-effectiveness" type="radio" data-aria-controls="conditional-include-effectiveness-conditional">
+                        <input asp-for="IncludesGoals" value="false" class="govuk-radios__input" id="include-effectiveness-conditional" name="include-effectiveness" type="radio" data-aria-controls="conditional-include-effectiveness-conditional">
                         <label class="govuk-label govuk-radios__label" for="include-effectiveness-conditional">
                             No
                         </label>
@@ -222,7 +222,7 @@
                             <label class="govuk-label" for="include-effectiveness-detail">
                                 Please provide detail
                             </label>
-                            <textarea asp-for="IncludedEffectivenessDetail" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-effectiveness-detail" name="include-effectiveness-detail" type="text"></textarea>
+                            <textarea asp-for="GoalsDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-effectiveness-detail" name="include-effectiveness-detail" type="text"></textarea>
                         </div>
 
                     </div>

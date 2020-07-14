@@ -140,6 +140,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         {
             // name things same as DB
             CreateMap<Statement, StatementModel>()
+                .ForMember(dest => dest.Status, opt => opt.Ignore()) // TODO - James Map this appropriately
                 .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.SubmissionDeadline.Year))
                 .ForMember(dest => dest.StatementSectors, opt => opt.MapFrom(src => src.Sectors.Select(s => new KeyValuePair<int, string>(s.StatementSectorTypeId, s.StatementSectorType.Description))))
                 .ForMember(dest => dest.StatementPolicies, opt => opt.MapFrom(src => src.Policies.Select(p => new KeyValuePair<int, string>(p.StatementPolicyTypeId, p.StatementPolicyType.Description))))
