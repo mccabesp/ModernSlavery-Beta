@@ -31,11 +31,11 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public DateTime? StatementEndDate { get; set; }
 
-        public string JobTitle { get; set; }
+        public string ApproverJobTitle { get; set; }
 
-        public string FirstName { get; set; }
+        public string ApproverFirstName { get; set; }
 
-        public string LastName { get; set; }
+        public string ApproverLastName { get; set; }
 
         public DateTime? ApprovedDate { get; set; }
 
@@ -73,9 +73,11 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public List<KeyValuePair<int, string>> StatementSectors { get; set; }
 
-        public string OtherSectorText { get; set; }
+        public string OtherSector { get; set; }
 
-        // turnover ?
+        public decimal? MinTurnover { get; set; }
+
+        public decimal? MaxTurnover { get; set; }
 
         #endregion
 
@@ -83,39 +85,55 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public List<KeyValuePair<int, string>> StatementPolicies { get; set; }
 
-        public string OtherPolicyText { get; set; }
+        public string OtherPolicies { get; set; }
 
         #endregion
 
-        #region Step 5 - Supply chain risks and due diligence
+        #region Step 5 - Supply chain risks and due diligence part 1
 
-        public List<KeyValuePair<int, string>> StatementDiligenceTypes { get; set; }
+        public List<KeyValuePair<int, string>> RelevantRisks { get; set; }
 
-        public string OtherDiligenceText { get; set; }
+        public string OtherRelevantRisks { get; set; }
 
-        public List<KeyValuePair<int, string>> StatementRiskTypes { get; set; }
+        public List<KeyValuePair<int, string>> HighRisks { get; set; }
 
-        public string OtherRiskText { get; set; }
+        public string OtherHighRisks { get; set; }
 
-        public List<KeyValuePair<int, string>> Countries { get; set; }
+        public List<KeyValuePair<int, string>> LocationRisks { get; set; }
+
+        #endregion
+
+        #region Step 5 - Supply chain risks and due diligence part 2
+
+        public List<KeyValuePair<int, string>> Diligences { get; set; }
+
+        public string ForcedLabourDetails { get; set; }
+
+        public string SlaveryInstanceDetails { get; set; }
+
+        public string SlaveryInstanceRemediation { get; set; }
 
         #endregion
 
         #region Step 6 - Training
 
-        public List<KeyValuePair<int, string>> StatementTrainingDivisions { get; set; }
+        public List<KeyValuePair<int, string>> Training { get; set; }
 
-        public string OtherTrainingText { get; set; }
+        public string OtherTraining { get; set; }
 
         #endregion
 
         #region Step 7 - Monitoring progress
 
-        [MaxLength(500)]
-        public string MeasuringProgress { get; set; }
+        public bool IncludesMeasuringProgress { get; set; }
 
-        [MaxLength(500)]
+        public string ProgressMeasures { get; set; }
+
         public string KeyAchievements { get; set; }
+
+        public decimal MinStatementYears { get; set; }
+
+        public decimal? MaxStatementYears { get; set; }
 
         #endregion
     }

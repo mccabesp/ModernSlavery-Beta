@@ -142,15 +142,12 @@ namespace ModernSlavery.BusinessDomain.Submission
             CreateMap<Statement, StatementModel>()
                 .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.SubmissionDeadline.Year))
                 .ForMember(dest => dest.StatementSectors, opt => opt.MapFrom(src => src.Sectors.Select(s => new KeyValuePair<int, string>(s.StatementSectorTypeId, s.StatementSectorType.Description))))
-                .ForMember(dest => dest.OtherSectorText, opt => opt.MapFrom(src => src.OtherSector))
                 .ForMember(dest => dest.StatementPolicies, opt => opt.MapFrom(src => src.Policies.Select(p => new KeyValuePair<int, string>(p.StatementPolicyTypeId, p.StatementPolicyType.Description))))
-                .ForMember(dest => dest.OtherPolicyText, opt => opt.MapFrom(src => src.OtherPolicies))
-                .ForMember(dest => dest.StatementTrainingDivisions, opt => opt.MapFrom(src => src.Training.Select(t => new KeyValuePair<int, string>(t.StatementTrainingTypeId, t.StatementTrainingType.Description))))
-                .ForMember(dest => dest.OtherTrainingText, opt => opt.MapFrom(src => src.OtherTraining))
-                .ForMember(dest => dest.StatementRiskTypes, opt => opt.MapFrom(src => src.RelevantRisks.Select(r => new KeyValuePair<int, string>(r.StatementRiskTypeId, r.StatementRiskType.Description))))
-                .ForMember(dest => dest.StatementDiligenceTypes, opt => opt.MapFrom(src => src.Diligences.Select(d => new KeyValuePair<int, string>(d.StatementDiligenceTypeId, d.StatementDiligenceType.Description))))
-                // These should be added to the entity
-                .ForMember(dest => dest.Countries, opt => opt.Ignore());
+                .ForMember(dest => dest.Training, opt => opt.MapFrom(src => src.Training.Select(t => new KeyValuePair<int, string>(t.StatementTrainingTypeId, t.StatementTrainingType.Description))))
+                .ForMember(dest => dest.RelevantRisks, opt => opt.MapFrom(src => src.RelevantRisks.Select(r => new KeyValuePair<int, string>(r.StatementRiskTypeId, r.StatementRiskType.Description))))
+                .ForMember(dest => dest.HighRisks, opt => opt.MapFrom(src => src.HighRisks.Select(r => new KeyValuePair<int, string>(r.StatementRiskTypeId, r.StatementRiskType.Description))))
+                .ForMember(dest => dest.LocationRisks, opt => opt.MapFrom(src => src.LocationRisks.Select(r => new KeyValuePair<int, string>(r.StatementRiskTypeId, r.StatementRiskType.Description))))
+                .ForMember(dest => dest.Diligences, opt => opt.MapFrom(src => src.Diligences.Select(d => new KeyValuePair<int, string>(d.StatementDiligenceTypeId, d.StatementDiligenceType.Description))));
         }
     }
 }

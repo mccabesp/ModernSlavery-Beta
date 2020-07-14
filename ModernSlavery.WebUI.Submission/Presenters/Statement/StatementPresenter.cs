@@ -414,13 +414,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public StatementMapperProfile()
         {
             CreateMap<StatementViewModel, StatementModel>()
-                .ForMember(dest => dest.OtherDiligenceText, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementTrainingDivisions, opt => opt.Ignore())
+                .ForMember(dest => dest.Training, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementDiligenceTypes, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementRiskTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.Diligences, opt => opt.Ignore())
+                .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
-                .ForMember(dest => dest.Countries, opt => opt.Ignore());
+                .ForMember(dest => dest.LocationRisks, opt => opt.Ignore());
 
             CreateMap<StatementModel, StatementViewModel>()
                 // These need obfuscating
