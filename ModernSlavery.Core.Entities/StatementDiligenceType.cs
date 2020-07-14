@@ -11,7 +11,7 @@ namespace ModernSlavery.Core.Entities
 
         public short? StatementDiligenceParentTypeId { get; set; }
 
-        public StatementDiligenceType StatementDiligenceParent { get; set; }
+        public virtual StatementDiligenceType StatementDiligenceParent { get; set; }
 
         public string Description { get; set; }
 

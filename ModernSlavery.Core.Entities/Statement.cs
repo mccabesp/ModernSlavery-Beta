@@ -13,6 +13,8 @@ namespace ModernSlavery.Core.Entities
             TrainingTypes = new HashSet<StatementTraining>();
             RelevantRisks = new HashSet<StatementRisk>();
             Diligences = new HashSet<StatementDiligence>();
+            HighRisks = new HashSet<StatementHighRisk>();
+            Countries = new HashSet<StatementRiskCountry>();
         }
 
         #region Key statement control properties
@@ -124,7 +126,7 @@ namespace ModernSlavery.Core.Entities
 
         public string OtherHighRisks { get; set; }
 
-        public virtual ICollection<StatementRisk> Countries { get; set; }
+        public virtual ICollection<StatementRiskCountry> Countries { get; set; }
 
         #endregion
 

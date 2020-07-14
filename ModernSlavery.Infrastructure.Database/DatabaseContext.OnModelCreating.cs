@@ -732,6 +732,18 @@ namespace ModernSlavery.Infrastructure.Database
 
             #endregion
 
+            #region StatementRiskType
+
+            modelBuilder.Entity<StatementRiskCountry>(
+                entity =>
+                {
+                    entity.HasKey(e => new { e.StatementRiskTypeId, e.StatementId })
+                        .HasName("PK_dbo.StatementRiskTypes");
+                });
+
+            #endregion
+
+
             #region StatementOrganisation
 
             modelBuilder.Entity<StatementOrganisation>(
