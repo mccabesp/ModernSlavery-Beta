@@ -519,10 +519,10 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.Property(e => e.TrainingDetails)
                         .HasMaxLength(250);
 
-                    entity.Property(e => e.Status)
+                    entity.Property(e => e.StatusId)
                         .HasColumnName("StatusId");
 
-                    entity.HasIndex(e => e.Status)
+                    entity.HasIndex(e => e.StatusId)
                         .HasName("IX_StatusId");
 
                     entity.Property(e => e.StatusDetails)
@@ -732,17 +732,16 @@ namespace ModernSlavery.Infrastructure.Database
 
             #endregion
 
-            #region StatementRiskType
+            #region StatementRiskCountry
 
             modelBuilder.Entity<StatementRiskCountry>(
                 entity =>
                 {
                     entity.HasKey(e => new { e.StatementRiskTypeId, e.StatementId })
-                        .HasName("PK_dbo.StatementRiskTypes");
+                        .HasName("PK_dbo.StatementRiskCountry");
                 });
 
             #endregion
-
 
             #region StatementOrganisation
 
@@ -811,6 +810,11 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.Property(e => e.StatusDetails)
                         .HasMaxLength(255);
+
+                    entity.HasOne(e => e.Statement)
+                        .WithMany(e => e.StatusHistory)
+                        .HasForeignKey(e => e.StatementId)
+                        .HasConstraintName("FK_dbo.StatementStatuses_dbo.Statement_StatementId");
 
                     entity.HasOne(e => e.ByUser)
                         .WithMany()

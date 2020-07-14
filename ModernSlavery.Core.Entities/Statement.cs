@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Policy;
 using System.Text;
 
 namespace ModernSlavery.Core.Entities
@@ -15,6 +16,7 @@ namespace ModernSlavery.Core.Entities
             Diligences = new HashSet<StatementDiligence>();
             HighRisks = new HashSet<StatementHighRisk>();
             Countries = new HashSet<StatementRiskCountry>();
+            StatusHistory = new HashSet<StatementStatus>();
         }
 
         #region Key statement control properties
@@ -27,7 +29,11 @@ namespace ModernSlavery.Core.Entities
 
         public DateTime SubmissionDeadline { get; set; }
 
-        public StatementStatus Status { get; set; }
+        public long StatusId { get; set; }
+
+        public virtual StatementStatus Status { get; set; }
+
+        public virtual ICollection<StatementStatus> StatusHistory { get; set; }
 
         public DateTime StatusDate { get; set; }
 
