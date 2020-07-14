@@ -217,8 +217,8 @@ namespace ModernSlavery.Infrastructure.Database
         public virtual DbSet<StatementDiligenceType> StatementDiligenceTypes { get; set; }
         public virtual DbSet<StatementPolicyType> StatementPolicyTypes { get; set; }
         public virtual DbSet<StatementPolicy> StatementPolicies { get; set; }
-        public virtual DbSet<StatementRisk> StatementRisks { get; set; }
-        public virtual DbSet<StatementLocationRisk> StatementRiskCountries { get; set; }
+        public virtual DbSet<StatementRelevantRisk> StatementRelevantRisks { get; set; }
+        public virtual DbSet<StatementLocationRisk> StatementLocationRisks { get; set; }
         public virtual DbSet<StatementHighRisk> StatementHighRisks { get; set; }
         public virtual DbSet<StatementRiskType> StatementRiskTypes { get; set; }
         public virtual DbSet<StatementOrganisation> StatementOrganisations { get; set; }

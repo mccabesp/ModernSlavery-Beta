@@ -669,9 +669,9 @@ namespace ModernSlavery.Infrastructure.Database
 
             #endregion
 
-            #region StatementRisk
+            #region StatementRelevantRisk
 
-            modelBuilder.Entity<StatementRisk>(
+            modelBuilder.Entity<StatementRelevantRisk>(
                 entity =>
                 {
                     entity.HasKey(e => new { e.StatementRiskTypeId, e.StatementId })

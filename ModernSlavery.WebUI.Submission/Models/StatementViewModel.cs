@@ -171,7 +171,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         [Display(Name = "Please specify")]
         public string OtherTrainingText { get; set; }
 
-        public List<StatementRisk> StatementRisks { get; set; }
+        public List<StatementRelevantRisk> StatementRisks { get; set; }
 
         public List<StatementRiskType> StatementRiskTypes { get; set; }
 

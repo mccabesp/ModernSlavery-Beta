@@ -12,7 +12,7 @@ namespace ModernSlavery.Core.Entities
             Sectors = new HashSet<StatementSector>();
             Policies = new HashSet<StatementPolicy>();
             Training = new HashSet<StatementTraining>();
-            RelevantRisks = new HashSet<StatementRisk>();
+            RelevantRisks = new HashSet<StatementRelevantRisk>();
             Diligences = new HashSet<StatementDiligence>();
             HighRisks = new HashSet<StatementHighRisk>();
             LocationRisks = new HashSet<StatementLocationRisk>();
@@ -124,7 +124,7 @@ namespace ModernSlavery.Core.Entities
         #region Supply chain risks and due diligence page 1
 
         //NOTE: Regions/countries can just be represented in the DB Parents/Child RelevantRisks
-        public virtual ICollection<StatementRisk> RelevantRisks { get; set; }
+        public virtual ICollection<StatementRelevantRisk> RelevantRisks { get; set; }
 
         public string OtherRelevantRisks { get; set; }
 

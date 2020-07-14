@@ -5,9 +5,9 @@ using System.Text;
 
 namespace ModernSlavery.Core.Entities
 {
-    public class StatementRisk
+    public class StatementRelevantRisk
     {
-        public short StatementRiskId { get; set; }
+        public short StatementRelevantRiskId { get; set; }
 
         public short StatementRiskTypeId { get; set; }
 
