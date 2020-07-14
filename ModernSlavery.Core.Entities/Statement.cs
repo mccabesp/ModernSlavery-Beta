@@ -10,7 +10,7 @@ namespace ModernSlavery.Core.Entities
         {
             Sectors = new HashSet<StatementSector>();
             Policies = new HashSet<StatementPolicy>();
-            TrainingDivisions = new HashSet<StatementTrainingDivision>();
+            TrainingDivisions = new HashSet<StatementTraining>();
             RelevantRisks = new HashSet<StatementRisk>();
             Diligences = new HashSet<StatementDiligence>();
         }
@@ -115,7 +115,6 @@ namespace ModernSlavery.Core.Entities
 
         #region Supply chain risks and due diligence page 1
 
-        //TODO: Rename to RelevantRisks and just put the relevent risks here. 
         //NOTE: Regions/countries can just be represented in the DB Parents/Child RelevantRisks
         public virtual ICollection<StatementRisk> RelevantRisks { get; set; }
 
@@ -135,20 +134,23 @@ namespace ModernSlavery.Core.Entities
         //NOTE: I have also added a new StatementDiligence.Description so we store "Other" categories of due diligence
         public virtual ICollection<StatementDiligence> Diligences { get; set; }
 
-        //NOTE: Only complete when answer is yes
-        //TODO: public string ForcedLabourDetails { get; set; }
+        public bool IdentifiedForcedLabour { get; set; }
 
-        //NOTE: Only complete when answer is yes
-        //TODO: public string SlaveryInstanceDetails { get; set; }
+        public string ForcedLabourDetails { get; set; }
+
+        public bool FoundModernSlaveryInOperations { get; set; }
+
+        public string SlaveryInstanceDetails { get; set; }
 
         //NOTE: The checkboxes and other can all be put into this field - each seperated by a newline character
-        //TODO: public string SlaveryInstanceRemediation { get; set; }
+        public string SlaveryInstanceRemediation { get; set; }
 
         #endregion
 
         #region Training Page
+
         //TODO: Rename TrainingDivisions to TrainingTypes
-        public virtual ICollection<StatementTrainingDivision> TrainingDivisions { get; set; }
+        public virtual ICollection<StatementTraining> TrainingDivisions { get; set; }
 
         //TODO: Rename OtherTrainingDivision to OtherTrainingTypes
         public string OtherTrainingDivision { get; set; }

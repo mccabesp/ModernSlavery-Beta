@@ -4,14 +4,11 @@ using System.Text;
 
 namespace ModernSlavery.Core.Entities
 {
-    //TODO: Rename to StatementTraining
-    public class StatementTrainingDivision
+    public class StatementTraining
     {
-        //TODO: Rename to StatementTrainingTypeId
         public short StatementDivisionTypeId { get; set; }
 
-        //TODO: Rename to StatementTrainingType
-        public virtual StatementDivisionType StatementDivisionType { get; set; }
+        public virtual StatementDivisionType StatementTrainingType { get; set; }
 
         public long StatementId { get; set; }
 

@@ -578,13 +578,13 @@ namespace ModernSlavery.Infrastructure.Database
 
             #region StatementTrainingDivision
 
-            modelBuilder.Entity<StatementTrainingDivision>(
+            modelBuilder.Entity<StatementTraining>(
                 entity =>
                 {
                     entity.HasKey(e => new { e.StatementDivisionTypeId, e.StatementId })
                         .HasName("PK_dbo.StatementTrainingDivisions");
 
-                    entity.HasOne(e => e.StatementDivisionType)
+                    entity.HasOne(e => e.StatementTrainingType)
                         .WithMany()
                         .HasForeignKey(e => e.StatementDivisionTypeId)
                         .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.StatementDivisionTypes_StatmentDivisionTypeId");

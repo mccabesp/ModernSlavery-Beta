@@ -10,8 +10,9 @@ namespace ModernSlavery.Core.Entities
     {
         public short StatementDiligenceTypeId { get; set; }
 
-        //TODO: Create a new StatementDiligenceParentTypeId so we can havea hierarchy of Due diligence categories
-        //public short? StatementDiligenceParentTypeId { get; set; }
+        public short StatementDiligenceParentTypeId { get; set; }
+
+        public StatementDiligenceType StatementDiligenceParent { get; set; }
 
         //TODO: We will have a Diligence type call "Other"
         public string Description { get; set; }
