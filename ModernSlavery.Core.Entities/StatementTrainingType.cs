@@ -5,11 +5,9 @@ using System.Text;
 
 namespace ModernSlavery.Core.Entities
 {
-    //TODO: Rename to StatementTrainingType
-    public class StatementDivisionType
+    public class StatementTrainingType
     {
-        //TODO: Rename to StatementTrainingTypeId
-        public short StatementDivisionTypeId { get; set; }
+        public short StatementTrainingTypeId { get; set; }
 
         public string Description { get; set; }
 

@@ -17,7 +17,6 @@ namespace ModernSlavery.Core.Entities
 
         public virtual Statement Statement { get; set; }
 
-        //TODO: If have a new StatementDiligenceParentTypeId (see StatementDiligenceType entity) we can then store the titles of "Other" due diligences into this Description field. 
         public string Details { get; set; }
 
         public DateTime Created { get; set; } = VirtualDateTime.Now;

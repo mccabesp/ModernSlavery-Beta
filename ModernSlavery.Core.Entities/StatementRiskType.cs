@@ -9,12 +9,20 @@ namespace ModernSlavery.Core.Entities
     {
         public short StatementRiskTypeId { get; set; }
 
-        public short ParentRiskTypeId { get; set; }
+        public short? ParentRiskTypeId { get; set; }
 
         public virtual StatementRiskType ParentRiskType { get; set; }
+
+        public RiskCategory Category { get; set; }
 
         public string Description { get; set; }
 
         public DateTime Created { get; set; } = VirtualDateTime.Now;
+    }
+
+    public enum RiskCategory
+    {
+        RiskArea,
+        Location
     }
 }

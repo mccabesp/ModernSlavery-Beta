@@ -10,7 +10,7 @@ namespace ModernSlavery.Core.Entities
         {
             Sectors = new HashSet<StatementSector>();
             Policies = new HashSet<StatementPolicy>();
-            TrainingDivisions = new HashSet<StatementTraining>();
+            TrainingTypes = new HashSet<StatementTraining>();
             RelevantRisks = new HashSet<StatementRisk>();
             Diligences = new HashSet<StatementDiligence>();
         }
@@ -120,11 +120,11 @@ namespace ModernSlavery.Core.Entities
 
         public string OtherRelavantRisks { get; set; }
 
-        //TODO: Create another table for HighRisks
         public virtual ICollection<StatementHighRisk> HighRisks { get; set; }
 
-        //TODO: Create to OtherHighRisks
         public string OtherHighRisks { get; set; }
+
+        public virtual ICollection<StatementRisk> Countries { get; set; }
 
         #endregion
 
@@ -149,30 +149,23 @@ namespace ModernSlavery.Core.Entities
 
         #region Training Page
 
-        //TODO: Rename TrainingDivisions to TrainingTypes
-        public virtual ICollection<StatementTraining> TrainingDivisions { get; set; }
+        public virtual ICollection<StatementTraining> TrainingTypes { get; set; }
 
-        //TODO: Rename OtherTrainingDivision to OtherTrainingTypes
-        public string OtherTrainingDivision { get; set; }
+        public string OtherTrainingTypes { get; set; }
 
         #endregion
 
         #region Monitoring progress page
 
-        //TODO: Check with SamG if this new field is required or just a duplicate of IncludesGoals (see above) on Compliance Areas Covered page 
-        //public bool IncludesMeasuringProgress { get; set; }
+        public bool IncludesMeasuringProgress { get; set; }
 
-        //TODO: Rename to ProgressMeasures
-        public string MeasuringProgress { get; set; }
+        public string ProgressMeasures { get; set; }
 
-        //TODO Create KeyAchievements
         public string KeyAchievements { get; set; }
 
-        //TODO Create MinStatementYears with default of 0
-        //public decimal MinStatementYears { get; set; }
+        public decimal MinStatementYears { get; set; }
 
-        //TODO Create MaxStatementYears
-        //public decimal? MaxStatementYears { get; set; }
+        public decimal? MaxStatementYears { get; set; }
 
         #endregion
 

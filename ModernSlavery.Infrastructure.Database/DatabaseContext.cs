@@ -211,8 +211,8 @@ namespace ModernSlavery.Infrastructure.Database
         public virtual DbSet<AuditLog> AuditLogs { get; set; }
         public virtual DbSet<ReminderEmail> ReminderEmails { get; set; }
         public virtual DbSet<Statement> Statements { get; set; }
-        public virtual DbSet<StatementDivisionType> StatementDivisionTypes { get; set; }
-        public virtual DbSet<StatementTraining> StatementTrainingDivisions { get; set; }
+        public virtual DbSet<StatementTrainingType> StatementTrainingTypes { get; set; }
+        public virtual DbSet<StatementTraining> StatementTrainings { get; set; }
         public virtual DbSet<StatementDiligence> StatementDiligences { get; set; }
         public virtual DbSet<StatementDiligenceType> StatementDiligenceTypes { get; set; }
         public virtual DbSet<StatementPolicyType> StatementPolicyTypes { get; set; }

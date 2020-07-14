@@ -563,10 +563,10 @@ namespace ModernSlavery.Infrastructure.Database
 
             #region StatementDivisionType
 
-            modelBuilder.Entity<StatementDivisionType>(
+            modelBuilder.Entity<StatementTrainingType>(
                 entity =>
                 {
-                    entity.HasKey(e => e.StatementDivisionTypeId)
+                    entity.HasKey(e => e.StatementTrainingTypeId)
                         .HasName("PK_dbo.StatementDivisionTypes");
 
                     entity.Property(e => e.Description)
@@ -581,16 +581,16 @@ namespace ModernSlavery.Infrastructure.Database
             modelBuilder.Entity<StatementTraining>(
                 entity =>
                 {
-                    entity.HasKey(e => new { e.StatementDivisionTypeId, e.StatementId })
+                    entity.HasKey(e => new { e.StatementTrainingTypeId, e.StatementId })
                         .HasName("PK_dbo.StatementTrainingDivisions");
 
                     entity.HasOne(e => e.StatementTrainingType)
                         .WithMany()
-                        .HasForeignKey(e => e.StatementDivisionTypeId)
+                        .HasForeignKey(e => e.StatementTrainingTypeId)
                         .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.StatementDivisionTypes_StatmentDivisionTypeId");
 
                     entity.HasOne(e => e.Statement)
-                        .WithMany()
+                        .WithMany(e => e.TrainingTypes)
                         .HasForeignKey(e => e.StatementId)
                         .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.Statements_StatementId");
                 });
@@ -611,7 +611,7 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasConstraintName("FK_dbo.StatementDiligences_dbo.StatementDiligenceType_StatementDiligenceTypeId");
 
                     entity.HasOne(e => e.Statement)
-                        .WithMany()
+                        .WithMany(e => e.Diligences)
                         .HasForeignKey(e => e.StatementId)
                         .HasConstraintName("FK_dbo.StatementDiligences_dbo.Statements_StatementId");
                 });
@@ -662,7 +662,7 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasConstraintName("FK_dbo.StatementPolicies_dbo.StatementPolicyType_StatementPolicyTypeId");
 
                     entity.HasOne(e => e.Statement)
-                        .WithMany()
+                        .WithMany(e => e.Policies)
                         .HasForeignKey(e => e.StatementId)
                         .HasConstraintName("FK_dbo.StatementPolicies_dbo.Statements_StatementId");
                 });
