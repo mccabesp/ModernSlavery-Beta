@@ -13,15 +13,16 @@ namespace ModernSlavery.Core.Entities
 
         public virtual StatementRiskType ParentRiskType { get; set; }
 
-        public RiskCategory Category { get; set; }
+        public RiskCategories Category { get; set; }
 
         public string Description { get; set; }
 
         public DateTime Created { get; set; } = VirtualDateTime.Now;
     }
 
-    public enum RiskCategory
+    public enum RiskCategories
     {
+        Unknown,
         RiskArea,
         Location
     }

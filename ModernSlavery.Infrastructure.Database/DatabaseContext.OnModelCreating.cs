@@ -528,16 +528,16 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.Property(e => e.StatusDetails)
                         .HasMaxLength(255);
 
-                    entity.Property(e => e.OtherRelavantRisks)
+                    entity.Property(e => e.OtherRelevantRisks)
                         .HasMaxLength(250);
 
-                    entity.Property(e => e.JobTitle)
+                    entity.Property(e => e.ApproverJobTitle)
                         .HasMaxLength(100);
 
-                    entity.Property(e => e.FirstName)
+                    entity.Property(e => e.ApproverFirstName)
                         .HasMaxLength(50);
 
-                    entity.Property(e => e.LastName)
+                    entity.Property(e => e.ApproverLastName)
                         .HasMaxLength(50);
 
                     entity.HasIndex(e => e.MinTurnover)
@@ -590,7 +590,7 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.StatementDivisionTypes_StatmentDivisionTypeId");
 
                     entity.HasOne(e => e.Statement)
-                        .WithMany(e => e.TrainingTypes)
+                        .WithMany(e => e.Training)
                         .HasForeignKey(e => e.StatementId)
                         .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.Statements_StatementId");
                 });
@@ -732,13 +732,23 @@ namespace ModernSlavery.Infrastructure.Database
 
             #endregion
 
-            #region StatementRiskCountry
+            #region StatementLocationRisk
 
-            modelBuilder.Entity<StatementRiskCountry>(
+            modelBuilder.Entity<StatementLocationRisk>(
                 entity =>
                 {
                     entity.HasKey(e => new { e.StatementRiskTypeId, e.StatementId })
-                        .HasName("PK_dbo.StatementRiskCountry");
+                        .HasName("PK_dbo.StatementLocationRisks");
+
+                    entity.HasOne(e => e.StatementRiskType)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementRiskTypeId)
+                        .HasConstraintName("FK_dbo.StatementLocationRisks_dbo.StatementRiskType_StatementRiskTypeId");
+
+                    entity.HasOne(e => e.Statement)
+                        .WithMany(e => e.LocationRisks)
+                        .HasForeignKey(e => e.StatementId)
+                        .HasConstraintName("FK_dbo.StatementLocationRisks_dbo.Statements_StatementId");
                 });
 
             #endregion

@@ -11,11 +11,11 @@ namespace ModernSlavery.Core.Entities
         {
             Sectors = new HashSet<StatementSector>();
             Policies = new HashSet<StatementPolicy>();
-            TrainingTypes = new HashSet<StatementTraining>();
+            Training = new HashSet<StatementTraining>();
             RelevantRisks = new HashSet<StatementRisk>();
             Diligences = new HashSet<StatementDiligence>();
             HighRisks = new HashSet<StatementHighRisk>();
-            Countries = new HashSet<StatementRiskCountry>();
+            LocationRisks = new HashSet<StatementLocationRisk>();
             StatusHistory = new HashSet<StatementStatus>();
         }
 
@@ -57,11 +57,11 @@ namespace ModernSlavery.Core.Entities
         // Latest date that the submission can be started
         public DateTime StatementEndDate { get; set; }
 
-        public string FirstName { get; set; }
+        public string ApproverFirstName { get; set; }
 
-        public string LastName { get; set; }
+        public string ApproverLastName { get; set; }
 
-        public string JobTitle { get; set; }
+        public string ApproverJobTitle { get; set; }
 
         public DateTime ApprovedDate { get; set; }
 
@@ -126,13 +126,13 @@ namespace ModernSlavery.Core.Entities
         //NOTE: Regions/countries can just be represented in the DB Parents/Child RelevantRisks
         public virtual ICollection<StatementRisk> RelevantRisks { get; set; }
 
-        public string OtherRelavantRisks { get; set; }
+        public string OtherRelevantRisks { get; set; }
 
         public virtual ICollection<StatementHighRisk> HighRisks { get; set; }
 
         public string OtherHighRisks { get; set; }
 
-        public virtual ICollection<StatementRiskCountry> Countries { get; set; }
+        public virtual ICollection<StatementLocationRisk> LocationRisks { get; set; }
 
         #endregion
 
@@ -142,11 +142,7 @@ namespace ModernSlavery.Core.Entities
         //NOTE: I have also added a new StatementDiligence.Description so we store "Other" categories of due diligence
         public virtual ICollection<StatementDiligence> Diligences { get; set; }
 
-        public bool IdentifiedForcedLabour { get; set; }
-
         public string ForcedLabourDetails { get; set; }
-
-        public bool FoundModernSlaveryInOperations { get; set; }
 
         public string SlaveryInstanceDetails { get; set; }
 
@@ -157,9 +153,9 @@ namespace ModernSlavery.Core.Entities
 
         #region Training Page
 
-        public virtual ICollection<StatementTraining> TrainingTypes { get; set; }
+        public virtual ICollection<StatementTraining> Training { get; set; }
 
-        public string OtherTrainingTypes { get; set; }
+        public string OtherTraining { get; set; }
 
         #endregion
 
