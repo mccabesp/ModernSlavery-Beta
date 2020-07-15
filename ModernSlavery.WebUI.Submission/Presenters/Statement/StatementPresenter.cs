@@ -415,14 +415,11 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         {
 
             CreateMap<StatementViewModel, StatementModel>()
-                .ForMember(dest => dest.OtherDiligenceText, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementTrainingDivisions, opt => opt.Ignore())
+                .ForMember(dest => dest.Training, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementDiligenceTypes, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementRiskTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.Diligences, opt => opt.Ignore())
+                .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
-
-
                 .ForMember(dest => dest.StructureDetails, opt => opt.Ignore())
                 .ForMember(dest => dest.PolicyDetails, opt => opt.Ignore())
                 .ForMember(dest => dest.RisksDetails, opt => opt.Ignore())
@@ -430,10 +427,18 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.DueDiligenceDetails, opt => opt.Ignore())
                 .ForMember(dest => dest.TrainingDetails, opt => opt.Ignore())
                 .ForMember(dest => dest.GoalsDetails, opt => opt.Ignore())
-                .ForMember(dest => dest.OtherSectorText, opt => opt.Ignore())
-                .ForMember(dest => dest.OtherPolicyText, opt => opt.Ignore())
-                .ForMember(dest => dest.OtherRiskText, opt => opt.Ignore())
-                .ForMember(dest => dest.OtherTrainingText, opt => opt.Ignore());
+                .ForMember(dest => dest.OtherSector, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherPolicies, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherRelevantRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherTraining, opt => opt.Ignore())
+                .ForMember(dest => dest.MinTurnover, opt => opt.Ignore())
+                .ForMember(dest => dest.MaxTurnover, opt => opt.Ignore())
+                .ForMember(dest => dest.LocationRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.MinStatementYears, opt => opt.Ignore())
+                .ForMember(dest => dest.MaxStatementYears, opt => opt.Ignore())
+                .ForMember(dest => dest.HighRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherHighRisks, opt => opt.Ignore());
+
 
             CreateMap<StatementModel, StatementViewModel>()
                 // These need obfuscating

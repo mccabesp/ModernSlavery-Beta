@@ -30,7 +30,7 @@
             </h2>
 
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var group in Model.RelevantRiskTypes.Where(x=> x.Category == RiskCategory.RiskArea).GroupBy(x => x.ParentRiskType))
+                @foreach (var group in Model.RelevantRiskTypes.Where(x=> x.Category == RiskCategories.RiskArea).GroupBy(x => x.ParentRiskType))
                 {
                     <div class="govuk-accordion__section accordion-with-counts">
                         <div class="govuk-accordion__section-header">
@@ -141,7 +141,7 @@
                 Which locations do you believe are at higher risk of modern slavery in your operations and supply chains?
             </h2>
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var group in Model.RelevantRiskTypes.Where(x => x.Category == RiskCategory.Location).GroupBy(x => x.ParentRiskType))
+                @foreach (var group in Model.RelevantRiskTypes.Where(x => x.Category == RiskCategories.Location).GroupBy(x => x.ParentRiskType))
                 {
                     <div class="govuk-accordion__section accordion-with-counts">
                         <div class="govuk-accordion__section-header">

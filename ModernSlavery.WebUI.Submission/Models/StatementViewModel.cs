@@ -144,10 +144,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         [Required]
         public bool? IncludesStructure { get; set; }
-
-        [Required]
-        public bool? IncludesStructure { get; set; }
-
         public string StructureDetails { get; set; }
         [Required]
         public bool? IncludesPolicies { get; set; }
@@ -166,8 +162,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public bool? IncludesGoals { get; set; }
         public string GoalsDetails { get; set; }
 
-        public bool? IncludesTraining { get; set; }
-        public string TrainingDetails { get; set; }
         #endregion
 
         #region Your organisation Page
@@ -187,28 +181,11 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Supply chain risks and due diligence Page 1
 
-        public List<StatementRisk> RelevantRisks { get; set; }
+        public List<StatementRelevantRisk> RelevantRisks { get; set; }
 
         public List<StatementRiskType> RelevantRiskTypes { get; set; }
-
-        public List<StatementSectors> StatementSectors { get; set; }
-
-        public string OtherSector { get; set; }
-
-        public LastFinancialYearBudget? LastFinancialYearBudget { get; set; }
-
-        public List<StatementPolicies> StatementPolicies { get; set; }
-        [Display(Name = "Please provide detail")]
-        public string OtherPolicies { get; set; }
-
-        public List<StatementTrainings> StatementTrainings { get; set; }
-        [Display(Name = "Please specify")]
-        public string OtherTraining { get; set; }
-
-        public List<StatementRelevantRisk> StatementRisks { get; set; }
-
         public string OtherRelevantRisks { get; set; }
-        public List<StatementRisk> HighRisks { get; set; }
+        public List<StatementRelevantRisk> HighRisks { get; set; }
         public List<StatementRiskType> HighRiskTypes { get; set; }
         public string OtherHighRisks { get; set; }
 
