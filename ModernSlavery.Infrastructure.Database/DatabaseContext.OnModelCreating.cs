@@ -25,6 +25,7 @@ namespace ModernSlavery.Infrastructure.Database
             modelBuilder.Entity<Feedback>().ToTable("Feedback");
             modelBuilder.Entity<AuditLog>().ToTable("AuditLogs");
             modelBuilder.Entity<ReminderEmail>().ToTable("ReminderEmails");
+            modelBuilder.Entity<StatementTraining>().ToTable("StatementTraining");
 
             #region AddressStatus
 
@@ -471,11 +472,17 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.OrganisationId)
                         .HasName("IX_OrganisationId");
 
+                    entity.Property(e => e.StatementStartDate)
+                        .HasColumnType("Date");
+
                     entity.HasIndex(e => e.StatementStartDate)
-                        .HasName("IX_ReportingStartDate");
+                        .HasName("IX_StatementStartDate");
+
+                    entity.Property(e => e.StatementEndDate)
+                        .HasColumnType("Date");
 
                     entity.HasIndex(e => e.StatementEndDate)
-                        .HasName("IX_ReportingEndDate");
+                        .HasName("IX_StatementEndDate");
 
                     entity.Property(e => e.SubmissionDeadline)
                         .HasColumnType("Date");
@@ -483,41 +490,26 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.SubmissionDeadline)
                         .HasName("IX_SubmissionDeadline");
 
+                    entity.Property(e => e.StatementUrl)
+                        .HasMaxLength(255);
+
                     entity.HasIndex(e => e.IncludesGoals)
                         .HasName("IX_IncludesGoals");
-
-                    entity.Property(e => e.GoalsDetails)
-                        .HasMaxLength(250);
 
                     entity.HasIndex(e => e.IncludesStructure)
                         .HasName("IX_IncludesStructure");
 
-                    entity.Property(e => e.StructureDetails)
-                        .HasMaxLength(250);
-
                     entity.HasIndex(e => e.IncludesPolicies)
                         .HasName("IX_IncludesPolicies");
-
-                    entity.Property(e => e.PolicyDetails)
-                        .HasMaxLength(250);
 
                     entity.HasIndex(e => e.IncludesDueDiligence)
                         .HasName("IX_IncludesDueDiligence");
 
-                    entity.Property(e => e.DueDiligenceDetails)
-                        .HasMaxLength(250);
-
                     entity.HasIndex(e => e.IncludesRisks)
                         .HasName("IX_IncludesRisks");
 
-                    entity.Property(e => e.RisksDetails)
-                        .HasMaxLength(250);
-
                     entity.HasIndex(e => e.IncludesTraining)
                         .HasName("IX_IncludesTraining");
-
-                    entity.Property(e => e.TrainingDetails)
-                        .HasMaxLength(250);
 
                     entity.Property(e => e.Status)
                         .HasColumnName("StatusId");
@@ -528,17 +520,17 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.Property(e => e.StatusDetails)
                         .HasMaxLength(255);
 
-                    entity.Property(e => e.OtherRelavantRisks)
-                        .HasMaxLength(250);
-
-                    entity.Property(e => e.JobTitle)
+                    entity.Property(e => e.ApproverJobTitle)
                         .HasMaxLength(100);
 
-                    entity.Property(e => e.FirstName)
+                    entity.Property(e => e.ApproverFirstName)
                         .HasMaxLength(50);
 
-                    entity.Property(e => e.LastName)
+                    entity.Property(e => e.ApproverLastName)
                         .HasMaxLength(50);
+
+                    entity.Property(e => e.ApprovedDate)
+                        .HasColumnType("Date");
 
                     entity.HasIndex(e => e.MinTurnover)
                         .HasName("IX_MinTurnover");
@@ -557,6 +549,12 @@ namespace ModernSlavery.Infrastructure.Database
                         .WithMany(p => p.Statements)
                         .HasForeignKey(d => d.OrganisationId)
                         .HasConstraintName("FK_dbo.Statements_dbo.Organisations_OrganisationId");
+
+                    entity.Property(e => e.IncludedOrganisationCount)
+                        .HasDefaultValue(0);
+
+                    entity.Property(e => e.ExcludedOrganisationCount)
+                        .HasDefaultValue(0);
                 });
 
             #endregion
@@ -590,7 +588,7 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.StatementDivisionTypes_StatmentDivisionTypeId");
 
                     entity.HasOne(e => e.Statement)
-                        .WithMany(e => e.TrainingTypes)
+                        .WithMany(e => e.Training)
                         .HasForeignKey(e => e.StatementId)
                         .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.Statements_StatementId");
                 });
@@ -669,9 +667,9 @@ namespace ModernSlavery.Infrastructure.Database
 
             #endregion
 
-            #region StatementRisk
+            #region StatementRelevantRisk
 
-            modelBuilder.Entity<StatementRisk>(
+            modelBuilder.Entity<StatementRelevantRisk>(
                 entity =>
                 {
                     entity.HasKey(e => new { e.StatementRiskTypeId, e.StatementId })
@@ -732,17 +730,26 @@ namespace ModernSlavery.Infrastructure.Database
 
             #endregion
 
-            #region StatementRiskType
+            #region StatementLocationRisk
 
-            modelBuilder.Entity<StatementRiskCountry>(
+            modelBuilder.Entity<StatementLocationRisk>(
                 entity =>
                 {
                     entity.HasKey(e => new { e.StatementRiskTypeId, e.StatementId })
-                        .HasName("PK_dbo.StatementRiskTypes");
+                        .HasName("PK_dbo.StatementLocationRisks");
+
+                    entity.HasOne(e => e.StatementRiskType)
+                        .WithMany()
+                        .HasForeignKey(e => e.StatementRiskTypeId)
+                        .HasConstraintName("FK_dbo.StatementLocationRisks_dbo.StatementRiskType_StatementRiskTypeId");
+
+                    entity.HasOne(e => e.Statement)
+                        .WithMany(e => e.LocationRisks)
+                        .HasForeignKey(e => e.StatementId)
+                        .HasConstraintName("FK_dbo.StatementLocationRisks_dbo.Statements_StatementId");
                 });
 
             #endregion
-
 
             #region StatementOrganisation
 
@@ -811,6 +818,11 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.Property(e => e.StatusDetails)
                         .HasMaxLength(255);
+
+                    entity.HasOne(e => e.Statement)
+                        .WithMany(e => e.StatusHistory)
+                        .HasForeignKey(e => e.StatementId)
+                        .HasConstraintName("FK_dbo.StatementStatuses_dbo.Statement_StatementId");
 
                     entity.HasOne(e => e.ByUser)
                         .WithMany()

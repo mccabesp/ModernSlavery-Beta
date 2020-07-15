@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Entities.Views;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Infrastructure.Database
@@ -28,12 +29,11 @@ namespace ModernSlavery.Infrastructure.Database
             if (!string.IsNullOrWhiteSpace(DatabaseOptions.ConnectionString))
                 ConnectionString = DatabaseOptions.ConnectionString;
 
-            if (databaseOptions.UseMigrations) EnsureMigrated();
+            if (databaseOptions.UseMigrations || (!string.IsNullOrWhiteSpace(databaseOptions.MigrationAppName) && databaseOptions.MigrationAppName.EqualsI(sharedOptions.ApplicationName))) EnsureMigrated();
         }
 
-        public DatabaseContext(DbContextOptions<DatabaseContext> options, bool useMigrations = false) : base(options)
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
-            if (useMigrations) EnsureMigrated();
         }
 
         public async Task<int> SaveChangesAsync()
@@ -217,8 +217,8 @@ namespace ModernSlavery.Infrastructure.Database
         public virtual DbSet<StatementDiligenceType> StatementDiligenceTypes { get; set; }
         public virtual DbSet<StatementPolicyType> StatementPolicyTypes { get; set; }
         public virtual DbSet<StatementPolicy> StatementPolicies { get; set; }
-        public virtual DbSet<StatementRisk> StatementRisks { get; set; }
-        public virtual DbSet<StatementRiskCountry> StatementRiskCountries { get; set; }
+        public virtual DbSet<StatementRelevantRisk> StatementRelevantRisks { get; set; }
+        public virtual DbSet<StatementLocationRisk> StatementLocationRisks { get; set; }
         public virtual DbSet<StatementHighRisk> StatementHighRisks { get; set; }
         public virtual DbSet<StatementRiskType> StatementRiskTypes { get; set; }
         public virtual DbSet<StatementOrganisation> StatementOrganisations { get; set; }

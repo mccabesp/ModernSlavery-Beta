@@ -103,13 +103,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public int? StatementEndYear { get; set; }
         [Display(Name = "Job Title")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a job title")]
-        public string JobTitle { get; set; }
+        public string ApproverJobTitle { get; set; }
         [Display(Name = "First Name")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a first name")]
-        public string FirstName { get; set; }
+        public string ApproverFirstName { get; set; }
         [Display(Name = "Last Name")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a last name")]
-        public string LastName { get; set; }
+        public string ApproverLastName { get; set; }
+
         public DateTime? ApprovedDate
         {
             get
@@ -136,20 +137,26 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public int? ApprovedMonth { get; set; }
         public int? ApprovedYear { get; set; }
 
+
         #endregion
 
         #region Compliance Page
 
         [Required]
         public bool? IncludesStructure { get; set; }
+
+        [Required]
+        public bool? IncludesStructure { get; set; }
+
         public string StructureDetails { get; set; }
         [Required]
         public bool? IncludesPolicies { get; set; }
         public string PolicyDetails { get; set; }
-        [Required]
+
         public bool? IncludesRisks { get; set; }
         public string RisksDetails { get; set; }
         [Required]
+
         public bool? IncludesDueDiligence { get; set; }
         public string DueDiligenceDetails { get; set; }
         [Required]
@@ -159,6 +166,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public bool? IncludesGoals { get; set; }
         public string GoalsDetails { get; set; }
 
+        public bool? IncludesTraining { get; set; }
+        public string TrainingDetails { get; set; }
         #endregion
 
         #region Your organisation Page
@@ -182,13 +191,28 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         public List<StatementRiskType> RelevantRiskTypes { get; set; }
 
+        public List<StatementSectors> StatementSectors { get; set; }
+
+        public string OtherSector { get; set; }
+
+        public LastFinancialYearBudget? LastFinancialYearBudget { get; set; }
+
+        public List<StatementPolicies> StatementPolicies { get; set; }
+        [Display(Name = "Please provide detail")]
+        public string OtherPolicies { get; set; }
+
+        public List<StatementTrainings> StatementTrainings { get; set; }
+        [Display(Name = "Please specify")]
+        public string OtherTraining { get; set; }
+
+        public List<StatementRelevantRisk> StatementRisks { get; set; }
+
         public string OtherRelevantRisks { get; set; }
         public List<StatementRisk> HighRisks { get; set; }
         public List<StatementRiskType> HighRiskTypes { get; set; }
         public string OtherHighRisks { get; set; }
 
         #endregion
-
         #region Supply chain risks and due diligence Page 2
 
         public List<StatementDiligence> Diligences { get; set; }
@@ -223,7 +247,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public bool IncludesMeasuringProgress { get; set; }
 
         [Display(Name = "How is your organisation measuring progress towards these goals?")]
-        public string MeasuringProgress { get; set; }
+        public string ProgressMeasures { get; set; }
         [MaxLength(500)]
         [Display(Name = "What were your key achievements in relation to reducing modern slavery during the period covered by this statement?")]
         public string KeyAchievements { get; set; }

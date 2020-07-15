@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModernSlavery.Infrastructure.Database;
 
 namespace ModernSlavery.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20200714151127_statement5")]
+    partial class statement5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1256,7 +1258,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
 
                     b.HasIndex("StatementId");
 
-                    b.ToTable("StatementLocationRisks");
+                    b.ToTable("StatementRiskCountries");
                 });
 
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementOrganisation", b =>
@@ -1333,7 +1335,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.ToTable("StatementPolicyTypes");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRelevantRisk", b =>
+            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRisk", b =>
                 {
                     b.Property<short>("StatementRiskTypeId")
                         .HasColumnType("smallint");
@@ -1347,7 +1349,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.Property<string>("Details")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<short>("StatementRelevantRiskId")
+                    b.Property<short>("StatementRiskId")
                         .HasColumnType("smallint");
 
                     b.HasKey("StatementRiskTypeId", "StatementId")
@@ -1355,7 +1357,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
 
                     b.HasIndex("StatementId");
 
-                    b.ToTable("StatementRelevantRisks");
+                    b.ToTable("StatementRisks");
                 });
 
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRiskType", b =>
@@ -2035,7 +2037,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRelevantRisk", b =>
+            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRisk", b =>
                 {
                     b.HasOne("ModernSlavery.Core.Entities.Statement", "Statement")
                         .WithMany("RelevantRisks")

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Policy;
 using System.Text;
 
 namespace ModernSlavery.Core.Entities
@@ -10,11 +11,12 @@ namespace ModernSlavery.Core.Entities
         {
             Sectors = new HashSet<StatementSector>();
             Policies = new HashSet<StatementPolicy>();
-            TrainingTypes = new HashSet<StatementTraining>();
-            RelevantRisks = new HashSet<StatementRisk>();
+            Training = new HashSet<StatementTraining>();
+            RelevantRisks = new HashSet<StatementRelevantRisk>();
             Diligences = new HashSet<StatementDiligence>();
             HighRisks = new HashSet<StatementHighRisk>();
-            Countries = new HashSet<StatementRiskCountry>();
+            LocationRisks = new HashSet<StatementLocationRisk>();
+            StatusHistory = new HashSet<StatementStatus>();
         }
 
         #region Key statement control properties
@@ -27,7 +29,9 @@ namespace ModernSlavery.Core.Entities
 
         public DateTime SubmissionDeadline { get; set; }
 
-        public StatementStatus Status { get; set; }
+        public ReturnStatuses Status { get; set; }
+
+        public virtual ICollection<StatementStatus> StatusHistory { get; set; }
 
         public DateTime StatusDate { get; set; }
 
@@ -51,11 +55,11 @@ namespace ModernSlavery.Core.Entities
         // Latest date that the submission can be started
         public DateTime StatementEndDate { get; set; }
 
-        public string FirstName { get; set; }
+        public string ApproverFirstName { get; set; }
 
-        public string LastName { get; set; }
+        public string ApproverLastName { get; set; }
 
-        public string JobTitle { get; set; }
+        public string ApproverJobTitle { get; set; }
 
         public DateTime ApprovedDate { get; set; }
 
@@ -101,9 +105,9 @@ namespace ModernSlavery.Core.Entities
         //HACK: Keep this for now as it may be required later since no provision in the UI
         public string OtherSector { get; set; }
 
-        public decimal MinTurnover { get; set; }
+        public int MinTurnover { get; set; }
 
-        public decimal MaxTurnover { get; set; }
+        public int MaxTurnover { get; set; }
 
         #endregion
 
@@ -118,15 +122,15 @@ namespace ModernSlavery.Core.Entities
         #region Supply chain risks and due diligence page 1
 
         //NOTE: Regions/countries can just be represented in the DB Parents/Child RelevantRisks
-        public virtual ICollection<StatementRisk> RelevantRisks { get; set; }
+        public virtual ICollection<StatementRelevantRisk> RelevantRisks { get; set; }
 
-        public string OtherRelavantRisks { get; set; }
+        public string OtherRelevantRisks { get; set; }
 
         public virtual ICollection<StatementHighRisk> HighRisks { get; set; }
 
         public string OtherHighRisks { get; set; }
 
-        public virtual ICollection<StatementRiskCountry> Countries { get; set; }
+        public virtual ICollection<StatementLocationRisk> LocationRisks { get; set; }
 
         #endregion
 
@@ -136,11 +140,7 @@ namespace ModernSlavery.Core.Entities
         //NOTE: I have also added a new StatementDiligence.Description so we store "Other" categories of due diligence
         public virtual ICollection<StatementDiligence> Diligences { get; set; }
 
-        public bool IdentifiedForcedLabour { get; set; }
-
         public string ForcedLabourDetails { get; set; }
-
-        public bool FoundModernSlaveryInOperations { get; set; }
 
         public string SlaveryInstanceDetails { get; set; }
 
@@ -151,9 +151,9 @@ namespace ModernSlavery.Core.Entities
 
         #region Training Page
 
-        public virtual ICollection<StatementTraining> TrainingTypes { get; set; }
+        public virtual ICollection<StatementTraining> Training { get; set; }
 
-        public string OtherTrainingTypes { get; set; }
+        public string OtherTraining { get; set; }
 
         #endregion
 
@@ -171,7 +171,7 @@ namespace ModernSlavery.Core.Entities
 
         #endregion
 
-        public int IncludedOrganistionCount { get; set; }
+        public int IncludedOrganisationCount { get; set; }
 
         public int ExcludedOrganisationCount { get; set; }
 

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModernSlavery.Infrastructure.Database;
 
 namespace ModernSlavery.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20200714145016_statement4")]
+    partial class statement4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -965,18 +967,6 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.Property<DateTime>("ApprovedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ApproverFirstName")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("ApproverJobTitle")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("ApproverLastName")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -993,12 +983,22 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.Property<int>("ExcludedOrganisationCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
                     b.Property<string>("ForcedLabourDetails")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("FoundModernSlaveryInOperations")
+                        .HasColumnType("bit");
 
                     b.Property<string>("GoalsDetails")
                         .HasColumnType("nvarchar(250)")
                         .HasMaxLength(250);
+
+                    b.Property<bool>("IdentifiedForcedLabour")
+                        .HasColumnType("bit");
 
                     b.Property<int>("IncludedOrganistionCount")
                         .HasColumnType("int");
@@ -1024,8 +1024,16 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.Property<bool>("IncludesTraining")
                         .HasColumnType("bit");
 
+                    b.Property<string>("JobTitle")
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
                     b.Property<string>("KeyAchievements")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("LateReason")
                         .HasColumnType("nvarchar(200)")
@@ -1052,14 +1060,14 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.Property<string>("OtherPolicies")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OtherRelevantRisks")
+                    b.Property<string>("OtherRelavantRisks")
                         .HasColumnType("nvarchar(250)")
                         .HasMaxLength(250);
 
                     b.Property<string>("OtherSector")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OtherTraining")
+                    b.Property<string>("OtherTrainingTypes")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PolicyDetails")
@@ -1234,31 +1242,6 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.ToTable("StatementHighRisks");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementLocationRisk", b =>
-                {
-                    b.Property<short>("StatementRiskTypeId")
-                        .HasColumnType("smallint");
-
-                    b.Property<long>("StatementId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Details")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<short>("StatementLocationRiskId")
-                        .HasColumnType("smallint");
-
-                    b.HasKey("StatementRiskTypeId", "StatementId")
-                        .HasName("PK_dbo.StatementLocationRisks");
-
-                    b.HasIndex("StatementId");
-
-                    b.ToTable("StatementLocationRisks");
-                });
-
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementOrganisation", b =>
                 {
                     b.Property<long>("StatementOrganisationId")
@@ -1333,7 +1316,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.ToTable("StatementPolicyTypes");
                 });
 
-            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRelevantRisk", b =>
+            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRisk", b =>
                 {
                     b.Property<short>("StatementRiskTypeId")
                         .HasColumnType("smallint");
@@ -1347,7 +1330,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.Property<string>("Details")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<short>("StatementRelevantRiskId")
+                    b.Property<short>("StatementRiskId")
                         .HasColumnType("smallint");
 
                     b.HasKey("StatementRiskTypeId", "StatementId")
@@ -1355,7 +1338,32 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
 
                     b.HasIndex("StatementId");
 
-                    b.ToTable("StatementRelevantRisks");
+                    b.ToTable("StatementRisks");
+                });
+
+            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRiskCountry", b =>
+                {
+                    b.Property<short>("StatementRiskTypeId")
+                        .HasColumnType("smallint");
+
+                    b.Property<long>("StatementId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<short>("StatementRiskCountryId")
+                        .HasColumnType("smallint");
+
+                    b.HasKey("StatementRiskTypeId", "StatementId")
+                        .HasName("PK_dbo.StatementRiskCountry");
+
+                    b.HasIndex("StatementId");
+
+                    b.ToTable("StatementRiskCountries");
                 });
 
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRiskType", b =>
@@ -1986,23 +1994,6 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementLocationRisk", b =>
-                {
-                    b.HasOne("ModernSlavery.Core.Entities.Statement", "Statement")
-                        .WithMany("LocationRisks")
-                        .HasForeignKey("StatementId")
-                        .HasConstraintName("FK_dbo.StatementLocationRisks_dbo.Statements_StatementId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ModernSlavery.Core.Entities.StatementRiskType", "StatementRiskType")
-                        .WithMany()
-                        .HasForeignKey("StatementRiskTypeId")
-                        .HasConstraintName("FK_dbo.StatementLocationRisks_dbo.StatementRiskType_StatementRiskTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementOrganisation", b =>
                 {
                     b.HasOne("ModernSlavery.Core.Entities.Organisation", "Organisation")
@@ -2035,7 +2026,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRelevantRisk", b =>
+            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRisk", b =>
                 {
                     b.HasOne("ModernSlavery.Core.Entities.Statement", "Statement")
                         .WithMany("RelevantRisks")
@@ -2048,6 +2039,21 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .WithMany()
                         .HasForeignKey("StatementRiskTypeId")
                         .HasConstraintName("FK_dbo.StatementRisk_dbo.StatementRiskType_StatementRiskTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRiskCountry", b =>
+                {
+                    b.HasOne("ModernSlavery.Core.Entities.Statement", "Statement")
+                        .WithMany("Countries")
+                        .HasForeignKey("StatementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ModernSlavery.Core.Entities.StatementRiskType", "StatementRiskType")
+                        .WithMany()
+                        .HasForeignKey("StatementRiskTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -2101,7 +2107,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementTraining", b =>
                 {
                     b.HasOne("ModernSlavery.Core.Entities.Statement", "Statement")
-                        .WithMany("Training")
+                        .WithMany("TrainingTypes")
                         .HasForeignKey("StatementId")
                         .HasConstraintName("FK_dbo.StatementTrainingDivisions_dbo.Statements_StatementId")
                         .OnDelete(DeleteBehavior.Cascade)

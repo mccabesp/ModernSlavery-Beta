@@ -9,7 +9,7 @@ namespace ModernSlavery.Core.Entities
     {
         public short StatementDiligenceTypeId { get; set; }
 
-        public short? StatementDiligenceParentTypeId { get; set; }
+        public short? ParentDiligenceTypeId { get; set; }
 
         public virtual StatementDiligenceType StatementDiligenceParent { get; set; }
 
