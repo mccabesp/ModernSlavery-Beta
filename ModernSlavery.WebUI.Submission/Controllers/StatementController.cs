@@ -51,7 +51,26 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         #endregion
 
-        #region Step 1 - Your statement
+        #region Before You Start
+        [HttpGet("{organisationIdentifier}/{year}/before-you-start")]
+        public async Task<IActionResult> BeforeYouStart(string organisationIdentifier, int year)
+        {
+            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+        }
+
+        [HttpPost("{organisationIdentifier}/{year}/before-you-start")]
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BeforeYouStart(StatementViewModel submissionModel)
+        {
+            // Redirect location
+            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.NotStarted);
+            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+        }
+
+        #endregion
+
+        #region Step 1 - Your statementyou
 
         [HttpGet("{organisationIdentifier}/{year}/your-statement")]
         public async Task<IActionResult> YourStatement(string organisationIdentifier, int year)
