@@ -29,9 +29,7 @@ namespace ModernSlavery.Core.Entities
 
         public DateTime SubmissionDeadline { get; set; }
 
-        public long StatusId { get; set; }
-
-        public virtual StatementStatus Status { get; set; }
+        public ReturnStatuses Status { get; set; }
 
         public virtual ICollection<StatementStatus> StatusHistory { get; set; }
 
@@ -107,9 +105,9 @@ namespace ModernSlavery.Core.Entities
         //HACK: Keep this for now as it may be required later since no provision in the UI
         public string OtherSector { get; set; }
 
-        public decimal MinTurnover { get; set; }
+        public int MinTurnover { get; set; }
 
-        public decimal MaxTurnover { get; set; }
+        public int MaxTurnover { get; set; }
 
         #endregion
 
@@ -173,7 +171,7 @@ namespace ModernSlavery.Core.Entities
 
         #endregion
 
-        public int IncludedOrganistionCount { get; set; }
+        public int IncludedOrganisationCount { get; set; }
 
         public int ExcludedOrganisationCount { get; set; }
 

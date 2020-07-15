@@ -25,6 +25,7 @@ namespace ModernSlavery.Infrastructure.Database
             modelBuilder.Entity<Feedback>().ToTable("Feedback");
             modelBuilder.Entity<AuditLog>().ToTable("AuditLogs");
             modelBuilder.Entity<ReminderEmail>().ToTable("ReminderEmails");
+            modelBuilder.Entity<StatementTraining>().ToTable("StatementTraining");
 
             #region AddressStatus
 
@@ -471,11 +472,17 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.OrganisationId)
                         .HasName("IX_OrganisationId");
 
+                    entity.Property(e => e.StatementStartDate)
+                        .HasColumnType("Date");
+
                     entity.HasIndex(e => e.StatementStartDate)
-                        .HasName("IX_ReportingStartDate");
+                        .HasName("IX_StatementStartDate");
+
+                    entity.Property(e => e.StatementEndDate)
+                        .HasColumnType("Date");
 
                     entity.HasIndex(e => e.StatementEndDate)
-                        .HasName("IX_ReportingEndDate");
+                        .HasName("IX_StatementEndDate");
 
                     entity.Property(e => e.SubmissionDeadline)
                         .HasColumnType("Date");
@@ -483,53 +490,35 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.SubmissionDeadline)
                         .HasName("IX_SubmissionDeadline");
 
+                    entity.Property(e => e.StatementUrl)
+                        .HasMaxLength(255);
+
                     entity.HasIndex(e => e.IncludesGoals)
                         .HasName("IX_IncludesGoals");
-
-                    entity.Property(e => e.GoalsDetails)
-                        .HasMaxLength(250);
 
                     entity.HasIndex(e => e.IncludesStructure)
                         .HasName("IX_IncludesStructure");
 
-                    entity.Property(e => e.StructureDetails)
-                        .HasMaxLength(250);
-
                     entity.HasIndex(e => e.IncludesPolicies)
                         .HasName("IX_IncludesPolicies");
-
-                    entity.Property(e => e.PolicyDetails)
-                        .HasMaxLength(250);
 
                     entity.HasIndex(e => e.IncludesDueDiligence)
                         .HasName("IX_IncludesDueDiligence");
 
-                    entity.Property(e => e.DueDiligenceDetails)
-                        .HasMaxLength(250);
-
                     entity.HasIndex(e => e.IncludesRisks)
                         .HasName("IX_IncludesRisks");
-
-                    entity.Property(e => e.RisksDetails)
-                        .HasMaxLength(250);
 
                     entity.HasIndex(e => e.IncludesTraining)
                         .HasName("IX_IncludesTraining");
 
-                    entity.Property(e => e.TrainingDetails)
-                        .HasMaxLength(250);
-
-                    entity.Property(e => e.StatusId)
+                    entity.Property(e => e.Status)
                         .HasColumnName("StatusId");
 
-                    entity.HasIndex(e => e.StatusId)
+                    entity.HasIndex(e => e.Status)
                         .HasName("IX_StatusId");
 
                     entity.Property(e => e.StatusDetails)
                         .HasMaxLength(255);
-
-                    entity.Property(e => e.OtherRelevantRisks)
-                        .HasMaxLength(250);
 
                     entity.Property(e => e.ApproverJobTitle)
                         .HasMaxLength(100);
@@ -539,6 +528,9 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.Property(e => e.ApproverLastName)
                         .HasMaxLength(50);
+
+                    entity.Property(e => e.ApprovedDate)
+                        .HasColumnType("Date");
 
                     entity.HasIndex(e => e.MinTurnover)
                         .HasName("IX_MinTurnover");
@@ -557,6 +549,12 @@ namespace ModernSlavery.Infrastructure.Database
                         .WithMany(p => p.Statements)
                         .HasForeignKey(d => d.OrganisationId)
                         .HasConstraintName("FK_dbo.Statements_dbo.Organisations_OrganisationId");
+
+                    entity.Property(e => e.IncludedOrganisationCount)
+                        .HasDefaultValue(0);
+
+                    entity.Property(e => e.ExcludedOrganisationCount)
+                        .HasDefaultValue(0);
                 });
 
             #endregion
