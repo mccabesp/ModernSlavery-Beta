@@ -13,7 +13,7 @@ namespace ModernSlavery.Core.Entities
 
         #endregion
 
-        [MaxLength(2000)] public string Details { get; set; }
+        public string Details { get; set; }
 
         public string EmailAddress { get; set; }
         public string PhoneNumber { get; set; }
@@ -81,7 +81,7 @@ namespace ModernSlavery.Core.Entities
         #endregion
     }
 
-    public enum DifficultyTypes
+    public enum DifficultyTypes:byte
     {
         VeryEasy = 0,
         Easy = 1,

@@ -30,7 +30,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
         // presentation
         Task<ReturnViewModel> GetReturnViewModelAsync(long organisationId, int snapshotYear, long userId);
 
-        bool ShouldUpdateLatestReturn(Organisation org, int snapshotYear);
+        bool ShouldUpdateLatestStatement(Organisation org, int snapshotYear);
 
         Task<ReportInfoModel> GetReportInfoModelWithLockedDraftAsync(Organisation organisation,
             DateTime? returnModifiedDate,
@@ -101,7 +101,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
 
             var result = new Return();
             result.AccountingDate = stashedReturnViewModel.AccountingDate;
-            result.Status = ReturnStatuses.Draft;
+            result.Status = StatementStatuses.Draft;
             result.OrganisationId = stashedReturnViewModel.OrganisationId;
             result.Organisation =
                 SubmissionService.SharedBusinessLogic.DataRepository.Get<Organisation>(result.OrganisationId);
@@ -157,7 +157,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             if (stashedReturnViewModel.MaleUpperPayBand != null)
                 result.MaleUpperPayBand = stashedReturnViewModel.MaleUpperPayBand.Value;
 
-            result.Status = ReturnStatuses.Draft;
+            result.Status = StatementStatuses.Draft;
             result.MinEmployees = (int) orgSizeRange.Minimum;
             result.MaxEmployees = (int) orgSizeRange.Maximum;
             result.LateReason = stashedReturnViewModel.LateReason;
@@ -298,7 +298,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
 
             return await SubmissionService.SharedBusinessLogic.DataRepository
                 .FirstOrDefaultByDescendingAsync<Return, long>(s => s.ReturnId,
-                    s => s.Status == ReturnStatuses.Submitted && s.AccountingDate.Year == snapshotYear &&
+                    s => s.Status == StatementStatuses.Submitted && s.AccountingDate.Year == snapshotYear &&
                          s.OrganisationId == organisationId);
         }
 
@@ -416,9 +416,9 @@ namespace ModernSlavery.WebUI.Submission.Classes
             return GetSnapshotDate(sector);
         }
 
-        public bool ShouldUpdateLatestReturn(Organisation org, int snapshotYear)
+        public bool ShouldUpdateLatestStatement(Organisation org, int snapshotYear)
         {
-            return org.LatestReturn == null || org.LatestReturn.AccountingDate.Year <= snapshotYear;
+            return org.LatestStatement == null || org.LatestStatement.SubmissionDeadline.Year <= snapshotYear-1;
         }
 
         public async Task<List<ReportInfoModel>> GetAllEditableReportsAsync(UserOrganisation userOrg,

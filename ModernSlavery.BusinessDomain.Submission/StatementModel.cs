@@ -12,7 +12,7 @@ namespace ModernSlavery.BusinessDomain.Submission
     {
         public long? StatementId { get; set; }
 
-        public ReturnStatuses Status { get; set; }
+        public StatementStatuses Status { get; set; }
 
         public DateTime? StatusDate { get; set; }
 

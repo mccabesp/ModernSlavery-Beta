@@ -116,7 +116,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         public DateTime AccountingDate { get; set; }
         public DateTime Modified { get; set; }
 
-        //public virtual ICollection<ReturnStatus> ReturnStatuses { get; set; }
+        //public virtual ICollection<ReturnStatus> StatementStatuses { get; set; }
 
         //[ForeignKey("OrganisationId")]
         //public virtual Organisation Organisation { get; set; }

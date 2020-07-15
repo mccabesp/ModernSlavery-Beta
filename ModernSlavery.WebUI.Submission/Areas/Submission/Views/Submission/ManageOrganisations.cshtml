@@ -41,7 +41,7 @@
                 var accountingEndYear = (accountingDate.Year + 1).ToString();
 
                 var encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
-                var latestReturn = userOrg.Organisation.LatestReturn;
+                var latestStatement = userOrg.Organisation.LatestStatement;
                 var scopeStatus = userOrg.Organisation.GetScopeStatus(accountingDate);
                 var address = userOrg.Organisation.GetLatestAddress()?.GetAddressString();
 

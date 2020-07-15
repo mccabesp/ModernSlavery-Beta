@@ -77,7 +77,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             uo.Organisation.OrganisationName,
                             CompanyNo = uo.Organisation.CompanyNumber,
                             Sector = uo.Organisation.SectorType,
-                            LatestReturn = uo.Organisation?.LatestReturn?.StatusDate,
+                            LatestStatement = uo.Organisation?.LatestStatement?.StatusDate,
                             uo.Method,
                             uo.Organisation.LatestScope?.ScopeStatus,
                             ScopeDate = uo.Organisation.LatestScope?.ScopeStatusDate,

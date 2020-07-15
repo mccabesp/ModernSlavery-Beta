@@ -38,7 +38,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
         {
             return organisations.Where(
                 o => o.Status == OrganisationStatuses.Active
-                     && (o.Returns.Any(r => r.Status == ReturnStatuses.Submitted)
+                     && (o.Statements.Any(r => r.Status == StatementStatuses.Submitted)
                          || o.OrganisationScopes.Any(
                              sc => sc.Status == ScopeRowStatuses.Active
                                    && (sc.ScopeStatus == ScopeStatuses.InScope ||

@@ -48,7 +48,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var orgSubmission = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Return>(
                 s => s.AccountingDate.Year == snapshotYear
                      && s.OrganisationId == organisationId
-                     && s.Status == ReturnStatuses.Submitted);
+                     && s.Status == StatementStatuses.Submitted);
 
             return orgSubmission;
         }
@@ -72,7 +72,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SubmissionDeadline}).ToList();
 
             var returns = _sharedBusinessLogic.DataRepository.GetAll<Return>()
-                .Where(r => r.AccountingDate.Year == year && r.Status == ReturnStatuses.Submitted).ToList();
+                .Where(r => r.AccountingDate.Year == year && r.Status == StatementStatuses.Submitted).ToList();
 
 #if DEBUG
             if (Debugger.IsAttached) returns = returns.Take(100).ToList();
@@ -155,7 +155,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     r => string.IsNullOrEmpty(r.Modifications)
                          || r.Modifications.ToLower().Contains("figures")
                          || r.Modifications.ToLower().Contains("personresponsible"))
-                .Where(r => r.Status == ReturnStatuses.Submitted)
+                .Where(r => r.Status == StatementStatuses.Submitted)
                 .Select(
                     r => new
                     {
@@ -279,7 +279,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     InternalMessages.HttpNotFoundCausedByOrganisationReturnNotInDatabase(_sharedBusinessLogic.Obfuscator.Obfuscate(organisation.OrganisationId),
                         year));
 
-            var result = reports.OrderByDescending(r => r.Status == ReturnStatuses.Submitted)
+            var result = reports.OrderByDescending(r => r.Status == StatementStatuses.Submitted)
                 .ThenByDescending(r => r.StatusDate)
                 .FirstOrDefault();
             if (!result.IsSubmitted())

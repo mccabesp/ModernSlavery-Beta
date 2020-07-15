@@ -23,7 +23,7 @@ namespace ModernSlavery.WebUI.Shared.Views.Components
         public string Url { get; set; }
     }
 
-    public enum ArrowDirection
+    public enum ArrowDirection : byte
     {
         Left = 0,
         Right = 1

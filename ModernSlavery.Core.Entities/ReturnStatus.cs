@@ -7,7 +7,7 @@ namespace ModernSlavery.Core.Entities
     {
         public long ReturnStatusId { get; set; }
         public long ReturnId { get; set; }
-        public ReturnStatuses Status { get; set; }
+        public StatementStatuses Status { get; set; }
 
         public DateTime StatusDate { get; set; } = VirtualDateTime.Now;
         public string StatusDetails { get; set; }

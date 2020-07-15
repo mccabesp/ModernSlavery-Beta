@@ -8,7 +8,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.Entities.Views;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 
@@ -225,22 +224,6 @@ namespace ModernSlavery.Infrastructure.Database
         public virtual DbSet<StatementSectorType> StatementSectorTypes { get; set; }
         public virtual DbSet<StatementSector> StatementSectors { get; set; }
         public virtual DbSet<StatementStatus> StatementStatuses { get; set; }
-
-        #endregion
-
-        #region Views
-
-        public virtual DbSet<UserInfoView> UserInfoView { get; set; }
-        public virtual DbSet<OrganisationAddressInfoView> OrganisationAddressInfoView { get; set; }
-        public virtual DbSet<OrganisationInfoView> OrganisationInfoView { get; set; }
-        public virtual DbSet<OrganisationRegistrationInfoView> OrganisationRegistrationInfoView { get; set; }
-        public virtual DbSet<OrganisationScopeAndReturnInfoView> OrganisationScopeAndReturnInfoView { get; set; }
-        public virtual DbSet<OrganisationScopeInfoView> OrganisationScopeInfoView { get; set; }
-        public virtual DbSet<OrganisationSearchInfoView> OrganisationSearchInfoView { get; set; }
-        public virtual DbSet<OrganisationSicCodeInfoView> OrganisationSicCodeInfoView { get; set; }
-        public virtual DbSet<OrganisationSubmissionInfoView> OrganisationSubmissionInfoView { get; set; }
-        public virtual DbSet<UserLinkedOrganisationsView> UserLinkedOrganisationsView { get; set; }
-        public virtual DbSet<UserStatusInfoView> UserStatusInfoView { get; set; }
 
         #endregion
     }

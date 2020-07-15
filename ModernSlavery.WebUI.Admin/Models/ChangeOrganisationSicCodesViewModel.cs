@@ -44,7 +44,7 @@ namespace ModernSlavery.WebUI.Admin.Models
         #endregion
     }
 
-    public enum AcceptCompaniesHouseSicCodes
+    public enum AcceptCompaniesHouseSicCodes : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "Yes, use these SIC codes from Companies House")]
         Accept,
@@ -53,7 +53,7 @@ namespace ModernSlavery.WebUI.Admin.Models
         Reject
     }
 
-    public enum ManuallyChangeOrganisationSicCodesActions
+    public enum ManuallyChangeOrganisationSicCodesActions : byte
     {
         Unknown,
 
@@ -72,7 +72,7 @@ namespace ModernSlavery.WebUI.Admin.Models
         ConfirmCoho
     }
 
-    public enum ChangeOrganisationSicCodesConfirmationType
+    public enum ChangeOrganisationSicCodesConfirmationType : byte
     {
         Manual,
         CoHo
