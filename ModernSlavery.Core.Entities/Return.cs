@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Entities
 {
+    [NotMapped]
     public partial class Return
     {
         public Return()

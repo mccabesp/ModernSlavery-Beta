@@ -173,8 +173,8 @@ namespace ModernSlavery.Core.Entities
 
         #endregion
 
-        public int IncludedOrganisationCount { get; set; }
+        public short IncludedOrganisationCount { get; set; }
 
-        public int ExcludedOrganisationCount { get; set; }
+        public short ExcludedOrganisationCount { get; set; }
     }
 }

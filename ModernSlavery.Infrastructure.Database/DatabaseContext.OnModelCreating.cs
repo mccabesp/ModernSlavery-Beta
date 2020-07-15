@@ -151,6 +151,9 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.Property(e => e.LatestRegistrationUserId).HasColumnName("LatestRegistration_UserId");
 
+                    entity.Property(e => e.OptedOutFromCompaniesHouseUpdate)
+                      .HasDefaultValue(0);
+
                     entity.Property(e => e.OrganisationName)
                         .IsRequired()
                         .HasMaxLength(100);
@@ -163,7 +166,7 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.HasOne(d => d.LatestScope).WithMany().HasForeignKey(e => e.LatestScopeId);
 
-                    entity.HasOne(d => d.LatestRegistration).WithMany().HasForeignKey("LatestRegistration_OrganisationId", "LatestRegistration_UserId");
+                    entity.HasOne(d => d.LatestRegistration).WithMany().HasForeignKey(p=> new { p.LatestRegistrationOrganisationId, p.LatestRegistrationUserId });
 
                     entity.HasOne(d => d.LatestPublicSectorType).WithMany().HasForeignKey(e => e.LatestPublicSectorTypeId);
                 });
@@ -509,7 +512,7 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasMaxLength(50);
 
                     entity.Property(e => e.LateReason)
-                        .HasMaxLength(200);
+                        .HasMaxLength(255);
 
                     entity.Property(e => e.StatementEndDate)
                         .HasColumnType("Date");
@@ -530,7 +533,6 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasColumnName("StatusId");
 
                     entity.Property(e => e.EHRCResponse)
-                        .HasColumnName("EHRCResponse")
                         .HasDefaultValue(0);
 
                     entity.HasOne(d => d.Organisation)
@@ -800,7 +802,7 @@ namespace ModernSlavery.Infrastructure.Database
             modelBuilder.Entity<StatementStatus>(
                 entity =>
                 {
-                    entity.HasKey(e => new { e.StatementStatusId, e.StatementId });
+                    entity.HasKey(e => e.StatementStatusId);
 
                     entity.HasIndex(e => e.ByUserId);
 
@@ -836,10 +838,16 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.HasIndex(e => e.UserId);
 
+                    entity.Property(e => e.PITPNotifyLetterId)
+                        .HasMaxLength(255);
+
+                    entity.Property(e => e.PIN)
+                        .HasMaxLength(255);
+
                     entity.Property(e => e.PINHash)
                         .HasMaxLength(255);
 
-                    entity.Property(e => e.Method).HasColumnName("MethodId").HasDefaultValue(0);
+                    entity.Property(e => e.Method).HasColumnName("MethodId");
 
                     entity.HasOne(d => d.Address).WithMany(e=>e.UserOrganisations).HasForeignKey(e => e.AddressId);
 
@@ -868,6 +876,8 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.EmailAddress);
 
                     entity.HasIndex(e => e.Status);
+
+                    entity.Property(e => e.Salt).HasMaxLength(255);
 
                     entity.Property(e => e.Status).HasColumnName("StatusId");
                     entity.Property(e => e.HashingAlgorithm).HasColumnName("HashingAlgorithmId");

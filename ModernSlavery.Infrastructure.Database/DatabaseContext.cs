@@ -20,6 +20,7 @@ namespace ModernSlavery.Infrastructure.Database
 
         public readonly DatabaseOptions DatabaseOptions;
         public readonly SharedOptions SharedOptions;
+        private static bool MigrationEnsured;
 
         public DatabaseContext(SharedOptions sharedOptions, DatabaseOptions databaseOptions)
         {
@@ -29,6 +30,15 @@ namespace ModernSlavery.Infrastructure.Database
                 ConnectionString = DatabaseOptions.ConnectionString;
 
             if (databaseOptions.UseMigrations || (!string.IsNullOrWhiteSpace(databaseOptions.MigrationAppName) && databaseOptions.MigrationAppName.EqualsI(sharedOptions.ApplicationName))) EnsureMigrated();
+        }
+
+        private void EnsureMigrated()
+        {
+            if (MigrationEnsured)
+                return; //This static variable is a temporary measure otherwise each request for a Database context takes a few seconds to check for migrations or if the database exists
+
+            Database.Migrate();
+            MigrationEnsured = true;
         }
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)

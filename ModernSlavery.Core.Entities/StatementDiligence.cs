@@ -7,8 +7,6 @@ namespace ModernSlavery.Core.Entities
 {
     public class StatementDiligence
     {
-        public long StatementDiligenceId { get; set; }
-
         public short StatementDiligenceTypeId { get; set; }
 
         public virtual StatementDiligenceType StatementDiligenceType { get; set; }

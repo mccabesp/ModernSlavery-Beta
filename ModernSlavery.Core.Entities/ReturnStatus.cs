@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Entities
 {
+    [NotMapped]
     public class ReturnStatus
     {
         public long ReturnStatusId { get; set; }
