@@ -15,10 +15,9 @@ using OpenQA.Selenium.Support.UI;
 namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
-    [Parallelizable]
-    public class CreateAccount: UITest
+    public class CreateAccountTests: UITest
     {
-        public CreateAccount():base(TestRunSetup.WebDriverService)
+        public CreateAccountTests():base(TestRunSetup.WebDriverService)
         {
             
         }
