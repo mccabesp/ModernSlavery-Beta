@@ -35,9 +35,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public int ExcludedOrganisationCount { get; set; }
 
 
-
-
-
         #region Statement Page
 
         [Url(ErrorMessage = "URL is not valid")]
@@ -213,9 +210,9 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Training Page
 
-        public List<StatementTrainings> TrainingTypes { get; set; }
+        public List<StatementTrainings> Training { get; set; }
         [Display(Name = "Please specify")]
-        public string OtherTrainingType { get; set; }
+        public string OtherTraining { get; set; }
 
         #endregion
 

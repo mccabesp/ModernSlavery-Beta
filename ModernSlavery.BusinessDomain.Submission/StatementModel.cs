@@ -71,7 +71,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 3 - Your organisation
 
-        public List<KeyValuePair<int, string>> StatementSectors { get; set; }
+        public List<KeyValuePair<int, string>> Sectors { get; set; }
 
         public string OtherSector { get; set; }
 
@@ -83,7 +83,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 4 - Policies
 
-        public List<KeyValuePair<int, string>> StatementPolicies { get; set; }
+        public List<KeyValuePair<int, string>> Policies { get; set; }
 
         public string OtherPolicies { get; set; }
 

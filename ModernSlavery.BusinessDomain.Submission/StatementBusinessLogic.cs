@@ -142,8 +142,8 @@ namespace ModernSlavery.BusinessDomain.Submission
             CreateMap<Statement, StatementModel>()
                 .ForMember(dest => dest.Status, opt => opt.Ignore()) // TODO - James Map this appropriately
                 .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.SubmissionDeadline.Year))
-                .ForMember(dest => dest.StatementSectors, opt => opt.MapFrom(src => src.Sectors.Select(s => new KeyValuePair<int, string>(s.StatementSectorTypeId, s.StatementSectorType.Description))))
-                .ForMember(dest => dest.StatementPolicies, opt => opt.MapFrom(src => src.Policies.Select(p => new KeyValuePair<int, string>(p.StatementPolicyTypeId, p.StatementPolicyType.Description))))
+                .ForMember(dest => dest.Sectors, opt => opt.MapFrom(src => src.Sectors.Select(s => new KeyValuePair<int, string>(s.StatementSectorTypeId, s.StatementSectorType.Description))))
+                .ForMember(dest => dest.Policies, opt => opt.MapFrom(src => src.Policies.Select(p => new KeyValuePair<int, string>(p.StatementPolicyTypeId, p.StatementPolicyType.Description))))
                 .ForMember(dest => dest.Training, opt => opt.MapFrom(src => src.Training.Select(t => new KeyValuePair<int, string>(t.StatementTrainingTypeId, t.StatementTrainingType.Description))))
                 .ForMember(dest => dest.RelevantRisks, opt => opt.MapFrom(src => src.RelevantRisks.Select(r => new KeyValuePair<int, string>(r.StatementRiskTypeId, r.StatementRiskType.Description))))
                 .ForMember(dest => dest.HighRisks, opt => opt.MapFrom(src => src.HighRisks.Select(r => new KeyValuePair<int, string>(r.StatementRiskTypeId, r.StatementRiskType.Description))))

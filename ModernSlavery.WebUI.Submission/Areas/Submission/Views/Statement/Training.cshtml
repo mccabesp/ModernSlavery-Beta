@@ -17,7 +17,7 @@
 
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.TrainingTypes)
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.Training)
                 }))
 
             <h1 class="govuk-heading-l">
@@ -34,15 +34,15 @@
                            {
                              ModernSlavery.WebUI.Submission.Presenters.StatementTrainings.Other,
 @<text>
-    @(Html.GovUkTextInputFor(model => model.OtherTrainingType))
-    @(Html.LabelFor(model => model.OtherTrainingType, new { @class = "govuk-label" }))
+    @(Html.GovUkTextInputFor(model => model.OtherTraining))
+    @(Html.LabelFor(model => model.OtherTraining, new { @class = "govuk-label" }))
 </text>
                             }
                                   };
 
 
                 @(Html.GovUkCheckboxesFor(
-                    model => model.TrainingTypes,
+                    model => model.Training,
                     new FieldsetViewModel
                     {
                         Legend = new LegendViewModel

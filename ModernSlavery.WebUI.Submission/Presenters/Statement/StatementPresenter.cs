@@ -416,10 +416,10 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
             CreateMap<StatementViewModel, StatementModel>()
                 .ForMember(dest => dest.Training, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
+                .ForMember(dest => dest.Policies, opt => opt.Ignore())
                 .ForMember(dest => dest.Diligences, opt => opt.Ignore())
                 .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
+                .ForMember(dest => dest.Sectors, opt => opt.Ignore())
                 .ForMember(dest => dest.StructureDetails, opt => opt.Ignore())
                 .ForMember(dest => dest.PolicyDetails, opt => opt.Ignore())
                 .ForMember(dest => dest.RisksDetails, opt => opt.Ignore())
@@ -446,7 +446,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.OrganisationIdentifier, opt => opt.Ignore())
                 // These need to change on VM to come from DB
                 .ForMember(dest => dest.Policies, opt => opt.Ignore())
-                .ForMember(dest => dest.TrainingTypes, opt => opt.Ignore())
+                .ForMember(dest => dest.Training, opt => opt.Ignore())
                 .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
                 .ForMember(dest => dest.Sectors, opt => opt.Ignore())
                 .ForMember(dest => dest.Diligences, opt => opt.Ignore())
@@ -459,12 +459,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.HighRisks, opt => opt.Ignore())
                 .ForMember(dest => dest.HighRiskTypes, opt => opt.Ignore())
                 .ForMember(dest => dest.OtherHighRisks, opt => opt.Ignore())
-                .ForMember(dest => dest.OtherTrainingType, opt => opt.Ignore())
+                .ForMember(dest => dest.OtherTraining, opt => opt.Ignore())
                  .ForMember(dest => dest.IncludesMeasuringProgress, opt => opt.Ignore())
 
 
                 // Work out storage of these
-                .ForMember(dest => dest.IncludedOrganistionCount, opt => opt.Ignore())
+                // .ForMember(dest => dest.IncludedOrganistionCount, opt => opt.Ignore())
                 .ForMember(dest => dest.ExcludedOrganisationCount, opt => opt.Ignore())
                 .ForMember(dest => dest.ForcedLabour, opt => opt.Ignore())
                 .ForMember(dest => dest.ForcedLabourDetails, opt => opt.Ignore())
