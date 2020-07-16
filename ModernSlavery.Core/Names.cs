@@ -22,43 +22,49 @@ namespace ModernSlavery.Core
 
     public static class Filenames
     {
-        public const string Organisations = "GPG-Organisations.csv";
-        public const string Users = "GPG-Users.csv";
-        public const string Registrations = "GPG-Registrations.csv";
-        public const string RegistrationAddresses = "GPG-RegistrationAddresses.csv";
-        public const string UnverifiedRegistrations = "GPG-UnverifiedRegistrations.csv";
-        public const string SendInfo = "GPG-UsersToSendInfo.csv";
-        public const string AllowFeedback = "GPG-UsersToContactForFeedback.csv";
-        public const string UnfinishedOrganisations = "GPG-UnfinishedOrgs.csv";
-        public const string OrphanOrganisations = "GPG-OrphanOrganisations.csv";
-        public const string OrganisationScopes = "GPG-Scopes.csv";
-        public const string OrganisationSubmissions = "GPG-Submissions.csv";
-        public const string OrganisationLateSubmissions = "GPG-LateSubmissions.csv";
-        public const string ShortCodes = "GPG-ShortCodes.csv";
-        public const string SicCodes = "SicCodes.csv";
-        public const string SicSections = "SicSections.csv";
-        public const string SicSectorSynonyms = "GPG-SicSectorSynonyms.csv";
+        public const string Organisations = "MSU-Organisations.csv";
+        public const string Users = "MSU-Users.csv";
+        public const string Registrations = "MSU-Registrations.csv";
+        public const string RegistrationAddresses = "MSU-RegistrationAddresses.csv";
+        public const string UnverifiedRegistrations = "MSU-UnverifiedRegistrations.csv";
+        public const string SendInfo = "MSU-UsersToSendInfo.csv";
+        public const string AllowFeedback = "MSU-UsersToContactForFeedback.csv";
+        public const string UnfinishedOrganisations = "MSU-UnfinishedOrgs.csv";
+        public const string OrphanOrganisations = "MSU-OrphanOrganisations.csv";
+        public const string OrganisationScopes = "MSU-Scopes.csv";
+        public const string OrganisationSubmissions = "MSU-Submissions.csv";
+        public const string OrganisationLateSubmissions = "MSU-LateSubmissions.csv";
+        public const string ShortCodes = "MSU-ShortCodes.csv";
+        public const string SicCodes = "MSU-SicCodes.csv";
+        public const string SicSections = "MSU-SicSections.csv";
+        public const string SicSectorSynonyms = "MSU-SicSectorSynonyms.csv";
+
+        public const string StatementDiligenceTypes = "MSU-StatementDiligenceTypes.csv";
+        public const string StatementPolicyTypes = "MSU-StatementPolicyTypes.csv";
+        public const string StatementRiskTypes = "MSU-StatementRiskTypes.csv";
+        public const string StatementSectorTypes = "MSU-StatementSectorTypes.csv";
+        public const string StatementTrainingTypes = "MSU-StatementTrainingTypes.csv";
 
         // Record logs
-        public const string BadSicLog = "BadSicLog.csv";
-        public const string ManualChangeLog = "ManualChangeLog.csv";
-        public const string RegistrationLog = "RegistrationLog.csv";
-        public const string SubmissionLog = "SubmissionLog.csv";
-        public const string EmailSendLog = "EmailSendLog.csv";
-        public const string StannpSendLog = "StannpSendLog.csv";
-        public const string SearchLog = "searchLog.csv";
-        public const string UserLog = "UserLog.csv";
+        public const string BadSicLog = "MSU-BadSicLog.csv";
+        public const string ManualChangeLog = "MSU-ManualChangeLog.csv";
+        public const string RegistrationLog = "MSU-RegistrationLog.csv";
+        public const string SubmissionLog = "MSU-SubmissionLog.csv";
+        public const string EmailSendLog = "MSU-EmailSendLog.csv";
+        public const string StannpSendLog = "MSU-StannpSendLog.csv";
+        public const string SearchLog = "MSU-searchLog.csv";
+        public const string UserLog = "MSU-UserLog.csv";
 
         public static string DnBOrganisations(int year = 0)
         {
             if (year == 0) year = VirtualDateTime.Now.Year;
-            return $"GPG-DnBOrgs_{year:yyyy}-{year++:yy}.csv";
+            return $"MSU-DnBOrgs_{year:yyyy}-{year++:yy}.csv";
         }
 
         public static string PreviousDnBOrganisations(int year = 0)
         {
             if (year == 0) year = VirtualDateTime.Now.Year;
-            return $"GPG-DnBOrgs_{year--:yyyy}-{year:yy}.csv";
+            return $"MSU-DnBOrgs_{year--:yyyy}-{year:yy}.csv";
         }
 
         public static string GetRootFilename(string filePath)

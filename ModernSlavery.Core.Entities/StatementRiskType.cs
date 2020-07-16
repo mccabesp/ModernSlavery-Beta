@@ -28,8 +28,8 @@ namespace ModernSlavery.Core.Entities
 
     public enum RiskCategories : byte
     {
-        Unknown,
-        RiskArea,
-        Location
+        Unknown=0,
+        RiskArea=1,
+        Location=2
     }
 }
