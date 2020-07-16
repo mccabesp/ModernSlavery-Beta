@@ -121,7 +121,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 .Where(uo => uo.LatestRegistration != null)
                 .Include(uo => uo.LatestRegistration)
                 .Include(uo => uo.LatestAddress)
-                .Include(uo => uo.LatestReturn)
+                .Include(uo => uo.LatestStatement)
                 .Include(uo => uo.LatestScope)
                 .ToListAsync();
 

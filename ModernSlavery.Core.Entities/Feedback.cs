@@ -13,7 +13,7 @@ namespace ModernSlavery.Core.Entities
 
         #endregion
 
-        [MaxLength(2000)] public string Details { get; set; }
+        public string Details { get; set; }
 
         public string EmailAddress { get; set; }
         public string PhoneNumber { get; set; }
@@ -40,7 +40,7 @@ namespace ModernSlavery.Core.Entities
 
         public bool? OtherSource { get; set; }
 
-        [MaxLength(2000)] public string OtherSourceText { get; set; }
+        public string OtherSourceText { get; set; }
 
         #endregion
 
@@ -58,7 +58,7 @@ namespace ModernSlavery.Core.Entities
 
         public bool? OtherReason { get; set; }
 
-        [MaxLength(2000)] public string OtherReasonText { get; set; }
+        public string OtherReasonText { get; set; }
 
         #endregion
 
@@ -76,12 +76,12 @@ namespace ModernSlavery.Core.Entities
 
         public bool? OtherPerson { get; set; }
 
-        [MaxLength(2000)] public string OtherPersonText { get; set; }
+        public string OtherPersonText { get; set; }
 
         #endregion
     }
 
-    public enum DifficultyTypes
+    public enum DifficultyTypes:byte
     {
         VeryEasy = 0,
         Easy = 1,

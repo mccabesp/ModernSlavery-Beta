@@ -10,5 +10,6 @@ namespace ModernSlavery.Core.Interfaces
         DateTime PrivateReportingDeadline { get; }
         DateTime PublicReportingDeadline { get; }
         DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0);
+        DateTime GetReportingDeadline(SectorTypes sectorType, int year = 0);
     }
 }

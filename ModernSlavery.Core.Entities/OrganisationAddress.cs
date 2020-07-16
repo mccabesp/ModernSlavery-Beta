@@ -9,7 +9,6 @@ namespace ModernSlavery.Core.Entities
         public OrganisationAddress()
         {
             AddressStatuses = new HashSet<AddressStatus>();
-            Organisations = new HashSet<Organisation>();
             UserOrganisations = new HashSet<UserOrganisation>();
         }
 
@@ -35,7 +34,7 @@ namespace ModernSlavery.Core.Entities
 
         public virtual Organisation Organisation { get; set; }
         public virtual ICollection<AddressStatus> AddressStatuses { get; set; }
-        public virtual ICollection<Organisation> Organisations { get; set; }
         public virtual ICollection<UserOrganisation> UserOrganisations { get; set; }
+
     }
 }

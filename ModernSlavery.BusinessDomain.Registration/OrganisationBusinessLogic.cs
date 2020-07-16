@@ -414,7 +414,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 PartialNameForSuffixSearches = organisation.OrganisationName,
                 PartialNameForCompleteTokenSearches = organisation.OrganisationName,
                 Abbreviations = abbreviations.ToArray(),
-                Size = organisation.LatestReturn == null ? 0 : (int)organisation.LatestReturn.OrganisationSize,
+                Size = 0,
                 SicSectionIds = sicCodes.Select(sic => sic.SicCode.SicSectionId.ToString()).Distinct().ToArray(),
                 SicSectionNames = sicCodes.Select(sic => sic.SicCode.SicSection.Description).Distinct().ToArray(),
                 SicCodeIds = sicCodes.Select(sicCode => sicCode.SicCodeId.ToString()).Distinct().ToArray(),

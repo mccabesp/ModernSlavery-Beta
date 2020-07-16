@@ -210,7 +210,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             new SubmissionLogModel
                             {
                                 StatusDate = @return.Created,
-                                Status = ReturnStatuses.Submitted,
+                                Status = StatementStatuses.Submitted,
                                 Details = "",
                                 Sector = @return.Organisation.SectorType,
                                 ReturnId = @return.ReturnId,

@@ -101,7 +101,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             // query submitted returns for current year
             var dbReturnsQuery = _DataRepository.GetAll<Return>()
-                .Where(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year).ToList();
+                .Where(r => r.Status == StatementStatuses.Submitted && r.AccountingDate.Year == year).ToList();
 
             // finally, generate the left join sql statement between scopes and returns
             var dbResults = dbScopesQuery.AsQueryable().GroupJoin(

@@ -54,13 +54,13 @@ namespace ModernSlavery.WebUI.Admin.Models
         #endregion
     }
 
-    public enum ManuallyChangeOrganisationAddressIsUkAddress
+    public enum ManuallyChangeOrganisationAddressIsUkAddress : byte
     {
         Yes,
         No
     }
 
-    public enum AcceptCompaniesHouseAddress
+    public enum AcceptCompaniesHouseAddress : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "Yes, use this address from Companies House")]
         Accept,
@@ -69,7 +69,7 @@ namespace ModernSlavery.WebUI.Admin.Models
         Reject
     }
 
-    public enum ManuallyChangeOrganisationAddressViewModelActions
+    public enum ManuallyChangeOrganisationAddressViewModelActions : byte
     {
         Unknown = 0,
         OfferNewCompaniesHouseAddress = 1,

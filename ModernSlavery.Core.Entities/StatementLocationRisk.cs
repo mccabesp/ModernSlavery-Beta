@@ -7,8 +7,6 @@ namespace ModernSlavery.Core.Entities
 {
     public class StatementLocationRisk
     {
-        public short StatementLocationRiskId { get; set; }
-
         public short StatementRiskTypeId { get; set; }
 
         public virtual StatementRiskType StatementRiskType { get; set; }

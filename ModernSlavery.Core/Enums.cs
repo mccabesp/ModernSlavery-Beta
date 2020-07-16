@@ -23,20 +23,20 @@ namespace ModernSlavery.Core
         Retired = 4
     }
 
-    public enum SearchModes
+    public enum SearchModes : byte
     {
         [EnumMember(Value = "any")] Any,
         [EnumMember(Value = "all")] All
     }
 
-    public enum SearchTypes
+    public enum SearchTypes : byte
     {
         ByEmployerName = 1,
         BySectorType = 2,
         NotSet = 99
     }
 
-    public enum SearchReportingStatusFilter
+    public enum SearchReportingStatusFilter : byte
     {
         [Display(Name = "Reported in the last 7 days")]
         ReportedInTheLast7Days,
