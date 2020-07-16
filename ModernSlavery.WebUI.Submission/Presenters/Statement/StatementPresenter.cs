@@ -238,21 +238,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 // is this the correct form of error?
                 return new CustomResult<StatementViewModel>(new CustomError(System.Net.HttpStatusCode.Unauthorized, "Unauthorised access"));
 
-            // check session stashed vm
-            var sessionVm = GetSessionVM();
-
-            if (sessionVm != null)
-            {
-                // check the sessionVm matches input parameters
-                // if it does not, do NOT return it
-                if (sessionVm.OrganisationId == organisation.OrganisationId && sessionVm.Year != year)
-                    // everything is valid, return from session
-                    return new CustomResult<StatementViewModel>(sessionVm);
-
-                // session is invalid in some way and has to be cleared
-                DeleteSessionVM();
-            }
-
             // Check business logic layer
             // that should query file and DB
             var entity = await StatementBusinessLogic.GetStatementByOrganisationAndYear(organisation, year);
@@ -283,7 +268,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 // is this the correct form of error?
                 return actionresult;
 
-            var model = MapToModel(viewmodel);
+            var model = await StatementBusinessLogic.GetStatementByOrganisationAndYear(organisation, viewmodel.Year);
+            model = MapToModel(model, viewmodel);
             var saveResult = await StatementBusinessLogic.SaveDraftStatement(user, model);
 
             return actionresult;
@@ -294,9 +280,11 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             throw new NotImplementedException();
         }
 
-        public async Task ClearDraftForUser()
+        public Task ClearDraftForUser()
         {
-            DeleteSessionVM();
+            // Delete the draft
+            // restore the backup
+            return Task.CompletedTask;
         }
 
         #endregion
@@ -305,12 +293,16 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         StatementViewModel MapToVM(StatementModel model)
         {
-            return Mapper.Map<StatementViewModel>(model);
+            var result = Mapper.Map<StatementViewModel>(model);
+            result.OrganisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(model.OrganisationId);
+            return result;
         }
 
-        StatementModel MapToModel(StatementViewModel viewModel)
+        StatementModel MapToModel(StatementModel destination, StatementViewModel source)
         {
-            return Mapper.Map<StatementModel>(viewModel);
+            var result = Mapper.Map<StatementViewModel, StatementModel>(source, destination);
+            result.OrganisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(source.OrganisationIdentifier);
+            return result;
         }
 
         #endregion
@@ -374,22 +366,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         }
 
         #endregion
-
-        private StatementViewModel GetSessionVM()
-        {
-            // originally taken from BaseController.UnstashModel
-            var json = HttpContextAccessor.HttpContext.Session.GetString(SessionKey + ":Model");
-            var result = string.IsNullOrWhiteSpace(json)
-                ? null
-                : JsonConvert.DeserializeObject<StatementViewModel>(json);
-
-            return result;
-        }
-
-        private void DeleteSessionVM()
-        {
-            HttpContextAccessor.HttpContext.Session.Remove(SessionKey + ":Model");
-        }
     }
 
     public enum SubmissionStep : byte
@@ -414,6 +390,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public StatementMapperProfile()
         {
             CreateMap<StatementViewModel, StatementModel>()
+                .ForMember(dest => dest.OrganisationId, opt => opt.Ignore())
+
                 .ForMember(dest => dest.Training, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
                 .ForMember(dest => dest.Diligences, opt => opt.Ignore())
@@ -433,8 +411,9 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
             CreateMap<StatementModel, StatementViewModel>()
                 // These need obfuscating
-                .ForMember(dest => dest.StatementIdentifier, opt => opt.Ignore())
                 .ForMember(dest => dest.OrganisationIdentifier, opt => opt.Ignore())
+
+                .ForMember(dest => dest.StatementIdentifier, opt => opt.Ignore())
                 // These need to change on VM to come from DB
                 .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementTrainings, opt => opt.Ignore())
@@ -478,6 +457,36 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.ApprovedDay, opt => opt.Ignore())
                 .ForMember(dest => dest.ApprovedMonth, opt => opt.Ignore())
                 .ForMember(dest => dest.ApprovedYear, opt => opt.Ignore());
+        }
+    }
+
+    public class ObfuscatedFieldResolver : IValueResolver<StatementModel, StatementViewModel, string>
+    {
+        readonly IObfuscator Obfuscator;
+
+        public ObfuscatedFieldResolver(IObfuscator obfuscator)
+        {
+            Obfuscator = obfuscator;
+        }
+
+        public string Resolve(StatementModel source, StatementViewModel destination, string destMember, ResolutionContext context)
+        {
+            return Obfuscator.Obfuscate(source.OrganisationId);
+        }
+    }
+
+    public class DeobfuscatedFieldResolver : IValueResolver<StatementViewModel, StatementModel, long>
+    {
+        readonly IObfuscator Obfuscator;
+
+        public DeobfuscatedFieldResolver(IObfuscator obfuscator)
+        {
+            Obfuscator = obfuscator;
+        }
+
+        public long Resolve(StatementViewModel source, StatementModel destination, long destMember, ResolutionContext context)
+        {
+            return Obfuscator.DeObfuscate(source.OrganisationIdentifier);
         }
     }
 }

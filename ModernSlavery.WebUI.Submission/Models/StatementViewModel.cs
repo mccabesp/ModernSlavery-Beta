@@ -82,9 +82,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter an end year")]
         public int? StatementEndYear { get; set; }
         public DateTime SubmissionDeadline { get; set; }
-        // This should never go over the wire!
-        public long OrganisationId { get; set; }
 
+        // This is the obfuscated DB id for the org
         public string OrganisationIdentifier { get; set; }
 
         public int Year { get; set; }
