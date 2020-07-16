@@ -1,4 +1,4 @@
-StatementRiskTypeId,ParentRiskTypeId,RiskCategoryId,Description
+StatementRiskTypeId,ParentRiskTypeId,Category,Description
 1,,1,Goods and services
 2,1,1,Goods for resale
 3,1,1,Goods not for resale

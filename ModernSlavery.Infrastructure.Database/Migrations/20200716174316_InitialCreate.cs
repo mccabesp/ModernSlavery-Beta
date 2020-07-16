@@ -94,8 +94,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                 name: "StatementDiligenceTypes",
                 columns: table => new
                 {
-                    StatementDiligenceTypeId = table.Column<short>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StatementDiligenceTypeId = table.Column<short>(nullable: false),
                     ParentDiligenceTypeId = table.Column<short>(nullable: true),
                     Description = table.Column<string>(maxLength: 255, nullable: false),
                     Created = table.Column<DateTime>(nullable: false)
@@ -115,8 +114,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                 name: "StatementPolicyTypes",
                 columns: table => new
                 {
-                    StatementPolicyTypeId = table.Column<short>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StatementPolicyTypeId = table.Column<short>(nullable: false),
                     Description = table.Column<string>(maxLength: 255, nullable: false),
                     Created = table.Column<DateTime>(nullable: false)
                 },
@@ -129,8 +127,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                 name: "StatementRiskTypes",
                 columns: table => new
                 {
-                    StatementRiskTypeId = table.Column<short>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StatementRiskTypeId = table.Column<short>(nullable: false),
                     ParentRiskTypeId = table.Column<short>(nullable: true),
                     RiskCategoryId = table.Column<byte>(nullable: false),
                     Description = table.Column<string>(maxLength: 255, nullable: true),
@@ -151,8 +148,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                 name: "StatementSectorTypes",
                 columns: table => new
                 {
-                    StatementSectorTypeId = table.Column<short>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StatementSectorTypeId = table.Column<short>(nullable: false),
                     Description = table.Column<string>(maxLength: 255, nullable: false),
                     Created = table.Column<DateTime>(nullable: false)
                 },
@@ -165,8 +161,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                 name: "StatementTrainingTypes",
                 columns: table => new
                 {
-                    StatementTrainingTypeId = table.Column<short>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StatementTrainingTypeId = table.Column<short>(nullable: false),
                     Description = table.Column<string>(maxLength: 255, nullable: false),
                     Created = table.Column<DateTime>(nullable: false)
                 },
@@ -611,7 +606,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     GoalsDetails = table.Column<string>(nullable: true),
                     OtherSector = table.Column<string>(nullable: true),
                     MinTurnover = table.Column<int>(nullable: false),
-                    MaxTurnover = table.Column<int>(nullable: false),
+                    MaxTurnover = table.Column<int>(nullable: true),
                     OtherPolicies = table.Column<string>(nullable: true),
                     OtherRelevantRisks = table.Column<string>(nullable: true),
                     OtherHighRisks = table.Column<string>(nullable: true),

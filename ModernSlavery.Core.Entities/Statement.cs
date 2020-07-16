@@ -109,7 +109,7 @@ namespace ModernSlavery.Core.Entities
 
         public int MinTurnover { get; set; }
 
-        public int MaxTurnover { get; set; }
+        public int? MaxTurnover { get; set; }
 
         #endregion
 

@@ -49,7 +49,12 @@ namespace ModernSlavery.Infrastructure.Database
             Task.WaitAll(
                 fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.DataPath),
                 fileRepository.PushRemoteFileAsync(Filenames.SicCodes, _sharedOptions.DataPath),
-                fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.DataPath)
+                fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.DataPath),
+                fileRepository.PushRemoteFileAsync(Filenames.StatementDiligenceTypes, _sharedOptions.DataPath),
+                fileRepository.PushRemoteFileAsync(Filenames.StatementPolicyTypes, _sharedOptions.DataPath),
+                fileRepository.PushRemoteFileAsync(Filenames.StatementRiskTypes, _sharedOptions.DataPath),
+                fileRepository.PushRemoteFileAsync(Filenames.StatementSectorTypes, _sharedOptions.DataPath),
+                fileRepository.PushRemoteFileAsync(Filenames.StatementTrainingTypes, _sharedOptions.DataPath)
             );
         }
 
