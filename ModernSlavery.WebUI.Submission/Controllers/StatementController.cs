@@ -94,6 +94,35 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // Redirect location
             //var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.YourStatement);
             //return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+
+            //  submissionModel.ParseAndValidateParameters(Request, m => m.StatementUrl);
+
+            //if (submissionModel.HasAnyErrors())
+            //    return View("YourStatement", submissionModel);
+
+            //if(submissionModel.StatementUrl)
+
+
+            if (!ModelState.IsValid)
+            {
+                this.CleanModelErrors<StatementViewModel>();
+                //TODO: investigate below further to be able to add error summaries
+                //foreach (var modelState in ViewData.ModelState.Values)
+                //{
+                //    foreach (var error in modelState.Errors)
+                //    {
+
+                //        //can't iterate through viewmodel like this though
+                //        submissionModel.AddErrorFor<StatementViewModel, object>(
+                //           m => m.OtherErrorMessagePlaceholder,
+                //            error.ErrorMessage);
+                //    }
+                //}
+
+                return View("YourStatement", submissionModel);
+
+            }
+
             var result = await SubmissionPresenter.TrySaveYourStatement(CurrentUser, submissionModel);
 
             return await GetActionResultFromSave(submissionModel, result, SubmissionStep.YourStatement);

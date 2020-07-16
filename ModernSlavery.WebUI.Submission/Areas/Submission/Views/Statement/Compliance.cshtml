@@ -4,7 +4,8 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
-<a class="govuk-back-link" href="@Url.Action("your-statement")">Back</a>
+
+<a class="govuk-back-link" href="@Url.Action("YourStatement", "Statement", new { organisationIdentifier = Model.OrganisationIdentifier, year = Model.Year })">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
