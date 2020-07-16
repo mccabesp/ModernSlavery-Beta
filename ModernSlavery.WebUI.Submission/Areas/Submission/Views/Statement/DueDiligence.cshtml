@@ -39,13 +39,13 @@
             @*TODO: make into a partial view with checkbox counts*@
 
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var group in Model.DiligenceTypes.GroupBy(x => x.StatementDiligenceParent))
+                @foreach (var group in Model.DiligenceTypes.GroupBy(x => x.ParentDiligenceType))
                 {
                     <div class="govuk-accordion__section ">
                         <div class="govuk-accordion__section-header">
                             <h2 class="govuk-accordion__section-heading">
                                 <span class="govuk-accordion__section-button" id="accordion-default-heading">
-                                    @group.Key.StatementDiligenceParent.Description
+                                    @group.Key.ParentDiligenceType.Description
                                 </span>
                             </h2>
                         </div>

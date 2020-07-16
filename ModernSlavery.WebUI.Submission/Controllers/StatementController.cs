@@ -76,13 +76,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> YourStatement(string organisationIdentifier, int year)
         {
 
-            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
-            //var checkResult = await CheckUserRegisteredOkAsync();
-            //if (checkResult != null) return checkResult;
+            // return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
 
-            //var result = await SubmissionPresenter.TryGetYourStatement(CurrentUser, organisationIdentifier, year);
+            var result = await SubmissionPresenter.TryGetYourStatement(CurrentUser, organisationIdentifier, year);
 
-            //return await GetActionResultFromQuery(result);
+            return await GetActionResultFromQuery(result);
         }
 
         [HttpPost("{organisationIdentifier}/{year}/your-statement")]
@@ -92,11 +92,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
 
             // Redirect location
-            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.YourStatement);
-            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
-            //var result = await SubmissionPresenter.TrySaveYourStatement(CurrentUser, submissionModel);
+            //var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.YourStatement);
+            //return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            var result = await SubmissionPresenter.TrySaveYourStatement(CurrentUser, submissionModel);
 
-            //return await GetActionResultFromSave(submissionModel, result, SubmissionStep.YourStatement);
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.YourStatement);
         }
 
         [HttpPost("cancel-your-statement")]
@@ -115,7 +115,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/compliance")]
         public async Task<IActionResult> Compliance(string organisationIdentifier, int year)
         {
-            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+            //return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
 
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
@@ -131,15 +131,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> Compliance(StatementViewModel submissionModel)
         {
             // Redirect location
-            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.Compliance);
-            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            //var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.Compliance);
+            //return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
 
             if (!ModelState.IsValid)
                 return View(submissionModel);
 
-            var result = await SubmissionPresenter.TrySaveYourStatement(CurrentUser, submissionModel);
+            var result = await SubmissionPresenter.TrySaveCompliance(CurrentUser, submissionModel);
 
-            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.YourStatement);
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.Compliance);
         }
 
         [HttpPost("cancel-compliance")]
@@ -158,11 +158,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/your-organisation")]
         public async Task<IActionResult> YourOrganisation(string organisationIdentifier, int year)
         {
-            return View(new StatementViewModel
-            {
-                OrganisationIdentifier = organisationIdentifier,
-                Year = year,
-            });
+            //return View(new StatementViewModel
+            //{
+            //    OrganisationIdentifier = organisationIdentifier,
+            //    Year = year,
+            //});
 
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
@@ -178,8 +178,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> YourOrganisation(StatementViewModel submissionModel)
         {
             // Redirect location
-            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.YourOrganisation);
-            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            //var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.YourOrganisation);
+            //return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+
+            if (!ModelState.IsValid)
+                return View(submissionModel);
+
+            var result = await SubmissionPresenter.TrySaveYourOrgansation(CurrentUser, submissionModel);
+
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.YourOrganisation);
 
         }
 
@@ -199,7 +206,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/policies")]
         public async Task<IActionResult> Policies(string organisationIdentifier, int year)
         {
-            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+            //return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
 
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
@@ -215,8 +222,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> Policies(StatementViewModel submissionModel)
         {
             // Redirect location
-            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.Policies);
-            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            //var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.Policies);
+            //return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            if (!ModelState.IsValid)
+                return View(submissionModel);
+
+            var result = await SubmissionPresenter.TrySavePolicies(CurrentUser, submissionModel);
+
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.Policies);
 
         }
 
@@ -236,19 +249,19 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/supply-chain-risks")]
         public async Task<IActionResult> SupplyChainRisks(string organisationIdentifier, int year)
         {
-            return View(new StatementViewModel
-            {
-                OrganisationIdentifier = organisationIdentifier,
-                Year = year,
-                RelevantRiskTypes = new List<StatementRiskType>()
-                //StatementRiskTypes = SharedBusinessLogic.DataRepository.GetAll<StatementRiskType>().Where(x => x.ParentRiskTypeId != x.StatementRiskTypeId).ToList(),
+            //return View(new StatementViewModel
+            //{
+            //    OrganisationIdentifier = organisationIdentifier,
+            //    Year = year,
+            //    RelevantRiskTypes = new List<StatementRiskType>()
+            //    //StatementRiskTypes = SharedBusinessLogic.DataRepository.GetAll<StatementRiskType>().Where(x => x.ParentRiskTypeId != x.StatementRiskTypeId).ToList(),
 
-            });
+            //});
 
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            var result = await SubmissionPresenter.TryGetSupplyChainRiskAndDueDiligence(CurrentUser, organisationIdentifier, year);
+            var result = await SubmissionPresenter.TryGetSupplyChainRisk(CurrentUser, organisationIdentifier, year);
 
             return await GetActionResultFromQuery(result);
         }
@@ -259,8 +272,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> SupplyChainRisks(StatementViewModel submissionModel)
         {
             // Redirect location
-            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.SupplyChainRisks);
-            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            //var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.SupplyChainRisks);
+            //return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            if (!ModelState.IsValid)
+                return View(submissionModel);
+
+            var result = await SubmissionPresenter.TrySaveSupplyChainRisk(CurrentUser, submissionModel);
+
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.SupplyChainRisks);
 
         }
 
@@ -280,20 +299,20 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/due-diligence")]
         public async Task<IActionResult> DueDiligence(string organisationIdentifier, int year)
         {
-            return View(new StatementViewModel
-            {
-                OrganisationIdentifier = organisationIdentifier,
-                Year = year,
-                DiligenceTypes = new List<StatementDiligenceType>()
-                // DiligenceTypes = SharedBusinessLogic.DataRepository.GetAll<StatementDiligenceType>().Where(x => x.ParentDiligenceTypeId != x.StatementDiligenceTypeId).ToList(),
+            //return View(new StatementViewModel
+            //{
+            //    OrganisationIdentifier = organisationIdentifier,
+            //    Year = year,
+            //    DiligenceTypes = new List<StatementDiligenceType>()
+            //    // DiligenceTypes = SharedBusinessLogic.DataRepository.GetAll<StatementDiligenceType>().Where(x => x.ParentDiligenceTypeId != x.StatementDiligenceTypeId).ToList(),
 
 
-            });
+            //});
 
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            var result = await SubmissionPresenter.TryGetSupplyChainRiskAndDueDiligence(CurrentUser, organisationIdentifier, year);
+            var result = await SubmissionPresenter.TryGetDueDiligence(CurrentUser, organisationIdentifier, year);
 
             return await GetActionResultFromQuery(result);
         }
@@ -304,8 +323,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> DueDiligence(StatementViewModel submissionModel)
         {
             // Redirect location
-            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.DueDiligence);
-            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            //var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.DueDiligence);
+            //return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            if (!ModelState.IsValid)
+                return View(submissionModel);
+
+            var result = await SubmissionPresenter.TrySaveDueDiligence(CurrentUser, submissionModel);
+
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.DueDiligence);
 
         }
 
@@ -325,7 +350,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/training")]
         public async Task<IActionResult> Training(string organisationIdentifier, int year)
         {
-            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+            // return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
 
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
@@ -341,8 +366,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> Training(StatementViewModel submissionModel)
         {
             // Redirect location
-            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.Training);
-            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            //var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.Training);
+            //return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            if (!ModelState.IsValid)
+                return View(submissionModel);
+
+            var result = await SubmissionPresenter.TrySaveTraining(CurrentUser, submissionModel);
+
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.Training);
 
         }
 
@@ -363,7 +394,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/monitoring-progress")]
         public async Task<IActionResult> MonitoringProgress(string organisationIdentifier, int year)
         {
-            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+            //return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
 
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
@@ -379,8 +410,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> MonitoringProgress(StatementViewModel submissionModel)
         {
             // Redirect location
-            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.MonitoringProgress);
-            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            //var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.MonitoringProgress);
+            //return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            if (!ModelState.IsValid)
+                return View(submissionModel);
+
+            var result = await SubmissionPresenter.TrySaveMonitorInProgress(CurrentUser, submissionModel);
+
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.MonitoringProgress);
 
         }
 

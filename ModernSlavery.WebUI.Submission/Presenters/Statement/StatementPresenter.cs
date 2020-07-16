@@ -45,9 +45,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         Task<StatementActionResult> TrySavePolicies(User user, StatementViewModel model);
 
-        Task<CustomResult<StatementViewModel>> TryGetSupplyChainRiskAndDueDiligence(User user, string organisationIdentifier, int year);
+        Task<CustomResult<StatementViewModel>> TryGetSupplyChainRisk(User user, string organisationIdentifier, int year);
 
-        Task<StatementActionResult> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementViewModel model);
+        Task<StatementActionResult> TrySaveSupplyChainRisk(User user, StatementViewModel model);
+
+        Task<CustomResult<StatementViewModel>> TryGetDueDiligence(User user, string organisationIdentifier, int year);
+
+        Task<StatementActionResult> TrySaveDueDiligence(User user, StatementViewModel model);
 
         Task<CustomResult<StatementViewModel>> TryGetTraining(User user, string organisationIdentifier, int year);
 
@@ -177,14 +181,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-        #region Step 5 - Supply chain risks and due diligence
+        #region Step 5 - Supply chain risks 
 
-        public async Task<CustomResult<StatementViewModel>> TryGetSupplyChainRiskAndDueDiligence(User user, string organisationIdentifier, int year)
+        public async Task<CustomResult<StatementViewModel>> TryGetSupplyChainRisk(User user, string organisationIdentifier, int year)
         {
             return await TryGetViewModel(user, organisationIdentifier, year);
         }
 
-        public async Task<StatementActionResult> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementViewModel model)
+        public async Task<StatementActionResult> TrySaveSupplyChainRisk(User user, StatementViewModel model)
         {
             await ValidateForDraft(model);
 
@@ -192,8 +196,24 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         }
 
         #endregion
+        public async Task<CustomResult<StatementViewModel>> TryGetDueDiligence(User user, string organisationIdentifier, int year)
+        {
+            return await TryGetViewModel(user, organisationIdentifier, year);
+        }
 
-        #region Step 6 - Training
+        public async Task<StatementActionResult> TrySaveDueDiligence(User user, StatementViewModel model)
+        {
+            await ValidateForDraft(model);
+
+            return await SaveDraftForUser(user, model);
+        }
+
+        #region Step 6 - Due Diligence
+
+
+        #endregion
+
+        #region Step 7 - Training
 
         public async Task<CustomResult<StatementViewModel>> TryGetTraining(User user, string organisationIdentifier, int year)
         {
@@ -209,7 +229,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-        #region Step 7 - Monitoring progress
+        #region Step 8 - Monitoring progress
 
         public async Task<CustomResult<StatementViewModel>> TryGetMonitoringInProgress(User user, string organisationIdentifier, int year)
         {
@@ -225,7 +245,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-        #region Step 8 - Review TODO
+        #region Step 9 - Review TODO
         #endregion
 
         private async Task<CustomResult<StatementViewModel>> TryGetViewModel(User user, string organisationIdentifier, int year)
@@ -464,7 +484,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
 
                 // Work out storage of these
-                // .ForMember(dest => dest.IncludedOrganistionCount, opt => opt.Ignore())
+                .ForMember(dest => dest.IncludedOrganistionCount, opt => opt.Ignore())
                 .ForMember(dest => dest.ExcludedOrganisationCount, opt => opt.Ignore())
                 .ForMember(dest => dest.ForcedLabour, opt => opt.Ignore())
                 .ForMember(dest => dest.ForcedLabourDetails, opt => opt.Ignore())
