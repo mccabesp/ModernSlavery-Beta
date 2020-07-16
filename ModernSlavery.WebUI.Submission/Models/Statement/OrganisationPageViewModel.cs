@@ -12,7 +12,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         public IList<SectorViewModel> AllSectors { get; set; }
         public IList<SectorViewModel> Sectors { get; set; }
 
-        public Presenters.LastFinancialYearBudget Turnover { get; set; }
+        public Presenters.LastFinancialYearBudget? Turnover { get; set; }
 
         public class SectorViewModel
         {

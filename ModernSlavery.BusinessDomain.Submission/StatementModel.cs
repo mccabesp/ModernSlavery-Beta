@@ -71,13 +71,13 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 3 - Your organisation
 
-        public List<KeyValuePair<int, string>> StatementSectors { get; set; }
+        public List<KeyValuePair<short, string>> StatementSectors { get; set; }
 
         public string OtherSector { get; set; }
 
-        public decimal? MinTurnover { get; set; }
+        public int? MinTurnover { get; set; }
 
-        public decimal? MaxTurnover { get; set; }
+        public int? MaxTurnover { get; set; }
 
         #endregion
 
