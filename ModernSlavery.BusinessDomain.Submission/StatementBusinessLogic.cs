@@ -85,7 +85,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
             var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(statement, Formatting.Indented, settings));
-            var fileName = GetFileName(statement.OrganisationId, statement.SubmissionDeadline.Year);
+            var fileName = GetFileName(statement.OrganisationId, statement.Year);
             await SharedBusinessLogic.FileRepository.WriteAsync(fileName, data);
         }
 
