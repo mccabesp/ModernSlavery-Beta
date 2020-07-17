@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -52,15 +53,18 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         Task SaveYourOrgansationAsync(User user, OrganisationPageViewModel viewModel);
 
         Task<CustomResult<StatementViewModel>> TryGetPolicies(User user, string organisationIdentifier, int year);
-        //Task<PoliciesPageViewModel> GetPoliciesAsync(User user, string organisationIdentifier, int year);
+        Task<PoliciesPageViewModel> GetPoliciesAsync(User user, string organisationIdentifier, int year);
 
         Task<StatementActionResult> TrySavePolicies(User user, StatementViewModel model);
+        Task SavePoliciesAsync(User user, PoliciesPageViewModel viewModel);
 
         Task<CustomResult<StatementViewModel>> TryGetSupplyChainRiskAndDueDiligence(User user, string organisationIdentifier, int year);
-        //Task<RisksPageViewModel> GetRisksAsync(User user, string organisationIdentifier, int year);
-        //Task<DueDiligencePageViewModel> GetDueDiligenceAsync(User user, string organisationIdentifier, int year);
+        Task<RisksPageViewModel> GetRisksAsync(User user, string organisationIdentifier, int year);
+        Task<DueDiligencePageViewModel> GetDueDiligenceAsync(User user, string organisationIdentifier, int year);
 
         Task<StatementActionResult> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementViewModel model);
+        Task SaveRisksAsync(User user, RisksPageViewModel viewModel);
+        Task SaveDueDiligenceAsync(User user, DueDiligencePageViewModel viewModel);
 
         Task<CustomResult<StatementViewModel>> TryGetTraining(User user, string organisationIdentifier, int year);
         //Task<TrainingPageViewModel> GetTrainingAsync(User user, string organisationIdentifier, int year);
@@ -360,6 +364,42 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await SaveDraftForUser(user, model);
         }
 
+        public async Task<PoliciesPageViewModel> GetPoliciesAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+            var policies = SharedBusinessLogic.DataRepository
+                .GetAll<StatementPolicyType>()
+                .Select(t => new PoliciesPageViewModel.PolicyViewModel
+                {
+                    Id = t.StatementPolicyTypeId,
+                    Description = t.Description
+                });
+
+            var vm = new PoliciesPageViewModel
+            {
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                AllPolicies = policies.ToList(),
+                Policies = model.StatementPolicies.Select(t => new PoliciesPageViewModel.PolicyViewModel { Id = t.Key, Description = t.Value }).ToList(),
+                OtherPolicies = model.OtherPolicies
+            };
+
+            return vm;
+        }
+
+        public async Task SavePoliciesAsync(User user, PoliciesPageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+
+            model.StatementPolicies = viewModel.Policies.Select(s => new KeyValuePair<short, string>(s.Id, s.Description)).ToList();
+            model.OtherPolicies = model.OtherPolicies;
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
+        }
+
         #endregion
 
         #region Step 5 - Supply chain risks and due diligence
@@ -377,6 +417,137 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         }
 
         #endregion
+
+        #region Step 5 - Supply chain risks and due diligence part 1
+
+        public async Task<RisksPageViewModel> GetRisksAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+
+            var risks = SharedBusinessLogic.DataRepository
+                .GetAll<StatementRiskType>()
+                .Where(t => t.Category == RiskCategories.RiskArea)
+                .Select(t => new RisksPageViewModel.RiskViewModel
+                {
+                    Id = t.StatementRiskTypeId,
+                    ParentId = t.ParentRiskTypeId,
+                    Description = t.Description,
+                });
+
+            var locations = SharedBusinessLogic.DataRepository
+                .GetAll<StatementRiskType>()
+                .Where(t => t.Category == RiskCategories.Location)
+                .Select(t => new RisksPageViewModel.RiskViewModel
+                {
+                    Id = t.StatementRiskTypeId,
+                    ParentId = t.ParentRiskTypeId,
+                    Description = t.Description,
+                });
+
+
+            var vm = new RisksPageViewModel
+            {
+                // TODO - Parent id for selected relevent/high/location risks
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                AllRelevantRisks = risks.ToList(),
+                RelevantRisks = model.RelevantRisks.Select(r => new RisksPageViewModel.RiskViewModel { Id = r.Key, Description = r.Value }).ToList(),
+                OtherRelevantRisks = model.OtherRelevantRisks,
+                AllHighRisks = risks.ToList(),
+                HighRisks = model.HighRisks.Select(r => new RisksPageViewModel.RiskViewModel { Id = r.Key, Description = r.Value }).ToList(),
+                OtherHighRisks = model.OtherHighRisks,
+                AllLocationRisks = locations.ToList(),
+                LocationRisks = model.LocationRisks.Select(r => new RisksPageViewModel.RiskViewModel { Id = r.Key, Description = r.Value }).ToList(),
+            };
+
+            return vm;
+        }
+
+        public async Task SaveRisksAsync(User user, RisksPageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+
+            model.RelevantRisks = viewModel.RelevantRisks.Select(r => new KeyValuePair<short, string>(r.Id, r.Description)).ToList();
+            model.OtherRelevantRisks = viewModel.OtherRelevantRisks;
+            model.HighRisks = viewModel.HighRisks.Select(r => new KeyValuePair<short, string>(r.Id, r.Description)).ToList();
+            model.OtherHighRisks = viewModel.OtherHighRisks;
+            model.LocationRisks = viewModel.LocationRisks.Select(r => new KeyValuePair<short, string>(r.Id, r.Description)).ToList();
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
+        }
+
+        #endregion
+
+        #region Step 5 - Supply chain risks and due diligence part 2
+
+        public async Task<DueDiligencePageViewModel> GetDueDiligenceAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+            var diligences = SharedBusinessLogic.DataRepository
+                .GetAll<StatementDiligenceType>()
+                .Select(t => new DueDiligencePageViewModel.DueDiligenceViewModel
+                {
+                    Id = t.StatementDiligenceTypeId,
+                    ParentId = t.ParentDiligenceTypeId,
+                    Description = t.Description
+                });
+
+            var vm = new DueDiligencePageViewModel
+            {
+                // TODO - Parent on selected DueDiligences
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                AllDueDiligences = diligences.ToList(),
+                DueDiligences = model.Diligences.Select(d => new DueDiligencePageViewModel.DueDiligenceViewModel { Id = d.Key, Description = d.Value }).ToList(),
+                HasForceLabour = string.IsNullOrEmpty(model.ForcedLabourDetails),
+                ForcedLabourDetails = model.ForcedLabourDetails,
+                HasSlaveryInstance = string.IsNullOrEmpty(model.SlaveryInstanceDetails),
+                SlaveryInstanceDetails = model.SlaveryInstanceDetails,
+                SlaveryInstanceRemediation = ParseRemediation(model.SlaveryInstanceRemediation).ToList(),
+            };
+
+            return vm;
+        }
+
+        private IEnumerable<StatementRemediation> ParseRemediation(string slaveryInstanceRemediation)
+        {
+            var items = slaveryInstanceRemediation.Split(Environment.NewLine);
+
+            return items.Select(r => (StatementRemediation)Enum.Parse(typeof(StatementRemediation), r));
+        }
+
+        public async Task SaveDueDiligenceAsync(User user, DueDiligencePageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+
+            model.Diligences = viewModel.DueDiligences.Select(d => new KeyValuePair<short, string>(d.Id, d.Description)).ToList();
+            if (viewModel.HasForceLabour)
+                model.ForcedLabourDetails = viewModel.ForcedLabourDetails;
+            else
+                model.ForcedLabourDetails = null;
+            if (viewModel.HasSlaveryInstance)
+            {
+                model.SlaveryInstanceDetails = viewModel.SlaveryInstanceDetails;
+                model.SlaveryInstanceRemediation = string.Join(Environment.NewLine, viewModel.SlaveryInstanceRemediation.Select(r => Enum.GetName(typeof(StatementRemediation), r)));
+            }
+            else
+            {
+                model.SlaveryInstanceDetails = null;
+                model.SlaveryInstanceRemediation = null;
+            }
+
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
+        }
+
+        #endregion
+
 
         #region Step 6 - Training
 

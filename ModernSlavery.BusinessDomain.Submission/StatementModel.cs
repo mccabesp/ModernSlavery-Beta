@@ -83,7 +83,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 4 - Policies
 
-        public List<KeyValuePair<int, string>> StatementPolicies { get; set; }
+        public List<KeyValuePair<short, string>> StatementPolicies { get; set; }
 
         public string OtherPolicies { get; set; }
 
@@ -91,21 +91,21 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 5 - Supply chain risks and due diligence part 1
 
-        public List<KeyValuePair<int, string>> RelevantRisks { get; set; }
+        public List<KeyValuePair<short, string>> RelevantRisks { get; set; }
 
         public string OtherRelevantRisks { get; set; }
 
-        public List<KeyValuePair<int, string>> HighRisks { get; set; }
+        public List<KeyValuePair<short, string>> HighRisks { get; set; }
 
         public string OtherHighRisks { get; set; }
 
-        public List<KeyValuePair<int, string>> LocationRisks { get; set; }
+        public List<KeyValuePair<short, string>> LocationRisks { get; set; }
 
         #endregion
 
         #region Step 5 - Supply chain risks and due diligence part 2
 
-        public List<KeyValuePair<int, string>> Diligences { get; set; }
+        public List<KeyValuePair<short, string>> Diligences { get; set; }
 
         public string ForcedLabourDetails { get; set; }
 

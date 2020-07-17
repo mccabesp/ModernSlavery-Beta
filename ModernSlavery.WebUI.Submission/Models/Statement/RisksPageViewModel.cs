@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         {
             public short Id { get; set; }
             public short? ParentId { get; set; }
-            public string Details { get; set; }
+            public string Description { get; set; }
         }
     }
 }
