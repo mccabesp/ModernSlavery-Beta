@@ -21,7 +21,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public class DueDiligenceViewModel
         {
-            // TODO - Handle "Other" case
+            // TODO - James Handle "Other" case
             // It seems to only appear once under "Social audits"
             public short Id { get; set; }
             public short? ParentId { get; set; }

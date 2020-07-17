@@ -111,15 +111,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
     public class StatementPresenter : IStatementPresenter
     {
-        // class will NOT provide enough uniqueness, think multiple open tabs
-        // the key will have to be constructed out of parameters in the url - org and year
-        const string SessionKey = "StatementPresenter";
-
         readonly IStatementBusinessLogic StatementBusinessLogic;
-
-        // required for accessing session
-        readonly IHttpContextAccessor HttpContextAccessor;
-
         readonly ISharedBusinessLogic SharedBusinessLogic;
 
         readonly IMapper Mapper;
@@ -127,13 +119,11 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public StatementPresenter(
             IMapper mapper,
             ISharedBusinessLogic sharedBusinessLogic,
-            IStatementBusinessLogic statementBusinessLogic,
-            IHttpContextAccessor httpContextAccessor)
+            IStatementBusinessLogic statementBusinessLogic)
         {
             Mapper = mapper;
             SharedBusinessLogic = sharedBusinessLogic;
             StatementBusinessLogic = statementBusinessLogic;
-            HttpContextAccessor = httpContextAccessor;
         }
 
         #region Step 1 - Your statement
@@ -150,11 +140,12 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await SaveDraftForUser(user, model);
         }
 
+        // TODO - James to keep it simple, throw exceptions on get/save methods
+        // These should really be handled with custom result type class rather than exceptions
+        // controllers interpret the result to present the correct view
+
         public async Task<YourStatementPageViewModel> GetYourStatementAsync(User user, string organisationIdentifier, int year)
         {
-            // to keep it simple, throw exceptions
-            // these should really be handled with custom result type class rather than exceptions
-
             var model = await GetStatementModelAsync(user, organisationIdentifier, year);
 
             var vm = new YourStatementPageViewModel
@@ -557,7 +548,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-
         #region Step 6 - Training
 
         public async Task<CustomResult<StatementViewModel>> TryGetTraining(User user, string organisationIdentifier, int year)
@@ -699,7 +689,10 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-        #region Step 8 - Review TODO
+        #region Step 8 - Review
+
+        // TODO - James Add calls for handling review page
+
         #endregion
 
         private async Task<StatementModel> GetStatementModelAsync(User user, string organisationIdentifier, int year)
@@ -795,8 +788,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Validation
 
-        // Validation should happen at lower levels,
-        // eg SubmissionService/SubmissionBusinessLogic
+        // TODO - James Validation of View models (can it be done with just attributes?
 
         public Task ValidateForDraft(StatementViewModel model)
         {
@@ -811,6 +803,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         #endregion
 
         #region Redirection
+
+        // TODO - James Handle more redirection cases, eg back to review page if that is where they came from
 
         /// <summary>
         /// 
@@ -842,6 +836,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                     throw new NotImplementedException();
             }
         }
+
+        // TODO - James Cancel page with save/exit without saving buttons
 
         /// <summary>
         /// Get the redirect location when cancelling.

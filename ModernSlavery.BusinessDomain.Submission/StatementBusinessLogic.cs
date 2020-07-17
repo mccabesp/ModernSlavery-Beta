@@ -53,7 +53,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             }
 
             var statement = await FindStatementAsync(organisation, year);
-
+            // TODO - James Handle null statement
             var dataResult = Mapper.Map<StatementModel>(statement);
             return dataResult;
         }
@@ -102,7 +102,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                 return StatementActionResult.Uneditable;
             }
 
-            // not been saved to DB
             await SaveToFile(statementModel);
             return StatementActionResult.Success;
         }
