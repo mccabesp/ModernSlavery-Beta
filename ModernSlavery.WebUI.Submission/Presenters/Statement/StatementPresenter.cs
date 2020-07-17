@@ -316,11 +316,11 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public async Task SaveYourOrgansationAsync(User user, OrganisationPageViewModel viewModel)
         {
             var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
-            var turnover = GetTurnoverRange(viewModel.Turnover);
+            var (min, max) = GetTurnoverRange(viewModel.Turnover);
 
             model.StatementSectors = viewModel.Sectors.Where(s => s.IsSelected).Select(s => s.Id).ToList();
-            model.MinTurnover = turnover.Item1;
-            model.MaxTurnover = turnover.Item2;
+            model.MinTurnover = min;
+            model.MaxTurnover = max;
 
             var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
 
@@ -328,25 +328,25 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 throw new ValidationException("Saving failed");
         }
 
-        private Tuple<int?, int?> GetTurnoverRange(LastFinancialYearBudget? turnover)
+        private (int? min, int? max) GetTurnoverRange(LastFinancialYearBudget? turnover)
         {
             if (!turnover.HasValue)
-                return new Tuple<int?, int?>(null, null);
+                return (null, null);
 
             switch (turnover.Value)
             {
                 case LastFinancialYearBudget.Under36Million:
-                    return new Tuple<int?, int?>(0, 36_000_000);
+                    return (0, 36_000_000);
                 case LastFinancialYearBudget.From36MillionTo60Million:
-                    return new Tuple<int?, int?>(36_000_000, 60_000_000);
+                    return (36_000_000, 60_000_000);
                 case LastFinancialYearBudget.From60MillionTo100Million:
-                    return new Tuple<int?, int?>(60_000_000, 100_000_000);
+                    return (60_000_000, 100_000_000);
                 case LastFinancialYearBudget.From100MillionTo500Million:
-                    return new Tuple<int?, int?>(100_000_000, 500_000_000);
+                    return (100_000_000, 500_000_000);
                 case LastFinancialYearBudget.From500MillionUpwards:
-                    return new Tuple<int?, int?>(500_000_000, null);
+                    return (500_000_000, null);
                 default:
-                    return new Tuple<int?, int?>(null, null);
+                    return (null, null);
             }
         }
 
@@ -623,6 +623,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
             return await SaveDraftForUser(user, model);
         }
+
         public async Task<ProgressPageViewModel> GetProgressAsync(User user, string organisationIdentifier, int year)
         {
             var model = await GetStatementModelAsync(user, organisationIdentifier, year);
@@ -664,13 +665,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public async Task SaveProgressAsync(User user, ProgressPageViewModel viewModel)
         {
             var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
-            var yearsRange = GetYearsRange(viewModel.NumberOfYearsOfStatements);
+            var (min, max) = GetYearsRange(viewModel.NumberOfYearsOfStatements);
 
             model.IncludesMeasuringProgress = viewModel.IncludesMeasuringProgress;
             model.ProgressMeasures = viewModel.ProgressMeasures;
             model.KeyAchievements = viewModel.KeyAchievements;
-            model.MinStatementYears = yearsRange.Item1;
-            model.MaxStatementYears = yearsRange.Item2;
+            model.MinStatementYears = min;
+            model.MaxStatementYears = max;
 
             var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
 
@@ -678,21 +679,21 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 throw new ValidationException("Saving failed");
         }
 
-        private Tuple<decimal?, decimal?> GetYearsRange(NumberOfYearsOfStatements? years)
+        private (decimal? min, decimal? max) GetYearsRange(NumberOfYearsOfStatements? years)
         {
             if (!years.HasValue)
-                return new Tuple<decimal?, decimal?>(null, null);
+                return (null, null);
 
             switch (years.Value)
             {
                 case NumberOfYearsOfStatements.thisIsTheFirstTime:
-                    return new Tuple<decimal?, decimal?>(0, 1);
+                    return (0, 1);
                 case NumberOfYearsOfStatements.from1To5Years:
-                    return new Tuple<decimal?, decimal?>(1, 5);
+                    return (1, 5);
                 case NumberOfYearsOfStatements.moreThan5Years:
-                    return new Tuple<decimal?, decimal?>(5, null);
+                    return (5, null);
                 default:
-                    return new Tuple<decimal?, decimal?>(null, null);
+                    return (null, null);
             }
         }
 
