@@ -9,7 +9,6 @@ namespace ModernSlavery.WebUI.Submission.Models
         public int Year { get; set; }
         public string OrganisationIdentifier { get; set; }
 
-        public IList<SectorViewModel> AllSectors { get; set; }
         public IList<SectorViewModel> Sectors { get; set; }
 
         public Presenters.LastFinancialYearBudget? Turnover { get; set; }
@@ -18,6 +17,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         {
             public short Id { get; set; }
             public string Description { get; set; }
+            public bool IsSelected { get; set; }
         }
     }
 }

@@ -9,7 +9,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public int Year { get; set; }
         public string OrganisationIdentifier { get; set; }
 
-        public List<DueDiligenceViewModel> AllDueDiligences { get; set; }
         public List<DueDiligenceViewModel> DueDiligences { get; set; }
 
         public bool HasForceLabour { get; set; }
@@ -22,9 +21,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public class DueDiligenceViewModel
         {
+            // TODO - Handle "Other" case
+            // It seems to only appear once under "Social audits"
             public short Id { get; set; }
             public short? ParentId { get; set; }
             public string Description { get; set; }
+            public bool IsSelected { get; set; }
         }
     }
 }

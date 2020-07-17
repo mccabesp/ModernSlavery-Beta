@@ -9,7 +9,6 @@ namespace ModernSlavery.WebUI.Submission.Models
         public int Year { get; set; }
         public string OrganisationIdentifier { get; set; }
 
-        public IList<TrainingViewModel> AllTraining { get; set; }
         public IList<TrainingViewModel> Training { get; set; }
 
         public string OtherTraining { get; set; }
@@ -17,8 +16,8 @@ namespace ModernSlavery.WebUI.Submission.Models
         public class TrainingViewModel
         {
             public short Id { get; set; }
-
             public string Description { get; set; }
+            public bool IsSelected { get; set; }
         }
     }
 }

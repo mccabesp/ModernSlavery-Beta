@@ -275,15 +275,15 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .Select(t => new OrganisationPageViewModel.SectorViewModel
                 {
                     Id = t.StatementSectorTypeId,
-                    Description = t.Description
+                    Description = t.Description,
+                    IsSelected = model.StatementSectors.Contains(t.StatementSectorTypeId)
                 });
 
             var vm = new OrganisationPageViewModel
             {
                 Year = year,
                 OrganisationIdentifier = organisationIdentifier,
-                AllSectors = sectors.ToList(),
-                Sectors = model.StatementSectors.Select(s => new OrganisationPageViewModel.SectorViewModel { Id = s.Key, Description = s.Value }).ToList(),
+                Sectors = sectors.ToList(),
                 Turnover = ParseTurnover(model.MinTurnover, model.MaxTurnover),
             };
 
@@ -316,7 +316,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
             var turnover = GetTurnoverRange(viewModel.Turnover);
 
-            model.StatementSectors = viewModel.Sectors.Select(s => new KeyValuePair<short, string>(s.Id, s.Description)).ToList();
+            model.StatementSectors = viewModel.Sectors.Where(s => s.IsSelected).Select(s => s.Id).ToList();
             model.MinTurnover = turnover.Item1;
             model.MaxTurnover = turnover.Item2;
 
@@ -372,15 +372,15 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .Select(t => new PoliciesPageViewModel.PolicyViewModel
                 {
                     Id = t.StatementPolicyTypeId,
-                    Description = t.Description
+                    Description = t.Description,
+                    IsSelected = model.StatementPolicies.Contains(t.StatementPolicyTypeId)
                 });
 
             var vm = new PoliciesPageViewModel
             {
                 Year = year,
                 OrganisationIdentifier = organisationIdentifier,
-                AllPolicies = policies.ToList(),
-                Policies = model.StatementPolicies.Select(t => new PoliciesPageViewModel.PolicyViewModel { Id = t.Key, Description = t.Value }).ToList(),
+                Policies = policies.ToList(),
                 OtherPolicies = model.OtherPolicies
             };
 
@@ -391,7 +391,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         {
             var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
 
-            model.StatementPolicies = viewModel.Policies.Select(s => new KeyValuePair<short, string>(s.Id, s.Description)).ToList();
+            model.StatementPolicies = viewModel.Policies.Where(p => p.IsSelected).Select(s => s.Id).ToList();
             model.OtherPolicies = model.OtherPolicies;
 
             var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
@@ -424,7 +424,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         {
             var model = await GetStatementModelAsync(user, organisationIdentifier, year);
 
-            var risks = SharedBusinessLogic.DataRepository
+            var releventRisks = SharedBusinessLogic.DataRepository
                 .GetAll<StatementRiskType>()
                 .Where(t => t.Category == RiskCategories.RiskArea)
                 .Select(t => new RisksPageViewModel.RiskViewModel
@@ -432,9 +432,21 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                     Id = t.StatementRiskTypeId,
                     ParentId = t.ParentRiskTypeId,
                     Description = t.Description,
+                    IsSelected = model.RelevantRisks.Contains(t.StatementRiskTypeId)
                 });
 
-            var locations = SharedBusinessLogic.DataRepository
+            var highRisks = SharedBusinessLogic.DataRepository
+                .GetAll<StatementRiskType>()
+                .Where(t => t.Category == RiskCategories.RiskArea)
+                .Select(t => new RisksPageViewModel.RiskViewModel
+                {
+                    Id = t.StatementRiskTypeId,
+                    ParentId = t.ParentRiskTypeId,
+                    Description = t.Description,
+                    IsSelected = model.HighRisks.Contains(t.StatementRiskTypeId)
+                });
+
+            var locationRisks = SharedBusinessLogic.DataRepository
                 .GetAll<StatementRiskType>()
                 .Where(t => t.Category == RiskCategories.Location)
                 .Select(t => new RisksPageViewModel.RiskViewModel
@@ -442,22 +454,19 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                     Id = t.StatementRiskTypeId,
                     ParentId = t.ParentRiskTypeId,
                     Description = t.Description,
+                    IsSelected = model.LocationRisks.Contains(t.StatementRiskTypeId)
                 });
 
 
             var vm = new RisksPageViewModel
             {
-                // TODO - Parent id for selected relevent/high/location risks
                 Year = year,
                 OrganisationIdentifier = organisationIdentifier,
-                AllRelevantRisks = risks.ToList(),
-                RelevantRisks = model.RelevantRisks.Select(r => new RisksPageViewModel.RiskViewModel { Id = r.Key, Description = r.Value }).ToList(),
+                RelevantRisks = releventRisks.ToList(),
                 OtherRelevantRisks = model.OtherRelevantRisks,
-                AllHighRisks = risks.ToList(),
-                HighRisks = model.HighRisks.Select(r => new RisksPageViewModel.RiskViewModel { Id = r.Key, Description = r.Value }).ToList(),
+                HighRisks = highRisks.ToList(),
                 OtherHighRisks = model.OtherHighRisks,
-                AllLocationRisks = locations.ToList(),
-                LocationRisks = model.LocationRisks.Select(r => new RisksPageViewModel.RiskViewModel { Id = r.Key, Description = r.Value }).ToList(),
+                LocationRisks = locationRisks.ToList(),
             };
 
             return vm;
@@ -467,11 +476,11 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         {
             var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
 
-            model.RelevantRisks = viewModel.RelevantRisks.Select(r => new KeyValuePair<short, string>(r.Id, r.Description)).ToList();
+            model.RelevantRisks = viewModel.RelevantRisks.Where(r => r.IsSelected).Select(r => r.Id).ToList();
             model.OtherRelevantRisks = viewModel.OtherRelevantRisks;
-            model.HighRisks = viewModel.HighRisks.Select(r => new KeyValuePair<short, string>(r.Id, r.Description)).ToList();
+            model.HighRisks = viewModel.HighRisks.Where(r => r.IsSelected).Select(r => r.Id).ToList();
             model.OtherHighRisks = viewModel.OtherHighRisks;
-            model.LocationRisks = viewModel.LocationRisks.Select(r => new KeyValuePair<short, string>(r.Id, r.Description)).ToList();
+            model.LocationRisks = viewModel.LocationRisks.Where(r => r.IsSelected).Select(r => r.Id).ToList();
 
             var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
 
@@ -492,16 +501,15 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 {
                     Id = t.StatementDiligenceTypeId,
                     ParentId = t.ParentDiligenceTypeId,
-                    Description = t.Description
+                    Description = t.Description,
+                    IsSelected = model.Diligences.Contains(t.StatementDiligenceTypeId)
                 });
 
             var vm = new DueDiligencePageViewModel
             {
-                // TODO - Parent on selected DueDiligences
                 Year = year,
                 OrganisationIdentifier = organisationIdentifier,
-                AllDueDiligences = diligences.ToList(),
-                DueDiligences = model.Diligences.Select(d => new DueDiligencePageViewModel.DueDiligenceViewModel { Id = d.Key, Description = d.Value }).ToList(),
+                DueDiligences = diligences.ToList(),
                 HasForceLabour = string.IsNullOrEmpty(model.ForcedLabourDetails),
                 ForcedLabourDetails = model.ForcedLabourDetails,
                 HasSlaveryInstance = string.IsNullOrEmpty(model.SlaveryInstanceDetails),
@@ -523,7 +531,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         {
             var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
 
-            model.Diligences = viewModel.DueDiligences.Select(d => new KeyValuePair<short, string>(d.Id, d.Description)).ToList();
+            model.Diligences = viewModel.DueDiligences.Where(r => r.IsSelected).Select(r => r.Id).ToList();
             if (viewModel.HasForceLabour)
                 model.ForcedLabourDetails = viewModel.ForcedLabourDetails;
             else
@@ -538,7 +546,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 model.SlaveryInstanceDetails = null;
                 model.SlaveryInstanceRemediation = null;
             }
-
 
             var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
 

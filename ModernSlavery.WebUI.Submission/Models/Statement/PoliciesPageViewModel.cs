@@ -9,7 +9,6 @@ namespace ModernSlavery.WebUI.Submission.Models
         public int Year { get; set; }
         public string OrganisationIdentifier { get; set; }
 
-        public IList<PolicyViewModel> AllPolicies { get; set; }
         public IList<PolicyViewModel> Policies { get; set; }
 
         public string OtherPolicies { get; set; }
@@ -18,6 +17,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         {
             public short Id { get; set; }
             public string Description { get; set; }
+            public bool IsSelected { get; set; }
         }
     }
 }
