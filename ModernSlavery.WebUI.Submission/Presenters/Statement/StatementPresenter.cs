@@ -704,7 +704,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         private async Task<StatementModel> GetStatementModelAsync(User user, string organisationIdentifier, int year)
         {
             var id = SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
-            var organisation = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(x => x.OrganisationId == id);
+            var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
             var actionresult = await StatementBusinessLogic.CanAccessStatement(user, organisation, year);
             if (actionresult != StatementActionResult.Success)
                 throw new ValidationException("You can not access this statement");
