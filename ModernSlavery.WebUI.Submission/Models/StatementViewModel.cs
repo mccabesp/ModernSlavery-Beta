@@ -17,7 +17,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         // Presentation layer Id
         public string StatementIdentifier { get; set; }
 
-        public ReturnStatuses Status { get; set; }
+        public StatementStatuses Status { get; set; }
 
         // Date the status last changed
         public DateTime StatusDate { get; set; }
@@ -277,7 +277,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
     }
 
 
-    public enum NumberOfYearsOfStatements
+    public enum NumberOfYearsOfStatements : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "This is the first time")]
         thisIsTheFirstTime = 0,
@@ -288,7 +288,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
     }
 
-    public enum StatementRemediation
+    public enum StatementRemediation : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "repayment of recruitment fees")]
         repaymentOfRecruitmentFees,
@@ -302,18 +302,18 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         //etc
     }
 
-    public enum AnyIdicatorsInSupplyChain
+    public enum AnyIdicatorsInSupplyChain : byte
     {
         Yes,
         No
     }
-    public enum AnyInstancesInSupplyChain
+    public enum AnyInstancesInSupplyChain : byte
     {
         Yes,
         No
     }
 
-    public enum StatementSectors
+    public enum StatementSectors : byte
     {
         Other = 0
     }
@@ -322,7 +322,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         Yes = 0,
         No = 1
     }
-    public enum LastFinancialYearBudget
+    public enum LastFinancialYearBudget : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "Under £36 million")]
         Under36Million = 0,
@@ -341,7 +341,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
     }
 
-    public enum StatementPolicies
+    public enum StatementPolicies : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "All")]
         All,
@@ -387,7 +387,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
     }
 
-    public enum StatementTrainings
+    public enum StatementTrainings : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "All")]
         All,

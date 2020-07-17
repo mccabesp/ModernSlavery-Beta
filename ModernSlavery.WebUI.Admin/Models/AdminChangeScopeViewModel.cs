@@ -21,7 +21,7 @@ namespace ModernSlavery.WebUI.Admin.Models
         public int ReportingYear { get; set; }
     }
 
-    public enum NewScopeStatus
+    public enum NewScopeStatus : byte
     {
         InScope = 0,
         OutOfScope = 1

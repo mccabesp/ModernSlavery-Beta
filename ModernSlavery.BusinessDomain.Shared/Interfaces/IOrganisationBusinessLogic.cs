@@ -15,8 +15,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
             DateTime securityCodeExpiryDateTime);
 
         // Organisation repo
-        IDnBOrgsRepository DnBOrgsRepository { get; }
-
         /// <summary>
         ///     Gets a list of organisations with latest returns and scopes for Organisations download file
         /// </summary>

@@ -197,6 +197,8 @@ namespace ModernSlavery.Core.Models
                 while (PublicReportingDeadline.Date.AddDays(1) < VirtualDateTime.Now)
                     PublicReportingDeadline = new DateTime(PublicReportingDeadline.Year + 1, PublicReportingDeadline.Month, PublicReportingDeadline.Day);
 
+            if (string.IsNullOrWhiteSpace(DataPath)) throw new ConfigurationErrorsException($"{nameof(DataPath)} cannot be empty");
+
             if (exceptions.Count > 0)
             {
                 if (exceptions.Count == 1) throw exceptions[0];

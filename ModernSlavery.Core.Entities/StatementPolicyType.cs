@@ -7,10 +7,18 @@ namespace ModernSlavery.Core.Entities
 {
     public class StatementPolicyType
     {
+        public StatementPolicyType()
+        {
+            StatementPolicies = new HashSet<StatementPolicy>();
+        }
+
         public short StatementPolicyTypeId { get; set; }
 
         public string Description { get; set; }
 
         public DateTime Created { get; set; } = VirtualDateTime.Now;
+
+        public virtual ICollection<StatementPolicy> StatementPolicies { get; set; }
+
     }
 }

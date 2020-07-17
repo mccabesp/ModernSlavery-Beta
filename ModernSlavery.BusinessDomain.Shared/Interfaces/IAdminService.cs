@@ -8,6 +8,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
     public interface IAdminService
     {
+        IDataImporter DataImporter { get; }
         IAuditLogger ManualChangeLog { get; }
         IAuditLogger BadSicLog { get; }
         IAuditLogger RegistrationLog { get; }

@@ -8,8 +8,8 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.Entities.Views;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Infrastructure.Database
@@ -19,17 +19,36 @@ namespace ModernSlavery.Infrastructure.Database
         public static string ConnectionString =
             @"Server=(localdb)\ProjectsV13;Initial Catalog=ModernSlaveryDb;Trusted_Connection=True;";
 
-        public readonly DatabaseOptions DatabaseOptions;
-        public readonly SharedOptions SharedOptions;
+        private readonly DatabaseOptions _databaseOptions;
+        private readonly SharedOptions _sharedOptions;
+        private static bool _migrationEnsured;
+        public bool MigrationsApplied { get; }
 
         public DatabaseContext(SharedOptions sharedOptions, DatabaseOptions databaseOptions)
         {
-            SharedOptions = sharedOptions;
-            DatabaseOptions = databaseOptions;
-            if (!string.IsNullOrWhiteSpace(DatabaseOptions.ConnectionString))
-                ConnectionString = DatabaseOptions.ConnectionString;
+            _sharedOptions = sharedOptions;
+            _databaseOptions = databaseOptions;
 
-            if (databaseOptions.UseMigrations || (!string.IsNullOrWhiteSpace(databaseOptions.MigrationAppName) && databaseOptions.MigrationAppName.EqualsI(sharedOptions.ApplicationName))) EnsureMigrated();
+            if (!string.IsNullOrWhiteSpace(_databaseOptions.ConnectionString))
+                ConnectionString = _databaseOptions.ConnectionString;
+
+            if (databaseOptions.UseMigrations || (!string.IsNullOrWhiteSpace(databaseOptions.MigrationAppName) && databaseOptions.MigrationAppName.EqualsI(sharedOptions.ApplicationName)))
+                MigrationsApplied=EnsureMigrated();
+        }
+
+        private bool EnsureMigrated()
+        {
+            if (_migrationEnsured)
+                return MigrationsApplied; //This static variable is a temporary measure otherwise each request for a Database context takes a few seconds to check for migrations or if the database exists
+
+            var migrationsPending = Database.GetPendingMigrations().Any();
+
+            Database.Migrate();
+            _migrationEnsured = true;
+
+            var migrationsApplied = Database.GetPendingMigrations().Any();
+
+            return migrationsPending && !migrationsApplied;
         }
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
@@ -225,22 +244,6 @@ namespace ModernSlavery.Infrastructure.Database
         public virtual DbSet<StatementSectorType> StatementSectorTypes { get; set; }
         public virtual DbSet<StatementSector> StatementSectors { get; set; }
         public virtual DbSet<StatementStatus> StatementStatuses { get; set; }
-
-        #endregion
-
-        #region Views
-
-        public virtual DbSet<UserInfoView> UserInfoView { get; set; }
-        public virtual DbSet<OrganisationAddressInfoView> OrganisationAddressInfoView { get; set; }
-        public virtual DbSet<OrganisationInfoView> OrganisationInfoView { get; set; }
-        public virtual DbSet<OrganisationRegistrationInfoView> OrganisationRegistrationInfoView { get; set; }
-        public virtual DbSet<OrganisationScopeAndReturnInfoView> OrganisationScopeAndReturnInfoView { get; set; }
-        public virtual DbSet<OrganisationScopeInfoView> OrganisationScopeInfoView { get; set; }
-        public virtual DbSet<OrganisationSearchInfoView> OrganisationSearchInfoView { get; set; }
-        public virtual DbSet<OrganisationSicCodeInfoView> OrganisationSicCodeInfoView { get; set; }
-        public virtual DbSet<OrganisationSubmissionInfoView> OrganisationSubmissionInfoView { get; set; }
-        public virtual DbSet<UserLinkedOrganisationsView> UserLinkedOrganisationsView { get; set; }
-        public virtual DbSet<UserStatusInfoView> UserStatusInfoView { get; set; }
 
         #endregion
     }

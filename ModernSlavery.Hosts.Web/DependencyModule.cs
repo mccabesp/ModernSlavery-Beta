@@ -167,9 +167,6 @@ namespace ModernSlavery.Hosts.Web
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            //Register the queue storage dependencies
-            builder.RegisterType<DnBOrgsRepository>().As<IDnBOrgsRepository>().WithParameter("dataPath", _sharedOptions.DataPath).WithAttributeFiltering();
-
             builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
 
             //Register the user audit log repository

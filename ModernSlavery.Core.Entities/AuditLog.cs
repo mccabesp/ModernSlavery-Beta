@@ -8,15 +8,18 @@ namespace ModernSlavery.Core.Entities
     public class AuditLog
     {
         public long AuditLogId { get; set; }
+
         public AuditedAction Action { get; set; }
+        public long? OrganisationId { get; set; }
+        public long? OriginalUserId { get; set; }
+        public long? ImpersonatedUserId { get; set; }
         public DateTime CreatedDate { get; set; }
-        public virtual Organisation Organisation { get; set; }
-
-        [ForeignKey("OriginalUserId")] public virtual User OriginalUser { get; set; }
-
-        [ForeignKey("ImpersonatedUserId")] public virtual User ImpersonatedUser { get; set; }
-
+        
         public string Details { get; set; }
+
+        public virtual User ImpersonatedUser { get; set; }
+        public virtual Organisation Organisation { get; set; }
+        public virtual User OriginalUser { get; set; }
 
         [NotMapped]
         public Dictionary<string, string> DetailsDictionary

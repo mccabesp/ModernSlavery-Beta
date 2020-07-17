@@ -16,7 +16,7 @@ namespace ModernSlavery.Core.Entities
             Diligences = new HashSet<StatementDiligence>();
             HighRisks = new HashSet<StatementHighRisk>();
             LocationRisks = new HashSet<StatementLocationRisk>();
-            StatusHistory = new HashSet<StatementStatus>();
+            Statuses = new HashSet<StatementStatus>();
         }
 
         #region Key statement control properties
@@ -29,14 +29,16 @@ namespace ModernSlavery.Core.Entities
 
         public DateTime SubmissionDeadline { get; set; }
 
-        public ReturnStatuses Status { get; set; }
+        public StatementStatuses Status { get; set; }
 
-        public virtual ICollection<StatementStatus> StatusHistory { get; set; }
+        public virtual ICollection<StatementStatus> Statuses { get; set; }
 
         public DateTime StatusDate { get; set; }
 
         public string StatusDetails { get; set; }
+        public string Modifications { get; set; }
 
+        public DateTime Modified { get; set; }
         public DateTime Created { get; set; }
 
         public string LateReason { get; set; }
@@ -171,9 +173,8 @@ namespace ModernSlavery.Core.Entities
 
         #endregion
 
-        public int IncludedOrganisationCount { get; set; }
+        public short IncludedOrganisationCount { get; set; }
 
-        public int ExcludedOrganisationCount { get; set; }
-
+        public short ExcludedOrganisationCount { get; set; }
     }
 }

@@ -52,9 +52,6 @@ namespace ModernSlavery.Hosts.Webjob
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            //Register the queue storage dependencies
-            builder.RegisterType<DnBOrgsRepository>().As<IDnBOrgsRepository>().WithParameter("dataPath", _sharedOptions.DataPath).WithAttributeFiltering();
-
             //Register the messaging dependencies
             builder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
             builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();

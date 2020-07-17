@@ -70,7 +70,7 @@ namespace ModernSlavery.Core.Entities
 
         public bool IsSubmitted()
         {
-            return Status == Entities.ReturnStatuses.Submitted;
+            return Status == Entities.StatementStatuses.Submitted;
         }
 
         public bool HasBonusesPaid()
@@ -102,11 +102,11 @@ namespace ModernSlavery.Core.Entities
                    && GetScopeStatus().IsAny(ScopeStatuses.OutOfScope, ScopeStatuses.PresumedOutOfScope);
         }
 
-        public void SetStatus(ReturnStatuses status, long byUserId, string details = null)
+        public void SetStatus(StatementStatuses status, long byUserId, string details = null)
         {
             if (status == Status && details == StatusDetails) return;
 
-            ReturnStatuses.Add(
+            StatementStatuses.Add(
                 new ReturnStatus
                 {
                     ReturnId = ReturnId,

@@ -7,7 +7,7 @@ namespace ModernSlavery.Core.Models.LogModels
     public class SubmissionLogModel
     {
         public DateTime StatusDate { get; set; }
-        public ReturnStatuses Status { get; set; }
+        public StatementStatuses Status { get; set; }
         public string Details { get; set; }
         public SectorTypes Sector { get; set; }
         public long ReturnId { get; set; }

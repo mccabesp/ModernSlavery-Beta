@@ -7,6 +7,7 @@ namespace ModernSlavery.Core.Entities
 {
     public class StatementPolicy
     {
+
         public short StatementPolicyTypeId { get; set; }
 
         public virtual StatementPolicyType StatementPolicyType { get; set; }

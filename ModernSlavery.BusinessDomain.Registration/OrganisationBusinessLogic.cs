@@ -26,14 +26,12 @@ namespace ModernSlavery.BusinessDomain.Registration
             ISharedBusinessLogic sharedBusinessLogic,
             ISubmissionBusinessLogic submissionLogic,
             IScopeBusinessLogic scopeLogic,
-            ISecurityCodeBusinessLogic securityCodeLogic,
-            IDnBOrgsRepository dnBOrgsRepository)
+            ISecurityCodeBusinessLogic securityCodeLogic)
         {
             _sharedBusinessLogic = sharedBusinessLogic;
             _submissionLogic = submissionLogic;
             _scopeLogic = scopeLogic;
             _securityCodeLogic = securityCodeLogic;
-            DnBOrgsRepository = dnBOrgsRepository;
         }
 
         public IQueryable<Organisation> SearchOrganisations(string searchText,int records)
@@ -52,8 +50,6 @@ namespace ModernSlavery.BusinessDomain.Registration
                 .Select(o => o.org);
             return searchResults;
         }
-
-        public IDnBOrgsRepository DnBOrgsRepository { get; }
 
         /// <summary>
         ///     Gets a list of organisations with latest returns and scopes for Organisations download file
@@ -414,7 +410,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 PartialNameForSuffixSearches = organisation.OrganisationName,
                 PartialNameForCompleteTokenSearches = organisation.OrganisationName,
                 Abbreviations = abbreviations.ToArray(),
-                Size = organisation.LatestReturn == null ? 0 : (int)organisation.LatestReturn.OrganisationSize,
+                Size = 0,
                 SicSectionIds = sicCodes.Select(sic => sic.SicCode.SicSectionId.ToString()).Distinct().ToArray(),
                 SicSectionNames = sicCodes.Select(sic => sic.SicCode.SicSection.Description).Distinct().ToArray(),
                 SicCodeIds = sicCodes.Select(sicCode => sicCode.SicCodeId.ToString()).Distinct().ToArray(),

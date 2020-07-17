@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ModernSlavery.Core.Entities
 {
-    public enum SectorTypes
+    public enum SectorTypes: byte
     {
         Unknown = 0,
         Private = 1,
@@ -47,7 +47,7 @@ namespace ModernSlavery.Core.Entities
         Retired = 6
     }
 
-    public enum RegistrationMethods
+    public enum RegistrationMethods: byte
     {
         Unknown = 0,
         PinInPost = 1,
@@ -56,7 +56,7 @@ namespace ModernSlavery.Core.Entities
         Fasttrack = 4
     }
 
-    public enum ReturnStatuses : byte
+    public enum StatementStatuses : byte
     {
         Unknown = 0,
         Draft = 1,
@@ -73,7 +73,7 @@ namespace ModernSlavery.Core.Entities
         Retired = 4
     }
 
-    public enum ScopeStatuses
+    public enum ScopeStatuses: byte
     {
         [Display(Name = "In scope")] Unknown = 0,
 
@@ -86,7 +86,7 @@ namespace ModernSlavery.Core.Entities
         [Display(Name = "Out of scope")] PresumedOutOfScope = 4
     }
 
-    public enum RegisterStatuses
+    public enum RegisterStatuses: byte
     {
         Unknown = 0,
         RegisterSkipped = 1,
@@ -95,7 +95,7 @@ namespace ModernSlavery.Core.Entities
         RegisterCancelled = 4
     }
 
-    public enum OrganisationSizes
+    public enum OrganisationSizes: byte
     {
         [Display(Name = "Not Provided")] [Range(0, 0)]
         NotProvided = 0,
@@ -119,7 +119,7 @@ namespace ModernSlavery.Core.Entities
         Employees20000OrMore = 6
     }
 
-    public enum AuditedAction
+    public enum AuditedAction:byte
     {
         [Display(Name = "Change late flag")] AdminChangeLateFlag = 0,
 

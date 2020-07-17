@@ -127,7 +127,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var orgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .Where(
                         o => o.Created < deadline
-                             && !o.Returns.Any()
+                             && !o.Statements.Any()
                              && !o.OrganisationScopes.Any(
                                  sc => sc.ScopeStatus == ScopeStatuses.InScope ||
                                        sc.ScopeStatus == ScopeStatuses.OutOfScope)
@@ -139,22 +139,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 if (orgs.Any())
                 {
-                    //Remove D&B orgs
-                    var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DataPath,
-                        Filenames.DnBOrganisations());
-                    var exists = await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath);
-                    if (exists)
-                    {
-                        var allDnBOrgs = await _SharedBusinessLogic.FileRepository.ReadCSVAsync<DnBOrgsModel>(filePath);
-                        allDnBOrgs = allDnBOrgs.OrderBy(o => o.OrganisationId).ToList();
-                        orgs.RemoveAll(
-                            o => allDnBOrgs.Any(
-                                dnbo => dnbo.OrganisationId == o.OrganisationId
-                                        || !string.IsNullOrWhiteSpace(dnbo.DUNSNumber) &&
-                                        dnbo.DUNSNumber == o.DUNSNumber));
-                    }
-
-
                     var count = 0;
                     foreach (var org in orgs)
                     {
@@ -190,7 +174,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 {
                                     org.LatestAddress = null;
                                     org.LatestRegistration = null;
-                                    org.LatestReturn = null;
+                                    org.LatestStatement = null;
                                     org.LatestScope = null;
                                     org.UserOrganisations.ForEach(uo => _SharedBusinessLogic.DataRepository.Delete(uo));
                                     await _SharedBusinessLogic.DataRepository.SaveChangesAsync();
@@ -238,7 +222,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     VirtualDateTime.Now.AddDays(0 - _SharedBusinessLogic.SharedOptions.PurgeRetiredReturnDays);
                 var returns = await _SharedBusinessLogic.DataRepository.GetAll<Return>()
                     .Where(r => r.StatusDate < deadline &&
-                                (r.Status == ReturnStatuses.Retired || r.Status == ReturnStatuses.Deleted))
+                                (r.Status == StatementStatuses.Retired || r.Status == StatementStatuses.Deleted))
                     .ToListAsync();
 
                 foreach (var @return in returns)

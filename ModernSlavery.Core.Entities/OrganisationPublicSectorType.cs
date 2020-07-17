@@ -21,6 +21,6 @@ namespace ModernSlavery.Core.Entities
 
         public virtual PublicSectorType PublicSectorType { get; set; }
 
-        public virtual ICollection<Organisation> Organisations { get; set; }
+        public virtual Organisation Organisation { get; set; }
     }
 }
