@@ -1,0 +1,72 @@
+﻿@using System.ComponentModel.DataAnnotations
+@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
+<div class="govuk-grid-row">
+    <div class="govuk-column-two-thirds">
+        @using (Html.BeginForm())
+
+        {
+            var controller = ViewData["Controller"] as BaseController;
+
+            @await Html.CustomValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+
+            <h1 class="govuk-heading-l">
+                Before you start
+            </h1>
+            <p class="govuk-body">
+                To use this service, you will need to provide us with some basic information about your most recent modern slavery statement.
+            </p>
+
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                        Read more about the information you need to provide
+                    </span>
+                </summary>
+                <div class="govuk-details__text">
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>the name of the organisation, or group of organisations, your statement is for</li>
+                        <li>the period covered by the statement</li>
+                        <li>who signed off the statement, and when</li>
+                        <li>which of the recommended areas the statement covers</li>
+                        <li>a link to the full statement on your website</li>
+                    </ul>
+                </div>
+            </details>
+
+            <p class="govuk-body">
+                We will then ask you some additional questions about your statement. These are optional – but we strongly encourage you to complete them.
+            </p>
+
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                        Read more about the additional questions
+                    </span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body">Additional questions cover:</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>the sector your organisation operates in</li>
+                        <li>your policies and codes in relation to modern slavery</li>
+                        <li>your supply chain risks and due diligence processes</li>
+                        <li>staff training on modern slavery risks</li>
+                        <li>how you use goals and key performance indicators to monitor your progress in addressing modern slavery risks</li>
+                    </ul>
+                </div>
+            </details>
+
+            <p class="govuk-body">
+                The information you provide us with will be published on our viewing service.
+            </p>
+
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Start now
+            </button>
+
+        }
+    </div>
+</div>
