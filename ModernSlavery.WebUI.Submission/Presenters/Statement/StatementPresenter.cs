@@ -962,34 +962,4 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.ApprovedYear, opt => opt.Ignore());
         }
     }
-
-    public class ObfuscatedFieldResolver : IValueResolver<StatementModel, StatementViewModel, string>
-    {
-        readonly IObfuscator Obfuscator;
-
-        public ObfuscatedFieldResolver(IObfuscator obfuscator)
-        {
-            Obfuscator = obfuscator;
-        }
-
-        public string Resolve(StatementModel source, StatementViewModel destination, string destMember, ResolutionContext context)
-        {
-            return Obfuscator.Obfuscate(source.OrganisationId);
-        }
-    }
-
-    public class DeobfuscatedFieldResolver : IValueResolver<StatementViewModel, StatementModel, long>
-    {
-        readonly IObfuscator Obfuscator;
-
-        public DeobfuscatedFieldResolver(IObfuscator obfuscator)
-        {
-            Obfuscator = obfuscator;
-        }
-
-        public long Resolve(StatementViewModel source, StatementModel destination, long destMember, ResolutionContext context)
-        {
-            return Obfuscator.DeObfuscate(source.OrganisationIdentifier);
-        }
-    }
 }
