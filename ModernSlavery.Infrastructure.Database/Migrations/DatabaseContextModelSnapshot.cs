@@ -963,7 +963,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTime>("ApprovedDate")
-                        .HasColumnType("Date");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ApproverFirstName")
                         .HasColumnType("nvarchar(50)")
@@ -981,7 +981,8 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DueDiligenceDetails")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(250)")
+                        .HasMaxLength(250);
 
                     b.Property<bool>("EHRCResponse")
                         .ValueGeneratedOnAdd()
@@ -990,20 +991,17 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasDefaultValueSql("((0))");
 
                     b.Property<int>("ExcludedOrganisationCount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
+                        .HasColumnType("int");
 
                     b.Property<string>("ForcedLabourDetails")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GoalsDetails")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(250)")
+                        .HasMaxLength(250);
 
-                    b.Property<int>("IncludedOrganisationCount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
+                    b.Property<int>("IncludedOrganistionCount")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IncludesDueDiligence")
                         .HasColumnType("bit");
@@ -1036,14 +1034,14 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.Property<decimal?>("MaxStatementYears")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("MaxTurnover")
-                        .HasColumnType("int");
+                    b.Property<decimal>("MaxTurnover")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("MinStatementYears")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("MinTurnover")
-                        .HasColumnType("int");
+                    b.Property<decimal>("MinTurnover")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<long>("OrganisationId")
                         .HasColumnType("bigint");
@@ -1055,7 +1053,8 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OtherRelevantRisks")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(250)")
+                        .HasMaxLength(250);
 
                     b.Property<string>("OtherSector")
                         .HasColumnType("nvarchar(max)");
@@ -1064,13 +1063,15 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PolicyDetails")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(250)")
+                        .HasMaxLength(250);
 
                     b.Property<string>("ProgressMeasures")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RisksDetails")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(250)")
+                        .HasMaxLength(250);
 
                     b.Property<string>("SlaveryInstanceDetails")
                         .HasColumnType("nvarchar(max)");
@@ -1079,18 +1080,13 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StatementEndDate")
-                        .HasColumnType("Date");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("StatementStartDate")
-                        .HasColumnType("Date");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("StatementUrl")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
-
-                    b.Property<byte>("Status")
-                        .HasColumnName("StatusId")
-                        .HasColumnType("tinyint");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StatusDate")
                         .HasColumnType("datetime2");
@@ -1099,14 +1095,20 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
 
+                    b.Property<long>("StatusId")
+                        .HasColumnName("StatusId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("StructureDetails")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(250)")
+                        .HasMaxLength(250);
 
                     b.Property<DateTime>("SubmissionDeadline")
                         .HasColumnType("Date");
 
                     b.Property<string>("TrainingDetails")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(250)")
+                        .HasMaxLength(250);
 
                     b.HasKey("StatementId")
                         .HasName("PK_dbo.Statements");
@@ -1139,12 +1141,12 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasName("IX_OrganisationId");
 
                     b.HasIndex("StatementEndDate")
-                        .HasName("IX_StatementEndDate");
+                        .HasName("IX_ReportingEndDate");
 
                     b.HasIndex("StatementStartDate")
-                        .HasName("IX_StatementStartDate");
+                        .HasName("IX_ReportingStartDate");
 
-                    b.HasIndex("Status")
+                    b.HasIndex("StatusId")
                         .HasName("IX_StatusId");
 
                     b.HasIndex("SubmissionDeadline")
@@ -1193,10 +1195,10 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(250)")
                         .HasMaxLength(250);
 
-                    b.Property<short?>("ParentDiligenceTypeId")
+                    b.Property<short?>("StatementDiligenceParentStatementDiligenceTypeId")
                         .HasColumnType("smallint");
 
-                    b.Property<short?>("StatementDiligenceParentStatementDiligenceTypeId")
+                    b.Property<short?>("StatementDiligenceParentTypeId")
                         .HasColumnType("smallint");
 
                     b.HasKey("StatementDiligenceTypeId")
@@ -1436,6 +1438,9 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.Property<long>("ByUserId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("StatementId1")
+                        .HasColumnType("bigint");
+
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
@@ -1452,6 +1457,10 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.HasIndex("ByUserId");
 
                     b.HasIndex("StatementId");
+
+                    b.HasIndex("StatementId1")
+                        .IsUnique()
+                        .HasFilter("[StatementId1] IS NOT NULL");
 
                     b.ToTable("StatementStatuses");
                 });
@@ -1475,7 +1484,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
 
                     b.HasIndex("StatementId");
 
-                    b.ToTable("StatementTraining");
+                    b.ToTable("StatementTrainings");
                 });
 
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementTrainingType", b =>
@@ -2083,6 +2092,10 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasConstraintName("FK_dbo.StatementStatuses_dbo.Statement_StatementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("ModernSlavery.Core.Entities.Statement", null)
+                        .WithOne("Status")
+                        .HasForeignKey("ModernSlavery.Core.Entities.StatementStatus", "StatementId1");
                 });
 
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementTraining", b =>
