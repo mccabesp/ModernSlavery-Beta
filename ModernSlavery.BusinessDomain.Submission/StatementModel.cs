@@ -71,19 +71,19 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 3 - Your organisation
 
-        public List<KeyValuePair<int, string>> StatementSectors { get; set; }
+        public List<short> StatementSectors { get; set; }
 
         public string OtherSector { get; set; }
 
-        public decimal? MinTurnover { get; set; }
+        public int? MinTurnover { get; set; }
 
-        public decimal? MaxTurnover { get; set; }
+        public int? MaxTurnover { get; set; }
 
         #endregion
 
         #region Step 4 - Policies
 
-        public List<KeyValuePair<int, string>> StatementPolicies { get; set; }
+        public List<short> StatementPolicies { get; set; }
 
         public string OtherPolicies { get; set; }
 
@@ -91,21 +91,21 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 5 - Supply chain risks and due diligence part 1
 
-        public List<KeyValuePair<int, string>> RelevantRisks { get; set; }
+        public List<short> RelevantRisks { get; set; }
 
         public string OtherRelevantRisks { get; set; }
 
-        public List<KeyValuePair<int, string>> HighRisks { get; set; }
+        public List<short> HighRisks { get; set; }
 
         public string OtherHighRisks { get; set; }
 
-        public List<KeyValuePair<int, string>> LocationRisks { get; set; }
+        public List<short> LocationRisks { get; set; }
 
         #endregion
 
         #region Step 5 - Supply chain risks and due diligence part 2
 
-        public List<KeyValuePair<int, string>> Diligences { get; set; }
+        public List<short> Diligences { get; set; }
 
         public string ForcedLabourDetails { get; set; }
 
@@ -117,7 +117,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 6 - Training
 
-        public List<KeyValuePair<int, string>> Training { get; set; }
+        public List<short> Training { get; set; }
 
         public string OtherTraining { get; set; }
 
@@ -131,7 +131,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public string KeyAchievements { get; set; }
 
-        public decimal MinStatementYears { get; set; }
+        public decimal? MinStatementYears { get; set; }
 
         public decimal? MaxStatementYears { get; set; }
 

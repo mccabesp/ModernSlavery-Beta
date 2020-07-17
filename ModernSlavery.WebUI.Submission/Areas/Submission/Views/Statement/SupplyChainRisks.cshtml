@@ -16,7 +16,7 @@
 
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementRisks)
+                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.RelevantRisks)
                 }))
 
             <h2>Part 1</h2>
@@ -25,38 +25,50 @@
                 Supply Chain Risks and due diligence
             </h1>
 
-            <h2>
+            <h2 class="govuk-heading-m">
                 Which areas are relevant to your organisation when assessing your supply chains for modern slavery risks?
-            </h2>
-            <h2>
-                Select all that apply
             </h2>
 
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var item in Model.StatementRiskTypes)
+                @foreach (var group in Model.RelevantRiskTypes.Where(x=> x.Category == RiskCategories.RiskArea).GroupBy(x => x.ParentRiskType))
                 {
-                    <div class="govuk-accordion__section ">
+                    <div class="govuk-accordion__section accordion-with-counts">
                         <div class="govuk-accordion__section-header">
                             <h2 class="govuk-accordion__section-heading">
                                 <span class="govuk-accordion__section-button" id="accordion-default-heading">
-                                    @item.Description
+                                    @group.Key.ParentRiskType.Description
                                 </span>
                             </h2>
                         </div>
                         <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
                             <div class="govuk-form-group">
                                 <fieldset class="govuk-fieldset">
+                                    <span class="govuk-hint" id="GovUk_Sectors-hint">
+                                        Select all that apply.
+                                    </span>
                                     <div class="govuk-checkboxes">
-                                        @foreach (var subitem in Model.StatementRisks.Where(x => x.StatementRiskType == item))
+                                        @foreach (var item in group.OrderBy(x => x.Description))
                                         {
                                             <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input" id="waste" name="waste" type="checkbox" value="carcasses">
-                                                <label class="govuk-label govuk-checkboxes__label" for="waste">
-                                                    @subitem @*TODO: need to add description to model*@
+                                                <input class="govuk-checkboxes__input" id="conditional" name="supply-risk" type="checkbox" data-aria-controls="conditional-conditional">
+                                                <label class="govuk-label govuk-checkboxes__label" for="conditional">
+                                                    @item.Description
                                                 </label>
+                                            </div>
+                                            //TODO: only have this visible for some of the options
+                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional">
+                                                <div class="govuk-form-group">
+                                                    <label class="govuk-label" for="other">
+                                                        Please specify other
+                                                    </label>
+                                                    @*TODO:need to bind to parent risk details*@
+                                                    <input @*asp-for=""*@ class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="other" type="text">
+                                                </div>
+                                                }
                                             </div>
                                         }
                                     </div>
+                                    @*<span class="checkbox-count">Selected</span>*@
                                 </fieldset>
                             </div>
                         </div>
@@ -71,48 +83,95 @@
                 <textarea asp-for="OtherRelevantRisks" class="govuk-textarea" rows="5"></textarea>
             </div>
 
-            <h1 class="govuk-heading-l">
+            <h2 class="govuk-heading-l">
                 Which areas of your supply chains do you consider to have the highest risk of modern slavery?
-            </h1>
-            <h2>
-                Select all that apply
             </h2>
-            @*TODO: need to clarify the 2nd set of accordions*@
-
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var item in Model.Continents)
+                @foreach (var group in Model.HighRiskTypes.GroupBy(x => x.ParentRiskType))
                 {
-                    //TODO:make these partial views and test chechbox counts
                     <div class="govuk-accordion__section accordion-with-counts">
                         <div class="govuk-accordion__section-header">
                             <h2 class="govuk-accordion__section-heading">
                                 <span class="govuk-accordion__section-button" id="accordion-default-heading">
-                                    @item.Name
+                                    @group.Key.ParentRiskType.Description
                                 </span>
                             </h2>
                         </div>
                         <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
                             <div class="govuk-form-group">
                                 <fieldset class="govuk-fieldset">
+                                    <span class="govuk-hint" id="GovUk_Sectors-hint">
+                                        Select up to 3 areas
+                                    </span>
                                     <div class="govuk-checkboxes">
-                                        @foreach (var subitem in Model.Countries.Where(x => x.Continent == item))
+                                        @foreach (var item in group)
                                         {
                                             <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input" id="risk" name="risk" type="checkbox" value="carcasses">
-                                                <label class="govuk-label govuk-checkboxes__label" for="risk">
-                                                    @subitem.Name @*TODO: need to add description to model*@
+                                                <input class="govuk-checkboxes__input" id="conditional-high-risk" name="high-risk" type="checkbox" data-aria-controls="conditional-conditional-high-risk">
+                                                <label class="govuk-label govuk-checkboxes__label" for="conditional">
+                                                    @item.Description
                                                 </label>
+                                            </div>
+                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional-high-risk">
+                                                <div class="govuk-form-group">
+
+                                                    <label class="govuk-label" for="other">
+                                                        Please explain why
+                                                    </label>
+                                                    <textarea @*asp-for=""*@ class="govuk-textarea" name="other" rows="5"></textarea>
+                                                </div>
                                             </div>
                                         }
                                     </div>
-                                    <span class="checkbox-count">Selected</span>  @*using css counters for checkbox counts*, will just need to be styled*@
+                                    @*<span class="checkbox-count">Selected</span>*@
                                 </fieldset>
                             </div>
                         </div>
                     </div>
                 }
             </div>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="address-town">
+                    If you want to specify an area not mentioned above, please provide details
+                </label>
+                <textarea asp-for="OtherHighRisks" class="govuk-textarea" rows="5"></textarea>
+            </div>
 
+            <h2 class="govuk-heading-l">
+                Which locations do you believe are at higher risk of modern slavery in your operations and supply chains?
+            </h2>
+            <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+                @foreach (var group in Model.RelevantRiskTypes.Where(x => x.Category == RiskCategories.Location).GroupBy(x => x.ParentRiskType))
+                {
+                    <div class="govuk-accordion__section accordion-with-counts">
+                        <div class="govuk-accordion__section-header">
+                            <h2 class="govuk-accordion__section-heading">
+                                <span class="govuk-accordion__section-button" id="accordion-default-heading">
+                                    @group.Key.ParentRiskType.Description
+                                </span>
+                            </h2>
+                        </div>
+                        <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">                                 
+                                    <div class="govuk-checkboxes">
+                                        @foreach (var item in group.OrderBy(x=> x.Description))
+                                        {
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" type="checkbox" >
+                                                <label class="govuk-label govuk-checkboxes__label">
+                                                    @item.Description
+                                                </label>
+                                            </div>                                           
+                                        }
+                                    </div>
+                                    @*<span class="checkbox-count">Selected</span>*@
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
 
 
             <button class="govuk-button" data-module="govuk-button" type="submit">
@@ -125,4 +184,4 @@
 
     </div>
 
-    </div>
+</div>

@@ -53,7 +53,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             }
 
             var statement = await FindStatementAsync(organisation, year);
-
+            // TODO - James Handle null statement
             var dataResult = Mapper.Map<StatementModel>(statement);
             return dataResult;
         }
@@ -85,7 +85,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
             var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(statement, Formatting.Indented, settings));
-            var fileName = GetFileName(statement.OrganisationId, statement.SubmissionDeadline.Year);
+            var fileName = GetFileName(statement.OrganisationId, statement.Year);
             await SharedBusinessLogic.FileRepository.WriteAsync(fileName, data);
         }
 
@@ -102,7 +102,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                 return StatementActionResult.Uneditable;
             }
 
-            // not been saved to DB
             await SaveToFile(statementModel);
             return StatementActionResult.Success;
         }
@@ -142,13 +141,13 @@ namespace ModernSlavery.BusinessDomain.Submission
             CreateMap<Statement, StatementModel>()
                 .ForMember(dest => dest.Status, opt => opt.Ignore()) // TODO - James Map this appropriately
                 .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.SubmissionDeadline.Year))
-                .ForMember(dest => dest.StatementSectors, opt => opt.MapFrom(src => src.Sectors.Select(s => new KeyValuePair<int, string>(s.StatementSectorTypeId, s.StatementSectorType.Description))))
-                .ForMember(dest => dest.StatementPolicies, opt => opt.MapFrom(src => src.Policies.Select(p => new KeyValuePair<int, string>(p.StatementPolicyTypeId, p.StatementPolicyType.Description))))
-                .ForMember(dest => dest.Training, opt => opt.MapFrom(src => src.Training.Select(t => new KeyValuePair<int, string>(t.StatementTrainingTypeId, t.StatementTrainingType.Description))))
-                .ForMember(dest => dest.RelevantRisks, opt => opt.MapFrom(src => src.RelevantRisks.Select(r => new KeyValuePair<int, string>(r.StatementRiskTypeId, r.StatementRiskType.Description))))
-                .ForMember(dest => dest.HighRisks, opt => opt.MapFrom(src => src.HighRisks.Select(r => new KeyValuePair<int, string>(r.StatementRiskTypeId, r.StatementRiskType.Description))))
-                .ForMember(dest => dest.LocationRisks, opt => opt.MapFrom(src => src.LocationRisks.Select(r => new KeyValuePair<int, string>(r.StatementRiskTypeId, r.StatementRiskType.Description))))
-                .ForMember(dest => dest.Diligences, opt => opt.MapFrom(src => src.Diligences.Select(d => new KeyValuePair<int, string>(d.StatementDiligenceTypeId, d.StatementDiligenceType.Description))));
+                .ForMember(dest => dest.StatementSectors, opt => opt.MapFrom(src => src.Sectors.Select(s => s.StatementSectorTypeId)))
+                .ForMember(dest => dest.StatementPolicies, opt => opt.MapFrom(src => src.Policies.Select(p => p.StatementPolicyTypeId)))
+                .ForMember(dest => dest.Training, opt => opt.MapFrom(src => src.Training.Select(t => t.StatementTrainingTypeId)))
+                .ForMember(dest => dest.RelevantRisks, opt => opt.MapFrom(src => src.RelevantRisks.Select(r => r.StatementRiskTypeId)))
+                .ForMember(dest => dest.HighRisks, opt => opt.MapFrom(src => src.HighRisks.Select(r => r.StatementRiskTypeId)))
+                .ForMember(dest => dest.LocationRisks, opt => opt.MapFrom(src => src.LocationRisks.Select(r => r.StatementRiskTypeId)))
+                .ForMember(dest => dest.Diligences, opt => opt.MapFrom(src => src.Diligences.Select(d => d.StatementDiligenceTypeId)));
         }
     }
 }
