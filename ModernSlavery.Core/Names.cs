@@ -54,18 +54,7 @@ namespace ModernSlavery.Core
         public const string StannpSendLog = "MSU-StannpSendLog.csv";
         public const string SearchLog = "MSU-searchLog.csv";
         public const string UserLog = "MSU-UserLog.csv";
-
-        public static string DnBOrganisations(int year = 0)
-        {
-            if (year == 0) year = VirtualDateTime.Now.Year;
-            return $"MSU-DnBOrgs_{year:yyyy}-{year++:yy}.csv";
-        }
-
-        public static string PreviousDnBOrganisations(int year = 0)
-        {
-            if (year == 0) year = VirtualDateTime.Now.Year;
-            return $"MSU-DnBOrgs_{year--:yyyy}-{year:yy}.csv";
-        }
+        public const string ImportOrganisations = "MSU-ImportOrganisations.csv";
 
         public static string GetRootFilename(string filePath)
         {

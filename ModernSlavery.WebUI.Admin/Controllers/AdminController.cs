@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Security.Principal;
-using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -23,14 +22,12 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
-using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
-using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
@@ -666,134 +663,141 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var model = new UploadViewModel();
 
             #region Show SicSection Upload
-            var sicSectionsCount = await SharedBusinessLogic.DataRepository.GetAll<SicSection>().CountAsync();
             var upload = new UploadViewModel.Upload
             {
                 Type = Filenames.SicSections,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.SicSections),
                 Title = "SIC Sections",
                 Description = "Standard Industrial Classification (SIC) sector titles.",
-                Count = sicSectionsCount.ToString()
+                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<SicSection>().CountAsync()
             };
-            upload.Modified = await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
-                : DateTime.MinValue;
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+            {
+                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
+                upload.FileExists = true;
+            }
             model.Uploads.Add(upload);
             #endregion
 
             #region Show SicCode Upload
-            var sicCodesCount = await SharedBusinessLogic.DataRepository.GetAll<SicCode>().CountAsync();
             upload = new UploadViewModel.Upload
             {
                 Type = Filenames.SicCodes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.SicCodes),
                 Title = "SIC Codes",
                 Description = "Standard Industrial Classification (SIC) codes and titles.",
-                Count = sicCodesCount.ToString()
+                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<SicCode>().CountAsync()
             };
-            upload.Modified = await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
-                : DateTime.MinValue;
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+            {
+                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
+                upload.FileExists = true;
+            }
             model.Uploads.Add(upload);
             #endregion
 
             #region Show StatementDiligenceTypes Upload
-            var statementDiligenceTypeCount = await SharedBusinessLogic.DataRepository.GetAll<StatementDiligenceType>().CountAsync();
             upload = new UploadViewModel.Upload
             {
                 Type = Filenames.StatementDiligenceTypes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementDiligenceTypes),
                 Title = "Statement Due Diligence Types",
                 Description = "Due-diligence types used for Modern Slavery Statements",
-                Count = statementDiligenceTypeCount.ToString()
+                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementDiligenceType>().CountAsync()
             };
-            upload.Modified = await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
-                : DateTime.MinValue;
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+            {
+                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
+                upload.FileExists = true;
+            }
             model.Uploads.Add(upload);
+            
             #endregion
 
             #region Show StatementPolicyTypes Upload
-            var statementPolicyTypeCount = await SharedBusinessLogic.DataRepository.GetAll<StatementPolicyType>().CountAsync();
             upload = new UploadViewModel.Upload
             {
                 Type = Filenames.StatementPolicyTypes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementPolicyTypes),
                 Title = "Statement Policy Types",
                 Description = "Policy types used for Modern Slavery Statements",
-                Count = statementPolicyTypeCount.ToString()
+                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementPolicyType>().CountAsync()
             };
-            upload.Modified = await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
-                : DateTime.MinValue;
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+            {
+                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
+                upload.FileExists = true;
+            }
             model.Uploads.Add(upload);
             #endregion
 
             #region Show StatementRiskTypes Upload
-            var statementRiskTypeCount = await SharedBusinessLogic.DataRepository.GetAll<StatementRiskType>().CountAsync();
             upload = new UploadViewModel.Upload
             {
                 Type = Filenames.StatementRiskTypes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementRiskTypes),
                 Title = "Statement Risk Types",
                 Description = "Risk types used for Modern Slavery Statements",
-                Count = statementRiskTypeCount.ToString()
+                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementRiskType>().CountAsync()
             };
-            upload.Modified = await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
-                : DateTime.MinValue;
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+            {
+                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
+                upload.FileExists = true;
+            }
             model.Uploads.Add(upload);
             #endregion
 
             #region Show StatementSectorTypes Upload
-            var statementSectorTypeCount = await SharedBusinessLogic.DataRepository.GetAll<StatementSectorType>().CountAsync();
             upload = new UploadViewModel.Upload
             {
                 Type = Filenames.StatementSectorTypes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementSectorTypes),
                 Title = "Statement Sector Types",
                 Description = "Sector types used for Modern Slavery Statements",
-                Count = statementSectorTypeCount.ToString()
+                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementSectorType>().CountAsync()
             };
-            upload.Modified = await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
-                : DateTime.MinValue;
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+            {
+                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
+                upload.FileExists = true;
+            }
             model.Uploads.Add(upload);
             #endregion
 
             #region Show StatementTrainingTypes Upload
-            var statementTrainingTypeCount = await SharedBusinessLogic.DataRepository.GetAll<StatementTrainingType>().CountAsync();
             upload = new UploadViewModel.Upload
             {
                 Type = Filenames.StatementTrainingTypes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementTrainingTypes),
                 Title = "Statement Due Training Types",
                 Description = "Due-Training types used for Modern Slavery Statements",
-                Count = statementTrainingTypeCount.ToString()
+                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementTrainingType>().CountAsync()
             };
-            upload.Modified = await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
-                : DateTime.MinValue;
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+            {
+                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
+                upload.FileExists = true;
+            }
+            
             model.Uploads.Add(upload);
             #endregion
 
-            #region Show DnBOrgs Upload
-            //Reload D&B
-            await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.ClearAllDnBOrgsAsync();
-            var allDnBOrgs = await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
+            #region Show ImportOrganisations Upload
             upload = new UploadViewModel.Upload
             {
-                Type = nameof(Filenames.DnBOrganisations),
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.DnBOrganisations()),
-                Title = "Dun & Bradstreet Organisations",
-                Description = "Latest list of public and private sector organisations from Dun & Bradstreet database.",
-                Count = allDnBOrgs == null
-                    ? "0"
-                    : $"{allDnBOrgs.Count(o => o.ImportedDate != null && (o.StatusCheckedDate == null || o.ImportedDate >= o.StatusCheckedDate))}/{allDnBOrgs.Count.ToString()}"
+                Type = Filenames.ImportOrganisations,
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ImportOrganisations),
+                Title = "Organisations Import",
+                Description = "Organisations from external data source",
+                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<Organisation>().CountAsync()
             };
-            upload.Modified = await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
-                : DateTime.MinValue;
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+            {
+                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
+                upload.FileExists = true;
+            }
+
             model.Uploads.Add(upload);
             #endregion
 
@@ -805,11 +809,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ShortCodes),
                 Title = "Short Codes",
                 Description = "Short codes for tracking and routing users to specific web pages.",
-                Count = allShortCodes == null ? "0" : allShortCodes.Count.ToString()
+                DatabaseCount = allShortCodes == null ? 0 : allShortCodes.Count
             };
-            upload.Modified = await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath)
-                ? await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath)
-                : DateTime.MinValue;
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+            {
+                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
+                upload.FileExists = true;
+            }
             model.Uploads.Add(upload);
             #endregion
 
@@ -823,6 +829,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [RequestSizeLimit(52428800)]
         public async Task<IActionResult> Uploads(List<IFormFile> files, string command)
         {
+            string fileName = command.AfterFirst(":");
+            command = command.BeforeFirst(":");
+
             //Throw error if the user is not a super administrator
             if (!IsSuperAdministrator)
                 return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a super administrator");
@@ -849,43 +858,54 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 await RecheckCompaniesAsync();
             }
 
-            else if (command.EqualsI("Import"))
+            else if (command.EqualsI("Upload","Import"))
             {
-                try
+                string fileContent = null;
+                if (command.EqualsI("Upload"))
                 {
-                    await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.ImportAsync(
-                        SharedBusinessLogic.DataRepository, CurrentUser);
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $@"Import Error': {ex.Message}");
-                }
-            }
-            else if (command.EqualsI("Upload"))
-            {
-                var file = files.FirstOrDefault();
-                if (file == null)
-                {
-                    ModelState.AddModelError("", "No file uploaded");
-                    return View("Uploads", model);
+                    var file = files.FirstOrDefault();
+                    if (file == null)
+                    {
+                        ModelState.AddModelError("", "No file uploaded");
+                        return View("Uploads", model);
+                    }
+
+                    if (!fileName.EqualsI(file.FileName))
+                    {
+                        ModelState.AddModelError("", $@"Invalid filename '{file.FileName}'");
+                        return View("Uploads", model);
+                    }
+
+                    if (file.Length == 0)
+                    {
+                        ModelState.AddModelError("", $@"No content found in '{file.FileName}'");
+                        return View("Uploads", model);
+                    }
+                    using (var reader = new StreamReader(file.OpenReadStream()))
+                        fileContent =await reader.ReadToEndAsync();
                 }
 
-                var upload = model.Uploads.FirstOrDefault(u => u.Filename.EqualsI(file.FileName));
+                var upload = model.Uploads.FirstOrDefault(u => u.Filename.EqualsI(fileName));
                 if (upload == null)
                 {
-                    ModelState.AddModelError("", $@"Invalid filename '{file.FileName}'");
+                    ModelState.AddModelError("", $@"Invalid filename '{fileName}'");
                     return View("Uploads", model);
                 }
 
-                if (file.Length == 0)
+                if (command.EqualsI("Import")) 
                 {
-                    ModelState.AddModelError("", $@"No content found in '{file.FileName}'");
-                    return View("Uploads", model);
+                    if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+                        fileContent = await SharedBusinessLogic.FileRepository.ReadAsync(upload.Filepath);
+                    else
+                    {
+                        ModelState.AddModelError("", $@"Cannot find file '{upload.Filepath}'");
+                        return View("Uploads", model);
+                    } 
                 }
 
                 try
                 {
-                    using (var reader = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
+                    using (var reader = new StringReader(fileContent))
                     {
                         var config = new CsvConfiguration(CultureInfo.CurrentCulture);
                         config.ShouldQuote = (field, context) => true;
@@ -896,117 +916,84 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         using var csvReader = new CsvReader(reader, config);
 
                         List<object> records;
-                        switch (upload.Type)
+                        switch (fileName)
                         {
-                            case nameof(Filenames.DnBOrganisations):
-                                var dnbOrgs = csvReader.GetRecords<DnBOrgsModel>().ToList();
-                                if (dnbOrgs.Count > 0)
-                                    await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.UploadAsync(dnbOrgs);
-
-                                records = dnbOrgs.Cast<object>().ToList();
+                            case var f when f.EqualsI(Filenames.ImportOrganisations):
+                                records = csvReader.GetRecords<ImportOrganisationModel>().Cast<object>().ToList();
                                 break;
-                            case Filenames.SicSections:
+                            case var f when f.EqualsI(Filenames.SicSections):
                                 records = csvReader.GetRecords<SicSection>().Cast<object>().ToList();
                                 break;
-                            case Filenames.SicCodes:
+                            case var f when f.EqualsI(Filenames.SicCodes):
                                 records = csvReader.GetRecords<SicCode>().Cast<object>().ToList();
                                 break;
-                            case Filenames.ShortCodes:
+                            case var f when f.EqualsI(Filenames.ShortCodes):
                                 records = csvReader.GetRecords<ShortCodeModel>().Cast<object>().ToList();
                                 break;
-                            case Filenames.StatementDiligenceTypes:
+                            case var f when f.EqualsI(Filenames.StatementDiligenceTypes):
                                 records = csvReader.GetRecords<StatementDiligenceType>().Cast<object>().ToList();
                                 break;
-                            case Filenames.StatementPolicyTypes:
+                            case var f when f.EqualsI(Filenames.StatementPolicyTypes):
                                 records = csvReader.GetRecords<StatementPolicyType>().Cast<object>().ToList();
                                 break;
-                            case Filenames.StatementRiskTypes:
+                            case var f when f.EqualsI(Filenames.StatementRiskTypes):
                                 records = csvReader.GetRecords<StatementRiskType>().Cast<object>().ToList();
                                 break;
-                            case Filenames.StatementSectorTypes:
+                            case var f when f.EqualsI(Filenames.StatementSectorTypes):
                                 records = csvReader.GetRecords<StatementSectorType>().Cast<object>().ToList();
                                 break;
-                            case Filenames.StatementTrainingTypes:
+                            case var f when f.EqualsI(Filenames.StatementTrainingTypes):
                                 records = csvReader.GetRecords<StatementTrainingType>().Cast<object>().ToList();
                                 break;
                             default:
-                                throw new Exception($"Invalid upload type '{upload.Type}'");
+                                throw new Exception($"Invalid upload '{fileName}'");
                         }
 
                         if (records.Count < 1)
                         {
-                            ModelState.AddModelError("", $@"No records found in '{upload.Filename}'");
+                            ModelState.AddModelError("", $@"No records found in '{fileName}'");
                             return View("Uploads", model);
                         }
 
                         //Core.Classes.Extensions
-                        await SharedBusinessLogic.FileRepository.SaveCSVAsync(records, upload.Filepath);
+                        if (command.EqualsI("Upload"))await SharedBusinessLogic.FileRepository.SaveCSVAsync(records, fileName);
+
                         var updateTime = VirtualDateTime.Now.AddMinutes(-2);
-                        switch (upload.Type)
+                        switch (fileName)
                         {
-                            case nameof(Filenames.DnBOrganisations):
-                                await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.ClearAllDnBOrgsAsync();
+                            case var f when f.EqualsI(Filenames.ImportOrganisations):
+                                await _adminService.DataImporter.ImportOrganisationsAsync(true);
                                 break;
-                            case Filenames.SicSections:
-                                await DataMigrations.Update_SICSectionsAsync(
-                                    SharedBusinessLogic.DataRepository,
-                                    SharedBusinessLogic.FileRepository,
-                                    SharedBusinessLogic.SharedOptions.DataPath,
-                                    true);
+                            case var f when f.EqualsI(Filenames.SicSections):
+                                await _adminService.DataImporter.ImportSICSectionsAsync(true);
                                 break;
-                            case Filenames.SicCodes:
-                                await DataMigrations.Update_SICCodesAsync(
-                                    SharedBusinessLogic.DataRepository,
-                                    SharedBusinessLogic.FileRepository,
-                                    SharedBusinessLogic.SharedOptions.DataPath,
-                                    true);
-                                //TODO Recheck remaining companies with no Sic against new SicCodes and then CoHo
-                                await UpdateCompanySicCodesAsync(updateTime);
+                            case var f when f.EqualsI(Filenames.SicCodes):
+                                await _adminService.DataImporter.ImportSICCodesAsync(true);
                                 break;
-                            case Filenames.ShortCodes:
+                            case var f when f.EqualsI(Filenames.ShortCodes):
                                 await WebService.ShortCodesRepository.ClearAllShortCodesAsync();
                                 break;
-                            case Filenames.StatementDiligenceTypes:
-                                await DataMigrations.Update_StatementDiligenceTypesAsync(
-                                    SharedBusinessLogic.DataRepository,
-                                    SharedBusinessLogic.FileRepository,
-                                    SharedBusinessLogic.SharedOptions.DataPath,
-                                    true);
+                            case var f when f.EqualsI(Filenames.StatementDiligenceTypes):
+                                await _adminService.DataImporter.ImportStatementDiligenceTypesAsync(true);
                                 break;
-                            case Filenames.StatementPolicyTypes:
-                                await DataMigrations.Update_StatementPolicyTypesAsync(
-                                    SharedBusinessLogic.DataRepository,
-                                    SharedBusinessLogic.FileRepository,
-                                    SharedBusinessLogic.SharedOptions.DataPath,
-                                    true);
+                            case var f when f.EqualsI(Filenames.StatementPolicyTypes):
+                                await _adminService.DataImporter.ImportStatementPolicyTypesAsync(true);
                                 break;
-                            case Filenames.StatementRiskTypes:
-                                await DataMigrations.Update_StatementRiskTypesAsync(
-                                    SharedBusinessLogic.DataRepository,
-                                    SharedBusinessLogic.FileRepository,
-                                    SharedBusinessLogic.SharedOptions.DataPath,
-                                    true);
+                            case var f when f.EqualsI(Filenames.StatementRiskTypes):
+                                await _adminService.DataImporter.ImportStatementRiskTypesAsync(true);
                                 break;
-                            case Filenames.StatementSectorTypes:
-                                await DataMigrations.Update_StatementSectorTypesAsync(
-                                    SharedBusinessLogic.DataRepository,
-                                    SharedBusinessLogic.FileRepository,
-                                    SharedBusinessLogic.SharedOptions.DataPath,
-                                    true);
+                            case var f when f.EqualsI(Filenames.StatementSectorTypes):
+                                await _adminService.DataImporter.ImportStatementSectorTypesAsync(true);
                                 break;
-                            case Filenames.StatementTrainingTypes:
-                                await DataMigrations.Update_StatementTrainingTypesAsync(
-                                    SharedBusinessLogic.DataRepository,
-                                    SharedBusinessLogic.FileRepository,
-                                    SharedBusinessLogic.SharedOptions.DataPath,
-                                    true);
+                            case var f when f.EqualsI(Filenames.StatementTrainingTypes):
+                                await _adminService.DataImporter.ImportStatementTrainingTypesAsync(true);
                                 break;
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", $@"Error reading file '{upload.Filename}': {ex.Message}");
+                    ModelState.AddModelError("", $@"Error reading file '{fileName}': {ex.Message}");
                 }
             }
 

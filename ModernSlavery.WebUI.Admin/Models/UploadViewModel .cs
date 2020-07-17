@@ -21,7 +21,8 @@ namespace ModernSlavery.WebUI.Admin.Models
             public string Filepath { get; set; }
             public DateTime Modified { get; set; }
 
-            public string Count { get; set; }
+            public int DatabaseCount { get; set; }
+            public bool FileExists { get; set; }
         }
     }
 }

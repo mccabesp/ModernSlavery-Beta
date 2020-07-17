@@ -15,16 +15,13 @@ namespace ModernSlavery.BusinessDomain.Viewing
     {
         private readonly IDataRepository _DataRepository;
         private readonly IObfuscator _obfuscator;
-        public readonly IDnBOrgsRepository DnBOrgsRepository;
 
         public CompareBusinessLogic(
             IObfuscator obfuscator,
-            IDataRepository dataRepo,
-            IDnBOrgsRepository dnBOrgsRepository)
+            IDataRepository dataRepo)
         {
             _obfuscator = obfuscator;
             _DataRepository = dataRepo;
-            DnBOrgsRepository = dnBOrgsRepository;
         }
 
         public virtual DataTable GetCompareDatatable(IEnumerable<CompareReportModel> data)

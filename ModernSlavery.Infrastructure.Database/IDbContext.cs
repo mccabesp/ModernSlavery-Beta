@@ -13,5 +13,7 @@ namespace ModernSlavery.Infrastructure.Database
         void UpdateChangesInBulk<TEntity>(IEnumerable<TEntity> listOfOrganisations) where TEntity : class;
 
         DatabaseFacade GetDatabase();
+
+        bool MigrationsApplied { get; }
     }
 }

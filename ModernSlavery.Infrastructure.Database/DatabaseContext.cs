@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Infrastructure.Database
@@ -18,27 +19,36 @@ namespace ModernSlavery.Infrastructure.Database
         public static string ConnectionString =
             @"Server=(localdb)\ProjectsV13;Initial Catalog=ModernSlaveryDb;Trusted_Connection=True;";
 
-        public readonly DatabaseOptions DatabaseOptions;
-        public readonly SharedOptions SharedOptions;
-        private static bool MigrationEnsured;
+        private readonly DatabaseOptions _databaseOptions;
+        private readonly SharedOptions _sharedOptions;
+        private static bool _migrationEnsured;
+        public bool MigrationsApplied { get; }
 
         public DatabaseContext(SharedOptions sharedOptions, DatabaseOptions databaseOptions)
         {
-            SharedOptions = sharedOptions;
-            DatabaseOptions = databaseOptions;
-            if (!string.IsNullOrWhiteSpace(DatabaseOptions.ConnectionString))
-                ConnectionString = DatabaseOptions.ConnectionString;
+            _sharedOptions = sharedOptions;
+            _databaseOptions = databaseOptions;
 
-            if (databaseOptions.UseMigrations || (!string.IsNullOrWhiteSpace(databaseOptions.MigrationAppName) && databaseOptions.MigrationAppName.EqualsI(sharedOptions.ApplicationName))) EnsureMigrated();
+            if (!string.IsNullOrWhiteSpace(_databaseOptions.ConnectionString))
+                ConnectionString = _databaseOptions.ConnectionString;
+
+            if (databaseOptions.UseMigrations || (!string.IsNullOrWhiteSpace(databaseOptions.MigrationAppName) && databaseOptions.MigrationAppName.EqualsI(sharedOptions.ApplicationName)))
+                MigrationsApplied=EnsureMigrated();
         }
 
-        private void EnsureMigrated()
+        private bool EnsureMigrated()
         {
-            if (MigrationEnsured)
-                return; //This static variable is a temporary measure otherwise each request for a Database context takes a few seconds to check for migrations or if the database exists
+            if (_migrationEnsured)
+                return MigrationsApplied; //This static variable is a temporary measure otherwise each request for a Database context takes a few seconds to check for migrations or if the database exists
+
+            var migrationsPending = Database.GetPendingMigrations().Any();
 
             Database.Migrate();
-            MigrationEnsured = true;
+            _migrationEnsured = true;
+
+            var migrationsApplied = Database.GetPendingMigrations().Any();
+
+            return migrationsPending && !migrationsApplied;
         }
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)

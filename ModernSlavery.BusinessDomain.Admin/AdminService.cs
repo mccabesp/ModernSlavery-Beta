@@ -26,7 +26,8 @@ namespace ModernSlavery.BusinessDomain.Admin
             [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
             ISearchRepository<EmployerSearchModel> employerSearchRepository,
             ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
-            ISharedBusinessLogic sharedBusinessLogic
+            ISharedBusinessLogic sharedBusinessLogic,
+            IDataImporter dataImporter
         )
         {
             ManualChangeLog = manualChangeLog;
@@ -45,8 +46,11 @@ namespace ModernSlavery.BusinessDomain.Admin
             EmployerSearchRepository = employerSearchRepository;
             SicCodeSearchRepository = sicCodeSearchRepository;
             SharedBusinessLogic = sharedBusinessLogic;
+
+            DataImporter = dataImporter;
         }
 
+        public IDataImporter DataImporter { get; }
         public IAuditLogger ManualChangeLog { get; }
         public IAuditLogger BadSicLog { get; }
         public IAuditLogger RegistrationLog { get; }

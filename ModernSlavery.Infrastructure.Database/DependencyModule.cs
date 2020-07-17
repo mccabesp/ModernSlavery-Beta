@@ -39,13 +39,14 @@ namespace ModernSlavery.Infrastructure.Database
             builder.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerLifetimeScope();
 
             builder.RegisterType<ShortCodesRepository>().As<IShortCodesRepository>().InstancePerLifetimeScope();
+
+            builder.RegisterType<DataImporter>().As<IDataImporter>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
-            //Ensure ShortCodes, SicCodes and SicSections exist on remote 
-            var fileRepository = lifetimeScope.Resolve<IFileRepository>(); 
-            
+            //Ensure import files exist on remote storage
+            var fileRepository = lifetimeScope.Resolve<IFileRepository>();
             Task.WaitAll(
                 fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.DataPath),
                 fileRepository.PushRemoteFileAsync(Filenames.SicCodes, _sharedOptions.DataPath),
@@ -54,8 +55,25 @@ namespace ModernSlavery.Infrastructure.Database
                 fileRepository.PushRemoteFileAsync(Filenames.StatementPolicyTypes, _sharedOptions.DataPath),
                 fileRepository.PushRemoteFileAsync(Filenames.StatementRiskTypes, _sharedOptions.DataPath),
                 fileRepository.PushRemoteFileAsync(Filenames.StatementSectorTypes, _sharedOptions.DataPath),
-                fileRepository.PushRemoteFileAsync(Filenames.StatementTrainingTypes, _sharedOptions.DataPath)
+                fileRepository.PushRemoteFileAsync(Filenames.StatementTrainingTypes, _sharedOptions.DataPath),
+                fileRepository.PushRemoteFileAsync(Filenames.ImportOrganisations, _sharedOptions.DataPath)
             );
+
+            //Seed database whenver migrations are applied
+            var dbContext = lifetimeScope.Resolve<IDbContext>();
+            if (dbContext.MigrationsApplied)
+            {
+                var _dataImporter = lifetimeScope.Resolve<IDataImporter>();
+
+                _dataImporter.ImportOrganisationsAsync().Wait();
+                _dataImporter.ImportSICCodesAsync().Wait();
+                _dataImporter.ImportSICSectionsAsync().Wait();
+                _dataImporter.ImportStatementDiligenceTypesAsync().Wait();
+                _dataImporter.ImportStatementPolicyTypesAsync().Wait();
+                _dataImporter.ImportStatementRiskTypesAsync().Wait();
+                _dataImporter.ImportStatementSectorTypesAsync().Wait();
+                _dataImporter.ImportStatementTrainingTypesAsync().Wait();
+            }
         }
 
         public void RegisterModules(IList<Type> modules)

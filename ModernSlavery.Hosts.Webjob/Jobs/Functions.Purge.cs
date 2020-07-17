@@ -139,22 +139,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 if (orgs.Any())
                 {
-                    //Remove D&B orgs
-                    var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DataPath,
-                        Filenames.DnBOrganisations());
-                    var exists = await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath);
-                    if (exists)
-                    {
-                        var allDnBOrgs = await _SharedBusinessLogic.FileRepository.ReadCSVAsync<DnBOrgsModel>(filePath);
-                        allDnBOrgs = allDnBOrgs.OrderBy(o => o.OrganisationId).ToList();
-                        orgs.RemoveAll(
-                            o => allDnBOrgs.Any(
-                                dnbo => dnbo.OrganisationId == o.OrganisationId
-                                        || !string.IsNullOrWhiteSpace(dnbo.DUNSNumber) &&
-                                        dnbo.DUNSNumber == o.DUNSNumber));
-                    }
-
-
                     var count = 0;
                     foreach (var org in orgs)
                     {
