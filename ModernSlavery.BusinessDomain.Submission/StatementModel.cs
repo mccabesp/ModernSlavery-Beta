@@ -117,7 +117,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 6 - Training
 
-        public List<int> Training { get; set; }
+        public List<short> Training { get; set; }
 
         public string OtherTraining { get; set; }
 
@@ -131,7 +131,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public string KeyAchievements { get; set; }
 
-        public decimal MinStatementYears { get; set; }
+        public decimal? MinStatementYears { get; set; }
 
         public decimal? MaxStatementYears { get; set; }
 

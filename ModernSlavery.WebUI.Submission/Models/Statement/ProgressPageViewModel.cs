@@ -15,6 +15,6 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public string KeyAchievements { get; set; }
 
-        public Presenters.NumberOfYearsOfStatements NumberOfYearsOfStatements { get; set; }
+        public Presenters.NumberOfYearsOfStatements? NumberOfYearsOfStatements { get; set; }
     }
 }

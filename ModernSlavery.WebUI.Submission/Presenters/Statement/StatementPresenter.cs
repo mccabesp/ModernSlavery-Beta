@@ -67,14 +67,16 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         Task SaveDueDiligenceAsync(User user, DueDiligencePageViewModel viewModel);
 
         Task<CustomResult<StatementViewModel>> TryGetTraining(User user, string organisationIdentifier, int year);
-        //Task<TrainingPageViewModel> GetTrainingAsync(User user, string organisationIdentifier, int year);
+        Task<TrainingPageViewModel> GetTrainingAsync(User user, string organisationIdentifier, int year);
 
         Task<StatementActionResult> TrySaveTraining(User user, StatementViewModel model);
+        Task SaveTrainingAsync(User user, TrainingPageViewModel viewModel);
 
         Task<CustomResult<StatementViewModel>> TryGetMonitoringInProgress(User user, string organisationIdentifier, int year);
-        //Task<ProgressPageViewModel> GetProgressAsync(User user, string organisationIdentifier, int year);
+        Task<ProgressPageViewModel> GetProgressAsync(User user, string organisationIdentifier, int year);
 
         Task<StatementActionResult> TrySaveMonitorInProgress(User user, StatementViewModel model);
+        Task SaveProgressAsync(User user, ProgressPageViewModel viewModel);
 
         /// <summary>
         /// Save and then submit the users current draft for the organisation
@@ -570,6 +572,42 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await SaveDraftForUser(user, model);
         }
 
+        public async Task<TrainingPageViewModel> GetTrainingAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+            var training = SharedBusinessLogic.DataRepository
+                .GetAll<StatementTrainingType>()
+                .Select(t => new TrainingPageViewModel.TrainingViewModel
+                {
+                    Id = t.StatementTrainingTypeId,
+                    Description = t.Description,
+                    IsSelected = model.Training.Contains(t.StatementTrainingTypeId)
+                });
+
+            var vm = new TrainingPageViewModel
+            {
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                Training = training.ToList(),
+                OtherTraining = model.OtherTraining,
+            };
+
+            return vm;
+        }
+
+        public async Task SaveTrainingAsync(User user, TrainingPageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+
+            model.Training = viewModel.Training.Where(t => t.IsSelected).Select(t => t.Id).ToList();
+            model.OtherTraining = viewModel.OtherTraining;
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
+        }
+
         #endregion
 
         #region Step 7 - Monitoring progress
@@ -584,6 +622,78 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             await ValidateForDraft(model);
 
             return await SaveDraftForUser(user, model);
+        }
+        public async Task<ProgressPageViewModel> GetProgressAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+            var training = SharedBusinessLogic.DataRepository
+                .GetAll<StatementTrainingType>()
+                .Select(t => new TrainingPageViewModel.TrainingViewModel
+                {
+                    Id = t.StatementTrainingTypeId,
+                    Description = t.Description,
+                    IsSelected = model.Training.Contains(t.StatementTrainingTypeId)
+                });
+
+            var vm = new ProgressPageViewModel
+            {
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                IncludesMeasuringProgress = model.IncludesMeasuringProgress,
+                ProgressMeasures = model.ProgressMeasures,
+                KeyAchievements = model.KeyAchievements,
+                NumberOfYearsOfStatements = ParseYears(model.MinStatementYears, model.MaxStatementYears),
+            };
+
+            return vm;
+        }
+
+        private NumberOfYearsOfStatements? ParseYears(decimal? min, decimal? max)
+        {
+            if (!min.HasValue && !max.HasValue)
+                return null;
+
+            if (min >= 5)
+                return NumberOfYearsOfStatements.moreThan5Years;
+            else if (max <= 5 && min >= 1)
+                return NumberOfYearsOfStatements.from1To5Years;
+            else
+                return NumberOfYearsOfStatements.thisIsTheFirstTime;
+        }
+
+        public async Task SaveProgressAsync(User user, ProgressPageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+            var yearsRange = GetYearsRange(viewModel.NumberOfYearsOfStatements);
+
+            model.IncludesMeasuringProgress = viewModel.IncludesMeasuringProgress;
+            model.ProgressMeasures = viewModel.ProgressMeasures;
+            model.KeyAchievements = viewModel.KeyAchievements;
+            model.MinStatementYears = yearsRange.Item1;
+            model.MaxStatementYears = yearsRange.Item2;
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
+        }
+
+        private Tuple<decimal?, decimal?> GetYearsRange(NumberOfYearsOfStatements? years)
+        {
+            if (!years.HasValue)
+                return new Tuple<decimal?, decimal?>(null, null);
+
+            switch (years.Value)
+            {
+                case NumberOfYearsOfStatements.thisIsTheFirstTime:
+                    return new Tuple<decimal?, decimal?>(0, 1);
+                case NumberOfYearsOfStatements.from1To5Years:
+                    return new Tuple<decimal?, decimal?>(1, 5);
+                case NumberOfYearsOfStatements.moreThan5Years:
+                    return new Tuple<decimal?, decimal?>(5, null);
+                default:
+                    return new Tuple<decimal?, decimal?>(null, null);
+            }
         }
 
         #endregion
