@@ -30,6 +30,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             : base(logger, webService, sharedBusinessLogic)
         {
             SubmissionPresenter = submissionPresenter;
+
         }
 
         #region General notes
@@ -55,17 +56,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/before-you-start")]
         public async Task<IActionResult> BeforeYouStart(string organisationIdentifier, int year)
         {
-            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
-        }
-
-        [HttpPost("{organisationIdentifier}/{year}/before-you-start")]
-        [PreventDuplicatePost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> BeforeYouStart(StatementViewModel submissionModel)
-        {
-            // Redirect location
-            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.NotStarted);
-            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            var result = SubmissionPresenter.CheckStatementAccess(this.VirtualUser, organisationIdentifier, year);
+            if (result==)
+            return View(Url.Action("YourStatement",new { OrganisationIdentifier = organisationIdentifier, Year = year }));
         }
 
         #endregion
@@ -75,6 +68,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/your-statement")]
         public async Task<IActionResult> YourStatement(string organisationIdentifier, int year)
         {
+            var getViewModelResult = SubmissionPresenter.GetYourStatementPageViewModel(organisationIdentifier, year);
+            if (!getViewModelResult.Outcome==Success)return getViewModelResult.
 
             return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
             //var checkResult = await CheckUserRegisteredOkAsync();
