@@ -1,4 +1,5 @@
 ﻿using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,9 @@ namespace ModernSlavery.BusinessDomain.Submission
     [Serializable]
     public class StatementModel
     {
+        public long UserId { get; set; }
+        public DateTime Timestamp { get; set; }
+
         public long? StatementId { get; set; }
 
         public StatementStatuses Status { get; set; }
@@ -20,11 +24,13 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public long OrganisationId { get; set; }
 
-        public int Year { get; set; }
+        public int Year => SubmissionDeadline.Year;
+
+        public DateTime Modified { get; set; } = VirtualDateTime.Now;
+        public DateTime Created { get; set; } = VirtualDateTime.Now;
 
         #region Step 1 - your statement
 
-        [MaxLength(255)]
         public string StatementUrl { get; set; }
 
         public DateTime? StatementStartDate { get; set; }
@@ -91,21 +97,21 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 5 - Supply chain risks and due diligence part 1
 
-        public List<short> RelevantRisks { get; set; }
+        public List<(short StatementRiskTypeId,string Details)> RelevantRisks { get; set; }
 
         public string OtherRelevantRisks { get; set; }
 
-        public List<short> HighRisks { get; set; }
+        public List<(short StatementRiskTypeId, string Details)> HighRisks { get; set; }
 
         public string OtherHighRisks { get; set; }
 
-        public List<short> LocationRisks { get; set; }
+        public List<(short StatementRiskTypeId, string Details)> LocationRisks { get; set; }
 
         #endregion
 
         #region Step 5 - Supply chain risks and due diligence part 2
 
-        public List<short> Diligences { get; set; }
+        public List<(short StatementDiligenceTypeId, string Details)> Diligences { get; set; }
 
         public string ForcedLabourDetails { get; set; }
 
@@ -117,7 +123,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 6 - Training
 
-        public List<short> Training { get; set; }
+        public List<(short StatementTrainingTypeId, string Details)> Training { get; set; }
 
         public string OtherTraining { get; set; }
 
@@ -125,7 +131,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 7 - Monitoring progress
 
-        public bool IncludesMeasuringProgress { get; set; }
+        public bool? IncludesMeasuringProgress { get; set; }
 
         public string ProgressMeasures { get; set; }
 
