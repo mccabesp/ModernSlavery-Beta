@@ -166,7 +166,7 @@ namespace ModernSlavery.Core.Models
 
         public string DownloadsLocation { get; set; }
 
-        public string SaveDraftPath { get; set; }
+
         #endregion
 
         public void Validate() 
