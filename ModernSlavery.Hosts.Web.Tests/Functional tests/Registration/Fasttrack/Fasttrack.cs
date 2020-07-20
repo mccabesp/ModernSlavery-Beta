@@ -16,129 +16,46 @@ using ModernSlavery.Core.Entities;
 namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
-    public class Fasttrack : UITest
+    public class Fasttrack : CreateAccount
     {
-        public Fasttrack() : base(TestRunSetup.WebDriverService)
+        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
+        public Fasttrack() : base(_firstname, _lastname, _title, _email, _password)
         {
 
+
         }
-        private string _webAuthority;
-        private IDataRepository _dataRepository;
-        private IFileRepository _fileRepository;
-        private string URL;
-
-        [OneTimeSetUp]
-        public void RunBeforeAnyTests()
-        {
-            //Get the url from the test web host
-            _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
-            if (Debugger.IsAttached) Debug.WriteLine($"Kestrel authority: {_webAuthority}");
-            Console.WriteLine($"Kestrel authority: {_webAuthority}");
-
-            //Get the data repository from the test web host
-            _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
-
-            //Get the file repository from the test web host
-            _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
-            if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
-            Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
-
-
-            //_dataRepository.Insert<User>(new User { EmailAddress = "test@uat.co" });
-            //_dataRepository.SaveChangesAsync();
-        }
-        private bool TestRunFailed = false;
-
-        [SetUp]
-        public void SetUp()
-        {
-            if (TestRunFailed)
-                Assert.Inconclusive("Previous test failed");
-            else
-                SetupTest(TestContext.CurrentContext.Test.Name);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            //if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
-            //TeardownTest();
-        }
-
-        [Test, Ignore("Working on dependency")]
-        public void Fastrack_CreateAndVerifyUser(){
-
-            //succesful create account journey 
-            Goto("/");
-
-            Click("Sign in");
-
-            ExpectHeader("Sign in");
-
-            BelowHeader("No account yet?");
-            Click("Create an account");
-
-            ExpectHeader("Create an Account");
-
-            Set("Email address").To(Create_Account.roger_email);
-            Set("Confirm your email address").To(Create_Account.roger_email);
-
-            Set("First name").To(Create_Account.roger_first);
-            Set("Last name").To(Create_Account.roger_last);
-            Set("Job title").To(Create_Account.roger_job_title);
-
-            Set("Password").To(Create_Account.roger_password);
-            Set("Confirm password").To(Create_Account.roger_password);
-
-            ClickLabel("I would like to receive information about webinars, events and new guidance");
-            ClickLabel("I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys");
-
-            Click("Continue");
-
-            ExpectHeader("Verify your email address");
-
-
-
-            Expect(What.Contains, "We have sent you a confirmation email to");
-            Expect(What.Contains, Create_Account.roger_email);
-            Expect(What.Contains, "Follow the instructions in the email to continue your sign up.");
-
-
-            //get email verification link
-            var URL = WebDriver.FindElement(By.LinkText(Create_Account.roger_email)).GetAttribute("href");
-
-            Logout();
-
-
-            //verify roger's email
-            Goto(URL);
-
-            Set("Email").To(Create_Account.roger_email);
-            Set("Password").To(Create_Account.roger_password);
-
-            Click(The.Bottom, "Sign In");
-            ExpectHeader("You've confirmed your email address");
-
-            Expect("To complete the registration process for Modern Slavery reporting please continue.");
-            Click("Continue");
-
-            ExpectHeader("Privacy Policy");
-
-            Click("Continue");
-
-            ExpectHeader("Select an organisation");
-            Logout();
-        }
-        [Test, Parallelizable, Ignore("Working on dependency")]
+        
+        [Test, Order(20)]
         public void Fastrack_Registration_Success()
         {
-            Goto("/");
-            Click("Sign in");
-            Set("EMail").To(Create_Account.roger_email);
-            Set("Password").To(Create_Account.roger_password);
+            //Goto("/");
+            ////Click("Sign in");
+            ////Set("EMail").To(Create_Account.roger_email);
+            ////Set("Password").To(Create_Account.roger_password);
 
-            Click(The.Bottom, "Sign in");
+            ////Click(The.Bottom, "Sign in");
 
+
+            //Click("Register an organisation");
+
+
+            //ExpectHeader("Registration Options");
+
+            //ClickLabel("Fast Track");
+
+            //Click("Continue");
+
+            //ExpectHeader("Fast track registration");
+
+            //BelowHeader("Fast track registration").ExpectText("If you have received a letter you can enter your employer reference and security code to fast track your organisation`s registration");
+
+            //BelowHeader("Fast track registration").ExpectLabel("Employer reference");
+            //BelowHeader("Fast track registration").ExpectField("Employer reference");
+
+            //BelowHeader("Fast track registration").ExpectLabel("Security code");
+            //BelowHeader("Fast track registration").ExpectField("Security code");
+
+            //ExpectButton("Continue");
 
             Click("Register an organisation");
 
@@ -146,20 +63,42 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Registration Options");
 
             ClickLabel("Fast Track");
-
             Click("Continue");
 
             ExpectHeader("Fast track registration");
 
-            BelowHeader("Fast track registration").ExpectText("If you have received a letter you can enter your employer reference and security code to fast track your organisation`s registration");
+            //register organisation
+            Set("Employer reference").To(Registration.EmployerReference_Milbrook);
+            Set("Security code").To(Registration.SecurtiyCode_Millbrook);
 
-            BelowHeader("Fast track registration").ExpectLabel("Employer reference");
-            BelowHeader("Fast track registration").ExpectField("Employer reference");
+            Click("Continue");
 
-            BelowHeader("Fast track registration").ExpectLabel("Security code");
-            BelowHeader("Fast track registration").ExpectField("Security code");
 
-            ExpectButton("Continue");
+            ExpectHeader("Confirm your organisation’s details");
+
+            //expect organisation details
+            AtRow("Organisation name").Expect(Registration.OrgName_Millbrook);
+            AtRow("Company number").Expect(Registration.CompanyNumber_Millbrook);
+            AtRow("Registered address").Expect(Registration.RegisteredAddress_Millbrook);
+
+            //using contains due to label including encoded spaces and not being detected properly
+            AtRow(That.Contains, "Business").Expect(Registration.SicCode_Milbrook.Item1);
+            AtRow(That.Contains, "Business").Below(Registration.SicCode_Milbrook.Item1).Expect(Registration.SicCode_Milbrook.Item2);
+            AtRow(That.Contains, "Business").RightOf(Registration.SicCode_Milbrook.Item2).Expect(Registration.SicCode_Milbrook.Item3);
+
+            Click("Confirm");
+            ExpectHeader("You can now publish a Modern Slavery statement on behalf of this organisation.");
+
+            At("Employer name").Expect(Registration.OrgName_Millbrook);
+
+            Below("Employer name").ExpectText("You can also specify whether this employer is in scope of the reporting regulations.");
+
+            Click("Continue");
+
+            ExpectHeader("Select an organisation");
+
+            ExpectRow(Registration.OrgName_Millbrook);
+            AtRow(Registration.OrgName_Millbrook).Column("Organisation Status").Expect("Registration Complete");
         }
 
     }
