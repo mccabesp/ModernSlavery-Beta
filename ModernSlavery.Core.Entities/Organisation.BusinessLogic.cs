@@ -343,6 +343,16 @@ namespace ModernSlavery.Core.Entities
         #endregion
 
         #region Registration
+        /// <summary>
+        /// Checks if a user is registered to submit for this organisation
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public bool GetUserIsRegistered(long userId)
+        {
+            return UserOrganisations.Any(uo => uo.UserId == userId && uo.PINConfirmedDate != null);
+        }
+
         public string GetRegistrationStatus()
         {
             var reg = UserOrganisations.OrderBy(uo => uo.PINConfirmedDate)
