@@ -1,5 +1,6 @@
 ﻿using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -11,31 +12,45 @@ namespace ModernSlavery.BusinessDomain.Submission
     public interface IStatementBusinessLogic
     {
         /// <summary>
-        /// Get the statement metadata from the specified year for the specified organisation.
+        /// Retrieves a readonly StatementModel of the last submitted data
         /// </summary>
-        Task<StatementModel> GetStatementByOrganisationAndYear(Organisation organisation, int reportingYear);
+        /// <param name="organisation">The organisation who owns the statement data</param>
+        /// <param name="reportingDeadlineYear">The reporting year of the statement data to retrieve</param>
+        /// <returns>The StatemenModel containing the submitted statement data</returns>
+        Task<Outcome<StatementErrors, StatementModel>> GetSubmittedStatementModel(long organisationId, int reportingDeadlineYear);
 
         /// <summary>
-        /// Check if the user can access the statement of the provided organisation and year.
+        /// Attempts to open an existing or create a new draft StaementModel for a specific user, organisation and reporting year
         /// </summary>
-        Task<StatementActionResult> CanAccessStatement(User user, Organisation organisation, int reportingYear);
-
-
-        Task<StatementActionResult> SaveDraftStatement(User user, StatementModel statementModel);
+        /// <param name="organisationId">The Id of the organisation who owns the statement data</param>
+        /// <param name="reportingDeadlineYear">The reporting year of the statement data to retrieve</param>
+        /// <param name="userId">The Id of the user who wishes to edit the statement data</param>
+        /// <returns>The statement model or a list of errors</returns>
+        Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModel(long organisationId, int reportingDeadlineYear, long userId);
 
         /// <summary>
-        /// Save the statement metadata.
+        /// Deletes any previously opened draft StatementModel and restores the backup
         /// </summary>
-        Task<StatementActionResult> SaveStatement(User user, StatementModel statement);
+        /// <param name="statementModel"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        Task CancelEditDraftStatementModel(long organisationId, int reportingDeadlineYear);
+
+        Task SaveDraftStatementModel(StatementModel statementModel);
+
+        Task SubmitDraftStatementModel(StatementModel statementModel);
+
     }
 
-    public enum StatementActionResult : byte
+    public enum StatementErrors : byte
     {
         Unknown = 0,
         Success = 1,
         InvalidPermissions = 2,
         Unauthorised = 3,
         Uneditable = 4,
-        Locked = 5
+        Locked = 5,
+        TooLate=6,
+        NotFound=7,
     }
 }
