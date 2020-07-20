@@ -10,7 +10,7 @@ namespace ModernSlavery.Core.Classes
         bool CanReplace(string source, string target);
         bool CanReplace(string source, IEnumerable<string> targets);
         bool IsCoHo(string source);
-        bool IsDnB(string source);
+        bool IsExternal(string source);
         int Parse(string source);
     }
 
@@ -50,14 +50,14 @@ namespace ModernSlavery.Core.Classes
 
             if (source.EqualsI("user") || source.IsEmailAddress()) return 2;
 
-            if (IsDnB(source) || source.EqualsI("Manual")) return 1;
+            if (IsExternal(source) || source.EqualsI("Manual")) return 1;
 
             return 0;
         }
 
-        public bool IsDnB(string source)
+        public bool IsExternal(string source)
         {
-            return source.Strip(" ").EqualsI("D&B", "DNB", "dunandbradstreet", "dun&bradstreet");
+            return source.Strip(" ").EqualsI("External", "Ext");
         }
 
         public bool IsCoHo(string source)

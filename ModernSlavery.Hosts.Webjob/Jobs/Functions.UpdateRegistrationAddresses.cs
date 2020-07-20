@@ -103,19 +103,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         public async Task<List<RegistrationAddressesFileModel>> GetLatestRegistrationAddressesAsync()
         {
-            // Load the DnBOrgs file from storage"
-            var dnbOrgsPath = Path.Combine(_SharedBusinessLogic.SharedOptions.DataPath, Filenames.DnBOrganisations());
-            var AllDnBOrgs = await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(dnbOrgsPath)
-                ? await _SharedBusinessLogic.FileRepository.ReadCSVAsync<DnBOrgsModel>(dnbOrgsPath)
-                : new List<DnBOrgsModel>();
-            AllDnBOrgs = AllDnBOrgs.OrderBy(o => o.OrganisationName).ToList();
-
-            // Extract the DUNSNumber, JobTitle and FullName from the DnBOrgs
-            var dnbUserOrgs = AllDnBOrgs
-                .Select(dnbOrg => new
-                    {dnbOrg.DUNSNumber, DnBJobTitle = dnbOrg.ContactJobtitle, DnBFullName = dnbOrg.GetContactName()})
-                .ToList();
-
             // Get all the latest verified organisation registrations
             var verifiedOrgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                 .Where(uo => uo.LatestRegistration != null)
@@ -159,15 +146,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         // Convert two letter country codes to full country names
                         var countryCode = Country.FindTwoLetterCode(latestAddress.Country);
 
-                        // Get the linked dnb record using the DUNSNumber
-                        var dnbOrg = dnbUserOrgs.FirstOrDefault(dnbo => dnbo.DUNSNumber == vo.DUNSNumber);
-
-                        // If (DnBJobTile and DnBFullName) is null or empty then DnbFullName = "Chief Executive"
-                        var dnbJobTitle = dnbOrg?.DnBJobTitle;
-                        var dnbFullName = dnbOrg?.DnBFullName;
-                        if (string.IsNullOrWhiteSpace(dnbJobTitle) && string.IsNullOrWhiteSpace(dnbFullName))
-                            dnbFullName = "Chief Executive";
-
                         // Retrieve the SectorType reporting snapshot date (d MMMM yyyy)
                         var expires = _snapshotDateHelper.GetReportingStartDate(vo.SectorType).AddYears(1).AddDays(-1)
                             .ToString("d MMMM yyyy");
@@ -179,8 +157,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             DUNSNumber = vo.DUNSNumber,
                             EmployerReference = vo.EmployerReference,
                             Sector = vo.SectorType,
-                            DnBJobTitle = dnbJobTitle,
-                            DnBFullName = dnbFullName,
                             LatestUserJobTitle = latestRegistrationUser.JobTitle,
                             LatestUserFullName = latestRegistrationUser.Fullname,
                             LatestUserStatus = latestRegistrationUser.Status.ToString(),

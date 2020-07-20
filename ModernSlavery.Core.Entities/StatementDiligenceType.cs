@@ -10,6 +10,7 @@ namespace ModernSlavery.Core.Entities
         public StatementDiligenceType()
         {
             ChildDiligenceTypes = new HashSet<StatementDiligenceType>();
+            StatementDiligences = new HashSet<StatementDiligence>();
         }
 
         public short StatementDiligenceTypeId { get; set; }
@@ -23,5 +24,6 @@ namespace ModernSlavery.Core.Entities
         public virtual StatementDiligenceType ParentDiligenceType { get; set; }
 
         public virtual ICollection<StatementDiligenceType> ChildDiligenceTypes { get; set; }
+        public virtual ICollection<StatementDiligence> StatementDiligences { get; set; }
     }
 }

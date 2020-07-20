@@ -26,14 +26,12 @@ namespace ModernSlavery.BusinessDomain.Registration
             ISharedBusinessLogic sharedBusinessLogic,
             ISubmissionBusinessLogic submissionLogic,
             IScopeBusinessLogic scopeLogic,
-            ISecurityCodeBusinessLogic securityCodeLogic,
-            IDnBOrgsRepository dnBOrgsRepository)
+            ISecurityCodeBusinessLogic securityCodeLogic)
         {
             _sharedBusinessLogic = sharedBusinessLogic;
             _submissionLogic = submissionLogic;
             _scopeLogic = scopeLogic;
             _securityCodeLogic = securityCodeLogic;
-            DnBOrgsRepository = dnBOrgsRepository;
         }
 
         public IQueryable<Organisation> SearchOrganisations(string searchText,int records)
@@ -52,8 +50,6 @@ namespace ModernSlavery.BusinessDomain.Registration
                 .Select(o => o.org);
             return searchResults;
         }
-
-        public IDnBOrgsRepository DnBOrgsRepository { get; }
 
         /// <summary>
         ///     Gets a list of organisations with latest returns and scopes for Organisations download file

@@ -554,6 +554,7 @@ namespace ModernSlavery.Infrastructure.Database
                 entity =>
                 {
                     entity.HasKey(e => e.StatementTrainingTypeId);
+                    entity.Property(e => e.StatementTrainingTypeId).ValueGeneratedNever();
 
                     entity.Property(e => e.Description)
                         .IsRequired()
@@ -572,7 +573,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.StatementTrainingType)
-                        .WithMany()
+                        .WithMany(e=>e.StatementTraining)
                         .HasForeignKey(e => e.StatementTrainingTypeId);
 
                     entity.HasOne(e => e.Statement)
@@ -598,6 +599,10 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasOne(e => e.Statement)
                         .WithMany(e => e.Diligences)
                         .HasForeignKey(e => e.StatementId);
+
+                    entity.HasOne(e => e.StatementDiligenceType)
+                        .WithMany(e => e.StatementDiligences)
+                        .HasForeignKey(e => e.StatementDiligenceTypeId);
                 });
 
             #endregion
@@ -608,7 +613,8 @@ namespace ModernSlavery.Infrastructure.Database
                 entity =>
                 {
                     entity.HasKey(e => e.StatementDiligenceTypeId);
-
+                    entity.Property(e => e.StatementDiligenceTypeId).ValueGeneratedNever();
+                    
                     entity.HasIndex(e => e.ParentDiligenceTypeId);
 
                     entity.Property(e => e.Description)
@@ -628,6 +634,7 @@ namespace ModernSlavery.Infrastructure.Database
                 entity =>
                 {
                     entity.HasKey(e => e.StatementPolicyTypeId);
+                    entity.Property(e => e.StatementPolicyTypeId).ValueGeneratedNever();
 
                     entity.Property(e => e.Description)
                         .IsRequired()
@@ -646,7 +653,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.StatementPolicyType)
-                        .WithMany()
+                        .WithMany(e=>e.StatementPolicies)
                         .HasForeignKey(e => e.StatementPolicyTypeId);
 
                     entity.HasOne(e => e.Statement)
@@ -666,7 +673,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.StatementRiskType)
-                        .WithMany()
+                        .WithMany(e=> e.StatementRelevantRisks)
                         .HasForeignKey(e => e.StatementRiskTypeId);
 
                     entity.HasOne(e => e.Statement)
@@ -686,7 +693,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.StatementRiskType)
-                        .WithMany()
+                        .WithMany(e=> e.StatementHighRisks)
                         .HasForeignKey(e => e.StatementRiskTypeId);
 
                     entity.HasOne(e => e.Statement)
@@ -701,9 +708,11 @@ namespace ModernSlavery.Infrastructure.Database
             modelBuilder.Entity<StatementRiskType>(
                 entity =>
                 {
+
                     entity.Property(e => e.Category).HasColumnName("RiskCategoryId");
 
                     entity.HasKey(e => e.StatementRiskTypeId);
+                    entity.Property(e => e.StatementRiskTypeId).ValueGeneratedNever();
 
                     entity.HasIndex(e => e.ParentRiskTypeId);
 
@@ -726,7 +735,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.StatementRiskType)
-                        .WithMany()
+                        .WithMany(e=>e.StatementLocationRisks)
                         .HasForeignKey(e => e.StatementRiskTypeId);
 
                     entity.HasOne(e => e.Statement)
@@ -769,6 +778,7 @@ namespace ModernSlavery.Infrastructure.Database
                 entity =>
                 {
                     entity.HasKey(e => e.StatementSectorTypeId);
+                    entity.Property(e => e.StatementSectorTypeId).ValueGeneratedNever();
 
                     entity.Property(e => e.Description)
                         .HasMaxLength(255)
@@ -791,7 +801,7 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasForeignKey(d => d.StatementId);
 
                     entity.HasOne(d => d.StatementSectorType)
-                        .WithMany()
+                        .WithMany(d=>d.StatementSectors)
                         .HasForeignKey(d => d.StatementSectorTypeId);
                 });
 

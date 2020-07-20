@@ -493,15 +493,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 //Make sure the organisation has an address
                 if (employer.SectorType == SectorTypes.Public)
                 {
-                    //Get the email domains from the D&B file
-                    if (string.IsNullOrWhiteSpace(employer.EmailDomains))
-                    {
-                        var allDnBOrgs = await _registrationService.OrganisationBusinessLogic.DnBOrgsRepository
-                            .GetAllDnBOrgsAsync();
-                        var dnbOrg = allDnBOrgs?.FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
-                        if (dnbOrg != null) employer.EmailDomains = dnbOrg.EmailDomains;
-                    }
-
                     model.ManualRegistration = false;
                     model.SelectedAuthorised = employer.IsAuthorised(VirtualUser.EmailAddress);
                     if (!model.SelectedAuthorised || !employer.HasAnyAddress())
@@ -911,15 +902,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             //Make sure the organisation has an address
             if (employer.SectorType == SectorTypes.Public)
             {
-                //Get the email domains from the D&B file
-                if (string.IsNullOrWhiteSpace(employer.EmailDomains))
-                {
-                    var allDnBOrgs = await _registrationService.OrganisationBusinessLogic.DnBOrgsRepository
-                        .GetAllDnBOrgsAsync();
-                    var dnbOrg = allDnBOrgs?.FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
-                    if (dnbOrg != null) employer.EmailDomains = dnbOrg.EmailDomains;
-                }
-
                 model.ManualAuthorised = employer.IsAuthorised(VirtualUser.EmailAddress);
                 if (!model.ManualAuthorised || !employer.HasAnyAddress()) model.ManualAddress = true;
             }

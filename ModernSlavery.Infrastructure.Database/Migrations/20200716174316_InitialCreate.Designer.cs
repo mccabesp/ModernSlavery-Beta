@@ -10,7 +10,7 @@ using ModernSlavery.Infrastructure.Database;
 namespace ModernSlavery.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20200715200655_InitialCreate")]
+    [Migration("20200716174316_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -814,7 +814,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.Property<decimal?>("MaxStatementYears")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("MaxTurnover")
+                    b.Property<int?>("MaxTurnover")
                         .HasColumnType("int");
 
                     b.Property<decimal>("MinStatementYears")
@@ -947,9 +947,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementDiligenceType", b =>
                 {
                     b.Property<short>("StatementDiligenceTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("smallint");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -1065,9 +1063,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementPolicyType", b =>
                 {
                     b.Property<short>("StatementPolicyTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("smallint");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -1106,9 +1102,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementRiskType", b =>
                 {
                     b.Property<short>("StatementRiskTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("smallint");
 
                     b.Property<byte>("Category")
                         .HasColumnName("RiskCategoryId")
@@ -1152,9 +1146,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementSectorType", b =>
                 {
                     b.Property<short>("StatementSectorTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("smallint");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -1226,9 +1218,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementTrainingType", b =>
                 {
                     b.Property<short>("StatementTrainingTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("smallint");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -1633,7 +1623,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementDiligence", b =>
                 {
                     b.HasOne("ModernSlavery.Core.Entities.StatementDiligenceType", "StatementDiligenceType")
-                        .WithMany()
+                        .WithMany("StatementDiligences")
                         .HasForeignKey("StatementDiligenceTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1661,7 +1651,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.HasOne("ModernSlavery.Core.Entities.StatementRiskType", "StatementRiskType")
-                        .WithMany()
+                        .WithMany("StatementHighRisks")
                         .HasForeignKey("StatementRiskTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1676,7 +1666,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.HasOne("ModernSlavery.Core.Entities.StatementRiskType", "StatementRiskType")
-                        .WithMany()
+                        .WithMany("StatementLocationRisks")
                         .HasForeignKey("StatementRiskTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1704,7 +1694,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.HasOne("ModernSlavery.Core.Entities.StatementPolicyType", "StatementPolicyType")
-                        .WithMany()
+                        .WithMany("StatementPolicies")
                         .HasForeignKey("StatementPolicyTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1719,7 +1709,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.HasOne("ModernSlavery.Core.Entities.StatementRiskType", "StatementRiskType")
-                        .WithMany()
+                        .WithMany("StatementRelevantRisks")
                         .HasForeignKey("StatementRiskTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1741,7 +1731,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.HasOne("ModernSlavery.Core.Entities.StatementSectorType", "StatementSectorType")
-                        .WithMany()
+                        .WithMany("StatementSectors")
                         .HasForeignKey("StatementSectorTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1771,7 +1761,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.HasOne("ModernSlavery.Core.Entities.StatementTrainingType", "StatementTrainingType")
-                        .WithMany()
+                        .WithMany("StatementTraining")
                         .HasForeignKey("StatementTrainingTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

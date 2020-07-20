@@ -13,8 +13,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                if (RunningJobs.Contains(nameof(DnBImportAsync))) return;
-
                 await ReferenceEmployersAsync();
                 log.LogDebug($"Executed {nameof(ReferenceEmployers)} successfully");
             }

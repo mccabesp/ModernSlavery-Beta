@@ -98,6 +98,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public int? StatementEndMonth { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter an end year")]
         public int? StatementEndYear { get; set; }
+        // This is the obfuscated DB id for the org
         [Display(Name = "Job Title")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter a job title")]
         public string ApproverJobTitle { get; set; }

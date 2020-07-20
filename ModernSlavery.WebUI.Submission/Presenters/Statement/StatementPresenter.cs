@@ -12,9 +12,14 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Submission.Controllers;
+using ModernSlavery.WebUI.Submission.Models;
+using ModernSlavery.WebUI.Submission.Models.Statement;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,39 +32,56 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// The action result will be the view.
         /// </summary>
         Task<CustomResult<StatementViewModel>> TryGetYourStatement(User user, string organisationIdentifier, int year);
+        Task<YourStatementPageViewModel> GetYourStatementAsync(User user, string organisationIdentifier, int year);
 
         /// <summary>
         /// Save the current submission draft which is only visible to the current user.
         /// </summary>
         Task<StatementActionResult> TrySaveYourStatement(User user, StatementViewModel model);
+        Task SaveYourStatementAsync(User user, YourStatementPageViewModel viewModel);
 
         Task<CustomResult<StatementViewModel>> TryGetCompliance(User user, string organisationIdentifier, int year);
+        Task<CompliancePageViewModel> GetComplianceAsync(User user, string organisationIdentifier, int year);
 
         Task<StatementActionResult> TrySaveCompliance(User user, StatementViewModel model);
+        Task SaveComplianceAsync(User user, CompliancePageViewModel viewModel);
 
         Task<CustomResult<StatementViewModel>> TryGetYourOrganisation(User user, string organisationIdentifier, int year);
+        Task<OrganisationPageViewModel> GetYourOrganisationAsync(User user, string organisationIdentifier, int year);
 
         Task<StatementActionResult> TrySaveYourOrgansation(User user, StatementViewModel model);
+        Task SaveYourOrgansationAsync(User user, OrganisationPageViewModel viewModel);
 
         Task<CustomResult<StatementViewModel>> TryGetPolicies(User user, string organisationIdentifier, int year);
+        Task<PoliciesPageViewModel> GetPoliciesAsync(User user, string organisationIdentifier, int year);
 
         Task<StatementActionResult> TrySavePolicies(User user, StatementViewModel model);
+        Task SavePoliciesAsync(User user, PoliciesPageViewModel viewModel);
 
-        Task<CustomResult<StatementViewModel>> TryGetSupplyChainRisk(User user, string organisationIdentifier, int year);
+        //TODO: need to seperate into 2 parts for supply chain risk and due diligence
+        Task<CustomResult<StatementViewModel>> TryGetSupplyChainRiskAndDueDiligence(User user, string organisationIdentifier, int year);
+        Task<RisksPageViewModel> GetRisksAsync(User user, string organisationIdentifier, int year);
+        Task<DueDiligencePageViewModel> GetDueDiligenceAsync(User user, string organisationIdentifier, int year);
 
-        Task<StatementActionResult> TrySaveSupplyChainRisk(User user, StatementViewModel model);
+        Task<StatementActionResult> TrySaveSupplyChainRiskAndDueDiligence(User user, StatementViewModel model);
+        Task SaveRisksAsync(User user, RisksPageViewModel viewModel);
+        Task SaveDueDiligenceAsync(User user, DueDiligencePageViewModel viewModel);
 
         Task<CustomResult<StatementViewModel>> TryGetDueDiligence(User user, string organisationIdentifier, int year);
 
         Task<StatementActionResult> TrySaveDueDiligence(User user, StatementViewModel model);
 
         Task<CustomResult<StatementViewModel>> TryGetTraining(User user, string organisationIdentifier, int year);
+        Task<TrainingPageViewModel> GetTrainingAsync(User user, string organisationIdentifier, int year);
 
         Task<StatementActionResult> TrySaveTraining(User user, StatementViewModel model);
+        Task SaveTrainingAsync(User user, TrainingPageViewModel viewModel);
 
         Task<CustomResult<StatementViewModel>> TryGetMonitoringInProgress(User user, string organisationIdentifier, int year);
+        Task<ProgressPageViewModel> GetProgressAsync(User user, string organisationIdentifier, int year);
 
         Task<StatementActionResult> TrySaveMonitorInProgress(User user, StatementViewModel model);
+        Task SaveProgressAsync(User user, ProgressPageViewModel viewModel);
 
         /// <summary>
         /// Save and then submit the users current draft for the organisation
@@ -94,15 +116,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
     public class StatementPresenter : IStatementPresenter
     {
-        // class will NOT provide enough uniqueness, think multiple open tabs
-        // the key will have to be constructed out of parameters in the url - org and year
-        const string SessionKey = "StatementPresenter";
-
         readonly IStatementBusinessLogic StatementBusinessLogic;
-
-        // required for accessing session
-        readonly IHttpContextAccessor HttpContextAccessor;
-
         readonly ISharedBusinessLogic SharedBusinessLogic;
 
         readonly IMapper Mapper;
@@ -110,13 +124,11 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public StatementPresenter(
             IMapper mapper,
             ISharedBusinessLogic sharedBusinessLogic,
-            IStatementBusinessLogic statementBusinessLogic,
-            IHttpContextAccessor httpContextAccessor)
+            IStatementBusinessLogic statementBusinessLogic)
         {
             Mapper = mapper;
             SharedBusinessLogic = sharedBusinessLogic;
             StatementBusinessLogic = statementBusinessLogic;
-            HttpContextAccessor = httpContextAccessor;
         }
 
         #region Step 1 - Your statement
@@ -133,6 +145,48 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await SaveDraftForUser(user, model);
         }
 
+        // TODO - James to keep it simple, throw exceptions on get/save methods
+        // These should really be handled with custom result type class rather than exceptions
+        // controllers interpret the result to present the correct view
+
+        public async Task<YourStatementPageViewModel> GetYourStatementAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+
+            var vm = new YourStatementPageViewModel
+            {
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                StatementUrl = model.StatementUrl,
+                StatementStartDate = model.StatementStartDate,
+                StatementEndDate = model.StatementEndDate,
+                ApproverFirstName = model.ApproverFirstName,
+                ApproverLastName = model.ApproverLastName,
+                ApproverJobTitle = model.ApproverLastName,
+                ApprovedDate = model.ApprovedDate,
+            };
+
+            return vm;
+        }
+
+        public async Task SaveYourStatementAsync(User user, YourStatementPageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+
+            model.StatementUrl = viewModel.StatementUrl;
+            model.StatementStartDate = viewModel.StatementStartDate;
+            model.StatementEndDate = viewModel.StatementEndDate;
+            model.ApproverFirstName = viewModel.ApproverFirstName;
+            model.ApproverLastName = viewModel.ApproverLastName;
+            model.ApproverJobTitle = viewModel.ApproverLastName;
+            model.ApprovedDate = viewModel.ApprovedDate;
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
+        }
+
         #endregion
 
         #region Step 2 - Compliance
@@ -145,6 +199,54 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public async Task<StatementActionResult> TrySaveCompliance(User user, StatementViewModel model)
         {
             return await SaveDraftForUser(user, model);
+        }
+
+        public async Task<CompliancePageViewModel> GetComplianceAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+
+            var vm = new CompliancePageViewModel
+            {
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                IncludesStructure = model.IncludesStructure,
+                StructureDetails = model.StructureDetails,
+                IncludesPolicies = model.IncludesPolicies,
+                PolicyDetails = model.PolicyDetails,
+                IncludesRisks = model.IncludesRisks,
+                RisksDetails = model.RisksDetails,
+                IncludesDueDiligence = model.IncludesDueDiligence,
+                DueDiligenceDetails = model.DueDiligenceDetails,
+                IncludesTraining = model.IncludesTraining,
+                TrainingDetails = model.TrainingDetails,
+                IncludesGoals = model.IncludesGoals,
+                GoalsDetails = model.GoalsDetails,
+            };
+
+            return vm;
+        }
+
+        public async Task SaveComplianceAsync(User user, CompliancePageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+
+            model.IncludesStructure = viewModel.IncludesStructure;
+            model.StructureDetails = viewModel.StructureDetails;
+            model.IncludesPolicies = viewModel.IncludesPolicies;
+            model.PolicyDetails = viewModel.PolicyDetails;
+            model.IncludesRisks = viewModel.IncludesRisks;
+            model.RisksDetails = viewModel.RisksDetails;
+            model.IncludesDueDiligence = viewModel.IncludesDueDiligence;
+            model.DueDiligenceDetails = viewModel.DueDiligenceDetails;
+            model.IncludesTraining = viewModel.IncludesTraining;
+            model.TrainingDetails = viewModel.TrainingDetails;
+            model.IncludesGoals = viewModel.IncludesGoals;
+            model.GoalsDetails = viewModel.GoalsDetails;
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
         }
 
         #endregion
@@ -163,6 +265,87 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await SaveDraftForUser(user, model);
         }
 
+        public async Task<OrganisationPageViewModel> GetYourOrganisationAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+            var sectors = SharedBusinessLogic.DataRepository
+                .GetAll<StatementSectorType>()
+                .Select(t => new OrganisationPageViewModel.SectorViewModel
+                {
+                    Id = t.StatementSectorTypeId,
+                    Description = t.Description,
+                    IsSelected = model.StatementSectors.Contains(t.StatementSectorTypeId)
+                });
+
+            var vm = new OrganisationPageViewModel
+            {
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                Sectors = sectors.ToList(),
+                Turnover = ParseTurnover(model.MinTurnover, model.MaxTurnover),
+            };
+
+            return vm;
+        }
+
+        private LastFinancialYearBudget? ParseTurnover(decimal? min, decimal? max)
+        {
+            if (!min.HasValue && !max.HasValue)
+                return null;
+
+            if (min >= 500_000_000)
+                return LastFinancialYearBudget.From500MillionUpwards;
+
+            else if (max <= 500_000_000 && min >= 100_000_000)
+                return LastFinancialYearBudget.From100MillionTo500Million;
+
+            else if (max <= 100_000_000 && min >= 60_000_000)
+                return LastFinancialYearBudget.From60MillionTo100Million;
+
+            else if (max <= 60_000_000 && min >= 36_000_000)
+                return LastFinancialYearBudget.From60MillionTo100Million;
+
+            else
+                return LastFinancialYearBudget.Under36Million;
+        }
+
+        public async Task SaveYourOrgansationAsync(User user, OrganisationPageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+            var (min, max) = GetTurnoverRange(viewModel.Turnover);
+
+            model.StatementSectors = viewModel.Sectors.Where(s => s.IsSelected).Select(s => s.Id).ToList();
+            model.MinTurnover = min;
+            model.MaxTurnover = max;
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
+        }
+
+        private (int? min, int? max) GetTurnoverRange(LastFinancialYearBudget? turnover)
+        {
+            if (!turnover.HasValue)
+                return (null, null);
+
+            switch (turnover.Value)
+            {
+                case LastFinancialYearBudget.Under36Million:
+                    return (0, 36_000_000);
+                case LastFinancialYearBudget.From36MillionTo60Million:
+                    return (36_000_000, 60_000_000);
+                case LastFinancialYearBudget.From60MillionTo100Million:
+                    return (60_000_000, 100_000_000);
+                case LastFinancialYearBudget.From100MillionTo500Million:
+                    return (100_000_000, 500_000_000);
+                case LastFinancialYearBudget.From500MillionUpwards:
+                    return (500_000_000, null);
+                default:
+                    return (null, null);
+            }
+        }
+
         #endregion
 
         #region Step 4 - Policies
@@ -177,6 +360,42 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             await ValidateForDraft(model);
 
             return await SaveDraftForUser(user, model);
+        }
+
+        public async Task<PoliciesPageViewModel> GetPoliciesAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+            var policies = SharedBusinessLogic.DataRepository
+                .GetAll<StatementPolicyType>()
+                .Select(t => new PoliciesPageViewModel.PolicyViewModel
+                {
+                    Id = t.StatementPolicyTypeId,
+                    Description = t.Description,
+                    IsSelected = model.StatementPolicies.Contains(t.StatementPolicyTypeId)
+                });
+
+            var vm = new PoliciesPageViewModel
+            {
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                Policies = policies.ToList(),
+                OtherPolicies = model.OtherPolicies
+            };
+
+            return vm;
+        }
+
+        public async Task SavePoliciesAsync(User user, PoliciesPageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+
+            model.StatementPolicies = viewModel.Policies.Where(p => p.IsSelected).Select(s => s.Id).ToList();
+            model.OtherPolicies = model.OtherPolicies;
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
         }
 
         #endregion
@@ -213,7 +432,144 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #endregion
 
-        #region Step 7 - Training
+        #region Step 5 - Supply chain risks and due diligence part 1
+
+        public async Task<RisksPageViewModel> GetRisksAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+
+            var releventRisks = SharedBusinessLogic.DataRepository
+                .GetAll<StatementRiskType>()
+                .Where(t => t.Category == RiskCategories.RiskArea)
+                .Select(t => new RisksPageViewModel.RiskViewModel
+                {
+                    Id = t.StatementRiskTypeId,
+                    ParentId = t.ParentRiskTypeId,
+                    Description = t.Description,
+                    IsSelected = model.RelevantRisks.Contains(t.StatementRiskTypeId)
+                });
+
+            var highRisks = SharedBusinessLogic.DataRepository
+                .GetAll<StatementRiskType>()
+                .Where(t => t.Category == RiskCategories.RiskArea)
+                .Select(t => new RisksPageViewModel.RiskViewModel
+                {
+                    Id = t.StatementRiskTypeId,
+                    ParentId = t.ParentRiskTypeId,
+                    Description = t.Description,
+                    IsSelected = model.HighRisks.Contains(t.StatementRiskTypeId)
+                });
+
+            var locationRisks = SharedBusinessLogic.DataRepository
+                .GetAll<StatementRiskType>()
+                .Where(t => t.Category == RiskCategories.Location)
+                .Select(t => new RisksPageViewModel.RiskViewModel
+                {
+                    Id = t.StatementRiskTypeId,
+                    ParentId = t.ParentRiskTypeId,
+                    Description = t.Description,
+                    IsSelected = model.LocationRisks.Contains(t.StatementRiskTypeId)
+                });
+
+
+            var vm = new RisksPageViewModel
+            {
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                RelevantRisks = releventRisks.ToList(),
+                OtherRelevantRisks = model.OtherRelevantRisks,
+                HighRisks = highRisks.ToList(),
+                OtherHighRisks = model.OtherHighRisks,
+                LocationRisks = locationRisks.ToList(),
+            };
+
+            return vm;
+        }
+
+        public async Task SaveRisksAsync(User user, RisksPageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+
+            model.RelevantRisks = viewModel.RelevantRisks.Where(r => r.IsSelected).Select(r => r.Id).ToList();
+            model.OtherRelevantRisks = viewModel.OtherRelevantRisks;
+            model.HighRisks = viewModel.HighRisks.Where(r => r.IsSelected).Select(r => r.Id).ToList();
+            model.OtherHighRisks = viewModel.OtherHighRisks;
+            model.LocationRisks = viewModel.LocationRisks.Where(r => r.IsSelected).Select(r => r.Id).ToList();
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
+        }
+
+        #endregion
+
+        #region Step 5 - Supply chain risks and due diligence part 2
+
+        public async Task<DueDiligencePageViewModel> GetDueDiligenceAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+            var diligences = SharedBusinessLogic.DataRepository
+                .GetAll<StatementDiligenceType>()
+                .Select(t => new DueDiligencePageViewModel.DueDiligenceViewModel
+                {
+                    Id = t.StatementDiligenceTypeId,
+                    ParentId = t.ParentDiligenceTypeId,
+                    Description = t.Description,
+                    IsSelected = model.Diligences.Contains(t.StatementDiligenceTypeId)
+                });
+
+            var vm = new DueDiligencePageViewModel
+            {
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                DueDiligences = diligences.ToList(),
+                HasForceLabour = string.IsNullOrEmpty(model.ForcedLabourDetails),
+                ForcedLabourDetails = model.ForcedLabourDetails,
+                HasSlaveryInstance = string.IsNullOrEmpty(model.SlaveryInstanceDetails),
+                SlaveryInstanceDetails = model.SlaveryInstanceDetails,
+                SlaveryInstanceRemediation = ParseRemediation(model.SlaveryInstanceRemediation).ToList(),
+            };
+
+            return vm;
+        }
+
+        private IEnumerable<StatementRemediation> ParseRemediation(string slaveryInstanceRemediation)
+        {
+            var items = slaveryInstanceRemediation.Split(Environment.NewLine);
+
+            return items.Select(r => (StatementRemediation)Enum.Parse(typeof(StatementRemediation), r));
+        }
+
+        public async Task SaveDueDiligenceAsync(User user, DueDiligencePageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+
+            model.Diligences = viewModel.DueDiligences.Where(r => r.IsSelected).Select(r => r.Id).ToList();
+            if (viewModel.HasForceLabour)
+                model.ForcedLabourDetails = viewModel.ForcedLabourDetails;
+            else
+                model.ForcedLabourDetails = null;
+            if (viewModel.HasSlaveryInstance)
+            {
+                model.SlaveryInstanceDetails = viewModel.SlaveryInstanceDetails;
+                model.SlaveryInstanceRemediation = string.Join(Environment.NewLine, viewModel.SlaveryInstanceRemediation.Select(r => Enum.GetName(typeof(StatementRemediation), r)));
+            }
+            else
+            {
+                model.SlaveryInstanceDetails = null;
+                model.SlaveryInstanceRemediation = null;
+            }
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
+        }
+
+        #endregion
+
+        #region Step 6 - Training
 
         public async Task<CustomResult<StatementViewModel>> TryGetTraining(User user, string organisationIdentifier, int year)
         {
@@ -225,6 +581,42 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             await ValidateForDraft(model);
 
             return await SaveDraftForUser(user, model);
+        }
+
+        public async Task<TrainingPageViewModel> GetTrainingAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+            var training = SharedBusinessLogic.DataRepository
+                .GetAll<StatementTrainingType>()
+                .Select(t => new TrainingPageViewModel.TrainingViewModel
+                {
+                    Id = t.StatementTrainingTypeId,
+                    Description = t.Description,
+                    IsSelected = model.Training.Contains(t.StatementTrainingTypeId)
+                });
+
+            var vm = new TrainingPageViewModel
+            {
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                Training = training.ToList(),
+                OtherTraining = model.OtherTraining,
+            };
+
+            return vm;
+        }
+
+        public async Task SaveTrainingAsync(User user, TrainingPageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+
+            model.Training = viewModel.Training.Where(t => t.IsSelected).Select(t => t.Id).ToList();
+            model.OtherTraining = viewModel.OtherTraining;
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
         }
 
         #endregion
@@ -243,10 +635,98 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await SaveDraftForUser(user, model);
         }
 
+        public async Task<ProgressPageViewModel> GetProgressAsync(User user, string organisationIdentifier, int year)
+        {
+            var model = await GetStatementModelAsync(user, organisationIdentifier, year);
+            var training = SharedBusinessLogic.DataRepository
+                .GetAll<StatementTrainingType>()
+                .Select(t => new TrainingPageViewModel.TrainingViewModel
+                {
+                    Id = t.StatementTrainingTypeId,
+                    Description = t.Description,
+                    IsSelected = model.Training.Contains(t.StatementTrainingTypeId)
+                });
+
+            var vm = new ProgressPageViewModel
+            {
+                Year = year,
+                OrganisationIdentifier = organisationIdentifier,
+                IncludesMeasuringProgress = model.IncludesMeasuringProgress,
+                ProgressMeasures = model.ProgressMeasures,
+                KeyAchievements = model.KeyAchievements,
+                NumberOfYearsOfStatements = ParseYears(model.MinStatementYears, model.MaxStatementYears),
+            };
+
+            return vm;
+        }
+
+        private NumberOfYearsOfStatements? ParseYears(decimal? min, decimal? max)
+        {
+            if (!min.HasValue && !max.HasValue)
+                return null;
+
+            if (min >= 5)
+                return NumberOfYearsOfStatements.moreThan5Years;
+            else if (max <= 5 && min >= 1)
+                return NumberOfYearsOfStatements.from1To5Years;
+            else
+                return NumberOfYearsOfStatements.thisIsTheFirstTime;
+        }
+
+        public async Task SaveProgressAsync(User user, ProgressPageViewModel viewModel)
+        {
+            var model = await GetStatementModelAsync(user, viewModel.OrganisationIdentifier, viewModel.Year);
+            var (min, max) = GetYearsRange(viewModel.NumberOfYearsOfStatements);
+
+            model.IncludesMeasuringProgress = viewModel.IncludesMeasuringProgress;
+            model.ProgressMeasures = viewModel.ProgressMeasures;
+            model.KeyAchievements = viewModel.KeyAchievements;
+            model.MinStatementYears = min;
+            model.MaxStatementYears = max;
+
+            var result = await StatementBusinessLogic.SaveDraftStatement(user, model);
+
+            if (result != StatementActionResult.Success)
+                throw new ValidationException("Saving failed");
+        }
+
+        private (decimal? min, decimal? max) GetYearsRange(NumberOfYearsOfStatements? years)
+        {
+            if (!years.HasValue)
+                return (null, null);
+
+            switch (years.Value)
+            {
+                case NumberOfYearsOfStatements.thisIsTheFirstTime:
+                    return (0, 1);
+                case NumberOfYearsOfStatements.from1To5Years:
+                    return (1, 5);
+                case NumberOfYearsOfStatements.moreThan5Years:
+                    return (5, null);
+                default:
+                    return (null, null);
+            }
+        }
+
         #endregion
 
-        #region Step 9 - Review TODO
+        #region Step 8 - Review
+
+        // TODO - James Add calls for handling review page
+
         #endregion
+
+        private async Task<StatementModel> GetStatementModelAsync(User user, string organisationIdentifier, int year)
+        {
+            var id = SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
+            var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
+            var actionresult = await StatementBusinessLogic.CanAccessStatement(user, organisation, year);
+            if (actionresult != StatementActionResult.Success)
+                throw new ValidationException("You can not access this statement");
+
+            var model = await StatementBusinessLogic.GetStatementByOrganisationAndYear(organisation, year);
+            return model;
+        }
 
         private async Task<CustomResult<StatementViewModel>> TryGetViewModel(User user, string organisationIdentifier, int year)
         {
@@ -257,21 +737,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             if (actionresult != StatementActionResult.Success)
                 // is this the correct form of error?
                 return new CustomResult<StatementViewModel>(new CustomError(System.Net.HttpStatusCode.Unauthorized, "Unauthorised access"));
-
-            // check session stashed vm
-            var sessionVm = GetSessionVM();
-
-            if (sessionVm != null)
-            {
-                // check the sessionVm matches input parameters
-                // if it does not, do NOT return it
-                if (sessionVm.OrganisationId == organisation.OrganisationId && sessionVm.Year != year)
-                    // everything is valid, return from session
-                    return new CustomResult<StatementViewModel>(sessionVm);
-
-                // session is invalid in some way and has to be cleared
-                DeleteSessionVM();
-            }
 
             // Check business logic layer
             // that should query file and DB
@@ -303,7 +768,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 // is this the correct form of error?
                 return actionresult;
 
-            var model = MapToModel(viewmodel);
+            var model = await StatementBusinessLogic.GetStatementByOrganisationAndYear(organisation, viewmodel.Year);
+            model = MapToModel(model, viewmodel);
             var saveResult = await StatementBusinessLogic.SaveDraftStatement(user, model);
 
             return actionresult;
@@ -314,9 +780,11 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             throw new NotImplementedException();
         }
 
-        public async Task ClearDraftForUser()
+        public Task ClearDraftForUser()
         {
-            DeleteSessionVM();
+            // Delete the draft
+            // restore the backup
+            return Task.CompletedTask;
         }
 
         #endregion
@@ -325,20 +793,23 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         StatementViewModel MapToVM(StatementModel model)
         {
-            return Mapper.Map<StatementViewModel>(model);
+            var result = Mapper.Map<StatementViewModel>(model);
+            result.OrganisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(model.OrganisationId);
+            return result;
         }
 
-        StatementModel MapToModel(StatementViewModel viewModel)
+        StatementModel MapToModel(StatementModel destination, StatementViewModel source)
         {
-            return Mapper.Map<StatementModel>(viewModel);
+            var result = Mapper.Map<StatementViewModel, StatementModel>(source, destination);
+            result.OrganisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(source.OrganisationIdentifier);
+            return result;
         }
 
         #endregion
 
         #region Validation
 
-        // Validation should happen at lower levels,
-        // eg SubmissionService/SubmissionBusinessLogic
+        // TODO - James Validation of View models (can it be done with just attributes?
 
         public Task ValidateForDraft(StatementViewModel model)
         {
@@ -353,6 +824,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         #endregion
 
         #region Redirection
+
+        // TODO - James Handle more redirection cases, eg back to review page if that is where they came from
 
         /// <summary>
         /// 
@@ -385,6 +858,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             }
         }
 
+        // TODO - James Cancel page with save/exit without saving buttons
+
         /// <summary>
         /// Get the redirect location when cancelling.
         /// </summary>
@@ -394,22 +869,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         }
 
         #endregion
-
-        private StatementViewModel GetSessionVM()
-        {
-            // originally taken from BaseController.UnstashModel
-            var json = HttpContextAccessor.HttpContext.Session.GetString(SessionKey + ":Model");
-            var result = string.IsNullOrWhiteSpace(json)
-                ? null
-                : JsonConvert.DeserializeObject<StatementViewModel>(json);
-
-            return result;
-        }
-
-        private void DeleteSessionVM()
-        {
-            HttpContextAccessor.HttpContext.Session.Remove(SessionKey + ":Model");
-        }
     }
 
     public enum SubmissionStep : byte
@@ -435,11 +894,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         {
 
             CreateMap<StatementViewModel, StatementModel>()
+                .ForMember(dest => dest.OrganisationId, opt => opt.Ignore())
+
                 .ForMember(dest => dest.Training, opt => opt.Ignore())
-                .ForMember(dest => dest.Policies, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
                 .ForMember(dest => dest.Diligences, opt => opt.Ignore())
                 .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
-                .ForMember(dest => dest.Sectors, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
                 .ForMember(dest => dest.StructureDetails, opt => opt.Ignore())
                 .ForMember(dest => dest.PolicyDetails, opt => opt.Ignore())
                 .ForMember(dest => dest.RisksDetails, opt => opt.Ignore())
@@ -462,8 +923,9 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
             CreateMap<StatementModel, StatementViewModel>()
                 // These need obfuscating
-                .ForMember(dest => dest.StatementIdentifier, opt => opt.Ignore())
                 .ForMember(dest => dest.OrganisationIdentifier, opt => opt.Ignore())
+
+                .ForMember(dest => dest.StatementIdentifier, opt => opt.Ignore())
                 // These need to change on VM to come from DB
                 .ForMember(dest => dest.Policies, opt => opt.Ignore())
                 .ForMember(dest => dest.Training, opt => opt.Ignore())
@@ -480,7 +942,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.HighRiskTypes, opt => opt.Ignore())
                 .ForMember(dest => dest.OtherHighRisks, opt => opt.Ignore())
                 .ForMember(dest => dest.OtherTraining, opt => opt.Ignore())
-                 .ForMember(dest => dest.IncludesMeasuringProgress, opt => opt.Ignore())
+                .ForMember(dest => dest.IncludesMeasuringProgress, opt => opt.Ignore())
 
 
                 // Work out storage of these
@@ -514,13 +976,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 .ForMember(dest => dest.StatementEndYear, opt => opt.Ignore())
                 .ForMember(dest => dest.ApprovedDay, opt => opt.Ignore())
                 .ForMember(dest => dest.ApprovedMonth, opt => opt.Ignore())
-                .ForMember(dest => dest.ApprovedYear, opt => opt.Ignore())
-
-
-                ;
-
-
-
+                .ForMember(dest => dest.ApprovedYear, opt => opt.Ignore());
         }
     }
 }

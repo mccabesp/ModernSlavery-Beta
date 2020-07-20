@@ -8,8 +8,6 @@ namespace ModernSlavery.Core.Models
         public string DUNSNumber { get; set; }
         public string EmployerReference { get; set; }
         public SectorTypes Sector { get; set; }
-        public string DnBJobTitle { get; set; }
-        public string DnBFullName { get; set; }
         public string LatestUserJobTitle { get; set; }
         public string LatestUserFullName { get; set; }
         public string LatestUserStatus { get; set; }

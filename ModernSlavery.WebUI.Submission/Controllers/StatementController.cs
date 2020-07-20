@@ -144,7 +144,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/compliance")]
         public async Task<IActionResult> Compliance(string organisationIdentifier, int year)
         {
-            //return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
+            return View(new StatementViewModel { OrganisationIdentifier = organisationIdentifier, Year = year });
 
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
@@ -160,15 +160,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> Compliance(StatementViewModel submissionModel)
         {
             // Redirect location
-            //var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.Compliance);
-            //return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
+            var next = await SubmissionPresenter.GetNextRedirectAction(SubmissionStep.Compliance);
+            return RedirectToAction(next, new { organisationIdentifier = submissionModel.OrganisationIdentifier, year = submissionModel.Year });
 
             if (!ModelState.IsValid)
                 return View(submissionModel);
 
-            var result = await SubmissionPresenter.TrySaveCompliance(CurrentUser, submissionModel);
+            var result = await SubmissionPresenter.TrySaveYourStatement(CurrentUser, submissionModel);
 
-            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.Compliance);
+            return await GetActionResultFromSave(submissionModel, result, SubmissionStep.YourStatement);
         }
 
         [HttpPost("cancel-compliance")]
