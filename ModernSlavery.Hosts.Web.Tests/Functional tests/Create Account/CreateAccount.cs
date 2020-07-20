@@ -3,19 +3,63 @@ using Geeks.Pangolin.Service.DriverService;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
+using ModernSlavery.Infrastructure.Hosts;
+using System.Diagnostics;
+using System;
+using ModernSlavery.Testing.Helpers;
+using ModernSlavery.Core.Interfaces;
+using NUnit.Framework.Interfaces;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    public abstract class CreateAccount : UITest
+    [Order (2)]
+    public  abstract class CreateAccount : UITest
     {
         string _firstname; string _lastname; string _title; string _email; string _password;
+        private string _webAuthority;
+        private IDataRepository _dataRepository;
+        private IFileRepository _fileRepository;
+        private string URL;
         public CreateAccount(string firstname, string lastname, string title, string email, string password) : base()
         {
             _firstname = firstname; _lastname = lastname; _title = title; _email = email; _password = password;
         }
 
-        private string URL;
+        [OneTimeSetUp]
+        public void RunBeforeAnyTests()
+        {
+            //Get the url from the test web host
+            _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
+            if (Debugger.IsAttached) Debug.WriteLine($"Kestrel authority: {_webAuthority}");
+            Console.WriteLine($"Kestrel authority: {_webAuthority}");
 
+            //Get the data repository from the test web host
+            _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
+
+            //Get the file repository from the test web host
+            _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
+            if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
+            Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
+
+        }
+        private bool TestRunFailed = false;
+
+        [SetUp]
+        public void SetUp()
+        {
+            if (TestRunFailed)
+                Assert.Inconclusive("Previous test failed");
+            else
+                SetupTest(TestContext.CurrentContext.Test.Name);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
+            TeardownTest();
+        }
+        [Test, Order(1)]
         public async Task GoToCreateAccountPage()
         {
             Goto("/");
@@ -33,7 +77,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
-        [Test]
+        [Test, Order(2)]
         public async Task EnterPersonalDetails()
         {
             Set("Email address").To(_email);
@@ -54,7 +98,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Verify your email address");
             await Task.CompletedTask;
         }
-        [Test]
+        [Test, Order(3)]
         public async Task ExtractVerifyURL()
         {
 
@@ -70,6 +114,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
+        [Test, Order(4)]
         public async Task VerifyEmail()
         {
 
@@ -89,6 +134,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click("Continue");
 
+            
             ExpectHeader("Select an organisation");
 
             await Task.CompletedTask;

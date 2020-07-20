@@ -14,10 +14,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
 
-        [Test]
+        [Test, Order(11)]
+
         public async Task ClickManageAccount_RedirectsToChangeDetailsPage()
         {
-            Click("Manage Account");
+            Click(The.Top, "Manage Account");
 
             ExpectHeader("Login details");
 
@@ -25,7 +26,8 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
-        [Test]
+        [Test, Order(12)]
+
         public async Task ChangeDetailsPage_ClickChange_GoestoPersonalDetails()
         {
             //Assign
@@ -33,7 +35,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
             //Act
-            Click(The.Bottom, "Change");
+            Above(The.Top, "Change").Click(The.Top, "Change");
 
             //Asert
             ExpectHeader("Change your personal details");
@@ -45,7 +47,8 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
-        [Test]
+        [Test, Order(13)]
+
         public async Task EmptyPersonalDetails_ClickContinue_ShowsErrors()
         {
             //Arrange
