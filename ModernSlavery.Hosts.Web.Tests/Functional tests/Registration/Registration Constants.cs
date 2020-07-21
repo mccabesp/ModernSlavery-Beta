@@ -34,8 +34,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public const string SicCodes_Blackpool = "Public Sector, General public administration activities";
 
         public const string EmployerReference_InterFloor = "B72GL8R2";
-        public const string OrgName_InterFloor = "InterFloor Limited";
-        public const string RegisteredAddress_InterFloor = "Broadway, Haslingden, Rossendale, BB4 4LS";
+        public const string OrgName_InterFloor = "INTERFLOOR LIMITED";
+        public const string RegisteredAddress_InterFloor = "Broadway, Haslingden, Rossendale, Lancashire, BB4 4LS";
         public const string Address1_InterFloor = "Broadway, Haslingden";
         public const string Address2_InterFloor = "";
         public const string Address3_InterFloor = "Rossendale";
