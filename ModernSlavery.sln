@@ -103,7 +103,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Hosts.DevOps.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.Infrastructure.DevOps.Cloud", "ModernSlavery.Infrastructure.DevOps.Cloud\ModernSlavery.Infrastructure.DevOps.Cloud.csproj", "{D71BAF93-BD3E-49A0-9CAB-67E2B56629D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.WebUI.Identity", "ModernSlavery.WebUI.Identity\ModernSlavery.WebUI.Identity.csproj", "{D252E2DD-542B-4953-A04E-1B48B0AB5506}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModernSlavery.WebUI.Identity", "ModernSlavery.WebUI.Identity\ModernSlavery.WebUI.Identity.csproj", "{D252E2DD-542B-4953-A04E-1B48B0AB5506}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
