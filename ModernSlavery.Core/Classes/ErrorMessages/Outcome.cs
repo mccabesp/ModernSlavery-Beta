@@ -16,6 +16,11 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
             Errors.Add((error, message));
         }
 
+        public Outcome(List<(TFail Error, string Message)> errors)
+        {
+            Errors = errors;
+        }
+
         public List<(TFail Error, string Message)> Errors { get; set; } = new List<(TFail, string)>();
         public bool Success => !Fail;
         public bool Fail => Errors != null && Errors.Any();
@@ -31,6 +36,11 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
 
         public Outcome(TFail error, string message = null):base(error,message)
         {
+        }
+
+        public Outcome(List<(TFail Error, string Message)> errors):base(errors)
+        {
+            
         }
 
         public TSuccess Result { get; }
