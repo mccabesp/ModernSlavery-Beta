@@ -95,6 +95,25 @@ namespace ModernSlavery.Core.Entities
         RegisterCancelled = 4
     }
 
+    public enum StatementYears : byte
+    {
+        [Display(Name = "Not Provided")]
+        [Range(0, 0)]
+        NotProvided = 0,
+
+        [Display(Name = "This is the first time")]
+        [Range(1, 1)]
+        StatementYears1 = 1,
+
+        [Display(Name = "1 to 5 Years")]
+        [Range(1, 5)]
+        StatementYears1To5 = 6,
+
+        [Display(Name = "More than 5 years")]
+        [Range(5, 0)]
+        StatementYears5plus = 3,
+    }
+
     public enum OrganisationSizes: byte
     {
         [Display(Name = "Not Provided")] [Range(0, 0)]
