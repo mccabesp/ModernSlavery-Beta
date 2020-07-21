@@ -2,36 +2,36 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
+@model ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
-
-        //TODO: add in hidden elements once view model complete
-        {
+         {
             var controller = ViewData["Controller"] as BaseController;
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementStartDay),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementStartMonth),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementStartYear),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementEndDay),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementEndMonth),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementEndYear)
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementStartDate),
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementStartDay),
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementStartMonth),
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementStartYear),
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementEndDate),
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementEndDay),
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementEndMonth),
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementEndYear)
                 }))
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.StatementUrl)
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementUrl)
 
                 }))
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.ApproverFirstName),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.ApproverLastName),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.ApproverJobTitle),
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.ApproverFirstName),
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.ApproverLastName),
+                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.ApproverJobTitle),
                 }))
 
             <h1 class="govuk-heading-l">

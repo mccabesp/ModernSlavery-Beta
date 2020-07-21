@@ -2,7 +2,7 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
+@model ModernSlavery.WebUI.Submission.Models.PoliciesPageViewModel
 
 <a class="govuk-back-link" href="@Url.Action("YourOrganisation", "Statement", new { organisationIdentifier = Model.OrganisationIdentifier, year = Model.Year })">Back</a>
 <div class="govuk-grid-row">
@@ -16,42 +16,65 @@
 
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.Policies)
+                    nameof(ModernSlavery.WebUI.Submission.Models.PoliciesPageViewModel.Policies)
                 }))
 
-            <h1 class="govuk-heading-l">
-                Policies
-            </h1>
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-heading-l">
+                            Policies
+                        </h1>
+                        <h2 class="govuk-heading-m">
+                            Do your organisation`s modern slavery policies or codes include any of the following provisions? (select all that apply)
+                        </h2>
+                    </legend>
+                    <span id="organisation-hint" class="govuk-hint">
+                        select all that apply
+                    </span>                    
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        @foreach (var item in Model.Policies)
+                        {
+                            <div class="govuk-checkboxes__item">
+                                <input asp-for="@item.IsSelected" class="govuk-checkboxes__input" id="policies-conditional" type="checkbox" data-aria-controls="policies-conditional">
+                                <label class="govuk-label govuk-checkboxes__label" for="policies-conditional">
+                                    @item.Description
+                                </label>
+                            </div>
+                        @if (item.Description.Contains("Other"))
+                        {
+                        <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="policies-conditional">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label" for="other">
+                                   Please provide detail
+                                </label>
+                                <input asp-for="OtherPolicies" class="govuk-input govuk-!-width-one-third" id="contact-by-email" name="other" type="email" spellcheck="false">
+                            </div>
+                        </div>
+                        }
+                        }
+                    </div>
+                </fieldset>
+            </div>
 
-            <h2 class="govuk-heading-m">
-                Do your organisation`s modern slavery policies or codes include any of the following provisions? (select all that apply)
-            </h2>
-            <details class="govuk-details" data-module="govuk-details">
-                <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">
-                        What is this?
-                    </span>
-                </summary>
-                <div class="govuk-details__text">
-                    @*TODO: get content*@
-                </div>
-            </details>
 
-            var organisationPolicyOptions =
-                                new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementPolicies, Func<object, object>>
+
+
+            @*var organisationPolicyOptions =
+                                new Dictionary<ModernSlavery.WebUI.Submission.Models.StatementPolicies, Func<object, object>>
                                 {
                            {
-                             ModernSlavery.WebUI.Submission.Presenters.StatementPolicies.Other,
-@<text>
-    @(Html.GovUkTextInputFor(model => model.OtherPolicies))
-    @(Html.LabelFor(model => model.OtherPolicies, new { @class = "govuk-label" }))
-</text>
+                             ModernSlavery.WebUI.Submission.Models.StatementPolicies.Other,
+    @<text>
+        @(Html.GovUkTextInputFor(model => model.OtherPolicies))
+        @(Html.LabelFor(model => model.OtherPolicies, new { @class = "govuk-label" }))
+    </text>
                             }
-                                          };
+                                              };
 
 
-                @(Html.GovUkCheckboxesFor(
-                    model => model.Policies,
+                    @(Html.GovUkCheckboxesFor(
+                    model => model.PoliciesEnums,
                     new FieldsetViewModel
                     {
                         Legend = new LegendViewModel
@@ -65,15 +88,16 @@
                         Text = "Select all that apply."
                     },
                     organisationPolicyOptions
-               ))
+               ));*@
 
-                <button class="govuk-button" data-module="govuk-button" type="submit">
-                    Continue
-                </button>
-                <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
-                    Cancel
-                </button>
-            }
+
+                    <button class="govuk-button" data-module="govuk-button" type="submit">
+                        Continue
+                    </button>
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
+                        Cancel
+                    </button>
+                }
 
     </div>
 

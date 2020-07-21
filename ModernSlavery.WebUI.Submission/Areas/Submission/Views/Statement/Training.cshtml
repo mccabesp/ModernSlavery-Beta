@@ -2,7 +2,7 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
+@model ModernSlavery.WebUI.Submission.Models.TrainingPageViewModel
 
 <a class="govuk-back-link" href="@Url.Action("DueDiligence", "Statement", new { organisationIdentifier = Model.OrganisationIdentifier, year = Model.Year })">Back</a>
 <div class="govuk-grid-row">
@@ -17,54 +17,84 @@
 
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.Training)
+                    nameof(ModernSlavery.WebUI.Submission.Models.TrainingPageViewModel.Training)
                 }))
 
-            <h1 class="govuk-heading-l">
-                Training
-            </h1>
-
-            <h2 class="govuk-heading-m">
-                Have you provided training on modern slavery and trafficking during the past year, or any other activities to raise awareness? If so, who was this for?
-            </h2>
-
-            var organisationTrainingOptions =
-                                new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementTrainings, Func<object, object>>
-                                {
-                           {
-                             ModernSlavery.WebUI.Submission.Presenters.StatementTrainings.Other,
-@<text>
-    @(Html.GovUkTextInputFor(model => model.OtherTraining))
-    @(Html.LabelFor(model => model.OtherTraining, new { @class = "govuk-label" }))
-</text>
-                            }
-                                  };
-
-
-                @(Html.GovUkCheckboxesFor(
-                    model => model.Training,
-                    new FieldsetViewModel
-                    {
-                        Legend = new LegendViewModel
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="training-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-heading-l">
+                            Training
+                        </h1>
+                        <h2 class="govuk-heading-m">
+                            Have you provided training on modern slavery and trafficking during the past year, or any other activities to raise awareness? If so, who was this for?
+                        </h2>
+                    </legend>
+                    <span id="training-hint" class="govuk-hint">
+                        Select all that apply
+                    </span>
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        @foreach (var item in Model.Training)
                         {
-                            Classes = "govuk-fieldset__legend--m"
-                        },
-                        Classes = "govuk-!-margin-top-6"
-                    },
-                    new HintViewModel
-                    {
-                        Text = "Select all that apply."
-                    },
-                    organisationTrainingOptions
-               ))
+                            <div class="govuk-checkboxes__item">
+                                <input asp-for="@item.IsSelected" class="govuk-checkboxes__input" id="policies-conditional" type="checkbox" data-aria-controls="policies-conditional">
+                                <label class="govuk-label govuk-checkboxes__label" for="policies-conditional">
+                                    @item.Description
+                                </label>
+                            </div>
+                            @if (item.Description.Equals("Other"))
+                            {
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="training-conditional">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="other">
+                                            Please provide detail
+                                        </label>
+                                        <input asp-for="OtherTraining" class="govuk-input govuk-!-width-one-third" id="contact-by-email" name="other" spellcheck="false">
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </fieldset>
+            </div>
 
-                <button class="govuk-button" data-module="govuk-button" type="submit">
-                    Continue
-                </button>
-                <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
-                    Cancel
-                </button>
-            }
+            @*var organisationTrainingOptions =
+                                            new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementTrainings, Func<object, object>>
+                                            {
+                                       {
+                                         ModernSlavery.WebUI.Submission.Presenters.StatementTrainings.Other,
+            @<text>
+                @(Html.GovUkTextInputFor(model => model.OtherTraining))
+                @(Html.LabelFor(model => model.OtherTraining, new { @class = "govuk-label" }))
+            </text>
+                                        }
+                                              };*@
+
+
+            @*@(Html.GovUkCheckboxesFor(
+                 model => model.Training,
+                 new FieldsetViewModel
+                 {
+                     Legend = new LegendViewModel
+                     {
+                         Classes = "govuk-fieldset__legend--m"
+                     },
+                     Classes = "govuk-!-margin-top-6"
+                 },
+                 new HintViewModel
+                 {
+                     Text = "Select all that apply."
+                 },
+                 organisationTrainingOptions
+            ))*@
+
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Continue
+            </button>
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
+                Cancel
+            </button>
+        }
     </div>
 
 </div>

@@ -2,7 +2,7 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
+@model ModernSlavery.WebUI.Submission.Models.ProgressPageViewModel
 <a class="govuk-back-link" href="@Url.Action("Training", "Statement", new { organisationIdentifier = Model.OrganisationIdentifier, year = Model.Year })">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
@@ -16,10 +16,10 @@
 
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.IncludesMeasuringProgress),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.ProgressMeasures),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.KeyAchievements),
-                    nameof(ModernSlavery.WebUI.Submission.Presenters.StatementViewModel.NumberOfYearsOfStatements),
+                    nameof(ModernSlavery.WebUI.Submission.Models.ProgressPageViewModel.IncludesMeasuringProgress),
+                    nameof(ModernSlavery.WebUI.Submission.Models.ProgressPageViewModel.ProgressMeasures),
+                    nameof(ModernSlavery.WebUI.Submission.Models.ProgressPageViewModel.KeyAchievements),
+                    nameof(ModernSlavery.WebUI.Submission.Models.ProgressPageViewModel.NumberOfYearsOfStatements),
                 }))
 
             <h1 class="govuk-heading-l">
@@ -31,7 +31,7 @@
         {
             Legend = new LegendViewModel
             {
-                Text = "Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?",
+                Text = Model.IncludesMeasuringProgress.GetAttribute<DisplayAttribute>().Name,
                 Classes = "govuk-fieldset__legend--m"
             },
             Classes = "govuk-!-margin-top-6"
@@ -60,7 +60,7 @@
                     {
                         Legend = new LegendViewModel
                         {
-                            Text = "How many years has your organisation been producing modern slavery statements?",
+                            Text = Model.NumberOfYearsOfStatements.GetAttribute<DisplayAttribute>().Name,
                             Classes = "govuk-fieldset__legend--m"
                         },
                         Classes = "govuk-!-margin-top-6"

@@ -4,8 +4,7 @@
     Layout = "/Views/GdsLayout.cshtml";
 
 }
-@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
-
+@model ModernSlavery.WebUI.Submission.Models.OrganisationPageViewModel
 <a class="govuk-back-link" href="@Url.Action("Compliance", "Statement", new { organisationIdentifier = Model.OrganisationIdentifier, year = Model.Year })">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
@@ -16,60 +15,50 @@
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
 
-
-            <h1 class="govuk-heading-l">
-                Your organisation
-            </h1>
-
-            <h2 class="govuk-heading-m">
-                Which sector does your organisation operate in?
-            </h2>
-            <details class="govuk-details" data-module="govuk-details">
-                <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">
-                        What is this?
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-heading-l">
+                            Your organisation
+                        </h1>
+                        <h2 class="govuk-heading-m">
+                            Which sector does your organisation operate in?
+                        </h2>
+                    </legend>
+                    <span id="organisation-hint" class="govuk-hint">
+                        Select all that apply
                     </span>
-                </summary>
-                <div class="govuk-details__text">
-                    @*TODO: get content*@
-                </div>
-            </details>
-
-            @*var organisationSectorOptions =
-                                            new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementSectors, Func<object, object>>
-                                            {
-                                           {
-                                             ModernSlavery.WebUI.Submission.Presenters.StatementSectors.Other,
-                @<text>
-                    @(Html.GovUkTextInputFor(model => model.OtherSector))
-                </text>
-                                            }
-                                                  };*@
-
-
-            @(Html.GovUkCheckboxesFor(
-                    model => model.Sectors,
-                    new FieldsetViewModel
-                    {
-                        Legend = new LegendViewModel
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                What is this?
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            @*TODO: get content*@
+                        </div>
+                    </details>
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        @foreach (var item in Model.Sectors)
                         {
-                            Classes = "govuk-fieldset__legend--m"
-                        },
-                        Classes = "govuk-!-margin-top-6"
-                    },
-                    new HintViewModel
-                    {
-                        Text = "Select all that apply."
-                    }
-                    //organisationSectorOptions
-               ))
+                                <div class="govuk-checkboxes__item">
+                                    <input asp-for="@item.IsSelected" class="govuk-checkboxes__input"  type="checkbox" >
+                                    <label class="govuk-label govuk-checkboxes__label" >
+                                       @item.Description
+                                    </label>
+                                </div>
+                        }
+                     </div>             
+                  </fieldset>
+            </div>
+
             @(Html.GovUkRadiosFor(
-                    model => model.LastFinancialYearBudget,
+                    model => model.Turnover,
                     new FieldsetViewModel
                     {
                         Legend = new LegendViewModel
                         {
-                            Text = "What was your turnover or budget during the last financial accounting year?",
+                            Text = Model.Turnover.GetAttribute<DisplayAttribute>().Name,
                             Classes = "govuk-fieldset__legend--m"
                         },
                         Classes = "govuk-!-margin-top-6"

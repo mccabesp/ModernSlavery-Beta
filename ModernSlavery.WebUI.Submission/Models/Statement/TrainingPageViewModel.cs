@@ -1,10 +1,14 @@
-﻿using System;
+﻿using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
-    public class TrainingPageViewModel
+    public class TrainingPageViewModel : GovUkViewModel, IValidatableObject
     {
         public int Year { get; set; }
         public string OrganisationIdentifier { get; set; }
@@ -12,6 +16,13 @@ namespace ModernSlavery.WebUI.Submission.Models
         public IList<TrainingViewModel> Training { get; set; }
 
         public string OtherTraining { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var otherTrainingCheckbox = Training.Single(x => x.Description.Equals("Other"));
+            if (otherTrainingCheckbox.IsSelected && OtherTraining == null)
+                yield return new ValidationResult("Please provide other details");
+        }
 
         public class TrainingViewModel
         {

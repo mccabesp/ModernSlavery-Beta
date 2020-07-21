@@ -164,14 +164,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Your organisation Page
         //TODO: bind StatementSector to this enum with attribute GovUkRadioCheckboxLabelText for the labels
-        public List<StatementSectors> Sectors { get; set; }
+        //   public List<StatementSectors> Sectors { get; set; }
         public string OtherSector { get; set; }
-        public LastFinancialYearBudget? LastFinancialYearBudget { get; set; }
+        // public LastFinancialYearBudget? LastFinancialYearBudget { get; set; }
 
         #endregion
 
         #region Policies Page
-        public List<StatementPolicies> Policies { get; set; }
+        //   public List<StatementPolicies> Policies { get; set; }
         [Display(Name = "Please provide detail")]
         public string OtherPolicies { get; set; }
 
@@ -193,16 +193,16 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public List<StatementDiligence> Diligences { get; set; }
         public List<StatementDiligenceType> DiligenceTypes { get; set; }
         //TODO: clarify mapping to model
-        public AnyIdicatorsInSupplyChain? ForcedLabour { get; set; }
+        //   public AnyIdicatorsInSupplyChain? ForcedLabour { get; set; }
 
         public string ForcedLabourDetails { get; set; }
 
         //TODO: clarify mapping to model
-        public AnyInstancesInSupplyChain? SlaveryInstance { get; set; }
+        //  public AnyInstancesInSupplyChain? SlaveryInstance { get; set; }
 
         public string SlaveryInstanceDetails { get; set; }
 
-        public List<StatementRemediation> StatementRemediations { get; set; }
+        //  public List<StatementRemediation> SlaveryInstanceRemediation { get; set; }
         //TODO: clarify mapping to model
         public string SlaveryInstanceRemediation { get; set; }
         [MaxLength(500)]
@@ -211,7 +211,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         #region Training Page
 
-        public List<StatementTrainings> Training { get; set; }
+        // public List<StatementTrainings> Training { get; set; }
         [Display(Name = "Please specify")]
         public string OtherTraining { get; set; }
 
@@ -227,7 +227,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         [Display(Name = "What were your key achievements in relation to reducing modern slavery during the period covered by this statement?")]
         public string KeyAchievements { get; set; }
 
-        public NumberOfYearsOfStatements? NumberOfYearsOfStatements { get; set; }
+        //  public NumberOfYearsOfStatements? NumberOfYearsOfStatements { get; set; }
 
         #endregion
 
@@ -277,140 +277,140 @@ namespace ModernSlavery.WebUI.Submission.Presenters
     }
 
 
-    public enum NumberOfYearsOfStatements : byte
-    {
-        [GovUkRadioCheckboxLabelText(Text = "This is the first time")]
-        thisIsTheFirstTime = 0,
-        [GovUkRadioCheckboxLabelText(Text = "1 - 5 years")]
-        from1To5Years = 1,
-        [GovUkRadioCheckboxLabelText(Text = "More than 5 years")]
-        moreThan5Years = 2,
+    //public enum NumberOfYearsOfStatements : byte
+    //{
+    //    [GovUkRadioCheckboxLabelText(Text = "This is the first time")]
+    //    thisIsTheFirstTime = 0,
+    //    [GovUkRadioCheckboxLabelText(Text = "1 - 5 years")]
+    //    from1To5Years = 1,
+    //    [GovUkRadioCheckboxLabelText(Text = "More than 5 years")]
+    //    moreThan5Years = 2,
 
-    }
+    //}
 
-    public enum StatementRemediation : byte
-    {
-        [GovUkRadioCheckboxLabelText(Text = "repayment of recruitment fees")]
-        repaymentOfRecruitmentFees,
+    //public enum StatementRemediation : byte
+    //{
+    //    [GovUkRadioCheckboxLabelText(Text = "repayment of recruitment fees")]
+    //    repaymentOfRecruitmentFees,
 
-        [GovUkRadioCheckboxLabelText(Text = "change in policy")]
-        changeInPolicy,
+    //    [GovUkRadioCheckboxLabelText(Text = "change in policy")]
+    //    changeInPolicy,
 
-        [GovUkRadioCheckboxLabelText(Text = "Other")]
-        Other
+    //    [GovUkRadioCheckboxLabelText(Text = "Other")]
+    //    Other
 
-        //etc
-    }
+    //    //etc
+    //}
 
-    public enum AnyIdicatorsInSupplyChain : byte
-    {
-        Yes,
-        No
-    }
-    public enum AnyInstancesInSupplyChain : byte
-    {
-        Yes,
-        No
-    }
+    //public enum AnyIdicatorsInSupplyChain : byte
+    //{
+    //    Yes,
+    //    No
+    //}
+    //public enum AnyInstancesInSupplyChain : byte
+    //{
+    //    Yes,
+    //    No
+    //}
 
-    public enum StatementSectors : byte
-    {
-        Other = 0
-    }
-    public enum IncludesGoals
-    {
-        Yes = 0,
-        No = 1
-    }
-    public enum LastFinancialYearBudget : byte
-    {
-        [GovUkRadioCheckboxLabelText(Text = "Under £36 million")]
-        Under36Million = 0,
+    //public enum StatementSectors : byte
+    //{
+    //    Other = 0
+    //}
+    //public enum IncludesGoals
+    //{
+    //    Yes = 0,
+    //    No = 1
+    //}
+    //public enum LastFinancialYearBudget : byte
+    //{
+    //    [GovUkRadioCheckboxLabelText(Text = "Under £36 million")]
+    //    Under36Million = 0,
 
-        [GovUkRadioCheckboxLabelText(Text = "£36 million - £60 million")]
-        From36MillionTo60Million = 1,
+    //    [GovUkRadioCheckboxLabelText(Text = "£36 million - £60 million")]
+    //    From36MillionTo60Million = 1,
 
-        [GovUkRadioCheckboxLabelText(Text = "£60 million - £100 million")]
-        From60MillionTo100Million = 2,
+    //    [GovUkRadioCheckboxLabelText(Text = "£60 million - £100 million")]
+    //    From60MillionTo100Million = 2,
 
-        [GovUkRadioCheckboxLabelText(Text = "£100 million - £500 million")]
-        From100MillionTo500Million = 3,
+    //    [GovUkRadioCheckboxLabelText(Text = "£100 million - £500 million")]
+    //    From100MillionTo500Million = 3,
 
-        [GovUkRadioCheckboxLabelText(Text = "£500 million+")]
-        From500MillionUpwards = 4,
+    //    [GovUkRadioCheckboxLabelText(Text = "£500 million+")]
+    //    From500MillionUpwards = 4,
 
-    }
+    //}
 
-    public enum StatementPolicies : byte
-    {
-        [GovUkRadioCheckboxLabelText(Text = "All")]
-        All,
+    //public enum StatementPolicies : byte
+    //{
+    //    [GovUkRadioCheckboxLabelText(Text = "All")]
+    //    All,
 
-        [GovUkRadioCheckboxLabelText(Text = "Adherence to local and national laws")]
-        AdherenceToLocalAndNationalLaws,
+    //    [GovUkRadioCheckboxLabelText(Text = "Adherence to local and national laws")]
+    //    AdherenceToLocalAndNationalLaws,
 
-        [GovUkRadioCheckboxLabelText(Text = "Freedom of workers to terminate employment")]
-        FreedomOfWorkersToTerminateEmployment,
+    //    [GovUkRadioCheckboxLabelText(Text = "Freedom of workers to terminate employment")]
+    //    FreedomOfWorkersToTerminateEmployment,
 
-        [GovUkRadioCheckboxLabelText(Text = "Freedom of movement")]
-        FreedomOfMovement,
+    //    [GovUkRadioCheckboxLabelText(Text = "Freedom of movement")]
+    //    FreedomOfMovement,
 
-        [GovUkRadioCheckboxLabelText(Text = "Freedom of association")]
-        FreedomOfAssociation,
+    //    [GovUkRadioCheckboxLabelText(Text = "Freedom of association")]
+    //    FreedomOfAssociation,
 
-        [GovUkRadioCheckboxLabelText(Text = "Prohibits any threat of violence, harassment and intimidation")]
-        ProhibitsAnyThreatOfViolenceHarassmentAndIntimidation,
+    //    [GovUkRadioCheckboxLabelText(Text = "Prohibits any threat of violence, harassment and intimidation")]
+    //    ProhibitsAnyThreatOfViolenceHarassmentAndIntimidation,
 
-        [GovUkRadioCheckboxLabelText(Text = "Prohibits the use of worker-paid recruitment fees")]
-        ProhibitsTheUseOfWorkerPaidRecruitmentFees,
+    //    [GovUkRadioCheckboxLabelText(Text = "Prohibits the use of worker-paid recruitment fees")]
+    //    ProhibitsTheUseOfWorkerPaidRecruitmentFees,
 
-        [GovUkRadioCheckboxLabelText(Text = "Prohibits compulsory overtime")]
-        ProhibitsCompulsoryOvertime,
+    //    [GovUkRadioCheckboxLabelText(Text = "Prohibits compulsory overtime")]
+    //    ProhibitsCompulsoryOvertime,
 
-        [GovUkRadioCheckboxLabelText(Text = "ProhibitsChildLabour")]
-        ProhibitsChildLabour,
+    //    [GovUkRadioCheckboxLabelText(Text = "ProhibitsChildLabour")]
+    //    ProhibitsChildLabour,
 
-        [GovUkRadioCheckboxLabelText(Text = "Prohibits discrimination")]
-        ProhibitsDiscrimination,
+    //    [GovUkRadioCheckboxLabelText(Text = "Prohibits discrimination")]
+    //    ProhibitsDiscrimination,
 
-        [GovUkRadioCheckboxLabelText(Text = "Prohibits confiscation of workers original identification documents")]
-        ProhibitsConfiscationOfWorkersOriginalIdentificationDocuments,
+    //    [GovUkRadioCheckboxLabelText(Text = "Prohibits confiscation of workers original identification documents")]
+    //    ProhibitsConfiscationOfWorkersOriginalIdentificationDocuments,
 
-        [GovUkRadioCheckboxLabelText(Text = "Provides access to remedy, compensation and justice for victims of modern slavery")]
-        ProvidesAccessToRemedyCompensationAndJusticeForVictimsOfModernSlavery,
+    //    [GovUkRadioCheckboxLabelText(Text = "Provides access to remedy, compensation and justice for victims of modern slavery")]
+    //    ProvidesAccessToRemedyCompensationAndJusticeForVictimsOfModernSlavery,
 
-        [GovUkRadioCheckboxLabelText(Text = "None of the above")]
-        NoneOfTheAbove,
+    //    [GovUkRadioCheckboxLabelText(Text = "None of the above")]
+    //    NoneOfTheAbove,
 
-        [GovUkRadioCheckboxLabelText(Text = "Other")]
-        Other
+    //    [GovUkRadioCheckboxLabelText(Text = "Other")]
+    //    Other
 
-    }
+    //}
 
-    public enum StatementTrainings : byte
-    {
-        [GovUkRadioCheckboxLabelText(Text = "All")]
-        All,
+    //public enum StatementTrainings : byte
+    //{
+    //    [GovUkRadioCheckboxLabelText(Text = "All")]
+    //    All,
 
-        [GovUkRadioCheckboxLabelText(Text = "Procurement")]
-        Procurement,
+    //    [GovUkRadioCheckboxLabelText(Text = "Procurement")]
+    //    Procurement,
 
-        [GovUkRadioCheckboxLabelText(Text = "Human Resources")]
-        HumanResources,
+    //    [GovUkRadioCheckboxLabelText(Text = "Human Resources")]
+    //    HumanResources,
 
-        [GovUkRadioCheckboxLabelText(Text = "C-Suite")]
-        CSuite,
+    //    [GovUkRadioCheckboxLabelText(Text = "C-Suite")]
+    //    CSuite,
 
-        [GovUkRadioCheckboxLabelText(Text = "Whole organisation")]
-        WholeOrganisation,
+    //    [GovUkRadioCheckboxLabelText(Text = "Whole organisation")]
+    //    WholeOrganisation,
 
-        [GovUkRadioCheckboxLabelText(Text = "Suppliers")]
-        Suppliers,
+    //    [GovUkRadioCheckboxLabelText(Text = "Suppliers")]
+    //    Suppliers,
 
-        [GovUkRadioCheckboxLabelText(Text = "Other")]
-        Other
+    //    [GovUkRadioCheckboxLabelText(Text = "Other")]
+    //    Other
 
-    }
+    //}
 
 
 }
