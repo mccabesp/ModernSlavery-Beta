@@ -10,7 +10,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public CancelPageViewModelMapperProfile()
         {
-            CreateMap<CancelPageViewModel, StatementModel>();
+            CreateMap<StatementModel,CancelPageViewModel>();
+            CreateMap<CancelPageViewModel, StatementModel>(MemberList.Source);
         }
     }
 

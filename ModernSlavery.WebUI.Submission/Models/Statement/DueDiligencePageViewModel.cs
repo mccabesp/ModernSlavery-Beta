@@ -10,7 +10,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public DueDiligencePageViewModelMapperProfile()
         {
-            CreateMap<DueDiligencePageViewModel, StatementModel>();
+            CreateMap<StatementModel,DueDiligencePageViewModel>();
+            CreateMap<DueDiligencePageViewModel, StatementModel>(MemberList.Source);
         }
     }
 

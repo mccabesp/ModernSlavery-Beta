@@ -10,7 +10,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public PoliciesPageViewModelMapperProfile()
         {
-            CreateMap<PoliciesPageViewModel, StatementModel>();
+            CreateMap<StatementModel,PoliciesPageViewModel>();
+            CreateMap<PoliciesPageViewModel, StatementModel>(MemberList.Source);
         }
     }
 

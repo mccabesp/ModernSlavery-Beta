@@ -155,9 +155,9 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public string KeyAchievements { get; set; }
 
-        public decimal? MinStatementYears { get; set; }
+        public byte? MinStatementYears { get; set; }
 
-        public decimal? MaxStatementYears { get; set; }
+        public byte? MaxStatementYears { get; set; }
 
         #endregion
     }

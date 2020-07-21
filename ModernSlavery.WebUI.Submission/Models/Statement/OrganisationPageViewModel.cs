@@ -10,7 +10,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public OrganisationPageViewModelMapperProfile()
         {
-            CreateMap<OrganisationPageViewModel, StatementModel>();
+            CreateMap<StatementModel,OrganisationPageViewModel>();
+            CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source);
         }
     }
 
