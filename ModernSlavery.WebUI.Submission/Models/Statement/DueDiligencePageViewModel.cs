@@ -1,14 +1,21 @@
-﻿using System;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class DueDiligencePageViewModel
+    public class DueDiligencePageViewModelMapperProfile : Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
+        public DueDiligencePageViewModelMapperProfile()
+        {
+            CreateMap<DueDiligencePageViewModel, StatementModel>();
+        }
+    }
 
+    public class DueDiligencePageViewModel: BaseViewModel
+    {
         public List<DueDiligenceViewModel> DueDiligences { get; set; }
 
         public bool HasForceLabour { get; set; }

@@ -1,14 +1,22 @@
-﻿using System;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.WebUI.Submission.Models.Statement;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class YourStatementPageViewModel
+    public class YourStatementPageViewModelMapperProfile: Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
+        public YourStatementPageViewModelMapperProfile()
+        {
+            CreateMap<YourStatementPageViewModel, StatementModel>();
+        }
+    }
 
+    public class YourStatementPageViewModel: BaseViewModel
+    {
         public string StatementUrl { get; set; }
 
         // Dates are split in to 3 components here so that there are 3 field (Day/Month/Year)

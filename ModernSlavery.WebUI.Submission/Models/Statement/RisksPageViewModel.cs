@@ -1,14 +1,21 @@
-﻿using System;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class RisksPageViewModel
+    public class RisksPageViewModelMapperProfile : Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
+        public RisksPageViewModelMapperProfile()
+        {
+            CreateMap<RisksPageViewModel, StatementModel>();
+        }
+    }
 
+    public class RisksPageViewModel : BaseViewModel
+    {
         public List<RiskViewModel> RelevantRisks { get; set; }
         public string OtherRelevantRisks;
 

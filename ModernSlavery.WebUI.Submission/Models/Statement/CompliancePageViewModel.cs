@@ -1,14 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class CompliancePageViewModel
+    public class CompliancePageViewModelMapperProfile : Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
+        public CompliancePageViewModelMapperProfile()
+        {
+            CreateMap<CompliancePageViewModel, StatementModel>();
+        }
+    }
 
+    public class CompliancePageViewModel: BaseViewModel
+    {
         public bool? IncludesStructure { get; set; }
         public string StructureDetails { get; set; }
 

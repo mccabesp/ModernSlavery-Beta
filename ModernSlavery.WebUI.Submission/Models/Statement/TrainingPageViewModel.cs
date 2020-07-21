@@ -1,14 +1,21 @@
-﻿using System;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class TrainingPageViewModel
+    public class TrainingPageViewModelMapperProfile : Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
+        public TrainingPageViewModelMapperProfile()
+        {
+            CreateMap<TrainingPageViewModel, StatementModel>();
+        }
+    }
 
+    public class TrainingPageViewModel : BaseViewModel
+    {
         public IList<TrainingViewModel> Training { get; set; }
 
         public string OtherTraining { get; set; }

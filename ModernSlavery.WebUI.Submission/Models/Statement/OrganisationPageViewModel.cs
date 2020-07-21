@@ -1,14 +1,21 @@
-﻿using System;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class OrganisationPageViewModel
+    public class OrganisationPageViewModelMapperProfile : Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
+        public OrganisationPageViewModelMapperProfile()
+        {
+            CreateMap<OrganisationPageViewModel, StatementModel>();
+        }
+    }
 
+    public class OrganisationPageViewModel : BaseViewModel
+    {
         public IList<SectorViewModel> Sectors { get; set; }
 
         public Presenters.LastFinancialYearBudget? Turnover { get; set; }

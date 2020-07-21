@@ -1,14 +1,21 @@
-﻿using System;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class PoliciesPageViewModel
+    public class PoliciesPageViewModelMapperProfile : Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
+        public PoliciesPageViewModelMapperProfile()
+        {
+            CreateMap<PoliciesPageViewModel, StatementModel>();
+        }
+    }
 
+    public class PoliciesPageViewModel : BaseViewModel
+    {
         public IList<PolicyViewModel> Policies { get; set; }
 
         public string OtherPolicies { get; set; }

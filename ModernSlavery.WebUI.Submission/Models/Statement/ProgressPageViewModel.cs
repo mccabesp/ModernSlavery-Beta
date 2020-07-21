@@ -1,10 +1,20 @@
-﻿using System;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class ProgressPageViewModel
+    public class ProgressPageViewModelMapperProfile : Profile
+    {
+        public ProgressPageViewModelMapperProfile()
+        {
+            CreateMap<ProgressPageViewModel, StatementModel>();
+        }
+    }
+
+    public class ProgressPageViewModel : BaseViewModel
     {
         public int Year { get; set; }
         public string OrganisationIdentifier { get; set; }
