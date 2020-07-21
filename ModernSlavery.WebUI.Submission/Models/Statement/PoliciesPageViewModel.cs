@@ -20,8 +20,7 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            //TODO: investigate if  [GovUkValidateRequiredIf] can be used
-
+            //better way to identify this checkbox
             if (Policies.Single(x => x.Description == "Other").IsSelected && OtherPolicies == null)
                 yield return new ValidationResult("Please provide detail on 'other'");
         }

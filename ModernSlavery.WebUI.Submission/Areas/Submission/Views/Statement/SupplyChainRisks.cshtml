@@ -64,7 +64,7 @@
                                                     <label class="govuk-label" for="other">
                                                         Please specify the @item.Description
                                                     </label>                                                   
-                                                    <input asp-for="@item.Details" class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="other" type="text">
+                                                    <input asp-for="@item.Details" class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="other" type="text" maxlength="100">
                                                 </div>
                                                 }
                                             </div>
@@ -82,7 +82,7 @@
             <div class="govuk-form-group">
                 <label asp-for="OtherRelevantRisks" class="govuk-label" for="address-town">                   
                 </label>
-                <textarea asp-for="OtherRelevantRisks" class="govuk-textarea" rows="5"></textarea>
+                <textarea asp-for="OtherRelevantRisks" class="govuk-textarea" rows="5" maxlength="250"></textarea>
             </div>
 
             <h2 class="govuk-heading-l">
@@ -119,7 +119,7 @@
                                                     <label class="govuk-label" for="other">
                                                         Please explain why
                                                     </label>
-                                                    <textarea asp-for="@item.Details" class="govuk-textarea" name="other" rows="5"></textarea>
+                                                    <textarea asp-for="@item.Details" class="govuk-textarea" name="other" rows="5" maxlength="250"></textarea>
                                                 </div>
                                             </div>
                                         }

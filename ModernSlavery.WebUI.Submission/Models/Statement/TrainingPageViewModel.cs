@@ -1,4 +1,5 @@
-﻿using ModernSlavery.WebUI.GDSDesignSystem.Models;
+﻿using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using System;
 using System.Collections.Generic;
@@ -15,12 +16,13 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public IList<TrainingViewModel> Training { get; set; }
 
+        [MaxLength(50)]
         public string OtherTraining { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var otherTrainingCheckbox = Training.Single(x => x.Description.Equals("Other"));
-            if (otherTrainingCheckbox.IsSelected && OtherTraining == null)
+            if (otherTrainingCheckbox.IsSelected && OtherTraining.IsNull())
                 yield return new ValidationResult("Please provide other details");
         }
 

@@ -1,10 +1,12 @@
-﻿using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
+﻿using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace ModernSlavery.WebUI.Submission.Models
@@ -18,15 +20,14 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         [Display(Name = "Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.")]
         public bool HasForceLabour { get; set; }
+        [MaxLength(500)]
         public string ForcedLabourDetails { get; set; }
 
         [Display(Name = "Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?")]
         public bool HasSlaveryInstance { get; set; }
+        [MaxLength(500)]
         public string SlaveryInstanceDetails { get; set; }
 
-
-        //string on model :SlaveryInstanceRemediation
-        //public IList<Presenters.StatementRemediation> SlaveryInstanceRemediation { get; set; }
         public List<StatementRemediation> SlaveryInstanceRemediation { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -34,12 +35,20 @@ namespace ModernSlavery.WebUI.Submission.Models
 
             var validationResults = new List<ValidationResult>();
             var otherDiligence = DueDiligences.Single(x => x.Description.Equals("other"));
-            if (otherDiligence.IsSelected && otherDiligence.OtherDiligence == null)
+            if (otherDiligence.IsSelected && otherDiligence.OtherDiligence.IsNull())
                 validationResults.Add(new ValidationResult("Please enter other details"));
-            if (HasForceLabour == true & ForcedLabourDetails == null)
+
+            if (HasForceLabour == true & ForcedLabourDetails.IsNull())
                 validationResults.Add(new ValidationResult("Please provide the detail"));
-            if (HasSlaveryInstance == true & SlaveryInstanceDetails == null)
+
+            if (HasSlaveryInstance == true & SlaveryInstanceDetails.IsNull())
                 validationResults.Add(new ValidationResult("Please provide the detail"));
+
+            //TODO: how to check checkbox here as no isSelected
+            //if (HasSlaveryInstance == true & SlaveryInstanceRemediation.None(x => x.IsSelected))
+            //    validationResults.Add(new ValidationResult("Please provide the detail"));
+
+
 
             return validationResults;
         }
@@ -62,12 +71,18 @@ namespace ModernSlavery.WebUI.Submission.Models
     {
         [GovUkRadioCheckboxLabelText(Text = "repayment of recruitment fees")]
         repaymentOfRecruitmentFees,
-
         [GovUkRadioCheckboxLabelText(Text = "change in policy")]
         changeInPolicy,
-
+        [GovUkRadioCheckboxLabelText(Text = "referring victims into government services")]
+        referringVictimsIntoGovernmentServices,
+        [GovUkRadioCheckboxLabelText(Text = "supporting victims via NGOs")]
+        supportingVictimsViaNGOs,
+        [GovUkRadioCheckboxLabelText(Text = "supporting criminal justice against perpetrator")]
+        supportingCriminalJusticeAgainstPerpetrator,
         [GovUkRadioCheckboxLabelText(Text = "other")]
-        Other
-        //etc
+        other,
+        [GovUkRadioCheckboxLabelText(Text = "none")]
+        none
+
     }
 }

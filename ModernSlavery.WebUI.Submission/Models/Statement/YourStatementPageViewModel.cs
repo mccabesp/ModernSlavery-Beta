@@ -1,21 +1,23 @@
-﻿using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
+﻿using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
     public class YourStatementPageViewModel : GovUkViewModel, IValidatableObject
     {
-
         //TODO: add regularexpression check to nullableIntParser so that error boxes populated correctly?
 
         public int Year { get; set; }
         public string OrganisationIdentifier { get; set; }
 
-        [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a URL")]
+        [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a URL")] //this will only get triggeres through parseAndValidate
         [Url(ErrorMessage = "URL is not valid")]
         [MaxLength(255, ErrorMessage = "The web address (URL) cannot be longer than 255 characters.")]
         [Display(Name = "URL")]
@@ -122,7 +124,27 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            return null;
+            var validationList = new List<ValidationResult>();
+
+            var startDateList = new List<int?> { StatementStartDay, StatementStartMonth, StatementStartYear };
+            if (startDateList.Any(x => x.HasValue) && !startDateList.Any(x => x.HasValue))
+                validationList.Add(new ValidationResult("Please complete the Start Date"));
+
+            var endDateList = new List<int?> { StatementEndDay, StatementEndMonth, StatementEndYear };
+            if (endDateList.Any(x => x.HasValue) && !endDateList.Any(x => x.HasValue))
+                validationList.Add(new ValidationResult("Please complete the End Date"));
+
+            var approvalDateList = new List<int?> { ApprovedDay, ApprovedMonth, ApprovedYear };
+            if (approvalDateList.Any(x => x.HasValue) && !approvalDateList.Any(x => x.HasValue))
+                validationList.Add(new ValidationResult("Please complete the Approved Date"));
+
+            var detailsList = new List<string> { ApproverFirstName, ApproverLastName, ApproverJobTitle };
+            if (detailsList.Any(x => x.IsNull()) && !detailsList.Any(x => x.IsNull()))
+                validationList.Add(new ValidationResult("Please complete First name, Last name, Job title"));
+
+            return validationList;
+
+
         }
 
         private DateTime? ParseDate(int? year, int? month, int? day)
