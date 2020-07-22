@@ -164,6 +164,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Administrator\Landing page\Administrator Sign In Checks.cs" />
+    <Compile Include="Richer Sumbission\Monitoring Progress Content Check.cs" />
     <Compile Include="Richer Sumbission\Review_And_Edit_Link_Navigation.cs" />
     <Compile Include="Richer Sumbission\Review_And_Submit_Cannot_Submit_Report_Without_Mandatory_Sections.cs" />
     <Compile Include="Richer Sumbission\Submission_Areas_Back_Button_Check.cs" />
@@ -178,9 +180,13 @@
     <Compile Include="Richer Sumbission\Supply_Chain_Part1_Mandatory_Field_Check.cs" />
     <Compile Include="Richer Sumbission\Supply_Chain_Risks_Part1_Q1_Interaction_Check.cs" />
     <Compile Include="Richer Sumbission\Supply_Chain_Risks_Part1_Q2_Interaction_Check.cs" />
+    <Compile Include="Search and Compare\Check Content Of Contact Us Page.cs" />
     <Compile Include="Search and Compare\Contact Us\User Checks Contact Us Page Navigation Is Correct.cs" />
     <Compile Include="Search and Compare\Contact Us\User Checks Navigation To New Tab Guidance Link.cs" />
     <Compile Include="Search and Compare\Contact Us\User Uses Email Function Of Contact Us.cs" />
+    <Compile Include="Search and Compare\Feedback\Feedback URL and Character Count Checks.cs" />
+    <Compile Include="Search and Compare\Feedback\Manage Feedback Content Check.cs" />
+    <Compile Include="Search and Compare\Feedback\Manage Mandatory Feedback Fields.cs" />
     <Compile Include="Search and Compare\Manage Account\Close Account User Is Set to Retired.cs" />
     <Compile Include="Richer Sumbission\Submission_Sectors_Content_Check.cs" />
     <Compile Include="Richer Sumbission\Submission_Training_Validation_Check.cs" />
@@ -206,6 +212,9 @@
     <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Modern Slavery Statement URL Mandatory And Valid.cs" />
     <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Policies Fields And %27Other%27 Functionality Checks.cs" />
     <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\Statement URL Fields Is Mandatory And Only Accepts Valid Format.cs" />
+    <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\User Creates A Draft Report.cs" />
+    <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\User Edits Draft Report For Current Year.cs" />
+    <Compile Include="Search and Compare\Mordern Slavery Reporting\Manage Organisation\User Submits Draft Report As Final Report.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Spam_Protection_Reset_Count.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registration_Expired.cs" />
     <Compile Include="Search and Compare\Registration\Fastrack\Fastrack_Registraion_Invalid_Reference.cs" />
