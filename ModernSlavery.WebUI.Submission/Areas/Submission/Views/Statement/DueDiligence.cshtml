@@ -139,16 +139,16 @@
                                         <h2 class="govuk-heading-m">
                                             What remediation action did your organisation take in response?
                                         </h2>
-                                    </legend>                                   
+                                    </legend>
                                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                         @foreach (var item in Model.SlaveryInstanceRemediation)
                                         {
                                             <div class="govuk-checkboxes__item">
-                                                <input  class="govuk-checkboxes__input" id="remediation-conditional" type="checkbox" data-aria-controls="remediation-conditional">
+                                                <input class="govuk-checkboxes__input" id="remediation-conditional" type="checkbox" data-aria-controls="remediation-conditional">
                                                 <label class="govuk-label govuk-checkboxes__label" for="remediation-conditional">
                                                     @item
                                                 </label>
-                                            </div>                                           
+                                            </div>
                                         }
                                     </div>
                                 </fieldset>
@@ -167,9 +167,7 @@
             <button class="govuk-button" data-module="govuk-button" type="submit">
                 Continue
             </button>
-            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
-                Cancel
-            </button>
+            <a class="govuk-button govuk-button--secondary" href="@Model.CancelUrl">Cancel</a>
         }
     </div>
 
