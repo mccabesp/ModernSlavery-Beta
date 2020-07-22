@@ -1,13 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
-using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Submission;
-using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
@@ -18,9 +13,8 @@ using ModernSlavery.WebUI.Submission.Models.Statement;
 using ModernSlavery.WebUI.Submission.Presenters;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
-using static ModernSlavery.WebUI.Submission.Presenters.StatementPresenter;
 
 namespace ModernSlavery.WebUI.Submission.Controllers
 {
@@ -70,8 +64,21 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         /// <returns>The IActionResult to execute</returns>
         private IActionResult HandleStatementErrors(IEnumerable<(StatementErrors Error, string Message)> errors)
         {
-            //TODO: These should most often return full page errors which return to the ManageOrganisation page
-            throw new NotImplementedException();
+            //Return full page errors which return to the ManageOrganisation page
+            var error = errors.FirstOrDefault();
+            switch (error.Error)
+            {
+                case StatementErrors.NotFound:
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1152, error));
+                case StatementErrors.Unauthorised:
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1153));
+                case StatementErrors.Locked:
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1154, error));
+                case StatementErrors.TooLate:
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1155));
+                default:
+                    throw new NotImplementedException($"{nameof(StatementErrors)} type '{error.Error}' is not recognised");
+            }
         }
 
         private object GetOrgAndYearRouteData() => new { OrganisationIdentifier, year = ReportingDeadlineYear };
@@ -88,47 +95,47 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             {
                 case YourStatementPageViewModel vm:
                     vm.BackUrl = ReturnUrl;
-                    vm.CancelUrl = CancelUrl;
+                    vm.CancelUrl = vm.CanRevertToBackup ? CancelUrl : ReturnUrl;
                     vm.ContinueUrl = Url.Action(nameof(this.Compliance), GetOrgAndYearRouteData());
                     break;
                 case CompliancePageViewModel vm:
                     vm.BackUrl = Url.Action(nameof(this.YourStatement), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
+                    vm.CancelUrl = vm.CanRevertToBackup ? CancelUrl : ReturnUrl;
                     vm.ContinueUrl = Url.Action(nameof(this.YourOrganisation), GetOrgAndYearRouteData());
                     break;
                 case OrganisationPageViewModel vm:
                     vm.BackUrl = Url.Action(nameof(this.Compliance), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
+                    vm.CancelUrl = vm.CanRevertToBackup ? CancelUrl : ReturnUrl;
                     vm.ContinueUrl = Url.Action(nameof(this.Policies), GetOrgAndYearRouteData());
                     break;
                 case PoliciesPageViewModel vm:
                     vm.BackUrl = Url.Action(nameof(this.YourOrganisation), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
+                    vm.CancelUrl = vm.CanRevertToBackup ? CancelUrl : ReturnUrl;
                     vm.ContinueUrl = Url.Action(nameof(this.SupplyChainRisks), GetOrgAndYearRouteData());
                     break;
                 case RisksPageViewModel vm:
                     vm.BackUrl = Url.Action(nameof(this.Policies), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
+                    vm.CancelUrl = vm.CanRevertToBackup ? CancelUrl : ReturnUrl;
                     vm.ContinueUrl = Url.Action(nameof(this.DueDiligence), GetOrgAndYearRouteData());
                     break;
                 case DueDiligencePageViewModel vm:
                     vm.BackUrl = Url.Action(nameof(this.SupplyChainRisks), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
+                    vm.CancelUrl = vm.CanRevertToBackup ? CancelUrl : ReturnUrl;
                     vm.ContinueUrl = Url.Action(nameof(this.Training), GetOrgAndYearRouteData());
                     break;
                 case TrainingPageViewModel vm:
                     vm.BackUrl = Url.Action(nameof(this.DueDiligence), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
+                    vm.CancelUrl = vm.CanRevertToBackup ? CancelUrl : ReturnUrl;
                     vm.ContinueUrl = Url.Action(nameof(this.MonitoringProgress), GetOrgAndYearRouteData());
                     break;
                 case ProgressPageViewModel vm:
                     vm.BackUrl = Url.Action(nameof(this.Training), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
+                    vm.CancelUrl = vm.CanRevertToBackup ? CancelUrl : ReturnUrl;
                     vm.ContinueUrl = Url.Action(nameof(this.Review), GetOrgAndYearRouteData());
                     break;
                 case ReviewPageViewModel vm:
                     vm.BackUrl = Url.Action(nameof(this.MonitoringProgress), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
+                    vm.CancelUrl = vm.CanRevertToBackup ? CancelUrl : ReturnUrl;
                     vm.ContinueUrl = ReturnUrl;
                     break;
                 case CancelPageViewModel vm:
