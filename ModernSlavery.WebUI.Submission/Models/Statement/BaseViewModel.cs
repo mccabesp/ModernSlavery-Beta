@@ -8,6 +8,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     public abstract class BaseViewModel: GovUkViewModel, IValidatableObject
     {
         [BindNever]
+        public bool CanRevertToBackup { get; set; }
+        [BindNever]
         public string BackUrl { get; set; }
         [BindNever]
         public string CancelUrl { get; set; }

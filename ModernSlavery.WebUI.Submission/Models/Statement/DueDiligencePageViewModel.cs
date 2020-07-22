@@ -41,7 +41,7 @@ namespace ModernSlavery.WebUI.Submission.Models
 
             var validationResults = new List<ValidationResult>();
             var otherDiligence = DueDiligences.Single(x => x.Description.Equals("other"));
-            if (otherDiligence.IsSelected && otherDiligence.OtherDiligence.IsNullOrWhiteSpace())
+            if (otherDiligence.IsSelected && otherDiligence.Details.IsNullOrWhiteSpace())
                 validationResults.Add(new ValidationResult("Please enter other details"));
 
             if (HasForceLabour == true & ForcedLabourDetails.IsNullOrWhiteSpace())
@@ -61,15 +61,11 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public class DueDiligenceViewModel
         {
-            // TODO - James Handle "Other" case
-            // It seems to only appear once under "Social audits"
             public short Id { get; set; }
             public short? ParentId { get; set; }
             public string Description { get; set; }
             public bool IsSelected { get; set; }
-            public List<DueDiligenceViewModel> ChildDiligences { get; set; }
-            //TODO: set on presenter level
-            public string OtherDiligence { get; set; }
+            public string Details { get; set; }
         }
     }
 

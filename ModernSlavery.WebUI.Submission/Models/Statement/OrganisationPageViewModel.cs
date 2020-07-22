@@ -37,7 +37,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             From100to500Million = 4,
 
             [GovUkRadioCheckboxLabelText(Text = "£500 million+")]
-            [Range(500, 0)]
             Over500Million = 5,
         }
 

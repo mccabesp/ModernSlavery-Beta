@@ -36,12 +36,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             public short? ParentId { get; set; }
             public string Description { get; set; }
             public bool IsSelected { get; set; }
-            //TODO: need to set this on presenter
             public string Category { get; set; }
-            //TODO: need to set this on presenter
-            public List<RiskViewModel> ChildRisks { get; set; }
-            //TODO: need to set this on presenter
-            // [MaxLength(100, ErrorMessage = "Reason can only be 100 characters or less")] - not possible as different for each block - handled on ui
             public string Details { get; set; }
 
         }
