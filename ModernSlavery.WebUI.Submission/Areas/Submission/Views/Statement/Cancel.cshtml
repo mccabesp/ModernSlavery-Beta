@@ -1,0 +1,24 @@
+﻿@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model CancelPageViewModel
+<div class="govuk-grid-row">
+    <div class="govuk-column-two-thirds">
+        @using (Html.BeginForm())
+        {          
+            @Html.AntiForgeryToken();
+
+            <h1 class="govuk-heading-l">
+                You have unsaved data, what do you want to do?
+            </h1>
+
+            <a class="govuk-button govuk-button--secondary" href="@Model.CancelUrl">
+                Exit without saving
+            </a>
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Save the data
+            </button>
+        }
+
+    </div>
+</div>
