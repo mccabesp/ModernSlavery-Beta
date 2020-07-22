@@ -35,13 +35,13 @@ namespace ModernSlavery.WebUI.Submission.Models
 
             var validationResults = new List<ValidationResult>();
             var otherDiligence = DueDiligences.Single(x => x.Description.Equals("other"));
-            if (otherDiligence.IsSelected && otherDiligence.OtherDiligence.IsNull())
+            if (otherDiligence.IsSelected && otherDiligence.OtherDiligence.IsNullOrWhiteSpace())
                 validationResults.Add(new ValidationResult("Please enter other details"));
 
-            if (HasForceLabour == true & ForcedLabourDetails.IsNull())
+            if (HasForceLabour == true & ForcedLabourDetails.IsNullOrWhiteSpace())
                 validationResults.Add(new ValidationResult("Please provide the detail"));
 
-            if (HasSlaveryInstance == true & SlaveryInstanceDetails.IsNull())
+            if (HasSlaveryInstance == true & SlaveryInstanceDetails.IsNullOrWhiteSpace())
                 validationResults.Add(new ValidationResult("Please provide the detail"));
 
             //TODO: how to check checkbox here as no isSelected

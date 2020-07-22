@@ -1,4 +1,5 @@
-﻿using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
+﻿using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using System;
@@ -21,7 +22,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             //better way to identify this checkbox
-            if (Policies.Single(x => x.Description == "Other").IsSelected && OtherPolicies == null)
+            if (Policies.Single(x => x.Description == "Other").IsSelected && OtherPolicies.IsNullOrWhiteSpace())
                 yield return new ValidationResult("Please provide detail on 'other'");
         }
 

@@ -41,17 +41,17 @@ namespace ModernSlavery.WebUI.Submission.Models
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
-            if (IncludesStructure == false && StructureDetails.IsNull())
+            if (IncludesStructure == false && StructureDetails.IsNullOrWhiteSpace())
                 validationResults.Add(new ValidationResult("Please provide the detail for: Your organisatio's structure, business and supply chains"));
-            if (IncludesPolicies == false && PolicyDetails.IsNull())
+            if (IncludesPolicies == false && PolicyDetails.IsNullOrWhiteSpace())
                 validationResults.Add(new ValidationResult("Please provide the detail for: Policies"));
-            if (IncludesRisks == false && RisksDetails.IsNull())
+            if (IncludesRisks == false && RisksDetails.IsNullOrWhiteSpace())
                 validationResults.Add(new ValidationResult("Please provide the detail for: Risk assessment and management"));
-            if (IncludesDueDiligence == false && DueDiligenceDetails.IsNull())
+            if (IncludesDueDiligence == false && DueDiligenceDetails.IsNullOrWhiteSpace())
                 validationResults.Add(new ValidationResult("Please provide the detail for: Due diligence processes"));
-            if (IncludesTraining == false && TrainingDetails.IsNull())
+            if (IncludesTraining == false && TrainingDetails.IsNullOrWhiteSpace())
                 validationResults.Add(new ValidationResult("Please provide the detail for: Staff training about slavery and human trafficking"));
-            if (IncludesGoals == false && GoalsDetails.IsNull())
+            if (IncludesGoals == false && GoalsDetails.IsNullOrWhiteSpace())
                 validationResults.Add(new ValidationResult("Please provide the detail for: Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions"));
             return validationResults;
 

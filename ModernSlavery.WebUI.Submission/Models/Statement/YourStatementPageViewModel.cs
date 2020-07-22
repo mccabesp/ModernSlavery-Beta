@@ -12,8 +12,6 @@ namespace ModernSlavery.WebUI.Submission.Models
 {
     public class YourStatementPageViewModel : GovUkViewModel, IValidatableObject
     {
-        //TODO: add regularexpression check to nullableIntParser so that error boxes populated correctly?
-
         public int Year { get; set; }
         public string OrganisationIdentifier { get; set; }
 
