@@ -39,7 +39,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         [Test, Order(13)]
 
-        public async Task InvalidDetails_Results_In_Validaiton()
+        public async Task ClickingCloseAccountClosesAccount()
         {
             Expect("This will not impact any reports already published on the service. Other people registered to the organisation will still be able to submit and change reports.");
 
