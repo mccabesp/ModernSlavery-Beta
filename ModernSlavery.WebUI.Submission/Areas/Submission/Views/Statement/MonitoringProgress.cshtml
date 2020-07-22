@@ -1,9 +1,8 @@
-﻿@using System.ComponentModel.DataAnnotations
-@{
+﻿@{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Models.ProgressPageViewModel
-<a class="govuk-back-link" href="@Url.Action("Training", "Statement", new { organisationIdentifier = Model.OrganisationIdentifier, year = Model.Year })">Back</a>
+@model ProgressPageViewModel
+<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
@@ -16,10 +15,10 @@
 
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Models.ProgressPageViewModel.IncludesMeasuringProgress),
-                    nameof(ModernSlavery.WebUI.Submission.Models.ProgressPageViewModel.ProgressMeasures),
-                    nameof(ModernSlavery.WebUI.Submission.Models.ProgressPageViewModel.KeyAchievements),
-                    nameof(ModernSlavery.WebUI.Submission.Models.ProgressPageViewModel.NumberOfYearsOfStatements),
+                    nameof(ProgressPageViewModel.IncludesMeasuringProgress),
+                    nameof(ProgressPageViewModel.ProgressMeasures),
+                    nameof(ProgressPageViewModel.KeyAchievements),
+                    nameof(ProgressPageViewModel.StatementYears),
                 }))
 
             <h1 class="govuk-heading-l">
@@ -55,12 +54,12 @@
 
 
             @(Html.GovUkRadiosFor(
-                    m => m.NumberOfYearsOfStatements,
+                    m => m.StatementYears,
                     new FieldsetViewModel
                     {
                         Legend = new LegendViewModel
                         {
-                            Text = Model.NumberOfYearsOfStatements.GetAttribute<DisplayAttribute>().Name,
+                            Text = Model.StatementYears.GetAttribute<DisplayAttribute>().Name,
                             Classes = "govuk-fieldset__legend--m"
                         },
                         Classes = "govuk-!-margin-top-6"

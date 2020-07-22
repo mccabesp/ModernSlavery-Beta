@@ -1,8 +1,7 @@
-﻿@using System.ComponentModel.DataAnnotations
-@{
+﻿@{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel
+@model YourStatementPageViewModel
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
@@ -13,25 +12,23 @@
             @Html.AntiForgeryToken();
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementStartDate),
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementStartDay),
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementStartMonth),
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementStartYear),
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementEndDate),
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementEndDay),
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementEndMonth),
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementEndYear)
+                    nameof(YourStatementPageViewModel.StatementStartDay),
+                    nameof(YourStatementPageViewModel.StatementStartMonth),
+                    nameof(YourStatementPageViewModel.StatementStartYear),
+                    nameof(YourStatementPageViewModel.StatementEndDay),
+                    nameof(YourStatementPageViewModel.StatementEndMonth),
+                    nameof(YourStatementPageViewModel.StatementEndYear)
                 }))
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.StatementUrl)
+                    nameof(YourStatementPageViewModel.StatementUrl)
 
                 }))
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.ApproverFirstName),
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.ApproverLastName),
-                    nameof(ModernSlavery.WebUI.Submission.Models.YourStatementPageViewModel.ApproverJobTitle),
+                    nameof(YourStatementPageViewModel.ApproverFirstName),
+                    nameof(YourStatementPageViewModel.ApproverLastName),
+                    nameof(YourStatementPageViewModel.ApproverJobTitle),
                 }))
 
             <h1 class="govuk-heading-l">

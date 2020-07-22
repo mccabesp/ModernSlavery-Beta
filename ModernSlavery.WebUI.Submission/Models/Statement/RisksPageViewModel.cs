@@ -1,20 +1,25 @@
-﻿using Microsoft.Azure.Management.WebSites.Models;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
+using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class RisksPageViewModel : GovUkViewModel, IValidatableObject
+    public class RisksPageViewModelMapperProfile : Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
+        public RisksPageViewModelMapperProfile()
+        {
+            CreateMap<StatementModel, RisksPageViewModel>();
+            CreateMap<RisksPageViewModel, StatementModel>(MemberList.Source);
+        }
+    }
 
+    public class RisksPageViewModel : BaseViewModel
+    {
         public List<RiskViewModel> RelevantRisks { get; set; }
         [Display(Name = " If you want to specify an area not mentioned above, please provide details")]
         public string OtherRelevantRisks;
@@ -41,7 +46,7 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
 
             var validationList = new List<ValidationResult>();

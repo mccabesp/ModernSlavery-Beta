@@ -252,6 +252,9 @@ namespace ModernSlavery.Infrastructure.Hosts
                         });
             });
 
+            //Compile the mapping now rather than at runtime
+            mapperConfig.CompileMappings();
+
             // only during development, validate your mappings; remove it before release
             if (assertConfigurationIsValid)mapperConfig.AssertConfigurationIsValid();
 

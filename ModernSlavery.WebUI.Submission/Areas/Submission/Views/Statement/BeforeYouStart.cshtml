@@ -1,18 +1,9 @@
-﻿@using System.ComponentModel.DataAnnotations
-@{
+﻿@{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Presenters.StatementViewModel
+@model string
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
-        @using (Html.BeginForm())
-
-        {
-            var controller = ViewData["Controller"] as BaseController;
-
-            @await Html.CustomValidationSummaryAsync();
-            @Html.AntiForgeryToken();
-
             <h1 class="govuk-heading-l">
                 Before you start
             </h1>
@@ -63,10 +54,7 @@
                 The information you provide us with will be published on our viewing service.
             </p>
 
-            <button class="govuk-button" data-module="govuk-button" type="submit">
-                Start now
-            </button>
+            <a href="@Model" class="govuk-button">Start now</a>
 
-        }
     </div>
 </div>

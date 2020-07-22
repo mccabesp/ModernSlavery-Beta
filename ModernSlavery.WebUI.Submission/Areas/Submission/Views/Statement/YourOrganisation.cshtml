@@ -1,11 +1,8 @@
-﻿@using System.ComponentModel.DataAnnotations
-@{
-
+﻿@{
     Layout = "/Views/GdsLayout.cshtml";
-
 }
-@model ModernSlavery.WebUI.Submission.Models.OrganisationPageViewModel
-<a class="govuk-back-link" href="@Url.Action("Compliance", "Statement", new { organisationIdentifier = Model.OrganisationIdentifier, year = Model.Year })">Back</a>
+@model OrganisationPageViewModel
+<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())

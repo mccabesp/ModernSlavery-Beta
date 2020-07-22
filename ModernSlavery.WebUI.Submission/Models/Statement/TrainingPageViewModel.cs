@@ -1,25 +1,31 @@
-﻿using ModernSlavery.Core.Extensions;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
-using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
+using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class TrainingPageViewModel : GovUkViewModel, IValidatableObject
+    public class TrainingPageViewModelMapperProfile : Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
+        public TrainingPageViewModelMapperProfile()
+        {
+            CreateMap<StatementModel, TrainingPageViewModel>();
+            CreateMap<TrainingPageViewModel, StatementModel>(MemberList.Source);
+        }
+    }
 
+    public class TrainingPageViewModel : BaseViewModel
+    {
         public IList<TrainingViewModel> Training { get; set; }
 
         [MaxLength(50)]
         public string OtherTraining { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var otherTrainingCheckbox = Training.Single(x => x.Description.Equals("Other"));
             if (otherTrainingCheckbox.IsSelected && OtherTraining.IsNull())

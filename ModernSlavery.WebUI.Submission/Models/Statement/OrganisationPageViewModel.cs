@@ -1,29 +1,54 @@
-﻿using ModernSlavery.BusinessDomain.Submission;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
-using System.Text;
+using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class OrganisationPageViewModel : GovUkViewModel, IValidatableObject
+    public class OrganisationPageViewModelMapperProfile : Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
+        public OrganisationPageViewModelMapperProfile()
+        {
+            CreateMap<StatementModel,OrganisationPageViewModel>();
+            CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source);
+        }
+    }
+
+    public class OrganisationPageViewModel : BaseViewModel
+    {
+        public enum TurnoverRanges : byte
+        {
+            //Not Provided
+            NotProvided = 0,
+
+            [GovUkRadioCheckboxLabelText(Text = "Under £36 million")]
+            Under36Million = 1,
+
+            [GovUkRadioCheckboxLabelText(Text = "£36 million - £60 million")]
+            From36to60Million = 2,
+
+            [GovUkRadioCheckboxLabelText(Text = "£60 million - £100 million")]
+            From60to100Million = 3,
+
+            [GovUkRadioCheckboxLabelText(Text = "£100 million - £500 million")]
+            From100to500Million = 4,
+
+            [GovUkRadioCheckboxLabelText(Text = "£500 million+")]
+            [Range(500, 0)]
+            Over500Million = 5,
+        }
 
         public IList<SectorViewModel> Sectors { get; set; }
 
         [Display(Name = "What was your turnover or budget during the last financial accounting year?")]
-        public LastFinancialYearBudget? Turnover { get; set; }
+        public TurnoverRanges? Turnover { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            return null;
+            throw new System.NotImplementedException();
         }
 
         public class SectorViewModel
@@ -31,28 +56,6 @@ namespace ModernSlavery.WebUI.Submission.Models
             public short Id { get; set; }
             public string Description { get; set; }
             public bool IsSelected { get; set; }
-
         }
-
     }
-
-    public enum LastFinancialYearBudget : byte
-    {
-        [GovUkRadioCheckboxLabelText(Text = "Under £36 million")]
-        Under36Million = 0,
-
-        [GovUkRadioCheckboxLabelText(Text = "£36 million - £60 million")]
-        From36MillionTo60Million = 1,
-
-        [GovUkRadioCheckboxLabelText(Text = "£60 million - £100 million")]
-        From60MillionTo100Million = 2,
-
-        [GovUkRadioCheckboxLabelText(Text = "£100 million - £500 million")]
-        From100MillionTo500Million = 3,
-
-        [GovUkRadioCheckboxLabelText(Text = "£500 million+")]
-        From500MillionUpwards = 4,
-
-    }
-
 }

@@ -1,10 +1,8 @@
-﻿@using System.ComponentModel.DataAnnotations
-@{
+﻿@{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Models.RisksPageViewModel
-
-<a class="govuk-back-link" href="@Url.Action("Policies", "Statement", new { organisationIdentifier = Model.OrganisationIdentifier, year = Model.Year })">Back</a>
+@model RisksPageViewModel
+<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
@@ -16,7 +14,7 @@
 
             @(Html.GovUkErrorSummary(new[]
         {
-                    nameof(ModernSlavery.WebUI.Submission.Models.RisksPageViewModel.RelevantRisks)
+                    nameof(RisksPageViewModel.RelevantRisks)
                 }))
 
             <h2>Part 1</h2>

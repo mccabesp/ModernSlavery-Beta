@@ -1,17 +1,39 @@
-﻿using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
+using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class ProgressPageViewModel : GovUkViewModel, IValidatableObject
+    public class ProgressPageViewModelMapperProfile : Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
-        [Display(Name = "Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?")]
+        public ProgressPageViewModelMapperProfile()
+        {
+            CreateMap<StatementModel, ProgressPageViewModel>();
+            CreateMap<ProgressPageViewModel, StatementModel>(MemberList.Source);
+        }
+    }
+
+    public class ProgressPageViewModel : BaseViewModel
+    {
+        public enum YearRanges : byte
+        {
+            NotProvided = 0,
+
+            [GovUkRadioCheckboxLabelText(Text = "This is the first time")]
+            Year1 = 1,
+
+            [GovUkRadioCheckboxLabelText(Text = "1 to 5 Years")]
+            Years1To5 = 2,
+
+            [GovUkRadioCheckboxLabelText(Text = "More than 5 years")]
+            Over5Years = 3,
+        }
+
+        [Display(Name = "Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?")] 
         public bool IncludesMeasuringProgress { get; set; }
 
         [Display(Name = "How is your organisation measuring progress towards these goals?")]
@@ -20,22 +42,12 @@ namespace ModernSlavery.WebUI.Submission.Models
         public string KeyAchievements { get; set; }
 
         [Display(Name = "How many years has your organisation been producing modern slavery statements?")]
-        public NumberOfYearsOfStatements? NumberOfYearsOfStatements { get; set; }
+        public YearRanges StatementYears { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            return null;
+            throw new System.NotImplementedException();
         }
-
-    }
-    public enum NumberOfYearsOfStatements : byte
-    {
-        [GovUkRadioCheckboxLabelText(Text = "This is the first time")]
-        thisIsTheFirstTime = 0,
-        [GovUkRadioCheckboxLabelText(Text = "1 - 5 years")]
-        from1To5Years = 1,
-        [GovUkRadioCheckboxLabelText(Text = "More than 5 years")]
-        moreThan5Years = 2,
 
     }
 }

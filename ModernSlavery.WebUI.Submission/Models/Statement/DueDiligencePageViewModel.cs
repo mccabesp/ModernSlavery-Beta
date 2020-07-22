@@ -1,21 +1,27 @@
-﻿using ModernSlavery.Core.Extensions;
+﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
-using System;
+using ModernSlavery.WebUI.Submission.Models.Statement;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
+using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
-    public class DueDiligencePageViewModel : GovUkViewModel, IValidatableObject
+    public class DueDiligencePageViewModelMapperProfile:Profile
     {
-        public int Year { get; set; }
-        public string OrganisationIdentifier { get; set; }
+        public DueDiligencePageViewModelMapperProfile()
+        {
+            CreateMap<StatementModel,DueDiligencePageViewModel>();
+            CreateMap<DueDiligencePageViewModel, StatementModel>(MemberList.Source);
+        }
+    }
 
+    public class DueDiligencePageViewModel : BaseViewModel
+    {
         public List<DueDiligenceViewModel> DueDiligences { get; set; }
 
         [Display(Name = "Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.")]
@@ -30,7 +36,7 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public List<StatementRemediation> SlaveryInstanceRemediation { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
 
             var validationResults = new List<ValidationResult>();

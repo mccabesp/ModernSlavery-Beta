@@ -1,11 +1,8 @@
-﻿@using System.ComponentModel.DataAnnotations
-@{
-
+﻿@{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model ModernSlavery.WebUI.Submission.Models.CompliancePageViewModel
-
-<a class="govuk-back-link" href="@Url.Action("YourStatement", "Statement", new { organisationIdentifier = Model.OrganisationIdentifier, year = Model.Year })">Back</a>
+@model CompliancePageViewModel
+<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
@@ -17,12 +14,12 @@
 
             @(Html.GovUkErrorSummary(new[]
                 {
-                    nameof(ModernSlavery.WebUI.Submission.Models.CompliancePageViewModel.IncludesStructure),
-                    nameof(ModernSlavery.WebUI.Submission.Models.CompliancePageViewModel.IncludesPolicies),
-                    nameof(ModernSlavery.WebUI.Submission.Models.CompliancePageViewModel.IncludesRisks),
-                    nameof(ModernSlavery.WebUI.Submission.Models.CompliancePageViewModel.IncludesDueDiligence),
-                    nameof(ModernSlavery.WebUI.Submission.Models.CompliancePageViewModel.IncludesTraining),
-                    nameof(ModernSlavery.WebUI.Submission.Models.CompliancePageViewModel.IncludesGoals)
+                    nameof(CompliancePageViewModel.IncludesStructure),
+                    nameof(CompliancePageViewModel.IncludesPolicies),
+                    nameof(CompliancePageViewModel.IncludesRisks),
+                    nameof(CompliancePageViewModel.IncludesDueDiligence),
+                    nameof(CompliancePageViewModel.IncludesTraining),
+                    nameof(CompliancePageViewModel.IncludesGoals)
                 }))
 
             <h1 class="govuk-heading-l">
