@@ -11,7 +11,7 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-
+            @Html.HiddenFor(m => m.ContinueUrl);
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -38,15 +38,15 @@
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         @foreach (var item in Model.Sectors)
                         {
-                                <div class="govuk-checkboxes__item">
-                                    <input asp-for="@item.IsSelected" class="govuk-checkboxes__input"  type="checkbox" >
-                                    <label class="govuk-label govuk-checkboxes__label" >
-                                       @item.Description
-                                    </label>
-                                </div>
+                            <div class="govuk-checkboxes__item">
+                                <input asp-for="@item.IsSelected" class="govuk-checkboxes__input" type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label">
+                                    @item.Description
+                                </label>
+                            </div>
                         }
-                     </div>             
-                  </fieldset>
+                    </div>
+                </fieldset>
             </div>
 
             @(Html.GovUkRadiosFor(

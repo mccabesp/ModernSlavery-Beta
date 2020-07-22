@@ -10,6 +10,7 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.ContinueUrl);
             @(Html.GovUkErrorSummary(new[]
                 {
                     nameof(YourStatementPageViewModel.StatementStartDay),

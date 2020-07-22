@@ -11,105 +11,105 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.ContinueUrl);
 
+            <h1 class="govuk-heading-l">
+                Review @Model.ReportingDeadlineYear group report for @Model.OrganisationName
+            </h1>
 
-        <h1 class="govuk-heading-l">
-            Review @Model.ReportingDeadlineYear group report for @Model.OrganisationName
-        </h1>
+            <p class="govuk-body govuk-!-margin-bottom-7">Submission incomplete</p> @*//TODO: get the correct text based on sections completed*@
 
-        <p class="govuk-body govuk-!-margin-bottom-7">Submission incomplete</p> @*//TODO: get the correct text based on sections completed*@
+            <ol class="app-task-list">
+                <li>
+                    <h2 class="app-task-list__section">
+                        <span class="app-task-list__section-number">1. </span> Required information about your statement
+                    </h2>
+                    <ul class="app-task-list__items">
+                        <li class="app-task-list__item">
+                            <span class="app-task-list__task-name">
+                                <a href="@(Url.Action("YourStatement"))" aria-describedby="slavery-statement">
+                                    Your modern slavery statement
+                                </a>
+                            </span>
+                            <strong class="@(Model.YourStatementCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="slavery-statement">@Model.YourStatementCompleted)</strong>
+                        </li>
+                        <li class="app-task-list__item">
+                            <span class="app-task-list__task-name">
+                                <a href="@(Url.Action("Compliance"))" aria-describedby="compliance">
+                                    Areas covered by your modern statement
+                                </a>
+                            </span>
+                            <strong class="@(Model.ComplianceCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="compliance">@Model.ComplianceCompleted</strong>
+                        </li>
+                    </ul>
+                </li>
 
-        <ol class="app-task-list">
-            <li>
-                <h2 class="app-task-list__section">
-                    <span class="app-task-list__section-number">1. </span> Required information about your statement
-                </h2>
-                <ul class="app-task-list__items">
-                    <li class="app-task-list__item">
-                        <span class="app-task-list__task-name">
-                            <a href="@(Url.Action("YourStatement"))" aria-describedby="slavery-statement">
-                                Your modern slavery statement
-                            </a>
-                        </span>
-                        <strong class="@(Model.YourStatementCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="slavery-statement">@Model.YourStatementCompleted)</strong>
-                    </li>
-                    <li class="app-task-list__item">
-                        <span class="app-task-list__task-name">
-                            <a href="@(Url.Action("Compliance"))" aria-describedby="compliance">
-                                Areas covered by your modern statement
-                            </a>
-                        </span>
-                        <strong class="@(Model.ComplianceCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="compliance">@Model.ComplianceCompleted</strong>
-                    </li>
-                </ul>
-            </li>
+                <li>
+                    <h2 class="app-task-list__section">
+                        <span class="app-task-list__section-number">2. </span> Additional information about your statement
+                    </h2>
+                    <ul class="app-task-list__items">
+                        <li class="app-task-list__item">
+                            <span class="app-task-list__task-name">
+                                <a href="@(Url.Action("YourOrganisation"))" aria-describedby="organisation">
+                                    Your Organisation
+                                </a>
+                            </span>
+                            <strong class="@(Model.YourOrganisationCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="organisation">@Model.ComplianceCompleted</strong>
+                        </li>
+                        <li class="app-task-list__item">
+                            <span class="app-task-list__task-name">
+                                <a href="@(Url.Action("Policies"))" aria-describedby="Policies">
+                                    Policies
+                                </a>
+                            </span>
+                            <strong class="@(Model.PoliciesCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="policies">@Model.PoliciesCompleted</strong>
+                        </li>
+                        <li class="app-task-list__item">
+                            <span class="app-task-list__task-name">
+                                <a href="@(Url.Action("SupplyChainRisks"))" aria-describedby="supply-risks-part-1">
+                                    Supply chain risks and due diligence (part 1)
+                                </a>
+                            </span>
+                            <strong class="@(Model.RisksCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="supply-risks-part-1">@Model.RisksCompleted</strong>
+                        </li>
+                        <li class="app-task-list__item">
+                            <span class="app-task-list__task-name">
+                                <a href="@(Url.Action("DueDiligence"))" aria-describedby="supply-risks-part-2">
+                                    Supply chain risks and due diligence (part 2)
+                                </a>
+                            </span>
+                            <strong class="@(Model.DueDiligencCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="supply-risks-part-2">@Model.DueDiligencCompleted</strong>
+                        </li>
+                        <li class="app-task-list__item">
+                            <span class="app-task-list__task-name">
+                                <a href="@(Url.Action("Training"))" aria-describedby="training">
+                                    Training
+                                </a>
+                            </span>
+                            <strong class="@(Model.TrainingCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="training">@Model.TrainingCompleted</strong>
+                        </li>
+                        <li class="app-task-list__item">
+                            <span class="app-task-list__task-name">
+                                <a href="@(Url.Action("MonitoringProgress"))" aria-describedby="monitoring-progress">
+                                    Monitoring Progress
+                                </a>
+                            </span>
+                            <strong class="@(Model.ProgressCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="monitoring-progress">@Model.ProgressCompleted</strong>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
 
-            <li>
-                <h2 class="app-task-list__section">
-                    <span class="app-task-list__section-number">2. </span> Additional information about your statement
-                </h2>
-                <ul class="app-task-list__items">
-                    <li class="app-task-list__item">
-                        <span class="app-task-list__task-name">
-                            <a href="@(Url.Action("YourOrganisation"))" aria-describedby="organisation">
-                                Your Organisation
-                            </a>
-                        </span>
-                        <strong class="@(Model.YourOrganisationCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="organisation">@Model.ComplianceCompleted</strong>
-                    </li>
-                    <li class="app-task-list__item">
-                        <span class="app-task-list__task-name">
-                            <a href="@(Url.Action("Policies"))" aria-describedby="Policies">
-                                Policies
-                            </a>
-                        </span>
-                        <strong class="@(Model.PoliciesCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="policies">@Model.PoliciesCompleted</strong>
-                    </li>
-                    <li class="app-task-list__item">
-                        <span class="app-task-list__task-name">
-                            <a href="@(Url.Action("SupplyChainRisks"))" aria-describedby="supply-risks-part-1">
-                                Supply chain risks and due diligence (part 1)
-                            </a>
-                        </span>
-                        <strong class="@(Model.RisksCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="supply-risks-part-1">@Model.RisksCompleted</strong>
-                    </li>
-                    <li class="app-task-list__item">
-                        <span class="app-task-list__task-name">
-                            <a href="@(Url.Action("DueDiligence"))" aria-describedby="supply-risks-part-2">
-                                Supply chain risks and due diligence (part 2)
-                            </a>
-                        </span>
-                        <strong class="@(Model.DueDiligencCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="supply-risks-part-2">@Model.DueDiligencCompleted</strong>
-                    </li>
-                    <li class="app-task-list__item">
-                        <span class="app-task-list__task-name">
-                            <a href="@(Url.Action("Training"))" aria-describedby="training">
-                                Training
-                            </a>
-                        </span>
-                        <strong class="@(Model.TrainingCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="training">@Model.TrainingCompleted</strong>
-                    </li>
-                    <li class="app-task-list__item">
-                        <span class="app-task-list__task-name">
-                            <a href="@(Url.Action("MonitoringProgress"))" aria-describedby="monitoring-progress">
-                                Monitoring Progress
-                            </a>
-                        </span>
-                        <strong class="@(Model.ProgressCompleted ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="monitoring-progress">@Model.ProgressCompleted</strong>
-                    </li>
-                </ul>
-            </li>            
-        </ol>
-
-        <button class="govuk-button" data-module="govuk-button" type="submit">
-            Confirm and Submit
-        </button>
-        <button class="govuk-button" data-module="govuk-button" type="submit">
-            Save draft
-        </button>
-        <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
-            Cancel
-        </button>
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Confirm and Submit
+            </button>
+            <button class="govuk-button" data-module="govuk-button" type="submit">
+                Save draft
+            </button>
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
+                Cancel
+            </button>
         }
     </div>
 </div>

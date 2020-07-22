@@ -11,6 +11,7 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.ContinueUrl);
 
 
             @(Html.GovUkErrorSummary(new[]
@@ -48,7 +49,7 @@
                             <div class="govuk-form-group">
                                 <fieldset class="govuk-fieldset">
                                     <div class="govuk-checkboxes">
-                                        @foreach (var item in group.ChildDiligences)
+                                        @foreach (var item in Model.DueDiligences.Where(x => x.Id == group.ParentId))
                                         {
                                             <div class="govuk-checkboxes__item">
                                                 <input class="govuk-checkboxes__input" id="conditional" name="supply-risk" type="checkbox" data-aria-controls="conditional-conditional">
@@ -63,7 +64,7 @@
                                                         <label class="govuk-label" for="other">
                                                             Please specify other @group.Description
                                                         </label>
-                                                        <input asp-for="@item.OtherDiligence" class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="other" type="text">
+                                                        <input asp-for="@item.Details" class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="other" type="text">
                                                     </div>
                                                     }
                                                 </div>
@@ -139,16 +140,16 @@
                                         <h2 class="govuk-heading-m">
                                             What remediation action did your organisation take in response?
                                         </h2>
-                                    </legend>                                   
+                                    </legend>
                                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                         @foreach (var item in Model.SlaveryInstanceRemediation)
                                         {
                                             <div class="govuk-checkboxes__item">
-                                                <input  class="govuk-checkboxes__input" id="remediation-conditional" type="checkbox" data-aria-controls="remediation-conditional">
+                                                <input class="govuk-checkboxes__input" id="remediation-conditional" type="checkbox" data-aria-controls="remediation-conditional">
                                                 <label class="govuk-label govuk-checkboxes__label" for="remediation-conditional">
                                                     @item
                                                 </label>
-                                            </div>                                           
+                                            </div>
                                         }
                                     </div>
                                 </fieldset>
