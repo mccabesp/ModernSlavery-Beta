@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Classes.ErrorMessages;
@@ -74,8 +73,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public StatementPresenter(
             IMapper mapper,
             ISharedBusinessLogic sharedBusinessLogic,
-            IStatementBusinessLogic statementBusinessLogic,
-            IUrlHelper urlHelper)
+            IStatementBusinessLogic statementBusinessLogic)
         {
             Mapper = mapper;
             SharedBusinessLogic = sharedBusinessLogic;
