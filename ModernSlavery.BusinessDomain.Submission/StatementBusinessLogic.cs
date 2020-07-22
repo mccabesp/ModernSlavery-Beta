@@ -151,8 +151,8 @@ namespace ModernSlavery.BusinessDomain.Submission
         void MapToModel(Statement statement, StatementModel statementModel)
         {
             _mapper.Map(statement, statementModel);
-            statementModel.StatementSectors = _sharedBusinessLogic.DataRepository.GetAll<StatementSectorType>().ToList().Select(type => new StatementModel.SectorModel(type.StatementSectorTypeId, type.Description, statement.Sectors.Any(st => st.StatementSectorTypeId == type.StatementSectorTypeId))).ToList();
-            statementModel.StatementPolicies = _sharedBusinessLogic.DataRepository.GetAll<StatementPolicyType>().ToList().Select(type => new StatementModel.PolicyModel(type.StatementPolicyTypeId, type.Description, statement.Policies.Any(st => st.StatementPolicyTypeId == type.StatementPolicyTypeId))).ToList();
+            statementModel.Sectors = _sharedBusinessLogic.DataRepository.GetAll<StatementSectorType>().ToList().Select(type => new StatementModel.SectorModel(type.StatementSectorTypeId, type.Description, statement.Sectors.Any(st => st.StatementSectorTypeId == type.StatementSectorTypeId))).ToList();
+            statementModel.Policies = _sharedBusinessLogic.DataRepository.GetAll<StatementPolicyType>().ToList().Select(type => new StatementModel.PolicyModel(type.StatementPolicyTypeId, type.Description, statement.Policies.Any(st => st.StatementPolicyTypeId == type.StatementPolicyTypeId))).ToList();
             var riskTypes = _sharedBusinessLogic.DataRepository.GetAll<StatementRiskType>().ToList();
             var relevantRisks = statement.LocationRisks.ToList();
             statementModel.LocationRisks = riskTypes.Select(type => new StatementModel.RisksModel(type.StatementRiskTypeId, type.ParentRiskTypeId,type.Description,type.Category.ToString(), relevantRisks.FirstOrDefault(st => st.StatementRiskTypeId == type.StatementRiskTypeId)?.Details, relevantRisks.Any(st => st.StatementRiskTypeId == type.StatementRiskTypeId))).ToList();
@@ -164,7 +164,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             statementModel.LocationRisks = riskTypes.Select(type => new StatementModel.RisksModel(type.StatementRiskTypeId, type.ParentRiskTypeId, type.Description, type.Category.ToString(), locationRisks.FirstOrDefault(st => st.StatementRiskTypeId == type.StatementRiskTypeId)?.Details, locationRisks.Any(st => st.StatementRiskTypeId == type.StatementRiskTypeId))).ToList();
 
             var diligences = statement.Diligences.ToList();
-            statementModel.Diligences = _sharedBusinessLogic.DataRepository.GetAll<StatementDiligenceType>().ToList().Select(type => new StatementModel.DiligenceModel(type.StatementDiligenceTypeId, type.ParentDiligenceTypeId, type.Description, diligences.FirstOrDefault(st => st.StatementDiligenceTypeId == type.StatementDiligenceTypeId)?.Details, diligences.Any(st => st.StatementDiligenceTypeId == type.StatementDiligenceTypeId))).ToList();
+            statementModel.DueDiligences = _sharedBusinessLogic.DataRepository.GetAll<StatementDiligenceType>().ToList().Select(type => new StatementModel.DiligenceModel(type.StatementDiligenceTypeId, type.ParentDiligenceTypeId, type.Description, diligences.FirstOrDefault(st => st.StatementDiligenceTypeId == type.StatementDiligenceTypeId)?.Details, diligences.Any(st => st.StatementDiligenceTypeId == type.StatementDiligenceTypeId))).ToList();
             statementModel.Training = _sharedBusinessLogic.DataRepository.GetAll<StatementTrainingType>().ToList().Select(type => new StatementModel.TrainingModel(type.StatementTrainingTypeId, type.Description, statement.Sectors.Any(st => st.StatementSectorTypeId == type.StatementTrainingTypeId))).ToList();
         }
 
@@ -173,15 +173,15 @@ namespace ModernSlavery.BusinessDomain.Submission
             _mapper.Map(statementModel, statement);
 
             //Map the sectors
-            statement.Sectors.Where(s => !statementModel.StatementSectors.Any(model => model.Id == s.StatementSectorTypeId)).ForEach(s => { statement.Sectors.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); }); 
-            statementModel.StatementSectors.ForEach(model => {
+            statement.Sectors.Where(s => !statementModel.Sectors.Any(model => model.Id == s.StatementSectorTypeId)).ForEach(s => { statement.Sectors.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); }); 
+            statementModel.Sectors.ForEach(model => {
                 var sector = statement.Sectors.FirstOrDefault(s => s.StatementSectorTypeId == model.Id);
                 if (sector == null) sector = new StatementSector() { StatementSectorTypeId = model.Id, StatementId = statement.StatementId };
             });
 
             //Map the Policies
-            statement.Policies.Where(s => !statementModel.StatementPolicies.Any(model => model.Id == s.StatementPolicyTypeId)).ForEach(s => { statement.Policies.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
-            statementModel.StatementPolicies.ForEach(model => {
+            statement.Policies.Where(s => !statementModel.Policies.Any(model => model.Id == s.StatementPolicyTypeId)).ForEach(s => { statement.Policies.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
+            statementModel.Policies.ForEach(model => {
                 var policy = statement.Policies.FirstOrDefault(s => s.StatementPolicyTypeId == model.Id);
                 if (policy == null) policy = new StatementPolicy() { StatementPolicyTypeId = model.Id, StatementId = statement.StatementId };
             });
@@ -217,8 +217,8 @@ namespace ModernSlavery.BusinessDomain.Submission
             });
 
             //Map the Due Diligences
-            statement.Diligences.Where(s => !statementModel.Diligences.Any(model => model.Id == s.StatementDiligenceTypeId)).ForEach(s => { statement.Diligences.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
-            statementModel.Diligences.ForEach(model => {
+            statement.Diligences.Where(s => !statementModel.DueDiligences.Any(model => model.Id == s.StatementDiligenceTypeId)).ForEach(s => { statement.Diligences.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
+            statementModel.DueDiligences.ForEach(model => {
                 var diligence = statement.Diligences.FirstOrDefault(s => s.StatementDiligenceTypeId == model.Id);
                 if (diligence == null)
                     diligence = new StatementDiligence() { StatementDiligenceTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
@@ -303,6 +303,9 @@ namespace ModernSlavery.BusinessDomain.Submission
 
                     //Load data from statement entity into the statementmodel
                     MapToModel(submittedStatement, statementModel);
+
+                    statementModel.BackupDate = submittedStatement.Modified;
+                    statementModel.CanRevertToBackup = true;
                 }
             }
 

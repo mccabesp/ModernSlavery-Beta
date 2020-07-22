@@ -13,8 +13,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public TrainingPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, TrainingPageViewModel>();
-            CreateMap<TrainingPageViewModel, StatementModel>(MemberList.Source);
+            CreateMap<StatementModel.TrainingModel, TrainingPageViewModel.TrainingViewModel>().ReverseMap();
+
+            CreateMap<StatementModel, TrainingPageViewModel>()
+                .ForMember(s => s.BackUrl, opt => opt.Ignore())
+                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
+                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+
+            CreateMap<TrainingPageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
         }
     }
 

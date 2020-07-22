@@ -17,7 +17,7 @@
             @(Html.GovUkErrorSummary(new[]
         {
                     nameof(DueDiligencePageViewModel.DueDiligences),
-                    nameof(DueDiligencePageViewModel.SlaveryInstanceRemediation),
+                    nameof(DueDiligencePageViewModel.SelectedRemediation),
                     nameof(DueDiligencePageViewModel.ForcedLabourDetails),
                     nameof(DueDiligencePageViewModel.SlaveryInstanceDetails)
                 }))
@@ -142,10 +142,10 @@
                                         </h2>
                                     </legend>
                                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                                        @foreach (var item in Model.SlaveryInstanceRemediation)
+                                        @foreach (StatementRemediation item in Enum.GetValues(typeof(StatementRemediation)))
                                         {
                                             <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input" id="remediation-conditional" type="checkbox" data-aria-controls="remediation-conditional">
+                                                <input class="govuk-checkboxes__input" id="remediation-conditional" type="checkbox" @(item == Model.SelectedRemediation ? "checked" : "") data-aria-controls="remediation-conditional">
                                                 <label class="govuk-label govuk-checkboxes__label" for="remediation-conditional">
                                                     @item
                                                 </label>

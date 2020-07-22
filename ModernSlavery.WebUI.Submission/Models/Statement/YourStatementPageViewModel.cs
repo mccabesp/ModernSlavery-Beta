@@ -23,12 +23,27 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.StatementEndYear, opt => opt.MapFrom(s => s.StatementEndDate.Value.Year))
                 .ForMember(d => d.ApprovedDay, opt => opt.MapFrom(s => s.ApprovedDate.Value.Day))
                 .ForMember(d => d.ApprovedMonth, opt => opt.MapFrom(s => s.ApprovedDate.Value.Month))
-                .ForMember(d => d.ApprovedYear, opt => opt.MapFrom(s => s.ApprovedDate.Value.Year));
+                .ForMember(d => d.ApprovedYear, opt => opt.MapFrom(s => s.ApprovedDate.Value.Year))
+                .ForMember(s => s.BackUrl, opt => opt.Ignore())
+                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
+                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<YourStatementPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.StatementStartDate, opt => opt.MapFrom(s => new DateTime(s.StatementStartYear.Value, s.StatementStartMonth.Value, s.StatementStartDay.Value)))
                 .ForMember(d => d.StatementEndDate, opt => opt.MapFrom(s => new DateTime(s.StatementEndYear.Value, s.StatementEndMonth.Value, s.StatementEndDay.Value)))
-                .ForMember(d => d.ApprovedDate, opt => opt.MapFrom(s => new DateTime(s.ApprovedYear.Value, s.ApprovedMonth.Value, s.ApprovedDay.Value)));
+                .ForMember(d => d.ApprovedDate, opt => opt.MapFrom(s => new DateTime(s.ApprovedYear.Value, s.ApprovedMonth.Value, s.ApprovedDay.Value)))
+                .ForSourceMember(s => s.StatementStartYear, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.StatementStartMonth, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.StatementStartDay, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.StatementEndYear, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.StatementEndMonth, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.StatementEndDay, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ApprovedYear, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ApprovedMonth, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ApprovedDay, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
         }
     }
 

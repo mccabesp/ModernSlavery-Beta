@@ -10,8 +10,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public CancelPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel,CancelPageViewModel>();
-            CreateMap<CancelPageViewModel, StatementModel>(MemberList.Source);
+            CreateMap<StatementModel,CancelPageViewModel>()
+                .ForMember(s => s.BackUrl, opt => opt.Ignore())
+                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
+                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+
+            CreateMap<CancelPageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
         }
     }
 

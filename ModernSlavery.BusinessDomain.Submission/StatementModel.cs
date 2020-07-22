@@ -24,20 +24,32 @@ namespace ModernSlavery.BusinessDomain.Submission
                 .ForMember(dest => dest.HighRisks, opt => opt.Ignore())
                 .ForMember(dest => dest.LocationRisks, opt => opt.Ignore())
                 .ForMember(dest => dest.Diligences, opt => opt.Ignore())
-                .ForMember(dest => dest.Training, opt => opt.Ignore());
+                .ForMember(dest => dest.Training, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementId, opt => opt.Ignore())
+                .ForMember(dest => dest.Created, opt => opt.Ignore())
+                .ForMember(dest => dest.Modified, opt => opt.Ignore())
+                .ForMember(dest => dest.Organisation, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.Ignore())
+                .ForMember(dest => dest.StatusDate, opt => opt.Ignore())
+                .ForMember(dest => dest.StatusDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.Statuses, opt => opt.Ignore());
 
-            CreateMap<Statement, StatementModel>(MemberList.Source)
+            CreateMap<Statement, StatementModel>()
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>((int)s.MinStatementYears, (int)s.MaxStatementYears)))
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>((int)s.MinStatementYears, (int)s.MaxStatementYears)))
-                .ForMember(dest => dest.Status, opt => opt.Ignore()) // TODO - James Map this appropriately
+                .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.SubmissionDeadline.Year))
-                .ForMember(dest => dest.StatementSectors, opt => opt.Ignore())
-                .ForMember(dest => dest.StatementPolicies, opt => opt.Ignore())
+                .ForMember(dest => dest.Sectors, opt => opt.Ignore())
+                .ForMember(dest => dest.Policies, opt => opt.Ignore())
                 .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
                 .ForMember(dest => dest.HighRisks, opt => opt.Ignore())
                 .ForMember(dest => dest.LocationRisks, opt => opt.Ignore())
-                .ForMember(dest => dest.Diligences, opt => opt.Ignore())
-                .ForMember(dest => dest.Training, opt => opt.Ignore());
+                .ForMember(dest => dest.DueDiligences, opt => opt.Ignore())
+                .ForMember(dest => dest.Training, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Timestamp, opt => opt.Ignore())
+                .ForMember(dest => dest.BackupDate, opt => opt.Ignore())
+                .ForMember(dest => dest.CanRevertToBackup, opt => opt.Ignore());
         }
     }
 
@@ -108,6 +120,12 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public int Year => SubmissionDeadline.Year;
 
+        public string Modifications { get; set; }
+        public string EHRCResponse { get; set; }
+        public string LateReason { get; set; }
+        public short IncludedOrganisationCount { get; set; }
+
+        public short ExcludedOrganisationCount { get; set; }
         public DateTime Modified { get; set; } = VirtualDateTime.Now;
         public DateTime Created { get; set; } = VirtualDateTime.Now;
 
@@ -172,7 +190,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             public bool IsSelected { get; set; }
         }
 
-        public List<SectorModel> StatementSectors { get; set; }
+        public List<SectorModel> Sectors { get; set; }
 
         public string OtherSector { get; set; }
 
@@ -194,7 +212,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             public bool IsSelected { get; set; }
         }
 
-        public List<PolicyModel> StatementPolicies { get; set; }
+        public List<PolicyModel> Policies { get; set; }
 
         public string OtherPolicies { get; set; }
 
@@ -253,7 +271,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             public string Details { get; set; }
         }
 
-        public List<DiligenceModel> Diligences { get; set; }
+        public List<DiligenceModel> DueDiligences { get; set; }
 
         public string ForcedLabourDetails { get; set; }
 
