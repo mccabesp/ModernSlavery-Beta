@@ -59,8 +59,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         #endregion
 
-        private string ReturnUrl => Url.Action("ManageOrganisation", new { organisationIdentifier=RouteData.Values["organisationIdentifier"].ToString() });
-        private string CancelUrl => Url.Action("Cancel", new { organisationIdentifier = RouteData.Values["organisationIdentifier"].ToString(), year= RouteData.Values["year"].ToString() });
+        private string ReturnUrl => Url.Action("ManageOrganisation", new { organisationIdentifier = RouteData.Values["organisationIdentifier"].ToString() });
+        private string CancelUrl => Url.Action("Cancel", new { organisationIdentifier = RouteData.Values["organisationIdentifier"].ToString(), year = RouteData.Values["year"].ToString() });
 
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [BindProperty]
         public string OrganisationIdentifier { get; set; }
 
-        [BindProperty(Name ="year")]
+        [BindProperty(Name = "year")]
         public string ReportingDeadlineYear { get; set; }
 
         private void SetNavigationUrl<TViewModel>(TViewModel viewModel)
@@ -129,12 +129,16 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 case ReviewPageViewModel vm:
                     vm.BackUrl = Url.Action(nameof(this.MonitoringProgress), GetOrgAndYearRouteData());
                     vm.CancelUrl = CancelUrl;
-                    vm.ContinueUrl = ReturnUrl;
+                    vm.ContinueUrl = Url.Action(nameof(this.SubmissionComplete), GetOrgAndYearRouteData());
                     break;
                 case CancelPageViewModel vm:
                     vm.BackUrl = vm.CancelUrl = HttpContext.GetUrlReferrer().PathAndQuery;
                     vm.ContinueUrl = ReturnUrl;
                     break;
+                case SubmissionCompleteViewModel vm:
+                    vm.ContinueUrl = ReturnUrl;
+                    break;
+
                 default:
                     throw new NotImplementedException();
             }
@@ -156,7 +160,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             return View(viewModel);
         }
 
-        private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year) where TViewModel:BaseViewModel
+        private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year) where TViewModel : BaseViewModel
         {
             //Validate the submitted ViewModel data
             if (!ModelState.IsValid) return View(viewModel);
@@ -181,7 +185,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             //Show the correct view
-            return View(Url.Action("YourStatement",new { OrganisationIdentifier = organisationIdentifier, Year = year }));
+            return View(Url.Action("YourStatement", new { OrganisationIdentifier = organisationIdentifier, Year = year }));
         }
         #endregion
 
@@ -214,7 +218,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/compliance")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Compliance(CompliancePageViewModel viewModel,string organisationIdentifier, int year)
+        public async Task<IActionResult> Compliance(CompliancePageViewModel viewModel, string organisationIdentifier, int year)
         {
             return await PostAsync(viewModel, organisationIdentifier, year);
         }
@@ -404,6 +408,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             //Redirect to the continue url
             return Redirect(viewModel.ContinueUrl);
+        }
+
+        #endregion
+
+        #region SubmissionComplete
+        [HttpGet("{organisationIdentifier}/{year}/submission-complete")]
+        public async Task<IActionResult> SubmissionComplete(string organisationIdentifier, int year)
+        {
+            return await GetAsync<SubmissionCompleteViewModel>(organisationIdentifier, year);
         }
 
         #endregion
