@@ -93,15 +93,24 @@ namespace ModernSlavery.Hosts.Web.Tests
             ClickLabel("I would like to receive information about webinars, events and new guidance");
             ClickLabel("I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys");
 
-            Click("Continue");
-
-            ExpectHeader("Verify your email address");
             await Task.CompletedTask;
         }
+
         [Test, Order(3)]
+
+        public async Task ClickingContinueNavigatesToVerification()
+        {
+            Click("Continue");
+            ExpectHeader("Verify your email address");
+
+            await Task.CompletedTask;
+        }
+
+
+            [Test, Order(4)]
         public async Task ExtractVerifyURL()
         {
-
+           
             Expect(What.Contains, "We have sent you a confirmation email to");
             Expect(What.Contains, _email);
             Expect(What.Contains, "Follow the instructions in the email to continue your sign up.");
@@ -114,7 +123,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
-        [Test, Order(4)]
+        [Test, Order(5)]
         public async Task VerifyEmail()
         {
 
