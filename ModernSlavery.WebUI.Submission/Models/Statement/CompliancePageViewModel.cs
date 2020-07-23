@@ -30,7 +30,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
         }
     }
-    public class CompliancePageViewModel:BaseViewModel
+    public class CompliancePageViewModel : BaseViewModel
     {
         public override string PageTitle => "Areas covered by your modern slavery statement";
 
@@ -81,7 +81,20 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            return IncludesStructure.HasValue
+                && ((IncludesStructure == true) || !StructureDetails.IsNullOrWhiteSpace())
+                && IncludesPolicies.HasValue
+                && ((IncludesPolicies == true) || !PolicyDetails.IsNullOrWhiteSpace())
+                && IncludesRisks.HasValue
+                && ((IncludesRisks == true) || !RisksDetails.IsNullOrWhiteSpace())
+                && IncludesDueDiligence.HasValue
+                && ((IncludesDueDiligence == true) || !DueDiligenceDetails.IsNullOrWhiteSpace())
+                && IncludesTraining.HasValue
+                && ((IncludesTraining == true) || !TrainingDetails.IsNullOrWhiteSpace())
+                && IncludesGoals.HasValue
+                && ((IncludesGoals == true) || !GoalsDetails.IsNullOrWhiteSpace());
+
+
         }
     }
 }

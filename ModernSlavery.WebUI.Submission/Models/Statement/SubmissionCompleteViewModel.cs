@@ -19,6 +19,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     public class SubmissionCompleteViewModel : BaseViewModel
     {
         public int Year { get; set; }
+
+        public override string PageTitle => "Submission Complete";
+
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             return null;

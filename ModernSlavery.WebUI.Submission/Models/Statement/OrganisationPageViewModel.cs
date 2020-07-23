@@ -4,6 +4,8 @@ using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Xml.Schema;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -14,7 +16,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel.SectorModel, OrganisationPageViewModel.SectorViewModel>().ReverseMap();
 
-            CreateMap<StatementModel,OrganisationPageViewModel>()
+            CreateMap<StatementModel, OrganisationPageViewModel>()
                 .ForMember(s => s.BackUrl, opt => opt.Ignore())
                 .ForMember(s => s.CancelUrl, opt => opt.Ignore())
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
@@ -75,7 +77,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            return Sectors.Any(x => x.IsSelected)
+                && Turnover != TurnoverRanges.NotProvided;
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
@@ -47,16 +49,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override string PageTitle => "Monitoring progress";
 
-        [Display(Name = "Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?")] 
-        public bool IncludesMeasuringProgress { get; set; }
+        [Display(Name = "Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?")]
+        [MaxLength(1000)]
+        public bool? IncludesMeasuringProgress { get; set; }
 
         [Display(Name = "How is your organisation measuring progress towards these goals?")]
+        [MaxLength(1000)]
         public string ProgressMeasures { get; set; }
         [Display(Name = "What were your key achievements in relation to reducing modern slavery during the period covered by this statement?")]
         public string KeyAchievements { get; set; }
 
         [Display(Name = "How many years has your organisation been producing modern slavery statements?")]
-        public YearRanges StatementYears { get; set; }
+        public YearRanges? StatementYears { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -65,7 +69,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            return IncludesMeasuringProgress.HasValue
+                && !ProgressMeasures.IsNullOrWhiteSpace()
+                && !KeyAchievements.IsNullOrWhiteSpace()
+                && StatementYears != YearRanges.NotProvided;
         }
     }
 }

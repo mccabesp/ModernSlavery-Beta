@@ -9,8 +9,8 @@
             @Html.AntiForgeryToken();
 
             <div class="govuk-panel govuk-panel--confirmation">
-                <h1 class="govuk-panel__title">
-                    Application complete
+                <h1 class="govuk-panel__title">                  
+                        @Model.PageTitle                  
                 </h1>
                 <div class="govuk-panel__body">
                     You've submitted your Modern Slavery Statement for @(Model.Year) to @((Model.Year + 1))

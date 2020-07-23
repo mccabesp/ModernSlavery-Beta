@@ -5,6 +5,7 @@ using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection.Emit;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -46,7 +47,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         #endregion
 
         public override string PageTitle => "Supply chain risks and due diligence";
-        public override string SubTitle => "Part 2";
+        public override string SubTitle => "Part 1";
 
         public List<RiskViewModel> RelevantRisks { get; set; }
         [Display(Name = " If you want to specify an area not mentioned above, please provide details")]
@@ -97,7 +98,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             foreach (var item in HighRisks)
             {
-                if (item.IsSelected && item.Details == null)
+                if (item.IsSelected && item.Details.IsNullOrWhiteSpace())
                     validationList.Add(new ValidationResult($"Please explain why {item.Description} is one of your highest risks"));
             }
 
@@ -106,7 +107,23 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            var vulnerableGroup = RelevantRisks.Single(x => x.Description.Equals("Other vulnerable groups"));
+            var typeOfWork = RelevantRisks.Single(x => x.Description.Equals("Other type of work"));
+            var sector = RelevantRisks.Single(x => x.Description.Equals("Other sector"));
+            var vulnerableGroupHighRisk = HighRisks.Single(x => x.Description.Equals("Other vulnerable groups"));
+            var typeOfWorkHighDetails = HighRisks.Single(x => x.Description.Equals("Other type of work"));
+            var sectorHighDetails = HighRisks.Single(x => x.Description.Equals("Other sector"));
+
+            return RelevantRisks.Any(x => x.IsSelected)
+                && HighRisks.Any(x => x.IsSelected)
+                && LocationRisks.Any(x => x.IsSelected)
+                && !vulnerableGroup.IsSelected || !vulnerableGroup.Details.IsNullOrWhiteSpace()
+                && !typeOfWork.IsSelected || !typeOfWork.Details.IsNullOrWhiteSpace()
+                && !sector.IsSelected || !sector.Details.IsNullOrWhiteSpace()
+                && !vulnerableGroup.IsSelected || !vulnerableGroup.Details.IsNullOrWhiteSpace()
+                && !typeOfWorkHighDetails.IsSelected || !typeOfWorkHighDetails.Details.IsNullOrWhiteSpace()
+                && !sectorHighDetails.IsSelected || !sectorHighDetails.Details.IsNullOrWhiteSpace()
+                && HighRisks.All(x => !x.IsSelected || !x.Details.IsNullOrWhiteSpace());
         }
     }
 }

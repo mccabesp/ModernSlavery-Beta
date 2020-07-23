@@ -50,14 +50,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            var otherTrainingCheckbox = Training.Single(x => x.Description.Equals("Other"));
-            if (otherTrainingCheckbox.IsSelected && OtherTraining.IsNull())
+            if (Training.Single(x => x.Description.Equals("Other")).IsSelected && OtherTraining.IsNullOrWhiteSpace())
                 yield return new ValidationResult("Please provide other details");
         }
 
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            return Training.Any(x => x.IsSelected)
+                && !Training.Single(x => x.Description.Equals("Other")).IsSelected || !OtherTraining.IsNullOrWhiteSpace();
         }
     }
 }

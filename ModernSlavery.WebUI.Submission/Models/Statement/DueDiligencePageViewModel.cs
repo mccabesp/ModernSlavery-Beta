@@ -14,7 +14,7 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
-    public class DueDiligencePageViewModelMapperProfile:Profile
+    public class DueDiligencePageViewModelMapperProfile : Profile
     {
         public DueDiligencePageViewModelMapperProfile()
         {
@@ -52,6 +52,7 @@ namespace ModernSlavery.WebUI.Submission.Models
             public short? ParentId { get; set; }
             public string Description { get; set; }
             public bool IsSelected { get; set; }
+            [MaxLength(100)]
             public string Details { get; set; }
         }
         public enum StatementRemediation : byte
@@ -80,19 +81,19 @@ namespace ModernSlavery.WebUI.Submission.Models
         public List<DueDiligenceViewModel> DueDiligences { get; set; }
 
         [Display(Name = "Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.")]
-        public bool HasForceLabour { get; set; }
+        public bool? HasForceLabour { get; set; }
         [MaxLength(500)]
         public string ForcedLabourDetails { get; set; }
 
         [Display(Name = "Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?")]
-        public bool HasSlaveryInstance { get; set; }
+        public bool? HasSlaveryInstance { get; set; }
         [MaxLength(500)]
         public string SlaveryInstanceDetails { get; set; }
 
         public StatementRemediation SelectedRemediation { get; set; }
         private string _OtherRemediation;
-        public string OtherRemediation 
-        { 
+        public string OtherRemediation
+        {
             get
             {
                 return _OtherRemediation;
@@ -119,8 +120,8 @@ namespace ModernSlavery.WebUI.Submission.Models
                     SelectedRemediation = StatementRemediation.none;
                 else
                 {
-                    var selectedRemediation=Enum.GetValues(typeof(StatementRemediation)).ToList<StatementRemediation>().FirstOrDefault(e => e.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>().Text.EqualsI(value));
-                    if (selectedRemediation==null)
+                    var selectedRemediation = Enum.GetValues(typeof(StatementRemediation)).ToList<StatementRemediation>().FirstOrDefault(e => e.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>().Text.EqualsI(value));
+                    if (selectedRemediation == null)
                     {
                         selectedRemediation = StatementRemediation.other;
                         OtherRemediation = value;
@@ -132,29 +133,30 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-
-            var validationResults = new List<ValidationResult>();
-            var otherDiligence = DueDiligences.Single(x => x.Description.Equals("other"));
-            if (otherDiligence.IsSelected && otherDiligence.Details.IsNullOrWhiteSpace())
-                validationResults.Add(new ValidationResult("Please enter other details"));
+            var otherSocialAudit = DueDiligences.Single(x => x.Description.Equals("other"));
+            if (otherSocialAudit.IsSelected && otherSocialAudit.Details.IsNullOrWhiteSpace())
+                yield return new ValidationResult("Please enter other details");
 
             if (HasForceLabour == true & ForcedLabourDetails.IsNullOrWhiteSpace())
-                validationResults.Add(new ValidationResult("Please provide the detail"));
+                yield return new ValidationResult("Please provide the detail");
 
             if (HasSlaveryInstance == true & SlaveryInstanceDetails.IsNullOrWhiteSpace())
-                validationResults.Add(new ValidationResult("Please provide the detail"));
+                yield return new ValidationResult("Please provide the detail");
 
-            //TODO: how to check checkbox here as no isSelected
-            //if (HasSlaveryInstance == true & SlaveryInstanceRemediation.None(x => x.IsSelected))
-            //    validationResults.Add(new ValidationResult("Please provide the detail"));
-
-
-
-            return validationResults;
+            if (HasSlaveryInstance == true & SlaveryInstanceRemediation.IsNullOrWhiteSpace())
+                yield return new ValidationResult("Please select the remediation's");
         }
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            var otherSocialAudit = DueDiligences.Single(x => x.Description.Equals("other"));
+
+            return DueDiligences.Any(x => x.IsSelected)
+                && HasForceLabour.HasValue
+                && HasSlaveryInstance.HasValue
+                && !otherSocialAudit.IsSelected || !otherSocialAudit.Details.IsNullOrWhiteSpace()
+                && HasForceLabour == false || !ForcedLabourDetails.IsNullOrWhiteSpace()
+                && HasSlaveryInstance == false || !SlaveryInstanceDetails.IsNullOrWhiteSpace()
+                && HasSlaveryInstance == false || !SlaveryInstanceRemediation.IsNullOrWhiteSpace();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel.PolicyModel, PoliciesPageViewModel.PolicyViewModel>().ReverseMap();
 
-            CreateMap<StatementModel,PoliciesPageViewModel>()
+            CreateMap<StatementModel, PoliciesPageViewModel>()
                 .ForMember(s => s.BackUrl, opt => opt.Ignore())
                 .ForMember(s => s.CancelUrl, opt => opt.Ignore())
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
@@ -48,14 +48,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            //better way to identify this checkbox
+            //FUTURE IMPROVEMENT: better way to identify this checkbox
             if (Policies.Single(x => x.Description == "Other").IsSelected && OtherPolicies.IsNullOrWhiteSpace())
                 yield return new ValidationResult("Please provide detail on 'other'");
         }
 
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            return Policies.Any(x => x.IsSelected)
+                && !Policies.Single(x => x.Description == "Other").IsSelected || !OtherPolicies.IsNullOrWhiteSpace();
         }
     }
 }
