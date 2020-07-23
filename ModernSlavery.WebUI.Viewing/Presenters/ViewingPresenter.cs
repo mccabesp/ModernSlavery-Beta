@@ -265,7 +265,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         {
             // setup the filters
             var firstYear = _sharedBusinessLogic.SharedOptions.FirstReportingYear;
-            var currentYear = _sharedBusinessLogic.GetAccountingStartDate(SectorTypes.Public).Year;
+            var currentYear = _sharedBusinessLogic.GetReportingStartDate(SectorTypes.Public).Year;
             var allYears = new List<int>();
             for (var year = firstYear; year <= currentYear; year++) allYears.Add(year);
 

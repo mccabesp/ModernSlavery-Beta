@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace ModernSlavery.BusinessDomain.Submission
+namespace ModernSlavery.BusinessDomain.Shared.Models
 {
     public class StatementModelMapperProfile : Profile
     {
@@ -314,6 +314,12 @@ namespace ModernSlavery.BusinessDomain.Submission
         public YearRanges StatementYears { get; set; }
 
         #endregion
+
+        public virtual bool IsEmpty()
+        {
+            //TODO
+            return false;
+        }
 
     }
 }

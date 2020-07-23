@@ -40,5 +40,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public abstract IEnumerable<ValidationResult> Validate(ValidationContext validationContext);
 
         public virtual bool IsComplete() => true;
+        public virtual bool IsEmpty() => false;
     }
 }

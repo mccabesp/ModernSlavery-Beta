@@ -1,10 +1,11 @@
 ﻿@inject IWebService WebService
+@inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
 @model RemoveOrganisationModel
 @{
     Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Remove organisation reason - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
-    var userId = Encryption.DecryptQuerystring(Model.EncUserId).ToInt64();
+    var userId = Obfuscator.DeObfuscate(Model.EncUserId).ToInt64();
 }
 <div class="grid-row">
     <div class="column-two-thirds">
@@ -32,7 +33,7 @@
                 More options
             </div>
             <p>
-                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission")">Manage Organisations</a>
+                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" )">Manage Organisations</a>
             </p>
         </div>
     </div>

@@ -46,8 +46,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (checkResult != null) return checkResult;
 
             // Decrypt org id
-            if (!id.DecryptToId(out var organisationId))
-                return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
+            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(id);
+            if (organisationId==0)return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
 
             // Check the user has permission for this organisation
             var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
@@ -104,9 +104,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             //Get the user organisation
-            
+
             // Decrypt org id
-            if (!id.DecryptToId(out var organisationId))
+            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(id);
+            if (organisationId == 0)
                 return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
 
             // Check the user has permission for this organisation
@@ -175,7 +176,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 userOrg.ConfirmAttempts = 0;
 
                 model.AccountingDate =
-                    _registrationService.SharedBusinessLogic.GetAccountingStartDate(userOrg.Organisation.SectorType);
+                    _registrationService.SharedBusinessLogic.GetReportingStartDate(userOrg.Organisation.SectorType);
                 model.OrganisationId = userOrg.OrganisationId;
                 StashModel(model);
 

@@ -9,7 +9,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
     {
         public ReturnViewModel()
         {
-            ReportInfo = new ReportInfoModel();
+            ReportInfo = new StatementInfoModel();
         }
 
         [Required(AllowEmptyStrings = false)]
@@ -166,13 +166,11 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         [Required(AllowEmptyStrings = false, ErrorMessage = "You must tell us if you were contacted by EHRC")]
         public string EHRCResponse { get; set; } = "";
 
-        public ReportInfoModel ReportInfo { get; set; }
+        public StatementInfoModel ReportInfo { get; set; }
 
         public bool HasDraftWithContent()
         {
-            if (ReportInfo == null) return false;
-
-            return ReportInfo.HasDraftContent();
+            return ReportInfo != null && ReportInfo.DraftStatementModifiedDate!=null && !ReportInfo.DraftStatementIsEmpty;
         }
 
         public bool HasReported()

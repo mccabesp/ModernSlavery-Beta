@@ -184,7 +184,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             ViewBag.Organisation = userOrg.Organisation.OrganisationName;
             ViewBag.Address = userOrg?.Address.GetAddressString(",<br/>");
 
-            var encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
+            var encOrgId = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId.ToString());
             //Show the PIN textbox and button
             return View("RequestPIN", encOrgId);
         }
@@ -209,7 +209,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             userOrg.PINSentDate = null;
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            var encOrgId = Encryption.EncryptQuerystring(userOrg.OrganisationId.ToString());
+            var encOrgId = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId.ToString());
             return RedirectToAction("PINSent", encOrgId);
         }
 

@@ -117,7 +117,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             string comment,
             bool saveToDatabase)
         {
-            snapshotYear = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType,snapshotYear)
+            snapshotYear = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType,snapshotYear)
                 .Year;
 
             var oldOrgScope = organisation.GetScopeOrThrow(snapshotYear);
@@ -274,7 +274,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         public bool FillMissingScopes(Organisation org)
         {
             var firstYear = _sharedBusinessLogic.SharedOptions.FirstReportingYear;
-            var currentSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(org.SectorType);
+            var currentSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(org.SectorType);
             var currentSnapshotYear = currentSnapshotDate.Year;
             var prevYearScope = ScopeStatuses.Unknown;
             var neverDeclaredScope = true;
@@ -347,7 +347,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var orgsWithMissingScope = new HashSet<OrganisationMissingScope>();
             foreach (var org in allOrgs)
             {
-                var currentSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(org.SectorType);
+                var currentSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(org.SectorType);
                 var currentYear = currentSnapshotDate.Year;
                 var missingSnapshotYears = new List<int>();
 
@@ -456,7 +456,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         public virtual OrganisationScope GetLatestScopeBySnapshotYear(Organisation organisation, int snapshotYear = 0)
         {
             if (snapshotYear == 0)
-                snapshotYear = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).Year;
+                snapshotYear = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType).Year;
 
             var orgScope = organisation.OrganisationScopes
                 .SingleOrDefault(s => s.SubmissionDeadline.Year == snapshotYear && s.Status == ScopeRowStatuses.Active);

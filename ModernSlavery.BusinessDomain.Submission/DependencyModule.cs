@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.DependencyInjection;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
 

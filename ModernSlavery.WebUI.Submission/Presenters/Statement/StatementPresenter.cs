@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.WebUI.Submission.Models.Statement;
@@ -108,7 +109,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public async Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {
             long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
-            var openOutcome = await StatementBusinessLogic.OpenDraftStatementModel(organisationId, reportingDeadlineYear, userId);
+            var openOutcome = await StatementBusinessLogic.OpenDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId);
             if (openOutcome.Fail) return new Outcome<StatementErrors, StatementModel>(openOutcome.Errors);
 
             if (openOutcome.Result == null) throw new ArgumentNullException(nameof(openOutcome.Result));
@@ -122,13 +123,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public async Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {
             long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
-            return await StatementBusinessLogic.CancelDraftStatementModel(organisationId, reportingDeadlineYear, userId);
+            return await StatementBusinessLogic.CancelDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId);
         }
 
         public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {
             long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
-            return await StatementBusinessLogic.SubmitDraftStatementModel(organisationId, reportingDeadlineYear, userId);
+            return await StatementBusinessLogic.SubmitDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId);
         }
 
         public async Task<Outcome<StatementErrors,TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId) where TViewModel:BaseViewModel
@@ -150,7 +151,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             statementModel = SetViewModelToStatementModel(viewModel,statementModel);
 
             //Save the new statement containing the updated viewModel
-            await StatementBusinessLogic.SaveDraftStatementModel(statementModel);
+            await StatementBusinessLogic.SaveDraftStatementModelAsync(statementModel);
 
             return new Outcome<StatementErrors, TViewModel>(viewModel);
         }

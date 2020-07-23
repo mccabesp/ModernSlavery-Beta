@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;

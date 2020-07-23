@@ -135,8 +135,8 @@ namespace ModernSlavery.BusinessDomain.Submission
         public virtual IEnumerable<LateSubmissionsFileModel> GetLateSubmissions()
         {
             // get the snapshot dates to filter submissions by
-            var curPrivateSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(SectorTypes.Private);
-            var curPublicSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(SectorTypes.Public);
+            var curPrivateSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(SectorTypes.Private);
+            var curPublicSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(SectorTypes.Public);
             var prevPrivateSnapshotDate = curPrivateSnapshotDate.AddYears(-1);
             var prevPublicSnapshotDate = curPublicSnapshotDate.AddYears(-1);
 

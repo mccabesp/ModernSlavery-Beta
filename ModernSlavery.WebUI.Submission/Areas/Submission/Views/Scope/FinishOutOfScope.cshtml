@@ -1,4 +1,6 @@
-﻿@model ScopingViewModel
+﻿@inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
+
+@model ScopingViewModel
 @{
     Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Complete - Modern Slavery reporting service";
@@ -16,12 +18,12 @@
         @await Html.PartialModelAsync(new CheckYourAnswers(
             new CheckYourAnswer("Completed on", VirtualDateTime.Now.ToFriendlyDate(), "CompletedDateAnswer")
             ))
-        <br/>
+        <br />
         <div class="no-print">
             <a class="print-link" onclick="window.print();return false;" href="#">Print this page for your records</a>
         </div>
         <p>
-            <br/>
+            <br />
             You have told us that your organisation is not in scope of the Modern Slavery reporting regulations.
             We will contact you if we need more information.
         </p>
@@ -31,7 +33,7 @@
             if (Model.UserIsRegistered)
             {
                 <p>
-                    <a href="@Url.Action("ManageOrganisation", "Organisation", new {id = Encryption.EncryptQuerystring(Model.OrganisationId.ToString())})" class="button">Continue</a>
+                    <a href="@Url.Action("ManageOrganisation", "Organisation", new {id = Obfuscator.Obfuscate(Model.OrganisationId.ToString())})" class="button">Continue</a>
                 </p>
             }
             else

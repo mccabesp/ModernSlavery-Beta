@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration.Annotations;
 using Microsoft.Azure.Management.WebSites.Models;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;

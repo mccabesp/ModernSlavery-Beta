@@ -9,6 +9,7 @@ using ModernSlavery.Core.Extensions;
 using AutoMapper;
 using ModernSlavery.BusinessDomain.Submission;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
+using ModernSlavery.BusinessDomain.Shared.Models;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {

@@ -32,8 +32,6 @@ namespace ModernSlavery.WebUI.Submission
         public void ConfigureContainer(ContainerBuilder builder)
         {
             //Register dependencies here
-            builder.RegisterType<SubmissionPresenter>().As<ISubmissionPresenter>()
-                .InstancePerLifetimeScope();
             builder.RegisterType<StatementPresenter>().As<IStatementPresenter>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ScopePresenter>().As<IScopePresenter>().InstancePerLifetimeScope();
