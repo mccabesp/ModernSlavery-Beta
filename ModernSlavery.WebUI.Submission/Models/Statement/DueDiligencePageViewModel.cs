@@ -31,6 +31,7 @@ namespace ModernSlavery.WebUI.Submission.Models
                 .ForMember(s => s.OtherRemediation, opt => opt.Ignore());
 
             CreateMap<DueDiligencePageViewModel, StatementModel>(MemberList.Source)
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForSourceMember(s => s.HasForceLabour, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.HasSlaveryInstance, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())

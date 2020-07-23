@@ -7,19 +7,18 @@ namespace ModernSlavery.WebUI.Submission.Models
     public class StatementInfoViewModel
     {
         public readonly StatementInfoModel StatementInfo;
-        public StatementInfoViewModel(StatementInfoModel statementInfoModel)
+        public readonly string OrganisationIdentifier;
+        public StatementInfoViewModel(StatementInfoModel statementInfoModel, string organisationIdentifier)
         {
             StatementInfo = statementInfoModel;
+            OrganisationIdentifier = organisationIdentifier;
         }
-        public long OrganisationId { get; set; }
 
-        public string OrganisationIdentifier { get; set; }
-
+        //TODO CanChangeScope needs repopulating
         public bool CanChangeScope { get; set; }
 
         public bool SubmissionAvailable => StatementInfo.SubmittedStatementModifiedDate != null;
         public bool DraftAvailable => StatementInfo.DraftStatementModifiedDate!=null && !StatementInfo.DraftStatementIsEmpty;
-
 
         public string ButtonText
         {

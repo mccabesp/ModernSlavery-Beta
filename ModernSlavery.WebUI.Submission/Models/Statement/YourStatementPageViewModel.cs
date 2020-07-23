@@ -16,23 +16,24 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public YourStatementPageViewModelMapperProfile()
         {
             CreateMap<StatementModel, YourStatementPageViewModel>()
-                .ForMember(d => d.StatementStartDay, opt => opt.MapFrom(s => s.StatementStartDate.Value.Day))
-                .ForMember(d => d.StatementStartMonth, opt => opt.MapFrom(s => s.StatementStartDate.Value.Month))
-                .ForMember(d => d.StatementStartYear, opt => opt.MapFrom(s => s.StatementStartDate.Value.Year))
-                .ForMember(d => d.StatementEndDay, opt => opt.MapFrom(s => s.StatementEndDate.Value.Day))
-                .ForMember(d => d.StatementEndMonth, opt => opt.MapFrom(s => s.StatementEndDate.Value.Month))
-                .ForMember(d => d.StatementEndYear, opt => opt.MapFrom(s => s.StatementEndDate.Value.Year))
-                .ForMember(d => d.ApprovedDay, opt => opt.MapFrom(s => s.ApprovedDate.Value.Day))
-                .ForMember(d => d.ApprovedMonth, opt => opt.MapFrom(s => s.ApprovedDate.Value.Month))
-                .ForMember(d => d.ApprovedYear, opt => opt.MapFrom(s => s.ApprovedDate.Value.Year))
+                .ForMember(d => d.StatementStartDay, opt => opt.MapFrom(s => s.StatementStartDate==null ? (int?)null : s.StatementStartDate.Value.Day))
+                .ForMember(d => d.StatementStartMonth, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Month))
+                .ForMember(d => d.StatementStartYear, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Year))
+                .ForMember(d => d.StatementEndDay, opt => opt.MapFrom(s => s.StatementEndDate == null ? (int?)null : s.StatementEndDate.Value.Day))
+                .ForMember(d => d.StatementEndMonth, opt => opt.MapFrom(s => s.StatementEndDate == null ? (int?)null : s.StatementEndDate.Value.Month))
+                .ForMember(d => d.StatementEndYear, opt => opt.MapFrom(s => s.StatementEndDate == null ? (int?)null : s.StatementEndDate.Value.Year))
+                .ForMember(d => d.ApprovedDay, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Day))
+                .ForMember(d => d.ApprovedMonth, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Month))
+                .ForMember(d => d.ApprovedYear, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Year))
                 .ForMember(s => s.BackUrl, opt => opt.Ignore())
                 .ForMember(s => s.CancelUrl, opt => opt.Ignore())
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<YourStatementPageViewModel, StatementModel>(MemberList.Source)
-                .ForMember(d => d.StatementStartDate, opt => opt.MapFrom(s => new DateTime(s.StatementStartYear.Value, s.StatementStartMonth.Value, s.StatementStartDay.Value)))
-                .ForMember(d => d.StatementEndDate, opt => opt.MapFrom(s => new DateTime(s.StatementEndYear.Value, s.StatementEndMonth.Value, s.StatementEndDay.Value)))
-                .ForMember(d => d.ApprovedDate, opt => opt.MapFrom(s => new DateTime(s.ApprovedYear.Value, s.ApprovedMonth.Value, s.ApprovedDay.Value)))
+                .ForMember(d => d.StatementStartDate, opt => { opt.MapFrom(s => s.StatementStartDate); })
+                .ForMember(d => d.StatementEndDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.StatementEndDate); })
+                .ForMember(d => d.ApprovedDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.ApprovedDate); })
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForSourceMember(s => s.StatementStartYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.StatementStartMonth, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.StatementStartDay, opt => opt.DoNotValidate())
@@ -61,12 +62,22 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [Display(Name = "URL")]
         public string StatementUrl { get; set; }
 
+        private DateTime? ToDateTime(int? year, int? month, int? day)
+        {
+            if (year == null || month == null || day == null) return null;
+            return new DateTime(year.Value, month.Value, day.Value);
+        }
+
+        public DateTime? StatementStartDate => ToDateTime(StatementStartYear, StatementStartMonth, StatementStartDay);
+
         [RegularExpression("^[0-9]*$", ErrorMessage = "Day format is incorrect")]
         public int? StatementStartDay { get; set; }
         [RegularExpression("^[0-9]*$", ErrorMessage = "Month format is incorrect")]
         public int? StatementStartMonth { get; set; }
         [RegularExpression("^[0-9]*$", ErrorMessage = "Year format is incorrect")]
         public int? StatementStartYear { get; set; }
+
+        public DateTime? StatementEndDate => ToDateTime(StatementEndYear, StatementEndMonth, StatementEndDay);
 
         [RegularExpression("^[0-9]*$", ErrorMessage = "Day format is incorrect")]
         public int? StatementEndDay { get; set; }
@@ -81,6 +92,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public string ApproverFirstName { get; set; }
         [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a last name")]
         public string ApproverLastName { get; set; }
+
+        public DateTime? ApprovedDate => ToDateTime(ApprovedYear, ApprovedMonth, ApprovedDay);
 
         [RegularExpression("^[0-9]*$", ErrorMessage = "Day format is incorrect")]
         public int? ApprovedDay { get; set; }

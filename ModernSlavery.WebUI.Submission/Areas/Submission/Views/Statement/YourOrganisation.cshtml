@@ -1,4 +1,5 @@
-﻿@{
+﻿@using ModernSlavery.WebUI.GDSDesignSystem.Attributes 
+@{
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model OrganisationPageViewModel
@@ -55,7 +56,7 @@
                     {
                         Legend = new LegendViewModel
                         {
-                            Text = Model.Turnover.GetAttribute<DisplayAttribute>().Name,
+                            Text = Model.Turnover.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text,
                             Classes = "govuk-fieldset__legend--m"
                         },
                         Classes = "govuk-!-margin-top-6"

@@ -84,11 +84,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         private object GetOrgAndYearRouteData() => new { OrganisationIdentifier, year = ReportingDeadlineYear };
 
-        [BindProperty]
-        public string OrganisationIdentifier { get; set; }
+        public string OrganisationIdentifier => RouteData.Values["OrganisationIdentifier"].ToString();
 
-        [BindProperty(Name ="year")]
-        public string ReportingDeadlineYear { get; set; }
+        public string ReportingDeadlineYear => RouteData.Values["Year"].ToString();
 
         private void SetNavigationUrl<TViewModel>(TViewModel viewModel)
         {
@@ -189,7 +187,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             //Show the correct view
-            return View(Url.Action("YourStatement",new { OrganisationIdentifier = organisationIdentifier, Year = year }));
+            return View("BeforeYouStart",Url.Action("YourStatement", new { OrganisationIdentifier = organisationIdentifier, Year = year }));
         }
         #endregion
 

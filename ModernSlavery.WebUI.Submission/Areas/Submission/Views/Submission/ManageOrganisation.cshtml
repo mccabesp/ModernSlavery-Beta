@@ -72,7 +72,7 @@
             </div>
             @await foreach (StatementInfoModel statementInfoModel in Model.StatementInfoModels)
             {
-                @await Html.PartialAsync("StatementInfoViewModel", new StatementInfoViewModel(statementInfoModel))
+                @await Html.PartialAsync("StatementInfoViewModel", new StatementInfoViewModel(statementInfoModel, Model.OrganisationIdentifier))
             }
 
         </div>

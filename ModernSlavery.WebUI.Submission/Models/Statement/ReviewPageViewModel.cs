@@ -30,7 +30,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     public class ReviewPageViewModel : BaseViewModel
     {
         public override string PageTitle => $"Review {ReportingDeadlineYear} group report for {OrganisationName}";
-
         public YourStatementPageViewModel YourStatement { get; set; }
         public CompliancePageViewModel Compliance { get; set; }
         public OrganisationPageViewModel Organisation { get; set; }

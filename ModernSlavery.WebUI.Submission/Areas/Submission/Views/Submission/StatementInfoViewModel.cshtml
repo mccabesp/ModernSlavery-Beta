@@ -1,13 +1,8 @@
 ﻿@using ModernSlavery.Core.Interfaces
 @model StatementInfoViewModel
-@inject IObfuscator Obfuscator
 @{
     var reportingDeadline = Model.StatementInfo.ReportingDeadline.AddDays(-1);
     var reportDateFormatter = new GDSDateFormatter(reportingDeadline);
-    var linkId = reportDateFormatter.StartYear;
-    var organisationId = Model.OrganisationId;
-    var scopeRequest = Encryption.EncryptAsParams(organisationId.ToString(), reportDateFormatter.StartYear.ToString());
-    var obfuscatedId = Obfuscator.Obfuscate(Model.OrganisationId);
 }
 <div class="gpg-manage-reports__row">
 
@@ -29,18 +24,12 @@
         @if (Model.CanChangeScope)
         {
             <div>
-                <a id="ChangeScope@(linkId)-@(Model.OrganisationIdentifier)" href="@(Url.Action("ChangeOrganisationScope", new {request = scopeRequest}))">Change</a>
+                <a id="ChangeScope@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@(Url.Action("ChangeOrganisationScope", new {organisationIdentifier = Model.OrganisationIdentifier, reportingDeadlineYear=reportDateFormatter.StartYear}))">Change</a>
             </div>
         }
     </div>
 
     <div class="gpg-manage-reports__cell gpg-manage-reports__cell--action">
-        @{
-
-            var returnOrDraftInfoIsAvailable = Encryption.EncryptAsParams(organisationId.ToString(), reportDateFormatter.StartYear.ToString(), true.ToString());
-            var returnOrDraftInfoIsNotAvailable = Encryption.EncryptAsParams(organisationId.ToString(), reportDateFormatter.StartYear.ToString(), false.ToString());
-        }
-
         <div>
             @if (Model.StatementInfo.SubmittedStatementModifiedDate == null)
             {
@@ -59,7 +48,7 @@
         </div>
         <br />
 
-        <a class="button" id="NewReport@(linkId)-@(Model.OrganisationIdentifier)" href="@Url.Action("BeforeYouStart", "Statement", new { organisationIdentifier = obfuscatedId, year = Model.StatementInfo.ReportingDeadline.Year })">
+        <a class="button" id="NewReport@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@Url.Action("BeforeYouStart", "Statement", new { organisationIdentifier = Model.OrganisationIdentifier, year = Model.StatementInfo.ReportingDeadline.Year })">
             <span>@Model.ButtonText</span>
         </a>
     </div>

@@ -19,6 +19,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<ProgressPageViewModel, StatementModel>(MemberList.Source)
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())

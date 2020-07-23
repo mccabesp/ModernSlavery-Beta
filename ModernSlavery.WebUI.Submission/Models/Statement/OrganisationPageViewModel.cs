@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Hosting;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
@@ -21,6 +22,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source)
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
@@ -71,7 +73,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            throw new System.NotImplementedException();
+            return null;
         }
 
         public override bool IsComplete()

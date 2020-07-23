@@ -488,20 +488,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         [Authorize]
-        [HttpGet("~/change-organisation-scope/{request}")]
-        public async Task<IActionResult> ChangeOrganisationScope(string request)
+        [HttpGet("~/change-organisation-scope/{organisationIdentifier}/{reportingDeadlineYear}")]
+        public async Task<IActionResult> ChangeOrganisationScope(string organisationIdentifier,int reportingDeadlineYear)
         {
             // Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            // Decrypt request
-            if (!request.DecryptToParams(out var requestParams))
-                return new HttpBadRequestResult($"Cannot decrypt request parameters '{request}'");
-
             // Extract the request vars
-            var organisationId = requestParams[0].ToInt64();
-            var reportingStartYear = requestParams[1].ToInt32();
+            long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
 
             // Check the user has permission for this organisation
             var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
@@ -513,8 +508,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var stateModel = ScopePresentation.CreateScopingViewModel(userOrg.Organisation, CurrentUser);
 
             // Get the latest scope for the reporting year
-            var latestScope = stateModel.ThisScope.SnapshotDate.Year == reportingStartYear ? stateModel.ThisScope :
-                stateModel.LastScope.SnapshotDate.Year == reportingStartYear ? stateModel.LastScope : null;
+            var latestScope = stateModel.ThisScope.SnapshotDate.Year == reportingDeadlineYear ? stateModel.ThisScope :
+                stateModel.LastScope.SnapshotDate.Year == reportingDeadlineYear ? stateModel.LastScope : null;
 
             // Set the return url
             stateModel.StartUrl = Url.Action("ManageOrganisation",

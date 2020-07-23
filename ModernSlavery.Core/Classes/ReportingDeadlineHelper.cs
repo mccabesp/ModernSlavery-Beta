@@ -87,7 +87,7 @@ namespace ModernSlavery.Core.Classes
 
             if (year == 0) year = now.Year;
 
-            var reportingDeadline = new DateTime(year, tempMonth, tempDay).Date.AddDays(1);
+            var reportingDeadline = new DateTime(year, tempMonth, tempDay).Date;
 
             return reportingDeadline < now ? reportingDeadline.AddYears(1) : reportingDeadline;
         }
