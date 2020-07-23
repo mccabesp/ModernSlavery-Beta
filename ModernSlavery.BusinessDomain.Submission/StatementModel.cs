@@ -35,7 +35,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 .ForMember(dest => dest.Statuses, opt => opt.Ignore());
 
             CreateMap<Statement, StatementModel>()
-                .ForMember(d => d.OrganisationName,opt=>opt.MapFrom(s=>s.Organisation.OrganisationName))
+                .ForMember(d => d.OrganisationName, opt => opt.MapFrom(s => s.Organisation.OrganisationName))
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>((int)s.MinStatementYears, (int)s.MaxStatementYears)))
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>((int)s.MinStatementYears, (int)s.MaxStatementYears)))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
@@ -315,5 +315,48 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #endregion
 
+        public bool IsEmpty()
+        {
+            return StatementUrl.IsNullOrWhiteSpace()
+                && StatementStartDate == null
+                && StatementEndDate == null
+                && ApproverFirstName.IsNullOrWhiteSpace()
+                && ApproverLastName.IsNullOrWhiteSpace()
+                && ApproverJobTitle.IsNullOrWhiteSpace()
+                && ApprovedDate == null
+                && IncludesStructure == null
+                && StructureDetails.IsNullOrWhiteSpace()
+                && IncludesPolicies == null
+                && PolicyDetails.IsNullOrWhiteSpace()
+                && IncludesRisks == null
+                && RisksDetails.IsNullOrWhiteSpace()
+                && IncludesDueDiligence == null
+                && DueDiligenceDetails.IsNullOrWhiteSpace()
+                && IncludesTraining == null
+                && TrainingDetails.IsNullOrWhiteSpace()
+                && IncludesGoals == null
+                && GoalsDetails.IsNullOrWhiteSpace()
+                && Sectors == null
+                && OtherSector.IsNullOrWhiteSpace()
+                && Turnover == TurnoverRanges.NotProvided
+                && Policies == null
+                && OtherPolicies.IsNullOrWhiteSpace()
+                && RelevantRisks == null
+                && OtherRelevantRisks.IsNullOrWhiteSpace()
+                && HighRisks == null
+                && OtherHighRisks.IsNullOrWhiteSpace()
+                && LocationRisks == null
+                && DueDiligences == null
+                && ForcedLabourDetails.IsNullOrWhiteSpace()
+                && SlaveryInstanceDetails.IsNullOrWhiteSpace()
+                && SlaveryInstanceRemediation.IsNullOrWhiteSpace()
+                && Training == null
+                && TrainingDetails.IsNullOrWhiteSpace()
+                && IncludesMeasuringProgress == null
+                && ProgressMeasures.IsNullOrWhiteSpace()
+                && KeyAchievements.IsNullOrWhiteSpace()
+                && StatementYears == YearRanges.NotProvided;
+
+        }
     }
 }
