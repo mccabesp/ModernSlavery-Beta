@@ -12,8 +12,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public PoliciesPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel,PoliciesPageViewModel>();
-            CreateMap<PoliciesPageViewModel, StatementModel>(MemberList.Source);
+            CreateMap<StatementModel.PolicyModel, PoliciesPageViewModel.PolicyViewModel>().ReverseMap();
+
+            CreateMap<StatementModel,PoliciesPageViewModel>()
+                .ForMember(s => s.BackUrl, opt => opt.Ignore())
+                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
+                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+
+            CreateMap<PoliciesPageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
         }
     }
 

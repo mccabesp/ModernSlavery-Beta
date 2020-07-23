@@ -6,15 +6,6 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class ReviewPageViewModelMapperProfile : Profile
-    {
-        public ReviewPageViewModelMapperProfile()
-        {
-            CreateMap<StatementModel,ReviewPageViewModel>();
-            CreateMap<ReviewPageViewModel, StatementModel>(MemberList.Source);
-        }
-    }
-
     public class ReviewPageViewModel : BaseViewModel
     {
         public int ReportingDeadlineYear { get; set; }

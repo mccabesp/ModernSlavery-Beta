@@ -13,8 +13,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public RisksPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, RisksPageViewModel>();
-            CreateMap<RisksPageViewModel, StatementModel>(MemberList.Source);
+            CreateMap<StatementModel.RisksModel, RisksPageViewModel.RiskViewModel>().ReverseMap();
+
+            CreateMap<StatementModel, RisksPageViewModel>()
+                .ForMember(s => s.BackUrl, opt => opt.Ignore())
+                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
+                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+
+            CreateMap<RisksPageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
         }
     }
 
@@ -36,12 +45,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             public short? ParentId { get; set; }
             public string Description { get; set; }
             public bool IsSelected { get; set; }
-            //TODO: need to set this on presenter
             public string Category { get; set; }
-            //TODO: need to set this on presenter
-            public List<RiskViewModel> ChildRisks { get; set; }
-            //TODO: need to set this on presenter
-            // [MaxLength(100, ErrorMessage = "Reason can only be 100 characters or less")] - not possible as different for each block - handled on ui
             public string Details { get; set; }
 
         }

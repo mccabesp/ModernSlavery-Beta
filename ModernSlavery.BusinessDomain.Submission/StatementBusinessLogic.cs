@@ -16,13 +16,10 @@ namespace ModernSlavery.BusinessDomain.Submission
     public enum StatementErrors : byte
     {
         Unknown = 0,
-        Success = 1,
-        InvalidPermissions = 2,
-        Unauthorised = 3,
-        Uneditable = 4,
-        Locked = 5,
-        TooLate = 6,
-        NotFound = 7,
+        NotFound = 1,
+        Unauthorised = 2,
+        Locked = 3,
+        TooLate = 4,
     }
 
     public interface IStatementBusinessLogic
@@ -151,6 +148,92 @@ namespace ModernSlavery.BusinessDomain.Submission
         }
         #endregion
 
+        void MapToModel(Statement statement, StatementModel statementModel)
+        {
+            _mapper.Map(statement, statementModel);
+            statementModel.Sectors = _sharedBusinessLogic.DataRepository.GetAll<StatementSectorType>().ToList().Select(type => new StatementModel.SectorModel(type.StatementSectorTypeId, type.Description, statement.Sectors.Any(st => st.StatementSectorTypeId == type.StatementSectorTypeId))).ToList();
+            statementModel.Policies = _sharedBusinessLogic.DataRepository.GetAll<StatementPolicyType>().ToList().Select(type => new StatementModel.PolicyModel(type.StatementPolicyTypeId, type.Description, statement.Policies.Any(st => st.StatementPolicyTypeId == type.StatementPolicyTypeId))).ToList();
+            var riskTypes = _sharedBusinessLogic.DataRepository.GetAll<StatementRiskType>().ToList();
+            var relevantRisks = statement.LocationRisks.ToList();
+            statementModel.LocationRisks = riskTypes.Select(type => new StatementModel.RisksModel(type.StatementRiskTypeId, type.ParentRiskTypeId,type.Description,type.Category.ToString(), relevantRisks.FirstOrDefault(st => st.StatementRiskTypeId == type.StatementRiskTypeId)?.Details, relevantRisks.Any(st => st.StatementRiskTypeId == type.StatementRiskTypeId))).ToList();
+
+            var highRisks = statement.HighRisks.ToList();
+            statementModel.HighRisks = riskTypes.Select(type => new StatementModel.RisksModel(type.StatementRiskTypeId, type.ParentRiskTypeId, type.Description, type.Category.ToString(), highRisks.FirstOrDefault(st => st.StatementRiskTypeId == type.StatementRiskTypeId)?.Details, highRisks.Any(st => st.StatementRiskTypeId == type.StatementRiskTypeId))).ToList();
+
+            var locationRisks = statement.LocationRisks.ToList();
+            statementModel.LocationRisks = riskTypes.Select(type => new StatementModel.RisksModel(type.StatementRiskTypeId, type.ParentRiskTypeId, type.Description, type.Category.ToString(), locationRisks.FirstOrDefault(st => st.StatementRiskTypeId == type.StatementRiskTypeId)?.Details, locationRisks.Any(st => st.StatementRiskTypeId == type.StatementRiskTypeId))).ToList();
+
+            var diligences = statement.Diligences.ToList();
+            statementModel.DueDiligences = _sharedBusinessLogic.DataRepository.GetAll<StatementDiligenceType>().ToList().Select(type => new StatementModel.DiligenceModel(type.StatementDiligenceTypeId, type.ParentDiligenceTypeId, type.Description, diligences.FirstOrDefault(st => st.StatementDiligenceTypeId == type.StatementDiligenceTypeId)?.Details, diligences.Any(st => st.StatementDiligenceTypeId == type.StatementDiligenceTypeId))).ToList();
+            statementModel.Training = _sharedBusinessLogic.DataRepository.GetAll<StatementTrainingType>().ToList().Select(type => new StatementModel.TrainingModel(type.StatementTrainingTypeId, type.Description, statement.Sectors.Any(st => st.StatementSectorTypeId == type.StatementTrainingTypeId))).ToList();
+        }
+
+        void MapFromModel(StatementModel statementModel, Statement statement)
+        {
+            _mapper.Map(statementModel, statement);
+
+            //Map the sectors
+            statement.Sectors.Where(s => !statementModel.Sectors.Any(model => model.Id == s.StatementSectorTypeId)).ForEach(s => { statement.Sectors.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); }); 
+            statementModel.Sectors.ForEach(model => {
+                var sector = statement.Sectors.FirstOrDefault(s => s.StatementSectorTypeId == model.Id);
+                if (sector == null) sector = new StatementSector() { StatementSectorTypeId = model.Id, StatementId = statement.StatementId };
+            });
+
+            //Map the Policies
+            statement.Policies.Where(s => !statementModel.Policies.Any(model => model.Id == s.StatementPolicyTypeId)).ForEach(s => { statement.Policies.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
+            statementModel.Policies.ForEach(model => {
+                var policy = statement.Policies.FirstOrDefault(s => s.StatementPolicyTypeId == model.Id);
+                if (policy == null) policy = new StatementPolicy() { StatementPolicyTypeId = model.Id, StatementId = statement.StatementId };
+            });
+
+            //Map the Relevant Risks
+            statement.RelevantRisks.Where(s => !statementModel.RelevantRisks.Any(model => model.Id == s.StatementRiskTypeId)).ForEach(s => { statement.RelevantRisks.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
+            statementModel.RelevantRisks.ForEach(model => {
+                var relevantRisk = statement.RelevantRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
+                if (relevantRisk == null) 
+                    relevantRisk = new StatementRelevantRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                else
+                    relevantRisk.Details = model.Details;
+            });
+
+            //Map the High Risks
+            statement.HighRisks.Where(s => !statementModel.HighRisks.Any(model => model.Id == s.StatementRiskTypeId)).ForEach(s => { statement.HighRisks.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
+            statementModel.HighRisks.ForEach(model => {
+                var highRisk = statement.HighRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
+                if (highRisk == null)
+                    highRisk = new StatementHighRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                else
+                    highRisk.Details = model.Details;
+            });
+
+            //Map the Location Risks
+            statement.LocationRisks.Where(s => !statementModel.LocationRisks.Any(model => model.Id == s.StatementRiskTypeId)).ForEach(s => { statement.LocationRisks.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
+            statementModel.LocationRisks.ForEach(model => {
+                var locationRisk = statement.LocationRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
+                if (locationRisk == null)
+                    locationRisk = new StatementLocationRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                else
+                    locationRisk.Details = model.Details;
+            });
+
+            //Map the Due Diligences
+            statement.Diligences.Where(s => !statementModel.DueDiligences.Any(model => model.Id == s.StatementDiligenceTypeId)).ForEach(s => { statement.Diligences.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
+            statementModel.DueDiligences.ForEach(model => {
+                var diligence = statement.Diligences.FirstOrDefault(s => s.StatementDiligenceTypeId == model.Id);
+                if (diligence == null)
+                    diligence = new StatementDiligence() { StatementDiligenceTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                else
+                    diligence.Details = model.Details;
+            });
+
+            //Map the Training
+            statement.Training.Where(s => !statementModel.Training.Any(model => model.Id == s.StatementTrainingTypeId)).ForEach(s => { statement.Training.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
+            statementModel.Training.ForEach(model => {
+                var training = statement.Training.FirstOrDefault(s => s.StatementTrainingTypeId == model.Id);
+                if (training == null) training = new StatementTraining() { StatementTrainingTypeId = model.Id, StatementId = statement.StatementId };
+            });
+        }
+
         #region Public Methods
         public async Task<Outcome<StatementErrors, StatementModel>> GetLatestSubmittedStatementModel(long organisationId, int reportingDeadlineYear)
         {
@@ -163,13 +246,13 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId),$"Invalid organisationId {organisationId}");
 
             var statement = organisation.Statements.FirstOrDefault(s => s.SubmissionDeadline.Year == reportingDeadlineYear);
-            if (statement == null) return new Outcome<StatementErrors, StatementModel>(StatementErrors.NotFound);
+            if (statement == null) return new Outcome<StatementErrors, StatementModel>(StatementErrors.NotFound,$"Cannot find statement summary for {organisation.OrganisationName} due for reporting year {reportingDeadlineYear}");
 
             var statementModel = new StatementModel();
 
             //Copy the statement properties to the model
-            _mapper.Map(statement, statementModel);
-
+            MapToModel(statement, statementModel);
+            
             //Return the successful model
             return new Outcome<StatementErrors, StatementModel>(statementModel);
         }
@@ -219,16 +302,23 @@ namespace ModernSlavery.BusinessDomain.Submission
                         return new Outcome<StatementErrors, StatementModel>(StatementErrors.TooLate);
 
                     //Load data from statement entity into the statementmodel
-                    _mapper.Map(submittedStatement, statementModel);
+                    MapToModel(submittedStatement, statementModel);
+
+                    statementModel.BackupDate = submittedStatement.Modified;
+                    statementModel.CanRevertToBackup = true;
                 }
             }
 
             //Save new statement model with timestamp to lock to new user
             await SaveDraftStatementModel(statementModel);
+            statementModel.CanRevertToBackup = false;
 
             var draftBackupFilePath = GetDraftBackupFilepath(statementModel.OrganisationId, statementModel.SubmissionDeadline.Year);
-            if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
-                statementModel.BackupDate=await _sharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(draftBackupFilePath);
+            if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
+            {
+                statementModel.BackupDate = await _sharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(draftBackupFilePath);
+                statementModel.CanRevertToBackup = statementModel.BackupDate.Value.AddMinutes(_submissionOptions.DraftTimeoutMinutes) < VirtualDateTime.Now;
+            }
 
             return new Outcome<StatementErrors, StatementModel>(statementModel);
         }
@@ -312,7 +402,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             organisation.Statements.Add(newStatement);
 
             //Copy all the other model propertiesto the entity
-            _mapper.Map(statementModel, newStatement);
+            MapFromModel(statementModel, newStatement);
 
             //Save the changes to the database
             await _sharedBusinessLogic.DataRepository.SaveChangesAsync();

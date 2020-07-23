@@ -12,8 +12,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public OrganisationPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel,OrganisationPageViewModel>();
-            CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source);
+            CreateMap<StatementModel.SectorModel, OrganisationPageViewModel.SectorViewModel>().ReverseMap();
+
+            CreateMap<StatementModel,OrganisationPageViewModel>()
+                .ForMember(s => s.BackUrl, opt => opt.Ignore())
+                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
+                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+
+            CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
         }
     }
 
@@ -37,7 +46,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             From100to500Million = 4,
 
             [GovUkRadioCheckboxLabelText(Text = "£500 million+")]
-            [Range(500, 0)]
             Over500Million = 5,
         }
 

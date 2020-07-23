@@ -11,6 +11,7 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.ContinueUrl);
 
             @(Html.GovUkErrorSummary(new[]
         {
@@ -45,7 +46,7 @@
                                         Select all that apply.
                                     </span>
                                     <div class="govuk-checkboxes">
-                                        @foreach (var item in group.ChildRisks)
+                                        @foreach (var item in Model.RelevantRisks.Where(x => x.Id == group.ParentId))
                                         {
                                             <div class="govuk-checkboxes__item">
                                                 <input asp-for="@item.IsSelected" class="govuk-checkboxes__input" id="conditional" name="supply-risk" type="checkbox" data-aria-controls="conditional-conditional">
@@ -104,7 +105,7 @@
                                         Select up to 3 areas
                                     </span>
                                     <div class="govuk-checkboxes">
-                                        @foreach (var item in group.ChildRisks)
+                                        @foreach (var item in Model.HighRisks.Where(x => x.Id == group.ParentId))
                                         {
                                             <div class="govuk-checkboxes__item">
                                                 <input asp-for="@item.IsSelected" class="govuk-checkboxes__input" id="conditional-high-risk" name="high-risk" type="checkbox" data-aria-controls="conditional-conditional-high-risk">
@@ -153,7 +154,7 @@
                             <div class="govuk-form-group">
                                 <fieldset class="govuk-fieldset">
                                     <div class="govuk-checkboxes">
-                                        @foreach (var item in group.ChildRisks)
+                                        @foreach (var item in Model.LocationRisks.Where(x => x.Id == group.ParentId))
                                         {
                                             <div class="govuk-checkboxes__item">
                                                 <input asp-for="@item.IsSelected" class="govuk-checkboxes__input" type="checkbox">

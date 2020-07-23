@@ -11,7 +11,7 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-
+            @Html.HiddenFor(m => m.ContinueUrl);
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">

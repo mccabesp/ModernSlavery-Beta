@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using AutoMapper.Configuration.Annotations;
+using Microsoft.Azure.Management.WebSites.Models;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using ModernSlavery.WebUI.Submission.Models.Statement;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,8 +18,25 @@ namespace ModernSlavery.WebUI.Submission.Models
     {
         public DueDiligencePageViewModelMapperProfile()
         {
-            CreateMap<StatementModel,DueDiligencePageViewModel>();
-            CreateMap<DueDiligencePageViewModel, StatementModel>(MemberList.Source);
+            CreateMap<StatementModel.DiligenceModel, DueDiligencePageViewModel.DueDiligenceViewModel>().ReverseMap();
+
+            CreateMap<StatementModel, DueDiligencePageViewModel>()
+                .ForMember(s => s.HasForceLabour, opt => opt.Ignore())
+                .ForMember(s => s.HasSlaveryInstance, opt => opt.Ignore())
+                .ForMember(s => s.BackUrl, opt => opt.Ignore())
+                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
+                .ForMember(s => s.ContinueUrl, opt => opt.Ignore())
+                .ForMember(s => s.SelectedRemediation, opt => opt.Ignore())
+                .ForMember(s => s.OtherRemediation, opt => opt.Ignore());
+
+            CreateMap<DueDiligencePageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.HasForceLabour, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.HasSlaveryInstance, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.SelectedRemediation, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.OtherRemediation, opt => opt.DoNotValidate());
         }
     }
 
@@ -34,14 +54,53 @@ namespace ModernSlavery.WebUI.Submission.Models
         [MaxLength(500)]
         public string SlaveryInstanceDetails { get; set; }
 
-        public List<StatementRemediation> SlaveryInstanceRemediation { get; set; }
+        public StatementRemediation SelectedRemediation { get; set; }
+        private string _OtherRemediation;
+        public string OtherRemediation 
+        { 
+            get
+            {
+                return _OtherRemediation;
+            }
+            set
+            {
+                _OtherRemediation = value;
+                if (!string.IsNullOrWhiteSpace(_OtherRemediation)) SelectedRemediation = StatementRemediation.other;
+            }
+        }
+
+        public string SlaveryInstanceRemediation
+        {
+            get
+            {
+                if (SelectedRemediation == StatementRemediation.other)
+                    return OtherRemediation;
+                else
+                    return SelectedRemediation.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>().Text;
+            }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    SelectedRemediation = StatementRemediation.none;
+                else
+                {
+                    var selectedRemediation=Enum.GetValues(typeof(StatementRemediation)).ToList<StatementRemediation>().FirstOrDefault(e => e.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>().Text.EqualsI(value));
+                    if (selectedRemediation==null)
+                    {
+                        selectedRemediation = StatementRemediation.other;
+                        OtherRemediation = value;
+                    }
+                    SelectedRemediation = selectedRemediation;
+                }
+            }
+        }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
 
             var validationResults = new List<ValidationResult>();
             var otherDiligence = DueDiligences.Single(x => x.Description.Equals("other"));
-            if (otherDiligence.IsSelected && otherDiligence.OtherDiligence.IsNullOrWhiteSpace())
+            if (otherDiligence.IsSelected && otherDiligence.Details.IsNullOrWhiteSpace())
                 validationResults.Add(new ValidationResult("Please enter other details"));
 
             if (HasForceLabour == true & ForcedLabourDetails.IsNullOrWhiteSpace())
@@ -61,15 +120,11 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public class DueDiligenceViewModel
         {
-            // TODO - James Handle "Other" case
-            // It seems to only appear once under "Social audits"
             public short Id { get; set; }
             public short? ParentId { get; set; }
             public string Description { get; set; }
             public bool IsSelected { get; set; }
-            public List<DueDiligenceViewModel> ChildDiligences { get; set; }
-            //TODO: set on presenter level
-            public string OtherDiligence { get; set; }
+            public string Details { get; set; }
         }
     }
 

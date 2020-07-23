@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,20 +17,39 @@ namespace ModernSlavery.BusinessDomain.Submission
                 .ForMember(d => d.MinStatementYears, opt => opt.MapFrom(s => s.StatementYears.GetAttribute<RangeAttribute>().Minimum))
                 .ForMember(d => d.MaxStatementYears, opt => opt.MapFrom(s => s.StatementYears.GetAttribute<RangeAttribute>().Maximum))
                 .ForMember(d => d.MinTurnover, opt => opt.MapFrom(s => s.Turnover.GetAttribute<RangeAttribute>().Minimum))
-                .ForMember(d => d.MaxTurnover, opt => opt.MapFrom(s => s.Turnover.GetAttribute<RangeAttribute>().Maximum));
+                .ForMember(d => d.MaxTurnover, opt => opt.MapFrom(s => s.Turnover.GetAttribute<RangeAttribute>().Maximum))
+                .ForMember(dest => dest.Sectors, opt => opt.Ignore())
+                .ForMember(dest => dest.Policies, opt => opt.Ignore())
+                .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.HighRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.LocationRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.Diligences, opt => opt.Ignore())
+                .ForMember(dest => dest.Training, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementId, opt => opt.Ignore())
+                .ForMember(dest => dest.Created, opt => opt.Ignore())
+                .ForMember(dest => dest.Modified, opt => opt.Ignore())
+                .ForMember(dest => dest.Organisation, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.Ignore())
+                .ForMember(dest => dest.StatusDate, opt => opt.Ignore())
+                .ForMember(dest => dest.StatusDetails, opt => opt.Ignore())
+                .ForMember(dest => dest.Statuses, opt => opt.Ignore());
 
-            CreateMap<Statement, StatementModel>(MemberList.Source)
+            CreateMap<Statement, StatementModel>()
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>((int)s.MinStatementYears, (int)s.MaxStatementYears)))
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>((int)s.MinStatementYears, (int)s.MaxStatementYears)))
-                .ForMember(dest => dest.Status, opt => opt.Ignore()) // TODO - James Map this appropriately
+                .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.SubmissionDeadline.Year))
-                .ForMember(dest => dest.StatementSectors, opt => opt.MapFrom(src => src.Sectors.Select(s => s.StatementSectorTypeId)))
-                .ForMember(dest => dest.StatementPolicies, opt => opt.MapFrom(src => src.Policies.Select(p => p.StatementPolicyTypeId)))
-                .ForMember(dest => dest.Training, opt => opt.MapFrom(src => src.Training.Select(t => t.StatementTrainingTypeId)))
-                .ForMember(dest => dest.RelevantRisks, opt => opt.MapFrom(src => src.RelevantRisks.Select(r => r.StatementRiskTypeId)))
-                .ForMember(dest => dest.HighRisks, opt => opt.MapFrom(src => src.HighRisks.Select(r => r.StatementRiskTypeId)))
-                .ForMember(dest => dest.LocationRisks, opt => opt.MapFrom(src => src.LocationRisks.Select(r => r.StatementRiskTypeId)))
-                .ForMember(dest => dest.Diligences, opt => opt.MapFrom(src => src.Diligences.Select(d => d.StatementDiligenceTypeId)));
+                .ForMember(dest => dest.Sectors, opt => opt.Ignore())
+                .ForMember(dest => dest.Policies, opt => opt.Ignore())
+                .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.HighRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.LocationRisks, opt => opt.Ignore())
+                .ForMember(dest => dest.DueDiligences, opt => opt.Ignore())
+                .ForMember(dest => dest.Training, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                .ForMember(dest => dest.Timestamp, opt => opt.Ignore())
+                .ForMember(dest => dest.BackupDate, opt => opt.Ignore())
+                .ForMember(dest => dest.CanRevertToBackup, opt => opt.Ignore());
         }
     }
 
@@ -82,6 +102,8 @@ namespace ModernSlavery.BusinessDomain.Submission
             Over5Years = 3,
         }
 
+        public bool CanRevertToBackup { get; set; }
+
         public long UserId { get; set; }
         public DateTime Timestamp { get; set; }
 
@@ -98,6 +120,12 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public int Year => SubmissionDeadline.Year;
 
+        public string Modifications { get; set; }
+        public string EHRCResponse { get; set; }
+        public string LateReason { get; set; }
+        public short IncludedOrganisationCount { get; set; }
+
+        public short ExcludedOrganisationCount { get; set; }
         public DateTime Modified { get; set; } = VirtualDateTime.Now;
         public DateTime Created { get; set; } = VirtualDateTime.Now;
 
@@ -148,8 +176,21 @@ namespace ModernSlavery.BusinessDomain.Submission
         #endregion
 
         #region Step 3 - Your organisation
+        public class SectorModel
+        {
+            public SectorModel(short id, string description, bool isSelected)
+            {
+                Id = id;
+                Description = description;
+                IsSelected = isSelected;
+            }
 
-        public List<short> StatementSectors { get; set; }
+            public short Id { get; set; }
+            public string Description { get; set; }
+            public bool IsSelected { get; set; }
+        }
+
+        public List<SectorModel> Sectors { get; set; }
 
         public string OtherSector { get; set; }
 
@@ -158,8 +199,20 @@ namespace ModernSlavery.BusinessDomain.Submission
         #endregion
 
         #region Step 4 - Policies
+        public class PolicyModel
+        {
+            public PolicyModel(short id, string description, bool isSelected)
+            {
+                Id = id;
+                Description = description;
+                IsSelected = isSelected;
+            }
+            public short Id { get; set; }
+            public string Description { get; set; }
+            public bool IsSelected { get; set; }
+        }
 
-        public List<short> StatementPolicies { get; set; }
+        public List<PolicyModel> Policies { get; set; }
 
         public string OtherPolicies { get; set; }
 
@@ -167,21 +220,58 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Step 5 - Supply chain risks and due diligence part 1
 
-        public List<(short StatementRiskTypeId,string Details)> RelevantRisks { get; set; }
+        public class RisksModel
+        {
+            public RisksModel(short id, short? parentId, string description, string category, string details, bool isSelected)
+            {
+                Id = id;
+                ParentId = parentId;
+                Description = description;
+                Category = category;
+                Details = details;
+                IsSelected = isSelected;
+            }
+
+            public short Id { get; set; }
+            public short? ParentId { get; set; }
+            public string Description { get; set; }
+            public bool IsSelected { get; set; }
+            public string Category { get; set; }
+            public string Details { get; set; }
+        }
+
+        public List<RisksModel> RelevantRisks { get; set; }
 
         public string OtherRelevantRisks { get; set; }
 
-        public List<(short StatementRiskTypeId, string Details)> HighRisks { get; set; }
+        public List<RisksModel> HighRisks { get; set; }
 
         public string OtherHighRisks { get; set; }
 
-        public List<(short StatementRiskTypeId, string Details)> LocationRisks { get; set; }
+        public List<RisksModel> LocationRisks { get; set; }
 
         #endregion
 
         #region Step 5 - Supply chain risks and due diligence part 2
+        public class DiligenceModel
+        {
+            public DiligenceModel(short id, short? parentId, string description, string details, bool isSelected)
+            {
+                Id = id;
+                ParentId = parentId;
+                Description = description;
+                Details = details;
+                IsSelected = IsSelected;
+            }
 
-        public List<(short StatementDiligenceTypeId, string Details)> Diligences { get; set; }
+            public short Id { get; set; }
+            public short? ParentId { get; set; }
+            public string Description { get; set; }
+            public bool IsSelected { get; set; }
+            public string Details { get; set; }
+        }
+
+        public List<DiligenceModel> DueDiligences { get; set; }
 
         public string ForcedLabourDetails { get; set; }
 
@@ -192,8 +282,21 @@ namespace ModernSlavery.BusinessDomain.Submission
         #endregion
 
         #region Step 6 - Training
+        public class TrainingModel
+        {
+            public TrainingModel(short statementTrainingTypeId, string description, bool isSelected)
+            {
+                Id = statementTrainingTypeId;
+                Description = description;
+                IsSelected = isSelected;
+            }
 
-        public List<(short StatementTrainingTypeId, string Details)> Training { get; set; }
+            public short Id { get; set; }
+            public string Description { get; set; }
+            public bool IsSelected { get; set; }
+        }
+
+        public List<TrainingModel> Training { get; set; }
 
         public string OtherTraining { get; set; }
 

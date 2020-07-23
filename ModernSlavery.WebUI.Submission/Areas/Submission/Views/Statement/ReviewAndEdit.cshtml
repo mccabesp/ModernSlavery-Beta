@@ -11,7 +11,7 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-
+            @Html.HiddenFor(m => m.ContinueUrl);
 
             <h1 class="govuk-heading-l">
                 Review @Model.ReportingDeadlineYear group report for @Model.OrganisationName
