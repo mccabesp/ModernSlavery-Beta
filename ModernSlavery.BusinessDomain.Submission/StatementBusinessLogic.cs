@@ -191,8 +191,9 @@ namespace ModernSlavery.BusinessDomain.Submission
             statementModel.Sectors = _sharedBusinessLogic.DataRepository.GetAll<StatementSectorType>().ToList().Select(type => new StatementModel.SectorModel(type.StatementSectorTypeId, type.Description, statement.Sectors.Any(st => st.StatementSectorTypeId == type.StatementSectorTypeId))).ToList();
             statementModel.Policies = _sharedBusinessLogic.DataRepository.GetAll<StatementPolicyType>().ToList().Select(type => new StatementModel.PolicyModel(type.StatementPolicyTypeId, type.Description, statement.Policies.Any(st => st.StatementPolicyTypeId == type.StatementPolicyTypeId))).ToList();
             var riskTypes = _sharedBusinessLogic.DataRepository.GetAll<StatementRiskType>().ToList();
+
             var relevantRisks = statement.LocationRisks.ToList();
-            statementModel.LocationRisks = riskTypes.Select(type => new StatementModel.RisksModel(type.StatementRiskTypeId, type.ParentRiskTypeId,type.Description,type.Category.ToString(), relevantRisks.FirstOrDefault(st => st.StatementRiskTypeId == type.StatementRiskTypeId)?.Details, relevantRisks.Any(st => st.StatementRiskTypeId == type.StatementRiskTypeId))).ToList();
+            statementModel.RelevantRisks = riskTypes.Select(type => new StatementModel.RisksModel(type.StatementRiskTypeId, type.ParentRiskTypeId,type.Description,type.Category.ToString(), relevantRisks.FirstOrDefault(st => st.StatementRiskTypeId == type.StatementRiskTypeId)?.Details, relevantRisks.Any(st => st.StatementRiskTypeId == type.StatementRiskTypeId))).ToList();
 
             var highRisks = statement.HighRisks.ToList();
             statementModel.HighRisks = riskTypes.Select(type => new StatementModel.RisksModel(type.StatementRiskTypeId, type.ParentRiskTypeId, type.Description, type.Category.ToString(), highRisks.FirstOrDefault(st => st.StatementRiskTypeId == type.StatementRiskTypeId)?.Details, highRisks.Any(st => st.StatementRiskTypeId == type.StatementRiskTypeId))).ToList();
@@ -418,8 +419,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                 statementModel = new StatementModel();
                 statementModel.UserId = userId;
                 statementModel.Timestamp = VirtualDateTime.Now;
-                statementModel.OrganisationId = organisationId;
-                statementModel.SubmissionDeadline = reportingDeadline;
 
                 var submittedStatement = await FindSubmittedStatementAsync(organisationId, reportingDeadline);
                 if (submittedStatement != null)
@@ -433,6 +432,17 @@ namespace ModernSlavery.BusinessDomain.Submission
 
                     statementModel.BackupDate = submittedStatement.Modified;
                     statementModel.CanRevertToBackup = true;
+                }
+                else
+                {
+                    submittedStatement = new Statement();
+                    submittedStatement.Organisation = organisation;
+
+                    //Load data from statement entity into the statementmodel
+                    MapToModel(submittedStatement, statementModel);
+
+                    statementModel.OrganisationId = organisationId;
+                    statementModel.SubmissionDeadline = reportingDeadline;
                 }
             }
 

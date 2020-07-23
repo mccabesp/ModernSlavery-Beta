@@ -36,8 +36,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
             CreateMap<Statement, StatementModel>()
                 .ForMember(d => d.OrganisationName,opt=>opt.MapFrom(s=>s.Organisation.OrganisationName))
-                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>((int)s.MinStatementYears, (int)s.MaxStatementYears)))
-                .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>((int)s.MinStatementYears, (int)s.MaxStatementYears)))
+                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>(s.MinStatementYears, s.MaxStatementYears==null ? 0 : s.MaxStatementYears.Value)))
+                .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>(s.MinTurnover, s.MaxTurnover==null ? 0 : s.MaxTurnover.Value)))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.Sectors, opt => opt.Ignore())
                 .ForMember(dest => dest.Policies, opt => opt.Ignore())

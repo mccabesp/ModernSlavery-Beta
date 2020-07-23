@@ -51,7 +51,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             //better way to identify this checkbox
-            if (Policies.Single(x => x.Description == "Other").IsSelected && OtherPolicies.IsNullOrWhiteSpace())
+            if (Policies.Single(x => x.Description == "Other").IsSelected && string.IsNullOrWhiteSpace(OtherPolicies))
                 yield return new ValidationResult("Please provide detail on 'other'");
         }
 

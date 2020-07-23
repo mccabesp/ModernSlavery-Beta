@@ -15,6 +15,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             _disable = !enable;
         }
 
+        [System.Diagnostics.DebuggerHidden()]
         public async Task Invoke(HttpContext httpContext)
         {
             httpContext.Response.OnStarting(
