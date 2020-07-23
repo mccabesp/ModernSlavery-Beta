@@ -21,6 +21,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<RisksPageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
@@ -29,16 +32,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class RisksPageViewModel : BaseViewModel
     {
-        public List<RiskViewModel> RelevantRisks { get; set; }
-        [Display(Name = " If you want to specify an area not mentioned above, please provide details")]
-        public string OtherRelevantRisks;
-
-        public List<RiskViewModel> HighRisks { get; set; }
-        [Display(Name = " If you want to specify an area not mentioned above, please provide details")]
-        public string OtherHighRisks;
-
-        public List<RiskViewModel> LocationRisks { get; set; }
-
+        #region Types
         public class RiskViewModel
         {
             public short Id { get; set; }
@@ -49,6 +43,20 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             public string Details { get; set; }
 
         }
+        #endregion
+
+        public override string PageTitle => "Supply chain risks and due diligence";
+        public override string SubTitle => "Part 2";
+
+        public List<RiskViewModel> RelevantRisks { get; set; }
+        [Display(Name = " If you want to specify an area not mentioned above, please provide details")]
+        public string OtherRelevantRisks;
+
+        public List<RiskViewModel> HighRisks { get; set; }
+        [Display(Name = " If you want to specify an area not mentioned above, please provide details")]
+        public string OtherHighRisks;
+
+        public List<RiskViewModel> LocationRisks { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -94,6 +102,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             }
 
             return validationList;
+        }
+
+        public override bool IsComplete()
+        {
+            return base.IsComplete();
         }
     }
 }

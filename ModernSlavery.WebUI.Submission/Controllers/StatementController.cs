@@ -13,6 +13,7 @@ using ModernSlavery.WebUI.Submission.Models.Statement;
 using ModernSlavery.WebUI.Submission.Presenters;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -359,6 +360,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             //Validate the submitted ViewModel data
             if (!ModelState.IsValid) return View(viewModel);
+
+            //Ensure all sections are complete
+            if (viewModel.IsComplete()) throw new ValidationException("Submitting an incomplete statement is not permitted");
 
             //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
             var viewModelResult = await SubmissionPresenter.SubmitDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);

@@ -18,6 +18,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<ProgressPageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
@@ -26,6 +29,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class ProgressPageViewModel : BaseViewModel
     {
+        #region Types
         public enum YearRanges : byte
         {
             NotProvided = 0,
@@ -39,6 +43,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             [GovUkRadioCheckboxLabelText(Text = "More than 5 years")]
             Over5Years = 3,
         }
+        #endregion
+
+        public override string PageTitle => "Monitoring progress";
 
         [Display(Name = "Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?")] 
         public bool IncludesMeasuringProgress { get; set; }
@@ -56,5 +63,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             throw new System.NotImplementedException();
         }
 
+        public override bool IsComplete()
+        {
+            return base.IsComplete();
+        }
     }
 }

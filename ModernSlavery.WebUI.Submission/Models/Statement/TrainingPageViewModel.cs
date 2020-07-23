@@ -21,6 +21,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<TrainingPageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
@@ -29,6 +32,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class TrainingPageViewModel : BaseViewModel
     {
+        #region Types
+        public class TrainingViewModel
+        {
+            public short Id { get; set; }
+            public string Description { get; set; }
+            public bool IsSelected { get; set; }
+        }
+        #endregion
+
+        public override string PageTitle => "Training";
+
         public IList<TrainingViewModel> Training { get; set; }
 
         [MaxLength(50)]
@@ -41,11 +55,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("Please provide other details");
         }
 
-        public class TrainingViewModel
+        public override bool IsComplete()
         {
-            public short Id { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
+            return base.IsComplete();
         }
     }
 }

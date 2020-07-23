@@ -35,10 +35,10 @@ namespace ModernSlavery.BusinessDomain.Submission
                 .ForMember(dest => dest.Statuses, opt => opt.Ignore());
 
             CreateMap<Statement, StatementModel>()
+                .ForMember(d => d.OrganisationName,opt=>opt.MapFrom(s=>s.Organisation.OrganisationName))
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>((int)s.MinStatementYears, (int)s.MaxStatementYears)))
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>((int)s.MinStatementYears, (int)s.MaxStatementYears)))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
-                .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.SubmissionDeadline.Year))
                 .ForMember(dest => dest.Sectors, opt => opt.Ignore())
                 .ForMember(dest => dest.Policies, opt => opt.Ignore())
                 .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
@@ -108,6 +108,9 @@ namespace ModernSlavery.BusinessDomain.Submission
         public DateTime Timestamp { get; set; }
 
         public long? StatementId { get; set; }
+
+        public string OrganisationName { get; set; }
+
         public DateTime? BackupDate { get; set; }
 
         public StatementStatuses Status { get; set; }
@@ -117,8 +120,6 @@ namespace ModernSlavery.BusinessDomain.Submission
         public DateTime SubmissionDeadline { get; set; }
 
         public long OrganisationId { get; set; }
-
-        public int Year => SubmissionDeadline.Year;
 
         public string Modifications { get; set; }
         public string EHRCResponse { get; set; }
@@ -313,5 +314,6 @@ namespace ModernSlavery.BusinessDomain.Submission
         public YearRanges StatementYears { get; set; }
 
         #endregion
+
     }
 }
