@@ -32,6 +32,9 @@ namespace ModernSlavery.WebUI.Submission.Models
             CreateMap<DueDiligencePageViewModel, StatementModel>(MemberList.Source)
                 .ForSourceMember(s => s.HasForceLabour, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.HasSlaveryInstance, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate())
@@ -42,6 +45,38 @@ namespace ModernSlavery.WebUI.Submission.Models
 
     public class DueDiligencePageViewModel : BaseViewModel
     {
+        #region Types
+        public class DueDiligenceViewModel
+        {
+            public short Id { get; set; }
+            public short? ParentId { get; set; }
+            public string Description { get; set; }
+            public bool IsSelected { get; set; }
+            public string Details { get; set; }
+        }
+        public enum StatementRemediation : byte
+        {
+            [GovUkRadioCheckboxLabelText(Text = "repayment of recruitment fees")]
+            repaymentOfRecruitmentFees,
+            [GovUkRadioCheckboxLabelText(Text = "change in policy")]
+            changeInPolicy,
+            [GovUkRadioCheckboxLabelText(Text = "referring victims into government services")]
+            referringVictimsIntoGovernmentServices,
+            [GovUkRadioCheckboxLabelText(Text = "supporting victims via NGOs")]
+            supportingVictimsViaNGOs,
+            [GovUkRadioCheckboxLabelText(Text = "supporting criminal justice against perpetrator")]
+            supportingCriminalJusticeAgainstPerpetrator,
+            [GovUkRadioCheckboxLabelText(Text = "other")]
+            other,
+            [GovUkRadioCheckboxLabelText(Text = "none")]
+            none
+
+        }
+        #endregion
+
+        public override string PageTitle => "Supply chain risks and due diligence";
+        public override string SubTitle => "Part 2";
+
         public List<DueDiligenceViewModel> DueDiligences { get; set; }
 
         [Display(Name = "Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.")]
@@ -117,33 +152,9 @@ namespace ModernSlavery.WebUI.Submission.Models
 
             return validationResults;
         }
-
-        public class DueDiligenceViewModel
+        public override bool IsComplete()
         {
-            public short Id { get; set; }
-            public short? ParentId { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
-            public string Details { get; set; }
+            return base.IsComplete();
         }
-    }
-
-    public enum StatementRemediation : byte
-    {
-        [GovUkRadioCheckboxLabelText(Text = "repayment of recruitment fees")]
-        repaymentOfRecruitmentFees,
-        [GovUkRadioCheckboxLabelText(Text = "change in policy")]
-        changeInPolicy,
-        [GovUkRadioCheckboxLabelText(Text = "referring victims into government services")]
-        referringVictimsIntoGovernmentServices,
-        [GovUkRadioCheckboxLabelText(Text = "supporting victims via NGOs")]
-        supportingVictimsViaNGOs,
-        [GovUkRadioCheckboxLabelText(Text = "supporting criminal justice against perpetrator")]
-        supportingCriminalJusticeAgainstPerpetrator,
-        [GovUkRadioCheckboxLabelText(Text = "other")]
-        other,
-        [GovUkRadioCheckboxLabelText(Text = "none")]
-        none
-
     }
 }

@@ -20,6 +20,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
@@ -28,6 +31,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class OrganisationPageViewModel : BaseViewModel
     {
+        #region Types
+        public class SectorViewModel
+        {
+            public short Id { get; set; }
+            public string Description { get; set; }
+            public bool IsSelected { get; set; }
+        }
         public enum TurnoverRanges : byte
         {
             //Not Provided
@@ -49,6 +59,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             Over500Million = 5,
         }
 
+        #endregion
+
+        public override string PageTitle => "Your organisation";
+
         public IList<SectorViewModel> Sectors { get; set; }
 
         [Display(Name = "What was your turnover or budget during the last financial accounting year?")]
@@ -59,11 +73,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             throw new System.NotImplementedException();
         }
 
-        public class SectorViewModel
+        public override bool IsComplete()
         {
-            public short Id { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
+            return base.IsComplete();
         }
     }
 }

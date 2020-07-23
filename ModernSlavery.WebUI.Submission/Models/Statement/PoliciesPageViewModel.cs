@@ -20,6 +20,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<PoliciesPageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
@@ -28,6 +31,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class PoliciesPageViewModel : BaseViewModel
     {
+        #region Types
+        public class PolicyViewModel
+        {
+            public short Id { get; set; }
+            public string Description { get; set; }
+            public bool IsSelected { get; set; }
+        }
+        #endregion
+
+        public override string PageTitle => "Policies";
+
         public IList<PolicyViewModel> Policies { get; set; }
 
         public string OtherPolicies { get; set; }
@@ -39,11 +53,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("Please provide detail on 'other'");
         }
 
-        public class PolicyViewModel
+        public override bool IsComplete()
         {
-            public short Id { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
+            return base.IsComplete();
         }
     }
 }

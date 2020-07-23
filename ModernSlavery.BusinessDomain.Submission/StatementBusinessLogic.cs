@@ -356,7 +356,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (statementModel == null) throw new ArgumentNullException(nameof(statementModel));
             if (statementModel.OrganisationId == 0) throw new ArgumentOutOfRangeException(nameof(statementModel.OrganisationId));
             if (statementModel.UserId == 0) throw new ArgumentOutOfRangeException(nameof(statementModel.UserId));
-            if (statementModel.Year<_sharedBusinessLogic.SharedOptions.FirstReportingYear || statementModel.Year >VirtualDateTime.Now.Year+1) throw new ArgumentOutOfRangeException(nameof(statementModel.Year));
+            if (statementModel.SubmissionDeadline.Year<_sharedBusinessLogic.SharedOptions.FirstReportingYear || statementModel.SubmissionDeadline.Year > VirtualDateTime.Now.Year+1) throw new ArgumentOutOfRangeException(nameof(statementModel.SubmissionDeadline.Year));
 
             //Try and get the organisation
             var organisation = _sharedBusinessLogic.DataRepository.Get<Organisation>(statementModel.OrganisationId);

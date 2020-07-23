@@ -22,9 +22,9 @@
                     nameof(ProgressPageViewModel.StatementYears),
                 }))
 
-            <h1 class="govuk-heading-l">
-                Monitoring progress
-            </h1>
+        <h1 class="govuk-heading-l">
+            @Model.PageTitle
+        </h1>
             @(Html.GovUkRadiosFor(
         m => m.IncludesMeasuringProgress,
         new FieldsetViewModel

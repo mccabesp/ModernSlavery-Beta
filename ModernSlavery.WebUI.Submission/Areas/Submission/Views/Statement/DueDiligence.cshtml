@@ -22,10 +22,10 @@
                     nameof(DueDiligencePageViewModel.SlaveryInstanceDetails)
                 }))
 
-            <h2>Part 2</h2>
+            <h2>@Model.SubTitle</h2>
 
             <h1 class="govuk-heading-l">
-                Supply Chain and Due diligence
+                @Model.PageTitle
             </h1>
 
             <h2 class="govuk-heading-m">
@@ -142,7 +142,7 @@
                                         </h2>
                                     </legend>
                                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                                        @foreach (StatementRemediation item in Enum.GetValues(typeof(StatementRemediation)))
+                                        @foreach (DueDiligencePageViewModel.StatementRemediation item in Enum.GetValues(typeof(DueDiligencePageViewModel.StatementRemediation)))
                                         {
                                             <div class="govuk-checkboxes__item">
                                                 <input class="govuk-checkboxes__input" id="remediation-conditional" type="checkbox" @(item == Model.SelectedRemediation ? "checked" : "") data-aria-controls="remediation-conditional">

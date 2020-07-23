@@ -22,6 +22,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<CompliancePageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
@@ -29,6 +32,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     }
     public class CompliancePageViewModel:BaseViewModel
     {
+        public override string PageTitle => "Areas covered by your modern slavery statement";
+
         public bool? IncludesStructure { get; set; }
 
         public string StructureDetails { get; set; }
@@ -72,6 +77,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             if (IncludesGoals == false && GoalsDetails.IsNullOrWhiteSpace())
                 yield return new ValidationResult("Please provide the detail for: Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions");
+        }
+
+        public override bool IsComplete()
+        {
+            return base.IsComplete();
         }
     }
 }

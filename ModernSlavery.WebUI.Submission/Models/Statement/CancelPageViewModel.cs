@@ -16,6 +16,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<CancelPageViewModel, StatementModel>(MemberList.Source)
+                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
@@ -24,6 +27,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class CancelPageViewModel : BaseViewModel
     {
+        public override string PageTitle => "Cancel Statement";
+
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             throw new System.NotImplementedException();
