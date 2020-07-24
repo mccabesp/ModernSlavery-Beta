@@ -143,6 +143,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.CancelUrl = vm.BackUrl;
                     vm.ContinueUrl = ReturnUrl;
                     break;
+                case SubmissionCompleteViewModel vm:
+                    vm.ContinueUrl = ReturnUrl;
+                    break;
+
                 default:
                     throw new NotImplementedException();
             }
@@ -164,7 +168,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             return View(viewModel);
         }
 
-        private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year) where TViewModel:BaseViewModel
+        private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year) where TViewModel : BaseViewModel
         {
             //Validate the submitted ViewModel data
             if (!ModelState.IsValid) return View(viewModel);
@@ -222,7 +226,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/compliance")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Compliance(CompliancePageViewModel viewModel,string organisationIdentifier, int year)
+        public async Task<IActionResult> Compliance(CompliancePageViewModel viewModel, string organisationIdentifier, int year)
         {
             return await PostAsync(viewModel, organisationIdentifier, year);
         }
@@ -444,6 +448,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             //Redirect to the continue url
             return Redirect(viewModel.ContinueUrl);
+        }
+
+        #endregion
+
+        #region SubmissionComplete
+        [HttpGet("{organisationIdentifier}/{year}/submission-complete")]
+        public async Task<IActionResult> SubmissionComplete(string organisationIdentifier, int year)
+        {
+            return await GetAsync<SubmissionCompleteViewModel>(organisationIdentifier, year);
         }
 
         #endregion

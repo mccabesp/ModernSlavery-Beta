@@ -72,7 +72,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            return Sectors.Any(x => x.IsSelected)
+                && Turnover != TurnoverRanges.NotProvided;
         }
     }
 }

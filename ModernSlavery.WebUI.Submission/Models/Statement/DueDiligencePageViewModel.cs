@@ -151,7 +151,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            var otherSocialAudit = DueDiligences.Single(x => x.Description.Equals("other"));
+
+            return DueDiligences.Any(x => x.IsSelected)
+                && HasForceLabour.HasValue
+                && HasSlaveryInstance.HasValue
+                && !otherSocialAudit.IsSelected || !otherSocialAudit.Details.IsNullOrWhiteSpace()
+                && HasForceLabour == false || !ForcedLabourDetails.IsNullOrWhiteSpace()
+                && HasSlaveryInstance == false || !SlaveryInstanceDetails.IsNullOrWhiteSpace()
+                && HasSlaveryInstance == false || !SlaveryInstanceRemediation.IsNullOrWhiteSpace();
         }
     }
 }

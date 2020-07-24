@@ -254,11 +254,48 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         #endregion
 
-        public virtual bool IsEmpty()
+        public bool IsEmpty()
         {
-            //TODO
-            return false;
-        }
+            return StatementUrl.IsNullOrWhiteSpace()
+                && StatementStartDate == null
+                && StatementEndDate == null
+                && ApproverFirstName.IsNullOrWhiteSpace()
+                && ApproverLastName.IsNullOrWhiteSpace()
+                && ApproverJobTitle.IsNullOrWhiteSpace()
+                && ApprovedDate == null
+                && IncludesStructure == null
+                && StructureDetails.IsNullOrWhiteSpace()
+                && IncludesPolicies == null
+                && PolicyDetails.IsNullOrWhiteSpace()
+                && IncludesRisks == null
+                && RisksDetails.IsNullOrWhiteSpace()
+                && IncludesDueDiligence == null
+                && DueDiligenceDetails.IsNullOrWhiteSpace()
+                && IncludesTraining == null
+                && TrainingDetails.IsNullOrWhiteSpace()
+                && IncludesGoals == null
+                && GoalsDetails.IsNullOrWhiteSpace()
+                && Sectors == null
+                && OtherSector.IsNullOrWhiteSpace()
+                && Turnover == TurnoverRanges.NotProvided
+                && Policies == null
+                && OtherPolicies.IsNullOrWhiteSpace()
+                && RelevantRisks == null
+                && OtherRelevantRisks.IsNullOrWhiteSpace()
+                && HighRisks == null
+                && OtherHighRisks.IsNullOrWhiteSpace()
+                && LocationRisks == null
+                && DueDiligences == null
+                && ForcedLabourDetails.IsNullOrWhiteSpace()
+                && SlaveryInstanceDetails.IsNullOrWhiteSpace()
+                && SlaveryInstanceRemediation.IsNullOrWhiteSpace()
+                && Training == null
+                && TrainingDetails.IsNullOrWhiteSpace()
+                && IncludesMeasuringProgress == null
+                && ProgressMeasures.IsNullOrWhiteSpace()
+                && KeyAchievements.IsNullOrWhiteSpace()
+                && StatementYears == YearRanges.NotProvided;
 
+        }
     }
 }

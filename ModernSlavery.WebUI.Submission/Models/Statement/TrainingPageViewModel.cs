@@ -50,7 +50,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            return Training.Any(x => x.IsSelected)
+                && !Training.Single(x => x.Description.Equals("Other")).IsSelected || !OtherTraining.IsNullOrWhiteSpace();
         }
     }
 }

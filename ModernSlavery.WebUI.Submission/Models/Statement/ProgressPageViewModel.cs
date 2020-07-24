@@ -62,7 +62,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            return IncludesMeasuringProgress.HasValue
+                && !ProgressMeasures.IsNullOrWhiteSpace()
+                && !KeyAchievements.IsNullOrWhiteSpace()
+                && StatementYears != YearRanges.NotProvided;
         }
     }
 }

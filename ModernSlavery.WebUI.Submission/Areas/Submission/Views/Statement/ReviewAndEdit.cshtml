@@ -100,8 +100,9 @@
                     </ul>
                 </li>
             </ol>
-
-            <button class="govuk-button" data-module="govuk-button" type="submit">
+            @if (Model.YourStatement.IsComplete() && Model.Compliance.IsComplete())
+            {
+            <button class="govuk-button" data-module="govuk-button" type="submit" >
                 Confirm and Submit
             </button>
             <a href="@Model.ContinueUrl" asp- class="govuk-button" data-module="govuk-button">

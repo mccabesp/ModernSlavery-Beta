@@ -55,7 +55,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public override string PageTitle => "Your modern slavery statement";
 
-        [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a URL")] //this will only get triggeres through parseAndValidate
         [Url(ErrorMessage = "URL is not valid")]
         [MaxLength(255, ErrorMessage = "The web address (URL) cannot be longer than 255 characters.")]
         [Display(Name = "URL")]
@@ -85,11 +84,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [RegularExpression("^[0-9]*$", ErrorMessage = "Year format is incorrect")]
         public int? StatementEndYear { get; set; }
 
-        [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a job title")]
         public string ApproverJobTitle { get; set; }
-        [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a first name")]
         public string ApproverFirstName { get; set; }
-        [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a last name")]
         public string ApproverLastName { get; set; }
 
         public DateTime? ApprovedDate => ToDateTime(ApprovedYear, ApprovedMonth, ApprovedDay);
@@ -116,13 +112,25 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("Please complete the Approved Date");
 
             var detailsList = new List<string> { ApproverFirstName, ApproverLastName, ApproverJobTitle };
-            if (detailsList.Any(x => x.IsNull()) && !detailsList.Any(x => x.IsNull()))
+            if (detailsList.Any(x => x.IsNullOrWhiteSpace()) && !detailsList.Any(x => x.IsNullOrWhiteSpace()))
                 yield return new ValidationResult("Please complete First name, Last name, Job title");
         }
 
         public override bool IsComplete()
         {
-            return base.IsComplete();
+            return !StatementUrl.IsNullOrWhiteSpace()
+                && StatementStartDay.HasValue
+                && StatementStartMonth.HasValue
+                && StatementStartYear.HasValue
+                && StatementEndDay.HasValue
+                && StatementEndMonth.HasValue
+                && StatementEndYear.HasValue
+                && !ApproverFirstName.IsNullOrWhiteSpace()
+                && !ApproverLastName.IsNullOrWhiteSpace()
+                && !ApproverJobTitle.IsNullOrWhiteSpace()
+                && ApprovedDay.HasValue
+                && ApprovedMonth.HasValue
+                && ApprovedYear.HasValue;
         }
     }
 }
