@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.BusinessDomain.Submission;
-using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Submission.Classes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -32,13 +31,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class PoliciesPageViewModel : BaseViewModel
     {
-        public PoliciesPageViewModel(PolicyTypeIndex policyTypes)
-        {
-            PolicyTypes = policyTypes;
-        }
         public override string PageTitle => "Policies";
-
-        public PolicyTypeIndex PolicyTypes { get; set; }
 
         public IList<short> Policies { get; set; }
 
@@ -46,8 +39,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            //Get the policy types
+            var policyTypes = validationContext.GetService<PolicyTypeIndex>();
+
             //better way to identify this checkbox
-            var otherId = PolicyTypes.Single(x => x.Description.Equals("other")).Id;
+            var otherId = policyTypes.Single(x => x.Description.Equals("Other")).Id;
             if (Policies.Contains(otherId) && string.IsNullOrWhiteSpace(OtherPolicies))
                 yield return new ValidationResult("Please provide detail on 'other'");
         }

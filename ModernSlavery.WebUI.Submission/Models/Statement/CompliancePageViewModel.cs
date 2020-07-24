@@ -1,13 +1,6 @@
-﻿using ModernSlavery.WebUI.GDSDesignSystem.Models;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
-using ModernSlavery.Core.Extensions;
 using AutoMapper;
-using ModernSlavery.BusinessDomain.Submission;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.BusinessDomain.Shared.Models;
 

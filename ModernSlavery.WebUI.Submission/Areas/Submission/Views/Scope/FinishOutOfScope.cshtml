@@ -33,7 +33,7 @@
             if (Model.UserIsRegistered)
             {
                 <p>
-                    <a href="@Url.Action("ManageOrganisation", "Organisation", new {id = Obfuscator.Obfuscate(Model.OrganisationId.ToString())})" class="button">Continue</a>
+                    <a href="@Url.Action("ManageOrganisation", "Organisation", new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId.ToString())})" class="button">Continue</a>
                 </p>
             }
             else

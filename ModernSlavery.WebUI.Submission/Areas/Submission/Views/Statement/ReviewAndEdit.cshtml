@@ -104,12 +104,12 @@
             <button class="govuk-button" data-module="govuk-button" type="submit">
                 Confirm and Submit
             </button>
-            <button class="govuk-button" data-module="govuk-button" type="submit">
+            <a href="@Model.ContinueUrl" asp- class="govuk-button" data-module="govuk-button">
                 Save draft
-            </button>
-            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">
+            </a>
+            <a href="@Model.CancelUrl" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                 Cancel
-            </button>
+            </a>
         }
     </div>
 </div>

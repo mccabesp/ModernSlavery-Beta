@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.BusinessDomain.Submission;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -64,6 +63,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             if (Progress.Validate(validationContext).Any())
                 yield return new ValidationResult($"Section '{Progress.PageTitle}' is invalid");
+
+            if (!IsComplete())
+                yield return new ValidationResult("You must first complete all sections before you can submit");
         }
 
         public override bool IsComplete()

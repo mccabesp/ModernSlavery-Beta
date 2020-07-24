@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.BusinessDomain.Submission;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;

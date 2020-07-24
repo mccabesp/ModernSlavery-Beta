@@ -196,7 +196,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             //Start new user registration
             return RedirectToAction("ManageOrganisation", "Submission",
-                new {id = SharedBusinessLogic.Obfuscator.Obfuscate(stateModel.OrganisationId.ToString())});
+                new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(stateModel.OrganisationId.ToString())});
         }
 
 
@@ -513,7 +513,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             // Set the return url
             stateModel.StartUrl = Url.Action("ManageOrganisation",
-                new {id = SharedBusinessLogic.Obfuscator.Obfuscate(organisationId.ToString())});
+                new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(organisationId.ToString())});
             stateModel.IsChangeJourney = true;
             stateModel.AccountingDate = latestScope.SnapshotDate;
 

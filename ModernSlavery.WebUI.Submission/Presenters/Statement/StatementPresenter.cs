@@ -14,6 +14,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
     public interface IStatementPresenter
     {
         /// <summary>
+        /// Copies all relevant data from a StatementModel into the specified ViewModel
+        /// </summary>
+        /// <typeparam name="TViewModel">The type of the desination ViewModel</typeparam>
+        /// <param name="statementModel">The instance of the source StatementModel</param>
+        /// <returns>A new instance of the populated ViewModel</returns>
+        TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel) where TViewModel : BaseViewModel;
+
+        /// <summary>
         /// Returns a ViewModel populated from a StatementModel for the specified oreganisation, reporting Deadline, and user
         /// Each Call relocks the Draft StatementModel to the user 
         /// </summary>
@@ -70,18 +78,16 @@ namespace ModernSlavery.WebUI.Submission.Presenters
     {
         readonly IStatementBusinessLogic StatementBusinessLogic;
         readonly ISharedBusinessLogic SharedBusinessLogic;
-        readonly IServiceProvider _serviceProvider;
         readonly IMapper Mapper;
 
         public StatementPresenter(
             IMapper mapper,
             ISharedBusinessLogic sharedBusinessLogic,
-            IStatementBusinessLogic statementBusinessLogic,IServiceProvider serviceProvider)
+            IStatementBusinessLogic statementBusinessLogic)
         {
             Mapper = mapper;
             SharedBusinessLogic = sharedBusinessLogic;
             StatementBusinessLogic = statementBusinessLogic;
-            _serviceProvider = serviceProvider; 
         }
 
         private DateTime GetReportingDeadline(long organisationId, int year)
@@ -89,18 +95,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(organisationId);
             if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId));
             return SharedBusinessLogic.GetReportingDeadline(organisation.SectorType, year);
-        }
-
-        /// <summary>
-        /// Copies all relevant data from a StatementModel into the specified ViewModel
-        /// </summary>
-        /// <typeparam name="TViewModel">The type of the desination ViewModel</typeparam>
-        /// <param name="statementModel">The instance of the source StatementModel</param>
-        /// <returns>A new instance of the populated ViewModel</returns>
-        private TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel) where TViewModel :BaseViewModel
-        {
-            var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
-            return Mapper.Map(statementModel, viewModel);
         }
 
         /// <summary>
@@ -114,6 +108,16 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         {
             return Mapper.Map(viewModel, statementModel);
         }
+
+        public TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel) where TViewModel : BaseViewModel
+        {
+            //Instantiate the ViewModel
+            var viewModel = Activator.CreateInstance<TViewModel>();
+
+            //Copy the StatementModel data to the viewModel
+            return Mapper.Map(statementModel, viewModel);
+        }
+
 
         public async Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {

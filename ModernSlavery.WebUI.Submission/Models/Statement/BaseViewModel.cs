@@ -11,7 +11,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     public abstract class BaseViewModel: GovUkViewModel, IValidatableObject
     {
         [BindNever]
-        public bool CanRevertToBackup { get; set; }
+        public bool CanRevertToOriginal { get; set; }
+
+        [BindNever]
+        public DateTime? DraftBackupDate { get; set; }
 
         [IgnoreMap]
         [BindNever]
@@ -39,7 +42,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public abstract IEnumerable<ValidationResult> Validate(ValidationContext validationContext);
 
-        public virtual bool IsComplete() => true;
+        public virtual bool IsComplete() => false;
         public virtual bool IsEmpty() => false;
     }
 }

@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
-using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using ModernSlavery.WebUI.Submission.Classes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -17,14 +14,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public OrganisationPageViewModelMapperProfile()
         {
             CreateMap<StatementModel,OrganisationPageViewModel>()
-                .ForMember(s => s.SectorTypes, opt => opt.Ignore())
                 .ForMember(s => s.BackUrl, opt => opt.Ignore())
                 .ForMember(s => s.CancelUrl, opt => opt.Ignore())
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
-                .ForSourceMember(s => s.SectorTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
@@ -36,11 +31,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class OrganisationPageViewModel : BaseViewModel
     {
-        public OrganisationPageViewModel(SectorTypeIndex sectorTypes)
-        {
-            SectorTypes = sectorTypes;
-        }
-
         #region Types
         public enum TurnoverRanges : byte
         {
@@ -67,7 +57,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override string PageTitle => "Your organisation";
 
-        public SectorTypeIndex SectorTypes { get; set; }
         public IList<short> Sectors { get; set; }
 
         [Display(Name = "What was your turnover or budget during the last financial accounting year?")]
@@ -75,6 +64,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            //Get the sector types
+            var sectorTypes = validationContext.GetService<SectorTypeIndex>();
+
             yield break;
         }
 

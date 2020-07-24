@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.BusinessDomain.Submission;
-using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using ModernSlavery.WebUI.Submission.Classes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -33,14 +31,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class TrainingPageViewModel : BaseViewModel
     {
-        public TrainingPageViewModel(TrainingTypeIndex trainingTypes)
-        {
-            TrainingTypes = trainingTypes;
-        }
-
         public override string PageTitle => "Training";
 
-        public TrainingTypeIndex TrainingTypes { get; set; }
         public IList<short> Training { get; set; }
 
         [MaxLength(50)]
@@ -48,7 +40,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            var otherId = TrainingTypes.Single(x => x.Description.Equals("other")).Id;
+            //Get the training types
+            var trainingTypes = validationContext.GetService<TrainingTypeIndex>();
+
+            var otherId = trainingTypes.Single(x => x.Description.Equals("Other")).Id;
             if (Training.Contains(otherId) && string.IsNullOrWhiteSpace(OtherTraining))
                 yield return new ValidationResult("Please provide other details");
         }

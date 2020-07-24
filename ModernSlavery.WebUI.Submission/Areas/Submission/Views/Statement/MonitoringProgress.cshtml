@@ -22,32 +22,42 @@
                     nameof(ProgressPageViewModel.StatementYears),
                 }))
 
-        <h1 class="govuk-heading-l">
-            @Model.PageTitle
-        </h1>
-            @(Html.GovUkRadiosFor(
-        m => m.IncludesMeasuringProgress,
-        new FieldsetViewModel
-        {
-            Legend = new LegendViewModel
-            {
-                Text = Model.IncludesMeasuringProgress.GetAttribute<DisplayAttribute>().Name,
-                Classes = "govuk-fieldset__legend--m"
-            },
-            Classes = "govuk-!-margin-top-6"
-        }));
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
 
-            <div class="govuk-form-group">
-                <h1 class="govuk-label-wrapper">
-                    <label asp-for="ProgressMeasures" class="govuk-label govuk-label--l" for="measuring-progress">
+
+            <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                <label asp-for="IncludesMeasuringProgress" class="govuk-label govuk-label--l">
+                    Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?
+                </label>
+                <div class="govuk-radios__item">
+                    <input asp-for="IncludesMeasuringProgress" value="true" class="govuk-radios__input" id="IncludeGoals_True" name="include-goals" type="radio">
+                    <label class="govuk-label govuk-radios__label" for="IncludeGoals_True">
+                        Yes
                     </label>
-                </h1>
-                <textarea asp-for="ProgressMeasures" class="govuk-textarea" id="more-detail" name="measuring-progress" rows="5"></textarea>
+                </div>
+                <div class="govuk-radios__item">
+                    <input asp-for="IncludesMeasuringProgress" value="false" class="govuk-radios__input" id="IncludeGoals_False" name="include-goals" type="radio" data-aria-controls="conditional-include-goals-conditional">
+                    <label class="govuk-label govuk-radios__label" for="IncludeGoals_False">
+                        No
+                    </label>
+                </div>
+                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-goals-conditional">
+                    <div class="govuk-form-group">
+                        <label asp-for="ProgressMeasures" class="govuk-label" for="include-goals-detail">
+                            How is your organisation measuring progress towards these goals?
+                        </label>
+                        <textarea asp-for="ProgressMeasures" id="include-goals-detail" class="govuk-textarea govuk-!-width-two-thirds" rows="5" type="text"> </textarea>
+
+                    </div>
+                </div>
             </div>
 
             <div class="govuk-form-group">
                 <h1 class="govuk-label-wrapper">
                     <label asp-for="KeyAchievements" class="govuk-label govuk-label--l" for="key-achievements">
+                        What were your key achievements in relation to reducing modern slavery during the period covered by this statement?
                     </label>
                 </h1>
                 <textarea asp-for="KeyAchievements" class="govuk-textarea" id="more-detail" name="key-achievements" rows="5"></textarea>
@@ -60,7 +70,7 @@
                     {
                         Legend = new LegendViewModel
                         {
-                            Text = Model.StatementYears.GetAttribute<DisplayAttribute>().Name,
+                            Text = "How many years has your organisation been producing modern slavery statements?",
                             Classes = "govuk-fieldset__legend--m"
                         },
                         Classes = "govuk-!-margin-top-6"

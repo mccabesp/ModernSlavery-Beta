@@ -2,7 +2,7 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model PoliciesPageViewModel
-
+@inject PolicyTypeIndex PolicyTypes
 <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
@@ -33,10 +33,10 @@
                         select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var policyType in Model.PolicyTypes)
+                        @foreach (var policyType in PolicyTypes)
                         {
                             <div class="govuk-checkboxes__item">
-                                <input name="Policies" value="@policyType.Id" id="@($"policy{policyType.Id}")" @(Model.Policies.Contains(policyType.Id) ? "checked" : "")) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="policies-conditional">
+                                <input name="Policies" value="@policyType.Id" id="@($"policy{policyType.Id}")" checked=@(Model.Policies.Contains(policyType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="policies-conditional">
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"policy{policyType.Id}")">
                                     @policyType.Description
                                 </label>
@@ -61,34 +61,34 @@
 
 
             @*var organisationPolicyOptions =
-                                        new Dictionary<StatementPolicies, Func<object, object>>
-                                        {
-                                   {
-                                     StatementPolicies.Other,
-            @<text>
-                @(Html.GovUkTextInputFor(model => model.OtherPolicies))
-                @(Html.LabelFor(model => model.OtherPolicies, new { @class = "govuk-label" }))
-            </text>
-                                    }
-                                                      };
+                                            new Dictionary<StatementPolicies, Func<object, object>>
+                                            {
+                                       {
+                                         StatementPolicies.Other,
+                @<text>
+                    @(Html.GovUkTextInputFor(model => model.OtherPolicies))
+                    @(Html.LabelFor(model => model.OtherPolicies, new { @class = "govuk-label" }))
+                </text>
+                                        }
+                                                          };
 
 
-                            @(Html.GovUkCheckboxesFor(
-                            model => model.PoliciesEnums,
-                            new FieldsetViewModel
-                            {
-                                Legend = new LegendViewModel
+                                @(Html.GovUkCheckboxesFor(
+                                model => model.PoliciesEnums,
+                                new FieldsetViewModel
                                 {
-                                    Classes = "govuk-fieldset__legend--m"
+                                    Legend = new LegendViewModel
+                                    {
+                                        Classes = "govuk-fieldset__legend--m"
+                                    },
+                                    Classes = "govuk-!-margin-top-6"
                                 },
-                                Classes = "govuk-!-margin-top-6"
-                            },
-                            new HintViewModel
-                            {
-                                Text = "Select all that apply."
-                            },
-                            organisationPolicyOptions
-                       ));*@
+                                new HintViewModel
+                                {
+                                    Text = "Select all that apply."
+                                },
+                                organisationPolicyOptions
+                           ));*@
 
 
             <button class="govuk-button" data-module="govuk-button" type="submit">

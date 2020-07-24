@@ -30,19 +30,10 @@ namespace ModernSlavery.WebUI.Submission
         {
             //Register service dependencies here
             services.AddSingleton<SectorTypeIndex>();
-            services.AddScoped<OrganisationPageViewModel>();
-
             services.AddSingleton<PolicyTypeIndex>();
-            services.AddScoped<PoliciesPageViewModel>();
-
             services.AddSingleton<RiskTypeIndex>();
-            services.AddScoped<RisksPageViewModel>();
-            
             services.AddSingleton<DiligenceTypeIndex>();
-            services.AddScoped<DueDiligencePageViewModel>();
-
             services.AddSingleton<TrainingTypeIndex>();
-            services.AddScoped<TrainingPageViewModel>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

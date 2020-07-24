@@ -82,16 +82,16 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         [Authorize]
-        [HttpGet("~/manage-organisation/{id}")]
-        public async Task<IActionResult> ManageOrganisation(string id)
+        [HttpGet("~/manage-organisation/{organisationIdentifier}")]
+        public async Task<IActionResult> ManageOrganisation(string organisationIdentifier)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
             // Decrypt org id
-            long organisationId = _SubmissionService.SharedBusinessLogic.Obfuscator.DeObfuscate(id);
-            if (organisationId == 0) return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
+            long organisationId = _SubmissionService.SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
+            if (organisationId == 0) return new HttpBadRequestResult($"Cannot decrypt organisation id {organisationIdentifier}");
 
             // Check the user has permission for this organisation
             var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
@@ -110,7 +110,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             {
                 var scopeStatus = await _SubmissionService.ScopeBusinessLogic.GetLatestScopeStatusForSnapshotYearAsync(organisationId, currentReportingDeadline.Year - 1);
                 if (!scopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope))
-                    return RedirectToAction(nameof(ScopeController.DeclareScope), "Scope", new { id });
+                    return RedirectToAction(nameof(ScopeController.DeclareScope), "Scope", new { organisationIdentifier });
             }
 
             // get any associated users for the current org

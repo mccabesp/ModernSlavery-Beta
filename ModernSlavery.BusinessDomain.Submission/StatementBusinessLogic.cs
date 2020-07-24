@@ -419,20 +419,15 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Save new statement model with timestamp to lock to new user
             await SaveDraftStatementModelAsync(draftStatement,createBackup);
-            draftStatement.CanRevertToOriginal = draftStatement.StatementId>0;
+            draftStatement.DraftBackupDate = null;
 
-            if (draftStatement.DraftBackupDate==null)
-            {
-                var draftBackupFilePath = GetDraftBackupFilepath(draftStatement.OrganisationId, draftStatement.SubmissionDeadline.Year);
-                if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
-                {
-                    //Get the draft backup date
-                    draftStatement.DraftBackupDate = await _sharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(draftBackupFilePath);
+            //Get the draft backup date
+            var draftBackupFilePath = GetDraftBackupFilepath(draftStatement.OrganisationId, draftStatement.SubmissionDeadline.Year);
+            if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
+                draftStatement.DraftBackupDate = await _sharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(draftBackupFilePath);
 
-                    //Allow revert to backup if backup exists and has timedout
-                    draftStatement.CanRevertToOriginal = draftStatement.StatementId > 0 || draftStatement.DraftBackupDate.Value.AddMinutes(_submissionOptions.DraftTimeoutMinutes) < VirtualDateTime.Now;
-                }
-            }
+            //Allow revert to backup if backup exists and has timedout
+            draftStatement.CanRevertToOriginal = draftStatement.StatementId > 0 || draftStatement.DraftBackupDate!=null;
 
             return new Outcome<StatementErrors, StatementModel>(draftStatement);
         }
@@ -493,7 +488,13 @@ namespace ModernSlavery.BusinessDomain.Submission
             }
 
             //Save the new draft data 
-            var draftJson = JsonConvert.SerializeObject(statementModel);
+            var jsonSettings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore, 
+                DefaultValueHandling = DefaultValueHandling.Ignore
+            };
+
+            var draftJson = JsonConvert.SerializeObject(statementModel,_sharedBusinessLogic.SharedOptions.IsProduction() ? Formatting.None : Formatting.Indented,jsonSettings);
             await _sharedBusinessLogic.FileRepository.WriteAsync(draftFilePath, Encoding.UTF8.GetBytes(draftJson));
         }
 

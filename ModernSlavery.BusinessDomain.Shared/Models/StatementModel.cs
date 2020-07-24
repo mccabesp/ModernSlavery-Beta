@@ -35,7 +35,10 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.Statuses, opt => opt.Ignore());
 
             CreateMap<Statement, StatementModel>()
-                .ForMember(d => d.OrganisationName,opt=>opt.MapFrom(s=>s.Organisation.OrganisationName))
+                .ForMember(d => d.StatementStartDate,opt=>opt.MapFrom(s=>s.StatementStartDate==DateTime.MinValue ? (DateTime?)null : s.StatementStartDate))
+                .ForMember(d => d.StatementEndDate, opt => opt.MapFrom(s => s.StatementEndDate == DateTime.MinValue ? (DateTime?)null : s.StatementEndDate))
+                .ForMember(d => d.ApprovedDate, opt => opt.MapFrom(s => s.ApprovedDate == DateTime.MinValue ? (DateTime?)null : s.ApprovedDate))
+                .ForMember(d => d.OrganisationName, opt=>opt.MapFrom(s=>s.Organisation.OrganisationName))
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>(s.MinStatementYears, s.MaxStatementYears==null ? 0 : s.MaxStatementYears.Value)))
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>(s.MinTurnover, s.MaxTurnover==null ? 0 : s.MaxTurnover.Value)))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
@@ -44,7 +47,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.RelevantRisks, opt => opt.MapFrom(st => st.RelevantRisks.Select(s => new StatementModel.RisksModel { Id=s.StatementRiskTypeId, Details=s.Details })))
                 .ForMember(dest => dest.HighRisks, opt => opt.MapFrom(st => st.HighRisks.Select(s => new StatementModel.RisksModel { Id = s.StatementRiskTypeId, Details = s.Details })))
                 .ForMember(dest => dest.LocationRisks, opt => opt.MapFrom(st => st.LocationRisks.Select(s => new StatementModel.RisksModel { Id = s.StatementRiskTypeId, Details = s.Details })))
-                .ForMember(dest => dest.DueDiligences, opt => opt.MapFrom(st => st.Diligences.Select(s => new StatementModel.RisksModel { Id = s.StatementDiligenceTypeId, Details = s.Details })))
+                .ForMember(dest => dest.DueDiligences, opt => opt.MapFrom(st => st.Diligences.Select(s => new StatementModel.DiligenceModel { Id = s.StatementDiligenceTypeId, Details = s.Details })))
                 .ForMember(dest => dest.Training, opt => opt.MapFrom(st => st.Training.Select(s => s.StatementTrainingTypeId)))
                 .ForMember(dest => dest.EditorUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.EditTimestamp, opt => opt.Ignore())
@@ -56,6 +59,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
     [Serializable]
     public class StatementModel
     {
+        #region Types
         public enum TurnoverRanges : byte
         {
             //Not Provided
@@ -101,8 +105,10 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
             [Range(5, 0)]
             Over5Years = 3,
         }
+        #endregion
 
         public bool CanRevertToOriginal { get; set; }
+        public DateTime? DraftBackupDate { get; set; }
 
         public long EditorUserId { get; set; }
         public DateTime EditTimestamp { get; set; }
@@ -111,7 +117,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public string OrganisationName { get; set; }
 
-        public DateTime? DraftBackupDate { get; set; }
         public StatementStatuses Status { get; set; }
 
         public DateTime? StatusDate { get; set; }
@@ -121,7 +126,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         public long OrganisationId { get; set; }
 
         public string Modifications { get; set; }
-        public string EHRCResponse { get; set; }
+        public bool EHRCResponse { get; set; }
         public string LateReason { get; set; }
         public short IncludedOrganisationCount { get; set; }
 
