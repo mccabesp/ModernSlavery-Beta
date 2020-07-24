@@ -62,22 +62,22 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (IncludesStructure == false && StructureDetails.IsNullOrWhiteSpace())
+            if (IncludesStructure == false && string.IsNullOrWhiteSpace(StructureDetails))
                 yield return new ValidationResult("Please provide the detail for: Your organisatio's structure, business and supply chains");
 
-            if (IncludesPolicies == false && PolicyDetails.IsNullOrWhiteSpace())
+            if (IncludesPolicies == false && string.IsNullOrWhiteSpace(PolicyDetails))
                 yield return new ValidationResult("Please provide the detail for: Policies");
 
-            if (IncludesRisks == false && RisksDetails.IsNullOrWhiteSpace())
+            if (IncludesRisks == false && string.IsNullOrWhiteSpace(RisksDetails))
                 yield return new ValidationResult("Please provide the detail for: Risk assessment and management");
 
-            if (IncludesDueDiligence == false && DueDiligenceDetails.IsNullOrWhiteSpace())
+            if (IncludesDueDiligence == false && string.IsNullOrWhiteSpace(DueDiligenceDetails))
                 yield return new ValidationResult("Please provide the detail for: Due diligence processes");
 
-            if (IncludesTraining == false && TrainingDetails.IsNullOrWhiteSpace())
+            if (IncludesTraining == false && string.IsNullOrWhiteSpace(TrainingDetails))
                 yield return new ValidationResult("Please provide the detail for: Staff training about slavery and human trafficking");
 
-            if (IncludesGoals == false && GoalsDetails.IsNullOrWhiteSpace())
+            if (IncludesGoals == false && string.IsNullOrWhiteSpace(GoalsDetails))
                 yield return new ValidationResult("Please provide the detail for: Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions");
         }
 

@@ -6,6 +6,7 @@ using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.Submission.Classes;
 using ModernSlavery.WebUI.Submission.Models.Statement;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
-namespace ModernSlavery.WebUI.Submission.Models
+namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
     public class DueDiligencePageViewModelMapperProfile:Profile
     {
@@ -47,13 +48,15 @@ namespace ModernSlavery.WebUI.Submission.Models
 
     public class DueDiligencePageViewModel : BaseViewModel
     {
+        public DueDiligencePageViewModel(DiligenceTypeIndex diligenceTypes)
+        {
+            DiligenceTypes = diligenceTypes;
+        }
+
         #region Types
         public class DueDiligenceViewModel
         {
             public short Id { get; set; }
-            public short? ParentId { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
             public string Details { get; set; }
         }
         public enum StatementRemediation : byte
@@ -79,6 +82,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         public override string PageTitle => "Supply chain risks and due diligence";
         public override string SubTitle => "Part 2";
 
+        public DiligenceTypeIndex DiligenceTypes { get; }
         public List<DueDiligenceViewModel> DueDiligences { get; set; }
 
         [Display(Name = "Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.")]
@@ -134,25 +138,20 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            var otherId = DiligenceTypes.Single(x => x.Description.Equals("other")).Id;
+            var otherDiligence = DueDiligences.FirstOrDefault(x => x.Id==otherId);
+            if (otherDiligence!=null && string.IsNullOrWhiteSpace(otherDiligence.Details))
+                yield return new ValidationResult("Please enter other details");
 
-            var validationResults = new List<ValidationResult>();
-            var otherDiligence = DueDiligences.Single(x => x.Description.Equals("other"));
-            if (otherDiligence.IsSelected && otherDiligence.Details.IsNullOrWhiteSpace())
-                validationResults.Add(new ValidationResult("Please enter other details"));
+            if (HasForceLabour == true & string.IsNullOrWhiteSpace(ForcedLabourDetails))
+                yield return new ValidationResult("Please provide the detail");
 
-            if (HasForceLabour == true & ForcedLabourDetails.IsNullOrWhiteSpace())
-                validationResults.Add(new ValidationResult("Please provide the detail"));
-
-            if (HasSlaveryInstance == true & SlaveryInstanceDetails.IsNullOrWhiteSpace())
-                validationResults.Add(new ValidationResult("Please provide the detail"));
+            if (HasSlaveryInstance == true & string.IsNullOrWhiteSpace(SlaveryInstanceDetails))
+                yield return new ValidationResult("Please provide the detail");
 
             //TODO: how to check checkbox here as no isSelected
             //if (HasSlaveryInstance == true & SlaveryInstanceRemediation.None(x => x.IsSelected))
             //    validationResults.Add(new ValidationResult("Please provide the detail"));
-
-
-
-            return validationResults;
         }
         public override bool IsComplete()
         {

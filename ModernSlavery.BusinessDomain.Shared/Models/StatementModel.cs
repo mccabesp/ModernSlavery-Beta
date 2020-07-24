@@ -39,13 +39,13 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>(s.MinStatementYears, s.MaxStatementYears==null ? 0 : s.MaxStatementYears.Value)))
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>(s.MinTurnover, s.MaxTurnover==null ? 0 : s.MaxTurnover.Value)))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
-                .ForMember(dest => dest.Sectors, opt => opt.Ignore())
-                .ForMember(dest => dest.Policies, opt => opt.Ignore())
-                .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
-                .ForMember(dest => dest.HighRisks, opt => opt.Ignore())
-                .ForMember(dest => dest.LocationRisks, opt => opt.Ignore())
-                .ForMember(dest => dest.DueDiligences, opt => opt.Ignore())
-                .ForMember(dest => dest.Training, opt => opt.Ignore())
+                .ForMember(dest => dest.Sectors, opt => opt.MapFrom(st=>st.Sectors.Select(s=>s.StatementSectorTypeId)))
+                .ForMember(dest => dest.Policies, opt => opt.MapFrom(st => st.Policies.Select(s => s.StatementPolicyTypeId)))
+                .ForMember(dest => dest.RelevantRisks, opt => opt.MapFrom(st => st.RelevantRisks.Select(s => new StatementModel.RisksModel { Id=s.StatementRiskTypeId, Details=s.Details })))
+                .ForMember(dest => dest.HighRisks, opt => opt.MapFrom(st => st.HighRisks.Select(s => new StatementModel.RisksModel { Id = s.StatementRiskTypeId, Details = s.Details })))
+                .ForMember(dest => dest.LocationRisks, opt => opt.MapFrom(st => st.LocationRisks.Select(s => new StatementModel.RisksModel { Id = s.StatementRiskTypeId, Details = s.Details })))
+                .ForMember(dest => dest.DueDiligences, opt => opt.MapFrom(st => st.Diligences.Select(s => new StatementModel.RisksModel { Id = s.StatementDiligenceTypeId, Details = s.Details })))
+                .ForMember(dest => dest.Training, opt => opt.MapFrom(st => st.Training.Select(s => s.StatementTrainingTypeId)))
                 .ForMember(dest => dest.UserId, opt => opt.Ignore())
                 .ForMember(dest => dest.Timestamp, opt => opt.Ignore())
                 .ForMember(dest => dest.BackupDate, opt => opt.Ignore())
@@ -177,21 +177,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         #endregion
 
         #region Step 3 - Your organisation
-        public class SectorModel
-        {
-            public SectorModel(short id, string description, bool isSelected)
-            {
-                Id = id;
-                Description = description;
-                IsSelected = isSelected;
-            }
-
-            public short Id { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
-        }
-
-        public List<SectorModel> Sectors { get; set; }
+        public List<short> Sectors { get; set; }
 
         public string OtherSector { get; set; }
 
@@ -200,20 +186,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         #endregion
 
         #region Step 4 - Policies
-        public class PolicyModel
-        {
-            public PolicyModel(short id, string description, bool isSelected)
-            {
-                Id = id;
-                Description = description;
-                IsSelected = isSelected;
-            }
-            public short Id { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
-        }
 
-        public List<PolicyModel> Policies { get; set; }
+        public List<short> Policies { get; set; }
 
         public string OtherPolicies { get; set; }
 
@@ -223,21 +197,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public class RisksModel
         {
-            public RisksModel(short id, short? parentId, string description, string category, string details, bool isSelected)
-            {
-                Id = id;
-                ParentId = parentId;
-                Description = description;
-                Category = category;
-                Details = details;
-                IsSelected = isSelected;
-            }
-
             public short Id { get; set; }
-            public short? ParentId { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
-            public string Category { get; set; }
             public string Details { get; set; }
         }
 
@@ -256,19 +216,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         #region Step 5 - Supply chain risks and due diligence part 2
         public class DiligenceModel
         {
-            public DiligenceModel(short id, short? parentId, string description, string details, bool isSelected)
-            {
-                Id = id;
-                ParentId = parentId;
-                Description = description;
-                Details = details;
-                IsSelected = IsSelected;
-            }
-
             public short Id { get; set; }
-            public short? ParentId { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
             public string Details { get; set; }
         }
 
@@ -283,21 +231,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         #endregion
 
         #region Step 6 - Training
-        public class TrainingModel
-        {
-            public TrainingModel(short statementTrainingTypeId, string description, bool isSelected)
-            {
-                Id = statementTrainingTypeId;
-                Description = description;
-                IsSelected = isSelected;
-            }
 
-            public short Id { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
-        }
-
-        public List<TrainingModel> Training { get; set; }
+        public List<short> Training { get; set; }
 
         public string OtherTraining { get; set; }
 

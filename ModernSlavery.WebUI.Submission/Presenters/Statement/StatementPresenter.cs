@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
@@ -69,17 +70,18 @@ namespace ModernSlavery.WebUI.Submission.Presenters
     {
         readonly IStatementBusinessLogic StatementBusinessLogic;
         readonly ISharedBusinessLogic SharedBusinessLogic;
-
+        readonly IServiceProvider _serviceProvider;
         readonly IMapper Mapper;
 
         public StatementPresenter(
             IMapper mapper,
             ISharedBusinessLogic sharedBusinessLogic,
-            IStatementBusinessLogic statementBusinessLogic)
+            IStatementBusinessLogic statementBusinessLogic,IServiceProvider serviceProvider)
         {
             Mapper = mapper;
             SharedBusinessLogic = sharedBusinessLogic;
             StatementBusinessLogic = statementBusinessLogic;
+            _serviceProvider = serviceProvider; 
         }
 
         private DateTime GetReportingDeadline(long organisationId, int year)
@@ -97,7 +99,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <returns>A new instance of the populated ViewModel</returns>
         private TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel) where TViewModel :BaseViewModel
         {
-            var viewModel = Activator.CreateInstance<TViewModel>();
+            var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
             return Mapper.Map(statementModel, viewModel);
         }
 

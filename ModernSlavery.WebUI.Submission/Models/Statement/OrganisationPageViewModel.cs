@@ -5,6 +5,7 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.Submission.Classes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
@@ -15,15 +16,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public OrganisationPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel.SectorModel, OrganisationPageViewModel.SectorViewModel>().ReverseMap();
-
             CreateMap<StatementModel,OrganisationPageViewModel>()
+                .ForMember(s => s.SectorTypes, opt => opt.Ignore())
                 .ForMember(s => s.BackUrl, opt => opt.Ignore())
                 .ForMember(s => s.CancelUrl, opt => opt.Ignore())
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
 
             CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
+                .ForSourceMember(s => s.SectorTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
@@ -35,13 +36,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class OrganisationPageViewModel : BaseViewModel
     {
-        #region Types
-        public class SectorViewModel
+        public OrganisationPageViewModel(SectorTypeIndex sectorTypes)
         {
-            public short Id { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
+            SectorTypes = sectorTypes;
         }
+
+        #region Types
         public enum TurnoverRanges : byte
         {
             //Not Provided
@@ -67,7 +67,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override string PageTitle => "Your organisation";
 
-        public IList<SectorViewModel> Sectors { get; set; }
+        public SectorTypeIndex SectorTypes { get; set; }
+        public IList<short> Sectors { get; set; }
 
         [Display(Name = "What was your turnover or budget during the last financial accounting year?")]
         public TurnoverRanges? Turnover { get; set; }

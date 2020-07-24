@@ -18,7 +18,7 @@
                     nameof(RisksPageViewModel.RelevantRisks)
                 }))
 
-        <h2>@Model.SubTitle</h2>
+            <h2>@Model.SubTitle</h2>
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
@@ -29,13 +29,13 @@
             </h2>
 
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var group in Model.RelevantRisks.Where(x => x.Category == RiskCategories.RiskArea.ToString() && x.ParentId == null))
+                @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
                 {
                     <div class="govuk-accordion__section accordion-with-counts">
                         <div class="govuk-accordion__section-header">
                             <h2 class="govuk-accordion__section-heading">
                                 <span class="govuk-accordion__section-button" id="accordion-default-heading">
-                                    @group.Description
+                                    @parentType.Description
                                 </span>
                             </h2>
                         </div>
@@ -46,28 +46,22 @@
                                         Select all that apply.
                                     </span>
                                     <div class="govuk-checkboxes">
-                                        @foreach (var item in Model.RelevantRisks.Where(x => x.Id == group.ParentId))
+                                        @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
                                         {
                                             <div class="govuk-checkboxes__item">
-                                                <input asp-for="@item.IsSelected" class="govuk-checkboxes__input" id="conditional" name="supply-risk" type="checkbox" data-aria-controls="conditional-conditional">
-                                                <label class="govuk-label govuk-checkboxes__label" for="conditional">
-                                                    @item.Description
+                                                <input name="RelevantRisks.Id" value="@childType.Id" id="@($"RelevantId{childType.Id}")" @(Model.RelevantRisks.Any(r => r.Id == childType.Id) ? "checked" : "") ) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="conditional-conditional">
+                                                <label class="govuk-label govuk-checkboxes__label" for="@($"RelevantId{childType.Id}")">
+                                                    @childType.Description
                                                 </label>
                                             </div>
-                                            //TODO: best way to determine when should have the other box ?
-                                            if (item.Description.Contains("Other"))
-                                            {
-
-                                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional">
-                                                    <div class="govuk-form-group">
-                                                        <label class="govuk-label" for="other">
-                                                            Please specify the @item.Description
-                                                        </label>
-                                                        <input asp-for="@item.Details" class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="other" type="text" maxlength="100">
-                                                    </div>
-                                                    }
+                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional" style="display:@(parentType.Description.Contains("Other") ? "block" : "none")">
+                                                <div class="govuk-form-group">
+                                                    <label class="govuk-label" for="@($"RelevantDetails{childType.Id}")">
+                                                        Please specify the @childType.Description
+                                                    </label>
+                                                    <input name="RelevantRisks.Details" id="@($"RelevantDetails{childType.Id}")" class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="other" type="text" maxlength="100">
                                                 </div>
-                                            }
+                                            </div>
                                         }
                                     </div>
                                     @*<span class="checkbox-count">Selected</span>*@
@@ -88,13 +82,13 @@
                 Which areas of your supply chains do you consider to have the highest risk of modern slavery?
             </h2>
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var group in Model.HighRisks.Where(x => x.ParentId == null))
+                @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
                 {
                     <div class="govuk-accordion__section accordion-with-counts">
                         <div class="govuk-accordion__section-header">
                             <h2 class="govuk-accordion__section-heading">
                                 <span class="govuk-accordion__section-button" id="accordion-default-heading">
-                                    @group.Description
+                                    @parentType.Description
                                 </span>
                             </h2>
                         </div>
@@ -105,20 +99,20 @@
                                         Select up to 3 areas
                                     </span>
                                     <div class="govuk-checkboxes">
-                                        @foreach (var item in Model.HighRisks.Where(x => x.Id == group.ParentId))
+                                        @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
                                         {
                                             <div class="govuk-checkboxes__item">
-                                                <input asp-for="@item.IsSelected" class="govuk-checkboxes__input" id="conditional-high-risk" name="high-risk" type="checkbox" data-aria-controls="conditional-conditional-high-risk">
-                                                <label class="govuk-label govuk-checkboxes__label" for="conditional">
-                                                    @item.Description
+                                                <input name="HighRisks.Id" value="@childType.Id" id="@($"HighId{childType.Id}")" @(Model.HighRisks.Any(r => r.Id == childType.Id) ? "checked" : "") ) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="conditional-conditional-high-risk">
+                                                <label class="govuk-label govuk-checkboxes__label" for="@($"HighId{childType.Id}")">
+                                                    @childType.Description
                                                 </label>
                                             </div>
-                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional-high-risk">
+                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional-high-risk"  style="display:@(parentType.Description.Contains("Other") ? "block" : "none")">
                                                 <div class="govuk-form-group">
-                                                    <label class="govuk-label" for="other">
+                                                    <label class="govuk-label" for="@($"HighDetails{childType.Id}")">
                                                         Please explain why
                                                     </label>
-                                                    <textarea asp-for="@item.Details" class="govuk-textarea" name="other" rows="5" maxlength="250"></textarea>
+                                                    <textarea name="HighRisks.Details" id="@($"HighDetails{childType.Id}")" class="govuk-textarea" rows="5" maxlength="250"></textarea>
                                                 </div>
                                             </div>
                                         }
@@ -140,13 +134,13 @@
                 Which locations do you believe are at higher risk of modern slavery in your operations and supply chains?
             </h2>
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var group in Model.LocationRisks.Where(x => x.Category == RiskCategories.Location.ToString() && x.ParentId == null))
+                @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "Location" && t.ParentId == null))
                 {
                     <div class="govuk-accordion__section accordion-with-counts">
                         <div class="govuk-accordion__section-header">
                             <h2 class="govuk-accordion__section-heading">
                                 <span class="govuk-accordion__section-button" id="accordion-default-heading">
-                                    @group.Description
+                                    @parentType.Description
                                 </span>
                             </h2>
                         </div>
@@ -154,12 +148,12 @@
                             <div class="govuk-form-group">
                                 <fieldset class="govuk-fieldset">
                                     <div class="govuk-checkboxes">
-                                        @foreach (var item in Model.LocationRisks.Where(x => x.Id == group.ParentId))
+                                        @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
                                         {
                                             <div class="govuk-checkboxes__item">
-                                                <input asp-for="@item.IsSelected" class="govuk-checkboxes__input" type="checkbox">
-                                                <label class="govuk-label govuk-checkboxes__label">
-                                                    @item.Description
+                                                <input name="LocationRisks.Id" value="@childType.Id" id="@($"LocationId{childType.Id}")" @(Model.LocationRisks.Any(r => r.Id == childType.Id) ? "checked" : "") ) class="govuk-checkboxes__input" type="checkbox">
+                                                <label class="govuk-label govuk-checkboxes__label" for="@($"LocationId{childType.Id}")">
+                                                    @childType.Description
                                                 </label>
                                             </div>
                                         }

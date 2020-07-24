@@ -3,6 +3,7 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.Submission.Classes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,8 +15,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public TrainingPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel.TrainingModel, TrainingPageViewModel.TrainingViewModel>().ReverseMap();
-
             CreateMap<StatementModel, TrainingPageViewModel>()
                 .ForMember(s => s.BackUrl, opt => opt.Ignore())
                 .ForMember(s => s.CancelUrl, opt => opt.Ignore())
@@ -34,26 +33,23 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class TrainingPageViewModel : BaseViewModel
     {
-        #region Types
-        public class TrainingViewModel
+        public TrainingPageViewModel(TrainingTypeIndex trainingTypes)
         {
-            public short Id { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
+            TrainingTypes = trainingTypes;
         }
-        #endregion
 
         public override string PageTitle => "Training";
 
-        public IList<TrainingViewModel> Training { get; set; }
+        public TrainingTypeIndex TrainingTypes { get; set; }
+        public IList<short> Training { get; set; }
 
         [MaxLength(50)]
         public string OtherTraining { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            var otherTrainingCheckbox = Training.Single(x => x.Description.Equals("Other"));
-            if (otherTrainingCheckbox.IsSelected && OtherTraining.IsNull())
+            var otherId = TrainingTypes.Single(x => x.Description.Equals("other")).Id;
+            if (Training.Contains(otherId) && string.IsNullOrWhiteSpace(OtherTraining))
                 yield return new ValidationResult("Please provide other details");
         }
 

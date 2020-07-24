@@ -35,13 +35,13 @@
             @*TODO: make into a partial view with checkbox counts*@
 
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var group in Model.DueDiligences.Where(x => x.ParentId == null))
+                @foreach (var parentType in Model.DiligenceTypes.Where(x => x.ParentId == null))
                 {
                     <div class="govuk-accordion__section ">
                         <div class="govuk-accordion__section-header">
                             <h2 class="govuk-accordion__section-heading">
                                 <span class="govuk-accordion__section-button" id="accordion-default-heading">
-                                    @group.Description
+                                    @parentType.Description
                                 </span>
                             </h2>
                         </div>
@@ -49,27 +49,22 @@
                             <div class="govuk-form-group">
                                 <fieldset class="govuk-fieldset">
                                     <div class="govuk-checkboxes">
-                                        @foreach (var item in Model.DueDiligences.Where(x => x.Id == group.ParentId))
+                                        @foreach (var childType in Model.DiligenceTypes.Where(t => t.ParentId == parentType.Id))
                                         {
                                             <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input" id="conditional" name="supply-risk" type="checkbox" data-aria-controls="conditional-conditional">
-                                                <label class="govuk-label govuk-checkboxes__label" for="conditional">
-                                                    @item.Description
+                                                <input name="DueDiligences.Id" value="@childType.Id" id="@($"DiligenceId{childType.Id}")" @(Model.DueDiligences.Any(r => r.Id == childType.Id) ? "checked" : "") ) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="conditional-conditional">
+                                                <label class="govuk-label govuk-checkboxes__label" for="@($"DiligenceId{childType.Id}")">
+                                                    @childType.Description
                                                 </label>
                                             </div>
-                                            if (item.Description.Contains("Other"))
-                                            {
-                                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional">
-                                                    <div class="govuk-form-group">
-                                                        <label class="govuk-label" for="other">
-                                                            Please specify other @group.Description
-                                                        </label>
-                                                        <input asp-for="@item.Details" class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="other" type="text">
-                                                    </div>
-                                                    }
+                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional" style="display:@(parentType.Description.Contains("Other") ? "block" : "none")">
+                                                <div class="govuk-form-group">
+                                                    <label class="govuk-label" for="@($"DiligenceDetails{childType.Id}")">
+                                                        Please specify other @parentType.Description
+                                                    </label>
+                                                    <input name="DueDiligences.Details" id="@($"DiligenceDetails{childType.Id}")" class="govuk-input govuk-!-width-one-third" type="text">
                                                 </div>
-                                            }
-
+                                            </div>
                                         }
                                     </div>
                                 </fieldset>

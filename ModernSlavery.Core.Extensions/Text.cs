@@ -52,7 +52,7 @@ namespace ModernSlavery.Core.Extensions
             return Regex.IsMatch(input, "[0-9]");
         }
 
-        public static bool IsNullOrWhiteSpace(this string input, params string[] inputs)
+        public static bool IsAnyNullOrWhiteSpace(this string input, params string[] inputs)
         {
             if (string.IsNullOrWhiteSpace(input)) return true;
 

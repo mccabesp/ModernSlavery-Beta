@@ -2,6 +2,7 @@
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Submission.Classes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,8 +14,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public PoliciesPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel.PolicyModel, PoliciesPageViewModel.PolicyViewModel>().ReverseMap();
-
             CreateMap<StatementModel,PoliciesPageViewModel>()
                 .ForMember(s => s.BackUrl, opt => opt.Ignore())
                 .ForMember(s => s.CancelUrl, opt => opt.Ignore())
@@ -33,25 +32,23 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class PoliciesPageViewModel : BaseViewModel
     {
-        #region Types
-        public class PolicyViewModel
+        public PoliciesPageViewModel(PolicyTypeIndex policyTypes)
         {
-            public short Id { get; set; }
-            public string Description { get; set; }
-            public bool IsSelected { get; set; }
+            PolicyTypes = policyTypes;
         }
-        #endregion
-
         public override string PageTitle => "Policies";
 
-        public IList<PolicyViewModel> Policies { get; set; }
+        public PolicyTypeIndex PolicyTypes { get; set; }
+
+        public IList<short> Policies { get; set; }
 
         public string OtherPolicies { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             //better way to identify this checkbox
-            if (Policies.Single(x => x.Description == "Other").IsSelected && string.IsNullOrWhiteSpace(OtherPolicies))
+            var otherId = PolicyTypes.Single(x => x.Description.Equals("other")).Id;
+            if (Policies.Contains(otherId) && string.IsNullOrWhiteSpace(OtherPolicies))
                 yield return new ValidationResult("Please provide detail on 'other'");
         }
 

@@ -33,17 +33,15 @@
                         select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @for (var i = 0; i < Model.Policies.Count; i++)
+                        @foreach (var policyType in Model.PolicyTypes)
                         {
                             <div class="govuk-checkboxes__item">
-                                <input asp-for="@Model.Policies[i].Id" type="hidden">
-                                <input asp-for="@Model.Policies[i].Description" type="hidden">
-                                <input asp-for="@Model.Policies[i].IsSelected" class="govuk-checkboxes__input" id="policies-conditional" type="checkbox" data-aria-controls="policies-conditional">
-                                <label class="govuk-label govuk-checkboxes__label" for="policies-conditional" asp-for="@Model.Policies[i].IsSelected">
-                                    @Model.Policies[i].Description
+                                <input name="Policies" value="@policyType.Id" id="@($"policy{policyType.Id}")" @(Model.Policies.Contains(policyType.Id) ? "checked" : "")) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="policies-conditional">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"policy{policyType.Id}")">
+                                    @policyType.Description
                                 </label>
                             </div>
-                            @if (Model.Policies[i].Description.Contains("Other"))
+                            @if (policyType.Description.Contains("Other"))
                             {
                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="policies-conditional">
                                     <div class="govuk-form-group">

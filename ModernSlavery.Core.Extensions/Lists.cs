@@ -225,7 +225,13 @@ namespace ModernSlavery.Core.Extensions
                 target[key] = source[key];
         }
 
-        public static Dictionary<TKey, TValue> ToDictionary<TKey,TValue>(this ConcurrentDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
+        public static void AddRange<TKey,TKeyValue>(this IDictionary<TKey, TKeyValue> target, IDictionary<TKey, TKeyValue> source)
+        {
+            foreach (var key in source.Keys)
+                target[key] = source[key];
+        }
+
+        public static Dictionary<TKey, TValue> ToDictionary<TKey,TValue>(this IDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
         {
             return new Dictionary<TKey, TValue>(source, comparer);
         }
