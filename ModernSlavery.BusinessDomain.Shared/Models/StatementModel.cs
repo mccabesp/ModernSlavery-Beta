@@ -46,10 +46,10 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.LocationRisks, opt => opt.MapFrom(st => st.LocationRisks.Select(s => new StatementModel.RisksModel { Id = s.StatementRiskTypeId, Details = s.Details })))
                 .ForMember(dest => dest.DueDiligences, opt => opt.MapFrom(st => st.Diligences.Select(s => new StatementModel.RisksModel { Id = s.StatementDiligenceTypeId, Details = s.Details })))
                 .ForMember(dest => dest.Training, opt => opt.MapFrom(st => st.Training.Select(s => s.StatementTrainingTypeId)))
-                .ForMember(dest => dest.UserId, opt => opt.Ignore())
-                .ForMember(dest => dest.Timestamp, opt => opt.Ignore())
-                .ForMember(dest => dest.BackupDate, opt => opt.Ignore())
-                .ForMember(dest => dest.CanRevertToBackup, opt => opt.Ignore());
+                .ForMember(dest => dest.EditorUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.EditTimestamp, opt => opt.Ignore())
+                .ForMember(dest => dest.DraftBackupDate, opt => opt.Ignore())
+                .ForMember(dest => dest.CanRevertToOriginal, opt => opt.Ignore());
         }
     }
 
@@ -102,17 +102,16 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
             Over5Years = 3,
         }
 
-        public bool CanRevertToBackup { get; set; }
+        public bool CanRevertToOriginal { get; set; }
 
-        public long UserId { get; set; }
-        public DateTime Timestamp { get; set; }
+        public long EditorUserId { get; set; }
+        public DateTime EditTimestamp { get; set; }
 
         public long? StatementId { get; set; }
 
         public string OrganisationName { get; set; }
 
-        public DateTime? BackupDate { get; set; }
-
+        public DateTime? DraftBackupDate { get; set; }
         public StatementStatuses Status { get; set; }
 
         public DateTime? StatusDate { get; set; }

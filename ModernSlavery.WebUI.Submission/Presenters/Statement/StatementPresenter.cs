@@ -125,7 +125,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             if (openOutcome.Result == null) throw new ArgumentNullException(nameof(openOutcome.Result));
             var statementModel = openOutcome.Result;
 
-            if (statementModel.UserId != userId) throw new ArgumentException(nameof(openOutcome.Result.UserId));
+            if (statementModel.EditorUserId != userId) throw new ArgumentException(nameof(openOutcome.Result.EditorUserId));
 
             return new Outcome<StatementErrors, StatementModel>(statementModel);
         }

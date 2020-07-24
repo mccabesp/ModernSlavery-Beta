@@ -90,8 +90,9 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// Saves a statement model as draft data to storage and deletes any deletes any draft data and draft backups.
         /// </summary>
         /// <param name="statementModel">The statement model to save</param>
+        /// <param name="createBackup">Whether to backup any previous file (default=false)</param>
         /// <returns>Nothing</returns>
-        Task SaveDraftStatementModelAsync(StatementModel statementModel);
+        Task SaveDraftStatementModelAsync(StatementModel statementModel, bool createBackup = false);
 
         /// <summary>
         /// Saves a statement model as submitted data to storage and deletes any deletes any draft data and draft backups.
@@ -105,7 +106,6 @@ namespace ModernSlavery.BusinessDomain.Submission
 
     partial class StatementBusinessLogic : IStatementBusinessLogic
     {
-
         private readonly SubmissionOptions _submissionOptions;
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
         private readonly IMapper _mapper;
@@ -295,7 +295,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var statementModel = await FindDraftStatementModelAsync(organisation.OrganisationId, reportingDeadline);
             if (statementModel != null)
             {
-                statementInfoModel.DraftStatementModifiedDate = statementModel.Timestamp;
+                statementInfoModel.DraftStatementModifiedDate = statementModel.EditTimestamp;
                 statementInfoModel.DraftStatementIsEmpty = statementModel.IsEmpty();
             }
 
@@ -373,70 +373,68 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Check the reporting deadlin
             CheckReportingDeadline(organisation, reportingDeadline);
 
+            //Check if it is too late to edit
+            if (reportingDeadline.Date.AddDays(0 - _submissionOptions.DeadlineExtensionDays) < VirtualDateTime.Now.Date)
+                return new Outcome<StatementErrors, StatementModel>(StatementErrors.TooLate);
+
             //Check the user can edit this statement
             if (!organisation.GetUserIsRegistered(userId))
                 return new Outcome<StatementErrors, StatementModel>(StatementErrors.Unauthorised);
 
             //Try and get the draft first
-            var statementModel = await FindDraftStatementModelAsync(organisationId, reportingDeadline);
+            var draftStatement = await FindDraftStatementModelAsync(organisationId, reportingDeadline);
 
-            //Check if the existing statement is owned by another user
-            if (statementModel != null && statementModel.UserId != userId)
-            { 
-                //Check if the existing statement is still locked 
-                if (statementModel.Timestamp.AddMinutes(_submissionOptions.DraftTimeoutMinutes) > VirtualDateTime.Now)
-                    return new Outcome<StatementErrors, StatementModel>(StatementErrors.Locked);
-
-                //Delete the other users draft file and its backup
-                await DeleteDraftStatementModelAsync(organisationId, reportingDeadline);
-
-                statementModel = null;
-            }
-
-            if (statementModel == null)
+            var createBackup = false;
+            if (draftStatement == null)
             {
-                statementModel = new StatementModel();
-                statementModel.UserId = userId;
-                statementModel.Timestamp = VirtualDateTime.Now;
+                //Create a new draft statement
+                draftStatement = new StatementModel();
 
+                //Get the statement to map from
                 var submittedStatement = await FindSubmittedStatementAsync(organisationId, reportingDeadline);
-                if (submittedStatement != null)
-                {
-                    //Check its not too late to edit 
-                    if (submittedStatement.SubmissionDeadline.Date.AddDays(0 - _submissionOptions.DeadlineExtensionDays) < VirtualDateTime.Now.Date)
-                        return new Outcome<StatementErrors, StatementModel>(StatementErrors.TooLate);
+                if (submittedStatement == null) submittedStatement = new Statement();
 
-                    //Load data from statement entity into the statementmodel
-                    _mapper.Map(submittedStatement, statementModel);
-
-                    statementModel.BackupDate = submittedStatement.Modified;
-                    statementModel.CanRevertToBackup = true;
-                }
-                else
-                {
-                    submittedStatement = new Statement();
-                    submittedStatement.Organisation = organisation;
-
-                    //Load data from statement entity into the statementmodel
-                    _mapper.Map(submittedStatement, statementModel);
-
-                    statementModel.OrganisationId = organisationId;
-                    statementModel.SubmissionDeadline = reportingDeadline;
-                }
+                //Load the statement entity into the statementmodel
+                _mapper.Map(submittedStatement, draftStatement);
             }
+
+            else
+            {
+                //Check if the existing draft lock has expired
+                var draftExpired = draftStatement.EditTimestamp.AddMinutes(_submissionOptions.DraftTimeoutMinutes) < VirtualDateTime.Now;
+                
+                //If the draft has expired then remember to create a backup
+                createBackup = draftExpired;
+
+                //Check the existing draft is not still locked by another user
+                if (draftStatement.EditorUserId != userId && !draftExpired)
+                    return new Outcome<StatementErrors, StatementModel>(StatementErrors.Locked);
+            }
+
+            //Set the key priorities
+            draftStatement.EditorUserId = userId;
+            draftStatement.EditTimestamp = VirtualDateTime.Now;
+            draftStatement.OrganisationId = organisationId;
+            draftStatement.SubmissionDeadline = reportingDeadline;
 
             //Save new statement model with timestamp to lock to new user
-            await SaveDraftStatementModelAsync(statementModel);
-            statementModel.CanRevertToBackup = false;
+            await SaveDraftStatementModelAsync(draftStatement,createBackup);
+            draftStatement.CanRevertToOriginal = draftStatement.StatementId>0;
 
-            var draftBackupFilePath = GetDraftBackupFilepath(statementModel.OrganisationId, statementModel.SubmissionDeadline.Year);
-            if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
+            if (draftStatement.DraftBackupDate==null)
             {
-                statementModel.BackupDate = await _sharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(draftBackupFilePath);
-                statementModel.CanRevertToBackup = statementModel.BackupDate.Value.AddMinutes(_submissionOptions.DraftTimeoutMinutes) < VirtualDateTime.Now;
+                var draftBackupFilePath = GetDraftBackupFilepath(draftStatement.OrganisationId, draftStatement.SubmissionDeadline.Year);
+                if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
+                {
+                    //Get the draft backup date
+                    draftStatement.DraftBackupDate = await _sharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(draftBackupFilePath);
+
+                    //Allow revert to backup if backup exists and has timedout
+                    draftStatement.CanRevertToOriginal = draftStatement.StatementId > 0 || draftStatement.DraftBackupDate.Value.AddMinutes(_submissionOptions.DraftTimeoutMinutes) < VirtualDateTime.Now;
+                }
             }
 
-            return new Outcome<StatementErrors, StatementModel>(statementModel);
+            return new Outcome<StatementErrors, StatementModel>(draftStatement);
         }
 
         public async Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId)
@@ -465,12 +463,12 @@ namespace ModernSlavery.BusinessDomain.Submission
             return new Outcome<StatementErrors>();
         }
 
-        public async Task SaveDraftStatementModelAsync(StatementModel statementModel)
+        public async Task SaveDraftStatementModelAsync(StatementModel statementModel, bool createBackup=false)
         {
             //Validate the parameters
             if (statementModel == null) throw new ArgumentNullException(nameof(statementModel));
             if (statementModel.OrganisationId == 0) throw new ArgumentOutOfRangeException(nameof(statementModel.OrganisationId));
-            if (statementModel.UserId == 0) throw new ArgumentOutOfRangeException(nameof(statementModel.UserId));
+            if (statementModel.EditorUserId == 0) throw new ArgumentOutOfRangeException(nameof(statementModel.EditorUserId));
             
             //Try and get the organisation
             var organisation = _sharedBusinessLogic.DataRepository.Get<Organisation>(statementModel.OrganisationId);
@@ -480,16 +478,19 @@ namespace ModernSlavery.BusinessDomain.Submission
             CheckReportingDeadline(organisation, statementModel.SubmissionDeadline);
 
             //Check the user can edit this statement
-            if (!organisation.GetUserIsRegistered(statementModel.UserId))
-                throw new SecurityException($"User {statementModel.UserId} does not have permission to submit for organisation {statementModel.OrganisationId}");
+            if (!organisation.GetUserIsRegistered(statementModel.EditorUserId))
+                throw new SecurityException($"User {statementModel.EditorUserId} does not have permission to submit for organisation {statementModel.OrganisationId}");
 
             //Get the current draft filepath
             var draftFilePath = GetDraftFilepath(statementModel.OrganisationId, statementModel.SubmissionDeadline.Year);
 
             //Create a backup if required
-            var draftBackupFilePath = GetDraftBackupFilepath(statementModel.OrganisationId, statementModel.SubmissionDeadline.Year);
-            if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath) && await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath))
-                await _sharedBusinessLogic.FileRepository.CopyFileAsync(draftFilePath, draftBackupFilePath, false);
+            if (createBackup)
+            {
+                var draftBackupFilePath = GetDraftBackupFilepath(statementModel.OrganisationId, statementModel.SubmissionDeadline.Year);
+                if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath) && await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath))
+                    await _sharedBusinessLogic.FileRepository.CopyFileAsync(draftFilePath, draftBackupFilePath, false);
+            }
 
             //Save the new draft data 
             var draftJson = JsonConvert.SerializeObject(statementModel);
