@@ -44,7 +44,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public const string SicCodes_InterFloor = "Public Sector, General public administration activities";
 
 
-        public const string OrgName_CantFind = "";
+        public const string OrgName_CantFind = "QWERTYUIOPQWERTYUIOP";
         public const string CompanyNumber_CantFind = "";
         public const string CharityNumber_CantFind = "";
         public const string MutualPartnerShipNumber_CantFind = "";
