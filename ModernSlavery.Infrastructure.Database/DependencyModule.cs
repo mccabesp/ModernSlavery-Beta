@@ -72,8 +72,8 @@ namespace ModernSlavery.Infrastructure.Database
                     var _dataImporter = lifetimeScope.Resolve<IDataImporter>();
 
                     _dataImporter.ImportOrganisationsAsync().Wait();
-                    _dataImporter.ImportSICCodesAsync().Wait();
                     _dataImporter.ImportSICSectionsAsync().Wait();
+                    _dataImporter.ImportSICCodesAsync().Wait();
                     _dataImporter.ImportStatementDiligenceTypesAsync().Wait();
                     _dataImporter.ImportStatementPolicyTypesAsync().Wait();
                     _dataImporter.ImportStatementRiskTypesAsync().Wait();
