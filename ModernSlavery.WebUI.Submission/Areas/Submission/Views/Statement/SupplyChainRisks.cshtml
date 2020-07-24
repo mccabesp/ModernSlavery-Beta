@@ -12,8 +12,6 @@
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
         {
-            var controller = ViewData["Controller"] as BaseController;
-
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ContinueUrl);

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using System;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -74,20 +75,20 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("Please provide the detail for: Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions");
         }
 
-        public override bool IsComplete()
+        public override bool IsComplete(IServiceProvider serviceProvider)
         {
             return IncludesStructure.HasValue
-                && ((IncludesStructure == true) || !StructureDetails.IsNullOrWhiteSpace())
+                && ((IncludesStructure == true) || !string.IsNullOrWhiteSpace(StructureDetails))
                 && IncludesPolicies.HasValue
-                && ((IncludesPolicies == true) || !PolicyDetails.IsNullOrWhiteSpace())
+                && ((IncludesPolicies == true) || !string.IsNullOrWhiteSpace(PolicyDetails))
                 && IncludesRisks.HasValue
-                && ((IncludesRisks == true) || !RisksDetails.IsNullOrWhiteSpace())
+                && ((IncludesRisks == true) || !string.IsNullOrWhiteSpace(RisksDetails))
                 && IncludesDueDiligence.HasValue
-                && ((IncludesDueDiligence == true) || !DueDiligenceDetails.IsNullOrWhiteSpace())
+                && ((IncludesDueDiligence == true) || !string.IsNullOrWhiteSpace(DueDiligenceDetails))
                 && IncludesTraining.HasValue
-                && ((IncludesTraining == true) || !TrainingDetails.IsNullOrWhiteSpace())
+                && ((IncludesTraining == true) || !string.IsNullOrWhiteSpace(TrainingDetails))
                 && IncludesGoals.HasValue
-                && ((IncludesGoals == true) || !GoalsDetails.IsNullOrWhiteSpace());
+                && ((IncludesGoals == true) || !string.IsNullOrWhiteSpace(GoalsDetails));
 
 
         }

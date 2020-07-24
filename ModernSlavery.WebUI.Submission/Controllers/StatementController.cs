@@ -139,7 +139,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.ContinueUrl = ReturnUrl;
                     break;
                 case CancelPageViewModel vm:
-                    vm.BackUrl = HttpContext.GetUrlReferrer().PathAndQuery;
+                    vm.BackUrl = HttpContext.GetUrlReferrer()==null ? Url.Action(nameof(this.ReviewAndEdit), GetOrgAndYearRouteData()) : HttpContext.GetUrlReferrer().PathAndQuery;
                     vm.CancelUrl = vm.BackUrl;
                     vm.ContinueUrl = ReturnUrl;
                     break;
@@ -437,9 +437,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(CancelPageViewModel viewModel, string organisationIdentifier, int year)
         {
-            //Validate the submitted ViewModel data
-            if (!ModelState.IsValid) return View(viewModel);
-
             //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
             var viewModelResult = await SubmissionPresenter.CancelDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
 

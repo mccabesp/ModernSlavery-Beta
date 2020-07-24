@@ -1,14 +1,22 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    var yourStatementComplete = Model.YourStatement.IsComplete(serviceProvider);
+    var complianceComplete = Model.Compliance.IsComplete(serviceProvider);
+    var organisationComplete = Model.Organisation.IsComplete(serviceProvider);
+    var policiesComplete = Model.Policies.IsComplete(serviceProvider);
+    var risksComplete = Model.Risks.IsComplete(serviceProvider);
+    var diligenceComplete = Model.DueDiligence.IsComplete(serviceProvider);
+    var trainingComplete = Model.Training.IsComplete(serviceProvider);
+    var progressComplete = Model.Progress.IsComplete(serviceProvider);
+
 }
 @model ReviewPageViewModel
+@inject IServiceProvider serviceProvider;
 <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
         {
-            var controller = ViewData["Controller"] as BaseController;
-
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ContinueUrl);
@@ -31,7 +39,7 @@
                                     Your modern slavery statement
                                 </a>
                             </span>
-                            <strong class="@(Model.YourStatement.IsComplete() ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="slavery-statement">@(Model.YourStatement.IsComplete() ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            <strong class="@(yourStatementComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="slavery-statement">@(yourStatementComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -39,7 +47,7 @@
                                     Areas covered by your modern statement
                                 </a>
                             </span>
-                            <strong class="@(Model.Compliance.IsComplete() ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="compliance">@(Model.Compliance.IsComplete() ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            <strong class="@(complianceComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="compliance">@(complianceComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
                         </li>
                     </ul>
                 </li>
@@ -55,7 +63,7 @@
                                     Your Organisation
                                 </a>
                             </span>
-                            <strong class="@(Model.Organisation.IsComplete() ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="organisation">@(Model.Organisation.IsComplete() ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            <strong class="@(organisationComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="organisation">@(organisationComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -63,7 +71,7 @@
                                     Policies
                                 </a>
                             </span>
-                            <strong class="@(Model.Policies.IsComplete() ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="policies">@(Model.Policies.IsComplete() ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            <strong class="@(policiesComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="policies">@(policiesComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -71,7 +79,7 @@
                                     Supply chain risks and due diligence (part 1)
                                 </a>
                             </span>
-                            <strong class="@(Model.Risks.IsComplete() ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="supply-risks-part-1">@(Model.Risks.IsComplete() ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            <strong class="@(risksComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="supply-risks-part-1">@(risksComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -79,7 +87,7 @@
                                     Supply chain risks and due diligence (part 2)
                                 </a>
                             </span>
-                            <strong class="@(Model.DueDiligence.IsComplete() ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="supply-risks-part-2">@(Model.DueDiligence.IsComplete() ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            <strong class="@(diligenceComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="supply-risks-part-2">@(diligenceComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -87,7 +95,7 @@
                                     Training
                                 </a>
                             </span>
-                            <strong class="@(Model.Training.IsComplete() ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="training">@(Model.Training.IsComplete() ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            <strong class="@(trainingComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="training">@(trainingComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -95,14 +103,12 @@
                                     Monitoring Progress
                                 </a>
                             </span>
-                            <strong class="@(Model.Progress.IsComplete() ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="monitoring-progress">@(Model.Progress.IsComplete() ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            <strong class="@(progressComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="monitoring-progress">@(progressComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
                         </li>
                     </ul>
                 </li>
             </ol>
-            @if (Model.YourStatement.IsComplete() && Model.Compliance.IsComplete())
-            {
-            <button class="govuk-button" data-module="govuk-button" type="submit" >
+            <button class="govuk-button" data-module="govuk-button" type="submit">
                 Confirm and Submit
             </button>
             <a href="@Model.ContinueUrl" asp- class="govuk-button" data-module="govuk-button">

@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
+using System;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -33,7 +34,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public override string PageTitle => "Policies";
 
-        public IList<short> Policies { get; set; }
+        public List<short> Policies { get; set; } = new List<short>();
 
         public string OtherPolicies { get; set; }
 
@@ -44,14 +45,20 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             //better way to identify this checkbox
             var otherId = policyTypes.Single(x => x.Description.Equals("Other")).Id;
+
             if (Policies.Contains(otherId) && string.IsNullOrWhiteSpace(OtherPolicies))
                 yield return new ValidationResult("Please provide detail on 'other'");
         }
 
-        public override bool IsComplete()
+        public override bool IsComplete(IServiceProvider serviceProvider)
         {
-            return Policies.Any(x => x.IsSelected)
-                && !Policies.Single(x => x.Description == "Other").IsSelected || !OtherPolicies.IsNullOrWhiteSpace();
+            //Get the policy types
+            var policyTypes = serviceProvider.GetService<PolicyTypeIndex>();
+
+            var other = policyTypes.Single(x => x.Description.Equals("Other"));
+
+            return Policies.Any()
+                && !Policies.Any(p=>p==other.Id && string.IsNullOrWhiteSpace(OtherPolicies));
         }
     }
 }

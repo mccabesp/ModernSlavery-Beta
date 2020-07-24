@@ -112,22 +112,22 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("Please complete the Approved Date");
 
             var detailsList = new List<string> { ApproverFirstName, ApproverLastName, ApproverJobTitle };
-            if (detailsList.Any(x => x.IsNullOrWhiteSpace()) && !detailsList.Any(x => x.IsNullOrWhiteSpace()))
+            if (detailsList.Any(x => string.IsNullOrWhiteSpace(x)) && !detailsList.Any(x => string.IsNullOrWhiteSpace(x)))
                 yield return new ValidationResult("Please complete First name, Last name, Job title");
         }
 
-        public override bool IsComplete()
+        public override bool IsComplete(IServiceProvider serviceProvider)
         {
-            return !StatementUrl.IsNullOrWhiteSpace()
+            return !string.IsNullOrWhiteSpace(StatementUrl)
                 && StatementStartDay.HasValue
                 && StatementStartMonth.HasValue
                 && StatementStartYear.HasValue
                 && StatementEndDay.HasValue
                 && StatementEndMonth.HasValue
                 && StatementEndYear.HasValue
-                && !ApproverFirstName.IsNullOrWhiteSpace()
-                && !ApproverLastName.IsNullOrWhiteSpace()
-                && !ApproverJobTitle.IsNullOrWhiteSpace()
+                && !string.IsNullOrWhiteSpace(ApproverFirstName)
+                && !string.IsNullOrWhiteSpace(ApproverLastName)
+                && !string.IsNullOrWhiteSpace(ApproverJobTitle)
                 && ApprovedDay.HasValue
                 && ApprovedMonth.HasValue
                 && ApprovedYear.HasValue;

@@ -455,6 +455,13 @@ namespace ModernSlavery.BusinessDomain.Submission
                 //Delete the backup draft
                 await _sharedBusinessLogic.FileRepository.DeleteFileAsync(draftBackupFilePath);
             }
+
+            if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath))
+            {
+                //Delete the draft
+                await _sharedBusinessLogic.FileRepository.DeleteFileAsync(draftFilePath);
+            }
+
             return new Outcome<StatementErrors>();
         }
 

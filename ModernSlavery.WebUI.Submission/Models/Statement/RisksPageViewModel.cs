@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
+using System;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -51,16 +52,21 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string PageTitle => "Supply chain risks and due diligence";
         public override string SubTitle => "Part 1";
 
-        public List<RiskViewModel> RelevantRisks { get; set; }
+        public List<RiskViewModel> RelevantRisks { get; set; } = new List<RiskViewModel>();
         public string OtherRelevantRisks;
 
-        public List<RiskViewModel> HighRisks { get; set; }
+        public List<RiskViewModel> HighRisks { get; set; } = new List<RiskViewModel>();
         public string OtherHighRisks;
 
-        public List<RiskViewModel> LocationRisks { get; set; }
+        public List<RiskViewModel> LocationRisks { get; set; } = new List<RiskViewModel>();
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            //Remove all the empty risks
+            RelevantRisks.RemoveAll(r => r.Id == 0);
+            HighRisks.RemoveAll(r => r.Id == 0);
+            LocationRisks.RemoveAll(r => r.Id == 0);
+
             //Get the risk types
             var riskTypes=validationContext.GetService<RiskTypeIndex>();
 
@@ -103,25 +109,24 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult($"Please explain why {riskTypes.Single(r=>r.Id==risk.Id).Description} is one of your highest risks");
         }
 
-        public override bool IsComplete()
+        public override bool IsComplete(IServiceProvider serviceProvider)
         {
-            var vulnerableGroup = RelevantRisks.Single(x => x.Description.Equals("Other vulnerable groups"));
-            var typeOfWork = RelevantRisks.Single(x => x.Description.Equals("Other type of work"));
-            var sector = RelevantRisks.Single(x => x.Description.Equals("Other sector"));
-            var vulnerableGroupHighRisk = HighRisks.Single(x => x.Description.Equals("Other vulnerable groups"));
-            var typeOfWorkHighDetails = HighRisks.Single(x => x.Description.Equals("Other type of work"));
-            var sectorHighDetails = HighRisks.Single(x => x.Description.Equals("Other sector"));
+            //Get the risk types
+            var riskTypes = serviceProvider.GetService<RiskTypeIndex>();
 
-            return RelevantRisks.Any(x => x.IsSelected)
-                && HighRisks.Any(x => x.IsSelected)
-                && LocationRisks.Any(x => x.IsSelected)
-                && !vulnerableGroup.IsSelected || !vulnerableGroup.Details.IsNullOrWhiteSpace()
-                && !typeOfWork.IsSelected || !typeOfWork.Details.IsNullOrWhiteSpace()
-                && !sector.IsSelected || !sector.Details.IsNullOrWhiteSpace()
-                && !vulnerableGroup.IsSelected || !vulnerableGroup.Details.IsNullOrWhiteSpace()
-                && !typeOfWorkHighDetails.IsSelected || !typeOfWorkHighDetails.Details.IsNullOrWhiteSpace()
-                && !sectorHighDetails.IsSelected || !sectorHighDetails.Details.IsNullOrWhiteSpace()
-                && HighRisks.All(x => !x.IsSelected || !x.Details.IsNullOrWhiteSpace());
+            var vulnerableGroup = riskTypes.Single(x => x.Description.Equals("Other vulnerable groups"));
+            var typeOfWork = riskTypes.Single(x => x.Description.Equals("Other type of work"));
+            var sector = riskTypes.Single(x => x.Description.Equals("Other sector"));
+
+            return RelevantRisks.Any()
+                && HighRisks.Any()
+                && LocationRisks.Any()
+                && !RelevantRisks.Any(r=>r.Id==vulnerableGroup.Id && string.IsNullOrWhiteSpace(r.Details))
+                && !RelevantRisks.Any(r => r.Id == typeOfWork.Id && string.IsNullOrWhiteSpace(r.Details))
+                && !RelevantRisks.Any(r => r.Id == sector.Id && string.IsNullOrWhiteSpace(r.Details))
+                && !HighRisks.Any(r => r.Id == vulnerableGroup.Id && string.IsNullOrWhiteSpace(r.Details))
+                && !HighRisks.Any(r => r.Id == typeOfWork.Id && string.IsNullOrWhiteSpace(r.Details))
+                && !HighRisks.Any(r => r.Id == sector.Id && string.IsNullOrWhiteSpace(r.Details));
         }
     }
 }

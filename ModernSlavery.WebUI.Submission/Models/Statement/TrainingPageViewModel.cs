@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
+using System;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -33,7 +34,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public override string PageTitle => "Training";
 
-        public IList<short> Training { get; set; }
+        public List<short> Training { get; set; } = new List<short>();
 
         [MaxLength(50)]
         public string OtherTraining { get; set; }
@@ -44,14 +45,20 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             var trainingTypes = validationContext.GetService<TrainingTypeIndex>();
 
             var otherId = trainingTypes.Single(x => x.Description.Equals("Other")).Id;
+
             if (Training.Contains(otherId) && string.IsNullOrWhiteSpace(OtherTraining))
                 yield return new ValidationResult("Please provide other details");
         }
 
-        public override bool IsComplete()
+        public override bool IsComplete(IServiceProvider serviceProvider)
         {
-            return Training.Any(x => x.IsSelected)
-                && !Training.Single(x => x.Description.Equals("Other")).IsSelected || !OtherTraining.IsNullOrWhiteSpace();
+            //Get the training types
+            var trainingTypes = serviceProvider.GetService<TrainingTypeIndex>();
+
+            var other = trainingTypes.Single(x => x.Description.Equals("Other"));
+
+            return Training.Any() 
+                && !Training.Any(t=>t==other.Id && string.IsNullOrWhiteSpace(OtherTraining));
         }
     }
 }

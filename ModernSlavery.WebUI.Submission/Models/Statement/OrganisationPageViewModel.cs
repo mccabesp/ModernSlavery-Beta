@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
+using System;
+using System.Linq;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -57,7 +59,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override string PageTitle => "Your organisation";
 
-        public IList<short> Sectors { get; set; }
+        public List<short> Sectors { get; set; } = new List<short>();
 
         [Display(Name = "What was your turnover or budget during the last financial accounting year?")]
         public TurnoverRanges? Turnover { get; set; }
@@ -70,9 +72,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             yield break;
         }
 
-        public override bool IsComplete()
+        public override bool IsComplete(IServiceProvider serviceProvider)
         {
-            return Sectors.Any(x => x.IsSelected)
+            return Sectors.Any()
                 && Turnover != TurnoverRanges.NotProvided;
         }
     }

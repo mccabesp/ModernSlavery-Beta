@@ -5,19 +5,20 @@
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
-        {          
+        {
             @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.ContinueUrl);
 
             <h1 class="govuk-heading-l">
                 You have unsaved data, what do you want to do?
             </h1>
 
-            <a class="govuk-button govuk-button--secondary" href="@Model.CancelUrl">
-                Exit without saving
-            </a>
-            <button class="govuk-button" data-module="govuk-button" type="submit">
-                Save the data
+            <button class="govuk-button" data-module="govuk-button">
+                Exit and lose changes
             </button>
+            <a class="govuk-button govuk-button--secondary" href="@Model.BackUrl">
+                Cancel
+            </a>
         }
 
     </div>

@@ -256,44 +256,44 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public bool IsEmpty()
         {
-            return StatementUrl.IsNullOrWhiteSpace()
+            return string.IsNullOrWhiteSpace(StatementUrl)
                 && StatementStartDate == null
                 && StatementEndDate == null
-                && ApproverFirstName.IsNullOrWhiteSpace()
-                && ApproverLastName.IsNullOrWhiteSpace()
-                && ApproverJobTitle.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(ApproverFirstName)
+                && string.IsNullOrWhiteSpace(ApproverLastName)
+                && string.IsNullOrWhiteSpace(ApproverJobTitle)
                 && ApprovedDate == null
                 && IncludesStructure == null
-                && StructureDetails.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(StructureDetails)
                 && IncludesPolicies == null
-                && PolicyDetails.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(PolicyDetails)
                 && IncludesRisks == null
-                && RisksDetails.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(RisksDetails)
                 && IncludesDueDiligence == null
-                && DueDiligenceDetails.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(DueDiligenceDetails)
                 && IncludesTraining == null
-                && TrainingDetails.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(TrainingDetails)
                 && IncludesGoals == null
-                && GoalsDetails.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(GoalsDetails)
                 && Sectors == null
-                && OtherSector.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(OtherSector)
                 && Turnover == TurnoverRanges.NotProvided
                 && Policies == null
-                && OtherPolicies.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(OtherPolicies)
                 && RelevantRisks == null
-                && OtherRelevantRisks.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(OtherRelevantRisks)
                 && HighRisks == null
-                && OtherHighRisks.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(OtherHighRisks)
                 && LocationRisks == null
                 && DueDiligences == null
-                && ForcedLabourDetails.IsNullOrWhiteSpace()
-                && SlaveryInstanceDetails.IsNullOrWhiteSpace()
-                && SlaveryInstanceRemediation.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(ForcedLabourDetails)
+                && string.IsNullOrWhiteSpace(SlaveryInstanceDetails)
+                && string.IsNullOrWhiteSpace(SlaveryInstanceRemediation)
                 && Training == null
-                && TrainingDetails.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(TrainingDetails)
                 && IncludesMeasuringProgress == null
-                && ProgressMeasures.IsNullOrWhiteSpace()
-                && KeyAchievements.IsNullOrWhiteSpace()
+                && string.IsNullOrWhiteSpace(ProgressMeasures)
+                && string.IsNullOrWhiteSpace(KeyAchievements)
                 && StatementYears == YearRanges.NotProvided;
 
         }

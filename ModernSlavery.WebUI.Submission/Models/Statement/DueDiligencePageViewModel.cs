@@ -76,14 +76,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string PageTitle => "Supply chain risks and due diligence";
         public override string SubTitle => "Part 2";
 
-        public List<DueDiligenceViewModel> DueDiligences { get; set; }
+        public List<DueDiligenceViewModel> DueDiligences { get; set; } = new List<DueDiligenceViewModel>();
 
-        public bool HasForceLabour { get; set; }
+        public bool? HasForceLabour { get; set; }
 
         [MaxLength(500)]
         public string ForcedLabourDetails { get; set; }
 
-        public bool HasSlaveryInstance { get; set; }
+        public bool? HasSlaveryInstance { get; set; }
 
         [MaxLength(500)]
         public string SlaveryInstanceDetails { get; set; }
@@ -131,6 +131,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            //Remove all the empty due diligences
+            DueDiligences.RemoveAll(r => r.Id == 0);
+
             //Get the diligence types
             var diligenceTypes = validationContext.GetService<DiligenceTypeIndex>();
 
@@ -149,17 +152,20 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             //if (HasSlaveryInstance == true & SlaveryInstanceRemediation.None(x => x.IsSelected))
             //    validationResults.Add(new ValidationResult("Please provide the detail"));
         }
-        public override bool IsComplete()
+        public bool IsComplete(IServiceProvider serviceProvider)
         {
-            var otherSocialAudit = DueDiligences.Single(x => x.Description.Equals("other"));
+            //Get the risk types
+            var diligenceTypes = serviceProvider.GetService<DiligenceTypeIndex>();
 
-            return DueDiligences.Any(x => x.IsSelected)
+            var otherSocialAudit = diligenceTypes.Single(x => x.Description.EqualsI("other type of social audit"));
+
+            return DueDiligences.Any()
                 && HasForceLabour.HasValue
                 && HasSlaveryInstance.HasValue
-                && !otherSocialAudit.IsSelected || !otherSocialAudit.Details.IsNullOrWhiteSpace()
-                && HasForceLabour == false || !ForcedLabourDetails.IsNullOrWhiteSpace()
-                && HasSlaveryInstance == false || !SlaveryInstanceDetails.IsNullOrWhiteSpace()
-                && HasSlaveryInstance == false || !SlaveryInstanceRemediation.IsNullOrWhiteSpace();
+                && !DueDiligences.Any(d=>d.Id==otherSocialAudit.Id && string.IsNullOrWhiteSpace(d.Details))
+                && HasForceLabour == false || !string.IsNullOrWhiteSpace(ForcedLabourDetails)
+                && HasSlaveryInstance == false || !string.IsNullOrWhiteSpace(SlaveryInstanceDetails)
+                && HasSlaveryInstance == false || !string.IsNullOrWhiteSpace(SlaveryInstanceRemediation);
         }
     }
 }

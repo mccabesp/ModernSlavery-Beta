@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -64,20 +66,21 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (Progress.Validate(validationContext).Any())
                 yield return new ValidationResult($"Section '{Progress.PageTitle}' is invalid");
 
-            if (!IsComplete())
+            var serviceProvider = validationContext.GetService<IServiceProvider>();
+            if (!IsComplete(serviceProvider))
                 yield return new ValidationResult("You must first complete all sections before you can submit");
         }
 
-        public override bool IsComplete()
+        public override bool IsComplete(IServiceProvider serviceProvider)
         {
-            return YourStatement.IsComplete() 
-                && Compliance.IsComplete() 
-                && Organisation.IsComplete() 
-                && Policies.IsComplete() 
-                && Risks.IsComplete() 
-                && DueDiligence.IsComplete() 
-                && Training.IsComplete() 
-                && Progress.IsComplete();
+            return YourStatement.IsComplete(serviceProvider) 
+                && Compliance.IsComplete(serviceProvider) 
+                && Organisation.IsComplete(serviceProvider) 
+                && Policies.IsComplete(serviceProvider) 
+                && Risks.IsComplete(serviceProvider) 
+                && DueDiligence.IsComplete(serviceProvider) 
+                && Training.IsComplete(serviceProvider) 
+                && Progress.IsComplete(serviceProvider);
         }
     }
 }
