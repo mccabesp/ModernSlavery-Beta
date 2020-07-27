@@ -35,16 +35,16 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.Statuses, opt => opt.Ignore());
 
             CreateMap<Statement, StatementModel>()
-                .ForMember(d => d.StatementStartDate,opt=>opt.MapFrom(s=>s.StatementStartDate==DateTime.MinValue ? (DateTime?)null : s.StatementStartDate))
+                .ForMember(d => d.StatementStartDate, opt => opt.MapFrom(s => s.StatementStartDate == DateTime.MinValue ? (DateTime?)null : s.StatementStartDate))
                 .ForMember(d => d.StatementEndDate, opt => opt.MapFrom(s => s.StatementEndDate == DateTime.MinValue ? (DateTime?)null : s.StatementEndDate))
                 .ForMember(d => d.ApprovedDate, opt => opt.MapFrom(s => s.ApprovedDate == DateTime.MinValue ? (DateTime?)null : s.ApprovedDate))
-                .ForMember(d => d.OrganisationName, opt=>opt.MapFrom(s=>s.Organisation.OrganisationName))
-                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>(s.MinStatementYears, s.MaxStatementYears==null ? 0 : s.MaxStatementYears.Value)))
-                .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>(s.MinTurnover, s.MaxTurnover==null ? 0 : s.MaxTurnover.Value)))
+                .ForMember(d => d.OrganisationName, opt => opt.MapFrom(s => s.Organisation.OrganisationName))
+                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>(s.MinStatementYears, s.MaxStatementYears == null ? 0 : s.MaxStatementYears.Value)))
+                .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>(s.MinTurnover, s.MaxTurnover == null ? 0 : s.MaxTurnover.Value)))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
-                .ForMember(dest => dest.Sectors, opt => opt.MapFrom(st=>st.Sectors.Select(s=>s.StatementSectorTypeId)))
+                .ForMember(dest => dest.Sectors, opt => opt.MapFrom(st => st.Sectors.Select(s => s.StatementSectorTypeId)))
                 .ForMember(dest => dest.Policies, opt => opt.MapFrom(st => st.Policies.Select(s => s.StatementPolicyTypeId)))
-                .ForMember(dest => dest.RelevantRisks, opt => opt.MapFrom(st => st.RelevantRisks.Select(s => new StatementModel.RisksModel { Id=s.StatementRiskTypeId, Details=s.Details })))
+                .ForMember(dest => dest.RelevantRisks, opt => opt.MapFrom(st => st.RelevantRisks.Select(s => new StatementModel.RisksModel { Id = s.StatementRiskTypeId, Details = s.Details })))
                 .ForMember(dest => dest.HighRisks, opt => opt.MapFrom(st => st.HighRisks.Select(s => new StatementModel.RisksModel { Id = s.StatementRiskTypeId, Details = s.Details })))
                 .ForMember(dest => dest.LocationRisks, opt => opt.MapFrom(st => st.LocationRisks.Select(s => new StatementModel.RisksModel { Id = s.StatementRiskTypeId, Details = s.Details })))
                 .ForMember(dest => dest.DueDiligences, opt => opt.MapFrom(st => st.Diligences.Select(s => new StatementModel.DiligenceModel { Id = s.StatementDiligenceTypeId, Details = s.Details })))
@@ -52,7 +52,14 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.EditorUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.EditTimestamp, opt => opt.Ignore())
                 .ForMember(dest => dest.DraftBackupDate, opt => opt.Ignore())
-                .ForMember(dest => dest.CanRevertToOriginal, opt => opt.Ignore());
+                .ForMember(dest => dest.CanRevertToOriginal, opt => opt.Ignore())
+                // for nullable to non-nullable properties, dont overwrite the null with the default values when new
+                .ForMember(dest => dest.IncludesStructure, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesStructure))
+                .ForMember(dest => dest.IncludesPolicies, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesPolicies))
+                .ForMember(dest => dest.IncludesRisks, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesRisks))
+                .ForMember(dest => dest.IncludesDueDiligence, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesDueDiligence))
+                .ForMember(dest => dest.IncludesTraining, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesTraining))
+                .ForMember(dest => dest.IncludesGoals, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesGoals));
         }
     }
 
