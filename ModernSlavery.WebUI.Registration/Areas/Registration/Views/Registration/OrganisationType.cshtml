@@ -12,7 +12,6 @@
         {
             @Html.AntiForgeryToken()
 
-
             @Html.HiddenFor(m => m.SearchText)
 
             @await Html.CustomValidationSummaryAsync()
@@ -21,39 +20,43 @@
                 Registration options
             </h1>
 
-            <p>
-                If you have received a letter please select Fast track option
-            </p>
-
+           
             <div id="SectorTypeGroup" class="form-group @Html.SetErrorClass(model => model.RegistrationType, "error")">
                 <fieldset>
-                    <legend>
-                        <h1 class="heading-medium" style="margin-top: 15px">
-                            Select which type of organisation you would like to register
-                        </h1>
-                        @Html.ValidationMessageFor(model => model.RegistrationType, null, new { @class = "error-danger" })
-                    </legend>
-
-                    <div class="multiple-choice">
-                        <input id="fasttrack" type="radio" name="RegistrationType" value="fasttrack">
+                    <div>
+                        <p>If you received a letter from us with an employer reference and security code, select the following option:</p>                        
+                    </div>
+                    <div class="govuk-grid-column-full">
+                             <div class="multiple-choice">
+                             <input id="fasttrack" type="radio" name="RegistrationType" value="fasttrack">
                         <label for="fasttrack">
                             Fast track
                         </label>
-                    </div>
-                    <div class="multiple-choice">
-                        <input id="private" type="radio" name="RegistrationType" value="private">
-                        <label for="private">
-                            Private limited company,<br />
-                            Limited liability partnership,<br />
-                            Charity,<br />
-                            Public limited company
-                        </label>
+                            </div>
+                        </div>
+                    <div>
+                        <p>
+                            If you didn't receive a letter from us, you need to tell us what type of organisation you want to register.
+                        </p>
                     </div>
                     <div class="multiple-choice">
                         <input id="public" type="radio" name="RegistrationType" value="public">
                         <label for="public">
                             Public sector organisation
                         </label>
+                        <span id="public-hint" class="govuk-hint govuk-radios__hint">
+                            This includes most government departments, the armed forces, local authorities, NHS bodies, universities, and most schools (including academies and multi-academy trusts)
+                        </span>
+                    </div>
+                    <div class="multiple-choice">
+                        <input id="private" type="radio" name="RegistrationType" value="private">
+                        <label for="private">
+                            Private or voluntary sector organisation
+                        </label>
+                        <span id="private-hint" class="govuk-hint govuk-radios__hint">
+                            This includes private limited companies, public limited companies, limited liability partnerships, charities, independent and private schools, and other private sector organisations
+                        </span>
+
                     </div>
                 </fieldset>
             </div>
