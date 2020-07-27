@@ -48,7 +48,7 @@
                                         <label class="govuk-label" for="other">
                                             Please provide detail
                                         </label>
-                                        <input asp-for="OtherPolicies" class="govuk-input govuk-!-width-one-third" id="contact-by-email" name="other" type="email" spellcheck="false">
+                                        <input asp-for="OtherPolicies" name="OtherPolicies" class="govuk-input govuk-!-width-one-third" id="policies-other" spellcheck="false">
                                     </div>
                                 </div>
                             }
@@ -56,40 +56,6 @@
                     </div>
                 </fieldset>
             </div>
-
-
-
-
-            @*var organisationPolicyOptions =
-                                            new Dictionary<StatementPolicies, Func<object, object>>
-                                            {
-                                       {
-                                         StatementPolicies.Other,
-                @<text>
-                    @(Html.GovUkTextInputFor(model => model.OtherPolicies))
-                    @(Html.LabelFor(model => model.OtherPolicies, new { @class = "govuk-label" }))
-                </text>
-                                        }
-                                                          };
-
-
-                                @(Html.GovUkCheckboxesFor(
-                                model => model.PoliciesEnums,
-                                new FieldsetViewModel
-                                {
-                                    Legend = new LegendViewModel
-                                    {
-                                        Classes = "govuk-fieldset__legend--m"
-                                    },
-                                    Classes = "govuk-!-margin-top-6"
-                                },
-                                new HintViewModel
-                                {
-                                    Text = "Select all that apply."
-                                },
-                                organisationPolicyOptions
-                           ));*@
-
 
             <button class="govuk-button" data-module="govuk-button" type="submit">
                 Continue
