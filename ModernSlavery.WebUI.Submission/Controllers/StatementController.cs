@@ -6,6 +6,7 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.Binding.Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
@@ -55,8 +56,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         #endregion
 
+        #region Private Methods
+        public string OrganisationIdentifier => RouteData.Values["OrganisationIdentifier"].ToString();
+
+        public string ReportingDeadlineYear => RouteData.Values["Year"].ToString();
         private string ReturnUrl => Url.Action("ManageOrganisation","Submission", new { organisationIdentifier= OrganisationIdentifier });
         private string CancelUrl => Url.Action("Cancel", new { organisationIdentifier = OrganisationIdentifier, year= ReportingDeadlineYear });
+        private object GetOrgAndYearRouteData() => new { OrganisationIdentifier, year = ReportingDeadlineYear };
+
 
 
         /// <summary>
@@ -82,12 +89,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     throw new NotImplementedException($"{nameof(StatementErrors)} type '{error.Error}' is not recognised");
             }
         }
-
-        private object GetOrgAndYearRouteData() => new { OrganisationIdentifier, year = ReportingDeadlineYear };
-
-        public string OrganisationIdentifier => RouteData.Values["OrganisationIdentifier"].ToString();
-
-        public string ReportingDeadlineYear => RouteData.Values["Year"].ToString();
 
         private void SetNavigationUrl<TViewModel>(TViewModel viewModel)
         {
@@ -182,7 +183,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Redirect to the continue url
             return Redirect(viewModel.ContinueUrl);
         }
-
+        #endregion
 
         #region Before You Start
         [HttpGet("{organisationIdentifier}/{year}/before-you-start")]
@@ -318,7 +319,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             return await PostAsync(viewModel, organisationIdentifier, year);
         }
         #endregion
-
 
         #region Step 8 - Monitoring progress
 

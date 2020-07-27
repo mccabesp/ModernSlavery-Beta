@@ -76,25 +76,28 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
     public class StatementPresenter : IStatementPresenter
     {
-        readonly IStatementBusinessLogic StatementBusinessLogic;
-        readonly ISharedBusinessLogic SharedBusinessLogic;
-        readonly IMapper Mapper;
+        private readonly IStatementBusinessLogic _statementBusinessLogic;
+        private readonly ISharedBusinessLogic _sharedBusinessLogic;
+        private readonly IMapper _mapper;
+        private readonly IServiceProvider _serviceProvider;
 
         public StatementPresenter(
             IMapper mapper,
             ISharedBusinessLogic sharedBusinessLogic,
-            IStatementBusinessLogic statementBusinessLogic)
+            IStatementBusinessLogic statementBusinessLogic, 
+            IServiceProvider serviceProvider)
         {
-            Mapper = mapper;
-            SharedBusinessLogic = sharedBusinessLogic;
-            StatementBusinessLogic = statementBusinessLogic;
+            _mapper = mapper;
+            _sharedBusinessLogic = sharedBusinessLogic;
+            _statementBusinessLogic = statementBusinessLogic;
+            _serviceProvider = serviceProvider;
         }
 
         private DateTime GetReportingDeadline(long organisationId, int year)
         {
-            var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(organisationId);
+            var organisation = _sharedBusinessLogic.DataRepository.Get<Organisation>(organisationId);
             if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId));
-            return SharedBusinessLogic.GetReportingDeadline(organisation.SectorType, year);
+            return _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, year);
         }
 
         /// <summary>
@@ -106,24 +109,24 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <returns>A new instance of the populated StatementModel</returns>
         private StatementModel SetViewModelToStatementModel<TViewModel>(TViewModel viewModel, StatementModel statementModel)
         {
-            return Mapper.Map(viewModel, statementModel);
+            return _mapper.Map(viewModel, statementModel);
         }
 
         public TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel) where TViewModel : BaseViewModel
         {
             //Instantiate the ViewModel
-            var viewModel = Activator.CreateInstance<TViewModel>();
+            var viewModel = ActivatorUtilities.CreateInstance<TViewModel>(_serviceProvider);
 
             //Copy the StatementModel data to the viewModel
-            return Mapper.Map(statementModel, viewModel);
+            return _mapper.Map(statementModel, viewModel);
         }
 
 
         public async Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {
-            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
+            long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
             var reportingDeadline = GetReportingDeadline(organisationId, reportingDeadlineYear);
-            var openOutcome = await StatementBusinessLogic.OpenDraftStatementModelAsync(organisationId, reportingDeadline, userId);
+            var openOutcome = await _statementBusinessLogic.OpenDraftStatementModelAsync(organisationId, reportingDeadline, userId);
             if (openOutcome.Fail) return new Outcome<StatementErrors, StatementModel>(openOutcome.Errors);
 
             if (openOutcome.Result == null) throw new ArgumentNullException(nameof(openOutcome.Result));
@@ -136,16 +139,16 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         public async Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {
-            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
+            long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
             var reportingDeadline = GetReportingDeadline(organisationId, reportingDeadlineYear);
-            return await StatementBusinessLogic.CancelDraftStatementModelAsync(organisationId, reportingDeadline, userId);
+            return await _statementBusinessLogic.CancelDraftStatementModelAsync(organisationId, reportingDeadline, userId);
         }
 
         public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {
-            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
+            long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
             var reportingDeadline = GetReportingDeadline(organisationId, reportingDeadlineYear);
-            return await StatementBusinessLogic.SubmitDraftStatementModelAsync(organisationId, reportingDeadline, userId);
+            return await _statementBusinessLogic.SubmitDraftStatementModelAsync(organisationId, reportingDeadline, userId);
         }
 
         public async Task<Outcome<StatementErrors,TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId) where TViewModel:BaseViewModel
@@ -167,7 +170,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             statementModel = SetViewModelToStatementModel(viewModel,statementModel);
 
             //Save the new statement containing the updated viewModel
-            await StatementBusinessLogic.SaveDraftStatementModelAsync(statementModel);
+            await _statementBusinessLogic.SaveDraftStatementModelAsync(statementModel);
 
             return new Outcome<StatementErrors, TViewModel>(viewModel);
         }

@@ -6,7 +6,6 @@
 
 }
 @model RisksPageViewModel
-@inject RiskTypeIndex RiskTypes
 <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
@@ -32,7 +31,7 @@
             </h2>
 
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var parentType in RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
+                @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
                 {
                     <div class="govuk-accordion__section accordion-with-counts">
                         <div class="govuk-accordion__section-header">
@@ -49,7 +48,7 @@
                                         Select all that apply.
                                     </span>
                                     <div class="govuk-checkboxes">
-                                        @foreach (var childType in RiskTypes.Where(t => t.ParentId == parentType.Id))
+                                        @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
                                         {
                                             <div class="govuk-checkboxes__item">
                                                 <input name="RelevantRisks[@relevantIndex].Id" id="RelevantRisks[@relevantIndex].Id" value="@childType.Id" checked=@(Model.RelevantRisks.Any(r => r.Id == childType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="conditional-conditional">
@@ -87,7 +86,7 @@
                 Which areas of your supply chains do you consider to have the highest risk of modern slavery?
             </h2>
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var parentType in RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
+                @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
                 {
 
                     <div class="govuk-accordion__section accordion-with-counts">
@@ -105,7 +104,7 @@
                                         Select up to 3 areas
                                     </span>
                                     <div class="govuk-checkboxes">
-                                        @foreach (var childType in RiskTypes.Where(t => t.ParentId == parentType.Id))
+                                        @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
                                         {
                                             <div class="govuk-checkboxes__item">
                                                 <input name="HighRisks[@highIndex].Id" value="@childType.Id" id="@($"HighId{childType.Id}")" checked=@(Model.HighRisks.Any(r => r.Id == childType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="conditional-conditional-high-risk">
@@ -142,7 +141,7 @@
                 Which locations do you believe are at higher risk of modern slavery in your operations and supply chains?
             </h2>
             <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var parentType in RiskTypes.Where(t => t.Category == "Location" && t.ParentId == null))
+                @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "Location" && t.ParentId == null))
                 {
 
                     <div class="govuk-accordion__section accordion-with-counts">
@@ -157,7 +156,7 @@
                             <div class="govuk-form-group">
                                 <fieldset class="govuk-fieldset">
                                     <div class="govuk-checkboxes">
-                                        @foreach (var childType in RiskTypes.Where(t => t.ParentId == parentType.Id))
+                                        @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
                                         {
                                             <div class="govuk-checkboxes__item">
                                                 <input name="LocationRisks[@locationIndex].Details" type="hidden">

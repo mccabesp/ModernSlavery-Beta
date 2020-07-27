@@ -21,6 +21,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             CreateMap<TrainingPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
+                .ForSourceMember(s => s.TrainingTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
@@ -32,6 +33,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class TrainingPageViewModel : BaseViewModel
     {
+        [IgnoreMap]
+        public TrainingTypeIndex TrainingTypes;
+        public TrainingPageViewModel(TrainingTypeIndex trainingTypes)
+        {
+            TrainingTypes = trainingTypes;
+        }
+
+        public TrainingPageViewModel()
+        {
+
+        }
         public override string PageTitle => "Training";
 
         public List<short> Training { get; set; } = new List<short>();
@@ -42,20 +54,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             //Get the training types
-            var trainingTypes = validationContext.GetService<TrainingTypeIndex>();
+            var TrainingTypes = validationContext.GetService<TrainingTypeIndex>();
 
-            var otherId = trainingTypes.Single(x => x.Description.Equals("Other")).Id;
+            var otherId = TrainingTypes.Single(x => x.Description.Equals("Other")).Id;
 
             if (Training.Contains(otherId) && string.IsNullOrWhiteSpace(OtherTraining))
                 yield return new ValidationResult("Please provide other details");
         }
 
-        public override bool IsComplete(IServiceProvider serviceProvider)
+        public override bool IsComplete()
         {
-            //Get the training types
-            var trainingTypes = serviceProvider.GetService<TrainingTypeIndex>();
-
-            var other = trainingTypes.Single(x => x.Description.Equals("Other"));
+            var other = TrainingTypes.Single(x => x.Description.Equals("Other"));
 
             return Training.Any() 
                 && !Training.Any(t=>t==other.Id && string.IsNullOrWhiteSpace(OtherTraining));

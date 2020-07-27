@@ -61,7 +61,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             yield break;
         }
 
-        public override bool IsComplete(IServiceProvider serviceProvider)
+        public override bool IsComplete()
         {
             return IncludesMeasuringProgress!=null
                 && !string.IsNullOrWhiteSpace(ProgressMeasures)

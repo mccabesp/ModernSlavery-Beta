@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -22,6 +24,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
+                .ForSourceMember(s => s.SectorTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
@@ -33,6 +36,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class OrganisationPageViewModel : BaseViewModel
     {
+        [IgnoreMap]
+        public SectorTypeIndex SectorTypes;
+        public OrganisationPageViewModel(SectorTypeIndex sectorTypes)
+        {
+            SectorTypes = sectorTypes;
+        }
+
+        public OrganisationPageViewModel()
+        {
+
+        }
+
         #region Types
         public enum TurnoverRanges : byte
         {
@@ -67,12 +82,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             //Get the sector types
-            var sectorTypes = validationContext.GetService<SectorTypeIndex>();
+            SectorTypes = validationContext.GetRequiredService<SectorTypeIndex>();
 
             yield break;
         }
 
-        public override bool IsComplete(IServiceProvider serviceProvider)
+        public override bool IsComplete()
         {
             return Sectors.Any()
                 && Turnover != TurnoverRanges.NotProvided;

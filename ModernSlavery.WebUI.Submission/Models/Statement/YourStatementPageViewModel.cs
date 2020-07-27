@@ -116,7 +116,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("Please complete First name, Last name, Job title");
         }
 
-        public override bool IsComplete(IServiceProvider serviceProvider)
+        public override bool IsComplete()
         {
             return !string.IsNullOrWhiteSpace(StatementUrl)
                 && StatementStartDay.HasValue

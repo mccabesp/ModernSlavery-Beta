@@ -1,17 +1,16 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
-    var yourStatementComplete = Model.YourStatement.IsComplete(serviceProvider);
-    var complianceComplete = Model.Compliance.IsComplete(serviceProvider);
-    var organisationComplete = Model.Organisation.IsComplete(serviceProvider);
-    var policiesComplete = Model.Policies.IsComplete(serviceProvider);
-    var risksComplete = Model.Risks.IsComplete(serviceProvider);
-    var diligenceComplete = Model.DueDiligence.IsComplete(serviceProvider);
-    var trainingComplete = Model.Training.IsComplete(serviceProvider);
-    var progressComplete = Model.Progress.IsComplete(serviceProvider);
+    var yourStatementComplete = Model.YourStatement.IsComplete();
+    var complianceComplete = Model.Compliance.IsComplete();
+    var organisationComplete = Model.Organisation.IsComplete();
+    var policiesComplete = Model.Policies.IsComplete();
+    var risksComplete = Model.Risks.IsComplete();
+    var diligenceComplete = Model.DueDiligence.IsComplete();
+    var trainingComplete = Model.Training.IsComplete();
+    var progressComplete = Model.Progress.IsComplete();
 
 }
 @model ReviewPageViewModel
-@inject IServiceProvider serviceProvider;
 <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">

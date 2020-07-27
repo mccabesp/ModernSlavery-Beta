@@ -2,7 +2,6 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model PoliciesPageViewModel
-@inject PolicyTypeIndex PolicyTypes
 <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-column-two-thirds">
@@ -33,7 +32,7 @@
                         select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var policyType in PolicyTypes)
+                        @foreach (var policyType in Model.PolicyTypes)
                         {
                             <div class="govuk-checkboxes__item">
                                 <input name="Policies" value="@policyType.Id" id="@($"policy{policyType.Id}")" checked=@(Model.Policies.Contains(policyType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="policies-conditional">

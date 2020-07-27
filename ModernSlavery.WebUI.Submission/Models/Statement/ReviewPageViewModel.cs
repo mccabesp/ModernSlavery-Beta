@@ -67,20 +67,20 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult($"Section '{Progress.PageTitle}' is invalid");
 
             var serviceProvider = validationContext.GetService<IServiceProvider>();
-            if (!IsComplete(serviceProvider))
+            if (!IsComplete())
                 yield return new ValidationResult("You must first complete all sections before you can submit");
         }
 
-        public override bool IsComplete(IServiceProvider serviceProvider)
+        public override bool IsComplete()
         {
-            return YourStatement.IsComplete(serviceProvider) 
-                && Compliance.IsComplete(serviceProvider) 
-                && Organisation.IsComplete(serviceProvider) 
-                && Policies.IsComplete(serviceProvider) 
-                && Risks.IsComplete(serviceProvider) 
-                && DueDiligence.IsComplete(serviceProvider) 
-                && Training.IsComplete(serviceProvider) 
-                && Progress.IsComplete(serviceProvider);
+            return YourStatement.IsComplete() 
+                && Compliance.IsComplete() 
+                && Organisation.IsComplete() 
+                && Policies.IsComplete() 
+                && Risks.IsComplete() 
+                && DueDiligence.IsComplete() 
+                && Training.IsComplete() 
+                && Progress.IsComplete();
         }
     }
 }

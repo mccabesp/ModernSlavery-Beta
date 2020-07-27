@@ -75,7 +75,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("Please provide the detail for: Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions");
         }
 
-        public override bool IsComplete(IServiceProvider serviceProvider)
+        public override bool IsComplete()
         {
             return IncludesStructure.HasValue
                 && ((IncludesStructure == true) || !string.IsNullOrWhiteSpace(StructureDetails))

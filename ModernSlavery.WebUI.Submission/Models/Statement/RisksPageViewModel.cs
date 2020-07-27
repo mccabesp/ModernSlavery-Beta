@@ -26,6 +26,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.HighRisks, opt => opt.MapFrom(s=>s.HighRisks.Where(r=>r.Id>0)))
                 .ForMember(d => d.LocationRisks, opt => opt.MapFrom(s=>s.LocationRisks.Where(r=>r.Id>0)))
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
+                .ForSourceMember(s => s.RiskTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.RelevantRisks, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.HighRisks, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.LocationRisks, opt => opt.DoNotValidate())
@@ -40,6 +41,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class RisksPageViewModel : BaseViewModel
     {
+        [IgnoreMap]
+        public RiskTypeIndex RiskTypes;
+        public RisksPageViewModel(RiskTypeIndex riskTypes)
+        {
+            RiskTypes = riskTypes;
+        }
+
+        public RisksPageViewModel()
+        {
+
+        }
+
         #region Types
         public class RiskViewModel
         {
@@ -68,24 +81,24 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             LocationRisks.RemoveAll(r => r.Id == 0);
 
             //Get the risk types
-            var riskTypes=validationContext.GetService<RiskTypeIndex>();
+            RiskTypes=validationContext.GetService<RiskTypeIndex>();
 
             //TODO: clarify this with Sam G as comment doesnt match?? Select all that apply
             if (RelevantRisks.Count > 3)
                 yield return new ValidationResult("Please select no more than 3 categories");
 
             //TODO: better way to identify this particular options
-            var vulnerableGroupId = riskTypes.Single(x => x.Description.Equals("Other vulnerable groups")).Id;
+            var vulnerableGroupId = RiskTypes.Single(x => x.Description.Equals("Other vulnerable groups")).Id;
             var otherVulnerableGroup = RelevantRisks.FirstOrDefault(x => x.Id == vulnerableGroupId);
             if (otherVulnerableGroup != null && string.IsNullOrWhiteSpace(otherVulnerableGroup.Details))
                 yield return new ValidationResult("Please enter the other vulnerable group");
 
-            var typeOfWorkId = riskTypes.Single(x => x.Description.Equals("Other type of work")).Id;
+            var typeOfWorkId = RiskTypes.Single(x => x.Description.Equals("Other type of work")).Id;
             var othertypeOfWork = RelevantRisks.FirstOrDefault(x => x.Id == typeOfWorkId);
             if (othertypeOfWork != null && string.IsNullOrWhiteSpace(othertypeOfWork.Details))
                 yield return new ValidationResult("Please enter the other type of work");
 
-            var sectorId = riskTypes.Single(x => x.Description.Equals("Other sector")).Id;
+            var sectorId = RiskTypes.Single(x => x.Description.Equals("Other sector")).Id;
             var othersector = RelevantRisks.FirstOrDefault(x => x.Id == sectorId);
             if (othersector != null && string.IsNullOrWhiteSpace(othersector.Details))
                 yield return new ValidationResult("Please enter the other sector");
@@ -106,17 +119,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("Please enter the other sector for high risk area");
 
             foreach (var risk in HighRisks.Where(r=>string.IsNullOrWhiteSpace(r.Details)))
-                yield return new ValidationResult($"Please explain why {riskTypes.Single(r=>r.Id==risk.Id).Description} is one of your highest risks");
+                yield return new ValidationResult($"Please explain why {RiskTypes.Single(r=>r.Id==risk.Id).Description} is one of your highest risks");
         }
 
-        public override bool IsComplete(IServiceProvider serviceProvider)
+        public override bool IsComplete()
         {
-            //Get the risk types
-            var riskTypes = serviceProvider.GetService<RiskTypeIndex>();
-
-            var vulnerableGroup = riskTypes.Single(x => x.Description.Equals("Other vulnerable groups"));
-            var typeOfWork = riskTypes.Single(x => x.Description.Equals("Other type of work"));
-            var sector = riskTypes.Single(x => x.Description.Equals("Other sector"));
+            var vulnerableGroup = RiskTypes.Single(x => x.Description.Equals("Other vulnerable groups"));
+            var typeOfWork = RiskTypes.Single(x => x.Description.Equals("Other type of work"));
+            var sector = RiskTypes.Single(x => x.Description.Equals("Other sector"));
 
             return RelevantRisks.Any()
                 && HighRisks.Any()
