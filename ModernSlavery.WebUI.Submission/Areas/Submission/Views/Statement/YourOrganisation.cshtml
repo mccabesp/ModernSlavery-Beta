@@ -26,17 +26,7 @@
                     </legend>
                     <span id="organisation-hint" class="govuk-hint">
                         Select all that apply
-                    </span>
-                    <details class="govuk-details" data-module="govuk-details">
-                        <summary class="govuk-details__summary">
-                            <span class="govuk-details__summary-text">
-                                What is this?
-                            </span>
-                        </summary>
-                        <div class="govuk-details__text">
-                            @*TODO: get content*@
-                        </div>
-                    </details>
+                    </span>                   
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         @foreach (var sectorType in SectorTypes.OrderBy(x=> x.Description))
                         {
