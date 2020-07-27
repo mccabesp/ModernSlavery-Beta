@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public YourStatementPageViewModelMapperProfile()
         {
             CreateMap<StatementModel, YourStatementPageViewModel>()
-                .ForMember(d => d.StatementStartDay, opt => opt.MapFrom(s => s.StatementStartDate==null ? (int?)null : s.StatementStartDate.Value.Day))
+                .ForMember(d => d.StatementStartDay, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Day))
                 .ForMember(d => d.StatementStartMonth, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Month))
                 .ForMember(d => d.StatementStartYear, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Year))
                 .ForMember(d => d.StatementEndDay, opt => opt.MapFrom(s => s.StatementEndDate == null ? (int?)null : s.StatementEndDate.Value.Day))
@@ -84,8 +84,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [RegularExpression("^[0-9]*$", ErrorMessage = "Year format is incorrect")]
         public int? StatementEndYear { get; set; }
 
+        [Display(Name = "Job Title")]
         public string ApproverJobTitle { get; set; }
+        [Display(Name = "First Name")]
         public string ApproverFirstName { get; set; }
+        [Display(Name = "Last Name")]
         public string ApproverLastName { get; set; }
 
         public DateTime? ApprovedDate => ToDateTime(ApprovedYear, ApprovedMonth, ApprovedDay);
@@ -100,15 +103,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var startDateList = new List<int?> { StatementStartDay, StatementStartMonth, StatementStartYear };
-            if (startDateList.Any(x => x.HasValue) && !startDateList.Any(x => x.HasValue))
+            if (startDateList.Any(x => x.HasValue) && startDateList.Any(x => !x.HasValue))
                 yield return new ValidationResult("Please complete the Start Date");
 
             var endDateList = new List<int?> { StatementEndDay, StatementEndMonth, StatementEndYear };
-            if (endDateList.Any(x => x.HasValue) && !endDateList.Any(x => x.HasValue))
+            if (endDateList.Any(x => x.HasValue) && !endDateList.Any(x => !x.HasValue))
                 yield return new ValidationResult("Please complete the End Date");
 
             var approvalDateList = new List<int?> { ApprovedDay, ApprovedMonth, ApprovedYear };
-            if (approvalDateList.Any(x => x.HasValue) && !approvalDateList.Any(x => x.HasValue))
+            if (approvalDateList.Any(x => x.HasValue) && !approvalDateList.Any(x => !x.HasValue))
                 yield return new ValidationResult("Please complete the Approved Date");
 
             var detailsList = new List<string> { ApproverFirstName, ApproverLastName, ApproverJobTitle };

@@ -57,7 +57,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (IncludesStructure == false && string.IsNullOrWhiteSpace(StructureDetails))
-                yield return new ValidationResult("Please provide the detail for: Your organisatio's structure, business and supply chains");
+                yield return new ValidationResult("Please provide the detail for: Your organisation's structure, business and supply chains");
 
             if (IncludesPolicies == false && string.IsNullOrWhiteSpace(PolicyDetails))
                 yield return new ValidationResult("Please provide the detail for: Policies");
