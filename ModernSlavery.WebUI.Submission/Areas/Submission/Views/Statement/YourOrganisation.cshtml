@@ -31,11 +31,22 @@
                         @foreach (var sectorType in SectorTypes.OrderBy(x => x.Description))
                         {
                             <div class="govuk-checkboxes__item">
-                                <input name="Sectors" value="@sectorType.Id" id="@($"sector{sectorType.Id}")" checked=@(Model.Sectors.Contains(sectorType.Id)) class="govuk-checkboxes__input" type="checkbox">
+                                <input name="Sectors" value="@sectorType.Id" id="@($"sector{sectorType.Id}")" checked=@(Model.Sectors.Contains(sectorType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="organisation-conditional">
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"sector{sectorType.Id}")">
                                     @sectorType.Description
                                 </label>
                             </div>
+                            @if (sectorType.Description.Equals("Other"))
+                            {
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="organisation-conditional">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="other">
+                                            Please specify
+                                        </label>
+                                        <input asp-for="OtherSector" class="govuk-input govuk-!-width-one-third" id="contact-by-email" name="OtherSector">
+                                    </div>
+                                </div>
+                            }
                         }
                     </div>
                 </fieldset>
@@ -48,15 +59,15 @@
                             What was your turnover or budget during the last financial accounting year?
                         </h2>
                     </legend>
-                    <div class="govuk-radios">                         
-                        @foreach (OrganisationPageViewModel.TurnoverRanges item in (Enum.GetValues(typeof(OrganisationPageViewModel.TurnoverRanges)).Cast<OrganisationPageViewModel.TurnoverRanges>().Where(x=> x != OrganisationPageViewModel.TurnoverRanges.NotProvided)))
+                    <div class="govuk-radios">
+                        @foreach (OrganisationPageViewModel.TurnoverRanges item in (Enum.GetValues(typeof(OrganisationPageViewModel.TurnoverRanges)).Cast<OrganisationPageViewModel.TurnoverRanges>().Where(x => x != OrganisationPageViewModel.TurnoverRanges.NotProvided)))
                         {
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input" id="Turnover" name="Turnover" type="radio" value="item">
                                 <label class="govuk-label govuk-radios__label" for="Turnover">
                                     @(item.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text)
                                 </label>
-                            </div>
+                            </div>                            
                         }
                     </div>
                 </fieldset>
