@@ -1,4 +1,5 @@
-﻿@{
+﻿@using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
+@{
     Layout = "/Views/GdsLayout.cshtml";
     var diligenceIndex = 0;
 }
@@ -14,15 +15,6 @@
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ContinueUrl);
-
-
-            @(Html.GovUkErrorSummary(new[]
-        {
-                    nameof(DueDiligencePageViewModel.DueDiligences),
-                    nameof(DueDiligencePageViewModel.SelectedRemediation),
-                    nameof(DueDiligencePageViewModel.ForcedLabourDetails),
-                    nameof(DueDiligencePageViewModel.SlaveryInstanceDetails)
-                }))
 
             <h2>@Model.SubTitle</h2>
 
@@ -145,7 +137,7 @@
                                             <div class="govuk-checkboxes__item">
                                                 <input class="govuk-checkboxes__input" id="remediation-conditional" type="checkbox" checked=@(item == Model.SelectedRemediation) data-aria-controls="remediation-conditional">
                                                 <label class="govuk-label govuk-checkboxes__label" for="remediation-conditional">
-                                                    @item
+                                                    @(item.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text)
                                                 </label>
                                             </div>
                                         }
