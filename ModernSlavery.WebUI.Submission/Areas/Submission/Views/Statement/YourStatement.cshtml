@@ -3,7 +3,7 @@
 }
 @model YourStatementPageViewModel
 <div class="govuk-grid-row">
-    <div class="govuk-column-two-thirds">
+    <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm())
         {
             @await Html.CustomValidationSummaryAsync();
@@ -45,7 +45,7 @@
                     <span asp-validation-for="StatementStartDate" class="govuk-error-message"></span>
                     <span asp-validation-for="StatementEndDate" class="govuk-error-message"></span>
                     <div class="govuk-grid-row">
-                        <div class="govuk-date-input govuk-grid-column-one-third" id="reporting-start">
+                        <div class="govuk-date-input govuk-grid-column-one-half" id="reporting-start">
                             <div class="govuk-date-input__item">
                                 <div class="govuk-form-group">
                                     <label class="govuk-label govuk-date-input__label" for="reporting-start-day">
@@ -75,7 +75,7 @@
 
                         @*<p>to</p>*@
 
-                        <div class="govuk-date-input govuk-grid-column-one-third" id="reporting-end">
+                        <div class="govuk-date-input govuk-grid-column-one-half" id="reporting-end">
                             <div class="govuk-date-input__item">
                                 <div class="govuk-form-group">
                                     <label class="govuk-label govuk-date-input__label" for="reporting-end-day">
