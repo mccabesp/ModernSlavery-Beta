@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public YourStatementPageViewModelMapperProfile()
         {
             CreateMap<StatementModel, YourStatementPageViewModel>()
-                .ForMember(d => d.StatementStartDay, opt => opt.MapFrom(s => s.StatementStartDate==null ? (int?)null : s.StatementStartDate.Value.Day))
+                .ForMember(d => d.StatementStartDay, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Day))
                 .ForMember(d => d.StatementStartMonth, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Month))
                 .ForMember(d => d.StatementStartYear, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Year))
                 .ForMember(d => d.StatementEndDay, opt => opt.MapFrom(s => s.StatementEndDate == null ? (int?)null : s.StatementEndDate.Value.Day))
@@ -62,6 +62,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         private DateTime? ToDateTime(int? year, int? month, int? day)
         {
+            //TODO - James, this will error if it isnt a valid datetime eg "50/50/50"
             if (year == null || month == null || day == null) return null;
             return new DateTime(year.Value, month.Value, day.Value);
         }
@@ -99,21 +100,24 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            // TODO - James, how do we get these to fit in with the xml config of error messages?
+            // it would normally be handled by an error code or attributes on the property
             var startDateList = new List<int?> { StatementStartDay, StatementStartMonth, StatementStartYear };
-            if (startDateList.Any(x => x.HasValue) && !startDateList.Any(x => x.HasValue))
-                yield return new ValidationResult("Please complete the Start Date");
+            if (startDateList.Any(x => x.HasValue) && startDateList.Any(x => !x.HasValue))
+                yield return new ValidationResult("Please complete the Start Date", new[] { nameof(StatementStartDate), nameof(StatementStartDay), nameof(StatementStartMonth), nameof(StatementStartYear) });
 
             var endDateList = new List<int?> { StatementEndDay, StatementEndMonth, StatementEndYear };
-            if (endDateList.Any(x => x.HasValue) && !endDateList.Any(x => x.HasValue))
-                yield return new ValidationResult("Please complete the End Date");
+            if (endDateList.Any(x => x.HasValue) && endDateList.Any(x => !x.HasValue))
+                yield return new ValidationResult("Please complete the End Date", new[] { nameof(StatementEndDate), nameof(StatementEndDay), nameof(StatementEndMonth), nameof(StatementEndYear) });
 
             var approvalDateList = new List<int?> { ApprovedDay, ApprovedMonth, ApprovedYear };
-            if (approvalDateList.Any(x => x.HasValue) && !approvalDateList.Any(x => x.HasValue))
-                yield return new ValidationResult("Please complete the Approved Date");
+            if (approvalDateList.Any(x => x.HasValue) && approvalDateList.Any(x => !x.HasValue))
+                yield return new ValidationResult("Please complete the Approved Date", new[] { nameof(ApprovedDate), nameof(ApprovedDay), nameof(ApprovedMonth), nameof(ApprovedYear) });
 
             var detailsList = new List<string> { ApproverFirstName, ApproverLastName, ApproverJobTitle };
             if (detailsList.Any(x => string.IsNullOrWhiteSpace(x)) && !detailsList.Any(x => string.IsNullOrWhiteSpace(x)))
-                yield return new ValidationResult("Please complete First name, Last name, Job title");
+                // TODO - James, these will want an error for each field that is null
+                yield return new ValidationResult("Please complete First name, Last name, Job title", detailsList.Where(x => string.IsNullOrWhiteSpace(x)));
         }
 
         public override bool IsComplete()
