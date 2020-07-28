@@ -4,6 +4,7 @@ using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Helpers;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
 {
@@ -25,6 +26,12 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
             {
                 ParserHelpers.AddRequiredAndMissingErrorMessage(model, property);
                 return;
+            }
+            if (ParserHelpers.IsValueRequiredBasedOnAnother(property, parameterValues))
+            {
+                var errorMessage = property.GetSingleCustomAttribute<GovUkValidateRequiredIfAttribute>().ErrorMessage;
+
+                model.AddErrorFor(property, errorMessage);
             }
 
             if (parameterValues.Count > 0)

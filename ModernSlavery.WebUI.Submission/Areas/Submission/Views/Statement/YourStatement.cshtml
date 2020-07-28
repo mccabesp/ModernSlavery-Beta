@@ -1,0 +1,183 @@
+﻿@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model YourStatementPageViewModel
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @await Html.CustomValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+          
+        <h1 class="govuk-heading-l">
+            @Model.PageTitle
+        </h1>
+
+            <h2 class="govuk-heading-m">
+                Provide a link to the modern slavery statement on your organisation's website
+            </h2>
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                        More information
+                    </span>
+                </summary>
+                <div class="govuk-details__text">
+                    It is a legal requirement that your modern slavery statement is published in a prominent place on your organisation’s website.
+                </div>
+            </details>
+            <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementUrl, "govuk-form-group--error")">
+                <label asp-for="StatementUrl" class="govuk-label govuk-label--m "></label>
+                <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
+                <input asp-for="StatementUrl" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+            </div>
+           
+            <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementStartDate, "govuk-form-group--error") @Html.SetErrorClass(model => model.StatementEndDate, "govuk-form-group--error")">
+                <fieldset class="govuk-fieldset" role="group" aria-describedby="reporting-start-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-heading-m">
+                            What period does this statement cover?
+                        </h1>
+                    </legend>
+                    <span id="reporting-start-hint" class="govuk-hint">
+                        For example, 31 3 1980
+                    </span>
+                    <span asp-validation-for="StatementStartDate" class="govuk-error-message"></span>
+                    <span asp-validation-for="StatementEndDate" class="govuk-error-message"></span>
+                    <div class="govuk-grid-row">
+                        <div class="govuk-date-input govuk-grid-column-one-half" id="reporting-start">
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-start-day">
+                                        Day
+                                    </label>
+                                    <input asp-for="StatementStartDay" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
+                            </div>
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-start-month">
+                                        Month
+                                    </label>
+                                    <input asp-for="StatementStartMonth" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
+                            </div>
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-start-year">
+                                        Year
+                                    </label>
+                                    <input asp-for="StatementStartYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        @*<p>to</p>*@
+
+                        <div class="govuk-date-input govuk-grid-column-one-half" id="reporting-end">
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-end-day">
+                                        Day
+                                    </label>
+                                    <input asp-for="StatementEndDay" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
+                            </div>
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-end-month">
+                                        Month
+                                    </label>
+                                    <input asp-for="StatementEndMonth" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
+                            </div>
+                            <div class="govuk-date-input__item">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label govuk-date-input__label" for="reporting-end-year">
+                                        Year
+                                    </label>
+                                    <input asp-for="StatementEndYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="text" pattern="[0-9]*" inputmode="numeric">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h1 class="govuk-heading-m">
+                        What is the name of the director (or equivalent) that signed off your statement?
+                    </h1>
+                </legend>
+
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverFirstName, "govuk-form-group--error")">
+                    <label asp-for="ApproverFirstName" class="govuk-label"></label>
+                    <span asp-validation-for="ApproverFirstName" class="govuk-error-message"></span>
+                    <input asp-for="ApproverFirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                </div>
+
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverLastName, "govuk-form-group--error")">
+                    <label asp-for="ApproverLastName" class="govuk-label"></label>
+                    <input asp-for="ApproverLastName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="ApproverLastName" class="govuk-error-message"></span>
+                </div>
+
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverJobTitle, "govuk-form-group--error")">
+                    <label asp-for="ApproverJobTitle" class="govuk-label"></label>
+                    <input asp-for="ApproverJobTitle" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="ApproverJobTitle" class="govuk-error-message"></span>
+                </div>
+            </fieldset>
+
+            <div class="govuk-form-group @Html.SetErrorClass(model => model.ApprovedDate, "govuk-form-group--error")">
+                <fieldset class="govuk-fieldset" role="group" aria-describedby="statement-approved-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-heading-m">
+                            What date was your statement approved by the board or equivalent management body?
+                        </h1>
+                    </legend>
+                    <span id="statement-approved-hint" class="govuk-hint">
+                        For example, 31 3 1980
+                    </span>
+                    <span asp-validation-for="ApprovedDate" class="govuk-error-message"></span>
+                    <div class="govuk-date-input" id="statement-approved">
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="approvedDate-day">
+                                    Day
+                                </label>
+                                <input asp-for="ApprovedDay" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
+                            </div>
+                        </div>
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="approvedDate-month">
+                                    Month
+                                </label>
+                                <input asp-for="ApprovedMonth" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
+                            </div>
+                        </div>
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="approvedDate-year">
+                                    Year
+                                </label>
+                                <input asp-for="ApprovedYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="text" pattern="[0-9]*" inputmode="numeric">
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Continue
+            </button>
+
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit"  name="command" value="@BaseViewModel.CommandType.Cancel">
+                Cancel
+            </button>
+        }
+    </div>
+</div>

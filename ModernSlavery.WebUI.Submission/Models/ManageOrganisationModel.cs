@@ -8,13 +8,15 @@ namespace ModernSlavery.WebUI.Submission.Models
     [Serializable]
     public class ManageOrganisationModel
     {
-        public List<ReportInfoModel> ReportInfoModels;
-        public UserOrganisation CurrentUserOrg { get; set; }
+        public string CurrentUserIdentifier;
+        public string CurrentUserFullName;
+        public string OrganisationName;
+        public string LatestAddress;
+
+        public IAsyncEnumerable<StatementInfoModel> StatementInfoModels;
 
         public List<UserOrganisation> AssociatedUserOrgs { get; set; }
 
-        public string EncCurrentOrgId { get; set; }
-
-        public Organisation Organisation => CurrentUserOrg.Organisation;
+        public string OrganisationIdentifier { get; set; }
     }
 }

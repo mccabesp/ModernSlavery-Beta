@@ -1792,7 +1792,7 @@ input[type="number"] { -moz-appearance: textfield; }
 }
 
 .phase-banner-beta .phase-tag {
-    background-color: #f47738;
+    background-color: #1d70b8;
     color: #fff;
     display: -moz-inline-stack;
     display: inline-block;

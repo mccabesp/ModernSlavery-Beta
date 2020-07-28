@@ -15,16 +15,13 @@ namespace ModernSlavery.BusinessDomain.Viewing
     {
         private readonly IDataRepository _DataRepository;
         private readonly IObfuscator _obfuscator;
-        public readonly IDnBOrgsRepository DnBOrgsRepository;
 
         public CompareBusinessLogic(
             IObfuscator obfuscator,
-            IDataRepository dataRepo,
-            IDnBOrgsRepository dnBOrgsRepository)
+            IDataRepository dataRepo)
         {
             _obfuscator = obfuscator;
             _DataRepository = dataRepo;
-            DnBOrgsRepository = dnBOrgsRepository;
         }
 
         public virtual DataTable GetCompareDatatable(IEnumerable<CompareReportModel> data)
@@ -96,12 +93,12 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             // query against scopes and filter by basket ids
             var dbScopesQuery = _DataRepository.GetAll<OrganisationScope>()
-                .Where(os => os.Status == ScopeRowStatuses.Active && os.SnapshotDate.Year == year)
+                .Where(os => os.Status == ScopeRowStatuses.Active && os.SubmissionDeadline.Year == year)
                 .Where(r => basketOrgIds.Contains(r.OrganisationId)).ToList();
 
             // query submitted returns for current year
             var dbReturnsQuery = _DataRepository.GetAll<Return>()
-                .Where(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year).ToList();
+                .Where(r => r.Status == StatementStatuses.Submitted && r.AccountingDate.Year == year).ToList();
 
             // finally, generate the left join sql statement between scopes and returns
             var dbResults = dbScopesQuery.AsQueryable().GroupJoin(

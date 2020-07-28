@@ -14,8 +14,8 @@ namespace ModernSlavery.Core.Entities
             OrganisationScopes = new HashSet<OrganisationScope>();
             OrganisationSicCodes = new HashSet<OrganisationSicCode>();
             OrganisationStatuses = new HashSet<OrganisationStatus>();
-            Returns = new HashSet<Return>();
             UserOrganisations = new HashSet<UserOrganisation>();
+            Statements = new HashSet<Statement>();
         }
 
         public long OrganisationId { get; set; }
@@ -31,7 +31,7 @@ namespace ModernSlavery.Core.Entities
         public string EmployerReference { get; set; }
         public DateTime? DateOfCessation { get; set; }
         public long? LatestAddressId { get; set; }
-        public long? LatestReturnId { get; set; }
+        public long? LatestStatementId { get; set; }
         public long? LatestScopeId { get; set; }
         public long? LatestRegistrationUserId { get; set; }
         public long? LatestRegistrationOrganisationId { get; set; }
@@ -46,7 +46,7 @@ namespace ModernSlavery.Core.Entities
 
         public virtual OrganisationAddress LatestAddress { get; set; }
         public virtual UserOrganisation LatestRegistration { get; set; }
-        public virtual Return LatestReturn { get; set; }
+        public virtual Statement LatestStatement { get; set; }
         public virtual OrganisationScope LatestScope { get; set; }
         public virtual OrganisationPublicSectorType LatestPublicSectorType { get; set; }
         public virtual ICollection<OrganisationAddress> OrganisationAddresses { get; set; }
@@ -55,7 +55,7 @@ namespace ModernSlavery.Core.Entities
         public virtual ICollection<OrganisationScope> OrganisationScopes { get; set; }
         public virtual ICollection<OrganisationSicCode> OrganisationSicCodes { get; set; }
         public virtual ICollection<OrganisationStatus> OrganisationStatuses { get; set; }
-        public virtual ICollection<Return> Returns { get; set; }
+        public virtual ICollection<Statement> Statements { get; set; }
         public virtual ICollection<UserOrganisation> UserOrganisations { get; set; }
     }
 }

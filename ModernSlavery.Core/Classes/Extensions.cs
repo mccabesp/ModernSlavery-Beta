@@ -50,15 +50,15 @@ namespace ModernSlavery.Core.Classes
             }
         }
 
-        public static async Task<List<T>> ReadCSVAsync<T>(this IFileRepository fileRepository, string filePath)
+        public static async Task<List<T>> ReadCSVAsync<T>(this IFileRepository fileRepository, string filePath,bool validateHeaders = true)
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
             var content = await fileRepository.ReadAsync(filePath);
-            return ReadCSV<T>(content);
+            return ReadCSV<T>(content,validateHeaders);
         }
 
-        public static List<T> ReadCSV<T>(string content)
+        public static List<T> ReadCSV<T>(string content, bool validateHeaders=true)
         {
             using (TextReader textReader = new StringReader(content))
             {
@@ -66,6 +66,7 @@ namespace ModernSlavery.Core.Classes
                 config.ShouldQuote = (field, context) => true;
                 config.TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim;
                 config.MissingFieldFound = null;
+                if (!validateHeaders)config.HeaderValidated = null;
 
                 using (var csvReader = new CsvReader(textReader, config))
                 {

@@ -176,12 +176,6 @@ namespace ModernSlavery.Core.Extensions
             return nsDecrypted.ToQueryString();
         }
 
-        public static string EncryptAsParams(params string[] param)
-        {
-            var encString = EncryptData(string.Join(":", param));
-            return encString.EncodeUrlBase64();
-        }
-
         public static string EncryptModel<TModel>(TModel model)
         {
             var modelSerialized = JsonConvert.SerializeObject(model);

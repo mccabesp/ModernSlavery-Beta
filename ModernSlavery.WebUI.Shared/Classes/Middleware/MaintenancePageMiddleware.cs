@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             _enabled = enabled;
         }
 
-
+        [System.Diagnostics.DebuggerHidden()]
         public async Task Invoke(HttpContext httpContext)
         {
             //Redirect to holding mage if in maintenance mode

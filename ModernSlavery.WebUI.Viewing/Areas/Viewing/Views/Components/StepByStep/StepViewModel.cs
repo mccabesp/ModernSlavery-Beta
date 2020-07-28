@@ -45,7 +45,7 @@ namespace ModernSlavery.WebUI.Viewing.Views.Components.StepByStep
 
     }
 
-    public enum StepType
+    public enum StepType : byte
     {
 
         Number = 0,

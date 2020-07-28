@@ -1,13 +1,13 @@
 ﻿@inject SubmissionOptions SubmissionOptions
 @inject SharedOptions sharedOptions
 @inject IWebService WebService
+@inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
 @using ModernSlavery.Core.Models
+@using ModernSlavery.BusinessDomain.Shared.Models
 @model ManageOrganisationModel
 @{
-    var controller = ViewData["Controller"] as SubmissionController;
-    var currentOrg = Model.Organisation;
     Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = "Manage " + currentOrg.OrganisationName + " organisation - Modern Slavery reporting service";
+    ViewBag.Title = "Manage " + Model.OrganisationName + " organisation - Modern Slavery reporting service";
 }
 
 @await Html.PartialAsync("AccountNavigation")
@@ -15,7 +15,7 @@
 <div class="grid-row">
     <div class="column-two-thirds">
         <h1 class="heading-large">
-            <span class="heading-secondary">Reporting as @currentOrg.OrganisationName</span>
+            <span class="heading-secondary">Reporting as @Model.OrganisationName</span>
             Manage your organisation's reporting
         </h1>
         <div style="margin-bottom: 20px">
@@ -27,7 +27,7 @@
                 </div>
                 <div>
                     <dt style="color: gray; font-size: 0.8em; font-weight: lighter;">
-                        @Html.Raw(currentOrg.LatestAddress.GetAddressString("&#44;<br/>"))
+                        @Html.Raw(Model.LatestAddress.Replace(Environment.NewLine,"&#44;<br/>"))
                     </dt>
                 </div>
             </dl>
@@ -70,21 +70,9 @@
                     Report status
                 </div>
             </div>
-            @for (int i = Model.ReportInfoModels.Count - 1, editScopeCount = SubmissionOptions.EditableScopeCount; i >= 0; i--, editScopeCount--)
+            @await foreach (StatementInfoModel statementInfoModel in Model.StatementInfoModels)
             {
-                var report = Model.ReportInfoModels[i];
-                if (report == null)
-                {
-                    continue;
-                }
-                var displayReportModel = new DisplayReportModel
-                {
-                    Report = report,
-                    OrganisationId = currentOrg.OrganisationId,
-                    EncCurrentOrgId = Model.EncCurrentOrgId,
-                    CanChangeScope = editScopeCount > 0
-                };
-                @await Html.PartialAsync("DisplayReportSection", displayReportModel)
+                @await Html.PartialAsync("StatementInfoViewModel", new StatementInfoViewModel(statementInfoModel, Model.OrganisationIdentifier))
             }
 
         </div>
@@ -124,11 +112,11 @@
                     @foreach (var assocUserOrg in Model.AssociatedUserOrgs)
                     {
                         var userFullname = assocUserOrg.User.Fullname;
-                        var encUserId = Encryption.EncryptQuerystring(assocUserOrg.UserId.ToString());
+                        var encUserId = Obfuscator.Obfuscate(assocUserOrg.UserId.ToString());
                         <tr>
                             <td style="border: none;" class="org-name">@userFullname</td>
                             <td style="border: none;">
-                                <a href="@Url.ActionArea("RemoveOrganisation","Registration", "Registration", new {orgId = Model.EncCurrentOrgId, userId = encUserId})">
+                                <a href="@Url.ActionArea("RemoveOrganisation","Registration", "Registration", new {orgId = Model.OrganisationIdentifier, userId = encUserId})">
                                     Remove user from reporting
                                 </a>
                             </td>
@@ -137,10 +125,10 @@
 
                     <tr>
                         <td style="border: none;" class="org-name">
-                            @controller.CurrentUser.Fullname <span>(You)</span>
+                            @Model.CurrentUserFullName <span>(You)</span>
                         </td>
                         <td style="border: none;">
-                            <a href="@Url.ActionArea("RemoveOrganisation","Registration", "Registration", new {orgId = Model.EncCurrentOrgId, userId = Encryption.EncryptQuerystring(controller.CurrentUser.UserId.ToString())})">
+                            <a href="@Url.ActionArea("RemoveOrganisation","Registration", "Registration", new {orgId = Model.OrganisationIdentifier, userId = Model.CurrentUserIdentifier})">
                                 Remove user from reporting
                             </a>
                         </td>

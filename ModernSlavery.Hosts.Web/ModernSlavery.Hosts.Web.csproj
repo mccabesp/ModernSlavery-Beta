@@ -72,7 +72,7 @@
     </Content>
   </ItemGroup>
 
-    <!-- *** THIS IS REQUIRED TO EXCLUDE Web.*.config from Publish folder *** -->
+  <!-- *** THIS IS REQUIRED TO EXCLUDE Web.*.config from Publish folder *** -->
   <ItemGroup>
     <Content Remove="Web.*.config" />
   </ItemGroup>
@@ -104,18 +104,7 @@
   </ItemGroup>
 
   <!-- *** THIS IS REQUIRED TO DEPLY WebjobS WITH WEBUI ON AZURE *** -->
-  <PropertyGroup>
-    <MSDeployPackagePublishDependsOn>
-      CopyWebjobs;
-    </MSDeployPackagePublishDependsOn>
-
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-
-    <WebjobProjects>$(MSBuildProjectDirectory)\..\ModernSlavery.Hosts.Webjob\ModernSlavery.Hosts.Webjob.csproj</WebjobProjects>
-
-  </PropertyGroup>
-
-  <Target Name="CopyWebjobs">
-    <MSBuild Projects="$(WebjobProjects)" Targets="Restore;Build;Publish;" Properties="DeployOnBuild=true;Configuration=$(Configuration);WebPublishMethod=FileSystem;PublishUrl=$(PublishIntermediateOutputPath)" RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+  <Target Name="PostpublishScript" AfterTargets="Publish">
+    <Exec Command="dotnet publish ..\ModernSlavery.Hosts.Webjob\ModernSlavery.Hosts.Webjob.csproj -c $(ConfigurationName) -o $(ProjectDir)$(PublishDir)App_Data\Jobs\continuous\ModernSlavery.Hosts.Webjob" />
   </Target>
 </Project>

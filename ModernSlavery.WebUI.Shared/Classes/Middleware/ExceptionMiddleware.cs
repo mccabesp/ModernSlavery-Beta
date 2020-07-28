@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -20,6 +21,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             _next = next;
         }
 
+        [DebuggerHidden()]
         public async Task InvokeAsync(HttpContext httpContext)
         {
             try

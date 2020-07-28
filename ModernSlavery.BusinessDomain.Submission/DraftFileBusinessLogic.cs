@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
@@ -22,7 +21,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             SharedOptions = sharedOptions;
 
             _fileRepository = fileRepository;
-            RootDraftPath = Path.Combine(sharedOptions.DataPath, sharedOptions.SaveDraftPath);
+            //RootDraftPath = Path.Combine(sharedOptions.DataPath, sharedOptions.SaveDraftPath);
         }
 
         #endregion

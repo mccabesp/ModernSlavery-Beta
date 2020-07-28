@@ -43,7 +43,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         public string PhoneNumber { get; set; }
     }
 
-    public enum HowEasyIsThisServiceToUse
+    public enum HowEasyIsThisServiceToUse : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "Very easy")]
         VeryEasy = 0,
@@ -61,7 +61,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         VeryDifficult = 4
     }
 
-    public enum HowDidYouHearAboutGpg
+    public enum HowDidYouHearAboutGpg : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "News article")]
         NewsArticle,
@@ -91,7 +91,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         Other
     }
 
-    public enum WhyVisitGpgSite
+    public enum WhyVisitGpgSite : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "I wanted to find out what Modern Slavery is")]
         FindOutAboutGpg,
@@ -113,7 +113,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         Other
     }
 
-    public enum WhoAreYou
+    public enum WhoAreYou : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "An employee interested in your organisation’s Modern Slavery statement?")]
         EmployeeInterestedInOrganisationData,

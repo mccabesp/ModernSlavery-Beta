@@ -43,9 +43,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             || o.LatestScope.ScopeStatus == ScopeStatuses.PresumedInScope)
                     .Where(
                         o =>
-                            o.LatestReturn == null
-                            || o.LatestReturn.AccountingDate != _snapshotDateHelper.GetReportingStartDate(o.SectorType)
-                            || o.LatestReturn.Status != ReturnStatuses.Submitted)
+                            o.LatestStatement == null
+                            || o.LatestStatement.SubmissionDeadline != _snapshotDateHelper.GetReportingDeadline(o.SectorType)
+                            || o.LatestStatement.Status != StatementStatuses.Submitted)
                     .ToList();
 
                 if (inScopeOrganisationsThatStillNeedToReport.Count > 0)

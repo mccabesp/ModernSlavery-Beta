@@ -188,41 +188,54 @@ namespace ModernSlavery.Core.Entities
         //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
         public Return GetReturn(int year)
         {
-            return Returns.Where(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year)
-                .OrderByDescending(r => r.StatusDate)
-                .FirstOrDefault();
+            return null;// Returns.Where(r => r.Status == StatementStatuses.Submitted && r.AccountingDate.Year == year).OrderByDescending(r => r.StatusDate).FirstOrDefault();
         }
 
         public IEnumerable<Return> GetSubmittedReports()
         {
-            return Returns.Where(r => r.Status == ReturnStatuses.Submitted)
-                .OrderByDescending(r => r.AccountingDate);
+            return null;// Returns.Where(r => r.Status == StatementStatuses.Submitted).OrderByDescending(r => r.AccountingDate);
+        }
+        #endregion
+
+        #region Statements
+        //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
+        public Statement GetStatement(int year)
+        {
+            return Statements.Where(r => r.Status == StatementStatuses.Submitted && r.SubmissionDeadline.Year == year)
+                .OrderByDescending(r => r.StatusDate)
+                .FirstOrDefault();
+        }
+
+        public IEnumerable<Statement> GetSubmittedStatements()
+        {
+            return Statements.Where(r => r.Status == StatementStatuses.Submitted)
+                .OrderByDescending(r => r.SubmissionDeadline);
         }
         #endregion
 
         #region Scope
-        public bool GetIsInscope(DateTime accountingDate)
+        public bool GetIsInscope(DateTime submissionDeadline)
         {
-            return !GetScopeStatus(accountingDate).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
+            return !GetScopeStatus(submissionDeadline).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
         }
 
         public OrganisationScope GetLatestScope()
         {
-            return OrganisationScopes.OrderByDescending(s=>s.SnapshotDate).FirstOrDefault(orgScope =>
+            return OrganisationScopes.OrderByDescending(s=>s.SubmissionDeadline).FirstOrDefault(orgScope =>
                 orgScope.Status == ScopeRowStatuses.Active);
         }
 
         //Returns the scope for the specified accounting date
-        public OrganisationScope GetScope(DateTime accountingStartDate)
+        public OrganisationScope GetScope(DateTime submissionDeadline)
         {
             return OrganisationScopes.FirstOrDefault(s =>
-                s.Status == ScopeRowStatuses.Active && s.SnapshotDate == accountingStartDate);
+                s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline == submissionDeadline);
         }
 
 
-        public ScopeStatuses GetScopeStatus(DateTime accountingStartDate)
+        public ScopeStatuses GetScopeStatus(DateTime submissionDeadline)
         {
-            var scope = GetScope(accountingStartDate);
+            var scope = GetScope(submissionDeadline);
             return scope == null ? ScopeStatuses.Unknown : scope.ScopeStatus;
         }
 
@@ -231,7 +244,7 @@ namespace ModernSlavery.Core.Entities
         {
             return OrganisationScopes.FirstOrDefault(orgScope =>
                 orgScope.Status == ScopeRowStatuses.Active
-                && orgScope.SnapshotDate.Year == snapshotYear);
+                && orgScope.SubmissionDeadline.Year == snapshotYear);
         }
 
         public OrganisationScope GetScopeOrThrow(int snapshotYear)
@@ -330,6 +343,16 @@ namespace ModernSlavery.Core.Entities
         #endregion
 
         #region Registration
+        /// <summary>
+        /// Checks if a user is registered to submit for this organisation
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public bool GetUserIsRegistered(long userId)
+        {
+            return UserOrganisations.Any(uo => uo.UserId == userId && uo.PINConfirmedDate != null);
+        }
+
         public string GetRegistrationStatus()
         {
             var reg = UserOrganisations.OrderBy(uo => uo.PINConfirmedDate)

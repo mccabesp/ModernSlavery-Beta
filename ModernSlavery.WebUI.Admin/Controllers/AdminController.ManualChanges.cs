@@ -458,7 +458,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     var hasBeenWillBe = test ? "will be" : "has been";
                     writer.WriteLine(
-                        $"{i}: {employerRef}: {hasBeenWillBe} set as '{outOfScopeOutcome.Result.ScopeStatus}' for snapshotYear '{outOfScopeOutcome.Result.SnapshotDate.Year}' with comment '{outOfScopeOutcome.Result.Reason}'");
+                        $"{i}: {employerRef}: {hasBeenWillBe} set as '{outOfScopeOutcome.Result.ScopeStatus}' for snapshotYear '{outOfScopeOutcome.Result.SubmissionDeadline.Year}' with comment '{outOfScopeOutcome.Result.Reason}'");
                     if (!test)
                         await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel
@@ -527,22 +527,22 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #endregion
 
-            #region Fix latest returns
+            #region Fix latest statements
 
             orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                .Where(o => o.LatestReturn == null && o.Returns.Any(r => r.Status == ReturnStatuses.Submitted));
+                .Where(o => o.LatestStatement == null && o.Statements.Any(r => r.Status == StatementStatuses.Submitted));
             subCount = 0;
             foreach (var org in orgs)
             {
-                var latestReturn = org.Returns.OrderByDescending(o => o.AccountingDate)
-                    .FirstOrDefault(o => o.Status == ReturnStatuses.Submitted);
-                if (latestReturn != null)
+                var latestStatement = org.Statements.OrderByDescending(o => o.SubmissionDeadline)
+                    .FirstOrDefault(o => o.Status == StatementStatuses.Submitted);
+                if (latestStatement != null)
                 {
-                    latestReturn.Organisation = org;
-                    org.LatestReturn = latestReturn;
+                    latestStatement.Organisation = org;
+                    org.LatestStatement = latestStatement;
                     subCount++;
                     writer.WriteLine(
-                        $"{subCount:000}: Organisation '{org.EmployerReference}:{org.OrganisationName}' missing a latest return {(test ? "will be" : "was successfully")} fixed");
+                        $"{subCount:000}: Organisation '{org.EmployerReference}:{org.OrganisationName}' missing a latest statement {(test ? "will be" : "was successfully")} fixed");
                 }
             }
 
@@ -562,7 +562,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             subCount = 0;
             foreach (var org in orgs)
             {
-                var latestScope = org.OrganisationScopes.OrderByDescending(o => o.SnapshotDate)
+                var latestScope = org.OrganisationScopes.OrderByDescending(o => o.SubmissionDeadline)
                     .FirstOrDefault(o => o.ScopeStatus != ScopeStatuses.Unknown);
                 if (latestScope != null)
                 {
@@ -1337,34 +1337,34 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var year = number.ToInt32(_adminService.SharedBusinessLogic.GetAccountingStartDate(org.SectorType).Year);
-                var @return = org.Returns.OrderByDescending(o => o.StatusDate)
-                    .FirstOrDefault(r => r.Status == ReturnStatuses.Submitted && r.AccountingDate.Year == year);
-                if (@return == null)
+                var year = number.ToInt32(_adminService.SharedBusinessLogic.GetReportingDeadline(org.SectorType).Year);
+                var statement = org.Statements.OrderByDescending(o => o.StatusDate)
+                    .FirstOrDefault(r => r.Status == StatementStatuses.Submitted && r.SubmissionDeadline.Year == year);
+                if (statement == null)
                 {
                     writer.WriteLine(Color.Orange,
                         $"{i}: WARNING: '{employerRef}' Cannot find submitted data for year {year}");
                     continue;
                 }
 
-                var newValue = ReturnStatuses.Deleted;
-                var oldValue = @return.Status;
+                var newValue = StatementStatuses.Deleted;
+                var oldValue = statement.Status;
 
                 //Output the actual execution result
-                @return.SetStatus(newValue, CurrentUser.UserId, comment);
-                if (@return.Organisation.LatestReturn != null &&
-                    @return.Organisation.LatestReturn.ReturnId == @return.ReturnId)
+                statement.SetStatus(newValue, CurrentUser.UserId, comment);
+                if (statement.Organisation.LatestStatement != null &&
+                    statement.Organisation.LatestStatement.StatementId == statement.StatementId)
                 {
                     //Get the latest return (if any)
-                    var latestReturn = @return.Organisation.Returns.OrderByDescending(o => o.AccountingDate)
-                        .FirstOrDefault(o => o.Status == ReturnStatuses.Submitted);
+                    var latestStatement = statement.Organisation.Statements.OrderByDescending(o => o.SubmissionDeadline)
+                        .FirstOrDefault(o => o.Status == StatementStatuses.Submitted);
 
                     //Set the new latest return or the organisation 
-                    @return.Organisation.LatestReturn = latestReturn;
-                    if (latestReturn != null) latestReturn.Organisation = org;
+                    statement.Organisation.LatestStatement = latestStatement;
+                    if (latestStatement != null) latestStatement.Organisation = org;
 
                     //Remove the old latest return 
-                    @return.Organisation = null;
+                    statement.Organisation = null;
                 }
 
                 writer.WriteLine(
@@ -1376,9 +1376,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             methodName,
                             ManualActions.Update,
                             CurrentUser.EmailAddress,
-                            nameof(Return.ReturnId),
-                            @return.ReturnId.ToString(),
-                            nameof(Return.Status),
+                            nameof(Statement.StatementId),
+                            statement.StatementId.ToString(),
+                            nameof(Statement.Status),
                             oldValue.ToString(),
                             newValue.ToString(),
                             comment,
@@ -1607,10 +1607,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var oldSector = org.SectorType;
 
                 var badReturnDates = false;
-                foreach (var @return in org.Returns)
+                foreach (var statement in org.Statements)
                 {
-                    var oldDate = @return.AccountingDate;
-                    var newDate = _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    var oldDate = statement.SubmissionDeadline;
+                    var newDate = _adminService.SharedBusinessLogic.GetReportingDeadline(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badReturnDates = true;
@@ -1620,8 +1620,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var badScopeDates = false;
                 foreach (var scope in org.OrganisationScopes)
                 {
-                    var oldDate = scope.SnapshotDate;
-                    var newDate = _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    var oldDate = scope.SubmissionDeadline;
+                    var newDate = _adminService.SharedBusinessLogic.GetReportingDeadline(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badScopeDates = true;
@@ -1684,23 +1684,23 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     //Set accounting Date
                     if (badReturnDates)
-                        foreach (var @return in org.Returns)
+                        foreach (var statement in org.Statements)
                         {
-                            var oldDate = @return.AccountingDate;
+                            var oldDate = statement.SubmissionDeadline;
                             var newDate =
-                                _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.GetReportingDeadline(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
-                            @return.AccountingDate = newDate;
+                            statement.SubmissionDeadline = newDate;
                             if (!test)
                                 await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
                                         ManualActions.Update,
                                         CurrentUser.EmailAddress,
-                                        nameof(@return.ReturnId),
-                                        @return.ReturnId.ToString(),
-                                        nameof(Return.AccountingDate),
+                                        nameof(statement.StatementId),
+                                        statement.StatementId.ToString(),
+                                        nameof(Statement.SubmissionDeadline),
                                         oldDate.ToString(),
                                         newDate.ToString(),
                                         comment));
@@ -1710,12 +1710,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     if (badScopeDates)
                         foreach (var scope in org.OrganisationScopes)
                         {
-                            var oldDate = scope.SnapshotDate;
+                            var oldDate = scope.SubmissionDeadline;
                             var newDate =
-                                _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.GetReportingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
-                            scope.SnapshotDate = newDate;
+                            scope.SubmissionDeadline = newDate;
                             if (!test)
                                 await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
@@ -1724,7 +1724,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         CurrentUser.EmailAddress,
                                         nameof(scope.OrganisationScopeId),
                                         scope.OrganisationScopeId.ToString(),
-                                        nameof(scope.SnapshotDate),
+                                        nameof(scope.SubmissionDeadline),
                                         oldDate.ToString(),
                                         newDate.ToString(),
                                         comment));
@@ -1788,10 +1788,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var oldSector = org.SectorType;
 
                 var badReturnDates = false;
-                foreach (var @return in org.Returns)
+                foreach (var statement in org.Statements)
                 {
-                    var oldDate = @return.AccountingDate;
-                    var newDate = _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    var oldDate = statement.SubmissionDeadline;
+                    var newDate = _adminService.SharedBusinessLogic.GetReportingDeadline(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badReturnDates = true;
@@ -1801,8 +1801,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var badScopeDates = false;
                 foreach (var scope in org.OrganisationScopes)
                 {
-                    var oldDate = scope.SnapshotDate;
-                    var newDate = _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                    var oldDate = scope.SubmissionDeadline;
+                    var newDate = _adminService.SharedBusinessLogic.GetReportingStartDate(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badScopeDates = true;
@@ -1870,28 +1870,28 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     //Set accounting Date
                     if (badReturnDates)
-                        foreach (var @return in org.Returns)
+                        foreach (var statement in org.Statements)
                         {
-                            var oldDate = @return.AccountingDate;
+                            var oldDate = statement.SubmissionDeadline;
                             var newDate =
-                                _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.GetReportingDeadline(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
-                            @return.AccountingDate = newDate;
+                            statement.SubmissionDeadline = newDate;
                             if (!test)
                                 await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
                                         ManualActions.Update,
                                         CurrentUser.EmailAddress,
-                                        nameof(@return.ReturnId),
-                                        @return.ReturnId.ToString(),
-                                        nameof(Return.AccountingDate),
+                                        nameof(statement.StatementId),
+                                        statement.StatementId.ToString(),
+                                        nameof(Statement.SubmissionDeadline),
                                         oldDate.ToString(),
                                         newDate.ToString(),
                                         comment));
 
-                            if (string.IsNullOrWhiteSpace(@return.ResponsiblePerson))
+                            if (string.IsNullOrWhiteSpace(statement.ApprovingPerson))
                                 writer.WriteLine(
                                     Color.Orange,
                                     $"    WARNING: No personal responsible for '{employerRef}' for data submited for year '{oldDate.Year}'");
@@ -1901,12 +1901,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     if (badScopeDates)
                         foreach (var scope in org.OrganisationScopes)
                         {
-                            var oldDate = scope.SnapshotDate;
+                            var oldDate = scope.SubmissionDeadline;
                             var newDate =
-                                _adminService.SharedBusinessLogic.GetAccountingStartDate(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.GetReportingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
-                            scope.SnapshotDate = newDate;
+                            scope.SubmissionDeadline = newDate;
                             if (!test)
                                 await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
@@ -1915,7 +1915,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         CurrentUser.EmailAddress,
                                         nameof(scope.OrganisationScopeId),
                                         scope.OrganisationScopeId.ToString(),
-                                        nameof(scope.SnapshotDate),
+                                        nameof(scope.SubmissionDeadline),
                                         oldDate.ToString(),
                                         newDate.ToString(),
                                         comment));

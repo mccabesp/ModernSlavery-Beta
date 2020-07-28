@@ -12,6 +12,8 @@ namespace ModernSlavery.Core.Interfaces
 
         TEntity Get<TEntity>(params object[] keyValues) where TEntity : class;
 
+        Task<TEntity> GetAsync<TEntity>(params object[] keyValues) where TEntity : class;
+
         IQueryable<TEntity> GetAll<TEntity>() where TEntity : class;
 
         Task<bool> AnyAsync<TEntity>(Expression<Func<TEntity, bool>> predicate = null) where TEntity : class;
@@ -36,6 +38,8 @@ namespace ModernSlavery.Core.Interfaces
             Expression<Func<TEntity, bool>> filterPredicate = null) where TEntity : class;
 
         void Insert<TEntity>(TEntity entity) where TEntity : class;
+
+        void Update<TEntity>(TEntity entity) where TEntity : class;
 
         Task SaveChangesAsync();
 

@@ -42,18 +42,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 
         #region Encypt Decrypt
 
-        public static bool DecryptToId(this string enc, out long decId)
-        {
-            decId = 0;
-            if (string.IsNullOrWhiteSpace(enc)) return false;
-
-            var id = Encryption.DecryptQuerystring(enc).ToInt64();
-            if (id <= 0) return false;
-
-            decId = id;
-            return true;
-        }
-
         public static bool DecryptToParams(this string enc, out List<string> outParams)
         {
             outParams = null;

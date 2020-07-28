@@ -8,7 +8,6 @@ namespace ModernSlavery.Core.Entities
     {
         public UserOrganisation()
         {
-            Organisations = new HashSet<Organisation>();
         }
 
         public long UserId { get; set; }
@@ -24,8 +23,7 @@ namespace ModernSlavery.Core.Entities
         public DateTime Modified { get; set; } = VirtualDateTime.Now;
         public long? AddressId { get; set; }
         public RegistrationMethods Method { get; set; } = RegistrationMethods.Unknown;
-        public virtual ICollection<Organisation> Organisations { get; set; }
-
+        
         public virtual Organisation Organisation { get; set; }
 
         public virtual OrganisationAddress Address { get; set; }

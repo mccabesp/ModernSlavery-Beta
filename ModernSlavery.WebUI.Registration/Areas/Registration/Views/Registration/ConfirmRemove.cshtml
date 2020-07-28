@@ -1,10 +1,11 @@
 ﻿@model RemoveOrganisationModel
+@inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
 @{
     Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Confirm removal of organisation - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
 
-    var userId = Encryption.DecryptQuerystring(Model.EncUserId).ToInt64();
+    var userId = Obfuscator.DeObfuscate(Model.EncUserId).ToInt64();
     var userRemovingSelf = controller.CurrentUser.UserId == userId && controller.IsImpersonatingUser == false;
     var userNamePostFix = userRemovingSelf ? "You" : "";
 }
@@ -53,13 +54,13 @@
                         </dd>
                     </div>
                 </dl>
-                <br/>
+                <br />
                 <div class="form-group">
                     <p>
                         <button type="submit" class="button button-warning" name="id">Remove user</button>
                     </p>
                     <p>
-                        <a href="@Url.Action("ManageOrganisation", new {id = Model.EncOrganisationId})">Cancel</a>
+                        <a href="@Url.Action("ManageOrganisation", new {organisationIdentifier = Model.EncOrganisationId})">Cancel</a>
                     </p>
                 </div>
             </div>

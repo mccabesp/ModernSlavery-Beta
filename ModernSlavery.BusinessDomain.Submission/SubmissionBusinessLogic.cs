@@ -48,7 +48,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var orgSubmission = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Return>(
                 s => s.AccountingDate.Year == snapshotYear
                      && s.OrganisationId == organisationId
-                     && s.Status == ReturnStatuses.Submitted);
+                     && s.Status == StatementStatuses.Submitted);
 
             return orgSubmission;
         }
@@ -68,11 +68,11 @@ namespace ModernSlavery.BusinessDomain.Submission
         public virtual IEnumerable<SubmissionsFileModel> GetSubmissionsFileModelByYear(int year)
         {
             var scopes = _sharedBusinessLogic.DataRepository.GetAll<OrganisationScope>()
-                .Where(os => os.SnapshotDate.Year == year && os.Status == ScopeRowStatuses.Active)
-                .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SnapshotDate}).ToList();
+                .Where(os => os.SubmissionDeadline.Year == year && os.Status == ScopeRowStatuses.Active)
+                .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SubmissionDeadline}).ToList();
 
             var returns = _sharedBusinessLogic.DataRepository.GetAll<Return>()
-                .Where(r => r.AccountingDate.Year == year && r.Status == ReturnStatuses.Submitted).ToList();
+                .Where(r => r.AccountingDate.Year == year && r.Status == StatementStatuses.Submitted).ToList();
 
 #if DEBUG
             if (Debugger.IsAttached) returns = returns.Take(100).ToList();
@@ -86,7 +86,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     // inner
                     r => new {r.OrganisationId, r.AccountingDate.Year},
                     // outer
-                    os => new {os.OrganisationId, os.SnapshotDate.Year},
+                    os => new {os.OrganisationId, os.SubmissionDeadline.Year},
                     // into
                     (r, os) => new {r, os = os.FirstOrDefault()})
                 .ToList()
@@ -135,8 +135,8 @@ namespace ModernSlavery.BusinessDomain.Submission
         public virtual IEnumerable<LateSubmissionsFileModel> GetLateSubmissions()
         {
             // get the snapshot dates to filter submissions by
-            var curPrivateSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(SectorTypes.Private);
-            var curPublicSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(SectorTypes.Public);
+            var curPrivateSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(SectorTypes.Private);
+            var curPublicSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(SectorTypes.Public);
             var prevPrivateSnapshotDate = curPrivateSnapshotDate.AddYears(-1);
             var prevPublicSnapshotDate = curPublicSnapshotDate.AddYears(-1);
 
@@ -155,7 +155,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     r => string.IsNullOrEmpty(r.Modifications)
                          || r.Modifications.ToLower().Contains("figures")
                          || r.Modifications.ToLower().Contains("personresponsible"))
-                .Where(r => r.Status == ReturnStatuses.Submitted)
+                .Where(r => r.Status == StatementStatuses.Submitted)
                 .Select(
                     r => new
                     {
@@ -177,8 +177,8 @@ namespace ModernSlavery.BusinessDomain.Submission
             // create scope table query
             var activeScopes = _sharedBusinessLogic.DataRepository.GetAll<OrganisationScope>()
                 .Where(os =>
-                    os.SnapshotDate.Year == prevPrivateSnapshotDate.Year && os.Status == ScopeRowStatuses.Active)
-                .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SnapshotDate}).ToList();
+                    os.SubmissionDeadline.Year == prevPrivateSnapshotDate.Year && os.Status == ScopeRowStatuses.Active)
+                .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SubmissionDeadline}).ToList();
 
             // perform a left join on lateSubmissions and activeScopes
             var records = lateSubmissions.AsQueryable().GroupJoin(
@@ -188,7 +188,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     // inner
                     r => new {r.OrganisationId, r.AccountingDate.Year},
                     // outer
-                    os => new {os.OrganisationId, os.SnapshotDate.Year},
+                    os => new {os.OrganisationId, os.SubmissionDeadline.Year},
                     // into
                     (r, os) => new {r, os = os.FirstOrDefault()})
                 // ensure we only have in scope returns
@@ -279,7 +279,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     InternalMessages.HttpNotFoundCausedByOrganisationReturnNotInDatabase(_sharedBusinessLogic.Obfuscator.Obfuscate(organisation.OrganisationId),
                         year));
 
-            var result = reports.OrderByDescending(r => r.Status == ReturnStatuses.Submitted)
+            var result = reports.OrderByDescending(r => r.Status == StatementStatuses.Submitted)
                 .ThenByDescending(r => r.StatusDate)
                 .FirstOrDefault();
             if (!result.IsSubmitted())

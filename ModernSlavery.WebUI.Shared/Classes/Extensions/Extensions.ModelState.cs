@@ -126,6 +126,14 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
         }
 
         public static void AddModelError(this ModelStateDictionary modelState,
+            CustomError error,
+            string propertyName = null,
+            object parameters = null)
+        {
+            AddModelError(modelState, error.Code, propertyName, parameters);
+        }
+
+        public static void AddModelError(this ModelStateDictionary modelState,
             int errorCode,
             string propertyName = null,
             object parameters = null)

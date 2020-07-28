@@ -55,17 +55,17 @@
     </thead>
     <tbody class="govuk-table__body">
     @{ var previousSnapshotDate = DateTime.MinValue; }
-    @foreach (var scope in Model.OrganisationScopes.OrderByDescending(s => s.SnapshotDate).ThenByDescending(s => s.ScopeStatusDate))
+    @foreach (var scope in Model.OrganisationScopes.OrderByDescending(s => s.SubmissionDeadline).ThenByDescending(s => s.ScopeStatusDate))
     {
         <tr class="govuk-table__row">
-            @if (scope.SnapshotDate == previousSnapshotDate)
+            @if (scope.SubmissionDeadline == previousSnapshotDate)
             {
                     @* Omit this TD, a TD above has a rowspan that covers this row *@
             }
             else
             {
-                <th scope="row" class="govuk-table__cell" rowspan="@(Model.OrganisationScopes.Count(s => s.SnapshotDate == scope.SnapshotDate))">
-                    @(ReportingPeriodHelper.FormatReportingPeriod(scope.SnapshotDate.Year))
+                <th scope="row" class="govuk-table__cell" rowspan="@(Model.OrganisationScopes.Count(s => s.SubmissionDeadline == scope.SubmissionDeadline))">
+                    @(ReportingPeriodHelper.FormatReportingPeriod(scope.SubmissionDeadline.Year))
                 </th>
             }
             <td class="govuk-table__cell">@(scope.ScopeStatus)</td>
@@ -76,21 +76,21 @@
             </td>
             <td class="govuk-table__cell">@(scope.ScopeStatusDate.ToString("d MMM yyyy"))</td>
             <td class="govuk-table__cell">@(scope.Status)</td>
-            @if (scope.SnapshotDate == previousSnapshotDate)
+            @if (scope.SubmissionDeadline == previousSnapshotDate)
             {
                     @* Omit this TD, a TD above has a rowspan that covers this row *@
             }
             else
             {
-                <td class="govuk-table__cell" rowspan="@(Model.OrganisationScopes.Count(s => s.SnapshotDate == scope.SnapshotDate))">
-                    <a href="@Url.Action("ChangeScopeGet", "AdminOrganisationScope", new {id = scope.OrganisationId, year = scope.SnapshotDate.Year})"
+                <td class="govuk-table__cell" rowspan="@(Model.OrganisationScopes.Count(s => s.SubmissionDeadline == scope.SubmissionDeadline))">
+                    <a href="@Url.Action("ChangeScopeGet", "AdminOrganisationScope", new {id = scope.OrganisationId, year = scope.SubmissionDeadline.Year})"
                        class="govuk-link">
-                        Change <span class="govuk-visually-hidden"> scope for @(ReportingPeriodHelper.FormatReportingPeriod(scope.SnapshotDate.Year))</span>
+                        Change <span class="govuk-visually-hidden"> scope for @(ReportingPeriodHelper.FormatReportingPeriod(scope.SubmissionDeadline.Year))</span>
                     </a>
                 </td>
             }
         </tr>
-        previousSnapshotDate = scope.SnapshotDate;
+        previousSnapshotDate = scope.SubmissionDeadline;
     }
     </tbody>
 </table>

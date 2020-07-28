@@ -9,6 +9,7 @@ namespace ModernSlavery.Infrastructure.Database
         public string ConnectionString { get; set; } =
             @"Server=(localdb)\ProjectsV13;Initial Catalog=ModernSlaveryDb;Trusted_Connection=True;";
 
+        public string MigrationAppName { get; set; }
         public bool UseMigrations { get; set; }
         public bool EncryptEmails { get; set; } = true;
     }

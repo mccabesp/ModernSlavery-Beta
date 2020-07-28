@@ -1,0 +1,25 @@
+﻿@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model SubmissionCompleteViewModel
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken();
+
+            <div class="govuk-panel govuk-panel--confirmation">
+                <h1 class="govuk-panel__title">                  
+                        @Model.PageTitle                  
+                </h1>
+                <div class="govuk-panel__body">
+                    You've submitted your Modern Slavery Statement for @(Model.ReportingDeadlineYear-1) to @((Model.ReportingDeadlineYear))
+                </div>
+            </div>
+
+            <a href="@Model.ContinueUrl">Manage Organisations</a>          
+            <a asp-action="SignOut" asp-controller="Account" asp-area="Account">Finish and sign out</a>
+        }
+
+    </div>
+</div>

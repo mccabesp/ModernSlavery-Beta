@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Admin.Models
         public string Reason { get; set; }
     }
 
-    public enum AcceptCompaniesHouseName
+    public enum AcceptCompaniesHouseName : byte
     {
         [GovUkRadioCheckboxLabelText(Text = "Yes, use this name from Companies House")]
         Accept,
@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Admin.Models
         Reject
     }
 
-    public enum ManuallyChangeOrganisationNameViewModelActions
+    public enum ManuallyChangeOrganisationNameViewModelActions : byte
     {
         Unknown = 0,
         OfferNewCompaniesHouseName = 1,

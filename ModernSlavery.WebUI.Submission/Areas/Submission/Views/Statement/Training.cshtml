@@ -1,0 +1,63 @@
+﻿@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model TrainingPageViewModel
+<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @await Html.CustomValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="training-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-heading-l">
+                            @Model.PageTitle
+                        </h1>
+                        <h2 class="govuk-heading-m">
+                            Have you provided training on modern slavery and trafficking during the past year, or any other activities to raise awareness? If so, who was this for?
+                        </h2>
+                    </legend>
+                    <span id="training-hint" class="govuk-hint">
+                        Select all that apply
+                    </span>
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        @foreach (var trainingType in Model.TrainingTypes)
+                        {
+                            <div class="govuk-checkboxes__item">
+                                <input name="Training" value="@trainingType.Id" id="@($"training{trainingType.Id}")" checked=@(Model.Training.Contains(trainingType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="training-conditional">
+                                <label class="govuk-label govuk-checkboxes__label" id="@($"training{trainingType.Id}")">
+                                    @trainingType.Description
+                                </label>
+                            </div>
+                            @if (trainingType.Description.Equals("Other"))
+                            {
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="training-conditional">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="other">
+                                            Please specify
+                                        </label>
+                                        <input asp-for="OtherTraining" class="govuk-input govuk-!-width-one-third" id="contact-by-email" name="OtherTraining" spellcheck="false">
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </fieldset>
+            </div>
+
+           
+           <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Continue
+            </button>
+
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+                Cancel
+            </button>
+
+        }
+    </div>
+
+</div>

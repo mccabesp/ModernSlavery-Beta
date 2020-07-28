@@ -185,7 +185,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             await ScopePresentation.SaveScopesAsync(stateModel, snapshotYears);
 
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            var currentSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType);
+            var currentSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType);
             if (stateModel.AccountingDate == currentSnapshotDate)
             {
                 var emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
@@ -196,7 +196,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             //Start new user registration
             return RedirectToAction("ManageOrganisation", "Submission",
-                new {id = Encryption.EncryptQuerystring(stateModel.OrganisationId.ToString())});
+                new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(stateModel.OrganisationId.ToString())});
         }
 
 
@@ -319,7 +319,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             StashModel(stateModel);
 
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            var currentSnapshotDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType);
+            var currentSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType);
             if (stateModel.AccountingDate == currentSnapshotDate)
             {
                 var emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
@@ -365,7 +365,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return RedirectToAction(
                     "ManageOrganisation",
                     "Submission",
-                    new {id = Encryption.EncryptQuerystring(stateModel.OrganisationId.ToString())});
+                    new {id = SharedBusinessLogic.Obfuscator.Obfuscate(stateModel.OrganisationId.ToString())});
 
             // when not auth then save codes and return ManageOrganisations redirect
             if (!stateModel.IsSecurityCodeExpired)
@@ -384,7 +384,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (checkResult != null) return checkResult;
 
             // Decrypt org id
-            if (!id.DecryptToId(out var organisationId))
+            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(id);
+            if (organisationId==0)
                 return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
 
             // Check the user has permission for this organisation
@@ -399,7 +400,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.EmployerReference}");
 
             //Get the current snapshot date
-            var snapshotDate = SharedBusinessLogic.GetAccountingStartDate(userOrg.Organisation.SectorType).AddYears(-1);
+            var snapshotDate = SharedBusinessLogic.GetReportingStartDate(userOrg.Organisation.SectorType).AddYears(-1);
             if (snapshotDate.Year < SharedBusinessLogic.SharedOptions.FirstReportingYear)
                 return new HttpBadRequestResult($"Snapshot year {snapshotDate.Year} is invalid");
 
@@ -427,7 +428,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (checkResult != null) return checkResult;
 
             // Decrypt org id
-            if (!id.DecryptToId(out var organisationId))
+            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(id);
+            if (organisationId==0)
                 return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
 
 
@@ -477,7 +479,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 ScopeStatus = model.ScopeStatus.Value,
                 Status = ScopeRowStatuses.Active,
                 ScopeStatusDate = VirtualDateTime.Now,
-                SnapshotDate = model.SnapshotDate
+                SubmissionDeadline = model.SnapshotDate
             };
 
             //Save the new declared scopes
@@ -486,20 +488,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         [Authorize]
-        [HttpGet("~/change-organisation-scope/{request}")]
-        public async Task<IActionResult> ChangeOrganisationScope(string request)
+        [HttpGet("~/change-organisation-scope/{organisationIdentifier}/{reportingDeadlineYear}")]
+        public async Task<IActionResult> ChangeOrganisationScope(string organisationIdentifier,int reportingDeadlineYear)
         {
             // Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            // Decrypt request
-            if (!request.DecryptToParams(out var requestParams))
-                return new HttpBadRequestResult($"Cannot decrypt request parameters '{request}'");
-
             // Extract the request vars
-            var organisationId = requestParams[0].ToInt64();
-            var reportingStartYear = requestParams[1].ToInt32();
+            long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
 
             // Check the user has permission for this organisation
             var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
@@ -511,12 +508,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var stateModel = ScopePresentation.CreateScopingViewModel(userOrg.Organisation, CurrentUser);
 
             // Get the latest scope for the reporting year
-            var latestScope = stateModel.ThisScope.SnapshotDate.Year == reportingStartYear ? stateModel.ThisScope :
-                stateModel.LastScope.SnapshotDate.Year == reportingStartYear ? stateModel.LastScope : null;
+            var latestScope = stateModel.ThisScope.SnapshotDate.Year == reportingDeadlineYear ? stateModel.ThisScope :
+                stateModel.LastScope.SnapshotDate.Year == reportingDeadlineYear ? stateModel.LastScope : null;
 
             // Set the return url
             stateModel.StartUrl = Url.Action("ManageOrganisation",
-                new {id = Encryption.EncryptQuerystring(organisationId.ToString())});
+                new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(organisationId.ToString())});
             stateModel.IsChangeJourney = true;
             stateModel.AccountingDate = latestScope.SnapshotDate;
 

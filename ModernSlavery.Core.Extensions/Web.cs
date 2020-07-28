@@ -10,7 +10,7 @@ namespace ModernSlavery.Core.Extensions
 {
     public static class Web
     {
-        public enum HttpMethods
+        public enum HttpMethods : byte
         {
             Get,
             Post,

@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Submission.Classes;
+using ModernSlavery.WebUI.Submission.Models;
+using ModernSlavery.WebUI.Submission.Models.Statement;
+using ModernSlavery.WebUI.Submission.Presenters;
 
 namespace ModernSlavery.WebUI.Submission
 {
@@ -25,13 +28,18 @@ namespace ModernSlavery.WebUI.Submission
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //TODO: Register service dependencies here
+            //Register service dependencies here
+            services.AddSingleton<SectorTypeIndex>();
+            services.AddSingleton<PolicyTypeIndex>();
+            services.AddSingleton<RiskTypeIndex>();
+            services.AddSingleton<DiligenceTypeIndex>();
+            services.AddSingleton<TrainingTypeIndex>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
             //Register dependencies here
-            builder.RegisterType<SubmissionPresenter>().As<ISubmissionPresenter>()
+            builder.RegisterType<StatementPresenter>().As<IStatementPresenter>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ScopePresenter>().As<IScopePresenter>().InstancePerLifetimeScope();
         }

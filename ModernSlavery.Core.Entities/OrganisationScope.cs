@@ -8,7 +8,6 @@ namespace ModernSlavery.Core.Entities
     {
         public OrganisationScope()
         {
-            Organisations = new HashSet<Organisation>();
         }
 
         public long OrganisationScopeId { get; set; }
@@ -24,11 +23,10 @@ namespace ModernSlavery.Core.Entities
         public bool? ReadGuidance { get; set; }
         public string Reason { get; set; }
         public string CampaignId { get; set; }
-        public DateTime SnapshotDate { get; set; }
+        public DateTime SubmissionDeadline { get; set; }
         public ScopeRowStatuses Status { get; set; }
         public string StatusDetails { get; set; }
 
         public virtual Organisation Organisation { get; set; }
-        public virtual ICollection<Organisation> Organisations { get; set; }
     }
 }

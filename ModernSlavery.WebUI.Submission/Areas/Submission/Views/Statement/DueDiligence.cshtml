@@ -1,0 +1,164 @@
+﻿@using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
+@{
+    Layout = "/Views/GdsLayout.cshtml";
+    var diligenceIndex = 0;
+}
+@model DueDiligencePageViewModel
+<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @await Html.CustomValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+
+            <h2>@Model.SubTitle</h2>
+
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
+
+            <h2 class="govuk-heading-m">
+                What methods does your organisation use to monitor working conditions in your operations and supply chain?
+            </h2>
+
+            @*TODO: make into a partial view with checkbox counts*@
+
+            <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+                @foreach (var parentType in Model.DiligenceTypes.Where(x => x.ParentId == null))
+                {
+                    <div class="govuk-accordion__section ">
+                        <div class="govuk-accordion__section-header">
+                            <h2 class="govuk-accordion__section-heading">
+                                <span class="govuk-accordion__section-button" id="accordion-default-heading">
+                                    @parentType.Description
+                                </span>
+                            </h2>
+                        </div>
+                        <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <div class="govuk-checkboxes">
+                                        @foreach (var childType in Model.DiligenceTypes.Where(t => t.ParentId == parentType.Id))
+                                        {
+                                            <div class="govuk-checkboxes__item">
+                                                <input name="DueDiligences[@diligenceIndex].Id" value="@childType.Id" id="@($"DiligenceId{childType.Id}")" checked=@(Model.DueDiligences.Any(r => r.Id == childType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="conditional-conditional">
+                                                <label class="govuk-label govuk-checkboxes__label" for="@($"DiligenceId{childType.Id}")">
+                                                    @childType.Description
+                                                </label>
+                                            </div>
+                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional" style="display:@(parentType.Description.Contains("Other") ? "block" : "none")">
+                                                <div class="govuk-form-group">
+                                                    <label class="govuk-label" for="@($"DiligenceDetails{childType.Id}")">
+                                                        Please specify other @parentType.Description
+                                                    </label>
+                                                    <input name="DueDiligences[@diligenceIndex].Details" id="@($"DiligenceDetails{childType.Id}")" class="govuk-input govuk-!-width-one-third" type="text">
+                                                </div>
+                                            </div>
+                                            { diligenceIndex++; }
+                                        }
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h2 class="govuk-heading-m">
+                            Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.
+                        </h2>
+                    </legend>
+                    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input asp-for="HasForceLabour" value="false" class="govuk-radios__input" id="has-forced-labour-conditional" name="has-forced-labour" type="radio" data-aria-controls="conditional-has-forced-labour-conditional">
+                            <label class="govuk-label govuk-radios__label" for="has-forced-labour-conditional">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-forced-labour-conditional">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label" for="has-forced-labour-detail">
+                                    Please provide detail
+                                </label>
+                                <textarea asp-for="ForcedLabourDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="has-forced-labour-detail" name="has-forced-labour-detail" type="text"></textarea>
+                            </div>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input asp-for="HasForceLabour" value="false" class="govuk-radios__input" id="has-forced-labour" name="has-forced-labour" type="radio">
+                            <label class="govuk-label govuk-radios__label">
+                                No
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h2 class="govuk-heading-m">
+                            Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?
+                        </h2>
+                    </legend>
+                    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input asp-for="HasSlaveryInstance" value="false" class="govuk-radios__input" id="has-slavery-instance-conditional" name="has-slavery-instance" type="radio" data-aria-controls="conditional-has-slavery-instance-conditional">
+                            <label class="govuk-label govuk-radios__label" for="has-slavery-instance-conditional">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-slavery-instance-conditional">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label" for="has-slavery-instance-detail">
+                                    Please provide detail
+                                </label>
+                                <textarea asp-for="SlaveryInstanceDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="has-slavery-instance-detail" name="has-slavery-instance-detail" type="text"></textarea>
+                            </div>
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                                        <h2 class="govuk-heading-m">
+                                            What remediation action did your organisation take in response?
+                                        </h2>
+                                    </legend>
+                                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                                        @foreach (DueDiligencePageViewModel.StatementRemediation item in Enum.GetValues(typeof(DueDiligencePageViewModel.StatementRemediation)))
+                                        {
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" id="remediation-conditional" type="checkbox" checked=@(item == Model.SelectedRemediation) data-aria-controls="remediation-conditional">
+                                                <label class="govuk-label govuk-checkboxes__label" for="remediation-conditional">
+                                                    @(item.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text)
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input asp-for="HasSlaveryInstance" value="false" class="govuk-radios__input" id="has-slavery-instance" name="has-slavery-instance" type="radio">
+                            <label class="govuk-label govuk-radios__label">
+                                No
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Continue
+            </button>
+
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+                Cancel
+            </button>
+        }
+    </div>
+
+</div>
