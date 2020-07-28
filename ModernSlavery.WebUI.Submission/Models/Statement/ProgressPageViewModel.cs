@@ -12,10 +12,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public ProgressPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, ProgressPageViewModel>()
-                .ForMember(s => s.BackUrl, opt => opt.Ignore())
-                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
-                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+            CreateMap<StatementModel, ProgressPageViewModel>();
 
             CreateMap<ProgressPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())

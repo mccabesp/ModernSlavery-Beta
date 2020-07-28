@@ -8,11 +8,8 @@
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
         {
-            var controller = ViewData["Controller"] as BaseController;
-
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ContinueUrl);
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -39,12 +36,12 @@
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         @foreach (var sectorType in Model.SectorTypes)
                         {
-                        <div class="govuk-checkboxes__item">
-                            <input name="Sectors" value="@sectorType.Id" id="@($"sector{sectorType.Id}")" checked=@(Model.Sectors.Contains(sectorType.Id)) class="govuk-checkboxes__input" type="checkbox">
-                            <label class="govuk-label govuk-checkboxes__label" for="@($"sector{sectorType.Id}")">
-                                @sectorType.Description
-                            </label>
-                        </div>
+                            <div class="govuk-checkboxes__item">
+                                <input name="Sectors" value="@sectorType.Id" id="@($"sector{sectorType.Id}")" checked=@(Model.Sectors.Contains(sectorType.Id)) class="govuk-checkboxes__input" type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"sector{sectorType.Id}")">
+                                    @sectorType.Description
+                                </label>
+                            </div>
                         }
                     </div>
                 </fieldset>
@@ -62,11 +59,13 @@
                         Classes = "govuk-!-margin-top-6"
                     }
                     ))
-
-            <button class="govuk-button" data-module="govuk-button" type="submit">
+            <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Continue
             </button>
-            <a class="govuk-button govuk-button--secondary" href="@Model.CancelUrl">Cancel</a>
+
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+                Cancel
+            </button>
         }
     </div>
 </div>

@@ -18,7 +18,6 @@
         {
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ContinueUrl);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
@@ -107,15 +106,15 @@
                     </ul>
                 </li>
             </ol>
-            <button class="govuk-button" data-module="govuk-button" type="submit">
+            <button class="govuk-button" data-module="govuk-button" disabled="@Model.IsComplete()" name="command" value="@BaseViewModel.CommandType.Submit">
                 Confirm and Submit
             </button>
-            <a href="@Model.ContinueUrl" asp- class="govuk-button" data-module="govuk-button">
-                Save draft
-            </a>
-            <a href="@Model.CancelUrl" class="govuk-button govuk-button--secondary" data-module="govuk-button">
-                Cancel
-            </a>
+            <button class="govuk-button" data-module="govuk-button" value="@BaseViewModel.CommandType.SaveAndExit">
+                Exit and keep changes
+            </button>
+            <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
+                Exit and lose changes
+            </button>
         }
     </div>
 </div>

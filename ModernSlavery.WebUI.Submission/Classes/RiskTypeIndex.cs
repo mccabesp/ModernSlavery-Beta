@@ -13,6 +13,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             var types = dataRepository.GetAll<StatementRiskType>().Select(t => new RiskType {Id=t.StatementRiskTypeId, ParentId = t.ParentRiskTypeId, Category = t.Category.ToString(), Description = t.Description });
             this.AddRange(types);
         }
+        public RiskTypeIndex() { }
 
         public class RiskType
         {

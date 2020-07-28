@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using System;
+using System.Text.Json.Serialization;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -14,10 +15,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public TrainingPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, TrainingPageViewModel>()
-                .ForMember(s => s.BackUrl, opt => opt.Ignore())
-                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
-                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+            CreateMap<StatementModel, TrainingPageViewModel>();
 
             CreateMap<TrainingPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
@@ -34,7 +32,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     public class TrainingPageViewModel : BaseViewModel
     {
         [IgnoreMap]
-        public TrainingTypeIndex TrainingTypes;
+        public TrainingTypeIndex TrainingTypes { get; set; }
         public TrainingPageViewModel(TrainingTypeIndex trainingTypes)
         {
             TrainingTypes = trainingTypes;
@@ -54,7 +52,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             //Get the training types
-            var TrainingTypes = validationContext.GetService<TrainingTypeIndex>();
+            TrainingTypes = validationContext.GetService<TrainingTypeIndex>();
 
             var otherId = TrainingTypes.Single(x => x.Description.Equals("Other")).Id;
 

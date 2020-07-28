@@ -7,11 +7,8 @@
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
         {
-            var controller = ViewData["Controller"] as BaseController;
-
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ContinueUrl);
 
             @(Html.GovUkErrorSummary(new[]
                 {
@@ -60,40 +57,43 @@
 
 
             @*var organisationPolicyOptions =
-                                            new Dictionary<StatementPolicies, Func<object, object>>
-                                            {
-                                       {
-                                         StatementPolicies.Other,
-                @<text>
-                    @(Html.GovUkTextInputFor(model => model.OtherPolicies))
-                    @(Html.LabelFor(model => model.OtherPolicies, new { @class = "govuk-label" }))
-                </text>
-                                        }
-                                                          };
+                                        new Dictionary<StatementPolicies, Func<object, object>>
+                                        {
+                                   {
+                                     StatementPolicies.Other,
+            @<text>
+                @(Html.GovUkTextInputFor(model => model.OtherPolicies))
+                @(Html.LabelFor(model => model.OtherPolicies, new { @class = "govuk-label" }))
+            </text>
+                                    }
+                                                      };
 
 
-                                @(Html.GovUkCheckboxesFor(
-                                model => model.PoliciesEnums,
-                                new FieldsetViewModel
+                            @(Html.GovUkCheckboxesFor(
+                            model => model.PoliciesEnums,
+                            new FieldsetViewModel
+                            {
+                                Legend = new LegendViewModel
                                 {
-                                    Legend = new LegendViewModel
-                                    {
-                                        Classes = "govuk-fieldset__legend--m"
-                                    },
-                                    Classes = "govuk-!-margin-top-6"
+                                    Classes = "govuk-fieldset__legend--m"
                                 },
-                                new HintViewModel
-                                {
-                                    Text = "Select all that apply."
-                                },
-                                organisationPolicyOptions
-                           ));*@
+                                Classes = "govuk-!-margin-top-6"
+                            },
+                            new HintViewModel
+                            {
+                                Text = "Select all that apply."
+                            },
+                            organisationPolicyOptions
+                       ));*@
 
 
-            <button class="govuk-button" data-module="govuk-button" type="submit">
+            <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Continue
             </button>
-            <a class="govuk-button govuk-button--secondary" href="@Model.CancelUrl">Cancel</a>
+
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+                Cancel
+            </button>
         }
 
     </div>

@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -19,14 +20,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel.DiligenceModel, DueDiligencePageViewModel.DueDiligenceViewModel>().ReverseMap();
 
-            CreateMap<StatementModel, DueDiligencePageViewModel>()
-                .ForMember(s => s.HasForceLabour, opt => opt.Ignore())
-                .ForMember(s => s.HasSlaveryInstance, opt => opt.Ignore())
-                .ForMember(s => s.BackUrl, opt => opt.Ignore())
-                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
-                .ForMember(s => s.ContinueUrl, opt => opt.Ignore())
-                .ForMember(s => s.SelectedRemediation, opt => opt.Ignore())
-                .ForMember(s => s.OtherRemediation, opt => opt.Ignore());
+            CreateMap<StatementModel, DueDiligencePageViewModel>();
 
             CreateMap<DueDiligencePageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
@@ -49,7 +43,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     public class DueDiligencePageViewModel : BaseViewModel
     {
         [IgnoreMap]
-        public DiligenceTypeIndex DiligenceTypes;
+        public DiligenceTypeIndex DiligenceTypes { get; set; }
         public DueDiligencePageViewModel(DiligenceTypeIndex diligenceTypes)
         {
             DiligenceTypes = diligenceTypes;
@@ -91,18 +85,23 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public List<DueDiligenceViewModel> DueDiligences { get; set; } = new List<DueDiligenceViewModel>();
 
+        [IgnoreMap]
         public bool? HasForceLabour { get; set; }
 
         [MaxLength(500)]
         public string ForcedLabourDetails { get; set; }
 
+        [IgnoreMap]
         public bool? HasSlaveryInstance { get; set; }
 
         [MaxLength(500)]
         public string SlaveryInstanceDetails { get; set; }
 
+        [IgnoreMap]
         public StatementRemediation SelectedRemediation { get; set; }
         private string _OtherRemediation;
+        
+        [IgnoreMap]
         public string OtherRemediation
         {
             get
@@ -148,7 +147,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             DueDiligences.RemoveAll(r => r.Id == 0);
 
             //Get the diligence types
-            var DiligenceTypes = validationContext.GetService<DiligenceTypeIndex>();
+            DiligenceTypes = validationContext.GetService<DiligenceTypeIndex>();
 
             var otherId = DiligenceTypes.Single(x => x.Description.EqualsI("other type of social audit")).Id;
             var otherDiligence = DueDiligences.FirstOrDefault(x => x.Id == otherId);

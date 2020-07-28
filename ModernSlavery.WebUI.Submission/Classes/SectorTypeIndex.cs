@@ -13,6 +13,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             var types = dataRepository.GetAll<StatementSectorType>().Select(t => new SectorType { Id=t.StatementSectorTypeId, Description = t.Description });
             this.AddRange(types);
         }
+        public SectorTypeIndex() { }
 
         public class SectorType
         {

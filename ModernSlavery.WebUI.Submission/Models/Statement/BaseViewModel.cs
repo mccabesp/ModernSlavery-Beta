@@ -10,6 +10,16 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
     public abstract class BaseViewModel: GovUkViewModel, IValidatableObject
     {
+        public enum CommandType
+        {
+            Unknown=0,
+            Cancel=1,
+            Continue=2,
+            SaveAndExit=3,
+            DiscardAndExit=4,
+            Submit = 5
+        }
+
         [BindNever]
         public bool CanRevertToOriginal { get; set; }
 
@@ -25,7 +35,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public string CancelUrl { get; set; }
 
         [IgnoreMap]
-        [BindRequired]
+        [BindNever]
         public string ContinueUrl { get; set; }
 
         [IgnoreMap]

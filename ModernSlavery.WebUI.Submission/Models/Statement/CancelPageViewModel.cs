@@ -10,13 +10,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public CancelPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel,CancelPageViewModel>()
-                .ForMember(s => s.BackUrl, opt => opt.Ignore())
-                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
-                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+            CreateMap<StatementModel, CancelPageViewModel>();
 
             CreateMap<CancelPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
+                .ForSourceMember(s => s.ErrorCount, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
@@ -30,9 +28,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public override string PageTitle => "Cancel Statement";
 
+        [IgnoreMap]
+        public int ErrorCount { get; set; }
+
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            throw new System.NotImplementedException();
+            yield break;
         }
     }
 }
