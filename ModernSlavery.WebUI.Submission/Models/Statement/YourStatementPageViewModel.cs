@@ -107,15 +107,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("Please complete the Start Date");
 
             var endDateList = new List<int?> { StatementEndDay, StatementEndMonth, StatementEndYear };
-            if (endDateList.Any(x => x.HasValue) && !endDateList.Any(x => !x.HasValue))
+            if (endDateList.Any(x => x.HasValue) && endDateList.Any(x => !x.HasValue))
                 yield return new ValidationResult("Please complete the End Date");
 
             var approvalDateList = new List<int?> { ApprovedDay, ApprovedMonth, ApprovedYear };
-            if (approvalDateList.Any(x => x.HasValue) && !approvalDateList.Any(x => !x.HasValue))
+            if (approvalDateList.Any(x => x.HasValue) && approvalDateList.Any(x => !x.HasValue))
                 yield return new ValidationResult("Please complete the Approved Date");
 
             var detailsList = new List<string> { ApproverFirstName, ApproverLastName, ApproverJobTitle };
-            if (detailsList.Any(x => string.IsNullOrWhiteSpace(x)) && !detailsList.Any(x => string.IsNullOrWhiteSpace(x)))
+            if (detailsList.Any(x => string.IsNullOrWhiteSpace(x)) && detailsList.Any(x => string.IsNullOrWhiteSpace(x)))
                 yield return new ValidationResult("Please complete First name, Last name, Job title");
         }
 
