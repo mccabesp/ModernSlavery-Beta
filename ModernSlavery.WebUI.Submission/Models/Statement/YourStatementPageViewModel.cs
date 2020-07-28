@@ -115,7 +115,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("Please complete the Approved Date");
 
             var detailsList = new List<string> { ApproverFirstName, ApproverLastName, ApproverJobTitle };
-            if (detailsList.Any(x => string.IsNullOrWhiteSpace(x)) && detailsList.Any(x => string.IsNullOrWhiteSpace(x)))
+            if (detailsList.Any(x => string.IsNullOrWhiteSpace(x)) && detailsList.Any(x => !string.IsNullOrWhiteSpace(x)))
                 yield return new ValidationResult("Please complete First name, Last name, Job title");
         }
 
