@@ -11,27 +11,7 @@
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ContinueUrl);
-            @(Html.GovUkErrorSummary(new[]
-                {
-                    nameof(YourStatementPageViewModel.StatementStartDay),
-                    nameof(YourStatementPageViewModel.StatementStartMonth),
-                    nameof(YourStatementPageViewModel.StatementStartYear),
-                    nameof(YourStatementPageViewModel.StatementEndDay),
-                    nameof(YourStatementPageViewModel.StatementEndMonth),
-                    nameof(YourStatementPageViewModel.StatementEndYear)
-                }))
-            @(Html.GovUkErrorSummary(new[]
-                {
-                    nameof(YourStatementPageViewModel.StatementUrl)
-
-                }))
-            @(Html.GovUkErrorSummary(new[]
-                {
-                    nameof(YourStatementPageViewModel.ApproverFirstName),
-                    nameof(YourStatementPageViewModel.ApproverLastName),
-                    nameof(YourStatementPageViewModel.ApproverJobTitle),
-                }))
-
+          
         <h1 class="govuk-heading-l">
             @Model.PageTitle
         </h1>
@@ -50,12 +30,11 @@
                 </div>
             </details>
             <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementUrl, "govuk-form-group--error")">
-                <label asp-for="StatementUrl" class="govuk-label"></label>
+                <label asp-for="StatementUrl" class="govuk-label govuk-label--m "></label>
                 <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
                 <input asp-for="StatementUrl" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
             </div>
-
-            //Todo: clarify format of errors as GDS as errors messages for dates
+           
             <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementStartDate, "govuk-form-group--error") @Html.SetErrorClass(model => model.StatementEndDate, "govuk-form-group--error")">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="reporting-start-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">

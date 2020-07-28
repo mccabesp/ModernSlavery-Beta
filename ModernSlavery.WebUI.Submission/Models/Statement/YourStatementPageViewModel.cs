@@ -88,8 +88,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [RegularExpression("^[0-9]*$", ErrorMessage = "Year format is incorrect")]
         public int? StatementEndYear { get; set; }
 
+        [Display(Name = "Job Title")]
         public string ApproverJobTitle { get; set; }
+        [Display(Name = "First Name")]
         public string ApproverFirstName { get; set; }
+        [Display(Name = "Last Name")]
         public string ApproverLastName { get; set; }
 
         public DateTime? ApprovedDate => ToDateTime(ApprovedYear, ApprovedMonth, ApprovedDay);
@@ -119,7 +122,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("Please provide a valid Approved Date", new[] { nameof(ApprovedDate), nameof(ApprovedDay), nameof(ApprovedMonth), nameof(ApprovedYear) });
 
             var detailsList = new List<string> { ApproverFirstName, ApproverLastName, ApproverJobTitle };
-            if (detailsList.Any(x => string.IsNullOrWhiteSpace(x)) && !detailsList.Any(x => string.IsNullOrWhiteSpace(x)))
+            if (detailsList.Any(x => string.IsNullOrWhiteSpace(x)) && detailsList.Any(x => !string.IsNullOrWhiteSpace(x)))
                 // TODO - James, these will want an error for each field that is null
                 yield return new ValidationResult("Please complete First name, Last name, Job title", detailsList.Where(x => string.IsNullOrWhiteSpace(x)));
         }

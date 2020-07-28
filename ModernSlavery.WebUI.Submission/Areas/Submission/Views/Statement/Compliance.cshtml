@@ -13,19 +13,9 @@
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ContinueUrl);
 
-            @(Html.GovUkErrorSummary(new[]
-                {
-                    nameof(CompliancePageViewModel.IncludesStructure),
-                    nameof(CompliancePageViewModel.IncludesPolicies),
-                    nameof(CompliancePageViewModel.IncludesRisks),
-                    nameof(CompliancePageViewModel.IncludesDueDiligence),
-                    nameof(CompliancePageViewModel.IncludesTraining),
-                    nameof(CompliancePageViewModel.IncludesGoals)
-                }))
-
-        <h1 class="govuk-heading-l">
-            @Model.PageTitle
-        </h1>
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
 
             <h2 class="govuk-heading-m">
                 Does your modern slavery statement cover the following areas in relation to slavery and human trafficking?
@@ -54,10 +44,10 @@
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-structure-conditional">
                             <div class="govuk-form-group @Html.SetErrorClass(model => model.StructureDetails, "govuk-form-group--error")">
                                 <label class="govuk-label" for="include-structure-detail">
-                                    Please provide detail
+                                    Please provide details
                                 </label>
                                 <span asp-validation-for="StructureDetails" class="govuk-error-message"></span>
-                                <textarea asp-for="StructureDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-structure-detail" name="structure-details" type="text"> </textarea>
+                                <textarea asp-for="StructureDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-structure-detail" type="text"> </textarea>
                             </div>
                         </div>
                     </div>
@@ -87,7 +77,7 @@
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-policies-conditional">
                             <div class="govuk-form-group @Html.SetErrorClass(model => model.PolicyDetails, "govuk-form-group--error")">
                                 <label class="govuk-label" for="include-policies-detail">
-                                    Please provide detail
+                                    Please provide details
                                 </label>
                                 <span asp-validation-for="PolicyDetails" class="govuk-error-message"></span>
                                 <textarea asp-for="PolicyDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-policies-detail" type="text"></textarea>
@@ -119,7 +109,7 @@
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-risks-conditional">
                             <div class="govuk-form-group @Html.SetErrorClass(model => model.RisksDetails, "govuk-form-group--error")">
                                 <label class="govuk-label" for="include-risks-detail">
-                                    Please provide detail
+                                    Please provide details
                                 </label>
                                 <span asp-validation-for="RisksDetails" class="govuk-error-message"></span>
                                 <textarea asp-for="RisksDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-risks-detail"></textarea>
@@ -144,15 +134,15 @@
                             </label>
                         </div>
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesDueDiligence" value="false" class="govuk-radios__input" id="include-methods-conditional" type="radio" data-aria-controls="conditional-include-methods-conditional">
-                            <label class="govuk-label govuk-radios__label" for="include-methods-conditional">
+                            <input asp-for="IncludesDueDiligence" value="false" class="govuk-radios__input" id="include-methods-conditional" type="radio" data-aria-controls="conditional-include-dueDiligence-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-dueDiligence-conditional">
                                 No
                             </label>
                         </div>
-                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-methods-conditional">
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-dueDiligence-conditional">
                             <div class="govuk-form-group @Html.SetErrorClass(model => model.DueDiligenceDetails, "govuk-form-group--error")">
-                                <label class="govuk-label" for="include-methods-detail">
-                                    Please provide detail
+                                <label class="govuk-label" for="include-dueDiligence-detail">
+                                    Please provide details
                                 </label>
                                 <span asp-validation-for="DueDiligenceDetails" class="govuk-error-message"></span>
                                 <textarea asp-for="DueDiligenceDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-methods-detail"></textarea>
@@ -184,7 +174,7 @@
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-training-conditional">
                             <div class="govuk-form-group @Html.SetErrorClass(model => model.TrainingDetails, "govuk-form-group--error")">
                                 <label class="govuk-label" for="include-training-detail">
-                                    Please provide detail
+                                    Please provide details
                                 </label>
                                 <span asp-validation-for="TrainingDetails" class="govuk-error-message"></span>
                                 <textarea asp-for="TrainingDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-training-detail"></textarea>
@@ -209,22 +199,20 @@
                                 Yes
                             </label>
                         </div>
-
                         <div class="govuk-radios__item">
                             <input asp-for="IncludesGoals" value="false" class="govuk-radios__input" id="include-effectiveness-conditional" type="radio" data-aria-controls="conditional-include-effectiveness-conditional">
-                            <label class="govuk-label govuk-radios__label" for="include-effectiveness-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-goals-conditional">
                                 No
                             </label>
                         </div>
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-effectiveness-conditional">
                             <div class="govuk-form-group @Html.SetErrorClass(model => model.GoalsDetails, "govuk-form-group--error")">
-                                <label class="govuk-label" for="include-effectiveness-detail">
-                                    Please provide detail
+                                <label class="govuk-label" for="include-goals-detail">
+                                    Please provide details
                                 </label>
                                 <span asp-validation-for="GoalsDetails" class="govuk-error-message"></span>
                                 <textarea asp-for="GoalsDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-effectiveness-detail"></textarea>
                             </div>
-
                         </div>
                     </div>
                 </fieldset>

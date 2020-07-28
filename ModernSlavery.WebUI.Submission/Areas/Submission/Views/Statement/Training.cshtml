@@ -11,12 +11,7 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ContinueUrl);
-
-            @(Html.GovUkErrorSummary(new[]
-                {
-                    nameof(TrainingPageViewModel.Training)
-                }))
+            @Html.HiddenFor(m => m.ContinueUrl);           
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="training-hint">
@@ -35,7 +30,7 @@
                         @foreach (var trainingType in Model.TrainingTypes)
                         {
                             <div class="govuk-checkboxes__item">
-                                <input name="Training" value="@trainingType.Id" id="@($"training{trainingType.Id}")" checked=@(Model.Training.Contains(trainingType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="policies-conditional">
+                                <input name="Training" value="@trainingType.Id" id="@($"training{trainingType.Id}")" checked=@(Model.Training.Contains(trainingType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="training-conditional">
                                 <label class="govuk-label govuk-checkboxes__label" id="@($"training{trainingType.Id}")">
                                     @trainingType.Description
                                 </label>
@@ -45,9 +40,9 @@
                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="training-conditional">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
-                                            Please provide detail
+                                            Please specify
                                         </label>
-                                        <input asp-for="OtherTraining" class="govuk-input govuk-!-width-one-third" id="contact-by-email" name="other" spellcheck="false">
+                                        <input asp-for="OtherTraining" class="govuk-input govuk-!-width-one-third" id="contact-by-email" name="OtherTraining" spellcheck="false">
                                     </div>
                                 </div>
                             }
@@ -56,35 +51,7 @@
                 </fieldset>
             </div>
 
-            @*var organisationTrainingOptions =
-                                                new Dictionary<ModernSlavery.WebUI.Submission.Presenters.StatementTrainings, Func<object, object>>
-                                                {
-                                           {
-                                             ModernSlavery.WebUI.Submission.Presenters.StatementTrainings.Other,
-                @<text>
-                    @(Html.GovUkTextInputFor(model => model.OtherTraining))
-                    @(Html.LabelFor(model => model.OtherTraining, new { @class = "govuk-label" }))
-                </text>
-                                            }
-                                                  };*@
-
-
-            @*@(Html.GovUkCheckboxesFor(
-                     model => model.Training,
-                     new FieldsetViewModel
-                     {
-                         Legend = new LegendViewModel
-                         {
-                             Classes = "govuk-fieldset__legend--m"
-                         },
-                         Classes = "govuk-!-margin-top-6"
-                     },
-                     new HintViewModel
-                     {
-                         Text = "Select all that apply."
-                     },
-                     organisationTrainingOptions
-                ))*@
+           
             <button class="govuk-button" data-module="govuk-button" type="submit">
                 Continue
             </button>
