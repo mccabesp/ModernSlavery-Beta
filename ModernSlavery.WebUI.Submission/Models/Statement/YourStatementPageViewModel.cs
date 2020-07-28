@@ -62,9 +62,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         private DateTime? ToDateTime(int? year, int? month, int? day)
         {
-            //TODO - James, this will error if it isnt a valid datetime eg "50/50/50"
             if (year == null || month == null || day == null) return null;
-            return new DateTime(year.Value, month.Value, day.Value);
+
+            if (DateTime.TryParse($"{year}-{month}-{day}", out var result))
+                return result;
+
+            return null;
         }
 
         public DateTime? StatementStartDate => ToDateTime(StatementStartYear, StatementStartMonth, StatementStartDay);
@@ -102,17 +105,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             // TODO - James, how do we get these to fit in with the xml config of error messages?
             // it would normally be handled by an error code or attributes on the property
+
             var startDateList = new List<int?> { StatementStartDay, StatementStartMonth, StatementStartYear };
-            if (startDateList.Any(x => x.HasValue) && startDateList.Any(x => !x.HasValue))
-                yield return new ValidationResult("Please complete the Start Date", new[] { nameof(StatementStartDate), nameof(StatementStartDay), nameof(StatementStartMonth), nameof(StatementStartYear) });
+            if (startDateList.Any(x => x.HasValue) && !StatementStartDate.HasValue)
+                yield return new ValidationResult("Please provide a valid Start Date", new[] { nameof(StatementStartDate), nameof(StatementStartDay), nameof(StatementStartMonth), nameof(StatementStartYear) });
 
             var endDateList = new List<int?> { StatementEndDay, StatementEndMonth, StatementEndYear };
-            if (endDateList.Any(x => x.HasValue) && endDateList.Any(x => !x.HasValue))
-                yield return new ValidationResult("Please complete the End Date", new[] { nameof(StatementEndDate), nameof(StatementEndDay), nameof(StatementEndMonth), nameof(StatementEndYear) });
+            if (endDateList.Any(x => x.HasValue) && !StatementEndDate.HasValue)
+                yield return new ValidationResult("Please provide a valid End Date", new[] { nameof(StatementEndDate), nameof(StatementEndDay), nameof(StatementEndMonth), nameof(StatementEndYear) });
 
             var approvalDateList = new List<int?> { ApprovedDay, ApprovedMonth, ApprovedYear };
-            if (approvalDateList.Any(x => x.HasValue) && approvalDateList.Any(x => !x.HasValue))
-                yield return new ValidationResult("Please complete the Approved Date", new[] { nameof(ApprovedDate), nameof(ApprovedDay), nameof(ApprovedMonth), nameof(ApprovedYear) });
+            if (approvalDateList.Any(x => x.HasValue) && !ApprovedDate.HasValue)
+                yield return new ValidationResult("Please provide a valid Approved Date", new[] { nameof(ApprovedDate), nameof(ApprovedDay), nameof(ApprovedMonth), nameof(ApprovedYear) });
 
             var detailsList = new List<string> { ApproverFirstName, ApproverLastName, ApproverJobTitle };
             if (detailsList.Any(x => string.IsNullOrWhiteSpace(x)) && !detailsList.Any(x => string.IsNullOrWhiteSpace(x)))
