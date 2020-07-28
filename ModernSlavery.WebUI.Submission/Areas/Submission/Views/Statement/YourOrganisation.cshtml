@@ -5,7 +5,7 @@
 @model OrganisationPageViewModel
 <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
-    <div class="govuk-column-two-thirds">
+    <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm())
         {
             var controller = ViewData["Controller"] as BaseController;
