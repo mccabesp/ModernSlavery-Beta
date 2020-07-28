@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using System;
+using System.Text.Json.Serialization;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -14,10 +15,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public PoliciesPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel,PoliciesPageViewModel>()
-                .ForMember(s => s.BackUrl, opt => opt.Ignore())
-                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
-                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+            CreateMap<StatementModel,PoliciesPageViewModel>();
 
             CreateMap<PoliciesPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
@@ -34,7 +32,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     public class PoliciesPageViewModel : BaseViewModel
     {
         [IgnoreMap]
-        public PolicyTypeIndex PolicyTypes;
+        public PolicyTypeIndex PolicyTypes { get; set; }
         public PoliciesPageViewModel(PolicyTypeIndex policyTypes)
         {
             PolicyTypes = policyTypes;

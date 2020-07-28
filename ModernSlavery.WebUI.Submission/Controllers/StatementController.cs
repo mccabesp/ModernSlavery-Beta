@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
@@ -11,10 +12,15 @@ using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Submission.Models.Statement;
 using ModernSlavery.WebUI.Submission.Presenters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ModernSlavery.WebUI.Submission.Controllers
 {
@@ -59,9 +65,38 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public string ReportingDeadlineYear => RouteData.Values["Year"].ToString();
         private string ReturnUrl => Url.Action("ManageOrganisation","Submission", new { organisationIdentifier= OrganisationIdentifier });
         private string CancelUrl => Url.Action("Cancel", new { organisationIdentifier = OrganisationIdentifier, year= ReportingDeadlineYear });
+
         private object GetOrgAndYearRouteData() => new { OrganisationIdentifier, year = ReportingDeadlineYear };
 
+        private JsonSerializerSettings _jsonSettings => new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Objects
+        };
 
+        public void StashCancellingViewModel<T>(T model)
+        {
+            if (model == null)
+                Session.Remove(this + ":CancellingViewModel");
+            else
+                Session[this + ":CancellingViewModel"] = JsonConvert.SerializeObject(model, _jsonSettings);
+        }
+
+        public T UnstashCancellingViewModel<T>(bool delete = false) where T : class
+        {
+            var json = Session[this + ":CancellingViewModel"].ToStringOrNull();
+            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json, _jsonSettings);
+            if (delete) Session.Remove(this + ":CancellingViewModel");
+
+            return result;
+        }
+
+        public object UnstashCancellingViewModel(bool delete = false)
+        {
+            var json = Session[this + ":CancellingViewModel"].ToStringOrNull();
+            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject(json, _jsonSettings);
+            if (delete) Session.Remove(this + ":CancellingViewModel");
+            return result;
+        }
 
         /// <summary>
         /// Returns an ActionResult to handle any StatementErrors
@@ -87,6 +122,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
         }
 
+        /// <summary>
+        /// Sets the Back, Cancel and continue url
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="viewModel"></param>
         private void SetNavigationUrl<TViewModel>(TViewModel viewModel)
         {
             switch (viewModel)
@@ -137,21 +177,63 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.ContinueUrl = ReturnUrl;
                     break;
                 case CancelPageViewModel vm:
-                    vm.BackUrl = HttpContext.GetUrlReferrer()==null ? Url.Action(nameof(this.ReviewAndEdit), GetOrgAndYearRouteData()) : HttpContext.GetUrlReferrer().PathAndQuery;
-                    vm.CancelUrl = vm.BackUrl;
+                    var referrer = HttpContext.GetUrlReferrer()?.ToString();
+                    vm.CancelUrl = vm.BackUrl = string.IsNullOrWhiteSpace(referrer) ? GetBackUrlFromCancellingViewModel() : referrer;
                     vm.ContinueUrl = ReturnUrl;
                     break;
                 case SubmissionCompleteViewModel vm:
                     vm.ContinueUrl = ReturnUrl;
                     break;
-
                 default:
                     throw new NotImplementedException();
             }
         }
 
+        /// <summary>
+        /// Uses the type of cancelling viewmodel stored in sessionm to determine url to the page that is currently cancelling 
+        /// </summary>
+        /// <returns>the url to the page that is currently cancelling </returns>
+        private string GetBackUrlFromCancellingViewModel()
+        {
+            //Get view model that is cancelling
+            var pageViewModel = UnstashCancellingViewModel();
+
+            //Return the page for the cancelling view model
+            switch (pageViewModel)
+            {
+                case YourStatementPageViewModel vm:
+                    return Url.Action(nameof(YourStatement), GetOrgAndYearRouteData());
+                case CompliancePageViewModel vm:
+                    return Url.Action(nameof(Compliance), GetOrgAndYearRouteData());
+                case OrganisationPageViewModel vm:
+                    return Url.Action(nameof(YourOrganisation), GetOrgAndYearRouteData());
+                case PoliciesPageViewModel vm:
+                    return Url.Action(nameof(Policies), GetOrgAndYearRouteData());
+                case RisksPageViewModel vm:
+                    return Url.Action(nameof(SupplyChainRisks), GetOrgAndYearRouteData());
+                case DueDiligencePageViewModel vm:
+                    return Url.Action(nameof(DueDiligence), GetOrgAndYearRouteData());
+                case TrainingPageViewModel vm:
+                    return Url.Action(nameof(Training), GetOrgAndYearRouteData());
+                case ProgressPageViewModel vm:
+                    return Url.Action(nameof(MonitoringProgress), GetOrgAndYearRouteData());
+            }
+
+            //Default to the review and edit page
+            return Url.Action(nameof(ReviewAndEdit), GetOrgAndYearRouteData());
+        }
+
         private async Task<IActionResult> GetAsync<TViewModel>(string organisationIdentifier, int year) where TViewModel : BaseViewModel
         {
+            //Try and get the viewmodel from session
+            var viewModel = UnstashCancellingViewModel<TViewModel>(true);
+            if (viewModel != null)
+            {
+                //Make sure we show any validation errors
+                TryValidateModel(viewModel);
+                return View(viewModel);
+            }
+
             //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
             var viewModelResult = await SubmissionPresenter.GetViewModelAsync<TViewModel>(organisationIdentifier, year, VirtualUser.UserId);
 
@@ -159,26 +241,40 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
 
             //Get the view model and set the navigation urls
-            var viewModel = viewModelResult.Result;
+            viewModel = viewModelResult.Result;
             SetNavigationUrl(viewModel);
 
             //Otherwise return the view using the populated ViewModel
             return View(viewModel);
         }
 
-        private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year) where TViewModel : BaseViewModel
+        private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command) where TViewModel : BaseViewModel
         {
-            //Validate the submitted ViewModel data
-            if (!ModelState.IsValid) return View(viewModel);
+            SetNavigationUrl(viewModel);
 
-            //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
-            var viewModelResult = await SubmissionPresenter.SaveViewModelAsync(viewModel, organisationIdentifier, year, VirtualUser.UserId);
+            switch (command)
+            {
+                case BaseViewModel.CommandType.Cancel:
+                    //Save the viewmodel to session
+                    StashCancellingViewModel(viewModel);
 
-            //Handle any StatementErrors
-            if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
+                    //Redirect to the cancel page
+                    return Redirect(viewModel.CancelUrl);
+                case BaseViewModel.CommandType.Continue:
+                    //Validate the submitted ViewModel data
+                    if (!ModelState.IsValid) return View(viewModel);
 
-            //Redirect to the continue url
-            return Redirect(viewModel.ContinueUrl);
+                    //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+                    var viewModelResult = await SubmissionPresenter.SaveViewModelAsync(viewModel, organisationIdentifier, year, VirtualUser.UserId);
+
+                    //Handle any StatementErrors
+                    if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
+
+                    //Redirect to the continue url
+                    return Redirect(viewModel.ContinueUrl);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(command), $"CommandType {command} is not valid here");
+            }
         }
         #endregion
 
@@ -206,9 +302,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/your-statement")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> YourStatement(YourStatementPageViewModel viewModel, string organisationIdentifier, int year)
+        public async Task<IActionResult> YourStatement(YourStatementPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
-            return await PostAsync(viewModel, organisationIdentifier, year);
+            return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
 
         #endregion
@@ -224,9 +320,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/compliance")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Compliance(CompliancePageViewModel viewModel, string organisationIdentifier, int year)
+        public async Task<IActionResult> Compliance(CompliancePageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
-            return await PostAsync(viewModel, organisationIdentifier, year);
+            return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
 
         #endregion
@@ -242,9 +338,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/your-organisation")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> YourOrganisation(OrganisationPageViewModel viewModel, string organisationIdentifier, int year)
+        public async Task<IActionResult> YourOrganisation(OrganisationPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
-            return await PostAsync(viewModel, organisationIdentifier, year);
+            return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
         #endregion
 
@@ -259,9 +355,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/policies")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Policies(PoliciesPageViewModel viewModel, string organisationIdentifier, int year)
+        public async Task<IActionResult> Policies(PoliciesPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
-            return await PostAsync(viewModel, organisationIdentifier, year);
+            return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
 
         #endregion
@@ -277,9 +373,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/supply-chain-risks")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SupplyChainRisks(RisksPageViewModel viewModel, string organisationIdentifier, int year)
+        public async Task<IActionResult> SupplyChainRisks(RisksPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
-            return await PostAsync(viewModel, organisationIdentifier, year);
+            return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
         #endregion
 
@@ -294,9 +390,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/due-diligence")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DueDiligence(DueDiligencePageViewModel viewModel, string organisationIdentifier, int year)
+        public async Task<IActionResult> DueDiligence(DueDiligencePageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
-            return await PostAsync(viewModel, organisationIdentifier, year);
+            return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
         #endregion
 
@@ -311,9 +407,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/training")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Training(TrainingPageViewModel viewModel, string organisationIdentifier, int year)
+        public async Task<IActionResult> Training(TrainingPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
-            return await PostAsync(viewModel, organisationIdentifier, year);
+            return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
         #endregion
 
@@ -328,9 +424,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/monitoring-progress")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MonitoringProgress(ProgressPageViewModel viewModel, string organisationIdentifier, int year)
+        public async Task<IActionResult> MonitoringProgress(ProgressPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
-            return await PostAsync(viewModel, organisationIdentifier, year);
+            return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
         #endregion
 
@@ -348,6 +444,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Create the view model
             var viewModel = CreateReviewPageViewModel(viewModelResult.Result);
 
+            //set the navigation urls
+            SetNavigationUrl(viewModel);
+
             //Otherwise return the view using the populated ViewModel
             return View(viewModel);
         }
@@ -356,31 +455,57 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/review-statement")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReviewAndEditPost(string organisationIdentifier, int year)
+        public async Task<IActionResult> ReviewAndEditPost(string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
-            //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
-            var viewModelResult = await SubmissionPresenter.OpenDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
-
-            //Handle any StatementErrors
-            if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
-
             //Create the view model
-            var viewModel = CreateReviewPageViewModel(viewModelResult.Result);
+            var viewModel = new ReviewPageViewModel();
 
-            //Validate the view model
-            TryValidateModel(viewModel);
+            //set the navigation urls
+            SetNavigationUrl(viewModel);
 
-            //Validate the submitted ViewModel data
-            if (!ModelState.IsValid) return View("ReviewAndEdit", viewModel);
+            switch (command)
+            {
+                case BaseViewModel.CommandType.Submit:
+                    //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+                    var openResult = await SubmissionPresenter.OpenDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
 
-            //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
-            var viewModelSubmitResult = await SubmissionPresenter.SubmitDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+                    //Handle any StatementErrors
+                    if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
-            //Handle any StatementErrors
-            if (viewModelSubmitResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
+                    //Create the view model
+                    viewModel = CreateReviewPageViewModel(openResult.Result);
 
-            //Redirect to the continue url
-            return Redirect(viewModel.ContinueUrl);
+                    //Validate the view model
+                    TryValidateModel(viewModel);
+
+                    //Validate the submitted ViewModel data
+                    if (!ModelState.IsValid) return View("ReviewAndEdit", viewModel);
+
+                    //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+                    var viewModelSubmitResult = await SubmissionPresenter.SubmitDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+
+                    //Handle any StatementErrors
+                    if (viewModelSubmitResult.Fail) return HandleStatementErrors(openResult.Errors);
+
+                    //Redirect to the continue url
+                    return Redirect(viewModel.ContinueUrl);
+                case BaseViewModel.CommandType.DiscardAndExit:
+                    //Close the draft and release the user lock
+                    var cancelResult = await SubmissionPresenter.CancelDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+                    //Handle any StatementErrors
+                    if (cancelResult.Fail) return HandleStatementErrors(cancelResult.Errors);
+                    //Redirect to the continue url
+                    return Redirect(viewModel.ContinueUrl);
+                case BaseViewModel.CommandType.SaveAndExit:
+                    //Close the draft and release the user lock
+                    var closeResult = await SubmissionPresenter.CloseDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+                    //Handle any StatementErrors
+                    if (closeResult.Fail) return HandleStatementErrors(closeResult.Errors);
+                    //Redirect to the continue url
+                    return Redirect(viewModel.ContinueUrl);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(command), $"CommandType {command} is not valid here");
+            }
         }
 
         private ReviewPageViewModel CreateReviewPageViewModel(StatementModel statementModel)
@@ -398,12 +523,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 Progress = SubmissionPresenter.GetViewModelFromStatementModel<ProgressPageViewModel>(statementModel)
             };
 
-            //set the navigation urls
-            SetNavigationUrl(viewModel);
-
             //Otherwise return the view using the populated ViewModel
             return viewModel;
         }
+
+
         #endregion
 
         #region Cancel
@@ -421,8 +545,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var viewModel = new CancelPageViewModel();
             SetNavigationUrl(viewModel);
 
-            viewModel.CancelUrl = viewModel.BackUrl = HttpContext.GetUrlReferrer().ToString();
-            viewModel.ContinueUrl = ReturnUrl;
+            //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+            var pageViewModel = UnstashCancellingViewModel();
+
+            //Ensure the viewmodel is valid before saving
+            if (!TryValidateModel(pageViewModel))
+            {
+                viewModel.ErrorCount = ModelState.ErrorCount;
+                return View(viewModel);
+            }
 
             //Otherwise return the view using the populated ViewModel
             return View(viewModel);
@@ -432,13 +563,72 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/cancel-statement")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Cancel(CancelPageViewModel viewModel, string organisationIdentifier, int year)
+        public async Task<IActionResult> Cancel(CancelPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
-            //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
-            var viewModelResult = await SubmissionPresenter.CancelDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+            //Get the cancel urls
+            SetNavigationUrl(viewModel);
+
+            Outcome<StatementErrors> viewModelResult = null;
+            switch (command)
+            {
+                case BaseViewModel.CommandType.DiscardAndExit:
+                    //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+                    viewModelResult = await SubmissionPresenter.CancelDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+                    break;
+                case BaseViewModel.CommandType.SaveAndExit:
+                    //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+                    var pageViewModel = UnstashCancellingViewModel();
+
+                    //Ensure the viewmodel is valid before saving
+                    if (!TryValidateModel(pageViewModel))
+                    {
+                        viewModel.ErrorCount = ModelState.ErrorCount;
+                        return View(viewModel);
+                    }
+
+                    //Save the viewmodel
+                    switch (pageViewModel)
+                    {
+                        case YourStatementPageViewModel vm:
+                            viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
+                            break;
+                        case CompliancePageViewModel vm:
+                            viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
+                            break;
+                        case OrganisationPageViewModel vm:
+                            viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
+                            break;
+                        case PoliciesPageViewModel vm:
+                            viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
+                            break;
+                        case RisksPageViewModel vm:
+                            viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
+                            break;
+                        case DueDiligencePageViewModel vm:
+                            viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
+                            break;
+                        case TrainingPageViewModel vm:
+                            viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
+                            break;
+                        case ProgressPageViewModel vm:
+                            viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
+                            break;
+                    }
+                    //Handle any StatementErrors
+                    if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
+
+                    //Close the draft and release the user lock
+                    viewModelResult = await SubmissionPresenter.CloseDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(command), $"CommandType {command} is not valid here");
+            }
 
             //Handle any StatementErrors
             if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
+
+            //Delete the stashed viewModel
+            UnstashCancellingViewModel(true);
 
             //Redirect to the continue url
             return Redirect(viewModel.ContinueUrl);

@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using System;
+using System.Text.Json.Serialization;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -16,10 +17,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel.RisksModel, RisksPageViewModel.RiskViewModel>().ReverseMap();
 
-            CreateMap<StatementModel, RisksPageViewModel>()
-                .ForMember(s => s.BackUrl, opt => opt.Ignore())
-                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
-                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+            CreateMap<StatementModel, RisksPageViewModel>();
 
             CreateMap<RisksPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.RelevantRisks, opt => opt.MapFrom(s=>s.RelevantRisks.Where(r=>r.Id>0)))
@@ -42,7 +40,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     public class RisksPageViewModel : BaseViewModel
     {
         [IgnoreMap]
-        public RiskTypeIndex RiskTypes;
+        public RiskTypeIndex RiskTypes { get; set; }
         public RisksPageViewModel(RiskTypeIndex riskTypes)
         {
             RiskTypes = riskTypes;

@@ -7,16 +7,25 @@
         @using (Html.BeginForm())
         {
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ContinueUrl);
+
+            @if (Model.ErrorCount > 0)
+            {
+                <p>
+                    You cannot save your changes are there are @(Model.ErrorCount) validation error@(Model.ErrorCount>1 ? "s" : "") on the previous page.
+                </p>
+            }
 
             <h1 class="govuk-heading-l">
                 You have unsaved data, what do you want to do?
             </h1>
 
-            <button class="govuk-button" data-module="govuk-button">
+            <button class="govuk-button" data-module="govuk-button" disabled=@(Model.ErrorCount>0) name="command" value="@BaseViewModel.CommandType.SaveAndExit">
+                Exit and save changes
+            </button>
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
                 Exit and lose changes
             </button>
-            <a class="govuk-button govuk-button--secondary" href="@Model.BackUrl">
+            <a class="govuk-button govuk-button--secondary" href="@Model.CancelUrl">
                 Cancel
             </a>
         }

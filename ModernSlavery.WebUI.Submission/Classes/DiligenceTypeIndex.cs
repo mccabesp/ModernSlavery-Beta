@@ -14,6 +14,8 @@ namespace ModernSlavery.WebUI.Submission.Classes
             this.AddRange(types);
         }
 
+        public DiligenceTypeIndex() { }
+
         public class DiligenceType
         {
             public short Id { get; set; }

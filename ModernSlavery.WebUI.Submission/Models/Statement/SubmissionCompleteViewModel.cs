@@ -12,10 +12,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public SubmissionCompleteViewModelMapperProfile()
         {
-            CreateMap<StatementModel, SubmissionCompleteViewModel>()
-                .ForMember(s => s.BackUrl, opt => opt.Ignore())
-                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
-                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+            CreateMap<StatementModel, SubmissionCompleteViewModel>();
 
             CreateMap<SubmissionCompleteViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())

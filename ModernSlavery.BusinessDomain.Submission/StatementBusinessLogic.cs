@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Security;
@@ -78,6 +79,15 @@ namespace ModernSlavery.BusinessDomain.Submission
         Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId);
 
         /// <summary>
+        /// Unlocks a open draft statement mode from a particular user 
+        /// </summary>
+        /// <param name="organisationId">The Id of the organisation who owns the statement data</param>
+        /// <param name="reportingDeadline">The reporting deadline of the statement data to retrieve</param>
+        /// <param name="userId">The Id of the user who currently owns the statement data</param>
+        /// <returns></returns>
+        Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId);
+
+        /// <summary>
         /// Deletes any previously opened draft StatementModel and restores the backup (if any)
         /// </summary>
         /// <param name="organisationId">The Id of the organisation who owns the statement data to delete</param>
@@ -86,13 +96,16 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// <returns>Nothing</returns>
         Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(long organisationId, DateTime reportingDeadline,long userId);
 
+
         /// <summary>
         /// Saves a statement model as draft data to storage and deletes any deletes any draft data and draft backups.
         /// </summary>
         /// <param name="statementModel">The statement model to save</param>
         /// <param name="createBackup">Whether to backup any previous file (default=false)</param>
+        /// <param name="deleteBackup">Whether to delete any existing backup (default=false)</param>
         /// <returns>Nothing</returns>
         Task SaveDraftStatementModelAsync(StatementModel statementModel, bool createBackup = false);
+
 
         /// <summary>
         /// Saves a statement model as submitted data to storage and deletes any deletes any draft data and draft backups.
@@ -260,6 +273,25 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         }
 
+        /// <summary>
+        /// Serialises a StatementModel to a json file
+        /// </summary>
+        /// <param name="statementModel">The source statementmodel to serialise</param>
+        /// <param name="draftFilePath">The target filepath to save the json to</param>
+        /// <returns></returns>
+        private async Task SaveStatementModelToFileAsync(StatementModel statementModel, string draftFilePath)
+        {
+            //Save the new draft data 
+            var jsonSettings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore
+            };
+
+            var draftJson = JsonConvert.SerializeObject(statementModel, _sharedBusinessLogic.SharedOptions.IsProduction() ? Formatting.None : Formatting.Indented, jsonSettings);
+            await _sharedBusinessLogic.FileRepository.WriteAsync(draftFilePath, Encoding.UTF8.GetBytes(draftJson));
+        }
+
         #endregion
 
         #region Public Methods
@@ -407,7 +439,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 createBackup = draftExpired;
 
                 //Check the existing draft is not still locked by another user
-                if (draftStatement.EditorUserId != userId && !draftExpired)
+                if (draftStatement.EditorUserId>0 && draftStatement.EditorUserId != userId && !draftExpired)
                     return new Outcome<StatementErrors, StatementModel>(StatementErrors.Locked);
             }
 
@@ -456,10 +488,40 @@ namespace ModernSlavery.BusinessDomain.Submission
                 await _sharedBusinessLogic.FileRepository.DeleteFileAsync(draftBackupFilePath);
             }
 
-            if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath))
+            else if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath))
             {
                 //Delete the draft
                 await _sharedBusinessLogic.FileRepository.DeleteFileAsync(draftFilePath);
+            }
+
+            return new Outcome<StatementErrors>();
+        }
+
+        public async Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId)
+        {
+            //Validate the parameters
+            if (organisationId <= 0) throw new ArgumentOutOfRangeException(nameof(organisationId));
+            if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
+
+            var openOutcome = await OpenDraftStatementModelAsync(organisationId, reportingDeadline, userId);
+            if (openOutcome.Fail) return new Outcome<StatementErrors>(openOutcome.Errors);
+
+            var statementModel = openOutcome.Result;
+            statementModel.EditorUserId = 0;
+
+            //Get the current draft filepath
+            var draftFilePath = GetDraftFilepath(statementModel.OrganisationId, statementModel.SubmissionDeadline.Year);
+
+            //Save the draft with no userId
+            await SaveStatementModelToFileAsync(statementModel, draftFilePath);
+
+            //Get the backup draft filepath
+            var draftBackupFilePath = GetDraftBackupFilepath(organisationId, reportingDeadline.Year);
+
+            if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
+            {
+                //Delete the backup draft
+                await _sharedBusinessLogic.FileRepository.DeleteFileAsync(draftBackupFilePath);
             }
 
             return new Outcome<StatementErrors>();
@@ -494,15 +556,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     await _sharedBusinessLogic.FileRepository.CopyFileAsync(draftFilePath, draftBackupFilePath, false);
             }
 
-            //Save the new draft data 
-            var jsonSettings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore, 
-                DefaultValueHandling = DefaultValueHandling.Ignore
-            };
-
-            var draftJson = JsonConvert.SerializeObject(statementModel,_sharedBusinessLogic.SharedOptions.IsProduction() ? Formatting.None : Formatting.Indented,jsonSettings);
-            await _sharedBusinessLogic.FileRepository.WriteAsync(draftFilePath, Encoding.UTF8.GetBytes(draftJson));
+            await SaveStatementModelToFileAsync(statementModel, draftFilePath);
         }
 
         public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId)

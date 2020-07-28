@@ -7,11 +7,8 @@
     <div class="govuk-column-two-thirds">
         @using (Html.BeginForm())
         {
-            var controller = ViewData["Controller"] as BaseController;
-
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ContinueUrl);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
@@ -218,10 +215,13 @@
                 </fieldset>
             </div>
 
-            <button class="govuk-button" data-module="govuk-button" type="submit">
+            <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Continue
             </button>
-            <a class="govuk-button govuk-button--secondary" href="@Model.CancelUrl">Cancel</a>
+
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+                Cancel
+            </button>
         }
     </div>
 </div>

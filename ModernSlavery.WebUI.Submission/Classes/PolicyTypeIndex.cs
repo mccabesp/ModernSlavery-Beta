@@ -14,6 +14,8 @@ namespace ModernSlavery.WebUI.Submission.Classes
             this.AddRange(types);
         }
 
+        public PolicyTypeIndex() { }
+
         public class PolicyType
         {
             public short Id { get; set; }

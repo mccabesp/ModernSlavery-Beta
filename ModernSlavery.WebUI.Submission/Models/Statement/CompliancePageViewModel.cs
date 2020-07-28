@@ -11,10 +11,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public CompliancePageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, CompliancePageViewModel>()
-                .ForMember(s => s.BackUrl, opt => opt.Ignore())
-                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
-                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+            CreateMap<StatementModel, CompliancePageViewModel>();
 
             CreateMap<CompliancePageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())

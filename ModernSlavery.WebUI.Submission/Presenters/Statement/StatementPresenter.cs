@@ -55,6 +55,15 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId);
 
         /// <summary>
+        /// Closes a previously opened Draft statement model and releases the lock from the current user
+        /// </summary>
+        /// <param name="organisationIdentifier">The unique obfuscated identifier of the organisation who owns the statement data</param>
+        /// <param name="reportingDeadlineYear">The year of the reporting deadlien to which the statement data relates</param>
+        /// <param name="userId">The unique Id of the user who currently editting the Statement data</param>
+        /// <returns>OutCome.Success or Outcome.Fail with a list of StatementErrors</returns>
+        Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId);
+
+        /// <summary>
         /// Cancels any changes to the previous draft StatementModel
         /// </summary>
         /// <param name="organisationIdentifier">The unique obfuscated identifier of the organisation who owns the statement data</param>
@@ -135,6 +144,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             if (statementModel.EditorUserId != userId) throw new ArgumentException(nameof(openOutcome.Result.EditorUserId));
 
             return new Outcome<StatementErrors, StatementModel>(statementModel);
+        }
+
+        public async Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
+        {
+            long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
+            var reportingDeadline = GetReportingDeadline(organisationId, reportingDeadlineYear);
+            return await _statementBusinessLogic.CloseDraftStatementModelAsync(organisationId, reportingDeadline, userId);
         }
 
         public async Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)

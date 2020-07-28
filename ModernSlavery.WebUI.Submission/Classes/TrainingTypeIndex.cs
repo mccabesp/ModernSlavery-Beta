@@ -14,6 +14,8 @@ namespace ModernSlavery.WebUI.Submission.Classes
             this.AddRange(types);
         }
 
+        public TrainingTypeIndex() { }
+
         public class TrainingType
         {
             public short Id { get; set; }

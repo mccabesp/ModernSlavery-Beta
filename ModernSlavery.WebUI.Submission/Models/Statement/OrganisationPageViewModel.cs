@@ -11,6 +11,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations.Schema;
 using ModernSlavery.Core.Entities;
+using System.Text.Json.Serialization;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -18,10 +19,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public OrganisationPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, OrganisationPageViewModel>()
-                .ForMember(s => s.BackUrl, opt => opt.Ignore())
-                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
-                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+            CreateMap<StatementModel,OrganisationPageViewModel>();
 
             CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
@@ -38,7 +36,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     public class OrganisationPageViewModel : BaseViewModel
     {
         [IgnoreMap]
-        public SectorTypeIndex SectorTypes;
+        public SectorTypeIndex SectorTypes { get; set; }
         public OrganisationPageViewModel(SectorTypeIndex sectorTypes)
         {
             SectorTypes = sectorTypes;
