@@ -1,24 +1,24 @@
 StatementSectorTypeId,Description
 1,Public sector
 2,"Automotive, machinery and heavy electrical equipment"
-3,Charitable / not-for-profit activities
-4,Cleaning and security services
+3,"Charitable / not-for-profit activities"
+4,"Cleaning and security services"
 5,"Construction, civil engineering and building products"
 6,"Consumer services, including accommodation, hospitality, tourism and leisure"
-7,Cosmetics and toiletries
-8,Defence and aerospace
+7,"Cosmetics and toiletries"
+8,"Defence and aerospace"
 9,"Durable consumer goods, including electronics and appliances, home furnishings and other accessories"
-10,Education and research
+10,"Education and research"
 11,"Fashion, textiles, apparel and luxury goods"
 12,"Financial, insurance and real estate activities"
 13,"Food and beverages, agriculture and fishing"
-14,"Forestry, timber products, paper and containers and packaging  "
-15,Healthcare and pharmaceuticals
-16,Information technology and telecommunication
+14,"Forestry, timber products, paper and containers and packaging"
+15,"Healthcare and pharmaceuticals"
+16,"Information technology and telecommunication"
 17,"Media, publishing, arts and entertainment"
 18,"Mining, metals, chemicals and resources (including oil and gas)"
-19,"Professional and administrative services and supplies, including legal, consulting and accounting services"
+19,"Professional and administrative services and supplies, including legal, consulting and accounting services"
 20,"Transportation, logistics, and storage"
 21,"Utilities: gas, water and electricity"
-22,Waste management and recycling
-23,Other
+22,"Waste management and recycling"
+23,"Other"
