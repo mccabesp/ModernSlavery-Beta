@@ -13,15 +13,6 @@
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ContinueUrl);
 
-
-            @(Html.GovUkErrorSummary(new[]
-                {
-                    nameof(ProgressPageViewModel.IncludesMeasuringProgress),
-                    nameof(ProgressPageViewModel.ProgressMeasures),
-                    nameof(ProgressPageViewModel.KeyAchievements),
-                    nameof(ProgressPageViewModel.StatementYears),
-                }))
-
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
             </h1>

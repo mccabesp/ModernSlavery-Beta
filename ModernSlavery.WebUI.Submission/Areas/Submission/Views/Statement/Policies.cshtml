@@ -11,12 +11,7 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ContinueUrl);
-
-            @(Html.GovUkErrorSummary(new[]
-                {
-                    nameof(PoliciesPageViewModel.Policies)
-                }))
+            @Html.HiddenFor(m => m.ContinueUrl);        
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
