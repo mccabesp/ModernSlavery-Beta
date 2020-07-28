@@ -8,7 +8,7 @@
     var diligenceComplete = Model.DueDiligence.IsComplete();
     var trainingComplete = Model.Training.IsComplete();
     var progressComplete = Model.Progress.IsComplete();
-    
+
 }
 @model ReviewPageViewModel
 <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
@@ -106,15 +106,25 @@
                     </ul>
                 </li>
             </ol>
-            <button class="govuk-button" data-module="govuk-button" disabled="@Model.IsComplete()" name="command" value="@BaseViewModel.CommandType.Submit">
-                Confirm and Submit
-            </button>
-            <button class="govuk-button" data-module="govuk-button" value="@BaseViewModel.CommandType.SaveAndExit">
-                Exit and save changes
-            </button>
-            <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
-                Exit and lose changes
-            </button>
+
+            @if (Model.HasChanged())
+            {
+                <button class="govuk-button" data-module="govuk-button" disabled="@Model.IsComplete()" name="command" value="@BaseViewModel.CommandType.Submit">
+                    Confirm and Submit
+                </button>
+                <button class="govuk-button" data-module="govuk-button" value="@BaseViewModel.CommandType.SaveAndExit">
+                    Exit and save changes
+                </button>
+                <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
+                    Exit and lose changes
+                </button>
+            }
+            else
+            {
+                <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
+                    Exit with no changes
+                </button>
+            }
         }
     </div>
 </div>

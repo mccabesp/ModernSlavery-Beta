@@ -30,10 +30,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         [IgnoreMap]
         public int ErrorCount { get; set; }
+        [IgnoreMap]
+        public string Modifications { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             yield break;
+        }
+
+        public bool HasChanged()
+        {
+            return !string.IsNullOrWhiteSpace(Modifications);
         }
     }
 }

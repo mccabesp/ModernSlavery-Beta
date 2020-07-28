@@ -39,6 +39,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public DueDiligencePageViewModel DueDiligence { get; set; }
         public TrainingPageViewModel Training { get; set; }
         public ProgressPageViewModel Progress { get; set; }
+        public string Modifications { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -81,6 +82,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 && DueDiligence.IsComplete() 
                 && Training.IsComplete() 
                 && Progress.IsComplete();
+        }
+
+        public bool HasChanged()
+        {
+            return !string.IsNullOrWhiteSpace(Modifications);
         }
     }
 }

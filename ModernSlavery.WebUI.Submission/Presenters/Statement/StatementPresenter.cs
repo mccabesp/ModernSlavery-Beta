@@ -22,6 +22,22 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel) where TViewModel : BaseViewModel;
 
         /// <summary>
+        /// Copies all relevant data from a ViewModel into the specified StatementModel 
+        /// </summary>
+        /// <typeparam name="TViewModel">The type of the source ViewModel</typeparam>
+        /// <param name="viewModel">The instance of the source ViewModel</param>
+        /// <param name="statementModel">The instance of the destination StatementModel</param>
+        /// <returns>A new instance of the populated StatementModel</returns>
+        StatementModel SetViewModelToStatementModel<TViewModel>(TViewModel viewModel, StatementModel statementModel);
+
+        /// <summary>
+        /// Returns a Json object showing modifications between the specified statementModel and the original (draft backup or submitted statements)
+        /// </summary>
+        /// <param name="statementModel">The current statement</param>
+        /// <returns>A Json list of modifications or null if no differences</returns>
+        Task<string> GetDraftModifications(StatementModel statementModel);
+
+        /// <summary>
         /// Returns a ViewModel populated from a StatementModel for the specified oreganisation, reporting Deadline, and user
         /// Each Call relocks the Draft StatementModel to the user 
         /// </summary>
@@ -81,6 +97,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
         /// <returns>OutCome.Success or Outcome.Fail with a list of StatementErrors</returns>
         Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId);
+        
     }
 
     public class StatementPresenter : IStatementPresenter
@@ -109,18 +126,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, year);
         }
 
-        /// <summary>
-        /// Copies all relevant data from a ViewModel into the specified StatementModel 
-        /// </summary>
-        /// <typeparam name="TViewModel">The type of the source ViewModel</typeparam>
-        /// <param name="viewModel">The instance of the source ViewModel</param>
-        /// <param name="statementModel">The instance of the destination StatementModel</param>
-        /// <returns>A new instance of the populated StatementModel</returns>
-        private StatementModel SetViewModelToStatementModel<TViewModel>(TViewModel viewModel, StatementModel statementModel)
-        {
-            return _mapper.Map(viewModel, statementModel);
-        }
-
         public TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel) where TViewModel : BaseViewModel
         {
             //Instantiate the ViewModel
@@ -130,6 +135,10 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return _mapper.Map(statementModel, viewModel);
         }
 
+        public StatementModel SetViewModelToStatementModel<TViewModel>(TViewModel viewModel, StatementModel statementModel)
+        {
+            return _mapper.Map(viewModel, statementModel);
+        }
 
         public async Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {
@@ -189,6 +198,11 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             await _statementBusinessLogic.SaveDraftStatementModelAsync(statementModel);
 
             return new Outcome<StatementErrors, TViewModel>(viewModel);
+        }
+
+        public async Task<string> GetDraftModifications(StatementModel statementModel)
+        {
+            return await _statementBusinessLogic.GetDraftModifications(statementModel);
         }
     }
 }
