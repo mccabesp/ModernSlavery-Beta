@@ -31,6 +31,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<DueDiligencePageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForMember(d => d.DueDiligences, opt => opt.MapFrom(s => s.DueDiligences.Where(r => r.Id > 0)))
+                .ForSourceMember(s => s.DiligenceTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.DueDiligences, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.HasForceLabour, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.HasSlaveryInstance, opt => opt.DoNotValidate())
@@ -47,6 +48,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class DueDiligencePageViewModel : BaseViewModel
     {
+        [IgnoreMap]
+        public DiligenceTypeIndex DiligenceTypes;
+        public DueDiligencePageViewModel(DiligenceTypeIndex diligenceTypes)
+        {
+            DiligenceTypes = diligenceTypes;
+        }
+
+        public DueDiligencePageViewModel()
+        {
+
+        }
+
         #region Types
         public class DueDiligenceViewModel
         {
@@ -135,9 +148,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             DueDiligences.RemoveAll(r => r.Id == 0);
 
             //Get the diligence types
-            var diligenceTypes = validationContext.GetService<DiligenceTypeIndex>();
+            var DiligenceTypes = validationContext.GetService<DiligenceTypeIndex>();
 
-            var otherId = diligenceTypes.Single(x => x.Description.EqualsI("other type of social audit")).Id;
+            var otherId = DiligenceTypes.Single(x => x.Description.EqualsI("other type of social audit")).Id;
             var otherDiligence = DueDiligences.FirstOrDefault(x => x.Id == otherId);
             if (otherDiligence != null && string.IsNullOrWhiteSpace(otherDiligence.Details))
                 yield return new ValidationResult("Please enter other details");
@@ -152,12 +165,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             //if (HasSlaveryInstance == true & SlaveryInstanceRemediation.None(x => x.IsSelected))
             //    validationResults.Add(new ValidationResult("Please provide the detail"));
         }
-        public bool IsComplete(IServiceProvider serviceProvider)
+        public bool IsComplete()
         {
-            //Get the risk types
-            var diligenceTypes = serviceProvider.GetService<DiligenceTypeIndex>();
-
-            var otherSocialAudit = diligenceTypes.Single(x => x.Description.EqualsI("other type of social audit"));
+            var otherSocialAudit = DiligenceTypes.Single(x => x.Description.EqualsI("other type of social audit"));
 
             return DueDiligences.Any()
                 && HasForceLabour.HasValue

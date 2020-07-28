@@ -8,6 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations.Schema;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -22,6 +25,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
+                .ForSourceMember(s => s.SectorTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
@@ -33,6 +37,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class OrganisationPageViewModel : BaseViewModel
     {
+        [IgnoreMap]
+        public SectorTypeIndex SectorTypes;
+        public OrganisationPageViewModel(SectorTypeIndex sectorTypes)
+        {
+            SectorTypes = sectorTypes;
+        }
+
+        public OrganisationPageViewModel()
+        {
+
+        }
+
         #region Types
         public enum TurnoverRanges : byte
         {
@@ -69,20 +85,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             //Get the sector types
-            var sectorTypes = validationContext.GetService<SectorTypeIndex>();
+            SectorTypes = validationContext.GetRequiredService<SectorTypeIndex>();
 
-            var otherId = sectorTypes.Single(x => x.Description.Equals("Other")).Id;
+            var otherId = SectorTypes.Single(x => x.Description.Equals("Other")).Id;
 
             if (Sectors.Contains(otherId) && string.IsNullOrEmpty(OtherSector))
                 yield return new ValidationResult("Please provide other details");
         }
 
-        public override bool IsComplete(IServiceProvider serviceProvider)
+        public override bool IsComplete()
         {
-            //Get the sector types
-            var sectorTypes = serviceProvider.GetService<SectorTypeIndex>();
-
-            var other = sectorTypes.Single(x => x.Description.Equals("Other"));
+            var other = SectorTypes.Single(x => x.Description.Equals("Other"));
 
             return Sectors.Any()
                 && !Sectors.Any(t => t == other.Id && string.IsNullOrWhiteSpace(OtherSector))

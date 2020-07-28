@@ -21,6 +21,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             CreateMap<PoliciesPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
+                .ForSourceMember(s => s.PolicyTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
@@ -32,6 +33,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class PoliciesPageViewModel : BaseViewModel
     {
+        [IgnoreMap]
+        public PolicyTypeIndex PolicyTypes;
+        public PoliciesPageViewModel(PolicyTypeIndex policyTypes)
+        {
+            PolicyTypes = policyTypes;
+        }
+
+        public PoliciesPageViewModel()
+        {
+
+        }
+
         public override string PageTitle => "Policies";
 
         public List<short> Policies { get; set; } = new List<short>();
@@ -41,21 +54,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             //Get the policy types
-            var policyTypes = validationContext.GetService<PolicyTypeIndex>();
+            PolicyTypes = validationContext.GetService<PolicyTypeIndex>();
 
             //better way to identify this checkbox
-            var otherId = policyTypes.Single(x => x.Description.Equals("Other")).Id;
+            var otherId = PolicyTypes.Single(x => x.Description.Equals("Other")).Id;
 
             if (Policies.Contains(otherId) && string.IsNullOrWhiteSpace(OtherPolicies))
                 yield return new ValidationResult("Please provide detail on 'other'");
         }
 
-        public override bool IsComplete(IServiceProvider serviceProvider)
+        public override bool IsComplete()
         {
-            //Get the policy types
-            var policyTypes = serviceProvider.GetService<PolicyTypeIndex>();
-
-            var other = policyTypes.Single(x => x.Description.Equals("Other"));
+            var other = PolicyTypes.Single(x => x.Description.Equals("Other"));
 
             return Policies.Any()
                 && !Policies.Any(p=>p==other.Id && string.IsNullOrWhiteSpace(OtherPolicies));
