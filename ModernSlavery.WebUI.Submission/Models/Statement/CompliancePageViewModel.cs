@@ -57,22 +57,22 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (IncludesStructure == false && string.IsNullOrWhiteSpace(StructureDetails))
-                yield return new ValidationResult("Please provide the detail for: Your organisatio's structure, business and supply chains");
+                yield return new ValidationResult("Please provide the detail for: Your organisation's structure, business and supply chains", new[] { nameof(StructureDetails) });
 
             if (IncludesPolicies == false && string.IsNullOrWhiteSpace(PolicyDetails))
-                yield return new ValidationResult("Please provide the detail for: Policies");
+                yield return new ValidationResult("Please provide the detail for: Policies", new[] { nameof(PolicyDetails) });
 
             if (IncludesRisks == false && string.IsNullOrWhiteSpace(RisksDetails))
-                yield return new ValidationResult("Please provide the detail for: Risk assessment and management");
+                yield return new ValidationResult("Please provide the detail for: Risk assessment and management", new[] { nameof(RisksDetails) });
 
             if (IncludesDueDiligence == false && string.IsNullOrWhiteSpace(DueDiligenceDetails))
-                yield return new ValidationResult("Please provide the detail for: Due diligence processes");
+                yield return new ValidationResult("Please provide the detail for: Due diligence processes", new[] { nameof(DueDiligenceDetails) });
 
             if (IncludesTraining == false && string.IsNullOrWhiteSpace(TrainingDetails))
-                yield return new ValidationResult("Please provide the detail for: Staff training about slavery and human trafficking");
+                yield return new ValidationResult("Please provide the detail for: Staff training about slavery and human trafficking", new[] { nameof(TrainingDetails) });
 
             if (IncludesGoals == false && string.IsNullOrWhiteSpace(GoalsDetails))
-                yield return new ValidationResult("Please provide the detail for: Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions");
+                yield return new ValidationResult("Please provide the detail for: Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions", new[] { nameof(GoalsDetails) });
         }
 
         public override bool IsComplete()
