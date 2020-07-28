@@ -2,6 +2,7 @@
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -132,6 +133,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public long OrganisationId { get; set; }
 
+        [JsonIgnore]
+        [IgnoreMap]
         public string Modifications { get; set; }
         public bool EHRCResponse { get; set; }
         public string LateReason { get; set; }
@@ -188,7 +191,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         #endregion
 
         #region Step 3 - Your organisation
-        public List<short> Sectors { get; set; }
+        public SortedSet<short> Sectors { get; set; }
 
         public string OtherSector { get; set; }
 
@@ -198,7 +201,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         #region Step 4 - Policies
 
-        public List<short> Policies { get; set; }
+        public SortedSet<short> Policies { get; set; }
 
         public string OtherPolicies { get; set; }
 
@@ -243,7 +246,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         #region Step 6 - Training
 
-        public List<short> Training { get; set; }
+        public SortedSet<short> Training { get; set; }
 
         public string OtherTraining { get; set; }
 

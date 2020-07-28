@@ -39,6 +39,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public DueDiligencePageViewModel DueDiligence { get; set; }
         public TrainingPageViewModel Training { get; set; }
         public ProgressPageViewModel Progress { get; set; }
+        
+        [IgnoreMap]
         public string Modifications { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
