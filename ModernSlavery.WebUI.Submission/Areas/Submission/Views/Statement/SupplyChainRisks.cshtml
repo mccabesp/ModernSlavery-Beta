@@ -14,12 +14,7 @@
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ContinueUrl);
-
-            @(Html.GovUkErrorSummary(new[]
-        {
-                    nameof(RisksPageViewModel.RelevantRisks)
-                }))
-
+          
             <h2>@Model.SubTitle</h2>
 
             <h1 class="govuk-heading-l">

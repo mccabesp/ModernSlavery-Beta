@@ -11,12 +11,7 @@
 
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ContinueUrl);
-
-            @(Html.GovUkErrorSummary(new[]
-                {
-                    nameof(PoliciesPageViewModel.Policies)
-                }))
+            @Html.HiddenFor(m => m.ContinueUrl);        
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
@@ -25,11 +20,11 @@
                             @Model.PageTitle
                         </h1>
                         <h2 class="govuk-heading-m">
-                            Do your organisation`s modern slavery policies or codes include any of the following provisions? (select all that apply)
+                            Do your organisation`s modern slavery policies or codes include any of the following provisions? 
                         </h2>
                     </legend>
                     <span id="organisation-hint" class="govuk-hint">
-                        select all that apply
+                        Select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         @foreach (var policyType in Model.PolicyTypes)
@@ -47,7 +42,7 @@
                                         <label class="govuk-label" for="other">
                                             Please provide detail
                                         </label>
-                                        <input asp-for="OtherPolicies" class="govuk-input govuk-!-width-one-third" id="contact-by-email" name="other" type="email" spellcheck="false">
+                                        <input asp-for="OtherPolicies" name="OtherPolicies" class="govuk-input govuk-!-width-one-third" id="policies-other" spellcheck="false">
                                     </div>
                                 </div>
                             }
@@ -55,40 +50,6 @@
                     </div>
                 </fieldset>
             </div>
-
-
-
-
-            @*var organisationPolicyOptions =
-                                            new Dictionary<StatementPolicies, Func<object, object>>
-                                            {
-                                       {
-                                         StatementPolicies.Other,
-                @<text>
-                    @(Html.GovUkTextInputFor(model => model.OtherPolicies))
-                    @(Html.LabelFor(model => model.OtherPolicies, new { @class = "govuk-label" }))
-                </text>
-                                        }
-                                                          };
-
-
-                                @(Html.GovUkCheckboxesFor(
-                                model => model.PoliciesEnums,
-                                new FieldsetViewModel
-                                {
-                                    Legend = new LegendViewModel
-                                    {
-                                        Classes = "govuk-fieldset__legend--m"
-                                    },
-                                    Classes = "govuk-!-margin-top-6"
-                                },
-                                new HintViewModel
-                                {
-                                    Text = "Select all that apply."
-                                },
-                                organisationPolicyOptions
-                           ));*@
-
 
             <button class="govuk-button" data-module="govuk-button" type="submit">
                 Continue

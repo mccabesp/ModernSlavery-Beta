@@ -26,42 +26,52 @@
                     <span id="organisation-hint" class="govuk-hint">
                         Select all that apply
                     </span>
-                    <details class="govuk-details" data-module="govuk-details">
-                        <summary class="govuk-details__summary">
-                            <span class="govuk-details__summary-text">
-                                What is this?
-                            </span>
-                        </summary>
-                        <div class="govuk-details__text">
-                            @*TODO: get content*@
-                        </div>
-                    </details>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var sectorType in Model.SectorTypes)
+                        @foreach (var sectorType in Model.SectorTypes.OrderBy(x => x.Description))
                         {
-                        <div class="govuk-checkboxes__item">
-                            <input name="Sectors" value="@sectorType.Id" id="@($"sector{sectorType.Id}")" checked=@(Model.Sectors.Contains(sectorType.Id)) class="govuk-checkboxes__input" type="checkbox">
-                            <label class="govuk-label govuk-checkboxes__label" for="@($"sector{sectorType.Id}")">
-                                @sectorType.Description
-                            </label>
-                        </div>
+                            <div class="govuk-checkboxes__item">
+                                <input name="Sectors" value="@sectorType.Id" id="@($"sector{sectorType.Id}")" checked=@(Model.Sectors.Contains(sectorType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="organisation-conditional">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"sector{sectorType.Id}")">
+                                    @sectorType.Description
+                                </label>
+                            </div>
+                            @if (sectorType.Description.Equals("Other"))
+                            {
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="organisation-conditional">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="other">
+                                            Please specify
+                                        </label>
+                                        <input asp-for="OtherSector" class="govuk-input govuk-!-width-one-third" id="contact-by-email" name="OtherSector">
+                                    </div>
+                                </div>
+                            }
                         }
                     </div>
                 </fieldset>
             </div>
 
-            @(Html.GovUkRadiosFor(
-                    model => model.Turnover,
-                    new FieldsetViewModel
-                    {
-                        Legend = new LegendViewModel
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h2 class="govuk-heading-m">
+                            What was your turnover or budget during the last financial accounting year?
+                        </h2>
+                    </legend>
+                    <div class="govuk-radios">
+                        @foreach (OrganisationPageViewModel.TurnoverRanges item in (Enum.GetValues(typeof(OrganisationPageViewModel.TurnoverRanges)).Cast<OrganisationPageViewModel.TurnoverRanges>().Where(x => x != OrganisationPageViewModel.TurnoverRanges.NotProvided)))
                         {
-                            Text = Model.Turnover.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text,
-                            Classes = "govuk-fieldset__legend--m"
-                        },
-                        Classes = "govuk-!-margin-top-6"
-                    }
-                    ))
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="Turnover" name="Turnover" type="radio" value="item">
+                                <label class="govuk-label govuk-radios__label" for="Turnover">
+                                    @(item.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text)
+                                </label>
+                            </div>                            
+                        }
+                    </div>
+                </fieldset>
+            </div>
+
 
             <button class="govuk-button" data-module="govuk-button" type="submit">
                 Continue

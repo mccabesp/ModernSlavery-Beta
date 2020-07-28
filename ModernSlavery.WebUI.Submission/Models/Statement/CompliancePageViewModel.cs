@@ -57,22 +57,22 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (IncludesStructure == false && string.IsNullOrWhiteSpace(StructureDetails))
-                yield return new ValidationResult("Please provide the detail for: Your organisatio's structure, business and supply chains");
+                yield return new ValidationResult("Please provide the detail");
 
             if (IncludesPolicies == false && string.IsNullOrWhiteSpace(PolicyDetails))
-                yield return new ValidationResult("Please provide the detail for: Policies");
+                yield return new ValidationResult("Please provide the detail");
 
             if (IncludesRisks == false && string.IsNullOrWhiteSpace(RisksDetails))
-                yield return new ValidationResult("Please provide the detail for: Risk assessment and management");
+                yield return new ValidationResult("Please provide the detail");
 
             if (IncludesDueDiligence == false && string.IsNullOrWhiteSpace(DueDiligenceDetails))
-                yield return new ValidationResult("Please provide the detail for: Due diligence processes");
+                yield return new ValidationResult("Please provide the detail");
 
             if (IncludesTraining == false && string.IsNullOrWhiteSpace(TrainingDetails))
-                yield return new ValidationResult("Please provide the detail for: Staff training about slavery and human trafficking");
+                yield return new ValidationResult("Please provide the detail");
 
             if (IncludesGoals == false && string.IsNullOrWhiteSpace(GoalsDetails))
-                yield return new ValidationResult("Please provide the detail for: Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions");
+                yield return new ValidationResult("Please provide the detail");
         }
 
         public override bool IsComplete()

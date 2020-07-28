@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations.Schema;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -17,7 +18,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public OrganisationPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel,OrganisationPageViewModel>()
+            CreateMap<StatementModel, OrganisationPageViewModel>()
                 .ForMember(s => s.BackUrl, opt => opt.Ignore())
                 .ForMember(s => s.CancelUrl, opt => opt.Ignore())
                 .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
@@ -76,6 +77,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public List<short> Sectors { get; set; } = new List<short>();
 
+        public string OtherSector { get; set; }
+
         [Display(Name = "What was your turnover or budget during the last financial accounting year?")]
         public TurnoverRanges? Turnover { get; set; }
 
@@ -84,12 +87,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             //Get the sector types
             SectorTypes = validationContext.GetRequiredService<SectorTypeIndex>();
 
-            yield break;
+            var otherId = SectorTypes.Single(x => x.Description.Equals("Other")).Id;
+
+            if (Sectors.Contains(otherId) && string.IsNullOrEmpty(OtherSector))
+                yield return new ValidationResult("Please provide other details");
         }
 
         public override bool IsComplete()
         {
+            var other = SectorTypes.Single(x => x.Description.Equals("Other"));
+
             return Sectors.Any()
+                && !Sectors.Any(t => t == other.Id && string.IsNullOrWhiteSpace(OtherSector))
                 && Turnover != TurnoverRanges.NotProvided;
         }
     }
