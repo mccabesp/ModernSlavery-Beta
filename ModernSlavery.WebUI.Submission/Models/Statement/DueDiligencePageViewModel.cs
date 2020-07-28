@@ -88,13 +88,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [IgnoreMap]
         public bool? HasForceLabour { get; set; }
 
-        [MaxLength(500)]
+        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
         public string ForcedLabourDetails { get; set; }
 
         [IgnoreMap]
         public bool? HasSlaveryInstance { get; set; }
 
-        [MaxLength(500)]
+        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
         public string SlaveryInstanceDetails { get; set; }
 
         [IgnoreMap]

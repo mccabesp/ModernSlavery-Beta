@@ -46,7 +46,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public List<short> Training { get; set; } = new List<short>();
 
-        [MaxLength(50)]
+        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
         public string OtherTraining { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

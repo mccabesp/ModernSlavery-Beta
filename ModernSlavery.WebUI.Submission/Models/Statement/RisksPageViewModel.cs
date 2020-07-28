@@ -64,9 +64,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string SubTitle => "Part 1";
 
         public List<RiskViewModel> RelevantRisks { get; set; } = new List<RiskViewModel>();
+
+        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
         public string OtherRelevantRisks;
 
         public List<RiskViewModel> HighRisks { get; set; } = new List<RiskViewModel>();
+        
+        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
         public string OtherHighRisks;
 
         public List<RiskViewModel> LocationRisks { get; set; } = new List<RiskViewModel>();

@@ -47,6 +47,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public List<short> Policies { get; set; } = new List<short>();
 
+        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
         public string OtherPolicies { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
