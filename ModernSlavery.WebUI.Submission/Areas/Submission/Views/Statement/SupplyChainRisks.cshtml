@@ -14,12 +14,11 @@
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
 
-          
-            <h2>@Model.SubTitle</h2>
-
-            <h1 class="govuk-heading-l">
-                @Model.PageTitle
-            </h1>
+       
+        <h1 class="govuk-heading-l">
+            <span class="govuk-caption-l">@Model.SubTitle</span>
+            @Model.PageTitle
+        </h1>
 
             <h2 class="govuk-heading-m">
                 Which areas are relevant to your organisation when assessing your supply chains for modern slavery risks?
