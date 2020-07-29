@@ -172,9 +172,18 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.ContinueUrl = Url.Action(nameof(this.ReviewAndEdit), GetOrgAndYearRouteData());
                     break;
                 case ReviewPageViewModel vm:
-                    vm.BackUrl = Url.Action(nameof(this.MonitoringProgress), GetOrgAndYearRouteData());
+                    var routeData = GetOrgAndYearRouteData();
+                    vm.BackUrl = Url.Action(nameof(this.MonitoringProgress), routeData);
                     vm.CancelUrl = CancelUrl;
                     vm.ContinueUrl = ReturnUrl;
+                    vm.YourStatementUrl = Url.Action(nameof(this.YourStatement), routeData);
+                    vm.ComplianceUrl = Url.Action(nameof(this.Compliance), routeData);
+                    vm.OrganisationUrl = Url.Action(nameof(this.YourOrganisation), routeData);
+                    vm.PoliciesUrl = Url.Action(nameof(this.Policies), routeData);
+                    vm.RisksUrl = Url.Action(nameof(this.SupplyChainRisks), routeData);
+                    vm.DueDiligenceUrl = Url.Action(nameof(this.DueDiligence), routeData);
+                    vm.TrainingUrl = Url.Action(nameof(this.Training), routeData);
+                    vm.ProgressUrl = Url.Action(nameof(this.MonitoringProgress), routeData);
                     break;
                 case CancelPageViewModel vm:
                     var referrer = HttpContext.GetUrlReferrer()?.ToString();

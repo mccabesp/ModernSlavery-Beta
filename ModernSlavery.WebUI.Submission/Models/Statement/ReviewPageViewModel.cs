@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
@@ -43,6 +44,31 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         
         [IgnoreMap]
         public IList<AutoMap.Diff> Modifications { get; set; }
+
+        [IgnoreMap]
+        [BindNever]
+        public string YourStatementUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string ComplianceUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string OrganisationUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string PoliciesUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string RisksUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string DueDiligenceUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string TrainingUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string ProgressUrl { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
