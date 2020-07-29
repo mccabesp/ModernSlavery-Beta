@@ -549,6 +549,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
             var pageViewModel = UnstashCancellingViewModel();
 
+            //Get the modifications
+            var statementModel = SubmissionPresenter.SetViewModelToStatementModel(pageViewModel, viewModelResult.Result);
+            viewModel.Modifications = await SubmissionPresenter.GetDraftModifications(statementModel);
+
             //Ensure the viewmodel is valid before saving
             if (!TryValidateModel(pageViewModel))
             {
@@ -556,9 +560,21 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return View(viewModel);
             }
 
-            //Get the modifications
-            var statementModel=SubmissionPresenter.SetViewModelToStatementModel(pageViewModel, viewModelResult.Result);
-            viewModel.Modifications = await SubmissionPresenter.GetDraftModifications(statementModel);
+            //Cancel immediately if no changes
+            if (!viewModel.HasChanged())
+            {
+                //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+                var cancelModelResult = await SubmissionPresenter.CancelDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+
+                //Handle any StatementErrors
+                if (cancelModelResult.Fail) return HandleStatementErrors(cancelModelResult.Errors);
+
+                //Delete the stashed viewModel
+                UnstashCancellingViewModel(true);
+
+                //Redirect to the continue url
+                return Redirect(viewModel.ContinueUrl);
+            }
 
             //Otherwise return the view using the populated ViewModel
             return View(viewModel);

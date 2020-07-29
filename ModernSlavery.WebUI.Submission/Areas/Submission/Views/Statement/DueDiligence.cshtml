@@ -2,6 +2,7 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
     var diligenceIndex = 0;
+    var remediationIndex = 0;
 }
 @model DueDiligencePageViewModel
 <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
@@ -65,7 +66,6 @@
                 }
             </div>
 
-
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -75,29 +75,28 @@
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
-                            <input asp-for="HasForceLabour" value="false" class="govuk-radios__input" id="has-forced-labour-conditional" name="has-forced-labour" type="radio" data-aria-controls="conditional-has-forced-labour-conditional">
-                            <label class="govuk-label govuk-radios__label" for="has-forced-labour-conditional">
+                            <input name="HasForceLabour" id="HasForceLabour_True" value="true" checked="@(Model.HasForceLabour==true)" class="govuk-radios__input" type="radio" data-aria-controls="conditional-has-forced-labour-conditional">
+                            <label class="govuk-label govuk-radios__label" for="HasForceLabour_True">
                                 Yes
                             </label>
                         </div>
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-forced-labour-conditional">
                             <div class="govuk-form-group">
-                                <label class="govuk-label" for="has-forced-labour-detail">
+                                <label class="govuk-label" asp-for="ForcedLabourDetails">
                                     Please provide detail
                                 </label>
-                                <textarea asp-for="ForcedLabourDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="has-forced-labour-detail" name="has-forced-labour-detail" type="text"></textarea>
+                                <textarea asp-for="ForcedLabourDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" type="text"></textarea>
                             </div>
                         </div>
                         <div class="govuk-radios__item">
-                            <input asp-for="HasForceLabour" value="false" class="govuk-radios__input" id="has-forced-labour" name="has-forced-labour" type="radio">
-                            <label class="govuk-label govuk-radios__label">
+                            <input name="HasForceLabour" id="HasForceLabour_False" value="false" checked="@(Model.HasForceLabour==false)" class="govuk-radios__input" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="HasForceLabour_False">
                                 No
                             </label>
                         </div>
                     </div>
                 </fieldset>
             </div>
-
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
@@ -108,46 +107,80 @@
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
-                            <input asp-for="HasSlaveryInstance" value="false" class="govuk-radios__input" id="has-slavery-instance-conditional" name="has-slavery-instance" type="radio" data-aria-controls="conditional-has-slavery-instance-conditional">
-                            <label class="govuk-label govuk-radios__label" for="has-slavery-instance-conditional">
+                            <input name="HasSlaveryInstance" id="HasSlaveryInstance_True" checked="@(Model.HasSlaveryInstance==true)" value="true" class="govuk-radios__input" type="radio" data-aria-controls="conditional-has-slavery-instance-conditional">
+                            <label class="govuk-label govuk-radios__label" for="HasSlaveryInstance_True">
                                 Yes
                             </label>
                         </div>
-                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-slavery-instance-conditional">
-                            <div class="govuk-form-group">
-                                <label class="govuk-label" for="has-slavery-instance-detail">
-                                    Please provide detail
-                                </label>
-                                <textarea asp-for="SlaveryInstanceDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="has-slavery-instance-detail" name="has-slavery-instance-detail" type="text"></textarea>
-                            </div>
-                            <div class="govuk-form-group">
-                                <fieldset class="govuk-fieldset">
-                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                                        <h2 class="govuk-heading-m">
-                                            What remediation action did your organisation take in response?
-                                        </h2>
-                                    </legend>
-                                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                                        @foreach (DueDiligencePageViewModel.StatementRemediation item in Enum.GetValues(typeof(DueDiligencePageViewModel.StatementRemediation)))
-                                        {
-                                            <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input" id="remediation-conditional" type="checkbox" checked=@(item == Model.SelectedRemediation) data-aria-controls="remediation-conditional">
-                                                <label class="govuk-label govuk-checkboxes__label" for="remediation-conditional">
-                                                    @(item.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text)
-                                                </label>
-                                            </div>
-                                        }
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
                         <div class="govuk-radios__item">
-                            <input asp-for="HasSlaveryInstance" value="false" class="govuk-radios__input" id="has-slavery-instance" name="has-slavery-instance" type="radio">
-                            <label class="govuk-label govuk-radios__label">
+                            <input name="HasSlaveryInstance" value="false" id="HasSlaveryInstance_false" checked="@(Model.HasSlaveryInstance==false)" class="govuk-radios__input" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="HasSlaveryInstance_false">
                                 No
                             </label>
                         </div>
-                    </div>
+
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-slavery-instance-conditional">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label" asp-for="SlaveryInstanceDetails">
+                                    Please provide details
+                                </label>
+                                <textarea asp-for="SlaveryInstanceDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" type="text"></textarea>
+                            </div>
+
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                                <h2 class="govuk-heading-m">
+                                    Did your organisation take any remediation actions in response?
+                                </h2>
+                            </legend>
+                            <div class="govuk-radios__item">
+                                <input name="HasRemediation" id="HasRemediation_True" value="true" checked="@(Model.HasRemediation==true)" class="govuk-radios__input" type="radio" data-aria-controls="conditional-has-remediation-conditional">
+                                <label class="govuk-label govuk-radios__label" for="HasRemediation_True">
+                                    Yes
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input name="HasRemediation" id="HasRemediation_False" value="false" checked="@(Model.HasRemediation==false)" class="govuk-radios__input" type="radio">
+                                <label class="govuk-label govuk-radios__label" false="HasRemediation_False">
+                                    No
+                                </label>
+                            </div>
+
+                            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-remediation-conditional">
+                                <div class="govuk-form-group">
+                                    <fieldset class="govuk-fieldset">
+                                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                                            <h2 class="govuk-heading-m">
+                                                What remediation action did your organisation take in response?
+                                            </h2>
+                                        </legend>
+                                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                                            @foreach (var remediationType in Model.RemediationTypes)
+                                            {
+                                                <div class="govuk-checkboxes__item">
+                                                    <input name="SelectedRemediationTypes" checked=@(Model.SelectedRemediationTypes.Contains(remediationType)) value="@remediationType" class="govuk-checkboxes__input" type="checkbox" data-aria-controls="remediation-conditional@(remediationIndex)">
+                                                    <label class="govuk-label govuk-checkboxes__label" for="remediation-conditional">
+                                                        @remediationType
+                                                    </label>
+                                                </div>
+                                                @if (remediationType.Equals("other"))
+                                                {
+                                                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="remediation-conditional@(remediationIndex)">
+                                                        <div class="govuk-form-group">
+                                                            <label class="govuk-label" for="other">
+                                                                Please specify
+                                                            </label>
+                                                            <input asp-for="OtherRemediation" class="govuk-input govuk-!-width-one-third">
+                                                        </div>
+                                                    </div>
+                                                }
+                                                { remediationIndex++; }
+                                            }
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
                 </fieldset>
             </div>
 

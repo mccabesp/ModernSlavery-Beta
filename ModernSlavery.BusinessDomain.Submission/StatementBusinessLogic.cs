@@ -354,17 +354,18 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// <summary>
         /// Returns a differences between two StatementModels in json format
         /// </summary>
-        /// <param name="sourceModel"></param>
-        /// <param name="targetModel"></param>
+        /// <param name="oldModel"></param>
+        /// <param name="newModel"></param>
         /// <returns></returns>
-        private IList<AutoMap.Diff> GetModifications(StatementModel sourceModel, StatementModel targetModel)
+        private IList<AutoMap.Diff> GetModifications(StatementModel oldModel, StatementModel newModel)
         {
-            if (sourceModel == null) throw new ArgumentNullException(nameof(sourceModel));
-            if (targetModel == null) throw new ArgumentNullException(nameof(targetModel));
+            if (oldModel == null) throw new ArgumentNullException(nameof(oldModel));
+            if (newModel == null) throw new ArgumentNullException(nameof(newModel));
 
             //Compare the two statementModels
             var membersToIgnore = new[] { nameof(StatementModel.CanRevertToOriginal), nameof(StatementModel.DraftBackupDate), nameof(StatementModel.EditorUserId), nameof(StatementModel.EditTimestamp), nameof(StatementModel.StatementId), nameof(StatementModel.OrganisationName), nameof(StatementModel.Status), nameof(StatementModel.StatusDate), nameof(StatementModel.SubmissionDeadline), nameof(StatementModel.OrganisationId), nameof(StatementModel.CanRevertToOriginal), nameof(StatementModel.Modifications), nameof(StatementModel.EHRCResponse), nameof(StatementModel.LateReason), nameof(StatementModel.IncludedOrganisationCount), nameof(StatementModel.ExcludedOrganisationCount), nameof(StatementModel.Modified), nameof(StatementModel.Created) };
-            return sourceModel.GetDifferences(targetModel, membersToIgnore).ToList();
+            var differences=oldModel.GetDifferences(newModel, membersToIgnore).ToList();
+            return differences;
         }
 
         #endregion
@@ -678,7 +679,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 _mapper.Map(previousStatement, statementModel);
 
                 //Compare the latest with the previous statementModel
-                var modifications= GetModifications(statementModel, previousStatementModel);
+                var modifications= GetModifications(previousStatementModel, statementModel);
                 newStatement.Modifications = modifications.Any() ? JsonConvert.SerializeObject(modifications,new JsonSerializerSettings { NullValueHandling= NullValueHandling.Ignore, DefaultValueHandling= DefaultValueHandling.Ignore }) : null;
             }
 
@@ -714,7 +715,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (backupStatementModel == null) return null;
 
             //Return the modifications
-            return GetModifications(statementModel, backupStatementModel);
+            return GetModifications(backupStatementModel,statementModel);
         }
 
     

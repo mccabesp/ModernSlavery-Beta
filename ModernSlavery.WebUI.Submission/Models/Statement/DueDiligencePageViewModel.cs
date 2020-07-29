@@ -27,15 +27,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.DueDiligences, opt => opt.MapFrom(s => s.DueDiligences.Where(r => r.Id > 0)))
                 .ForSourceMember(s => s.DiligenceTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.DueDiligences, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.HasForceLabour, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.HasSlaveryInstance, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.SelectedRemediation, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.SelectedRemediationTypes, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.RemediationTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.OtherRemediation, opt => opt.DoNotValidate());
         }
     }
@@ -60,24 +59,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             public short Id { get; set; }
             public string Details { get; set; }
         }
-        public enum StatementRemediation : byte
-        {
-            [GovUkRadioCheckboxLabelText(Text = "repayment of recruitment fees")]
-            repaymentOfRecruitmentFees,
-            [GovUkRadioCheckboxLabelText(Text = "change in policy")]
-            changeInPolicy,
-            [GovUkRadioCheckboxLabelText(Text = "referring victims into government services")]
-            referringVictimsIntoGovernmentServices,
-            [GovUkRadioCheckboxLabelText(Text = "supporting victims via NGOs")]
-            supportingVictimsViaNGOs,
-            [GovUkRadioCheckboxLabelText(Text = "supporting criminal justice against perpetrator")]
-            supportingCriminalJusticeAgainstPerpetrator,
-            [GovUkRadioCheckboxLabelText(Text = "other")]
-            other,
-            [GovUkRadioCheckboxLabelText(Text = "none")]
-            none
 
-        }
         #endregion
 
         public override string PageTitle => "Supply chain risks and due diligence";
@@ -85,59 +67,64 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public List<DueDiligenceViewModel> DueDiligences { get; set; } = new List<DueDiligenceViewModel>();
 
-        [IgnoreMap]
         public bool? HasForceLabour { get; set; }
 
         [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
         public string ForcedLabourDetails { get; set; }
 
-        [IgnoreMap]
         public bool? HasSlaveryInstance { get; set; }
+
+        public bool? HasRemediation { get; set; }
 
         [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
         public string SlaveryInstanceDetails { get; set; }
 
         [IgnoreMap]
-        public StatementRemediation SelectedRemediation { get; set; }
-        private string _OtherRemediation;
-        
-        [IgnoreMap]
-        public string OtherRemediation
+        public string[] RemediationTypes = new[]
         {
-            get
-            {
-                return _OtherRemediation;
-            }
-            set
-            {
-                _OtherRemediation = value;
-                if (!string.IsNullOrWhiteSpace(_OtherRemediation)) SelectedRemediation = StatementRemediation.other;
-            }
-        }
+            "repayment of recruitment fees",
+            "change in policy",
+            "referring victims into government services",
+            "supporting victims via NGOs",
+            "supporting criminal justice against perpetrator",
+            "other"
+        };
+
+        [IgnoreMap]
+        public List<string> SelectedRemediationTypes { get; set; } = new List<string>();
+
+        [IgnoreMap]
+        public string OtherRemediation { get; set; }
 
         public string SlaveryInstanceRemediation
         {
             get
             {
-                if (SelectedRemediation == StatementRemediation.other)
-                    return OtherRemediation;
-                else
-                    return SelectedRemediation.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>().Text;
+                var selectedRemediationTypes = new List<string>(SelectedRemediationTypes.Where(s => !string.IsNullOrWhiteSpace(s)));
+
+                if (selectedRemediationTypes.Contains("other"))
+                {
+                    selectedRemediationTypes.Remove("other");
+                    selectedRemediationTypes.Add(OtherRemediation);
+                }
+                return selectedRemediationTypes.ToDelimitedString(Environment.NewLine);
             }
             set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                    SelectedRemediation = StatementRemediation.none;
-                else
+                var selectedRemediationTypes = new List<string>(value.SplitI(Environment.NewLine).Where(s => !string.IsNullOrWhiteSpace(s)));
+
+                //Set the selected types
+                SelectedRemediationTypes.Clear();
+                for (int i= selectedRemediationTypes.Count-1; i>=0;i--)
                 {
-                    var selectedRemediation = Enum.GetValues(typeof(StatementRemediation)).ToList<StatementRemediation>().FirstOrDefault(e => e.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>().Text.EqualsI(value));
-                    if (selectedRemediation == null)
-                    {
-                        selectedRemediation = StatementRemediation.other;
-                        OtherRemediation = value;
-                    }
-                    SelectedRemediation = selectedRemediation;
+                        if (RemediationTypes.ContainsI(selectedRemediationTypes[i]))
+                        {
+                            SelectedRemediationTypes.Add(selectedRemediationTypes[i]);
+                            selectedRemediationTypes.RemoveAt(i);
+                        }
                 }
+                OtherRemediation = selectedRemediationTypes.ToDelimitedString(Environment.NewLine);
+                if (!string.IsNullOrWhiteSpace(OtherRemediation)) SelectedRemediationTypes.Add("other");
             }
         }
 
@@ -154,15 +141,38 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (otherDiligence != null && string.IsNullOrWhiteSpace(otherDiligence.Details))
                 yield return new ValidationResult("Please enter other details");
 
-            if (HasForceLabour == true & string.IsNullOrWhiteSpace(ForcedLabourDetails))
-                yield return new ValidationResult("Please provide the detail");
+            if (HasForceLabour == true)
+            {
+                if (string.IsNullOrWhiteSpace(ForcedLabourDetails))
+                    yield return new ValidationResult("Please provide the detail");
+            }
+            else
+                ForcedLabourDetails = null;
 
-            if (HasSlaveryInstance == true & string.IsNullOrWhiteSpace(SlaveryInstanceDetails))
-                yield return new ValidationResult("Please provide the detail");
 
-            //TODO: how to check checkbox here as no isSelected
-            //if (HasSlaveryInstance == true & SlaveryInstanceRemediation.None(x => x.IsSelected))
-            //    validationResults.Add(new ValidationResult("Please provide the detail"));
+            if (HasSlaveryInstance == true)
+            {
+                if (string.IsNullOrWhiteSpace(SlaveryInstanceDetails))
+                    yield return new ValidationResult("Please provide the detail");
+
+                if (HasRemediation == null)
+                    yield return new ValidationResult("Please provide the detail");
+
+                if (HasRemediation == true)
+                {
+                    if (!SelectedRemediationTypes.Any())
+                        yield return new ValidationResult("Please remediation details");
+                    else if (SelectedRemediationTypes.Contains("other") && string.IsNullOrWhiteSpace(OtherRemediation))
+                        yield return new ValidationResult("Please provide the other remediation details");
+                }
+            }
+            else
+            {
+                SlaveryInstanceDetails = null;
+                HasRemediation = null;
+                SelectedRemediationTypes.Clear();
+                OtherRemediation = null;
+            }
         }
         public bool IsComplete()
         {
@@ -171,7 +181,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return DueDiligences.Any()
                 && HasForceLabour.HasValue
                 && HasSlaveryInstance.HasValue
-                && !DueDiligences.Any(d=>d.Id==otherSocialAudit.Id && string.IsNullOrWhiteSpace(d.Details))
+                && !DueDiligences.Any(d => d.Id == otherSocialAudit.Id && string.IsNullOrWhiteSpace(d.Details))
                 && HasForceLabour == false || !string.IsNullOrWhiteSpace(ForcedLabourDetails)
                 && HasSlaveryInstance == false || !string.IsNullOrWhiteSpace(SlaveryInstanceDetails)
                 && HasSlaveryInstance == false || !string.IsNullOrWhiteSpace(SlaveryInstanceRemediation);
