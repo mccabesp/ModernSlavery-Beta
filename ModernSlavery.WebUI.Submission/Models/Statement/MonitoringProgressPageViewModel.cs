@@ -12,9 +12,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public ProgressPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, ProgressPageViewModel>();
+            CreateMap<StatementModel, MonitoringProgressPageViewModel>();
 
-            CreateMap<ProgressPageViewModel, StatementModel>(MemberList.Source)
+            CreateMap<MonitoringProgressPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class ProgressPageViewModel : BaseViewModel
+    public class MonitoringProgressPageViewModel : BaseViewModel
     {
         #region Types
         public enum YearRanges : byte
@@ -55,7 +55,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            yield break;
+            var validationResults = new List<ValidationResult>();
+
+            return validationResults;
         }
 
         public override bool IsComplete()

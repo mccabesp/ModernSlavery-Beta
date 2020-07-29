@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public ReviewPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, ReviewPageViewModel>()
+            CreateMap<StatementModel, ReviewAndEditPageViewModel>()
                 .ForMember(s => s.YourStatement, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.Compliance, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.Organisation, opt => opt.MapFrom(s => s))
@@ -30,7 +30,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class ReviewPageViewModel : BaseViewModel
+    public class ReviewAndEditPageViewModel : BaseViewModel
     {
         public override string PageTitle => $"Review {ReportingDeadlineYear - 1} to {ReportingDeadlineYear} group report for {OrganisationName}";
         public override string SubTitle => GetSubtitle();
@@ -51,12 +51,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public YourStatementPageViewModel YourStatement { get; set; }
         public CompliancePageViewModel Compliance { get; set; }
-        public OrganisationPageViewModel Organisation { get; set; }
+        public YourOrganisationPageViewModel Organisation { get; set; }
         public PoliciesPageViewModel Policies { get; set; }
-        public RisksPageViewModel Risks { get; set; }
+        public SupplyChainRisksPageViewModel Risks { get; set; }
         public DueDiligencePageViewModel DueDiligence { get; set; }
         public TrainingPageViewModel Training { get; set; }
-        public ProgressPageViewModel Progress { get; set; }
+        public MonitoringProgressPageViewModel Progress { get; set; }
         
         [IgnoreMap]
         public IList<AutoMap.Diff> Modifications { get; set; }

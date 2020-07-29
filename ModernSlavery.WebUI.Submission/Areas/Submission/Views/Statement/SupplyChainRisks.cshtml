@@ -5,7 +5,7 @@
     var locationIndex = 0;
 
 }
-@model RisksPageViewModel
+@model SupplyChainRisksPageViewModel
 <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -23,7 +23,9 @@
                 Which areas are relevant to your organisation when assessing your supply chains for modern slavery risks?
             </h2>
 
-            <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+            <div class="govuk-accordion @Html.SetErrorClass(model => model.RelevantRisks, "govuk-form-group--error")" data-module="govuk-accordion" id="accordion-default">
+                <span asp-validation-for="RelevantRisks" class="govuk-error-message"></span>
+
                 @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
                 {
                     <div class="govuk-accordion__section accordion-with-counts">
@@ -40,23 +42,31 @@
                                     <span class="govuk-hint" id="GovUk_Sectors-hint">
                                         Select all that apply.
                                     </span>
-                                    <div class="govuk-checkboxes">
+                                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                         @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
                                         {
                                             <div class="govuk-checkboxes__item">
-                                                <input name="RelevantRisks[@relevantIndex].Id" id="RelevantRisks[@relevantIndex].Id" value="@childType.Id" checked=@(Model.RelevantRisks.Any(r => r.Id == childType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="conditional-conditional">
+                                                <input name="RelevantRisks[@relevantIndex].Id" id="RelevantRisks[@relevantIndex].Id" value="@childType.Id" checked=@(Model.RelevantRisks.Any(r => r.Id == childType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="relevant-risks-@(relevantIndex)">
                                                 <label class="govuk-label govuk-checkboxes__label" for="RelevantRisks[@relevantIndex].Id">
                                                     @childType.Description
                                                 </label>
                                             </div>
-                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional" style="display:@(parentType.Description.Contains("Other") ? "block" : "none")">
-                                                <div class="govuk-form-group">
-                                                    <label class="govuk-label" for="RelevantRisks[@relevantIndex].Details">
-                                                        Please specify the @childType.Description
-                                                    </label>
-                                                    <input name="RelevantRisks[@relevantIndex].Details" id="RelevantRisks[@relevantIndex].Details" class="govuk-input govuk-!-width-one-third" id="contact-by-text" name="other" type="text" maxlength="100">
+                                            @if (childType.Description.Contains("Other"))
+                                            {
+                                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass($"RelevantRisks[{relevantIndex}].Details", "govuk-form-group--error")" id="relevant-risks-@(relevantIndex)">
+                                                    <div class="govuk-form-group">
+                                                        <label class="govuk-label" for="RelevantRisks[@relevantIndex].Details">
+                                                            Please specify the @childType.Description
+                                                        </label>
+                                                        <input name="RelevantRisks[@relevantIndex].Details" id="RelevantRisks[@relevantIndex].Details" value="@(Model.RelevantRisks.FirstOrDefault(r=>r.Id==childType.Id)?.Details)" class="govuk-input govuk-!-width-one-third" type="text" maxlength="100">
+                                                        @Html.ValidationMessage($"RelevantRisks[{relevantIndex}].Details", null, new { @class = "govuk-error-message" })
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            }
+                                            else
+                                            {
+                                                <input name="RelevantRisks[@relevantIndex].Details" id="RelevantRisks[@relevantIndex].Details" type="hidden">
+                                            }
                                             { relevantIndex++; }
                                         }
                                     </div>
@@ -77,8 +87,12 @@
 
             <h2 class="govuk-heading-l">
                 Which areas of your supply chains do you consider to have the highest risk of modern slavery?
+                <span class="govuk-hint" id="GovUk_Sectors-hint">
+                    Select up to 3 areas
+                </span>
             </h2>
-            <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+            <div class="govuk-accordion @Html.SetErrorClass(model => model.HighRisks, "govuk-form-group--error")" data-module="govuk-accordion" id="accordion-default">
+                <span asp-validation-for="HighRisks" class="govuk-error-message"></span>
                 @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
                 {
 
@@ -93,24 +107,22 @@
                         <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
                             <div class="govuk-form-group">
                                 <fieldset class="govuk-fieldset">
-                                    <span class="govuk-hint" id="GovUk_Sectors-hint">
-                                        Select up to 3 areas
-                                    </span>
-                                    <div class="govuk-checkboxes">
+                                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                         @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
                                         {
                                             <div class="govuk-checkboxes__item">
-                                                <input name="HighRisks[@highIndex].Id" value="@childType.Id" id="@($"HighId{childType.Id}")" checked=@(Model.HighRisks.Any(r => r.Id == childType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="conditional-conditional-high-risk">
+                                                <input name="HighRisks[@highIndex].Id" value="@childType.Id" id="@($"HighId{childType.Id}")" checked=@(Model.HighRisks.Any(r => r.Id == childType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="high-risks-@highIndex">
                                                 <label class="govuk-label govuk-checkboxes__label" for="@($"HighId{childType.Id}")">
                                                     @childType.Description
                                                 </label>
                                             </div>
-                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional-high-risk" style="display:@(parentType.Description.Contains("Other") ? "block" : "none")">
+                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass($"HighRisks[{highIndex}].Details", "govuk-form-group--error")" id="high-risks-@highIndex">
                                                 <div class="govuk-form-group">
                                                     <label class="govuk-label" for="@($"HighDetails{childType.Id}")">
                                                         Please explain why
                                                     </label>
-                                                    <textarea name="HighRisks[@highIndex].Details" id="@($"HighDetails{childType.Id}")" class="govuk-textarea" rows="5" maxlength="250"></textarea>
+                                                    <textarea name="HighRisks[@highIndex].Details" id="@($"HighDetails{childType.Id}")" class="govuk-textarea" rows="5" maxlength="250">@(Model.HighRisks.FirstOrDefault(r=>r.Id==childType.Id)?.Details)</textarea>
+                                                    @Html.ValidationMessage($"HighRisks[{highIndex}].Details", null, new { @class = "govuk-error-message" })
                                                 </div>
                                             </div>
                                             { highIndex++; }
@@ -158,6 +170,7 @@
                                                     @childType.Description
                                                 </label>
                                             </div>
+
                                             { locationIndex++; }
                                         }
                                     </div>

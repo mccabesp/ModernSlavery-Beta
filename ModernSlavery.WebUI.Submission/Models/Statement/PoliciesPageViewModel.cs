@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using System;
 using System.Text.Json.Serialization;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -52,6 +53,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            var validationResults = new List<ValidationResult>();
+
             //Get the policy types
             PolicyTypes = validationContext.GetService<PolicyTypeIndex>();
 
@@ -59,7 +62,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             var otherId = PolicyTypes.Single(x => x.Description.Equals("Other")).Id;
 
             if (Policies.Contains(otherId) && string.IsNullOrWhiteSpace(OtherPolicies))
-                yield return new ValidationResult("Please provide detail on 'other'");
+                validationResults.AddValidationError(3400, nameof(OtherPolicies));
+
+            return validationResults;
         }
 
         public override bool IsComplete()

@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -130,21 +131,21 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            //Remove all the empty due diligences
-            DueDiligences.RemoveAll(r => r.Id == 0);
+            var validationResults = new List<ValidationResult>();
 
             //Get the diligence types
             DiligenceTypes = validationContext.GetService<DiligenceTypeIndex>();
 
             var otherId = DiligenceTypes.Single(x => x.Description.EqualsI("other type of social audit")).Id;
-            var otherDiligence = DueDiligences.FirstOrDefault(x => x.Id == otherId);
+            var otherIndex = DiligenceTypes.FindIndex(r => r.Id == otherId);
+            var otherDiligence = DueDiligences.FirstOrDefault(x => x.Id == otherId); 
             if (otherDiligence != null && string.IsNullOrWhiteSpace(otherDiligence.Details))
-                yield return new ValidationResult("Please enter other details");
+                validationResults.AddValidationError(3600, $"DueDiligences[{otherIndex}].Details");
 
             if (HasForceLabour == true)
             {
                 if (string.IsNullOrWhiteSpace(ForcedLabourDetails))
-                    yield return new ValidationResult("Please provide the detail");
+                    validationResults.AddValidationError(3600, nameof(ForcedLabourDetails));
             }
             else
                 ForcedLabourDetails = null;
@@ -153,17 +154,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (HasSlaveryInstance == true)
             {
                 if (string.IsNullOrWhiteSpace(SlaveryInstanceDetails))
-                    yield return new ValidationResult("Please provide the detail");
+                    validationResults.AddValidationError(3600, nameof(SlaveryInstanceDetails));
 
                 if (HasRemediation == null)
-                    yield return new ValidationResult("Please provide the detail");
+                    validationResults.AddValidationError(3601, nameof(HasRemediation));
 
                 if (HasRemediation == true)
                 {
                     if (!SelectedRemediationTypes.Any())
-                        yield return new ValidationResult("Please remediation details");
+                        validationResults.AddValidationError(3602, nameof(SelectedRemediationTypes));
                     else if (SelectedRemediationTypes.Contains("other") && string.IsNullOrWhiteSpace(OtherRemediation))
-                        yield return new ValidationResult("Please provide the other remediation details");
+                        validationResults.AddValidationError(3603, nameof(OtherRemediation));
                 }
             }
             else
@@ -173,6 +174,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 SelectedRemediationTypes.Clear();
                 OtherRemediation = null;
             }
+
+            //Remove all the empty due diligences
+            DueDiligences.RemoveAll(r => r.Id == 0);
+
+            return validationResults;
         }
         public bool IsComplete()
         {

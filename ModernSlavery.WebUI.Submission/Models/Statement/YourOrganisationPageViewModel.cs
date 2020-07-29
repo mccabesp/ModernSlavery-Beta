@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations.Schema;
 using ModernSlavery.Core.Entities;
 using System.Text.Json.Serialization;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -19,9 +20,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public OrganisationPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel,OrganisationPageViewModel>();
+            CreateMap<StatementModel,YourOrganisationPageViewModel>();
 
-            CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source)
+            CreateMap<YourOrganisationPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForSourceMember(s => s.SectorTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
@@ -33,16 +34,16 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class OrganisationPageViewModel : BaseViewModel
+    public class YourOrganisationPageViewModel : BaseViewModel
     {
         [IgnoreMap]
         public SectorTypeIndex SectorTypes { get; set; }
-        public OrganisationPageViewModel(SectorTypeIndex sectorTypes)
+        public YourOrganisationPageViewModel(SectorTypeIndex sectorTypes)
         {
             SectorTypes = sectorTypes;
         }
 
-        public OrganisationPageViewModel()
+        public YourOrganisationPageViewModel()
         {
 
         }
@@ -83,13 +84,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            var validationResults = new List<ValidationResult>();
+
             //Get the sector types
             SectorTypes = validationContext.GetRequiredService<SectorTypeIndex>();
 
             var otherId = SectorTypes.Single(x => x.Description.Equals("Other")).Id;
 
             if (Sectors.Contains(otherId) && string.IsNullOrEmpty(OtherSector))
-                yield return new ValidationResult("Please provide other details");
+                validationResults.AddValidationError(3300, nameof(OtherSector));
+
+            return validationResults;
         }
 
         public override bool IsComplete()

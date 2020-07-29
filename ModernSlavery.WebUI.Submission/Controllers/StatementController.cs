@@ -112,17 +112,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     return GetYourStatementUrl();
                 case CompliancePageViewModel vm:
                     return GetComplianceUrl();
-                case OrganisationPageViewModel vm:
+                case YourOrganisationPageViewModel vm:
                     return GetYourOrganisationUrl();
                 case PoliciesPageViewModel vm:
                     return GetPoliciesUrl();
-                case RisksPageViewModel vm:
+                case SupplyChainRisksPageViewModel vm:
                     return GetRisksUrl();
                 case DueDiligencePageViewModel vm:
                     return GetDueDiligenceUrl();
                 case TrainingPageViewModel vm:
                     return GetTrainingUrl();
-                case ProgressPageViewModel vm:
+                case MonitoringProgressPageViewModel vm:
                     return GetProgressUrl();
             }
 
@@ -149,7 +149,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetYourOrganisationUrl();
                     break;
-                case OrganisationPageViewModel vm:
+                case YourOrganisationPageViewModel vm:
                     vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetComplianceUrl();
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetPoliciesUrl();
@@ -159,7 +159,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetRisksUrl();
                     break;
-                case RisksPageViewModel vm:
+                case SupplyChainRisksPageViewModel vm:
                     vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetPoliciesUrl();
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetDueDiligenceUrl();
@@ -174,13 +174,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetProgressUrl();
                     break;
-                case ProgressPageViewModel vm:
+                case MonitoringProgressPageViewModel vm:
                     vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetTrainingUrl();
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = GetReviewUrl();
                     break;
-                case ReviewPageViewModel vm:
-                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetTrainingUrl();
+                case ReviewAndEditPageViewModel vm:
+                    vm.BackUrl = vm.CanRevertToOriginal ? null : GetProgressUrl();
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = GetReviewUrl();
                     vm.YourStatementUrl = GetYourOrganisationUrl();
@@ -372,13 +372,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/your-organisation")]
         public async Task<IActionResult> YourOrganisation(string organisationIdentifier, int year)
         {
-            return await GetAsync<OrganisationPageViewModel>(organisationIdentifier, year);
+            return await GetAsync<YourOrganisationPageViewModel>(organisationIdentifier, year);
         }
 
         [HttpPost("{organisationIdentifier}/{year}/your-organisation")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> YourOrganisation(OrganisationPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> YourOrganisation(YourOrganisationPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -407,13 +407,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/supply-chain-risks")]
         public async Task<IActionResult> SupplyChainRisks(string organisationIdentifier, int year)
         {
-            return await GetAsync<RisksPageViewModel>(organisationIdentifier, year);
+            return await GetAsync<SupplyChainRisksPageViewModel>(organisationIdentifier, year);
         }
 
         [HttpPost("{organisationIdentifier}/{year}/supply-chain-risks")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SupplyChainRisks(RisksPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> SupplyChainRisks(SupplyChainRisksPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -458,13 +458,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/monitoring-progress")]
         public async Task<IActionResult> MonitoringProgress(string organisationIdentifier, int year)
         {
-            return await GetAsync<ProgressPageViewModel>(organisationIdentifier, year);
+            return await GetAsync<MonitoringProgressPageViewModel>(organisationIdentifier, year);
         }
 
         [HttpPost("{organisationIdentifier}/{year}/monitoring-progress")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MonitoringProgress(ProgressPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> MonitoringProgress(MonitoringProgressPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -498,7 +498,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> ReviewAndEditPost(string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
             //Create the view model
-            var viewModel = new ReviewPageViewModel();
+            var viewModel = new ReviewAndEditPageViewModel();
 
             //set the navigation urls
             SetNavigationUrl(viewModel);
@@ -548,19 +548,19 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
         }
 
-        private async Task<ReviewPageViewModel> CreateReviewPageViewModelAsync(StatementModel statementModel)
+        private async Task<ReviewAndEditPageViewModel> CreateReviewPageViewModelAsync(StatementModel statementModel)
         {
             //Create the view model
-            var viewModel = SubmissionPresenter.GetViewModelFromStatementModel<ReviewPageViewModel>(statementModel);
+            var viewModel = SubmissionPresenter.GetViewModelFromStatementModel<ReviewAndEditPageViewModel>(statementModel);
 
             viewModel.YourStatement = SubmissionPresenter.GetViewModelFromStatementModel<YourStatementPageViewModel>(statementModel);
             viewModel.Compliance = SubmissionPresenter.GetViewModelFromStatementModel<CompliancePageViewModel>(statementModel);
-            viewModel.Organisation = SubmissionPresenter.GetViewModelFromStatementModel<OrganisationPageViewModel>(statementModel);
+            viewModel.Organisation = SubmissionPresenter.GetViewModelFromStatementModel<YourOrganisationPageViewModel>(statementModel);
             viewModel.Policies = SubmissionPresenter.GetViewModelFromStatementModel<PoliciesPageViewModel>(statementModel);
-            viewModel.Risks = SubmissionPresenter.GetViewModelFromStatementModel<RisksPageViewModel>(statementModel);
+            viewModel.Risks = SubmissionPresenter.GetViewModelFromStatementModel<SupplyChainRisksPageViewModel>(statementModel);
             viewModel.DueDiligence = SubmissionPresenter.GetViewModelFromStatementModel<DueDiligencePageViewModel>(statementModel);
             viewModel.Training = SubmissionPresenter.GetViewModelFromStatementModel<TrainingPageViewModel>(statementModel);
-            viewModel.Progress = SubmissionPresenter.GetViewModelFromStatementModel<ProgressPageViewModel>(statementModel);
+            viewModel.Progress = SubmissionPresenter.GetViewModelFromStatementModel<MonitoringProgressPageViewModel>(statementModel);
             viewModel.Modifications=await SubmissionPresenter.GetDraftModifications(statementModel);
 
             //Otherwise return the view using the populated ViewModel
@@ -667,13 +667,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                         case CompliancePageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
-                        case OrganisationPageViewModel vm:
+                        case YourOrganisationPageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
                         case PoliciesPageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
-                        case RisksPageViewModel vm:
+                        case SupplyChainRisksPageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
                         case DueDiligencePageViewModel vm:
@@ -682,7 +682,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                         case TrainingPageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
-                        case ProgressPageViewModel vm:
+                        case MonitoringProgressPageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
                     }

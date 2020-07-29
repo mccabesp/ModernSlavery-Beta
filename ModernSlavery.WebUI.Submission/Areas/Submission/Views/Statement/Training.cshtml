@@ -35,12 +35,13 @@
                             </div>
                             @if (trainingType.Description.Equals("Other"))
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="training-conditional">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTraining, "govuk-form-group--error")" id="training-conditional">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
                                             Please specify
                                         </label>
                                         <input asp-for="OtherTraining" class="govuk-input govuk-!-width-one-third" id="contact-by-email" name="OtherTraining" spellcheck="false">
+                                        <span asp-validation-for="OtherTraining" class="govuk-error-message"></span>
                                     </div>
                                 </div>
                             }

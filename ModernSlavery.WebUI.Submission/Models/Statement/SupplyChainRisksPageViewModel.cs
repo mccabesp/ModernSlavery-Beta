@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using System;
 using System.Text.Json.Serialization;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -15,11 +16,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public RisksPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel.RisksModel, RisksPageViewModel.RiskViewModel>().ReverseMap();
+            CreateMap<StatementModel.RisksModel, SupplyChainRisksPageViewModel.RiskViewModel>().ReverseMap();
 
-            CreateMap<StatementModel, RisksPageViewModel>();
+            CreateMap<StatementModel, SupplyChainRisksPageViewModel>();
 
-            CreateMap<RisksPageViewModel, StatementModel>(MemberList.Source)
+            CreateMap<SupplyChainRisksPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.RelevantRisks, opt => opt.MapFrom(s=>s.RelevantRisks.Where(r=>r.Id>0)))
                 .ForMember(d => d.HighRisks, opt => opt.MapFrom(s=>s.HighRisks.Where(r=>r.Id>0)))
                 .ForMember(d => d.LocationRisks, opt => opt.MapFrom(s=>s.LocationRisks.Where(r=>r.Id>0)))
@@ -37,16 +38,16 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class RisksPageViewModel : BaseViewModel
+    public class SupplyChainRisksPageViewModel : BaseViewModel
     {
         [IgnoreMap]
         public RiskTypeIndex RiskTypes { get; set; }
-        public RisksPageViewModel(RiskTypeIndex riskTypes)
+        public SupplyChainRisksPageViewModel(RiskTypeIndex riskTypes)
         {
             RiskTypes = riskTypes;
         }
 
-        public RisksPageViewModel()
+        public SupplyChainRisksPageViewModel()
         {
 
         }
@@ -77,51 +78,46 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            var validationResults = new List<ValidationResult>();
+
+            //Get the risk types
+            RiskTypes=validationContext.GetService<RiskTypeIndex>();
+
+            if (RelevantRisks.Count(r => r.Id > 0) > 3)
+                validationResults.AddValidationError(3501, nameof(RelevantRisks));
+
+            var vulnerableGroupId = RiskTypes.Single(x => x.Description.Equals("Other vulnerable groups")).Id;
+            var vulnerableGroupIndex = RelevantRisks.FindIndex(r => r.Id == vulnerableGroupId);
+            var otherVulnerableGroup = RelevantRisks.FirstOrDefault(x => x.Id == vulnerableGroupId);
+            if (otherVulnerableGroup != null && string.IsNullOrWhiteSpace(otherVulnerableGroup.Details))
+                validationResults.AddValidationError(3500, $"RelevantRisks[{vulnerableGroupIndex}].Details");
+
+            var typeOfWorkId = RiskTypes.Single(x => x.Description.Equals("Other type of work")).Id;
+            var typeOfWorkIndex = RelevantRisks.FindIndex(r => r.Id == typeOfWorkId);
+            var othertypeOfWork = RelevantRisks.FirstOrDefault(x => x.Id == typeOfWorkId);
+            if (othertypeOfWork != null && string.IsNullOrWhiteSpace(othertypeOfWork.Details))
+                validationResults.AddValidationError(3500, $"RelevantRisks[{typeOfWorkIndex}].Details");
+
+            var sectorId = RiskTypes.Single(x => x.Description.Equals("Other sector")).Id;
+            var sectorIndex = RelevantRisks.FindIndex(r => r.Id == sectorId);
+            var othersector = RelevantRisks.FirstOrDefault(x => x.Id == sectorId);
+            if (othersector != null && string.IsNullOrWhiteSpace(othersector.Details))
+                validationResults.AddValidationError(3500, $"RelevantRisks[{sectorIndex}].Details");
+
+            if (HighRisks.Count(r=>r.Id>0) > 3)validationResults.AddValidationError(3501, nameof(HighRisks));
+
+            for (var highRiskIndex=0; highRiskIndex<HighRisks.Count; highRiskIndex++)
+            {
+                if (HighRisks[highRiskIndex].Id > 0 && string.IsNullOrWhiteSpace(HighRisks[highRiskIndex].Details))
+                    validationResults.AddValidationError(3500, $"HighRisks[{highRiskIndex}].Details");
+            }
+
             //Remove all the empty risks
             RelevantRisks.RemoveAll(r => r.Id == 0);
             HighRisks.RemoveAll(r => r.Id == 0);
             LocationRisks.RemoveAll(r => r.Id == 0);
 
-            //Get the risk types
-            RiskTypes=validationContext.GetService<RiskTypeIndex>();
-
-            //TODO: clarify this with Sam G as comment doesnt match?? Select all that apply
-            if (RelevantRisks.Count > 3)
-                yield return new ValidationResult("Please select no more than 3 categories");
-
-            //TODO: better way to identify this particular options
-            var vulnerableGroupId = RiskTypes.Single(x => x.Description.Equals("Other vulnerable groups")).Id;
-            var otherVulnerableGroup = RelevantRisks.FirstOrDefault(x => x.Id == vulnerableGroupId);
-            if (otherVulnerableGroup != null && string.IsNullOrWhiteSpace(otherVulnerableGroup.Details))
-                yield return new ValidationResult("Please enter the other vulnerable group");
-
-            var typeOfWorkId = RiskTypes.Single(x => x.Description.Equals("Other type of work")).Id;
-            var othertypeOfWork = RelevantRisks.FirstOrDefault(x => x.Id == typeOfWorkId);
-            if (othertypeOfWork != null && string.IsNullOrWhiteSpace(othertypeOfWork.Details))
-                yield return new ValidationResult("Please enter the other type of work");
-
-            var sectorId = RiskTypes.Single(x => x.Description.Equals("Other sector")).Id;
-            var othersector = RelevantRisks.FirstOrDefault(x => x.Id == sectorId);
-            if (othersector != null && string.IsNullOrWhiteSpace(othersector.Details))
-                yield return new ValidationResult("Please enter the other sector");
-
-            if (HighRisks.Count > 3)
-                yield return new ValidationResult("Please select no more than 3 high risk areas");
-
-            otherVulnerableGroup = HighRisks.FirstOrDefault(x => x.Id == vulnerableGroupId);
-            if (otherVulnerableGroup != null && string.IsNullOrWhiteSpace(otherVulnerableGroup.Details))
-                yield return new ValidationResult("Please enter the other vulnerable group for high risk area");
-
-            othertypeOfWork = HighRisks.FirstOrDefault(x => x.Id == typeOfWorkId);
-            if (othertypeOfWork != null && string.IsNullOrWhiteSpace(othertypeOfWork.Details))
-                yield return new ValidationResult("Please enter the other type of work for high risk area");
-
-            othersector = HighRisks.FirstOrDefault(x => x.Id == sectorId);
-            if (othersector != null && string.IsNullOrWhiteSpace(othersector.Details))
-                yield return new ValidationResult("Please enter the other sector for high risk area");
-
-            foreach (var risk in HighRisks.Where(r=>string.IsNullOrWhiteSpace(r.Details)))
-                yield return new ValidationResult($"Please explain why {RiskTypes.Single(r=>r.Id==risk.Id).Description} is one of your highest risks");
+            return validationResults;
         }
 
         public override bool IsComplete()
