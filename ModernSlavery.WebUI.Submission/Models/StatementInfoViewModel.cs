@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared.Models;
 
 namespace ModernSlavery.WebUI.Submission.Models
@@ -8,9 +9,11 @@ namespace ModernSlavery.WebUI.Submission.Models
     {
         public readonly StatementInfoModel StatementInfo;
         public readonly string OrganisationIdentifier;
-        public StatementInfoViewModel(StatementInfoModel statementInfoModel, string organisationIdentifier)
+        private readonly IUrlHelper _urlHelper;
+        public StatementInfoViewModel(StatementInfoModel statementInfoModel, IUrlHelper urlHelper, string organisationIdentifier)
         {
             StatementInfo = statementInfoModel;
+            _urlHelper = urlHelper;
             OrganisationIdentifier = organisationIdentifier;
         }
 
@@ -33,6 +36,15 @@ namespace ModernSlavery.WebUI.Submission.Models
                 if (SubmissionAvailable && DraftAvailable)
                     return "Edit Draft Report";
                 return null;
+            }
+        }
+
+        public string EditUrl
+        {
+            get
+            {
+                if (!SubmissionAvailable && !DraftAvailable)return _urlHelper.Action("BeforeYouStart", "Statement", new { organisationIdentifier = OrganisationIdentifier, year = StatementInfo.ReportingDeadline.Year });
+                return _urlHelper.Action("ReviewAndEdit", "Statement", new { organisationIdentifier = OrganisationIdentifier, year = StatementInfo.ReportingDeadline.Year });
             }
         }
     }
