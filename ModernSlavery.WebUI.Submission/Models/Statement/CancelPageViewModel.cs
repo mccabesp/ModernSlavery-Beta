@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.Core.Extensions;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -32,7 +34,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [IgnoreMap]
         public int ErrorCount { get; set; }
         [IgnoreMap]
-        public string Modifications { get; set; }
+        public IList<AutoMap.Diff> Modifications { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -41,7 +43,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public bool HasChanged()
         {
-            return !string.IsNullOrWhiteSpace(Modifications);
+            return Modifications!=null && Modifications.Any();
         }
     }
 }

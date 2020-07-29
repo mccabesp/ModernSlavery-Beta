@@ -42,6 +42,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(d => d.OrganisationName, opt => opt.MapFrom(s => s.Organisation.OrganisationName))
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>(s.MinStatementYears, s.MaxStatementYears == null ? 0 : s.MaxStatementYears.Value)))
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>(s.MinTurnover, s.MaxTurnover == null ? 0 : s.MaxTurnover.Value)))
+                .ForMember(dest => dest.Modifications, opt => opt.MapFrom(s=>string.IsNullOrWhiteSpace(s.Modifications) ? null : JsonConvert.DeserializeObject<List<AutoMap.Diff>>(s.Modifications)))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.Sectors, opt => opt.MapFrom(st => st.Sectors.Select(s => s.StatementSectorTypeId)))
                 .ForMember(dest => dest.Policies, opt => opt.MapFrom(st => st.Policies.Select(s => s.StatementPolicyTypeId)))
@@ -135,7 +136,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         [JsonIgnore]
         [IgnoreMap]
-        public string Modifications { get; set; }
+        public IList<AutoMap.Diff> Modifications { get; set; }
         public bool EHRCResponse { get; set; }
         public string LateReason { get; set; }
         public short IncludedOrganisationCount { get; set; }

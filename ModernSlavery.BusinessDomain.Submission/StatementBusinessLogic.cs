@@ -64,7 +64,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// </summary>
         /// <param name="statementModel">The current statement</param>
         /// <returns>A Json list of modifications or null if no differences</returns>
-        Task<string> GetDraftModifications(StatementModel statementModel);
+        Task<IList<AutoMap.Diff>> GetDraftModifications(StatementModel statementModel);
 
         /// <summary>
         /// Attempts to open an existing draft StaementModel (if it exists) for a specific user, organisation and reporting deadline
@@ -357,22 +357,16 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// <param name="sourceModel"></param>
         /// <param name="targetModel"></param>
         /// <returns></returns>
-        private string GetModifications(StatementModel sourceModel, StatementModel targetModel)
+        private IList<AutoMap.Diff> GetModifications(StatementModel sourceModel, StatementModel targetModel)
         {
             if (sourceModel == null) throw new ArgumentNullException(nameof(sourceModel));
             if (targetModel == null) throw new ArgumentNullException(nameof(targetModel));
 
             //Compare the two statementModels
             var membersToIgnore = new[] { nameof(StatementModel.CanRevertToOriginal), nameof(StatementModel.DraftBackupDate), nameof(StatementModel.EditorUserId), nameof(StatementModel.EditTimestamp), nameof(StatementModel.StatementId), nameof(StatementModel.OrganisationName), nameof(StatementModel.Status), nameof(StatementModel.StatusDate), nameof(StatementModel.SubmissionDeadline), nameof(StatementModel.OrganisationId), nameof(StatementModel.CanRevertToOriginal), nameof(StatementModel.Modifications), nameof(StatementModel.EHRCResponse), nameof(StatementModel.LateReason), nameof(StatementModel.IncludedOrganisationCount), nameof(StatementModel.ExcludedOrganisationCount), nameof(StatementModel.Modified), nameof(StatementModel.Created) };
-            var differences = sourceModel.GetDifferences(targetModel, membersToIgnore);
-
-            //If no differences then return no modifications
-            if (!differences.Any()) return null;
-
-            //Return the list of differences as a json object
-            return JsonConvert.SerializeObject(differences);
-
+            return sourceModel.GetDifferences(targetModel, membersToIgnore).ToList();
         }
+
         #endregion
 
         #region Public Methods
@@ -684,7 +678,8 @@ namespace ModernSlavery.BusinessDomain.Submission
                 _mapper.Map(previousStatement, statementModel);
 
                 //Compare the latest with the previous statementModel
-                newStatement.Modifications =GetModifications(statementModel, previousStatementModel); 
+                var modifications= GetModifications(statementModel, previousStatementModel);
+                newStatement.Modifications = modifications.Any() ? JsonConvert.SerializeObject(modifications,new JsonSerializerSettings { NullValueHandling= NullValueHandling.Ignore, DefaultValueHandling= DefaultValueHandling.Ignore }) : null;
             }
 
 
@@ -697,7 +692,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             return new Outcome<StatementErrors>();
         }
 
-        public async Task<string> GetDraftModifications(StatementModel statementModel)
+        public async Task<IList<AutoMap.Diff>> GetDraftModifications(StatementModel statementModel)
         {
             //Try and find a back draft first
             var backupStatementModel = await FindDraftBackupStatementModelAsync(statementModel.OrganisationId, statementModel.SubmissionDeadline);

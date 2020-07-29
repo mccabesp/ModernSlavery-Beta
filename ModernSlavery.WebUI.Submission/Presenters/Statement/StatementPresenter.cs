@@ -5,8 +5,10 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Submission.Models.Statement;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.WebUI.Submission.Presenters
@@ -35,7 +37,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// </summary>
         /// <param name="statementModel">The current statement</param>
         /// <returns>A Json list of modifications or null if no differences</returns>
-        Task<string> GetDraftModifications(StatementModel statementModel);
+        Task<IList<AutoMap.Diff>> GetDraftModifications(StatementModel statementModel);
 
         /// <summary>
         /// Returns a ViewModel populated from a StatementModel for the specified oreganisation, reporting Deadline, and user
@@ -200,7 +202,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return new Outcome<StatementErrors, TViewModel>(viewModel);
         }
 
-        public async Task<string> GetDraftModifications(StatementModel statementModel)
+        public async Task<IList<AutoMap.Diff>> GetDraftModifications(StatementModel statementModel)
         {
             return await _statementBusinessLogic.GetDraftModifications(statementModel);
         }
