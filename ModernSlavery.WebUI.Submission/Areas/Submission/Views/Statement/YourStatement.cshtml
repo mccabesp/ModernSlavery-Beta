@@ -8,10 +8,11 @@
         {
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-          
-        <h1 class="govuk-heading-l">
-            @Model.PageTitle
-        </h1>
+            @Html.HiddenFor(m => m.CanRevertToOriginal);
+
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
 
             <h2 class="govuk-heading-m">
                 Provide a link to the modern slavery statement on your organisation's website
@@ -31,7 +32,7 @@
                 <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
                 <input asp-for="StatementUrl" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
             </div>
-           
+
             <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementStartDate, "govuk-form-group--error") @Html.SetErrorClass(model => model.StatementEndDate, "govuk-form-group--error")">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="reporting-start-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -175,7 +176,7 @@
                 Continue
             </button>
 
-            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit"  name="command" value="@BaseViewModel.CommandType.Cancel">
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
                 Cancel
             </button>
         }

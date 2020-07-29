@@ -9,6 +9,7 @@
         {
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.CanRevertToOriginal);
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="training-hint">
@@ -48,8 +49,8 @@
                 </fieldset>
             </div>
 
-           
-           <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+
+            <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Continue
             </button>
 

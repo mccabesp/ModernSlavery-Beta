@@ -10,6 +10,8 @@
         {
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.CanRevertToOriginal);
+
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -63,7 +65,7 @@
                                 <label class="govuk-label govuk-radios__label" for="Turnover">
                                     @(item.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text)
                                 </label>
-                            </div>                            
+                            </div>
                         }
                     </div>
                 </fieldset>
