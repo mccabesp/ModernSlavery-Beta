@@ -2,6 +2,7 @@
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -69,20 +70,20 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public DateTime? StatementStartDate => ToDateTime(StatementStartYear, StatementStartMonth, StatementStartDay);
 
-        [RegularExpression("^[0-9]*$", ErrorMessage = "Day format is incorrect")]
+        [RegularExpression("^[0-9]*$")]
         public int? StatementStartDay { get; set; }
-        [RegularExpression("^[0-9]*$", ErrorMessage = "Month format is incorrect")]
+        [RegularExpression("^[0-9]*$")]
         public int? StatementStartMonth { get; set; }
-        [RegularExpression("^[0-9]*$", ErrorMessage = "Year format is incorrect")]
+        [RegularExpression("^[0-9]*$")]
         public int? StatementStartYear { get; set; }
 
         public DateTime? StatementEndDate => ToDateTime(StatementEndYear, StatementEndMonth, StatementEndDay);
 
-        [RegularExpression("^[0-9]*$", ErrorMessage = "Day format is incorrect")]
+        [RegularExpression("^[0-9]*$")]
         public int? StatementEndDay { get; set; }
-        [RegularExpression("^[0-9]*$", ErrorMessage = "Month format is incorrect")]
+        [RegularExpression("^[0-9]*$")]
         public int? StatementEndMonth { get; set; }
-        [RegularExpression("^[0-9]*$", ErrorMessage = "Year format is incorrect")]
+        [RegularExpression("^[0-9]*$")]
         public int? StatementEndYear { get; set; }
 
         [Display(Name = "Job Title")]
@@ -94,34 +95,85 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public DateTime? ApprovedDate => ToDateTime(ApprovedYear, ApprovedMonth, ApprovedDay);
 
-        [RegularExpression("^[0-9]*$", ErrorMessage = "Day format is incorrect")]
+        [RegularExpression("^[0-9]*$")]
         public int? ApprovedDay { get; set; }
-        [RegularExpression("^[0-9]*$", ErrorMessage = "Month format is incorrect")]
+        [RegularExpression("^[0-9]*$")]
         public int? ApprovedMonth { get; set; }
-        [RegularExpression("^[0-9]*$", ErrorMessage = "Year format is incorrect")]
+        [RegularExpression("^[0-9]*$")]
         public int? ApprovedYear { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            // TODO - James, how do we get these to fit in with the xml config of error messages?
-            // it would normally be handled by an error code or attributes on the property
+            var validationResults = new List<ValidationResult>();
 
-            var startDateList = new List<int?> { StatementStartDay, StatementStartMonth, StatementStartYear };
-            if (startDateList.Any(x => x.HasValue) && !StatementStartDate.HasValue)
-                yield return new ValidationResult("Please provide a valid Start Date", new[] { nameof(StatementStartDate), nameof(StatementStartDay), nameof(StatementStartMonth), nameof(StatementStartYear) });
+            //Validate the start date parts
+            var partsComplete = !Text.IsAnyNull(StatementStartDay, StatementStartMonth, StatementStartYear);
+            var partsEmpty = Text.IsAllNull(ApproverFirstName, ApproverLastName, ApproverJobTitle);
+            if (!partsComplete && !partsEmpty)
+            {
+                if (StatementStartDay==null)
+                    validationResults.AddValidationError(3101, nameof(StatementStartDay));
 
-            var endDateList = new List<int?> { StatementEndDay, StatementEndMonth, StatementEndYear };
-            if (endDateList.Any(x => x.HasValue) && !StatementEndDate.HasValue)
-                yield return new ValidationResult("Please provide a valid End Date", new[] { nameof(StatementEndDate), nameof(StatementEndDay), nameof(StatementEndMonth), nameof(StatementEndYear) });
+                if (StatementStartMonth==null)
+                    validationResults.AddValidationError(3102, nameof(StatementStartMonth));
 
-            var approvalDateList = new List<int?> { ApprovedDay, ApprovedMonth, ApprovedYear };
-            if (approvalDateList.Any(x => x.HasValue) && !ApprovedDate.HasValue)
-                yield return new ValidationResult("Please provide a valid Approved Date", new[] { nameof(ApprovedDate), nameof(ApprovedDay), nameof(ApprovedMonth), nameof(ApprovedYear) });
+                if (StatementStartYear==null)
+                    validationResults.AddValidationError(3103, nameof(StatementStartYear));
+            }
+            if (partsComplete && StatementStartDate==null)
+                validationResults.AddValidationError(3104, nameof(StatementStartDate));
 
-            var detailsList = new List<string> { ApproverFirstName, ApproverLastName, ApproverJobTitle };
-            if (detailsList.Any(x => string.IsNullOrWhiteSpace(x)) && detailsList.Any(x => !string.IsNullOrWhiteSpace(x)))
-                // TODO - James, these will want an error for each field that is null
-                yield return new ValidationResult("Please complete First name, Last name, Job title", detailsList.Where(x => string.IsNullOrWhiteSpace(x)));
+            //Validate the end date parts
+            partsComplete = !Text.IsAnyNull(StatementEndDay, StatementEndMonth, StatementEndYear);
+            partsEmpty = Text.IsAllNull(StatementEndDay, StatementEndMonth, StatementEndYear);
+            if (!partsComplete && !partsEmpty)
+            {
+                if (StatementEndDay == null)
+                    validationResults.AddValidationError(3105, nameof(StatementEndDay));
+
+                if (StatementEndMonth == null)
+                    validationResults.AddValidationError(3106, nameof(StatementEndMonth));
+
+                if (StatementEndYear == null)
+                    validationResults.AddValidationError(3107, nameof(StatementEndYear));
+            }
+            if (partsComplete && StatementEndDate==null)
+                validationResults.AddValidationError(3108, nameof(StatementEndDate));
+
+            //Validate the approved date parts
+            partsComplete = !Text.IsAnyNull(ApprovedDay, ApprovedMonth, ApprovedYear);
+            partsEmpty = Text.IsAllNull(ApprovedDay, ApprovedMonth, ApprovedYear);
+            if (!partsComplete && !partsEmpty)
+            {
+                if (ApprovedDay == null)
+                    validationResults.AddValidationError(3109, nameof(ApprovedDay));
+
+                if (ApprovedMonth == null)
+                    validationResults.AddValidationError(3110, nameof(ApprovedMonth));
+
+                if (ApprovedYear == null)
+                    validationResults.AddValidationError(3111, nameof(ApprovedYear));
+            }
+            if (partsComplete && ApprovedDate==null)
+                validationResults.AddValidationError(3112, nameof(ApprovedDate));
+
+            //Validate the approver parts
+            partsComplete = !Text.IsAnyNullOrWhiteSpace(ApproverFirstName,ApproverLastName,ApproverJobTitle);
+            partsEmpty = Text.IsAllNullOrWhiteSpace(ApproverFirstName,ApproverLastName,ApproverJobTitle);
+
+            if (!partsComplete && !partsEmpty)
+            {
+                if (string.IsNullOrWhiteSpace(ApproverFirstName))
+                    validationResults.AddValidationError(3113,nameof(ApproverFirstName));
+
+                if (string.IsNullOrWhiteSpace(ApproverLastName))
+                    validationResults.AddValidationError(3114, nameof(ApproverLastName));
+
+                if (string.IsNullOrWhiteSpace(ApproverJobTitle))
+                    validationResults.AddValidationError(3115, nameof(ApproverJobTitle));
+            }
+
+            return validationResults;
         }
 
         public override bool IsComplete()

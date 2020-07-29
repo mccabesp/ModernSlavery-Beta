@@ -298,7 +298,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     return Redirect(viewModel.CancelUrl);
                 case BaseViewModel.CommandType.Continue:
                     //Validate the submitted ViewModel data
-                    if (!ModelState.IsValid) return View(viewModel);
+                    if (!ModelState.IsValid)
+                    {
+                        this.CleanModelErrors<TViewModel>();
+                        return View(viewModel);
+                    }
 
                     //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
                     var viewModelResult = await SubmissionPresenter.SaveViewModelAsync(viewModel, organisationIdentifier, year, VirtualUser.UserId);

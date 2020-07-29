@@ -29,11 +29,11 @@
             </details>
             <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementUrl, "govuk-form-group--error")">
                 <label asp-for="StatementUrl" class="govuk-label govuk-label--m "></label>
-                <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
                 <input asp-for="StatementUrl" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
             </div>
 
-            <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementStartDate, "govuk-form-group--error") @Html.SetErrorClass(model => model.StatementEndDate, "govuk-form-group--error")">
+            <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="reporting-start-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                         <h1 class="govuk-heading-m">
@@ -43,10 +43,8 @@
                     <span id="reporting-start-hint" class="govuk-hint">
                         For example, 31 3 1980
                     </span>
-                    <span asp-validation-for="StatementStartDate" class="govuk-error-message"></span>
-                    <span asp-validation-for="StatementEndDate" class="govuk-error-message"></span>
                     <div class="govuk-grid-row">
-                        <div class="govuk-date-input govuk-grid-column-one-half" id="reporting-start">
+                        <div class="govuk-date-input govuk-grid-column-one-half @Html.SetErrorClass(model => model.StatementStartDate, "govuk-form-group--error")" id="reporting-start">
                             <div class="govuk-date-input__item">
                                 <div class="govuk-form-group">
                                     <label class="govuk-label govuk-date-input__label" for="reporting-start-day">
@@ -71,37 +69,38 @@
                                     <input asp-for="StatementStartYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="text" pattern="[0-9]*" inputmode="numeric">
                                 </div>
                             </div>
-
+                            <span asp-validation-for="StatementStartDate" class="govuk-error-message"></span>
                         </div>
 
                         @*<p>to</p>*@
 
-                        <div class="govuk-date-input govuk-grid-column-one-half" id="reporting-end">
-                            <div class="govuk-date-input__item">
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label govuk-date-input__label" for="reporting-end-day">
-                                        Day
-                                    </label>
-                                    <input asp-for="StatementEndDay" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
-                                </div>
-                            </div>
-                            <div class="govuk-date-input__item">
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label govuk-date-input__label" for="reporting-end-month">
-                                        Month
-                                    </label>
-                                    <input asp-for="StatementEndMonth" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
-                                </div>
-                            </div>
-                            <div class="govuk-date-input__item">
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label govuk-date-input__label" for="reporting-end-year">
-                                        Year
-                                    </label>
-                                    <input asp-for="StatementEndYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="text" pattern="[0-9]*" inputmode="numeric">
-                                </div>
+                    <div class="govuk-date-input govuk-grid-column-one-half @Html.SetErrorClass(model => model.StatementEndDate, "govuk-form-group--error")" id="reporting-end">
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="reporting-end-day">
+                                    Day
+                                </label>
+                                <input asp-for="StatementEndDay" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
                             </div>
                         </div>
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="reporting-end-month">
+                                    Month
+                                </label>
+                                <input asp-for="StatementEndMonth" class="govuk-input govuk-date-input__input govuk-input--width-2" type="text" pattern="[0-9]*" inputmode="numeric">
+                            </div>
+                        </div>
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" for="reporting-end-year">
+                                    Year
+                                </label>
+                                <input asp-for="StatementEndYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="text" pattern="[0-9]*" inputmode="numeric">
+                            </div>
+                        </div>
+                        <span asp-validation-for="StatementEndDate" class="govuk-error-message"></span>
+                    </div>
                     </div>
                 </fieldset>
             </div>
@@ -115,8 +114,8 @@
 
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverFirstName, "govuk-form-group--error")">
                     <label asp-for="ApproverFirstName" class="govuk-label"></label>
-                    <span asp-validation-for="ApproverFirstName" class="govuk-error-message"></span>
                     <input asp-for="ApproverFirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="ApproverFirstName" class="govuk-error-message"></span>
                 </div>
 
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverLastName, "govuk-form-group--error")">
@@ -142,7 +141,6 @@
                     <span id="statement-approved-hint" class="govuk-hint">
                         For example, 31 3 1980
                     </span>
-                    <span asp-validation-for="ApprovedDate" class="govuk-error-message"></span>
                     <div class="govuk-date-input" id="statement-approved">
                         <div class="govuk-date-input__item">
                             <div class="govuk-form-group">
@@ -169,6 +167,8 @@
                             </div>
                         </div>
                     </div>
+                    <span asp-validation-for="ApprovedDate" class="govuk-error-message"></span>
+
                 </fieldset>
             </div>
 
