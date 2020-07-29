@@ -63,8 +63,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public string OrganisationIdentifier => RouteData.Values["OrganisationIdentifier"].ToString();
 
         public string ReportingDeadlineYear => RouteData.Values["Year"].ToString();
-        private string ReturnUrl => Url.Action("ManageOrganisation","Submission", new { organisationIdentifier= OrganisationIdentifier });
-        private string CancelUrl => Url.Action("Cancel", new { organisationIdentifier = OrganisationIdentifier, year= ReportingDeadlineYear });
+        private string ReturnUrl => Url.Action("ManageOrganisation", "Submission", new { organisationIdentifier = OrganisationIdentifier });
+        private string CancelUrl => Url.Action("Cancel", new { organisationIdentifier = OrganisationIdentifier, year = ReportingDeadlineYear });
 
         private object GetOrgAndYearRouteData() => new { OrganisationIdentifier, year = ReportingDeadlineYear };
 
@@ -296,7 +296,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             //Show the correct view
-            return View("BeforeYouStart",Url.Action("YourStatement", new { OrganisationIdentifier = organisationIdentifier, Year = year }));
+            return View("BeforeYouStart", Url.Action("YourStatement", new { OrganisationIdentifier = organisationIdentifier, Year = year }));
         }
         #endregion
 
@@ -520,18 +520,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         private async Task<ReviewPageViewModel> CreateReviewPageViewModelAsync(StatementModel statementModel)
         {
             //Create the view model
-            var viewModel = new ReviewPageViewModel
-            {
-                YourStatement = SubmissionPresenter.GetViewModelFromStatementModel<YourStatementPageViewModel>(statementModel),
-                Compliance = SubmissionPresenter.GetViewModelFromStatementModel<CompliancePageViewModel>(statementModel),
-                Organisation = SubmissionPresenter.GetViewModelFromStatementModel<OrganisationPageViewModel>(statementModel),
-                Policies = SubmissionPresenter.GetViewModelFromStatementModel<PoliciesPageViewModel>(statementModel),
-                Risks = SubmissionPresenter.GetViewModelFromStatementModel<RisksPageViewModel>(statementModel),
-                DueDiligence = SubmissionPresenter.GetViewModelFromStatementModel<DueDiligencePageViewModel>(statementModel),
-                Training = SubmissionPresenter.GetViewModelFromStatementModel<TrainingPageViewModel>(statementModel),
-                Progress = SubmissionPresenter.GetViewModelFromStatementModel<ProgressPageViewModel>(statementModel),
-                Modifications=await SubmissionPresenter.GetDraftModifications(statementModel)
-            };
+            var viewModel = SubmissionPresenter.GetViewModelFromStatementModel<ReviewPageViewModel>(statementModel);
+
+            viewModel.YourStatement = SubmissionPresenter.GetViewModelFromStatementModel<YourStatementPageViewModel>(statementModel);
+            viewModel.Compliance = SubmissionPresenter.GetViewModelFromStatementModel<CompliancePageViewModel>(statementModel);
+            viewModel.Organisation = SubmissionPresenter.GetViewModelFromStatementModel<OrganisationPageViewModel>(statementModel);
+            viewModel.Policies = SubmissionPresenter.GetViewModelFromStatementModel<PoliciesPageViewModel>(statementModel);
+            viewModel.Risks = SubmissionPresenter.GetViewModelFromStatementModel<RisksPageViewModel>(statementModel);
+            viewModel.DueDiligence = SubmissionPresenter.GetViewModelFromStatementModel<DueDiligencePageViewModel>(statementModel);
+            viewModel.Training = SubmissionPresenter.GetViewModelFromStatementModel<TrainingPageViewModel>(statementModel);
+            viewModel.Progress = SubmissionPresenter.GetViewModelFromStatementModel<ProgressPageViewModel>(statementModel);
+            viewModel.Modifications=await SubmissionPresenter.GetDraftModifications(statementModel);
 
             //Otherwise return the view using the populated ViewModel
             return viewModel;
