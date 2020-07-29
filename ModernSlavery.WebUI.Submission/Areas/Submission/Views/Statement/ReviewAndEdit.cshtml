@@ -23,89 +23,77 @@
                 @Model.PageTitle
             </h1>
 
-            <p class="govuk-body govuk-!-margin-bottom-7">Submission incomplete</p> @*//TODO: get the correct text based on sections completed*@
+            @*//TODO: get the correct text based on sections completed*@
+            <p class="govuk-body govuk-!-margin-bottom-7">Submission incomplete</p>
 
-            <ol class="app-task-list">
+            <h2 class="govuk-heading-m">
+                <span class="app-task-list__section-number">1. </span> Required information about your statement
+            </h2>
+            <ul class="govuk-list govuk-list--spaced">
                 <li>
-                    <h2 class="app-task-list__section">
-                        <span class="app-task-list__section-number">1. </span> Required information about your statement
-                    </h2>
-                    <ul class="app-task-list__items">
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a href="@(Url.Action("YourStatement"))" aria-describedby="slavery-statement">
-                                    Your modern slavery statement
-                                </a>
-                            </span>
-                            <strong class="@(yourStatementComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="slavery-statement">@(yourStatementComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a href="@(Url.Action("Compliance"))" aria-describedby="compliance">
-                                    Areas covered by your modern statement
-                                </a>
-                            </span>
-                            <strong class="@(complianceComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="compliance">@(complianceComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                    </ul>
+                    <a class="govuk-link" href="@(Url.Action("YourStatement"))" aria-describedby="slavery-statement">
+                        Your modern slavery statement
+                    </a>
+                    <strong class="govuk-tag @(yourStatementComplete ? "" : "govuk-tag--grey")" id="slavery-statement">@(yourStatementComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                    <hr class="govuk-section-break govuk-section-break--visible">
                 </li>
+                <li>
+                    <a class="govuk-link" href="@(Url.Action("Compliance"))" aria-describedby="compliance">
+                        Areas covered by your modern statement
+                    </a>
+                    <strong class="govuk-tag @(complianceComplete ? "" : "govuk-tag--grey")" id="compliance">@(complianceComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                    <hr class="govuk-section-break govuk-section-break--visible">
+                </li>
+            </ul>
 
+            <h2 class="govuk-heading-m">
+                <span class="app-task-list__section-number">2. </span> Additional information about your statement
+            </h2>
+            <ul class="govuk-list govuk-list--spaced">
                 <li>
-                    <h2 class="app-task-list__section">
-                        <span class="app-task-list__section-number">2. </span> Additional information about your statement
-                    </h2>
-                    <ul class="app-task-list__items">
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a href="@(Url.Action("YourOrganisation"))" aria-describedby="organisation">
-                                    Your Organisation
-                                </a>
-                            </span>
-                            <strong class="@(organisationComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="organisation">@(organisationComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a href="@(Url.Action("Policies"))" aria-describedby="Policies">
-                                    Policies
-                                </a>
-                            </span>
-                            <strong class="@(policiesComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="policies">@(policiesComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a href="@(Url.Action("SupplyChainRisks"))" aria-describedby="supply-risks-part-1">
-                                    Supply chain risks and due diligence (part 1)
-                                </a>
-                            </span>
-                            <strong class="@(risksComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="supply-risks-part-1">@(risksComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a href="@(Url.Action("DueDiligence"))" aria-describedby="supply-risks-part-2">
-                                    Supply chain risks and due diligence (part 2)
-                                </a>
-                            </span>
-                            <strong class="@(diligenceComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="supply-risks-part-2">@(diligenceComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a href="@(Url.Action("Training"))" aria-describedby="training">
-                                    Training
-                                </a>
-                            </span>
-                            <strong class="@(trainingComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="training">@(trainingComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a href="@(Url.Action("MonitoringProgress"))" aria-describedby="monitoring-progress">
-                                    Monitoring Progress
-                                </a>
-                            </span>
-                            <strong class="@(progressComplete ? "govuk-tag app-task-list__tag" : "govuk-tag govuk-tag--grey app-task-list__tag" )" id="monitoring-progress">@(progressComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                    </ul>
+                    <a class="govuk-link" href="@(Url.Action("YourOrganisation"))" aria-describedby="organisation">
+                        Your Organisation
+                    </a>
+                    <strong class="govuk-tag @(organisationComplete ? "" : "govuk-tag--grey")" id="organisation">@(organisationComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                    <hr class="govuk-section-break govuk-section-break--visible">
                 </li>
-            </ol>
+                <li>
+                    <a class="govuk-link" href="@(Url.Action("Policies"))" aria-describedby="Policies">
+                        Policies
+                    </a>
+                    <strong class="govuk-tag @(policiesComplete ? "" : "govuk-tag--grey")" id="policies">@(policiesComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                    <hr class="govuk-section-break govuk-section-break--visible">
+                </li>
+                <li>
+                    <a class="govuk-link" href="@(Url.Action("SupplyChainRisks"))" aria-describedby="supply-risks-part-1">
+                        Supply chain risks and due diligence (part 1)
+                    </a>
+                    <strong class="govuk-tag @(risksComplete ? "" : "govuk-tag--grey")" id="supply-risks-part-1">@(risksComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                    <hr class="govuk-section-break govuk-section-break--visible">
+                </li>
+                <li>
+                    <a class="govuk-link" href="@(Url.Action("DueDiligence"))" aria-describedby="supply-risks-part-2">
+                        Supply chain risks and due diligence (part 2)
+                    </a>
+                    <strong class="govuk-tag @(diligenceComplete ? "" : "govuk-tag--grey")" id="supply-risks-part-2">@(diligenceComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                    <hr class="govuk-section-break govuk-section-break--visible">
+                </li>
+                <li>
+                    <a class="govuk-link" href="@(Url.Action("Training"))" aria-describedby="training">
+                        Training
+                    </a>
+                    <strong class="govuk-tag @(trainingComplete ? "" : "govuk-tag--grey")" id="training">@(trainingComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                    <hr class="govuk-section-break govuk-section-break--visible">
+                </li>
+                <li>
+                    <a class="govuk-link" href="@(Url.Action("MonitoringProgress"))" aria-describedby="monitoring-progress">
+                        Monitoring Progress
+                    </a>
+                    <strong class="govuk-tag @(progressComplete ? "" : "govuk-tag--grey")" id="monitoring-progress">@(progressComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                    <hr class="govuk-section-break govuk-section-break--visible">
+                </li>
+            </ul>
+
 
             @if (Model.HasChanged())
             {
