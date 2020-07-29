@@ -50,7 +50,7 @@ StatementRiskTypeId,ParentRiskTypeId,Category,Description
 49,28,2,"Gambia, Republic of the"
 50,28,2,"Ghana, Republic of"
 51,28,2,"Guinea, Republic of"
-52,28,2,"Cote d'Ivoire, Republic of"
+52,28,2,"Côte d'Ivoire, Republic of"
 53,28,2,"Kenya, Republic of"
 54,28,2,"Lesotho, Kingdom of"
 55,28,2,"Liberia, Republic of"
@@ -69,7 +69,7 @@ StatementRiskTypeId,ParentRiskTypeId,Category,Description
 68,28,2,Reunion
 69,28,2,"Rwanda, Republic of"
 70,28,2,Saint Helena
-71,28,2,"Sao Tome and Principe, Democratic Republic of"
+71,28,2,"São Tomé and Príncipe, Democratic Republic of"
 72,28,2,"Senegal, Republic of"
 73,28,2,"Seychelles, Republic of"
 74,28,2,"Sierra Leone, Republic of"
@@ -163,7 +163,7 @@ StatementRiskTypeId,ParentRiskTypeId,Category,Description
 162,148,2,"Estonia, Republic of"
 163,148,2,Faroe Islands
 164,148,2,"Finland, Republic of"
-165,148,2,Aland Islands
+165,148,2,Åland Islands
 166,148,2,"France, French Republic"
 167,148,2,Georgia
 168,148,2,"Germany, Federal Republic of"
@@ -230,7 +230,7 @@ StatementRiskTypeId,ParentRiskTypeId,Category,Description
 229,207,2,"Mexico, United Mexican States"
 230,207,2,Montserrat
 231,207,2,Netherlands Antilles
-232,207,2,Curacao
+232,207,2,Curaçao
 233,207,2,Aruba
 234,207,2,Sint Maarten (Netherlands)
 235,207,2,"Bonaire, Sint Eustatius and Saba"
