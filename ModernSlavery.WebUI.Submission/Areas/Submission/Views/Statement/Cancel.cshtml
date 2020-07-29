@@ -8,23 +8,46 @@
         {
             @Html.AntiForgeryToken();
 
-            @if (Model.ErrorCount > 0)
+            @if (Model.HasChanged() || Model.ErrorCount > 0)
             {
-                <p>
-                    You cannot save your changes are there are @(Model.ErrorCount) validation error@(Model.ErrorCount>1 ? "s" : "") on the previous page.
-                </p>
+                @if (Model.ErrorCount > 0)
+                {
+                    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary" data-valmsg-summary="False">
+
+                        <h2 class="govuk-error-summary__title" id="error-summary-title">
+                            <span>You cannot save your changes</span>
+                        </h2>
+
+                        <div class="govuk-error-summary__body">
+                            <ul class="govuk-list govuk-error-summary__list">
+                                <li>
+                                    You have validation errors on the previous page.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+
+                <h1 class="govuk-heading-l">
+                    <span>You have unsaved data, what do you want to do?</span>
+                </h1>
+                <button class="govuk-button" data-module="govuk-button" disabled=@(Model.ErrorCount>0) name="command" value="@BaseViewModel.CommandType.SaveAndExit">
+                    Exit and save changes
+                </button>
+                <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
+                    Exit and lose changes
+                </button>
+            }
+            else
+            {
+                <h1 class="govuk-heading-l">
+                    You have no unsaved data, are you sure you want to exit?
+                </h1>
+                <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
+                    Exit with no changes
+                </button>
             }
 
-            <h1 class="govuk-heading-l">
-                You have unsaved data, what do you want to do?
-            </h1>
-
-            <button class="govuk-button" data-module="govuk-button" disabled=@(Model.ErrorCount>0) name="command" value="@BaseViewModel.CommandType.SaveAndExit">
-                Exit and save changes
-            </button>
-            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
-                Exit and lose changes
-            </button>
             <a class="govuk-button govuk-button--secondary" href="@Model.CancelUrl">
                 Cancel
             </a>

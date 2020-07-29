@@ -442,7 +442,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
 
             //Create the view model
-            var viewModel = CreateReviewPageViewModel(viewModelResult.Result);
+            var viewModel = await CreateReviewPageViewModelAsync(viewModelResult.Result);
 
             //set the navigation urls
             SetNavigationUrl(viewModel);
@@ -473,7 +473,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
                     //Create the view model
-                    viewModel = CreateReviewPageViewModel(openResult.Result);
+                    viewModel = await CreateReviewPageViewModelAsync(openResult.Result);
 
                     //Validate the view model
                     TryValidateModel(viewModel);
@@ -508,7 +508,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
         }
 
-        private ReviewPageViewModel CreateReviewPageViewModel(StatementModel statementModel)
+        private async Task<ReviewPageViewModel> CreateReviewPageViewModelAsync(StatementModel statementModel)
         {
             //Create the view model
             var viewModel = new ReviewPageViewModel
@@ -520,7 +520,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 Risks = SubmissionPresenter.GetViewModelFromStatementModel<RisksPageViewModel>(statementModel),
                 DueDiligence = SubmissionPresenter.GetViewModelFromStatementModel<DueDiligencePageViewModel>(statementModel),
                 Training = SubmissionPresenter.GetViewModelFromStatementModel<TrainingPageViewModel>(statementModel),
-                Progress = SubmissionPresenter.GetViewModelFromStatementModel<ProgressPageViewModel>(statementModel)
+                Progress = SubmissionPresenter.GetViewModelFromStatementModel<ProgressPageViewModel>(statementModel),
+                Modifications=await SubmissionPresenter.GetDraftModifications(statementModel)
             };
 
             //Otherwise return the view using the populated ViewModel
@@ -548,11 +549,31 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
             var pageViewModel = UnstashCancellingViewModel();
 
+            //Get the modifications
+            var statementModel = SubmissionPresenter.SetViewModelToStatementModel(pageViewModel, viewModelResult.Result);
+            viewModel.Modifications = await SubmissionPresenter.GetDraftModifications(statementModel);
+
             //Ensure the viewmodel is valid before saving
             if (!TryValidateModel(pageViewModel))
             {
                 viewModel.ErrorCount = ModelState.ErrorCount;
                 return View(viewModel);
+            }
+
+            //Cancel immediately if no changes
+            if (!viewModel.HasChanged())
+            {
+                //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+                var cancelModelResult = await SubmissionPresenter.CancelDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+
+                //Handle any StatementErrors
+                if (cancelModelResult.Fail) return HandleStatementErrors(cancelModelResult.Errors);
+
+                //Delete the stashed viewModel
+                UnstashCancellingViewModel(true);
+
+                //Redirect to the continue url
+                return Redirect(viewModel.ContinueUrl);
             }
 
             //Otherwise return the view using the populated ViewModel
@@ -583,6 +604,18 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     if (!TryValidateModel(pageViewModel))
                     {
                         viewModel.ErrorCount = ModelState.ErrorCount;
+
+                        //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+                        var openModelResult = await SubmissionPresenter.OpenDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+
+                        //Handle any StatementErrors
+                        if (viewModelResult.Fail) return HandleStatementErrors(openModelResult.Errors);
+
+                        //Get the modifications
+                        var statementModel = SubmissionPresenter.SetViewModelToStatementModel(pageViewModel, openModelResult.Result);
+                        viewModel.Modifications = await SubmissionPresenter.GetDraftModifications(statementModel);
+
+                        //Return the errors
                         return View(viewModel);
                     }
 

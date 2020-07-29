@@ -2,6 +2,7 @@
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -41,6 +42,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(d => d.OrganisationName, opt => opt.MapFrom(s => s.Organisation.OrganisationName))
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>(s.MinStatementYears, s.MaxStatementYears == null ? 0 : s.MaxStatementYears.Value)))
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>(s.MinTurnover, s.MaxTurnover == null ? 0 : s.MaxTurnover.Value)))
+                .ForMember(dest => dest.Modifications, opt => opt.MapFrom(s=>string.IsNullOrWhiteSpace(s.Modifications) ? null : JsonConvert.DeserializeObject<List<AutoMap.Diff>>(s.Modifications)))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.Sectors, opt => opt.MapFrom(st => st.Sectors.Select(s => s.StatementSectorTypeId)))
                 .ForMember(dest => dest.Policies, opt => opt.MapFrom(st => st.Policies.Select(s => s.StatementPolicyTypeId)))
@@ -59,7 +61,11 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.IncludesRisks, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesRisks))
                 .ForMember(dest => dest.IncludesDueDiligence, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesDueDiligence))
                 .ForMember(dest => dest.IncludesTraining, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesTraining))
-                .ForMember(dest => dest.IncludesGoals, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesGoals));
+                .ForMember(dest => dest.IncludesGoals, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesGoals))
+                .ForMember(dest => dest.IncludesMeasuringProgress, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesMeasuringProgress))
+                .ForMember(dest => dest.HasForceLabour, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.ForcedLabourDetails)))
+                .ForMember(dest => dest.HasSlaveryInstance, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.SlaveryInstanceDetails)))
+                .ForMember(dest => dest.HasRemediation, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.SlaveryInstanceRemediation)));
         }
     }
 
@@ -132,7 +138,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public long OrganisationId { get; set; }
 
-        public string Modifications { get; set; }
+        [JsonIgnore]
+        [IgnoreMap]
+        public IList<AutoMap.Diff> Modifications { get; set; }
         public bool EHRCResponse { get; set; }
         public string LateReason { get; set; }
         public short IncludedOrganisationCount { get; set; }
@@ -188,7 +196,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         #endregion
 
         #region Step 3 - Your organisation
-        public List<short> Sectors { get; set; }
+        public SortedSet<short> Sectors { get; set; } = new SortedSet<short>();
 
         public string OtherSector { get; set; }
 
@@ -198,7 +206,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         #region Step 4 - Policies
 
-        public List<short> Policies { get; set; }
+        public SortedSet<short> Policies { get; set; } = new SortedSet<short>();
 
         public string OtherPolicies { get; set; }
 
@@ -212,15 +220,15 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
             public string Details { get; set; }
         }
 
-        public List<RisksModel> RelevantRisks { get; set; }
+        public List<RisksModel> RelevantRisks { get; set; } = new List<RisksModel>();
 
         public string OtherRelevantRisks { get; set; }
 
-        public List<RisksModel> HighRisks { get; set; }
+        public List<RisksModel> HighRisks { get; set; } = new List<RisksModel>();
 
         public string OtherHighRisks { get; set; }
 
-        public List<RisksModel> LocationRisks { get; set; }
+        public List<RisksModel> LocationRisks { get; set; } = new List<RisksModel>();
 
         #endregion
 
@@ -231,7 +239,13 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
             public string Details { get; set; }
         }
 
-        public List<DiligenceModel> DueDiligences { get; set; }
+        public List<DiligenceModel> DueDiligences { get; set; } = new List<DiligenceModel>();
+
+        public bool? HasForceLabour { get; set; }
+
+        public bool? HasSlaveryInstance { get; set; }
+
+        public bool? HasRemediation { get; set; }
 
         public string ForcedLabourDetails { get; set; }
 
@@ -243,7 +257,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         #region Step 6 - Training
 
-        public List<short> Training { get; set; }
+        public SortedSet<short> Training { get; set; } = new SortedSet<short>();
 
         public string OtherTraining { get; set; }
 

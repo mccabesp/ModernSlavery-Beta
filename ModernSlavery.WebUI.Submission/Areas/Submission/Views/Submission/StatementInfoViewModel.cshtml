@@ -48,7 +48,7 @@
         </div>
         <br />
 
-        <a class="button" id="NewReport@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@Url.Action("BeforeYouStart", "Statement", new { organisationIdentifier = Model.OrganisationIdentifier, year = Model.StatementInfo.ReportingDeadline.Year })">
+        <a class="button" id="NewReport@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@Model.EditUrl">
             <span>@Model.ButtonText</span>
         </a>
     </div>

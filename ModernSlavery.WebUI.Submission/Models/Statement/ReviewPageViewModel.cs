@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -39,6 +40,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public DueDiligencePageViewModel DueDiligence { get; set; }
         public TrainingPageViewModel Training { get; set; }
         public ProgressPageViewModel Progress { get; set; }
+        
+        [IgnoreMap]
+        public IList<AutoMap.Diff> Modifications { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -81,6 +85,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 && DueDiligence.IsComplete() 
                 && Training.IsComplete() 
                 && Progress.IsComplete();
+        }
+
+        public bool HasChanged()
+        {
+            return Modifications!=null && Modifications.Any();
         }
     }
 }

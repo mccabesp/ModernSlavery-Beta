@@ -28,7 +28,7 @@
                         {
                             <div class="govuk-checkboxes__item">
                                 <input name="Training" value="@trainingType.Id" id="@($"training{trainingType.Id}")" checked=@(Model.Training.Contains(trainingType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="training-conditional">
-                                <label class="govuk-label govuk-checkboxes__label" id="@($"training{trainingType.Id}")">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"training{trainingType.Id}")">
                                     @trainingType.Description
                                 </label>
                             </div>

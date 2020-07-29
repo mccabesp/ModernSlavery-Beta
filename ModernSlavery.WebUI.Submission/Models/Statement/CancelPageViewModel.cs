@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.Core.Extensions;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -14,6 +16,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             CreateMap<CancelPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
+                .ForSourceMember(s => s.Modifications, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ErrorCount, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
@@ -30,10 +33,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         [IgnoreMap]
         public int ErrorCount { get; set; }
+        [IgnoreMap]
+        public IList<AutoMap.Diff> Modifications { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             yield break;
+        }
+
+        public bool HasChanged()
+        {
+            return Modifications!=null && Modifications.Any();
         }
     }
 }

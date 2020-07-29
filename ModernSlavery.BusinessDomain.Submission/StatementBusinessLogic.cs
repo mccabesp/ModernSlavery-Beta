@@ -60,6 +60,13 @@ namespace ModernSlavery.BusinessDomain.Submission
         Task<Outcome<StatementErrors, StatementModel>> GetLatestSubmittedStatementModelAsync(long organisationId, DateTime reportingDeadline);
 
         /// <summary>
+        /// Returns a Json object showing modifications between the specified statementModel and the original (draft backup or submitted statements)
+        /// </summary>
+        /// <param name="statementModel">The current statement</param>
+        /// <returns>A Json list of modifications or null if no differences</returns>
+        Task<IList<AutoMap.Diff>> GetDraftModifications(StatementModel statementModel);
+
+        /// <summary>
         /// Attempts to open an existing draft StaementModel (if it exists) for a specific user, organisation and reporting deadline
         /// </summary>
         /// <param name="organisationId">The Id of the organisation who owns the statement data</param>
@@ -68,6 +75,14 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// <returns>The statement model or a list of errors</returns>
         Task<StatementModel> GetDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId);
 
+        /// <summary>
+        /// Attempts to open an existing backup draft StatementModel (if it exists) for a specific organisation and reporting deadline
+        /// </summary>
+        /// <param name="organisationId">The Id of the organisation who owns the statement data</param>
+        /// <param name="reportingDeadline">The reporting deadline of the statement data to retrieve</param>
+        /// <param name="userId">The Id of the user who wishes to view the backup statement data</param>
+        /// <returns>The statement model or a list of errors</returns>
+        Task<StatementModel> GetDraftBackupStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId);
 
         /// <summary>
         /// Attempts to open an existing or create a new draft StaementModel for a specific user, organisation and reporting deadline
@@ -94,7 +109,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// <param name="reportingDeadline">The reporting deadline of the statement data to retrieve</param>
         /// <param name="userId">The Id of the user who wishes to submit the draft statement data</param>
         /// <returns>Nothing</returns>
-        Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(long organisationId, DateTime reportingDeadline,long userId);
+        Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId);
 
 
         /// <summary>
@@ -123,7 +138,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
         private readonly IMapper _mapper;
 
-        public StatementBusinessLogic(SubmissionOptions submissionOptions,ISharedBusinessLogic sharedBusinessLogic, IMapper mapper)
+        public StatementBusinessLogic(SubmissionOptions submissionOptions, ISharedBusinessLogic sharedBusinessLogic, IMapper mapper)
         {
             _submissionOptions = submissionOptions;
             _sharedBusinessLogic = sharedBusinessLogic;
@@ -162,10 +177,47 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath)) return null;
 
             //Return the draft StatementModel deserialized from file
-            var draftJson =await _sharedBusinessLogic.FileRepository.ReadAsync(draftFilePath);
-            var statementModel=JsonConvert.DeserializeObject<StatementModel>(draftJson);
+            var draftJson = await _sharedBusinessLogic.FileRepository.ReadAsync(draftFilePath);
+            var statementModel = JsonConvert.DeserializeObject<StatementModel>(draftJson);
             //TODO: Check all TypeIds are still valid in case some new ones or old retired
             return statementModel;
+        }
+
+        /// <summary>
+        /// Returns any existing backup DraftStatementModel for this organisation and reporting deadline or null if it doesnt exist
+        /// </summary>
+        /// <param name="organisationId">The Id of the organisation who owns the statement data</param>
+        /// <param name="reportingDeadline">The year of the reporting deadline to which the statement data relates</param>
+        /// <returns>The StatementModel or null if file not found</returns>
+        private async Task<StatementModel> FindDraftBackupStatementModelAsync(long organisationId, DateTime reportingDeadline)
+        {
+            //Get the draft filepath for this organisation and reporting deadline
+            var backupFilePath = GetDraftBackupFilepath(organisationId, reportingDeadline.Year);
+
+            //Return null if no draft file exists
+            if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(backupFilePath)) return null;
+
+            //Return the draft StatementModel deserialized from file
+            var draftJson = await _sharedBusinessLogic.FileRepository.ReadAsync(backupFilePath);
+            var statementModel = JsonConvert.DeserializeObject<StatementModel>(draftJson);
+            //TODO: Check all TypeIds are still valid in case some new ones or old retired
+            return statementModel;
+        }
+
+        public async Task<Statement> FindLatestSubmittedStatementAsync(long organisationId, DateTime reportingDeadline)
+        {
+            //Validate method parameters
+            if (organisationId <= 0) throw new ArgumentOutOfRangeException(nameof(organisationId));
+
+            //Try and get the organisation
+            var organisation = await _sharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId);
+            if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId), $"Invalid organisationId {organisationId}");
+
+            //Check the reporting deadlin
+            CheckReportingDeadline(organisation, reportingDeadline);
+
+            var statement = organisation.Statements.FirstOrDefault(s => s.SubmissionDeadline == reportingDeadline && s.Status == StatementStatuses.Submitted);
+            return statement;
         }
 
         /// <summary>
@@ -176,7 +228,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// <returns>The Statement entity or null if not found</returns>
         private async Task<Statement> FindSubmittedStatementAsync(long organisationId, DateTime reportingDeadline)
         {
-            return await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Statement>(s => s.OrganisationId == organisationId && s.SubmissionDeadline == reportingDeadline);
+            return await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Statement>(s => s.OrganisationId == organisationId && s.SubmissionDeadline == reportingDeadline && s.Status==StatementStatuses.Submitted);
         }
 
         /// <summary>
@@ -203,24 +255,27 @@ namespace ModernSlavery.BusinessDomain.Submission
             _mapper.Map(statementModel, statement);
 
             //Map the sectors
-            statement.Sectors.Where(s => !statementModel.Sectors.Contains(s.StatementSectorTypeId)).ForEach(s => { statement.Sectors.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); }); 
-            statementModel.Sectors.ForEach(id => {
+            statement.Sectors.Where(s => !statementModel.Sectors.Contains(s.StatementSectorTypeId)).ForEach(s => { statement.Sectors.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
+            statementModel.Sectors.ForEach(id =>
+            {
                 var sector = statement.Sectors.FirstOrDefault(s => s.StatementSectorTypeId == id);
                 if (sector == null) sector = new StatementSector() { StatementSectorTypeId = id, StatementId = statement.StatementId };
             });
 
             //Map the Policies
             statement.Policies.Where(s => !statementModel.Policies.Contains(s.StatementPolicyTypeId)).ForEach(s => { statement.Policies.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
-            statementModel.Policies.ForEach(id => {
+            statementModel.Policies.ForEach(id =>
+            {
                 var policy = statement.Policies.FirstOrDefault(s => s.StatementPolicyTypeId == id);
                 if (policy == null) policy = new StatementPolicy() { StatementPolicyTypeId = id, StatementId = statement.StatementId };
             });
 
             //Map the Relevant Risks
             statement.RelevantRisks.Where(s => !statementModel.RelevantRisks.Any(model => model.Id == s.StatementRiskTypeId)).ForEach(s => { statement.RelevantRisks.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
-            statementModel.RelevantRisks.ForEach(model => {
+            statementModel.RelevantRisks.ForEach(model =>
+            {
                 var relevantRisk = statement.RelevantRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
-                if (relevantRisk == null) 
+                if (relevantRisk == null)
                     relevantRisk = new StatementRelevantRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
                 else
                     relevantRisk.Details = model.Details;
@@ -228,7 +283,8 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Map the High Risks
             statement.HighRisks.Where(s => !statementModel.HighRisks.Any(model => model.Id == s.StatementRiskTypeId)).ForEach(s => { statement.HighRisks.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
-            statementModel.HighRisks.ForEach(model => {
+            statementModel.HighRisks.ForEach(model =>
+            {
                 var highRisk = statement.HighRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
                 if (highRisk == null)
                     highRisk = new StatementHighRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
@@ -238,7 +294,8 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Map the Location Risks
             statement.LocationRisks.Where(s => !statementModel.LocationRisks.Any(model => model.Id == s.StatementRiskTypeId)).ForEach(s => { statement.LocationRisks.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
-            statementModel.LocationRisks.ForEach(model => {
+            statementModel.LocationRisks.ForEach(model =>
+            {
                 var locationRisk = statement.LocationRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
                 if (locationRisk == null)
                     locationRisk = new StatementLocationRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
@@ -248,7 +305,8 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Map the Due Diligences
             statement.Diligences.Where(s => !statementModel.DueDiligences.Any(model => model.Id == s.StatementDiligenceTypeId)).ForEach(s => { statement.Diligences.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
-            statementModel.DueDiligences.ForEach(model => {
+            statementModel.DueDiligences.ForEach(model =>
+            {
                 var diligence = statement.Diligences.FirstOrDefault(s => s.StatementDiligenceTypeId == model.Id);
                 if (diligence == null)
                     diligence = new StatementDiligence() { StatementDiligenceTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
@@ -258,7 +316,8 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Map the Training
             statement.Training.Where(s => !statementModel.Training.Contains(s.StatementTrainingTypeId)).ForEach(s => { statement.Training.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
-            statementModel.Training.ForEach(id => {
+            statementModel.Training.ForEach(id =>
+            {
                 var training = statement.Training.FirstOrDefault(s => s.StatementTrainingTypeId == id);
                 if (training == null) training = new StatementTraining() { StatementTrainingTypeId = id, StatementId = statement.StatementId };
             });
@@ -292,6 +351,23 @@ namespace ModernSlavery.BusinessDomain.Submission
             await _sharedBusinessLogic.FileRepository.WriteAsync(draftFilePath, Encoding.UTF8.GetBytes(draftJson));
         }
 
+        /// <summary>
+        /// Returns a differences between two StatementModels in json format
+        /// </summary>
+        /// <param name="oldModel"></param>
+        /// <param name="newModel"></param>
+        /// <returns></returns>
+        private IList<AutoMap.Diff> GetModifications(StatementModel oldModel, StatementModel newModel)
+        {
+            if (oldModel == null) throw new ArgumentNullException(nameof(oldModel));
+            if (newModel == null) throw new ArgumentNullException(nameof(newModel));
+
+            //Compare the two statementModels
+            var membersToIgnore = new[] { nameof(StatementModel.CanRevertToOriginal), nameof(StatementModel.DraftBackupDate), nameof(StatementModel.EditorUserId), nameof(StatementModel.EditTimestamp), nameof(StatementModel.StatementId), nameof(StatementModel.OrganisationName), nameof(StatementModel.Status), nameof(StatementModel.StatusDate), nameof(StatementModel.SubmissionDeadline), nameof(StatementModel.OrganisationId), nameof(StatementModel.CanRevertToOriginal), nameof(StatementModel.Modifications), nameof(StatementModel.EHRCResponse), nameof(StatementModel.LateReason), nameof(StatementModel.IncludedOrganisationCount), nameof(StatementModel.ExcludedOrganisationCount), nameof(StatementModel.Modified), nameof(StatementModel.Created) };
+            var differences=oldModel.GetDifferences(newModel, membersToIgnore).ToList();
+            return differences;
+        }
+
         #endregion
 
         #region Public Methods
@@ -310,7 +386,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         public async Task<StatementInfoModel> GetStatementInfoModelAsync(Organisation organisation, DateTime reportingDeadline)
         {
             //Validate method parameters
-            if (organisation==null) throw new ArgumentNullException(nameof(organisation));
+            if (organisation == null) throw new ArgumentNullException(nameof(organisation));
 
             //Get the organisation info
             var statementInfoModel = new StatementInfoModel
@@ -342,24 +418,14 @@ namespace ModernSlavery.BusinessDomain.Submission
             {
                 yield return await GetStatementInfoModelAsync(organisation, reportingDeadline);
 
-                reportingDeadline=reportingDeadline.AddYears(1);
+                reportingDeadline = reportingDeadline.AddYears(1);
             }
         }
 
         public async Task<Outcome<StatementErrors, StatementModel>> GetLatestSubmittedStatementModelAsync(long organisationId, DateTime reportingDeadline)
         {
-            //Validate method parameters
-            if (organisationId <= 0) throw new ArgumentOutOfRangeException(nameof(organisationId));
-
-            //Try and get the organisation
-            var organisation = await _sharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId);
-            if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId),$"Invalid organisationId {organisationId}");
-
-            //Check the reporting deadlin
-            CheckReportingDeadline(organisation, reportingDeadline);
-
-            var statement = organisation.Statements.FirstOrDefault(s => s.SubmissionDeadline == reportingDeadline);
-            if (statement == null) return new Outcome<StatementErrors, StatementModel>(StatementErrors.NotFound,$"Cannot find statement summary for {organisation.OrganisationName} due for reporting deadline {reportingDeadline}");
+            var statement = FindLatestSubmittedStatementAsync(organisationId, reportingDeadline);
+            if (statement == null) return new Outcome<StatementErrors, StatementModel>(StatementErrors.NotFound, $"Cannot find statement summary for Organisation:{organisationId} due for reporting deadline {reportingDeadline}");
 
             var statementModel = new StatementModel();
 
@@ -392,6 +458,28 @@ namespace ModernSlavery.BusinessDomain.Submission
             return statementModel;
         }
 
+        public async Task<StatementModel> GetDraftBackupStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId)
+        {
+            //Validate method parameters
+            if (organisationId <= 0) throw new ArgumentOutOfRangeException(nameof(organisationId));
+            if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
+
+            //Try and get the organisation
+            var organisation = await _sharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId);
+            if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId), $"Invalid organisationId {organisationId}");
+
+            //Check the reporting deadlin
+            CheckReportingDeadline(organisation, reportingDeadline);
+
+            //Check the user can edit this statement
+            if (!organisation.GetUserIsRegistered(userId)) throw new SecurityException($"User {userId} does not have permission to view statement for organisation {organisationId}");
+
+            //Try and get the draft first
+            var backupStatementModel = await FindDraftBackupStatementModelAsync(organisationId, reportingDeadline);
+
+            return backupStatementModel;
+        }
+
         public async Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId)
         {
             //Validate method parameters
@@ -400,7 +488,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Try and get the organisation
             var organisation = await _sharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId);
-            if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId),$"Invalid organisationId {organisationId}");
+            if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId), $"Invalid organisationId {organisationId}");
 
             //Check the reporting deadlin
             CheckReportingDeadline(organisation, reportingDeadline);
@@ -434,12 +522,12 @@ namespace ModernSlavery.BusinessDomain.Submission
             {
                 //Check if the existing draft lock has expired
                 var draftExpired = draftStatement.EditTimestamp.AddMinutes(_submissionOptions.DraftTimeoutMinutes) < VirtualDateTime.Now;
-                
+
                 //If the draft has expired then remember to create a backup
                 createBackup = draftExpired;
 
                 //Check the existing draft is not still locked by another user
-                if (draftStatement.EditorUserId>0 && draftStatement.EditorUserId != userId && !draftExpired)
+                if (draftStatement.EditorUserId > 0 && draftStatement.EditorUserId != userId && !draftExpired)
                     return new Outcome<StatementErrors, StatementModel>(StatementErrors.Locked);
             }
 
@@ -450,7 +538,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             draftStatement.SubmissionDeadline = reportingDeadline;
 
             //Save new statement model with timestamp to lock to new user
-            await SaveDraftStatementModelAsync(draftStatement,createBackup);
+            await SaveDraftStatementModelAsync(draftStatement, createBackup);
             draftStatement.DraftBackupDate = null;
 
             //Get the draft backup date
@@ -459,7 +547,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 draftStatement.DraftBackupDate = await _sharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(draftBackupFilePath);
 
             //Allow revert to backup if backup exists and has timedout
-            draftStatement.CanRevertToOriginal = draftStatement.StatementId > 0 || draftStatement.DraftBackupDate!=null;
+            draftStatement.CanRevertToOriginal = draftStatement.StatementId > 0 || draftStatement.DraftBackupDate != null;
 
             return new Outcome<StatementErrors, StatementModel>(draftStatement);
         }
@@ -527,16 +615,16 @@ namespace ModernSlavery.BusinessDomain.Submission
             return new Outcome<StatementErrors>();
         }
 
-        public async Task SaveDraftStatementModelAsync(StatementModel statementModel, bool createBackup=false)
+        public async Task SaveDraftStatementModelAsync(StatementModel statementModel, bool createBackup = false)
         {
             //Validate the parameters
             if (statementModel == null) throw new ArgumentNullException(nameof(statementModel));
             if (statementModel.OrganisationId == 0) throw new ArgumentOutOfRangeException(nameof(statementModel.OrganisationId));
             if (statementModel.EditorUserId == 0) throw new ArgumentOutOfRangeException(nameof(statementModel.EditorUserId));
-            
+
             //Try and get the organisation
             var organisation = _sharedBusinessLogic.DataRepository.Get<Organisation>(statementModel.OrganisationId);
-            if (organisation==null) throw new ArgumentOutOfRangeException(nameof(statementModel.OrganisationId));
+            if (organisation == null) throw new ArgumentOutOfRangeException(nameof(statementModel.OrganisationId));
 
             //Check the reporting deadlin
             CheckReportingDeadline(organisation, statementModel.SubmissionDeadline);
@@ -582,6 +670,19 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Copy all the other model propertiesto the entity
             MapFromModel(statementModel, newStatement);
+            newStatement.Modifications = null;
+
+            if (previousStatement != null)
+            {
+                //Create the previous StatementModel
+                var previousStatementModel = new StatementModel();
+                _mapper.Map(previousStatement, statementModel);
+
+                //Compare the latest with the previous statementModel
+                var modifications= GetModifications(previousStatementModel, statementModel);
+                newStatement.Modifications = modifications.Any() ? JsonConvert.SerializeObject(modifications,new JsonSerializerSettings { NullValueHandling= NullValueHandling.Ignore, DefaultValueHandling= DefaultValueHandling.Ignore }) : null;
+            }
+
 
             //Save the changes to the database
             await _sharedBusinessLogic.DataRepository.SaveChangesAsync();
@@ -591,6 +692,33 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             return new Outcome<StatementErrors>();
         }
+
+        public async Task<IList<AutoMap.Diff>> GetDraftModifications(StatementModel statementModel)
+        {
+            //Try and find a back draft first
+            var backupStatementModel = await FindDraftBackupStatementModelAsync(statementModel.OrganisationId, statementModel.SubmissionDeadline);
+
+            //If no backup then use the latest statement
+            if (backupStatementModel == null)
+            {
+
+                var statement = await FindLatestSubmittedStatementAsync(statementModel.OrganisationId, statementModel.SubmissionDeadline);
+                if (statement == null) statement = new Statement();
+
+                backupStatementModel = new StatementModel();
+
+                //Copy the statement properties to the model
+                _mapper.Map(statement, statementModel);
+            }
+
+            //If no backup and never submitted then return no modifications
+            if (backupStatementModel == null) return null;
+
+            //Return the modifications
+            return GetModifications(backupStatementModel,statementModel);
+        }
+
+    
         #endregion
     }
 }
