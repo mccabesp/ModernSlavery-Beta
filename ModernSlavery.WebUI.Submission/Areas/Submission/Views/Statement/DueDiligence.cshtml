@@ -78,9 +78,12 @@
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                         <h2 class="govuk-heading-m">
-                            Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.
+                            For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?
                         </h2>
                     </legend>
+                    <div class="govuk-hint">
+                        Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.
+                    </div>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
                             <input name="HasForceLabour" id="HasForceLabour_True" value="true" checked="@(Model.HasForceLabour==true)" class="govuk-radios__input" type="radio" data-aria-controls="conditional-has-forced-labour-conditional">
@@ -111,13 +114,9 @@
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                         <h2 class="govuk-heading-m">
-                            For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?
+                            Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?
                         </h2>
-                    </legend>
-                    <div class="govuk-hint">
-                        Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.
-                    </div>
-
+                    </legend>                  
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
                             <input name="HasSlaveryInstance" id="HasSlaveryInstance_True" checked="@(Model.HasSlaveryInstance==true)" value="true" class="govuk-radios__input" type="radio" data-aria-controls="conditional-has-slavery-instance-conditional">
@@ -125,13 +124,6 @@
                                 Yes
                             </label>
                         </div>
-                        <div class="govuk-radios__item ">
-                            <input name="HasSlaveryInstance" value="false" id="HasSlaveryInstance_false" checked="@(Model.HasSlaveryInstance==false)" class="govuk-radios__input" type="radio">
-                            <label class="govuk-label govuk-radios__label" for="HasSlaveryInstance_false">
-                                No
-                            </label>
-                        </div>
-
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden @Html.SetErrorClass(model => model.SlaveryInstanceDetails, "govuk-form-group--error")" id="conditional-has-slavery-instance-conditional">
                             <div class="govuk-form-group">
                                 <label class="govuk-label" asp-for="SlaveryInstanceDetails">
@@ -154,6 +146,43 @@
                                         Yes
                                     </label>
                                 </div>
+                                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-remediation-conditional">
+                                    <div class="govuk-form-group">
+                                        <fieldset class="govuk-fieldset">
+                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                                                <h2 class="govuk-heading-m">
+                                                    What remediation action did your organisation take in response?
+                                                </h2>
+                                            </legend>
+                                            <div class="govuk-checkboxes @Html.SetErrorClass(model => model.SelectedRemediationTypes, "govuk-form-group--error")" data-module="govuk-checkboxes">
+                                                <span asp-validation-for="SelectedRemediationTypes" class="govuk-error-message"></span>
+                                                @foreach (var remediationType in Model.RemediationTypes)
+                                                {
+                                                    <div class="govuk-checkboxes__item">
+                                                        <input name="SelectedRemediationTypes" checked=@(Model.SelectedRemediationTypes.Contains(remediationType)) value="@remediationType" class="govuk-checkboxes__input" type="checkbox" data-aria-controls="remediation-conditional@(remediationIndex)">
+                                                        <label class="govuk-label govuk-checkboxes__label" for="remediation-conditional">
+                                                            @remediationType
+                                                        </label>
+                                                    </div>
+                                                    @if (remediationType.Equals("other"))
+                                                    {
+                                                        <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherRemediation, "govuk-form-group--error")" id="remediation-conditional@(remediationIndex)">
+                                                            <div class="govuk-form-group">
+                                                                <label class="govuk-label" for="other">
+                                                                    Please specify
+                                                                </label>
+                                                                <input asp-for="OtherRemediation" class="govuk-input govuk-!-width-one-third">
+                                                                <span asp-validation-for="OtherRemediation" class="govuk-error-message"></span>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    { remediationIndex++; }
+                                                }
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+
                                 <div class="govuk-radios__item">
                                     <input name="HasRemediation" id="HasRemediation_False" value="false" checked="@(Model.HasRemediation==false)" class="govuk-radios__input" type="radio">
                                     <label class="govuk-label govuk-radios__label" false="HasRemediation_False">
@@ -162,43 +191,15 @@
                                 </div>
                             </div>
 
-                            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-remediation-conditional">
-                                <div class="govuk-form-group">
-                                    <fieldset class="govuk-fieldset">
-                                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                                            <h2 class="govuk-heading-m">
-                                                What remediation action did your organisation take in response?
-                                            </h2>
-                                        </legend>
-                                        <div class="govuk-checkboxes @Html.SetErrorClass(model => model.SelectedRemediationTypes, "govuk-form-group--error")" data-module="govuk-checkboxes">
-                                            <span asp-validation-for="SelectedRemediationTypes" class="govuk-error-message"></span>
-                                            @foreach (var remediationType in Model.RemediationTypes)
-                                            {
-                                                <div class="govuk-checkboxes__item">
-                                                    <input name="SelectedRemediationTypes" checked=@(Model.SelectedRemediationTypes.Contains(remediationType)) value="@remediationType" class="govuk-checkboxes__input" type="checkbox" data-aria-controls="remediation-conditional@(remediationIndex)">
-                                                    <label class="govuk-label govuk-checkboxes__label" for="remediation-conditional">
-                                                        @remediationType
-                                                    </label>
-                                                </div>
-                                                @if (remediationType.Equals("other"))
-                                                {
-                                                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherRemediation, "govuk-form-group--error")" id="remediation-conditional@(remediationIndex)">
-                                                        <div class="govuk-form-group">
-                                                            <label class="govuk-label" for="other">
-                                                                Please specify
-                                                            </label>
-                                                            <input asp-for="OtherRemediation" class="govuk-input govuk-!-width-one-third">
-                                                            <span asp-validation-for="OtherRemediation" class="govuk-error-message"></span>
-                                                        </div>
-                                                    </div>
-                                                }
-                                                { remediationIndex++; }
-                                            }
-                                        </div>
-                                    </fieldset>
-                                </div>
                             </div>
+
+                        <div class="govuk-radios__item ">
+                            <input name="HasSlaveryInstance" value="false" id="HasSlaveryInstance_false" checked="@(Model.HasSlaveryInstance==false)" class="govuk-radios__input" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="HasSlaveryInstance_false">
+                                No
+                            </label>
                         </div>
+
                     </div>
                 </fieldset>
             </div>
