@@ -4,11 +4,9 @@ using ModernSlavery.WebUI.Submission.Classes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
-using System;
-using System.Text.Json.Serialization;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Binding;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -30,10 +28,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
+    [DependencyModelBinder]
     public class PoliciesPageViewModel : BaseViewModel
     {
         [IgnoreMap]
-        public PolicyTypeIndex PolicyTypes { get; set; }
+        [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore
+        public PolicyTypeIndex PolicyTypes { get; }
         public PoliciesPageViewModel(PolicyTypeIndex policyTypes)
         {
             PolicyTypes = policyTypes;
@@ -54,9 +54,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
-
-            //Get the policy types
-            PolicyTypes = validationContext.GetService<PolicyTypeIndex>();
 
             //better way to identify this checkbox
             var otherId = PolicyTypes.Single(x => x.Description.Equals("Other")).Id;

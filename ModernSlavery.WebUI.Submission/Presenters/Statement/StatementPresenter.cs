@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Submission.Models.Statement;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,6 +18,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 {
     public interface IStatementPresenter
     {
+        JsonSerializerSettings JsonSettings { get; }
+
         /// <summary>
         /// Copies all relevant data from a StatementModel into the specified ViewModel
         /// </summary>
@@ -99,7 +104,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
         /// <returns>OutCome.Success or Outcome.Fail with a list of StatementErrors</returns>
         Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId);
-        
+
     }
 
     public class StatementPresenter : IStatementPresenter
@@ -107,19 +112,27 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         private readonly IStatementBusinessLogic _statementBusinessLogic;
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
         private readonly IMapper _mapper;
+        public JsonSerializerSettings JsonSettings { get; }
         private readonly IServiceProvider _serviceProvider;
-
         public StatementPresenter(
             IMapper mapper,
+            DependencyContractResolver dependencyContractResolver,
             ISharedBusinessLogic sharedBusinessLogic,
-            IStatementBusinessLogic statementBusinessLogic, 
+            IStatementBusinessLogic statementBusinessLogic,
             IServiceProvider serviceProvider)
         {
             _mapper = mapper;
+            JsonSettings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Objects,
+                ContractResolver = dependencyContractResolver
+            };
             _sharedBusinessLogic = sharedBusinessLogic;
             _statementBusinessLogic = statementBusinessLogic;
             _serviceProvider = serviceProvider;
         }
+
+
 
         private DateTime GetReportingDeadline(long organisationId, int year)
         {
@@ -178,7 +191,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await _statementBusinessLogic.SubmitDraftStatementModelAsync(organisationId, reportingDeadline, userId);
         }
 
-        public async Task<Outcome<StatementErrors,TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId) where TViewModel:BaseViewModel
+        public async Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId) where TViewModel : BaseViewModel
         {
             var openOutcome = await OpenDraftStatementModelAsync(organisationIdentifier, reportingDeadlineYear, userId);
             if (openOutcome.Fail) return new Outcome<StatementErrors, TViewModel>(openOutcome.Errors);
@@ -194,7 +207,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             if (openOutcome.Fail) return new Outcome<StatementErrors, TViewModel>(openOutcome.Errors);
 
             var statementModel = openOutcome.Result;
-            statementModel = SetViewModelToStatementModel(viewModel,statementModel);
+            statementModel = SetViewModelToStatementModel(viewModel, statementModel);
 
             //Save the new statement containing the updated viewModel
             await _statementBusinessLogic.SaveDraftStatementModelAsync(statementModel);
@@ -206,5 +219,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         {
             return await _statementBusinessLogic.GetDraftModifications(statementModel);
         }
+
+
     }
 }

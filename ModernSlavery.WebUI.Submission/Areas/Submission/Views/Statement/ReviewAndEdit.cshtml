@@ -114,7 +114,7 @@
 
             @if (Model.HasChanged())
             {
-                <button class="govuk-button" data-module="govuk-button" disabled="@Model.IsComplete()" name="command" value="@BaseViewModel.CommandType.Submit">
+                <button class="govuk-button" data-module="govuk-button" disabled="@(!Model.IsComplete())" name="command" value="@BaseViewModel.CommandType.Submit">
                     Confirm and Submit
                 </button>
                 <button class="govuk-button" data-module="govuk-button" name="command" value="@BaseViewModel.CommandType.SaveAndExit">

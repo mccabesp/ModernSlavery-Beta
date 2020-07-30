@@ -29,14 +29,14 @@
                         @foreach (var sectorType in Model.SectorTypes.OrderBy(x => x.Description))
                         {
                             <div class="govuk-checkboxes__item">
-                                <input name="Sectors" value="@sectorType.Id" id="@($"sector{sectorType.Id}")" checked=@(Model.Sectors.Contains(sectorType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="organisation-conditional">
+                                <input name="Sectors" value="@sectorType.Id" id="@($"sector{sectorType.Id}")" checked=@(Model.Sectors.Contains(sectorType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="organisation-conditional-@(sectorType.Id)">
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"sector{sectorType.Id}")">
                                     @sectorType.Description
                                 </label>
                             </div>
                             @if (sectorType.Description.Equals("Other"))
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherSector, "govuk-form-group--error")" id="organisation-conditional">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherSector, "govuk-form-group--error")" id="organisation-conditional-@(sectorType.Id)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
                                             Please specify
@@ -62,8 +62,8 @@
                         @foreach (YourOrganisationPageViewModel.TurnoverRanges item in (Enum.GetValues(typeof(YourOrganisationPageViewModel.TurnoverRanges)).Cast<YourOrganisationPageViewModel.TurnoverRanges>().Where(x => x != YourOrganisationPageViewModel.TurnoverRanges.NotProvided)))
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="Turnover" name="Turnover" type="radio" value="item">
-                                <label class="govuk-label govuk-radios__label" for="Turnover">
+                                <input class="govuk-radios__input" id="Turnover-@(item)" name="Turnover" type="radio" value="@(item)">
+                                <label class="govuk-label govuk-radios__label" for="Turnover-@(item)">
                                     @(item.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text)
                                 </label>
                             </div>

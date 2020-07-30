@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Policy;
 using System.Text;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Entities
 {
@@ -38,8 +39,8 @@ namespace ModernSlavery.Core.Entities
         public string StatusDetails { get; set; }
         public string Modifications { get; set; }
 
-        public DateTime Modified { get; set; }
-        public DateTime Created { get; set; }
+        public DateTime Modified { get; set; } = VirtualDateTime.Now;
+        public DateTime Created { get; set; } = VirtualDateTime.Now;
 
         public string LateReason { get; set; }
 

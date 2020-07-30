@@ -1,17 +1,14 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.Submission.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
-using System.ComponentModel;
-using System.Text.Json.Serialization;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Binding;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -40,10 +37,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
+    [DependencyModelBinder]
     public class DueDiligencePageViewModel : BaseViewModel
     {
         [IgnoreMap]
-        public DiligenceTypeIndex DiligenceTypes { get; set; }
+        [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore
+        public DiligenceTypeIndex DiligenceTypes { get; }
         public DueDiligencePageViewModel(DiligenceTypeIndex diligenceTypes)
         {
             DiligenceTypes = diligenceTypes;
@@ -132,9 +131,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
-
-            //Get the diligence types
-            DiligenceTypes = validationContext.GetService<DiligenceTypeIndex>();
 
             var otherId = DiligenceTypes.Single(x => x.Description.EqualsI("other type of social audit")).Id;
             var otherIndex = DiligenceTypes.FindIndex(r => r.Id == otherId);

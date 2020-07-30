@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using System;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement

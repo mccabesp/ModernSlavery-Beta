@@ -4,11 +4,9 @@ using ModernSlavery.WebUI.Submission.Classes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
-using System;
-using System.Text.Json.Serialization;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Binding;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -38,10 +36,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
+    [DependencyModelBinder]
     public class SupplyChainRisksPageViewModel : BaseViewModel
     {
         [IgnoreMap]
-        public RiskTypeIndex RiskTypes { get; set; }
+        [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore
+        public RiskTypeIndex RiskTypes { get; }
         public SupplyChainRisksPageViewModel(RiskTypeIndex riskTypes)
         {
             RiskTypes = riskTypes;
@@ -79,9 +79,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
-
-            //Get the risk types
-            RiskTypes=validationContext.GetService<RiskTypeIndex>();
 
             if (RelevantRisks.Count(r => r.Id > 0) > 3)
                 validationResults.AddValidationError(3501, nameof(RelevantRisks));

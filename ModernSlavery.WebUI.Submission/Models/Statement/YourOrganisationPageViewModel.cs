@@ -4,15 +4,10 @@ using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.Submission.Classes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
-using System;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations.Schema;
-using ModernSlavery.Core.Entities;
-using System.Text.Json.Serialization;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Binding;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -34,10 +29,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
+    [DependencyModelBinder]
     public class YourOrganisationPageViewModel : BaseViewModel
     {
         [IgnoreMap]
-        public SectorTypeIndex SectorTypes { get; set; }
+        [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore
+        public SectorTypeIndex SectorTypes { get; }
         public YourOrganisationPageViewModel(SectorTypeIndex sectorTypes)
         {
             SectorTypes = sectorTypes;
@@ -85,9 +82,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
-
-            //Get the sector types
-            SectorTypes = validationContext.GetRequiredService<SectorTypeIndex>();
 
             var otherId = SectorTypes.Single(x => x.Description.Equals("Other")).Id;
 

@@ -13,14 +13,10 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Submission.Models.Statement;
 using ModernSlavery.WebUI.Submission.Presenters;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ModernSlavery.WebUI.Submission.Controllers
 {
@@ -60,10 +56,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         #endregion
 
         #region Properties
-        private JsonSerializerSettings _jsonSettings = new JsonSerializerSettings
-        {
-            TypeNameHandling = TypeNameHandling.Objects
-        };
+        
         #endregion
 
         #region Url Methods
@@ -213,13 +206,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (model == null)
                 Session.Remove(this + ":CancellingViewModel");
             else
-                Session[this + ":CancellingViewModel"] = JsonConvert.SerializeObject(model, _jsonSettings);
+                Session[this + ":CancellingViewModel"] = JsonConvert.SerializeObject(model, SubmissionPresenter.JsonSettings);
         }
 
         private T UnstashCancellingViewModel<T>(bool delete = false) where T : class
         {
             var json = Session[this + ":CancellingViewModel"].ToStringOrNull();
-            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json, _jsonSettings);
+            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json, SubmissionPresenter.JsonSettings);
             if (delete) Session.Remove(this + ":CancellingViewModel");
 
             return result;
@@ -228,7 +221,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         private object UnstashCancellingViewModel(bool delete = false)
         {
             var json = Session[this + ":CancellingViewModel"].ToStringOrNull();
-            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject(json, _jsonSettings);
+            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject(json, SubmissionPresenter.JsonSettings);
             if (delete) Session.Remove(this + ":CancellingViewModel");
             return result;
         }
@@ -500,9 +493,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Create the view model
             var viewModel = new ReviewAndEditPageViewModel();
 
-            //set the navigation urls
-            SetNavigationUrl(viewModel);
-
             switch (command)
             {
                 case BaseViewModel.CommandType.Submit:
@@ -514,6 +504,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                     //Create the view model
                     viewModel = await CreateReviewPageViewModelAsync(openResult.Result);
+
+                    //set the navigation urls
+                    SetNavigationUrl(viewModel);
 
                     //Validate the view model
                     TryValidateModel(viewModel);
@@ -530,17 +523,27 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     //Redirect to the continue url
                     return Redirect(viewModel.ContinueUrl);
                 case BaseViewModel.CommandType.DiscardAndExit:
+                    //set the navigation urls
+                    SetNavigationUrl(viewModel);
+
                     //Close the draft and release the user lock
                     var cancelResult = await SubmissionPresenter.CancelDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+
                     //Handle any StatementErrors
                     if (cancelResult.Fail) return HandleStatementErrors(cancelResult.Errors);
+
                     //Redirect to the continue url
                     return Redirect(viewModel.ContinueUrl);
                 case BaseViewModel.CommandType.SaveAndExit:
+                    //set the navigation urls
+                    SetNavigationUrl(viewModel);
+
                     //Close the draft and release the user lock
                     var closeResult = await SubmissionPresenter.CloseDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+
                     //Handle any StatementErrors
                     if (closeResult.Fail) return HandleStatementErrors(closeResult.Errors);
+
                     //Redirect to the continue url
                     return Redirect(viewModel.ContinueUrl);
                 default:

@@ -25,7 +25,7 @@ namespace ModernSlavery.Core.Entities
         public AddressStatuses Status { get; set; }
         public DateTime StatusDate { get; set; } = VirtualDateTime.Now;
         public string StatusDetails { get; set; }
-        public DateTime Created { get; set; }
+        public DateTime Created { get; set; } = VirtualDateTime.Now;
         public DateTime Modified { get; set; } = VirtualDateTime.Now;
         public long OrganisationId { get; set; }
         public string Source { get; set; }

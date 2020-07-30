@@ -4,11 +4,9 @@ using ModernSlavery.WebUI.Submission.Classes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
-using System;
-using System.Text.Json.Serialization;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Binding;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -30,10 +28,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
+    [DependencyModelBinder]
     public class TrainingPageViewModel : BaseViewModel
     {
+        
         [IgnoreMap]
-        public TrainingTypeIndex TrainingTypes { get; set; }
+        [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore
+        public TrainingTypeIndex TrainingTypes { get; }
         public TrainingPageViewModel(TrainingTypeIndex trainingTypes)
         {
             TrainingTypes = trainingTypes;
@@ -53,9 +54,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
-
-            //Get the training types
-            TrainingTypes = validationContext.GetService<TrainingTypeIndex>();
 
             var otherId = TrainingTypes.Single(x => x.Description.Equals("Other")).Id;
 

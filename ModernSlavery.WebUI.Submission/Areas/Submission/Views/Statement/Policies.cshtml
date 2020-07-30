@@ -28,14 +28,14 @@
                         @foreach (var policyType in Model.PolicyTypes)
                         {
                             <div class="govuk-checkboxes__item">
-                                <input name="Policies" value="@policyType.Id" id="@($"policy{policyType.Id}")" checked=@(Model.Policies.Contains(policyType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="policies-conditional">
+                                <input name="Policies" value="@policyType.Id" id="@($"policy{policyType.Id}")" checked=@(Model.Policies.Contains(policyType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="policies-conditional@(policyType.Id)">
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"policy{policyType.Id}")">
                                     @policyType.Description
                                 </label>
                             </div>
                             @if (policyType.Description.Contains("Other"))
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPolicies, "govuk-form-group--error")" id="policies-conditional">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPolicies, "govuk-form-group--error")" id="policies-conditional@(policyType.Id)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
                                             Please provide detail

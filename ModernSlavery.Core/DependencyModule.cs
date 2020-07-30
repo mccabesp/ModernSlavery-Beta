@@ -24,7 +24,8 @@ namespace ModernSlavery.Core
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //TODO: Register service dependencies here
+            //Register service dependencies here
+            services.AddSingleton<DependencyContractResolver>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
