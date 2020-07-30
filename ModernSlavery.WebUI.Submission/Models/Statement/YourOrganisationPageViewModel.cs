@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public OrganisationPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel,YourOrganisationPageViewModel>();
+            CreateMap<StatementModel, YourOrganisationPageViewModel>();
 
             CreateMap<YourOrganisationPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
@@ -54,16 +54,16 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             [GovUkRadioCheckboxLabelText(Text = "Under £36 million")]
             Under36Million = 1,
 
-            [GovUkRadioCheckboxLabelText(Text = "£36 million - £60 million")]
+            [GovUkRadioCheckboxLabelText(Text = "£36 million to £60 million")]
             From36to60Million = 2,
 
-            [GovUkRadioCheckboxLabelText(Text = "£60 million - £100 million")]
+            [GovUkRadioCheckboxLabelText(Text = "£60 million to £100 million")]
             From60to100Million = 3,
 
-            [GovUkRadioCheckboxLabelText(Text = "£100 million - £500 million")]
+            [GovUkRadioCheckboxLabelText(Text = "£100 million to £500 million")]
             From100to500Million = 4,
 
-            [GovUkRadioCheckboxLabelText(Text = "£500 million+")]
+            [GovUkRadioCheckboxLabelText(Text = "Over £500 million")]
             Over500Million = 5,
         }
 
