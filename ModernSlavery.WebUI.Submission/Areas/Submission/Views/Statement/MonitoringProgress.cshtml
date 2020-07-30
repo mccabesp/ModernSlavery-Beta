@@ -16,32 +16,33 @@
                 @Model.PageTitle
             </h1>
 
-
-            <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                <label asp-for="IncludesMeasuringProgress" class="govuk-label govuk-label--m">
-                    Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?
-                </label>
-                <div class="govuk-radios__item">
-                    <input asp-for="IncludesMeasuringProgress" value="true" id="IncludeGoals_True" checked="@(Model.IncludesMeasuringProgress==true)" class="govuk-radios__input" type="radio">
-                    <label class="govuk-label govuk-radios__label" asp-for="IncludesMeasuringProgress">
-                        Yes
+            <div class="govuk-form-group">
+                <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                    <label asp-for="IncludesMeasuringProgress" class="govuk-label govuk-label--m">
+                        Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?
                     </label>
-                </div>
-                <div class="govuk-radios__item">
-                    <input asp-for="IncludesMeasuringProgress" value="false" id="IncludeGoals_False" checked="@(Model.IncludesMeasuringProgress==false)" class="govuk-radios__input" type="radio" data-aria-controls="conditional-include-goals-conditional">
-                    <label class="govuk-label govuk-radios__label" for="IncludeGoals_False">
-                        No
-                    </label>
-                </div>
-                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-goals-conditional">
-                    <div class="govuk-form-group">
-                        <label asp-for="ProgressMeasures" class="govuk-label" for="include-goals-detail">
-                            How is your organisation measuring progress towards these goals?
+                    <div class="govuk-radios__item">
+                        <input asp-for="IncludesMeasuringProgress" value="true" id="IncludeGoals_True" checked="@(Model.IncludesMeasuringProgress==true)" class="govuk-radios__input" type="radio">
+                        <label class="govuk-label govuk-radios__label" asp-for="IncludesMeasuringProgress">
+                            Yes
                         </label>
-                        <textarea asp-for="ProgressMeasures" id="include-goals-detail" class="govuk-textarea govuk-!-width-two-thirds" rows="5" type="text">@Model.ProgressMeasures</textarea>
-
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input asp-for="IncludesMeasuringProgress" value="false" id="IncludeGoals_False" checked="@(Model.IncludesMeasuringProgress==false)" class="govuk-radios__input" type="radio" data-aria-controls="conditional-include-goals-conditional">
+                        <label class="govuk-label govuk-radios__label" for="IncludeGoals_False">
+                            No
+                        </label>
                     </div>
                 </div>
+            </div>
+
+            <div class="govuk-form-group">
+                <h1 class="govuk-label-wrapper">
+                    <label asp-for="ProgressMeasures" class="govuk-label govuk-label--m" for="include-goals-detail">
+                        How is your organisation measuring progress towards these goals?
+                    </label>
+                </h1>
+                <textarea asp-for="ProgressMeasures" id="include-goals-detail" class="govuk-textarea " rows="5" type="text" maxlength="1024">@Model.ProgressMeasures</textarea>
             </div>
 
             <div class="govuk-form-group">
