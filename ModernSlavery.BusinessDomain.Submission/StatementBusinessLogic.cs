@@ -512,7 +512,16 @@ namespace ModernSlavery.BusinessDomain.Submission
 
                 //Get the statement to map from
                 var submittedStatement = await FindSubmittedStatementAsync(organisationId, reportingDeadline);
-                if (submittedStatement == null) submittedStatement = new Statement();
+                if (submittedStatement == null)
+                {
+                    // Set basic fields so that null will not be mapped to the statementmodel
+                    submittedStatement = new Statement
+                    {
+                        OrganisationId = organisationId,
+                        Organisation = organisation,
+                        SubmissionDeadline = reportingDeadline
+                    };
+                }
 
                 //Load the statement entity into the statementmodel
                 _mapper.Map(submittedStatement, draftStatement);

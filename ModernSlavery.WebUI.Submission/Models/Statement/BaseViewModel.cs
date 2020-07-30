@@ -40,12 +40,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         [IgnoreMap]
         public abstract string PageTitle { get; }
-        [IgnoreMap] 
+        [IgnoreMap]
         public virtual string SubTitle { get; }
 
         public DateTime SubmissionDeadline { get; set; }
 
-        [IgnoreMap] 
+        [IgnoreMap]
         public int ReportingDeadlineYear => SubmissionDeadline.Year;
 
         public string OrganisationName { get; set; }

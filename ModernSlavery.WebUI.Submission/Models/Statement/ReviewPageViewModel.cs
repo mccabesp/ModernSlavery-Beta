@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
@@ -31,7 +32,23 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class ReviewPageViewModel : BaseViewModel
     {
-        public override string PageTitle => $"Review {ReportingDeadlineYear} group report for {OrganisationName}";
+        public override string PageTitle => $"Review {ReportingDeadlineYear - 1} to {ReportingDeadlineYear} group report for {OrganisationName}";
+        public override string SubTitle => GetSubtitle();
+
+        private string GetSubtitle()
+        {
+            var complete = YourStatement.IsComplete() && Compliance.IsComplete();
+
+            var result = $"Submission {(complete ? "" : "in")}complete.";
+
+            if (complete)
+                return result;
+
+            result += " Section 1 must be completed in order to submit.";
+
+            return result;
+        }
+
         public YourStatementPageViewModel YourStatement { get; set; }
         public CompliancePageViewModel Compliance { get; set; }
         public OrganisationPageViewModel Organisation { get; set; }
@@ -43,6 +60,31 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         
         [IgnoreMap]
         public IList<AutoMap.Diff> Modifications { get; set; }
+
+        [IgnoreMap]
+        [BindNever]
+        public string YourStatementUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string ComplianceUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string OrganisationUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string PoliciesUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string RisksUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string DueDiligenceUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string TrainingUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string ProgressUrl { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
