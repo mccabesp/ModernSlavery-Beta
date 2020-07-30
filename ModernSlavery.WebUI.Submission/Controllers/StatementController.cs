@@ -596,6 +596,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             viewModel.Modifications = await SubmissionPresenter.GetDraftModifications(statementModel);
 
             //Ensure the viewmodel is valid before saving
+            ModelState.Clear();
             if (!TryValidateModel(pageViewModel))
             {
                 viewModel.ErrorCount = ModelState.ErrorCount;
@@ -643,6 +644,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     var pageViewModel = UnstashCancellingViewModel();
 
                     //Ensure the viewmodel is valid before saving
+                    ModelState.Clear();
                     if (!TryValidateModel(pageViewModel))
                     {
                         viewModel.ErrorCount = ModelState.ErrorCount;
@@ -651,7 +653,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                         var openModelResult = await SubmissionPresenter.OpenDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
 
                         //Handle any StatementErrors
-                        if (viewModelResult.Fail) return HandleStatementErrors(openModelResult.Errors);
+                        if (openModelResult.Fail) return HandleStatementErrors(openModelResult.Errors);
 
                         //Get the modifications
                         var statementModel = SubmissionPresenter.SetViewModelToStatementModel(pageViewModel, openModelResult.Result);
