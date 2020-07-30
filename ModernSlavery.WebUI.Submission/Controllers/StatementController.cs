@@ -133,47 +133,47 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             switch (viewModel)
             {
                 case YourStatementPageViewModel vm:
-                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetReturnUrl();
+                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : null;
                     vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetComplianceUrl();
+                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetComplianceUrl();
                     break;
                 case CompliancePageViewModel vm:
-                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetYourStatementUrl();
+                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetYourStatementUrl();
                     vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetYourOrganisationUrl();
+                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetYourOrganisationUrl();
                     break;
                 case YourOrganisationPageViewModel vm:
-                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetComplianceUrl();
+                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetComplianceUrl();
                     vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetPoliciesUrl();
+                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetPoliciesUrl();
                     break;
                 case PoliciesPageViewModel vm:
-                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetYourOrganisationUrl();
+                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetYourOrganisationUrl();
                     vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetRisksUrl();
+                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetRisksUrl();
                     break;
                 case SupplyChainRisksPageViewModel vm:
-                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetPoliciesUrl();
+                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetPoliciesUrl();
                     vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetDueDiligenceUrl();
+                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetDueDiligenceUrl();
                     break;
                 case DueDiligencePageViewModel vm:
-                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetRisksUrl();
+                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetRisksUrl();
                     vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetTrainingUrl();
+                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetTrainingUrl();
                     break;
                 case TrainingPageViewModel vm:
-                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetDueDiligenceUrl();
+                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetDueDiligenceUrl();
                     vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetProgressUrl();
+                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetProgressUrl();
                     break;
                 case MonitoringProgressPageViewModel vm:
-                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetTrainingUrl();
+                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetTrainingUrl();
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = GetReviewUrl();
                     break;
                 case ReviewAndEditPageViewModel vm:
-                    vm.BackUrl = vm.CanRevertToOriginal ? null : GetProgressUrl();
+                    vm.BackUrl = vm.ReturnToReviewPage ? null : GetProgressUrl();
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = GetReturnUrl();
                     vm.YourStatementUrl = GetYourStatementUrl();
@@ -474,8 +474,18 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Handle any StatementErrors
             if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
 
+            var statementModel = viewModelResult.Result;
+
             //Create the view model
-            var viewModel = await CreateReviewPageViewModelAsync(viewModelResult.Result);
+            var viewModel = await CreateReviewPageViewModelAsync(statementModel);
+
+            //Set the flag so we now always return to the review page
+            if (!viewModel.ReturnToReviewPage)
+            {
+                statementModel.ReturnToReviewPage = true;
+                await SubmissionPresenter.SaveStatementModelAsync(statementModel);
+                viewModel.ReturnToReviewPage = true;
+            }
 
             //set the navigation urls
             SetNavigationUrl(viewModel);
@@ -522,6 +532,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                     //Redirect to the continue url
                     return Redirect(viewModel.ContinueUrl);
+                case BaseViewModel.CommandType.ExitNoChanges:
                 case BaseViewModel.CommandType.DiscardAndExit:
                     //set the navigation urls
                     SetNavigationUrl(viewModel);
@@ -596,6 +607,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             viewModel.Modifications = await SubmissionPresenter.GetDraftModifications(statementModel);
 
             //Ensure the viewmodel is valid before saving
+            ModelState.Clear();
             if (!TryValidateModel(pageViewModel))
             {
                 viewModel.ErrorCount = ModelState.ErrorCount;
@@ -643,6 +655,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     var pageViewModel = UnstashCancellingViewModel();
 
                     //Ensure the viewmodel is valid before saving
+                    ModelState.Clear();
                     if (!TryValidateModel(pageViewModel))
                     {
                         viewModel.ErrorCount = ModelState.ErrorCount;
@@ -651,7 +664,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                         var openModelResult = await SubmissionPresenter.OpenDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
 
                         //Handle any StatementErrors
-                        if (viewModelResult.Fail) return HandleStatementErrors(openModelResult.Errors);
+                        if (openModelResult.Fail) return HandleStatementErrors(openModelResult.Errors);
 
                         //Get the modifications
                         var statementModel = SubmissionPresenter.SetViewModelToStatementModel(pageViewModel, openModelResult.Result);

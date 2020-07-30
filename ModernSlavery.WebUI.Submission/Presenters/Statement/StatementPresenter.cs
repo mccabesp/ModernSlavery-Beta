@@ -104,7 +104,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
         /// <returns>OutCome.Success or Outcome.Fail with a list of StatementErrors</returns>
         Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId);
-
+        
+        /// <summary>
+        /// Save any changes to the statement model
+        /// </summary>
+        /// <param name="statementModel">The statement model to save</param>
+        /// <returns></returns>
+        Task SaveStatementModelAsync(StatementModel statementModel);
     }
 
     public class StatementPresenter : IStatementPresenter
@@ -214,6 +220,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
             return new Outcome<StatementErrors, TViewModel>(viewModel);
         }
+
+        public async Task SaveStatementModelAsync(StatementModel statementModel) 
+        {
+            //Save the new statement containing the updated viewModel
+            await _statementBusinessLogic.SaveDraftStatementModelAsync(statementModel);
+        }
+
 
         public async Task<IList<AutoMap.Diff>> GetDraftModifications(StatementModel statementModel)
         {

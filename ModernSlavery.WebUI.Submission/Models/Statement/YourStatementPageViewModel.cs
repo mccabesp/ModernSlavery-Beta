@@ -108,7 +108,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             //Validate the start date parts
             var partsComplete = !Text.IsAnyNull(StatementStartDay, StatementStartMonth, StatementStartYear);
-            var partsEmpty = Text.IsAllNull(ApproverFirstName, ApproverLastName, ApproverJobTitle);
+            var partsEmpty = Text.IsAllNull(StatementStartDay, StatementStartMonth, StatementStartYear);
             if (!partsComplete && !partsEmpty)
             {
                 if (StatementStartDay==null)

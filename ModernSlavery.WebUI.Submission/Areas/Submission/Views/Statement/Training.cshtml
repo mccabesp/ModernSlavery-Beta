@@ -9,7 +9,7 @@
         {
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.CanRevertToOriginal);
+            @Html.HiddenFor(m => m.ReturnToReviewPage);
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="training-hint">

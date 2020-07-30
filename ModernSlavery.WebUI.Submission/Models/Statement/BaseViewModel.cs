@@ -17,11 +17,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             Continue=2,
             SaveAndExit=3,
             DiscardAndExit=4,
-            Submit = 5
+            ExitNoChanges = 5,
+            Submit = 6
         }
 
         [BindRequired]
-        public bool CanRevertToOriginal { get; set; }
+        public bool ReturnToReviewPage { get; set; }
 
         [BindNever]
         public DateTime? DraftBackupDate { get; set; }

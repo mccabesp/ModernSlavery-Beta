@@ -9,7 +9,7 @@
         {
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.CanRevertToOriginal);
+            @Html.HiddenFor(m => m.ReturnToReviewPage);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
@@ -29,13 +29,13 @@
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
                             <input asp-for="IncludesStructure" value="true" class="govuk-radios__input" id="IncludeStructure_True" type="radio">
-                            <label class="govuk-label govuk-radios__label">
+                            <label class="govuk-label govuk-radios__label" for="IncludeStructure_True">
                                 Yes
                             </label>
                         </div>
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesStructure" value="false" class="govuk-radios__input" id="include-structure-conditional" type="radio" data-aria-controls="conditional-include-structure-conditional">
-                            <label class="govuk-label govuk-radios__label" for="include-structure-conditional">
+                            <input asp-for="IncludesStructure" value="false" class="govuk-radios__input" id="IncludeStructure_False" type="radio" data-aria-controls="conditional-include-structure-conditional">
+                            <label class="govuk-label govuk-radios__label" for="IncludeStructure_False">
                                 No
                             </label>
                         </div>
@@ -61,14 +61,14 @@
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesPolicies" value="true" class="govuk-radios__input" id="include-policies" type="radio">
-                            <label class="govuk-label govuk-radios__label">
+                            <input asp-for="IncludesPolicies" value="true" class="govuk-radios__input" id="include-policies_True" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="include-policies_True">
                                 Yes
                             </label>
                         </div>
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesPolicies" value="false" class="govuk-radios__input" id="include-policies-conditional" type="radio" data-aria-controls="conditional-include-policies-conditional">
-                            <label class="govuk-label govuk-radios__label" for="include-policies-conditional">
+                            <input asp-for="IncludesPolicies" value="false" class="govuk-radios__input" id="include-policies_False" type="radio" data-aria-controls="conditional-include-policies-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-policies_False">
                                 No
                             </label>
                         </div>
@@ -93,14 +93,14 @@
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesRisks" value="true" class="govuk-radios__input" id="include-risks" type="radio">
-                            <label class="govuk-label govuk-radios__label">
+                            <input asp-for="IncludesRisks" value="true" class="govuk-radios__input" id="include-risks_True" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="include-risks_True">
                                 Yes
                             </label>
                         </div>
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesRisks" value="false" class="govuk-radios__input" id="include-risks-conditional" type="radio" data-aria-controls="conditional-include-risks-conditional">
-                            <label class="govuk-label govuk-radios__label" for="include-risks-conditional">
+                            <input asp-for="IncludesRisks" value="false" class="govuk-radios__input" id="include-risks_False" type="radio" data-aria-controls="conditional-include-risks-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-risks_False">
                                 No
                             </label>
                         </div>
@@ -126,14 +126,14 @@
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesDueDiligence" value="true" class="govuk-radios__input" id="include-methods" type="radio">
-                            <label class="govuk-label govuk-radios__label">
+                            <input asp-for="IncludesDueDiligence" value="true" class="govuk-radios__input" id="include-methods_True" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="include-methods_True">
                                 Yes
                             </label>
                         </div>
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesDueDiligence" value="false" class="govuk-radios__input" id="include-methods-conditional" type="radio" data-aria-controls="conditional-include-dueDiligence-conditional">
-                            <label class="govuk-label govuk-radios__label" for="include-dueDiligence-conditional">
+                            <input asp-for="IncludesDueDiligence" value="false" class="govuk-radios__input" id="include-methods_False" type="radio" data-aria-controls="conditional-include-dueDiligence-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-methods_False">
                                 No
                             </label>
                         </div>
@@ -158,14 +158,14 @@
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesTraining" value="true" class="govuk-radios__input" id="include-training" type="radio">
-                            <label class="govuk-label govuk-radios__label">
+                            <input asp-for="IncludesTraining" value="true" class="govuk-radios__input" id="include-training_True" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="include-training_True">
                                 Yes
                             </label>
                         </div>
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesTraining" value="false" class="govuk-radios__input" id="include-training-conditional" type="radio" data-aria-controls="conditional-include-training-conditional">
-                            <label class="govuk-label govuk-radios__label" for="include-training-conditional">
+                            <input asp-for="IncludesTraining" value="false" class="govuk-radios__input" id="include-training_False" type="radio" data-aria-controls="conditional-include-training-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-training_False">
                                 No
                             </label>
                         </div>
@@ -192,14 +192,14 @@
 
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesGoals" value="true" class="govuk-radios__input" id="include-effectiveness" type="radio">
-                            <label class="govuk-label govuk-radios__label">
+                            <input asp-for="IncludesGoals" value="true" class="govuk-radios__input" id="include-effectiveness_True" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="include-effectiveness_True">
                                 Yes
                             </label>
                         </div>
                         <div class="govuk-radios__item">
-                            <input asp-for="IncludesGoals" value="false" class="govuk-radios__input" id="include-effectiveness-conditional" type="radio" data-aria-controls="conditional-include-effectiveness-conditional">
-                            <label class="govuk-label govuk-radios__label" for="include-goals-conditional">
+                            <input asp-for="IncludesGoals" value="false" class="govuk-radios__input" id="include-effectiveness_False" type="radio" data-aria-controls="conditional-include-effectiveness-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-effectiveness_False">
                                 No
                             </label>
                         </div>

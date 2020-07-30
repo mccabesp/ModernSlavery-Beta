@@ -12,7 +12,7 @@
         {
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.CanRevertToOriginal);
+            @Html.HiddenFor(m => m.ReturnToReviewPage);
 
             <h1 class="govuk-heading-l">
                 <span class="govuk-caption-l">@Model.SubTitle</span>

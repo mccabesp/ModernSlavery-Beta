@@ -387,7 +387,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (newModel == null) throw new ArgumentNullException(nameof(newModel));
 
             //Compare the two statementModels
-            var membersToIgnore = new[] { nameof(StatementModel.CanRevertToOriginal), nameof(StatementModel.DraftBackupDate), nameof(StatementModel.EditorUserId), nameof(StatementModel.EditTimestamp), nameof(StatementModel.StatementId), nameof(StatementModel.OrganisationName), nameof(StatementModel.Status), nameof(StatementModel.StatusDate), nameof(StatementModel.SubmissionDeadline), nameof(StatementModel.OrganisationId), nameof(StatementModel.CanRevertToOriginal), nameof(StatementModel.Modifications), nameof(StatementModel.EHRCResponse), nameof(StatementModel.LateReason), nameof(StatementModel.IncludedOrganisationCount), nameof(StatementModel.ExcludedOrganisationCount), nameof(StatementModel.Modified), nameof(StatementModel.Created) };
+            var membersToIgnore = new[] { nameof(StatementModel.ReturnToReviewPage), nameof(StatementModel.DraftBackupDate), nameof(StatementModel.EditorUserId), nameof(StatementModel.EditTimestamp), nameof(StatementModel.StatementId), nameof(StatementModel.OrganisationName), nameof(StatementModel.Status), nameof(StatementModel.StatusDate), nameof(StatementModel.SubmissionDeadline), nameof(StatementModel.OrganisationId), nameof(StatementModel.ReturnToReviewPage), nameof(StatementModel.Modifications), nameof(StatementModel.EHRCResponse), nameof(StatementModel.LateReason), nameof(StatementModel.IncludedOrganisationCount), nameof(StatementModel.ExcludedOrganisationCount), nameof(StatementModel.Modified), nameof(StatementModel.Created) };
             var differences=oldModel.GetDifferences(newModel, membersToIgnore).ToList();
             return differences;
         }
@@ -593,9 +593,6 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
                 draftStatement.DraftBackupDate = await _sharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(draftBackupFilePath);
 
-            //Allow revert to backup if backup exists and has timedout
-            draftStatement.CanRevertToOriginal = draftStatement.StatementId > 0 || draftStatement.DraftBackupDate != null;
-
             return new Outcome<StatementErrors, StatementModel>(draftStatement);
         }
 
@@ -643,12 +640,16 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             var statementModel = openOutcome.Result;
             statementModel.EditorUserId = 0;
-
+            
             //Get the current draft filepath
             var draftFilePath = GetDraftFilepath(statementModel.OrganisationId, statementModel.SubmissionDeadline.Year);
 
-            //Save the draft with no userId
-            await SaveStatementModelToFileAsync(statementModel, draftFilePath);
+            if (statementModel.IsEmpty())
+                //Delete the empty draft
+                await _sharedBusinessLogic.FileRepository.DeleteFileAsync(draftFilePath);
+            else
+                //Save the draft with no userId
+                await SaveStatementModelToFileAsync(statementModel, draftFilePath);
 
             //Get the backup draft filepath
             var draftBackupFilePath = GetDraftBackupFilepath(organisationId, reportingDeadline.Year);
