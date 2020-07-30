@@ -62,7 +62,7 @@
                         @foreach (YourOrganisationPageViewModel.TurnoverRanges item in (Enum.GetValues(typeof(YourOrganisationPageViewModel.TurnoverRanges)).Cast<YourOrganisationPageViewModel.TurnoverRanges>().Where(x => x != YourOrganisationPageViewModel.TurnoverRanges.NotProvided)))
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="Turnover-@(item)" name="Turnover" type="radio" value="@(item)">
+                                <input class="govuk-radios__input" id="Turnover-@(item)" name="Turnover" type="radio" checked="@(Model.Turnover==item)" value="@(item)">
                                 <label class="govuk-label govuk-radios__label" for="Turnover-@(item)">
                                     @(item.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text)
                                 </label>

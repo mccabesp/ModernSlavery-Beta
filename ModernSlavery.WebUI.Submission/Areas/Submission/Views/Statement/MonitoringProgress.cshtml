@@ -65,7 +65,7 @@
                         @foreach (MonitoringProgressPageViewModel.YearRanges item in (Enum.GetValues(typeof(MonitoringProgressPageViewModel.YearRanges)).Cast<MonitoringProgressPageViewModel.YearRanges>().Where(x => x != MonitoringProgressPageViewModel.YearRanges.NotProvided)))
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="StatementYears-@(item)" name="StatementYears" type="radio" value="@(item)">
+                                <input class="govuk-radios__input" id="StatementYears-@(item)" name="StatementYears" checked="@(Model.StatementYears==item)" type="radio" value="@(item)">
                                 <label class="govuk-label govuk-radios__label" for="StatementYears-@(item)">
                                     @(item.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text)
                                 </label>

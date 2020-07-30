@@ -166,7 +166,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             else
             {
                 SlaveryInstanceDetails = null;
-                HasRemediation = null;
                 SelectedRemediationTypes.Clear();
                 OtherRemediation = null;
             }

@@ -175,8 +175,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 case ReviewAndEditPageViewModel vm:
                     vm.BackUrl = vm.CanRevertToOriginal ? null : GetProgressUrl();
                     vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = GetReviewUrl();
-                    vm.YourStatementUrl = GetYourOrganisationUrl();
+                    vm.ContinueUrl = GetReturnUrl();
+                    vm.YourStatementUrl = GetYourStatementUrl();
                     vm.ComplianceUrl = GetComplianceUrl();
                     vm.OrganisationUrl = GetYourOrganisationUrl();
                     vm.PoliciesUrl = GetPoliciesUrl();
