@@ -368,6 +368,24 @@ namespace ModernSlavery.BusinessDomain.Submission
             return differences;
         }
 
+        /// <summary>
+        /// Returns a new statement instance.
+        /// </summary>
+        /// <param name="organisation">The organisation that the statement is for.</param>
+        /// <param name="submissionDeadline">The submission deadline of the statement.</param>
+        /// <returns></returns>
+        private Statement GetEmptyStatement(Organisation organisation, DateTime submissionDeadline)
+        {
+            // These fields need to be set so that when mapped to the
+            // statementmodel appropriate fields are populated
+            return new Statement
+            {
+                OrganisationId = organisation.OrganisationId,
+                Organisation = organisation,
+                SubmissionDeadline = submissionDeadline
+            };
+        }
+
         #endregion
 
         #region Public Methods
@@ -514,13 +532,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 var submittedStatement = await FindSubmittedStatementAsync(organisationId, reportingDeadline);
                 if (submittedStatement == null)
                 {
-                    // Set basic fields so that null will not be mapped to the statementmodel
-                    submittedStatement = new Statement
-                    {
-                        OrganisationId = organisationId,
-                        Organisation = organisation,
-                        SubmissionDeadline = reportingDeadline
-                    };
+                    submittedStatement = GetEmptyStatement(organisation, reportingDeadline);
                 }
 
                 //Load the statement entity into the statementmodel
@@ -543,7 +555,9 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Set the key priorities
             draftStatement.EditorUserId = userId;
             draftStatement.EditTimestamp = VirtualDateTime.Now;
-            draftStatement.OrganisationId = organisationId;
+
+            // opening statements with old data should be overwritten with the newest state
+            draftStatement.OrganisationName = organisation.OrganisationName;
             draftStatement.SubmissionDeadline = reportingDeadline;
 
             //Save new statement model with timestamp to lock to new user
@@ -712,7 +726,11 @@ namespace ModernSlavery.BusinessDomain.Submission
             {
 
                 var statement = await FindLatestSubmittedStatementAsync(statementModel.OrganisationId, statementModel.SubmissionDeadline);
-                if (statement == null) statement = new Statement();
+                if (statement == null)
+                {
+                    var organisation = await _sharedBusinessLogic.DataRepository.GetAsync<Organisation>(statementModel.OrganisationId); ;
+                    statement = GetEmptyStatement(organisation, statementModel.SubmissionDeadline);
+                }
 
                 backupStatementModel = new StatementModel();
 
