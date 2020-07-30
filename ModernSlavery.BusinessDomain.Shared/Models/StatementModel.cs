@@ -54,7 +54,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.EditorUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.EditTimestamp, opt => opt.Ignore())
                 .ForMember(dest => dest.DraftBackupDate, opt => opt.Ignore())
-                .ForMember(dest => dest.CanRevertToOriginal, opt => opt.Ignore())
+                .ForMember(dest => dest.ReturnToReviewPage, opt => opt.MapFrom(st=>st.StatementId>0))
                 // for nullable to non-nullable properties, dont overwrite the null with the default values when new
                 .ForMember(dest => dest.IncludesStructure, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesStructure))
                 .ForMember(dest => dest.IncludesPolicies, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesPolicies))
@@ -120,7 +120,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         }
         #endregion
 
-        public bool CanRevertToOriginal { get; set; }
+        public bool ReturnToReviewPage { get; set; }
         public DateTime? DraftBackupDate { get; set; }
 
         public long EditorUserId { get; set; }
@@ -296,21 +296,21 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 && string.IsNullOrWhiteSpace(TrainingDetails)
                 && IncludesGoals == null
                 && string.IsNullOrWhiteSpace(GoalsDetails)
-                && Sectors == null
+                && (Sectors == null || !Sectors.Any())
                 && string.IsNullOrWhiteSpace(OtherSector)
                 && Turnover == TurnoverRanges.NotProvided
-                && Policies == null
+                && (Policies == null || !Policies.Any())
                 && string.IsNullOrWhiteSpace(OtherPolicies)
-                && RelevantRisks == null
+                && (RelevantRisks == null || !RelevantRisks.Any())
                 && string.IsNullOrWhiteSpace(OtherRelevantRisks)
-                && HighRisks == null
+                && (HighRisks == null || !HighRisks.Any())
                 && string.IsNullOrWhiteSpace(OtherHighRisks)
-                && LocationRisks == null
-                && DueDiligences == null
+                && (LocationRisks == null || !LocationRisks.Any())
+                && (DueDiligences == null || !DueDiligences.Any())
                 && string.IsNullOrWhiteSpace(ForcedLabourDetails)
                 && string.IsNullOrWhiteSpace(SlaveryInstanceDetails)
                 && string.IsNullOrWhiteSpace(SlaveryInstanceRemediation)
-                && Training == null
+                && (Training == null || !Training.Any())
                 && string.IsNullOrWhiteSpace(TrainingDetails)
                 && IncludesMeasuringProgress == null
                 && string.IsNullOrWhiteSpace(ProgressMeasures)

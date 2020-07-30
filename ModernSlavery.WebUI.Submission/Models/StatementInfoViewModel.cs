@@ -21,7 +21,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         public bool CanChangeScope { get; set; }
 
         public bool SubmissionAvailable => StatementInfo.SubmittedStatementModifiedDate != null;
-        public bool DraftAvailable => StatementInfo.DraftStatementModifiedDate!=null && !StatementInfo.DraftStatementIsEmpty;
+        public bool DraftAvailable => StatementInfo.DraftStatementModifiedDate!=null;
 
         public string ButtonText
         {
@@ -43,7 +43,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         {
             get
             {
-                if (!SubmissionAvailable && !DraftAvailable)return _urlHelper.Action("BeforeYouStart", "Statement", new { organisationIdentifier = OrganisationIdentifier, year = StatementInfo.ReportingDeadline.Year });
+                if (!SubmissionAvailable && !DraftAvailable) return _urlHelper.Action("BeforeYouStart", "Statement", new { organisationIdentifier = OrganisationIdentifier, year = StatementInfo.ReportingDeadline.Year });
                 return _urlHelper.Action("ReviewAndEdit", "Statement", new { organisationIdentifier = OrganisationIdentifier, year = StatementInfo.ReportingDeadline.Year });
             }
         }
