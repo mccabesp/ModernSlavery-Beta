@@ -810,13 +810,13 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasMaxLength(255);
 
                     b.Property<decimal?>("MaxStatementYears")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("tinyint");
 
                     b.Property<int?>("MaxTurnover")
                         .HasColumnType("int");
 
                     b.Property<decimal>("MinStatementYears")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("tinyint");
 
                     b.Property<int>("MinTurnover")
                         .HasColumnType("int");

@@ -617,8 +617,8 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     IncludesMeasuringProgress = table.Column<bool>(nullable: false),
                     ProgressMeasures = table.Column<string>(nullable: true),
                     KeyAchievements = table.Column<string>(nullable: true),
-                    MinStatementYears = table.Column<decimal>(nullable: false),
-                    MaxStatementYears = table.Column<decimal>(nullable: true),
+                    MinStatementYears = table.Column<byte>(nullable: false),
+                    MaxStatementYears = table.Column<byte>(nullable: true),
                     IncludedOrganisationCount = table.Column<short>(nullable: false, defaultValue: (short)0),
                     ExcludedOrganisationCount = table.Column<short>(nullable: false, defaultValue: (short)0)
                 },

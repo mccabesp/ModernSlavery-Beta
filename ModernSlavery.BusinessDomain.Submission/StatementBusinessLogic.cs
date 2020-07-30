@@ -259,7 +259,11 @@ namespace ModernSlavery.BusinessDomain.Submission
             statementModel.Sectors.ForEach(id =>
             {
                 var sector = statement.Sectors.FirstOrDefault(s => s.StatementSectorTypeId == id);
-                if (sector == null) sector = new StatementSector() { StatementSectorTypeId = id, StatementId = statement.StatementId };
+                if (sector == null)
+                {
+                    sector = new StatementSector() { StatementSectorTypeId = id, StatementId = statement.StatementId };
+                    statement.Sectors.Add(sector);
+                }
             });
 
             //Map the Policies
@@ -267,7 +271,11 @@ namespace ModernSlavery.BusinessDomain.Submission
             statementModel.Policies.ForEach(id =>
             {
                 var policy = statement.Policies.FirstOrDefault(s => s.StatementPolicyTypeId == id);
-                if (policy == null) policy = new StatementPolicy() { StatementPolicyTypeId = id, StatementId = statement.StatementId };
+                if (policy == null)
+                {
+                    policy = new StatementPolicy() { StatementPolicyTypeId = id, StatementId = statement.StatementId };
+                    statement.Policies.Add(policy);
+                }
             });
 
             //Map the Relevant Risks
@@ -276,7 +284,10 @@ namespace ModernSlavery.BusinessDomain.Submission
             {
                 var relevantRisk = statement.RelevantRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
                 if (relevantRisk == null)
+                {
                     relevantRisk = new StatementRelevantRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                    statement.RelevantRisks.Add(relevantRisk);
+                }
                 else
                     relevantRisk.Details = model.Details;
             });
@@ -287,7 +298,10 @@ namespace ModernSlavery.BusinessDomain.Submission
             {
                 var highRisk = statement.HighRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
                 if (highRisk == null)
+                {
                     highRisk = new StatementHighRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                    statement.HighRisks.Add(highRisk);
+                }
                 else
                     highRisk.Details = model.Details;
             });
@@ -298,7 +312,10 @@ namespace ModernSlavery.BusinessDomain.Submission
             {
                 var locationRisk = statement.LocationRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
                 if (locationRisk == null)
+                {
                     locationRisk = new StatementLocationRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                    statement.LocationRisks.Add(locationRisk);
+                }
                 else
                     locationRisk.Details = model.Details;
             });
@@ -309,7 +326,10 @@ namespace ModernSlavery.BusinessDomain.Submission
             {
                 var diligence = statement.Diligences.FirstOrDefault(s => s.StatementDiligenceTypeId == model.Id);
                 if (diligence == null)
+                {
                     diligence = new StatementDiligence() { StatementDiligenceTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                    statement.Diligences.Add(diligence);
+                }
                 else
                     diligence.Details = model.Details;
             });
@@ -319,7 +339,11 @@ namespace ModernSlavery.BusinessDomain.Submission
             statementModel.Training.ForEach(id =>
             {
                 var training = statement.Training.FirstOrDefault(s => s.StatementTrainingTypeId == id);
-                if (training == null) training = new StatementTraining() { StatementTrainingTypeId = id, StatementId = statement.StatementId };
+                if (training == null) 
+                { 
+                    training = new StatementTraining() { StatementTrainingTypeId = id, StatementId = statement.StatementId };
+                    statement.Training.Add(training);
+                }
             });
         }
 
@@ -671,11 +695,10 @@ namespace ModernSlavery.BusinessDomain.Submission
             var previousStatement = await FindSubmittedStatementAsync(organisationId, reportingDeadline);
             previousStatement?.SetStatus(StatementStatuses.Retired, userId);
 
-            var organisation = previousStatement.Organisation ?? await _sharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId);
             var newStatement = new Statement();
-            newStatement.Organisation = organisation;
+            newStatement.Organisation = previousStatement == null ? await _sharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId) : previousStatement.Organisation;
             newStatement.SetStatus(StatementStatuses.Submitted, userId);
-            organisation.Statements.Add(newStatement);
+            newStatement.Organisation.Statements.Add(newStatement);
 
             //Copy all the other model propertiesto the entity
             MapFromModel(statementModel, newStatement);
@@ -685,13 +708,12 @@ namespace ModernSlavery.BusinessDomain.Submission
             {
                 //Create the previous StatementModel
                 var previousStatementModel = new StatementModel();
-                _mapper.Map(previousStatement, statementModel);
+                _mapper.Map(previousStatement, previousStatementModel);
 
                 //Compare the latest with the previous statementModel
                 var modifications= GetModifications(previousStatementModel, statementModel);
                 newStatement.Modifications = modifications.Any() ? JsonConvert.SerializeObject(modifications,new JsonSerializerSettings { NullValueHandling= NullValueHandling.Ignore, DefaultValueHandling= DefaultValueHandling.Ignore }) : null;
             }
-
 
             //Save the changes to the database
             await _sharedBusinessLogic.DataRepository.SaveChangesAsync();
@@ -717,7 +739,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 backupStatementModel = new StatementModel();
 
                 //Copy the statement properties to the model
-                _mapper.Map(statement, statementModel);
+                _mapper.Map(statement, backupStatementModel);
             }
 
             //If no backup and never submitted then return no modifications

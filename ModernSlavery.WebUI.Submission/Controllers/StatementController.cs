@@ -13,14 +13,10 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Submission.Models.Statement;
 using ModernSlavery.WebUI.Submission.Presenters;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ModernSlavery.WebUI.Submission.Controllers
 {
@@ -59,45 +55,179 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         #endregion
 
-        #region Private Methods
-        public string OrganisationIdentifier => RouteData.Values["OrganisationIdentifier"].ToString();
+        #region Properties
+        
+        #endregion
 
-        public string ReportingDeadlineYear => RouteData.Values["Year"].ToString();
-        private string ReturnUrl => Url.Action("ManageOrganisation", "Submission", new { organisationIdentifier = OrganisationIdentifier });
-        private string CancelUrl => Url.Action("Cancel", new { organisationIdentifier = OrganisationIdentifier, year = ReportingDeadlineYear });
+        #region Url Methods
+        public string GetOrganisationIdentifier() => RouteData.Values["OrganisationIdentifier"].ToString();
 
-        private object GetOrgAndYearRouteData() => new { OrganisationIdentifier, year = ReportingDeadlineYear };
+        public string GetReportingDeadlineYear() => RouteData.Values["Year"].ToString();
 
-        private JsonSerializerSettings _jsonSettings => new JsonSerializerSettings
+        private object GetOrgAndYearRouteData() => new { OrganisationIdentifier = GetOrganisationIdentifier(), year = GetReportingDeadlineYear() };
+
+        private string GetReturnUrl() => Url.Action("ManageOrganisation", "Submission", new { organisationIdentifier = GetOrganisationIdentifier() });
+
+        private string GetCancelUrl() => Url.Action(nameof(Cancel), new { organisationIdentifier = GetOrganisationIdentifier(), year = GetReportingDeadlineYear() });
+
+        private string GetYourStatementUrl() => Url.Action(nameof(YourStatement), GetOrgAndYearRouteData());
+
+        private string GetComplianceUrl() => Url.Action(nameof(Compliance), GetOrgAndYearRouteData());
+
+        private string GetYourOrganisationUrl() => Url.Action(nameof(YourOrganisation), GetOrgAndYearRouteData());
+
+        private string GetPoliciesUrl() => Url.Action(nameof(Policies), GetOrgAndYearRouteData());
+
+        private string GetRisksUrl() => Url.Action(nameof(SupplyChainRisks), GetOrgAndYearRouteData());
+
+        private string GetDueDiligenceUrl() => Url.Action(nameof(DueDiligence), GetOrgAndYearRouteData());
+
+        private string GetTrainingUrl() => Url.Action(nameof(Training), GetOrgAndYearRouteData());
+
+        private string GetProgressUrl() => Url.Action(nameof(MonitoringProgress), GetOrgAndYearRouteData());
+
+
+        private string GetReviewUrl() => Url.Action(nameof(ReviewAndEdit), new { organisationIdentifier = GetOrganisationIdentifier(), year = GetReportingDeadlineYear() });
+
+        /// <summary>
+        /// Uses the type of cancelling viewmodel stored in sessionm to determine url to the page that is currently cancelling 
+        /// </summary>
+        /// <returns>the url to the page that is currently cancelling </returns>
+        private string GetBackUrlFromCancellingViewModel()
         {
-            TypeNameHandling = TypeNameHandling.Objects
-        };
+            //Get view model that is cancelling
+            var pageViewModel = UnstashCancellingViewModel();
 
-        public void StashCancellingViewModel<T>(T model)
+            //Return the page for the cancelling view model
+            switch (pageViewModel)
+            {
+                case YourStatementPageViewModel vm:
+                    return GetYourStatementUrl();
+                case CompliancePageViewModel vm:
+                    return GetComplianceUrl();
+                case YourOrganisationPageViewModel vm:
+                    return GetYourOrganisationUrl();
+                case PoliciesPageViewModel vm:
+                    return GetPoliciesUrl();
+                case SupplyChainRisksPageViewModel vm:
+                    return GetRisksUrl();
+                case DueDiligencePageViewModel vm:
+                    return GetDueDiligenceUrl();
+                case TrainingPageViewModel vm:
+                    return GetTrainingUrl();
+                case MonitoringProgressPageViewModel vm:
+                    return GetProgressUrl();
+            }
+
+            //Default to the review and edit page
+            return GetReviewUrl();
+        }
+
+        /// <summary>
+        /// Sets the Back, Cancel and continue url
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="viewModel"></param>
+        private void SetNavigationUrl<TViewModel>(TViewModel viewModel)
+        {
+            switch (viewModel)
+            {
+                case YourStatementPageViewModel vm:
+                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetReturnUrl();
+                    vm.CancelUrl = GetCancelUrl();
+                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetComplianceUrl();
+                    break;
+                case CompliancePageViewModel vm:
+                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetYourStatementUrl();
+                    vm.CancelUrl = GetCancelUrl();
+                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetYourOrganisationUrl();
+                    break;
+                case YourOrganisationPageViewModel vm:
+                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetComplianceUrl();
+                    vm.CancelUrl = GetCancelUrl();
+                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetPoliciesUrl();
+                    break;
+                case PoliciesPageViewModel vm:
+                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetYourOrganisationUrl();
+                    vm.CancelUrl = GetCancelUrl();
+                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetRisksUrl();
+                    break;
+                case SupplyChainRisksPageViewModel vm:
+                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetPoliciesUrl();
+                    vm.CancelUrl = GetCancelUrl();
+                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetDueDiligenceUrl();
+                    break;
+                case DueDiligencePageViewModel vm:
+                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetRisksUrl();
+                    vm.CancelUrl = GetCancelUrl();
+                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetTrainingUrl();
+                    break;
+                case TrainingPageViewModel vm:
+                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetDueDiligenceUrl();
+                    vm.CancelUrl = GetCancelUrl();
+                    vm.ContinueUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetProgressUrl();
+                    break;
+                case MonitoringProgressPageViewModel vm:
+                    vm.BackUrl = vm.CanRevertToOriginal ? GetReviewUrl() : GetTrainingUrl();
+                    vm.CancelUrl = GetCancelUrl();
+                    vm.ContinueUrl = GetReviewUrl();
+                    break;
+                case ReviewAndEditPageViewModel vm:
+                    vm.BackUrl = vm.CanRevertToOriginal ? null : GetProgressUrl();
+                    vm.CancelUrl = GetCancelUrl();
+                    vm.ContinueUrl = GetReturnUrl();
+                    vm.YourStatementUrl = GetYourStatementUrl();
+                    vm.ComplianceUrl = GetComplianceUrl();
+                    vm.OrganisationUrl = GetYourOrganisationUrl();
+                    vm.PoliciesUrl = GetPoliciesUrl();
+                    vm.RisksUrl = GetRisksUrl();
+                    vm.DueDiligenceUrl = GetDueDiligenceUrl();
+                    vm.TrainingUrl = GetTrainingUrl();
+                    vm.ProgressUrl = GetProgressUrl();
+                    break;
+                case CancelPageViewModel vm:
+                    var referrer = HttpContext.GetUrlReferrer()?.ToString();
+                    vm.CancelUrl = vm.BackUrl = string.IsNullOrWhiteSpace(referrer) ? GetBackUrlFromCancellingViewModel() : referrer;
+                    vm.ContinueUrl = GetReturnUrl();
+                    break;
+                case SubmissionCompleteViewModel vm:
+                    vm.ContinueUrl = GetReturnUrl();
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
+        #region Session Stack Methods
+        private void StashCancellingViewModel<T>(T model)
         {
             if (model == null)
                 Session.Remove(this + ":CancellingViewModel");
             else
-                Session[this + ":CancellingViewModel"] = JsonConvert.SerializeObject(model, _jsonSettings);
+                Session[this + ":CancellingViewModel"] = JsonConvert.SerializeObject(model, SubmissionPresenter.JsonSettings);
         }
 
-        public T UnstashCancellingViewModel<T>(bool delete = false) where T : class
+        private T UnstashCancellingViewModel<T>(bool delete = false) where T : class
         {
             var json = Session[this + ":CancellingViewModel"].ToStringOrNull();
-            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json, _jsonSettings);
+            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json, SubmissionPresenter.JsonSettings);
             if (delete) Session.Remove(this + ":CancellingViewModel");
 
             return result;
         }
 
-        public object UnstashCancellingViewModel(bool delete = false)
+        private object UnstashCancellingViewModel(bool delete = false)
         {
             var json = Session[this + ":CancellingViewModel"].ToStringOrNull();
-            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject(json, _jsonSettings);
+            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject(json, SubmissionPresenter.JsonSettings);
             if (delete) Session.Remove(this + ":CancellingViewModel");
             return result;
         }
+        #endregion
 
+        #region Page Handling Methods
         /// <summary>
         /// Returns an ActionResult to handle any StatementErrors
         /// </summary>
@@ -121,117 +251,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     throw new NotImplementedException($"{nameof(StatementErrors)} type '{error.Error}' is not recognised");
             }
         }
-
-        /// <summary>
-        /// Sets the Back, Cancel and continue url
-        /// </summary>
-        /// <typeparam name="TViewModel"></typeparam>
-        /// <param name="viewModel"></param>
-        private void SetNavigationUrl<TViewModel>(TViewModel viewModel)
-        {
-            switch (viewModel)
-            {
-                case YourStatementPageViewModel vm:
-                    vm.BackUrl = ReturnUrl;
-                    vm.CancelUrl = CancelUrl;
-                    vm.ContinueUrl = Url.Action(nameof(this.Compliance), GetOrgAndYearRouteData());
-                    break;
-                case CompliancePageViewModel vm:
-                    vm.BackUrl = Url.Action(nameof(this.YourStatement), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
-                    vm.ContinueUrl = Url.Action(nameof(this.YourOrganisation), GetOrgAndYearRouteData());
-                    break;
-                case OrganisationPageViewModel vm:
-                    vm.BackUrl = Url.Action(nameof(this.Compliance), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
-                    vm.ContinueUrl = Url.Action(nameof(this.Policies), GetOrgAndYearRouteData());
-                    break;
-                case PoliciesPageViewModel vm:
-                    vm.BackUrl = Url.Action(nameof(this.YourOrganisation), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
-                    vm.ContinueUrl = Url.Action(nameof(this.SupplyChainRisks), GetOrgAndYearRouteData());
-                    break;
-                case RisksPageViewModel vm:
-                    vm.BackUrl = Url.Action(nameof(this.Policies), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
-                    vm.ContinueUrl = Url.Action(nameof(this.DueDiligence), GetOrgAndYearRouteData());
-                    break;
-                case DueDiligencePageViewModel vm:
-                    vm.BackUrl = Url.Action(nameof(this.SupplyChainRisks), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
-                    vm.ContinueUrl = Url.Action(nameof(this.Training), GetOrgAndYearRouteData());
-                    break;
-                case TrainingPageViewModel vm:
-                    vm.BackUrl = Url.Action(nameof(this.DueDiligence), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
-                    vm.ContinueUrl = Url.Action(nameof(this.MonitoringProgress), GetOrgAndYearRouteData());
-                    break;
-                case ProgressPageViewModel vm:
-                    vm.BackUrl = Url.Action(nameof(this.Training), GetOrgAndYearRouteData());
-                    vm.CancelUrl = CancelUrl;
-                    vm.ContinueUrl = Url.Action(nameof(this.ReviewAndEdit), GetOrgAndYearRouteData());
-                    break;
-                case ReviewPageViewModel vm:
-                    var routeData = GetOrgAndYearRouteData();
-                    vm.BackUrl = Url.Action(nameof(this.MonitoringProgress), routeData);
-                    vm.CancelUrl = CancelUrl;
-                    vm.ContinueUrl = ReturnUrl;
-                    vm.YourStatementUrl = Url.Action(nameof(this.YourStatement), routeData);
-                    vm.ComplianceUrl = Url.Action(nameof(this.Compliance), routeData);
-                    vm.OrganisationUrl = Url.Action(nameof(this.YourOrganisation), routeData);
-                    vm.PoliciesUrl = Url.Action(nameof(this.Policies), routeData);
-                    vm.RisksUrl = Url.Action(nameof(this.SupplyChainRisks), routeData);
-                    vm.DueDiligenceUrl = Url.Action(nameof(this.DueDiligence), routeData);
-                    vm.TrainingUrl = Url.Action(nameof(this.Training), routeData);
-                    vm.ProgressUrl = Url.Action(nameof(this.MonitoringProgress), routeData);
-                    break;
-                case CancelPageViewModel vm:
-                    var referrer = HttpContext.GetUrlReferrer()?.ToString();
-                    vm.CancelUrl = vm.BackUrl = string.IsNullOrWhiteSpace(referrer) ? GetBackUrlFromCancellingViewModel() : referrer;
-                    vm.ContinueUrl = ReturnUrl;
-                    break;
-                case SubmissionCompleteViewModel vm:
-                    vm.ContinueUrl = ReturnUrl;
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// Uses the type of cancelling viewmodel stored in sessionm to determine url to the page that is currently cancelling 
-        /// </summary>
-        /// <returns>the url to the page that is currently cancelling </returns>
-        private string GetBackUrlFromCancellingViewModel()
-        {
-            //Get view model that is cancelling
-            var pageViewModel = UnstashCancellingViewModel();
-
-            //Return the page for the cancelling view model
-            switch (pageViewModel)
-            {
-                case YourStatementPageViewModel vm:
-                    return Url.Action(nameof(YourStatement), GetOrgAndYearRouteData());
-                case CompliancePageViewModel vm:
-                    return Url.Action(nameof(Compliance), GetOrgAndYearRouteData());
-                case OrganisationPageViewModel vm:
-                    return Url.Action(nameof(YourOrganisation), GetOrgAndYearRouteData());
-                case PoliciesPageViewModel vm:
-                    return Url.Action(nameof(Policies), GetOrgAndYearRouteData());
-                case RisksPageViewModel vm:
-                    return Url.Action(nameof(SupplyChainRisks), GetOrgAndYearRouteData());
-                case DueDiligencePageViewModel vm:
-                    return Url.Action(nameof(DueDiligence), GetOrgAndYearRouteData());
-                case TrainingPageViewModel vm:
-                    return Url.Action(nameof(Training), GetOrgAndYearRouteData());
-                case ProgressPageViewModel vm:
-                    return Url.Action(nameof(MonitoringProgress), GetOrgAndYearRouteData());
-            }
-
-            //Default to the review and edit page
-            return Url.Action(nameof(ReviewAndEdit), GetOrgAndYearRouteData());
-        }
-
+        
         private async Task<IActionResult> GetAsync<TViewModel>(string organisationIdentifier, int year) where TViewModel : BaseViewModel
         {
             //Try and get the viewmodel from session
@@ -271,7 +291,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     return Redirect(viewModel.CancelUrl);
                 case BaseViewModel.CommandType.Continue:
                     //Validate the submitted ViewModel data
-                    if (!ModelState.IsValid) return View(viewModel);
+                    if (!ModelState.IsValid)
+                    {
+                        this.CleanModelErrors<TViewModel>();
+                        return View(viewModel);
+                    }
 
                     //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
                     var viewModelResult = await SubmissionPresenter.SaveViewModelAsync(viewModel, organisationIdentifier, year, VirtualUser.UserId);
@@ -296,7 +320,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             //Show the correct view
-            return View("BeforeYouStart", Url.Action("YourStatement", new { OrganisationIdentifier = organisationIdentifier, Year = year }));
+            return View("BeforeYouStart",GetYourStatementUrl());
         }
         #endregion
 
@@ -341,13 +365,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/your-organisation")]
         public async Task<IActionResult> YourOrganisation(string organisationIdentifier, int year)
         {
-            return await GetAsync<OrganisationPageViewModel>(organisationIdentifier, year);
+            return await GetAsync<YourOrganisationPageViewModel>(organisationIdentifier, year);
         }
 
         [HttpPost("{organisationIdentifier}/{year}/your-organisation")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> YourOrganisation(OrganisationPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> YourOrganisation(YourOrganisationPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -376,13 +400,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/supply-chain-risks")]
         public async Task<IActionResult> SupplyChainRisks(string organisationIdentifier, int year)
         {
-            return await GetAsync<RisksPageViewModel>(organisationIdentifier, year);
+            return await GetAsync<SupplyChainRisksPageViewModel>(organisationIdentifier, year);
         }
 
         [HttpPost("{organisationIdentifier}/{year}/supply-chain-risks")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SupplyChainRisks(RisksPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> SupplyChainRisks(SupplyChainRisksPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -427,13 +451,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/monitoring-progress")]
         public async Task<IActionResult> MonitoringProgress(string organisationIdentifier, int year)
         {
-            return await GetAsync<ProgressPageViewModel>(organisationIdentifier, year);
+            return await GetAsync<MonitoringProgressPageViewModel>(organisationIdentifier, year);
         }
 
         [HttpPost("{organisationIdentifier}/{year}/monitoring-progress")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MonitoringProgress(ProgressPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> MonitoringProgress(MonitoringProgressPageViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -467,10 +491,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> ReviewAndEditPost(string organisationIdentifier, int year, BaseViewModel.CommandType command)
         {
             //Create the view model
-            var viewModel = new ReviewPageViewModel();
-
-            //set the navigation urls
-            SetNavigationUrl(viewModel);
+            var viewModel = new ReviewAndEditPageViewModel();
 
             switch (command)
             {
@@ -483,6 +504,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                     //Create the view model
                     viewModel = await CreateReviewPageViewModelAsync(openResult.Result);
+
+                    //set the navigation urls
+                    SetNavigationUrl(viewModel);
 
                     //Validate the view model
                     TryValidateModel(viewModel);
@@ -499,17 +523,27 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     //Redirect to the continue url
                     return Redirect(viewModel.ContinueUrl);
                 case BaseViewModel.CommandType.DiscardAndExit:
+                    //set the navigation urls
+                    SetNavigationUrl(viewModel);
+
                     //Close the draft and release the user lock
                     var cancelResult = await SubmissionPresenter.CancelDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+
                     //Handle any StatementErrors
                     if (cancelResult.Fail) return HandleStatementErrors(cancelResult.Errors);
+
                     //Redirect to the continue url
                     return Redirect(viewModel.ContinueUrl);
                 case BaseViewModel.CommandType.SaveAndExit:
+                    //set the navigation urls
+                    SetNavigationUrl(viewModel);
+
                     //Close the draft and release the user lock
                     var closeResult = await SubmissionPresenter.CloseDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+
                     //Handle any StatementErrors
                     if (closeResult.Fail) return HandleStatementErrors(closeResult.Errors);
+
                     //Redirect to the continue url
                     return Redirect(viewModel.ContinueUrl);
                 default:
@@ -517,19 +551,19 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
         }
 
-        private async Task<ReviewPageViewModel> CreateReviewPageViewModelAsync(StatementModel statementModel)
+        private async Task<ReviewAndEditPageViewModel> CreateReviewPageViewModelAsync(StatementModel statementModel)
         {
             //Create the view model
-            var viewModel = SubmissionPresenter.GetViewModelFromStatementModel<ReviewPageViewModel>(statementModel);
+            var viewModel = SubmissionPresenter.GetViewModelFromStatementModel<ReviewAndEditPageViewModel>(statementModel);
 
             viewModel.YourStatement = SubmissionPresenter.GetViewModelFromStatementModel<YourStatementPageViewModel>(statementModel);
             viewModel.Compliance = SubmissionPresenter.GetViewModelFromStatementModel<CompliancePageViewModel>(statementModel);
-            viewModel.Organisation = SubmissionPresenter.GetViewModelFromStatementModel<OrganisationPageViewModel>(statementModel);
+            viewModel.Organisation = SubmissionPresenter.GetViewModelFromStatementModel<YourOrganisationPageViewModel>(statementModel);
             viewModel.Policies = SubmissionPresenter.GetViewModelFromStatementModel<PoliciesPageViewModel>(statementModel);
-            viewModel.Risks = SubmissionPresenter.GetViewModelFromStatementModel<RisksPageViewModel>(statementModel);
+            viewModel.Risks = SubmissionPresenter.GetViewModelFromStatementModel<SupplyChainRisksPageViewModel>(statementModel);
             viewModel.DueDiligence = SubmissionPresenter.GetViewModelFromStatementModel<DueDiligencePageViewModel>(statementModel);
             viewModel.Training = SubmissionPresenter.GetViewModelFromStatementModel<TrainingPageViewModel>(statementModel);
-            viewModel.Progress = SubmissionPresenter.GetViewModelFromStatementModel<ProgressPageViewModel>(statementModel);
+            viewModel.Progress = SubmissionPresenter.GetViewModelFromStatementModel<MonitoringProgressPageViewModel>(statementModel);
             viewModel.Modifications=await SubmissionPresenter.GetDraftModifications(statementModel);
 
             //Otherwise return the view using the populated ViewModel
@@ -636,13 +670,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                         case CompliancePageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
-                        case OrganisationPageViewModel vm:
+                        case YourOrganisationPageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
                         case PoliciesPageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
-                        case RisksPageViewModel vm:
+                        case SupplyChainRisksPageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
                         case DueDiligencePageViewModel vm:
@@ -651,7 +685,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                         case TrainingPageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
-                        case ProgressPageViewModel vm:
+                        case MonitoringProgressPageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
                     }

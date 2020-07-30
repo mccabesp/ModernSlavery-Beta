@@ -12,7 +12,8 @@
         {
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-                       
+            @Html.HiddenFor(m => m.CanRevertToOriginal);
+
             <h1 class="govuk-heading-l">
                 <span class="govuk-caption-l">@Model.SubTitle</span>
                 @Model.PageTitle
@@ -38,7 +39,7 @@
                         <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
                             <div class="govuk-form-group">
                                 <fieldset class="govuk-fieldset">
-                                    <div class="govuk-checkboxes">
+                                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                         @foreach (var childType in Model.DiligenceTypes.Where(t => t.ParentId == parentType.Id))
                                         {
                                             <div class="govuk-checkboxes__item">
@@ -47,14 +48,22 @@
                                                     @childType.Description
                                                 </label>
                                             </div>
-                                            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-conditional" style="display:@(parentType.Description.Contains("Other") ? "block" : "none")">
-                                                <div class="govuk-form-group">
-                                                    <label class="govuk-label" for="@($"DiligenceDetails{childType.Id}")">
-                                                        Please specify other @parentType.Description
-                                                    </label>
-                                                    <input name="DueDiligences[@diligenceIndex].Details" id="@($"DiligenceDetails{childType.Id}")" class="govuk-input govuk-!-width-one-third" type="text">
+                                            @if (childType.Description.Contains("other type of social audit"))
+                                            {
+                                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass($"DueDiligences[{diligenceIndex}].Details", "govuk-form-group--error")" id="conditional-conditional">
+                                                    <div class="govuk-form-group">
+                                                        <label class="govuk-label" for="@($"DiligenceDetails{childType.Id}")">
+                                                            Please specify other @parentType.Description
+                                                        </label>
+                                                        <input name="DueDiligences[@diligenceIndex].Details" id="@($"DiligenceDetails{childType.Id}")" value="@(Model.DueDiligences.FirstOrDefault(r => r.Id == childType.Id)?.Details)" class="govuk-input govuk-!-width-one-third" type="text">
+                                                        @Html.ValidationMessage($"DueDiligences[{diligenceIndex}].Details", null, new { @class = "govuk-error-message" })
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            }
+                                            else
+                                            {
+                                                <input name="DueDiligences[@diligenceIndex].Details" type="hidden">
+                                            }
                                             { diligenceIndex++; }
                                         }
                                     </div>
@@ -79,12 +88,13 @@
                                 Yes
                             </label>
                         </div>
-                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-forced-labour-conditional">
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden @Html.SetErrorClass(model => model.ForcedLabourDetails, "govuk-form-group--error")" id="conditional-has-forced-labour-conditional">
                             <div class="govuk-form-group">
                                 <label class="govuk-label" asp-for="ForcedLabourDetails">
                                     Please provide detail
                                 </label>
                                 <textarea asp-for="ForcedLabourDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" type="text"></textarea>
+                                <span asp-validation-for="ForcedLabourDetails" class="govuk-error-message"></span>
                             </div>
                         </div>
                         <div class="govuk-radios__item">
@@ -111,19 +121,20 @@
                                 Yes
                             </label>
                         </div>
-                        <div class="govuk-radios__item">
+                        <div class="govuk-radios__item ">
                             <input name="HasSlaveryInstance" value="false" id="HasSlaveryInstance_false" checked="@(Model.HasSlaveryInstance==false)" class="govuk-radios__input" type="radio">
                             <label class="govuk-label govuk-radios__label" for="HasSlaveryInstance_false">
                                 No
                             </label>
                         </div>
 
-                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-slavery-instance-conditional">
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden @Html.SetErrorClass(model => model.SlaveryInstanceDetails, "govuk-form-group--error")" id="conditional-has-slavery-instance-conditional">
                             <div class="govuk-form-group">
                                 <label class="govuk-label" asp-for="SlaveryInstanceDetails">
                                     Please provide details
                                 </label>
                                 <textarea asp-for="SlaveryInstanceDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" type="text"></textarea>
+                                <span asp-validation-for="SlaveryInstanceDetails" class="govuk-error-message"></span>
                             </div>
 
                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -131,17 +142,20 @@
                                     Did your organisation take any remediation actions in response?
                                 </h2>
                             </legend>
-                            <div class="govuk-radios__item">
-                                <input name="HasRemediation" id="HasRemediation_True" value="true" checked="@(Model.HasRemediation==true)" class="govuk-radios__input" type="radio" data-aria-controls="conditional-has-remediation-conditional">
-                                <label class="govuk-label govuk-radios__label" for="HasRemediation_True">
-                                    Yes
-                                </label>
-                            </div>
-                            <div class="govuk-radios__item">
-                                <input name="HasRemediation" id="HasRemediation_False" value="false" checked="@(Model.HasRemediation==false)" class="govuk-radios__input" type="radio">
-                                <label class="govuk-label govuk-radios__label" false="HasRemediation_False">
-                                    No
-                                </label>
+                            <div class="@Html.SetErrorClass(model => model.HasRemediation, "govuk-form-group--error")">
+                                <span asp-validation-for="HasRemediation" class="govuk-error-message"></span>
+                                <div class="govuk-radios__item">
+                                    <input name="HasRemediation" id="HasRemediation_True" value="true" checked="@(Model.HasRemediation==true)" class="govuk-radios__input" type="radio" data-aria-controls="conditional-has-remediation-conditional">
+                                    <label class="govuk-label govuk-radios__label" for="HasRemediation_True">
+                                        Yes
+                                    </label>
+                                </div>
+                                <div class="govuk-radios__item">
+                                    <input name="HasRemediation" id="HasRemediation_False" value="false" checked="@(Model.HasRemediation==false)" class="govuk-radios__input" type="radio">
+                                    <label class="govuk-label govuk-radios__label" false="HasRemediation_False">
+                                        No
+                                    </label>
+                                </div>
                             </div>
 
                             <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-remediation-conditional">
@@ -152,7 +166,8 @@
                                                 What remediation action did your organisation take in response?
                                             </h2>
                                         </legend>
-                                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                                        <div class="govuk-checkboxes @Html.SetErrorClass(model => model.SelectedRemediationTypes, "govuk-form-group--error")" data-module="govuk-checkboxes">
+                                            <span asp-validation-for="SelectedRemediationTypes" class="govuk-error-message"></span>
                                             @foreach (var remediationType in Model.RemediationTypes)
                                             {
                                                 <div class="govuk-checkboxes__item">
@@ -163,12 +178,13 @@
                                                 </div>
                                                 @if (remediationType.Equals("other"))
                                                 {
-                                                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="remediation-conditional@(remediationIndex)">
+                                                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherRemediation, "govuk-form-group--error")" id="remediation-conditional@(remediationIndex)">
                                                         <div class="govuk-form-group">
                                                             <label class="govuk-label" for="other">
                                                                 Please specify
                                                             </label>
                                                             <input asp-for="OtherRemediation" class="govuk-input govuk-!-width-one-third">
+                                                            <span asp-validation-for="OtherRemediation" class="govuk-error-message"></span>
                                                         </div>
                                                     </div>
                                                 }

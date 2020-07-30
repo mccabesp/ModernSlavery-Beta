@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using System;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -53,23 +53,27 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            var validationResults = new List<ValidationResult>();
+
             if (IncludesStructure == false && string.IsNullOrWhiteSpace(StructureDetails))
-                yield return new ValidationResult("Please provide details", new[] { nameof(StructureDetails) });
+                validationResults.AddValidationError(3200, nameof(StructureDetails));
 
             if (IncludesPolicies == false && string.IsNullOrWhiteSpace(PolicyDetails))
-                yield return new ValidationResult("Please provide details", new[] { nameof(PolicyDetails) });
+                validationResults.AddValidationError(3200, nameof(PolicyDetails));
 
             if (IncludesRisks == false && string.IsNullOrWhiteSpace(RisksDetails))
-                yield return new ValidationResult("Please provide details", new[] { nameof(RisksDetails) });
+                validationResults.AddValidationError(3200, nameof(RisksDetails));
 
             if (IncludesDueDiligence == false && string.IsNullOrWhiteSpace(DueDiligenceDetails))
-                yield return new ValidationResult("Please provide details", new[] { nameof(DueDiligenceDetails) });
+                validationResults.AddValidationError(3200, nameof(DueDiligenceDetails));
 
             if (IncludesTraining == false && string.IsNullOrWhiteSpace(TrainingDetails))
-                yield return new ValidationResult("Please provide details", new[] { nameof(TrainingDetails) });
+                validationResults.AddValidationError(3200, nameof(TrainingDetails));
 
             if (IncludesGoals == false && string.IsNullOrWhiteSpace(GoalsDetails))
-                yield return new ValidationResult("Please provide details", new[] { nameof(GoalsDetails) });
+                validationResults.AddValidationError(3200, nameof(GoalsDetails));
+
+            return validationResults;
         }
 
         public override bool IsComplete()

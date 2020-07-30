@@ -20,7 +20,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             Submit = 5
         }
 
-        [BindNever]
+        [BindRequired]
         public bool CanRevertToOriginal { get; set; }
 
         [BindNever]

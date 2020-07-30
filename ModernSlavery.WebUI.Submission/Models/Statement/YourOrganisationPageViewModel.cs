@@ -4,14 +4,10 @@ using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.Submission.Classes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.DependencyInjection;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
-using System;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations.Schema;
-using ModernSlavery.Core.Entities;
-using System.Text.Json.Serialization;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Binding;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -19,9 +15,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public OrganisationPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel,OrganisationPageViewModel>();
+            CreateMap<StatementModel,YourOrganisationPageViewModel>();
 
-            CreateMap<OrganisationPageViewModel, StatementModel>(MemberList.Source)
+            CreateMap<YourOrganisationPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForSourceMember(s => s.SectorTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
@@ -33,16 +29,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class OrganisationPageViewModel : BaseViewModel
+    [DependencyModelBinder]
+    public class YourOrganisationPageViewModel : BaseViewModel
     {
         [IgnoreMap]
-        public SectorTypeIndex SectorTypes { get; set; }
-        public OrganisationPageViewModel(SectorTypeIndex sectorTypes)
+        [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore
+        public SectorTypeIndex SectorTypes { get; }
+        public YourOrganisationPageViewModel(SectorTypeIndex sectorTypes)
         {
             SectorTypes = sectorTypes;
         }
 
-        public OrganisationPageViewModel()
+        public YourOrganisationPageViewModel()
         {
 
         }
@@ -83,13 +81,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            //Get the sector types
-            SectorTypes = validationContext.GetRequiredService<SectorTypeIndex>();
+            var validationResults = new List<ValidationResult>();
 
             var otherId = SectorTypes.Single(x => x.Description.Equals("Other")).Id;
 
             if (Sectors.Contains(otherId) && string.IsNullOrEmpty(OtherSector))
-                yield return new ValidationResult("Please provide other details");
+                validationResults.AddValidationError(3300, nameof(OtherSector));
+
+            return validationResults;
         }
 
         public override bool IsComplete()

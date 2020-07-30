@@ -2,16 +2,21 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model YourStatementPageViewModel
+@if (!string.IsNullOrWhiteSpace(Model.BackUrl))
+{
+    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm())
         {
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
-          
-        <h1 class="govuk-heading-l">
-            @Model.PageTitle
-        </h1>
+            @Html.HiddenFor(m => m.CanRevertToOriginal);
+
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
 
             <h2 class="govuk-heading-m">
                 Provide a link to the modern slavery statement on your organisation's website
@@ -28,11 +33,11 @@
             </details>
             <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementUrl, "govuk-form-group--error")">
                 <label asp-for="StatementUrl" class="govuk-label govuk-label--m "></label>
-                <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
                 <input asp-for="StatementUrl" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
             </div>
-           
-            <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementStartDate, "govuk-form-group--error") @Html.SetErrorClass(model => model.StatementEndDate, "govuk-form-group--error")">
+
+            <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="reporting-start-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                         <h1 class="govuk-heading-m">
@@ -42,10 +47,8 @@
                     <span id="reporting-start-hint" class="govuk-hint">
                         For example, 31 3 1980
                     </span>
-                    <span asp-validation-for="StatementStartDate" class="govuk-error-message"></span>
-                    <span asp-validation-for="StatementEndDate" class="govuk-error-message"></span>
                     <div class="govuk-grid-row">
-                        <div class="govuk-date-input govuk-grid-column-one-half" id="reporting-start">
+                        <div class="govuk-date-input govuk-grid-column-one-half @Html.SetErrorClass(model => model.StatementStartDate, "govuk-form-group--error")" id="reporting-start">
                             <div class="govuk-date-input__item">
                                 <div class="govuk-form-group">
                                     <label class="govuk-label govuk-date-input__label" for="reporting-start-day">
@@ -70,12 +73,12 @@
                                     <input asp-for="StatementStartYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="text" pattern="[0-9]*" inputmode="numeric">
                                 </div>
                             </div>
-
+                            <span asp-validation-for="StatementStartDate" class="govuk-error-message"></span>
                         </div>
 
                         @*<p>to</p>*@
 
-                        <div class="govuk-date-input govuk-grid-column-one-half" id="reporting-end">
+                        <div class="govuk-date-input govuk-grid-column-one-half @Html.SetErrorClass(model => model.StatementEndDate, "govuk-form-group--error")" id="reporting-end">
                             <div class="govuk-date-input__item">
                                 <div class="govuk-form-group">
                                     <label class="govuk-label govuk-date-input__label" for="reporting-end-day">
@@ -100,6 +103,7 @@
                                     <input asp-for="StatementEndYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="text" pattern="[0-9]*" inputmode="numeric">
                                 </div>
                             </div>
+                            <span asp-validation-for="StatementEndDate" class="govuk-error-message"></span>
                         </div>
                     </div>
                 </fieldset>
@@ -114,8 +118,8 @@
 
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverFirstName, "govuk-form-group--error")">
                     <label asp-for="ApproverFirstName" class="govuk-label"></label>
-                    <span asp-validation-for="ApproverFirstName" class="govuk-error-message"></span>
                     <input asp-for="ApproverFirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="ApproverFirstName" class="govuk-error-message"></span>
                 </div>
 
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverLastName, "govuk-form-group--error")">
@@ -141,7 +145,6 @@
                     <span id="statement-approved-hint" class="govuk-hint">
                         For example, 31 3 1980
                     </span>
-                    <span asp-validation-for="ApprovedDate" class="govuk-error-message"></span>
                     <div class="govuk-date-input" id="statement-approved">
                         <div class="govuk-date-input__item">
                             <div class="govuk-form-group">
@@ -168,6 +171,8 @@
                             </div>
                         </div>
                     </div>
+                    <span asp-validation-for="ApprovedDate" class="govuk-error-message"></span>
+
                 </fieldset>
             </div>
 
@@ -175,7 +180,7 @@
                 Continue
             </button>
 
-            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit"  name="command" value="@BaseViewModel.CommandType.Cancel">
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
                 Cancel
             </button>
         }
