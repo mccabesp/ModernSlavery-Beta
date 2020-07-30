@@ -111,9 +111,13 @@
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                         <h2 class="govuk-heading-m">
-                            Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?
+                            For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?
                         </h2>
                     </legend>
+                    <div class="govuk-hint">
+                        Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.
+                    </div>
+
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
                             <input name="HasSlaveryInstance" id="HasSlaveryInstance_True" checked="@(Model.HasSlaveryInstance==true)" value="true" class="govuk-radios__input" type="radio" data-aria-controls="conditional-has-slavery-instance-conditional">
