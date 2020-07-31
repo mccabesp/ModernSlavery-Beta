@@ -45,9 +45,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string PageTitle => "Monitoring progress";
 
         public bool? IncludesMeasuringProgress { get; set; }
-
+        [MaxLength(1024)]
         public string ProgressMeasures { get; set; }
-
+        [MaxLength(1024)]
         public string KeyAchievements { get; set; }
 
         public YearRanges? StatementYears { get; set; }
@@ -61,7 +61,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            return IncludesMeasuringProgress!=null
+            return IncludesMeasuringProgress != null
                 && !string.IsNullOrWhiteSpace(ProgressMeasures)
                 && !string.IsNullOrWhiteSpace(KeyAchievements)
                 && StatementYears != YearRanges.NotProvided;

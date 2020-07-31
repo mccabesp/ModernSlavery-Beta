@@ -14,7 +14,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public PoliciesPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel,PoliciesPageViewModel>();
+            CreateMap<StatementModel, PoliciesPageViewModel>();
 
             CreateMap<PoliciesPageViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
@@ -48,7 +48,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public List<short> Policies { get; set; } = new List<short>();
 
-        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
+        [MaxLength(256)]//We need at least one validation annotation otherwise Validate wont execute
         public string OtherPolicies { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -69,7 +69,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             var other = PolicyTypes.Single(x => x.Description.Equals("Other"));
 
             return Policies.Any()
-                && !Policies.Any(p=>p==other.Id && string.IsNullOrWhiteSpace(OtherPolicies));
+                && !Policies.Any(p => p == other.Id && string.IsNullOrWhiteSpace(OtherPolicies));
         }
     }
 }

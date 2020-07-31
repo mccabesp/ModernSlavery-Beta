@@ -28,27 +28,27 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string PageTitle => "Areas covered by your modern slavery statement";
 
         public bool? IncludesStructure { get; set; }
-
+        [MaxLength(128)]
         public string StructureDetails { get; set; }
 
         public bool? IncludesPolicies { get; set; }
-
+        [MaxLength(128)]
         public string PolicyDetails { get; set; }
 
         public bool? IncludesRisks { get; set; }
-
+        [MaxLength(128)]
         public string RisksDetails { get; set; }
 
         public bool? IncludesDueDiligence { get; set; }
-
+        [MaxLength(128)]
         public string DueDiligenceDetails { get; set; }
 
         public bool? IncludesTraining { get; set; }
-
+        [MaxLength(128)]
         public string TrainingDetails { get; set; }
 
         public bool? IncludesGoals { get; set; }
-
+        [MaxLength(128)]
         public string GoalsDetails { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

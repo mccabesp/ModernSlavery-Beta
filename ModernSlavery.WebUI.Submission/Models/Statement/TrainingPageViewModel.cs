@@ -31,7 +31,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     [DependencyModelBinder]
     public class TrainingPageViewModel : BaseViewModel
     {
-        
+
         [IgnoreMap]
         [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore
         public TrainingTypeIndex TrainingTypes { get; }
@@ -48,7 +48,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public List<short> Training { get; set; } = new List<short>();
 
-        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
+        [MaxLength(256)]//We need at least one validation annotation otherwise Validate wont execute
         public string OtherTraining { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -67,8 +67,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             var other = TrainingTypes.Single(x => x.Description.Equals("Other"));
 
-            return Training.Any() 
-                && !Training.Any(t=>t==other.Id && string.IsNullOrWhiteSpace(OtherTraining));
+            return Training.Any()
+                && !Training.Any(t => t == other.Id && string.IsNullOrWhiteSpace(OtherTraining));
         }
     }
 }
