@@ -53,8 +53,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public override string PageTitle => "Your modern slavery statement";
 
-        [Url(ErrorMessage = "URL is not valid")]
-        [MaxLength(256, ErrorMessage = "The web address (URL) cannot be longer than 256 characters.")]
+        [Url]
+        [MaxLength(256)]
         [Display(Name = "URL")]
         public string StatementUrl { get; set; }
 
