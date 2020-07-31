@@ -51,7 +51,7 @@
                         What were your key achievements in relation to reducing modern slavery during the period covered by this statement?
                     </label>
                 </h1>
-                <textarea asp-for="KeyAchievements" class="govuk-textarea" id="more-detail" rows="5">@Model.KeyAchievements</textarea>
+                <textarea asp-for="KeyAchievements" class="govuk-textarea" id="more-detail" rows="5" maxlength="1024">@Model.KeyAchievements</textarea>
             </div>
 
             <fieldset class="govuk-fieldset govuk-!-margin-top-6" describedby="GovUk_StatementYears-hint">

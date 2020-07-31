@@ -19,9 +19,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, SupplyChainRisksPageViewModel>();
 
             CreateMap<SupplyChainRisksPageViewModel, StatementModel>(MemberList.Source)
-                .ForMember(d => d.RelevantRisks, opt => opt.MapFrom(s=>s.RelevantRisks.Where(r=>r.Id>0)))
-                .ForMember(d => d.HighRisks, opt => opt.MapFrom(s=>s.HighRisks.Where(r=>r.Id>0)))
-                .ForMember(d => d.LocationRisks, opt => opt.MapFrom(s=>s.LocationRisks.Where(r=>r.Id>0)))
+                .ForMember(d => d.RelevantRisks, opt => opt.MapFrom(s => s.RelevantRisks.Where(r => r.Id > 0)))
+                .ForMember(d => d.HighRisks, opt => opt.MapFrom(s => s.HighRisks.Where(r => r.Id > 0)))
+                .ForMember(d => d.LocationRisks, opt => opt.MapFrom(s => s.LocationRisks.Where(r => r.Id > 0)))
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForSourceMember(s => s.RiskTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.RelevantRisks, opt => opt.DoNotValidate())
@@ -56,6 +56,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public class RiskViewModel
         {
             public short Id { get; set; }
+            [MaxLength(256)]
             public string Details { get; set; }
         }
 
@@ -66,12 +67,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public List<RiskViewModel> RelevantRisks { get; set; } = new List<RiskViewModel>();
 
-        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
+        [MaxLength(256)]//We need at least one validation annotation otherwise Validate wont execute
         public string OtherRelevantRisks;
 
         public List<RiskViewModel> HighRisks { get; set; } = new List<RiskViewModel>();
-        
-        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
+
+        [MaxLength(256)]//We need at least one validation annotation otherwise Validate wont execute
         public string OtherHighRisks;
 
         public List<RiskViewModel> LocationRisks { get; set; } = new List<RiskViewModel>();
@@ -101,9 +102,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (othersector != null && string.IsNullOrWhiteSpace(othersector.Details))
                 validationResults.AddValidationError(3500, $"RelevantRisks[{sectorIndex}].Details");
 
-            if (HighRisks.Count(r=>r.Id>0) > 3)validationResults.AddValidationError(3501, nameof(HighRisks));
+            if (HighRisks.Count(r => r.Id > 0) > 3) validationResults.AddValidationError(3501, nameof(HighRisks));
 
-            for (var highRiskIndex=0; highRiskIndex<HighRisks.Count; highRiskIndex++)
+            for (var highRiskIndex = 0; highRiskIndex < HighRisks.Count; highRiskIndex++)
             {
                 if (HighRisks[highRiskIndex].Id > 0 && string.IsNullOrWhiteSpace(HighRisks[highRiskIndex].Details))
                     validationResults.AddValidationError(3500, $"HighRisks[{highRiskIndex}].Details");
@@ -126,7 +127,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return RelevantRisks.Any()
                 && HighRisks.Any()
                 && LocationRisks.Any()
-                && !RelevantRisks.Any(r=>r.Id==vulnerableGroup.Id && string.IsNullOrWhiteSpace(r.Details))
+                && !RelevantRisks.Any(r => r.Id == vulnerableGroup.Id && string.IsNullOrWhiteSpace(r.Details))
                 && !RelevantRisks.Any(r => r.Id == typeOfWork.Id && string.IsNullOrWhiteSpace(r.Details))
                 && !RelevantRisks.Any(r => r.Id == sector.Id && string.IsNullOrWhiteSpace(r.Details))
                 && !HighRisks.Any(r => r.Id == vulnerableGroup.Id && string.IsNullOrWhiteSpace(r.Details))

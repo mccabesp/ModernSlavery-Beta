@@ -57,6 +57,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public class DueDiligenceViewModel
         {
             public short Id { get; set; }
+            [MaxLength(256)]
             public string Details { get; set; }
         }
 
@@ -69,14 +70,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public bool? HasForceLabour { get; set; }
 
-        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
+        [MaxLength(512)]//We need at least one validation annotation otherwise Validate wont execute
         public string ForcedLabourDetails { get; set; }
 
         public bool? HasSlaveryInstance { get; set; }
 
         public bool? HasRemediation { get; set; }
 
-        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
+        [MaxLength(512)]//We need at least one validation annotation otherwise Validate wont execute
         public string SlaveryInstanceDetails { get; set; }
 
         [IgnoreMap]
@@ -94,6 +95,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public List<string> SelectedRemediationTypes { get; set; } = new List<string>();
 
         [IgnoreMap]
+        [MaxLength(512)]
         public string OtherRemediation { get; set; }
 
         public string SlaveryInstanceRemediation
@@ -115,13 +117,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
                 //Set the selected types
                 SelectedRemediationTypes.Clear();
-                for (int i= selectedRemediationTypes.Count-1; i>=0;i--)
+                for (int i = selectedRemediationTypes.Count - 1; i >= 0; i--)
                 {
-                        if (RemediationTypes.ContainsI(selectedRemediationTypes[i]))
-                        {
-                            SelectedRemediationTypes.Add(selectedRemediationTypes[i]);
-                            selectedRemediationTypes.RemoveAt(i);
-                        }
+                    if (RemediationTypes.ContainsI(selectedRemediationTypes[i]))
+                    {
+                        SelectedRemediationTypes.Add(selectedRemediationTypes[i]);
+                        selectedRemediationTypes.RemoveAt(i);
+                    }
                 }
                 OtherRemediation = selectedRemediationTypes.ToDelimitedString(Environment.NewLine);
                 if (!string.IsNullOrWhiteSpace(OtherRemediation)) SelectedRemediationTypes.Add("other");
@@ -134,7 +136,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             var otherId = DiligenceTypes.Single(x => x.Description.EqualsI("other type of social audit")).Id;
             var otherIndex = DiligenceTypes.FindIndex(r => r.Id == otherId);
-            var otherDiligence = DueDiligences.FirstOrDefault(x => x.Id == otherId); 
+            var otherDiligence = DueDiligences.FirstOrDefault(x => x.Id == otherId);
             if (otherDiligence != null && string.IsNullOrWhiteSpace(otherDiligence.Details))
                 validationResults.AddValidationError(3600, $"DueDiligences[{otherIndex}].Details");
 

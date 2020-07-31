@@ -40,7 +40,7 @@
                                         <label class="govuk-label" for="other">
                                             Please provide detail
                                         </label>
-                                        <input asp-for="OtherPolicies" name="OtherPolicies" class="govuk-input govuk-!-width-one-third" id="policies-other" spellcheck="false">
+                                        <textarea asp-for="OtherPolicies" name="OtherPolicies" class="govuk-textarea" id="policies-other" spellcheck="false" rows="5" maxlength="256">@Model.OtherPolicies</textarea>
                                         <span asp-validation-for="OtherPolicies" class="govuk-error-message"></span>
                                     </div>
                                 </div>

@@ -73,7 +73,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public List<short> Sectors { get; set; } = new List<short>();
 
-        [MaxLength(1024)]//We need at least one validation annotation otherwise Validate wont execute
+        [MaxLength(128)]//We need at least one validation annotation otherwise Validate wont execute
         public string OtherSector { get; set; }
 
         [Display(Name = "What was your turnover or budget during the last financial accounting year?")]

@@ -54,7 +54,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string PageTitle => "Your modern slavery statement";
 
         [Url(ErrorMessage = "URL is not valid")]
-        [MaxLength(255, ErrorMessage = "The web address (URL) cannot be longer than 255 characters.")]
+        [MaxLength(256, ErrorMessage = "The web address (URL) cannot be longer than 256 characters.")]
         [Display(Name = "URL")]
         public string StatementUrl { get; set; }
 
@@ -70,36 +70,27 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public DateTime? StatementStartDate => ToDateTime(StatementStartYear, StatementStartMonth, StatementStartDay);
 
-        [RegularExpression("^[0-9]*$")]
         public int? StatementStartDay { get; set; }
-        [RegularExpression("^[0-9]*$")]
         public int? StatementStartMonth { get; set; }
-        [RegularExpression("^[0-9]*$")]
         public int? StatementStartYear { get; set; }
 
         public DateTime? StatementEndDate => ToDateTime(StatementEndYear, StatementEndMonth, StatementEndDay);
 
-        [RegularExpression("^[0-9]*$")]
         public int? StatementEndDay { get; set; }
-        [RegularExpression("^[0-9]*$")]
         public int? StatementEndMonth { get; set; }
-        [RegularExpression("^[0-9]*$")]
         public int? StatementEndYear { get; set; }
 
-        [Display(Name = "Job Title")]
+        [Display(Name = "Job title")]
         public string ApproverJobTitle { get; set; }
-        [Display(Name = "First Name")]
+        [Display(Name = "First name")]
         public string ApproverFirstName { get; set; }
-        [Display(Name = "Last Name")]
+        [Display(Name = "Last name")]
         public string ApproverLastName { get; set; }
 
         public DateTime? ApprovedDate => ToDateTime(ApprovedYear, ApprovedMonth, ApprovedDay);
 
-        [RegularExpression("^[0-9]*$")]
         public int? ApprovedDay { get; set; }
-        [RegularExpression("^[0-9]*$")]
         public int? ApprovedMonth { get; set; }
-        [RegularExpression("^[0-9]*$")]
         public int? ApprovedYear { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -111,16 +102,16 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             var partsEmpty = Text.IsAllNull(StatementStartDay, StatementStartMonth, StatementStartYear);
             if (!partsComplete && !partsEmpty)
             {
-                if (StatementStartDay==null)
+                if (StatementStartDay == null)
                     validationResults.AddValidationError(3101, nameof(StatementStartDay));
 
-                if (StatementStartMonth==null)
+                if (StatementStartMonth == null)
                     validationResults.AddValidationError(3102, nameof(StatementStartMonth));
 
-                if (StatementStartYear==null)
+                if (StatementStartYear == null)
                     validationResults.AddValidationError(3103, nameof(StatementStartYear));
             }
-            if (partsComplete && StatementStartDate==null)
+            if (partsComplete && StatementStartDate == null)
                 validationResults.AddValidationError(3104, nameof(StatementStartDate));
 
             //Validate the end date parts
@@ -137,7 +128,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 if (StatementEndYear == null)
                     validationResults.AddValidationError(3107, nameof(StatementEndYear));
             }
-            if (partsComplete && StatementEndDate==null)
+            if (partsComplete && StatementEndDate == null)
                 validationResults.AddValidationError(3108, nameof(StatementEndDate));
 
             //Validate the approved date parts
@@ -154,17 +145,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 if (ApprovedYear == null)
                     validationResults.AddValidationError(3111, nameof(ApprovedYear));
             }
-            if (partsComplete && ApprovedDate==null)
+            if (partsComplete && ApprovedDate == null)
                 validationResults.AddValidationError(3112, nameof(ApprovedDate));
 
             //Validate the approver parts
-            partsComplete = !Text.IsAnyNullOrWhiteSpace(ApproverFirstName,ApproverLastName,ApproverJobTitle);
-            partsEmpty = Text.IsAllNullOrWhiteSpace(ApproverFirstName,ApproverLastName,ApproverJobTitle);
+            partsComplete = !Text.IsAnyNullOrWhiteSpace(ApproverFirstName, ApproverLastName, ApproverJobTitle);
+            partsEmpty = Text.IsAllNullOrWhiteSpace(ApproverFirstName, ApproverLastName, ApproverJobTitle);
 
             if (!partsComplete && !partsEmpty)
             {
                 if (string.IsNullOrWhiteSpace(ApproverFirstName))
-                    validationResults.AddValidationError(3113,nameof(ApproverFirstName));
+                    validationResults.AddValidationError(3113, nameof(ApproverFirstName));
 
                 if (string.IsNullOrWhiteSpace(ApproverLastName))
                     validationResults.AddValidationError(3114, nameof(ApproverLastName));
