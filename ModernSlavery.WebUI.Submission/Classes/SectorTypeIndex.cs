@@ -10,8 +10,13 @@ namespace ModernSlavery.WebUI.Submission.Classes
     {
         public SectorTypeIndex(IDataRepository dataRepository):base()
         {
-            var types = dataRepository.GetAll<StatementSectorType>().Select(t => new SectorType { Id=t.StatementSectorTypeId, Description = t.Description });
-            this.AddRange(types);
+            var types = dataRepository.GetAll<StatementSectorType>()
+                .OrderBy(t => t.Description)
+                .Select(t => new SectorType { Id = t.StatementSectorTypeId, Description = t.Description })
+                .AsEnumerable();
+            var other = types.Single(t => t.Description == "Other");
+            this.AddRange(types.Where(t => t.Id != other.Id));
+            this.Add(other);
         }
         public SectorTypeIndex() { }
 

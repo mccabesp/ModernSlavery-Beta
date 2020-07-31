@@ -26,7 +26,7 @@
                         Select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var sectorType in Model.SectorTypes.OrderBy(x => x.Description))
+                        @foreach (var sectorType in Model.SectorTypes)
                         {
                             <div class="govuk-checkboxes__item">
                                 <input name="Sectors" value="@sectorType.Id" id="@($"sector{sectorType.Id}")" checked=@(Model.Sectors.Contains(sectorType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="organisation-conditional-@(sectorType.Id)">
