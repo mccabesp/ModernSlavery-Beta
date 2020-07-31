@@ -140,7 +140,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<ResetViewModel>();
+                this.SetModelCustomErrors<ResetViewModel>();
                 return View("PasswordReset", model);
             }
 
@@ -151,7 +151,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             //Validate the submitted fields
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<ResetViewModel>();
+                this.SetModelCustomErrors<ResetViewModel>();
                 return View("PasswordReset", model);
             }
 
@@ -178,7 +178,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             if (!await ResendPasswordResetAsync(user))
             {
                 AddModelError(1122);
-                this.CleanModelErrors<ResetViewModel>();
+                this.SetModelCustomErrors<ResetViewModel>();
                 return View("PasswordReset", model);
             }
 
@@ -296,7 +296,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             //Validate the submitted fields
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<ResetViewModel>();
+                this.SetModelCustomErrors<ResetViewModel>();
                 return View("NewPassword", model);
             }
 

@@ -14,6 +14,7 @@
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ReturnToReviewPage);
+            @Html.HiddenFor(m => m.Submitted);
 
             <h1 class="govuk-heading-l">
                 <span class="govuk-caption-l">@Model.SubTitle</span>
@@ -150,7 +151,7 @@
                 @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "Location" && t.ParentId == null))
                 {
 
-                    <div class="govuk-accordion__section accordion-with-counts">
+                    <div class="govuk-accordion__section accordion-with-counts govuk-accordion__section--expanded">
                         <div class="govuk-accordion__section-header">
                             <h2 class="govuk-accordion__section-heading">
                                 <span class="govuk-accordion__section-button" id="accordion-location-risks-heading-@parentType.Id">
@@ -159,9 +160,19 @@
                             </h2>
                         </div>
                         <div id="accordion-location-risks-content-@parentType.Id" class="govuk-accordion__section-content" aria-labelledby="accordion-location-risks-heading-@parentType.Id">
-                            <div class="govuk-form-group">
+                            <div class="govuk-form-group @Html.SetErrorClass($"LocationRisks[{locationIndex}].Id", "govuk-form-group--error")">
                                 <fieldset class="govuk-fieldset">
+                                    @Html.ValidationMessage($"LocationRisks[{locationIndex}].Id", null, new { @class = "govuk-error-message" })
                                     <div class="govuk-checkboxes">
+                                        <div class="govuk-checkboxes__item">
+                                            <input name="LocationRisks[@locationIndex].Details" type="hidden">
+                                            <input name="LocationRisks[@locationIndex].Id" value="@parentType.Id" id="@($"LocationId{parentType.Id}")" checked=@(Model.LocationRisks.Any(r => r.Id == parentType.Id)) class="govuk-checkboxes__input" type="checkbox">
+                                            <label class="govuk-label govuk-checkboxes__label" for="@($"LocationId{parentType.Id}")">
+                                                All
+                                            </label>
+                                        </div>
+
+                                        @{ locationIndex++; }
                                         @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
                                         {
                                             <div class="govuk-checkboxes__item">

@@ -99,7 +99,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             //Ensure they have entered a PIN
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<CompleteViewModel>();
+                this.SetModelCustomErrors<CompleteViewModel>();
                 return View("ActivateService", model);
             }
 

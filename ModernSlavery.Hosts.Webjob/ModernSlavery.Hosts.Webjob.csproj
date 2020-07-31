@@ -3,7 +3,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <Copyright>Crown Copyright © $([System.DateTime]::UtcNow.Year) ($([System.DateTime]::UtcNow.ToLocalTime()))</Copyright>
-    <ProjectGuid>1DF71C5E-2C26-43ED-80EA-79317303909F</ProjectGuid>
+    <ProjectGuid>{73D4A349-7276-4C72-9C67-A8FD08D7ED82}</ProjectGuid>
     <!-- This is required otherwise refs folder (only needed during runtime compilation) is published required Sdk="Microsoft.NET.Sdk.Web"-->
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
     <!-- Removes all the satellite language folders from theoutput directory-->

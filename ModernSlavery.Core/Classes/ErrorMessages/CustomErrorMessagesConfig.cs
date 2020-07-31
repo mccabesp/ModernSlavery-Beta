@@ -154,7 +154,7 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
 
         public static CustomErrorMessage GetError(int errorCode)
         {
-            return DefaultSection.Messages[errorCode];
+            return DefaultSection.Messages[errorCode] ?? DefaultSection.Messages?.ValidationErrors?.Values.FirstOrDefault(v=>v.Code==errorCode);
         }
 
         public static string GetTitle(int code)

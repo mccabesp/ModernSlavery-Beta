@@ -88,7 +88,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // When ModelState is Not Valid Then Return the EnterCodes View
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<EnterCodesViewModel>();
+                this.SetModelCustomErrors<EnterCodesViewModel>();
                 return View("EnterCodes", model);
             }
 
@@ -99,7 +99,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             {
                 await IncrementRetryCountAsync("lastScopeCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
                 ModelState.AddModelError(3027);
-                this.CleanModelErrors<EnterCodesViewModel>();
+                this.SetModelCustomErrors<EnterCodesViewModel>();
                 return View("EnterCodes", model);
             }
 
@@ -267,7 +267,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // validate the details
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<ScopingViewModel>();
+                this.SetModelCustomErrors<ScopingViewModel>();
                 return View("EnterOutOfScopeAnswers", stateModel);
             }
 
@@ -464,7 +464,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<DeclareScopeModel>();
+                this.SetModelCustomErrors<DeclareScopeModel>();
                 return View("DeclareScope", model);
             }
 

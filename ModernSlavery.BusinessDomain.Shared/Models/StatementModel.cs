@@ -36,6 +36,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.Statuses, opt => opt.Ignore());
 
             CreateMap<Statement, StatementModel>()
+                .ForMember(d => d.Submitted, opt => opt.MapFrom(s => s.StatementId>0))
                 .ForMember(d => d.StatementStartDate, opt => opt.MapFrom(s => s.StatementStartDate == DateTime.MinValue ? (DateTime?)null : s.StatementStartDate))
                 .ForMember(d => d.StatementEndDate, opt => opt.MapFrom(s => s.StatementEndDate == DateTime.MinValue ? (DateTime?)null : s.StatementEndDate))
                 .ForMember(d => d.ApprovedDate, opt => opt.MapFrom(s => s.ApprovedDate == DateTime.MinValue ? (DateTime?)null : s.ApprovedDate))
@@ -120,6 +121,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         }
         #endregion
 
+        public bool Submitted { get; set; }
         public bool ReturnToReviewPage { get; set; }
         public DateTime? DraftBackupDate { get; set; }
 

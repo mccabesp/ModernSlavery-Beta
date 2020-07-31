@@ -5,7 +5,7 @@
     <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <Copyright>Crown Copyright © $([System.DateTime]::UtcNow.Year) ($([System.DateTime]::UtcNow.ToLocalTime()))</Copyright>
-    <ProjectGuid>73D4A349-7276-4C72-9C67-A8FD08D7ED82</ProjectGuid>
+    <ProjectGuid>{1DF71C5E-2C26-43ED-80EA-79317303909F}</ProjectGuid>
     <LangVersion>8.0</LangVersion>
     <!-- This is required otherwise refs folder (only needed during runtime compilation) is published -->
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>

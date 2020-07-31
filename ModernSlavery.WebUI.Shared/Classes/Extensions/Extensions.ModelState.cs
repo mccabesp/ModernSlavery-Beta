@@ -12,9 +12,10 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 {
     public static partial class Extensions
     {
-        public static void CleanModelErrors<TModel>(this Controller controller)
+        public static void SetModelCustomErrors<TModel>(this Controller controller, TModel model=default)
         {
-            var containerType = typeof(TModel);
+            var modelType = typeof(TModel);
+
             //Save the old modelstate
             var oldModelState = new ModelStateDictionary();
             foreach (var modelState in controller.ModelState)
@@ -41,7 +42,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                 //Get the validation attributes
                 var propertyInfo = string.IsNullOrWhiteSpace(propertyName)
                     ? null
-                    : containerType.GetPropertyInfo(propertyName);
+                    : modelType.GetPropertyInfo(propertyName);
                 var attributes = propertyInfo == null
                     ? null
                     : propertyInfo.GetCustomAttributes(typeof(ValidationAttribute), false)
@@ -75,7 +76,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                     if (attribute == null) goto addModelError;
 
                     var validatorKey =
-                        $"{containerType.Name}.{propertyName}:{attribute.GetType().Name.TrimSuffix("Attribute")}";
+                        $"{modelType.Name}.{propertyName}:{attribute.GetType().Name.TrimSuffix("Attribute")}";
                     var customError = CustomErrorMessages.GetValidationError(validatorKey);
                     if (customError == null) goto addModelError;
 
