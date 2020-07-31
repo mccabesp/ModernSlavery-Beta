@@ -162,7 +162,7 @@
                             <div class="govuk-form-group">
                                 <fieldset class="govuk-fieldset">
                                     <div class="govuk-checkboxes">
-                                        @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
+                                        @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id).OrderBy(t => t.Description))
                                         {
                                             <div class="govuk-checkboxes__item">
                                                 <input name="LocationRisks[@locationIndex].Details" type="hidden">
