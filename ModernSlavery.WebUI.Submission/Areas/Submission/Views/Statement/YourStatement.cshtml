@@ -20,19 +20,9 @@
 
             <h2 class="govuk-heading-m">
                 Provide a link to the modern slavery statement on your organisation's website
-            </h2>
-            <details class="govuk-details" data-module="govuk-details">
-                <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">
-                        More information
-                    </span>
-                </summary>
-                <div class="govuk-details__text">
-                    It is a legal requirement that your modern slavery statement is published in a prominent place on your organisation’s website.
-                </div>
-            </details>
+            </h2>           
             <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementUrl, "govuk-form-group--error")">
-                <label asp-for="StatementUrl" class="govuk-label govuk-label--m "></label>
+                <label asp-for="StatementUrl" class="govuk-label"></label>
                 <input asp-for="StatementUrl" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
                 <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
             </div>
