@@ -120,13 +120,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override bool IsComplete()
         {
             return YourStatement.IsComplete() 
-                && Compliance.IsComplete() 
-                && Organisation.IsComplete() 
-                && Policies.IsComplete() 
-                && Risks.IsComplete() 
-                && DueDiligence.IsComplete() 
-                && Training.IsComplete() 
-                && Progress.IsComplete();
+                && Compliance.IsComplete();
         }
 
         public bool HasChanged()
