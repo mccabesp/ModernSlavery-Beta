@@ -3,10 +3,12 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -45,17 +47,51 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
+                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.MinStartYear, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.MaxStartYear, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.MinEndYear, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.MaxEndYear, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.MinApprovedYear, opt => opt.DoNotValidate())
+                .ForSourceMember(s => s.MaxApprovedYear, opt => opt.DoNotValidate());
         }
     }
 
     public class YourStatementPageViewModel : BaseViewModel
     {
+        public YourStatementPageViewModel()
+        {
+            MinStartYear = VirtualDateTime.Now.AddYears(-5).Year;
+            MaxStartYear = VirtualDateTime.Now.AddYears(5).Year;
+            MinEndYear = MinStartYear;
+            MaxEndYear = MaxStartYear;
+            MinApprovedYear = MinStartYear;
+            MaxApprovedYear = MaxStartYear;
+        }
+
+        [JsonIgnore]
+        [IgnoreMap]
+        public readonly int MinStartYear;
+        [JsonIgnore]
+        [IgnoreMap]
+        public readonly int MaxStartYear;
+        [JsonIgnore]
+        [IgnoreMap]
+        public readonly int MinEndYear;
+        [JsonIgnore]
+        [IgnoreMap]
+        public readonly int MaxEndYear;
+        [JsonIgnore]
+        [IgnoreMap]
+        public readonly int MinApprovedYear;
+        [JsonIgnore]
+        [IgnoreMap]
+        public readonly int MaxApprovedYear;
+
         public override string PageTitle => "Your modern slavery statement";
 
         [Url]
         [MaxLength(256)]
-        [Display(Name = "URL")]
         public string StatementUrl { get; set; }
 
         private DateTime? ToDateTime(int? year, int? month, int? day)
@@ -70,26 +106,33 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public DateTime? StatementStartDate => ToDateTime(StatementStartYear, StatementStartMonth, StatementStartDay);
 
+        [Range(1, 31)]
         public int? StatementStartDay { get; set; }
+        [Range(1, 12)]
         public int? StatementStartMonth { get; set; }
+
         public int? StatementStartYear { get; set; }
 
         public DateTime? StatementEndDate => ToDateTime(StatementEndYear, StatementEndMonth, StatementEndDay);
 
+        [Range(1, 31)]
         public int? StatementEndDay { get; set; }
+        [Range(1, 12)]
         public int? StatementEndMonth { get; set; }
         public int? StatementEndYear { get; set; }
 
-        [Display(Name = "Job title")]
+        [MaxLength(50)]
         public string ApproverJobTitle { get; set; }
-        [Display(Name = "First name")]
+        [MaxLength(50)]
         public string ApproverFirstName { get; set; }
-        [Display(Name = "Last name")]
+        [MaxLength(50)]
         public string ApproverLastName { get; set; }
 
         public DateTime? ApprovedDate => ToDateTime(ApprovedYear, ApprovedMonth, ApprovedDay);
 
+        [Range(1, 31)]
         public int? ApprovedDay { get; set; }
+        [Range(1, 12)]
         public int? ApprovedMonth { get; set; }
         public int? ApprovedYear { get; set; }
 
@@ -111,8 +154,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 if (StatementStartYear == null)
                     validationResults.AddValidationError(3103, nameof(StatementStartYear));
             }
-            if (partsComplete && StatementStartDate == null)
-                validationResults.AddValidationError(3104, nameof(StatementStartDate));
+            
+            if (StatementStartYear!=null && (StatementStartYear.Value > MaxStartYear || StatementStartYear.Value < MinStartYear))
+                validationResults.AddValidationError(3119, nameof(StatementStartYear), new { minYear = MinStartYear, maxYear = MaxStartYear });
 
             //Validate the end date parts
             partsComplete = !Text.IsAnyNull(StatementEndDay, StatementEndMonth, StatementEndYear);
@@ -128,8 +172,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 if (StatementEndYear == null)
                     validationResults.AddValidationError(3107, nameof(StatementEndYear));
             }
-            if (partsComplete && StatementEndDate == null)
-                validationResults.AddValidationError(3108, nameof(StatementEndDate));
+
+            if (StatementEndYear!=null && (StatementEndYear.Value > MaxEndYear || StatementEndYear.Value < MinEndYear))
+                validationResults.AddValidationError(3122, nameof(StatementEndYear), new { minYear = MinEndYear, maxYear = MaxEndYear });
 
             //Validate the approved date parts
             partsComplete = !Text.IsAnyNull(ApprovedDay, ApprovedMonth, ApprovedYear);
@@ -145,8 +190,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 if (ApprovedYear == null)
                     validationResults.AddValidationError(3111, nameof(ApprovedYear));
             }
-            if (partsComplete && ApprovedDate == null)
-                validationResults.AddValidationError(3112, nameof(ApprovedDate));
+            
+            if (ApprovedYear!=null && (ApprovedYear.Value > MaxApprovedYear || ApprovedYear.Value < MinApprovedYear))
+                validationResults.AddValidationError(3125, nameof(ApprovedYear), new { minYear = MinApprovedYear, maxYear = MaxApprovedYear });
 
             //Validate the approver parts
             partsComplete = !Text.IsAnyNullOrWhiteSpace(ApproverFirstName, ApproverLastName, ApproverJobTitle);

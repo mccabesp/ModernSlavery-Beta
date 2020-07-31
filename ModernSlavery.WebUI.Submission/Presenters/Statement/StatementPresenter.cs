@@ -38,11 +38,18 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         StatementModel SetViewModelToStatementModel<TViewModel>(TViewModel viewModel, StatementModel statementModel);
 
         /// <summary>
-        /// Returns a Json object showing modifications between the specified statementModel and the original (draft backup or submitted statements)
+        /// Returns list of modifications between the specified statementModel and the draft backup)
         /// </summary>
-        /// <param name="statementModel">The current statement</param>
-        /// <returns>A Json list of modifications or null if no differences</returns>
-        Task<IList<AutoMap.Diff>> GetDraftModifications(StatementModel statementModel);
+        /// <param name="newStatementModel">The new statement</param>
+        /// <returns>A list of modifications, null if no differences, or all changes from empty if no backup</returns>
+        Task<IList<AutoMap.Diff>> CompareToDraftBackupStatement(StatementModel newStatementModel);
+
+        /// <summary>
+        /// Returns list of modifications between the specified statementModel and the latest submitted statement
+        /// </summary>
+        /// <param name="newStatementModel">The new statement</param>
+        /// <returns>A list of modifications, null if no differences, or all changes from empty if no submitted statement</returns>
+        Task<IList<AutoMap.Diff>> CompareToSubmittedStatement(StatementModel newStatementModel);
 
         /// <summary>
         /// Returns a ViewModel populated from a StatementModel for the specified oreganisation, reporting Deadline, and user
@@ -228,11 +235,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         }
 
 
-        public async Task<IList<AutoMap.Diff>> GetDraftModifications(StatementModel statementModel)
+        public async Task<IList<AutoMap.Diff>> CompareToDraftBackupStatement(StatementModel newStatementModel)
         {
-            return await _statementBusinessLogic.GetDraftModifications(statementModel);
+            return await _statementBusinessLogic.CompareToDraftBackupStatement(newStatementModel);
         }
-
+        public async Task<IList<AutoMap.Diff>> CompareToSubmittedStatement(StatementModel newStatementModel)
+        {
+            return await _statementBusinessLogic.CompareToSubmittedStatement(newStatementModel);
+        }
 
     }
 }

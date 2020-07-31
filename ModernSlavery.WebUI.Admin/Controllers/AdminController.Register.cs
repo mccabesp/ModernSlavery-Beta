@@ -350,7 +350,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View(nameof(ReviewRequest), model);
             }
 
@@ -439,7 +439,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    this.CleanModelErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<OrganisationViewModel>();
                     return View("ReviewRequest", model);
                 }
 
@@ -501,7 +501,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)))
                 {
                     ModelState.AddModelError(1132);
-                    this.CleanModelErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<OrganisationViewModel>();
                     return View("ReviewRequest", model);
                 }
 
@@ -675,7 +675,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     : model.CancellationReason))
             {
                 ModelState.AddModelError(1131);
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View("ConfirmCancellation", model);
             }
 

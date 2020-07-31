@@ -21,6 +21,8 @@
         {
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.ReturnToReviewPage);
+            @Html.HiddenFor(m => m.Submitted);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
@@ -110,7 +112,6 @@
                     </ul>
                 </li>
             </ol>
-
 
             @if (Model.HasChanged())
             {

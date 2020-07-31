@@ -399,7 +399,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             //Get the latest sic codes
             var sicCodes = GetOrganisationSicCodes(organisation);
 
-            var submittedReports = organisation.GetSubmittedReports().ToArray();
+            var submittedStatements = organisation.GetSubmittedStatements().ToArray();
 
             var result = new EmployerSearchModel
             {
@@ -415,14 +415,14 @@ namespace ModernSlavery.BusinessDomain.Registration
                 SicSectionNames = sicCodes.Select(sic => sic.SicCode.SicSection.Description).Distinct().ToArray(),
                 SicCodeIds = sicCodes.Select(sicCode => sicCode.SicCodeId.ToString()).Distinct().ToArray(),
                 Address = organisation.LatestAddress?.GetAddressString(),
-                LatestReportedDate = submittedReports.Select(x => x.Created).FirstOrDefault(),
-                ReportedYears = submittedReports.Select(x => x.AccountingDate.Year.ToString()).ToArray(),
+                LatestReportedDate = submittedStatements.Select(x => x.Created).FirstOrDefault(),
+                ReportedYears = submittedStatements.Select(x => x.SubmissionDeadline.Year.ToString()).ToArray(),
                 ReportedLateYears =
-                    submittedReports.Where(x => x.IsLateSubmission).Select(x => x.AccountingDate.Year.ToString())
+                    submittedStatements.Where(x => x.CalculateIsLateSubmission()).Select(x => x.SubmissionDeadline.Year.ToString())
                         .ToArray(),
-                ReportedExplanationYears = submittedReports
-                    .Where(x => string.IsNullOrEmpty(x.CompanyLinkToGPGInfo) == false)
-                    .Select(x => x.AccountingDate.Year.ToString())
+                ReportedExplanationYears = submittedStatements
+                    .Where(x => string.IsNullOrEmpty(x.StatementUrl) == false)
+                    .Select(x => x.SubmissionDeadline.Year.ToString())
                     .ToArray()
             };
 

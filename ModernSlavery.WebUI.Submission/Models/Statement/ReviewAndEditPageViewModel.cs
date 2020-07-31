@@ -32,7 +32,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class ReviewAndEditPageViewModel : BaseViewModel
     {
-        public override string PageTitle => $"Review {ReportingDeadlineYear - 1} to {ReportingDeadlineYear} group report for {OrganisationName}";
+        public override string PageTitle => $"Review before submitting";
         public override string SubTitle => GetSubtitle();
 
         private string GetSubtitle()
@@ -59,7 +59,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public MonitoringProgressPageViewModel Progress { get; set; }
         
         [IgnoreMap]
-        public IList<AutoMap.Diff> Modifications { get; set; }
+        public IList<AutoMap.Diff> DraftModifications { get; set; }
+
+        [IgnoreMap]
+        public IList<AutoMap.Diff> SubmittedModifications { get; set; }
 
         [IgnoreMap]
         [BindNever]
@@ -112,7 +115,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (Progress.Validate(validationContext).Any())
                 yield return new ValidationResult($"Section '{Progress.PageTitle}' is invalid");
 
-            var serviceProvider = validationContext.GetService<IServiceProvider>();
             if (!IsComplete())
                 yield return new ValidationResult("You must first complete all sections before you can submit");
         }
@@ -125,7 +127,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public bool HasChanged()
         {
-            return Modifications!=null && Modifications.Any();
+            return (!Submitted && DraftModifications!=null && DraftModifications.Any()) 
+                || (Submitted && SubmittedModifications != null && SubmittedModifications.Any());
         }
     }
 }

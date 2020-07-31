@@ -17,6 +17,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
                 .OrderBy(t => t.Description);
             this.AddRange(types.Where(t => t.Category != RiskCategories.Location.ToString()));
             this.AddRange(countries);
+            Regions = this.Where(t => t.ParentId == null && t.Category == RiskCategories.Location.ToString()).ToList();
         }
 
         public RiskTypeIndex() { }
@@ -28,6 +29,6 @@ namespace ModernSlavery.WebUI.Submission.Classes
             public string Description { get; set; }
             public string Category { get; set; }
         }
-
-    }
+        public readonly IList<RiskType> Regions;
+   }
 }

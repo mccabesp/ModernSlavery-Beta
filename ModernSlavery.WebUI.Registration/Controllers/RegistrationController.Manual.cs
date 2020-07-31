@@ -96,7 +96,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             ModelState.Exclude(excludes.ToArray());
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View(nameof(AddAddress), model);
             }
 
@@ -234,7 +234,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             ModelState.Exclude(excludes.ToArray());
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View("AddContact", model);
             }
 
@@ -361,7 +361,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View("AddSector", model);
             }
 

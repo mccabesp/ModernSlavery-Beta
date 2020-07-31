@@ -13,11 +13,12 @@
             @await Html.CustomValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ReturnToReviewPage);
+            @Html.HiddenFor(m => m.Submitted);
 
             <h1 class="govuk-heading-l">
                 <span class="govuk-caption-l">@Model.SubTitle</span>
                 @Model.PageTitle
-            </h1>       
+            </h1>
 
             <h2 class="govuk-heading-m">
                 What methods does your organisation use to monitor working conditions in your operations and supply chain?
@@ -55,7 +56,7 @@
                                                         <label class="govuk-label" for="@($"DiligenceDetails{childType.Id}")">
                                                             Please specify other @parentType.Description
                                                         </label>
-                                                        <input name="DueDiligences[@diligenceIndex].Details" id="@($"DiligenceDetails{childType.Id}")" value="@(Model.DueDiligences.FirstOrDefault(r => r.Id == childType.Id)?.Details)" class="govuk-input" type="text" maxlength="256" >
+                                                        <input name="DueDiligences[@diligenceIndex].Details" id="@($"DiligenceDetails{childType.Id}")" value="@(Model.DueDiligences.FirstOrDefault(r => r.Id == childType.Id)?.Details)" class="govuk-input" type="text" maxlength="256">
                                                         @Html.ValidationMessage($"DueDiligences[{diligenceIndex}].Details", null, new { @class = "govuk-error-message" })
                                                     </div>
                                                 </div>
@@ -116,7 +117,7 @@
                         <h2 class="govuk-heading-m">
                             Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?
                         </h2>
-                    </legend>                  
+                    </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
                             <input name="HasSlaveryInstance" id="HasSlaveryInstance_True" checked="@(Model.HasSlaveryInstance==true)" value="true" class="govuk-radios__input" type="radio" data-aria-controls="conditional-has-slavery-instance-conditional">
@@ -191,7 +192,7 @@
                                 </div>
                             </div>
 
-                            </div>
+                        </div>
 
                         <div class="govuk-radios__item ">
                             <input name="HasSlaveryInstance" value="false" id="HasSlaveryInstance_false" checked="@(Model.HasSlaveryInstance==false)" class="govuk-radios__input" type="radio">

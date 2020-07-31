@@ -7,6 +7,8 @@ using System.Linq;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Binding;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -108,6 +110,23 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             {
                 if (HighRisks[highRiskIndex].Id > 0 && string.IsNullOrWhiteSpace(HighRisks[highRiskIndex].Details))
                     validationResults.AddValidationError(3500, $"HighRisks[{highRiskIndex}].Details");
+            }
+
+
+            foreach (var region in RiskTypes.Regions)
+            {
+                //Skip if this region isnt selected
+                if (!LocationRisks.Any(l => l.Id == region.Id)) continue;
+
+                var regionRiskIndex = LocationRisks.FindIndex(r => r.Id == region.Id);
+
+                //Get all the child country ids
+                var countryIds = RiskTypes.Where(t => t.ParentId == region.Id).Select(c=>c.Id).ToSortedSet();
+
+                //if a child of the region is also selected the nthrow an error
+                if (LocationRisks.Any(l=> countryIds.Contains(l.Id)))
+                    validationResults.AddValidationError(3505, $"LocationRisks[{regionRiskIndex}].Id",new { regionName=region.Description});
+
             }
 
             //Remove all the empty risks

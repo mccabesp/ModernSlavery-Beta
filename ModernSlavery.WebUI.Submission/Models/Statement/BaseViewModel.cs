@@ -10,6 +10,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
     public abstract class BaseViewModel: GovUkViewModel, IValidatableObject
     {
+
         public enum CommandType
         {
             Unknown=0,
@@ -20,6 +21,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             ExitNoChanges = 5,
             Submit = 6
         }
+
+        [BindRequired]
+        public bool Submitted { get; set; }
 
         [BindRequired]
         public bool ReturnToReviewPage { get; set; }

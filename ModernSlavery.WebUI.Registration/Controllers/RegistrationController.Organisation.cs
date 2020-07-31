@@ -72,7 +72,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             {
                 // either it is fast track, or sectortype mut be set
                 AddModelError(3005, "RegistrationType");
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View("OrganisationType", model);
             }
 
@@ -131,7 +131,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             ModelState.Include("SearchText");
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View("OrganisationSearch", model);
             }
 
@@ -315,7 +315,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    this.CleanModelErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<OrganisationViewModel>();
                     return View("ChooseOrganisation", model);
                 }
 
@@ -431,7 +431,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     && !VirtualUser.UserOrganisations.Any(uo => uo.PINConfirmedDate != null))
                 {
                     AddModelError(3022);
-                    this.CleanModelErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<OrganisationViewModel>();
                     return View("ChooseOrganisation", model);
                 }
 
@@ -472,7 +472,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     if (userOrg != null)
                     {
                         AddModelError(userOrg.PINConfirmedDate == null ? 3021 : 3020);
-                        this.CleanModelErrors<OrganisationViewModel>();
+                        this.SetModelCustomErrors<OrganisationViewModel>();
                         return View("ChooseOrganisation", model);
                     }
 
@@ -663,7 +663,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             ModelState.Exclude(excludes.ToArray());
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View("AddOrganisation", model);
             }
 
@@ -882,7 +882,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     !VirtualUser.UserOrganisations.Any(uo => uo.PINConfirmedDate != null))
                 {
                     AddModelError(3022);
-                    this.CleanModelErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<OrganisationViewModel>();
                     return View(returnAction, model);
                 }
 
@@ -892,7 +892,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (userOrg != null)
             {
                 AddModelError(userOrg.PINConfirmedDate == null ? 3021 : 3020);
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View(returnAction, model);
             }
 

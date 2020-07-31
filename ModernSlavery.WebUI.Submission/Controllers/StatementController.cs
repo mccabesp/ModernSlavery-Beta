@@ -86,8 +86,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         private string GetProgressUrl() => Url.Action(nameof(MonitoringProgress), GetOrgAndYearRouteData());
 
-
-        private string GetReviewUrl() => Url.Action(nameof(ReviewAndEdit), new { organisationIdentifier = GetOrganisationIdentifier(), year = GetReportingDeadlineYear() });
+        private string GetReviewUrl() => Url.Action(nameof(ReviewAndEdit), GetOrgAndYearRouteData());
+        private string GetCompleteUrl() => Url.Action(nameof(SubmissionComplete), GetOrgAndYearRouteData());
 
         /// <summary>
         /// Uses the type of cancelling viewmodel stored in sessionm to determine url to the page that is currently cancelling 
@@ -293,7 +293,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     //Validate the submitted ViewModel data
                     if (!ModelState.IsValid)
                     {
-                        this.CleanModelErrors<TViewModel>();
+                        this.SetModelCustomErrors(viewModel);
                         return View(viewModel);
                     }
 
@@ -531,7 +531,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     if (viewModelSubmitResult.Fail) return HandleStatementErrors(openResult.Errors);
 
                     //Redirect to the continue url
-                    return Redirect(viewModel.ContinueUrl);
+                    return Redirect(GetCompleteUrl());
                 case BaseViewModel.CommandType.ExitNoChanges:
                 case BaseViewModel.CommandType.DiscardAndExit:
                     //set the navigation urls
@@ -575,7 +575,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             viewModel.DueDiligence = SubmissionPresenter.GetViewModelFromStatementModel<DueDiligencePageViewModel>(statementModel);
             viewModel.Training = SubmissionPresenter.GetViewModelFromStatementModel<TrainingPageViewModel>(statementModel);
             viewModel.Progress = SubmissionPresenter.GetViewModelFromStatementModel<MonitoringProgressPageViewModel>(statementModel);
-            viewModel.Modifications=await SubmissionPresenter.GetDraftModifications(statementModel);
+            viewModel.DraftModifications=await SubmissionPresenter.CompareToDraftBackupStatement(statementModel);
+            viewModel.SubmittedModifications = await SubmissionPresenter.CompareToSubmittedStatement(statementModel);
 
             //Otherwise return the view using the populated ViewModel
             return viewModel;
@@ -604,7 +605,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             //Get the modifications
             var statementModel = SubmissionPresenter.SetViewModelToStatementModel(pageViewModel, viewModelResult.Result);
-            viewModel.Modifications = await SubmissionPresenter.GetDraftModifications(statementModel);
+            viewModel.Modifications = await SubmissionPresenter.CompareToDraftBackupStatement(statementModel);
 
             //Ensure the viewmodel is valid before saving
             ModelState.Clear();
@@ -668,7 +669,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                         //Get the modifications
                         var statementModel = SubmissionPresenter.SetViewModelToStatementModel(pageViewModel, openModelResult.Result);
-                        viewModel.Modifications = await SubmissionPresenter.GetDraftModifications(statementModel);
+                        viewModel.Modifications = await SubmissionPresenter.CompareToDraftBackupStatement(statementModel);
 
                         //Return the errors
                         return View(viewModel);
