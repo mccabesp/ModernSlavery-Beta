@@ -44,10 +44,10 @@
             }
             else
             {
-                <span>Published </span>
+                <span>Published</span>
                 if (!Model.StatementInfo.RequiredToReport)
                 {
-                    <span>voluntarily</span>
+                    <span> voluntarily</span>
                 }
                 var modifiedDateFormatter = new GDSDateFormatter(Model.StatementInfo.SubmittedStatementModifiedDate.Value);
                 <span> on @modifiedDateFormatter.FullStartDate</span>

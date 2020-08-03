@@ -68,7 +68,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (checkResult != null && IsImpersonatingUser == false) return checkResult;
 
             // check if the user has accepted the privacy statement (unless admin or impersonating)
-            if (!IsImpersonatingUser && !SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(base.CurrentUser))
+            if (WebService.FeatureSwitchOptions.IsEnabled("PrivacyPolicyLink") && !IsImpersonatingUser && !SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(base.CurrentUser))
             {
                 var hasReadPrivacy = VirtualUser.AcceptedPrivacyStatement;
                 if (hasReadPrivacy == null ||
