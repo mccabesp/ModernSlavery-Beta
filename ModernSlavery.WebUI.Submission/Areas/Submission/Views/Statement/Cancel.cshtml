@@ -33,10 +33,10 @@
                 <h1 class="govuk-heading-l">
                     <span>You have unsaved data, what do you want to do?</span>
                 </h1>
-                <button class="govuk-button" data-module="govuk-button" disabled=@(Model.ErrorCount>0) name="command" value="@BaseViewModel.CommandType.SaveAndExit">
+                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled=@(Model.ErrorCount>0) name="command" value="@BaseViewModel.CommandType.SaveAndExit">
                     Exit and save changes
                 </button>
-                <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
+                <button class="govuk-button govuk-button--secondary govuk-!-margin-right-1" data-module="govuk-button" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
                     Exit and lose changes
                 </button>
             }
@@ -45,7 +45,7 @@
                 <h1 class="govuk-heading-l">
                     You have no unsaved data, are you sure you want to exit?
                 </h1>
-                <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
+                <button class="govuk-button govuk-button--secondary govuk-!-margin-right-1" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
                     Exit with no changes
                 </button>
             }
