@@ -37,7 +37,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Registration Options");
 
-            ClickLabel(That.Contains, "Private limited company");
+            ClickLabel(That.Contains, "Private or voluntary sector organisation");
             Click("Continue");
 
             ExpectHeader("Find your organisation");
