@@ -26,6 +26,7 @@ using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;
 using ModernSlavery.Infrastructure.Telemetry;
 using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Classes.Binding;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Classes.Providers;
@@ -74,6 +75,7 @@ namespace ModernSlavery.Hosts.Web
             var mvcBuilder = services.AddControllersWithViews(
                     options =>
                     {
+                        options.ModelBinderProviders.Insert(0,new DependencyModelBinderSource());
                         options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
                         options.ModelMetadataDetailsProviders.Add(
                             new TrimModelBinder()); //Set DisplayMetadata to input empty strings as null
@@ -168,9 +170,6 @@ namespace ModernSlavery.Hosts.Web
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            //Register the queue storage dependencies
-            builder.RegisterType<DnBOrgsRepository>().As<IDnBOrgsRepository>().WithParameter("dataPath", _sharedOptions.DataPath).WithAttributeFiltering();
-
             builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
 
             //Register the user audit log repository

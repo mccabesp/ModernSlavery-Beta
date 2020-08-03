@@ -18,7 +18,7 @@ namespace ModernSlavery.Core.Extensions
         // Object
         public static TAttribute GetAttribute<TAttribute>(this object value) where TAttribute : Attribute
         {
-            return value.GetType().GetCustomAttribute<TAttribute>();
+            return value?.GetType().GetCustomAttribute<TAttribute>();
         }
     }
 }

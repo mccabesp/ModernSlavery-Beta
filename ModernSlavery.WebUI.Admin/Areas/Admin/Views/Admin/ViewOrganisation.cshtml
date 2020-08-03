@@ -191,12 +191,12 @@
             @{
                 var scopes = Model.OrganisationScopes
                     .Where(s => s.Status == ScopeRowStatuses.Active)
-                    .OrderByDescending(s => s.SnapshotDate);
+                    .OrderByDescending(s => s.SubmissionDeadline);
             }
             @foreach (var scope in scopes)
             {
                 <b>
-                    @(ReportingPeriodHelper.FormatReportingPeriod(scope.SnapshotDate.Year)):
+                    @(ReportingPeriodHelper.FormatReportingPeriod(scope.SubmissionDeadline.Year)):
                 </b>
                 @(scope.ScopeStatus)
                 <br/>
@@ -229,7 +229,7 @@
         <th scope="col" class="govuk-table__header">Snapshot date</th>
         <th scope="col" class="govuk-table__header">Public page</th>
         <th scope="col" class="govuk-table__header">Modified</th>
-        <th scope="col" class="govuk-table__header">Employees</th>
+        <th scope="col" class="govuk-table__header">Turnover</th>
         <th scope="col" class="govuk-table__header">Modifications</th>
         <th scope="col" class="govuk-table__header">Status</th>
         <th scope="col" class="govuk-table__header">Late</th>
@@ -237,53 +237,53 @@
     </tr>
     </thead>
     <tbody class="govuk-table__body">
-    @{ var previousAccountingDate = DateTime.MinValue; }
-    @foreach (var returnForYear in Model.Returns.OrderByDescending(r => r.AccountingDate).ThenByDescending(r => r.StatusDate))
+    @{ var previousSubmissionDeadline = DateTime.MinValue; }
+    @foreach (var statementForYear in Model.Statements.OrderByDescending(r => r.SubmissionDeadline).ThenByDescending(r => r.StatusDate))
     {
         <tr class="govuk-table__row">
-            @if (returnForYear.AccountingDate == previousAccountingDate)
+            @if (statementForYear.SubmissionDeadline == previousSubmissionDeadline)
             {
                     @* Omit this TD, a TD above has a rowspan that covers this row *@
             }
             else
             {
-                <th scope="row" class="govuk-table__cell" style="white-space: nowrap" rowspan="@(Model.Returns.Count(s => s.AccountingDate == returnForYear.AccountingDate))">
-                    @(returnForYear.AccountingDate.ToString("d MMM yyyy"))
+                <th scope="row" class="govuk-table__cell" style="white-space: nowrap" rowspan="@(Model.Statements.Count(s => s.SubmissionDeadline == statementForYear.SubmissionDeadline))">
+                    @(statementForYear.SubmissionDeadline.ToString("d MMM yyyy"))
                 </th>
-                <td class="govuk-table__cell" rowspan="@(Model.Returns.Count(s => s.AccountingDate == returnForYear.AccountingDate))">
-                    <a href="@Url.ActionArea("Report", "Viewing", "Viewing", new {employerIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = returnForYear.AccountingDate.Year})"
+                <td class="govuk-table__cell" rowspan="@(Model.Statements.Count(s => s.SubmissionDeadline == statementForYear.SubmissionDeadline))">
+                    <a href="@Url.ActionArea("Report", "Viewing", "Viewing", new {employerIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = statementForYear.SubmissionDeadline.Year})"
                        class="govuk-link">
-                        @(returnForYear.AccountingDate.Year)
+                        @(statementForYear.SubmissionDeadline.Year)
                     </a>
                 </td>
             }
             <td class="govuk-table__cell">
                 <span style="white-space: nowrap">
-                    @(returnForYear.Modified.ToString("d MMM yyyy"))
+                    @(statementForYear.Modified.ToString("d MMM yyyy"))
                 </span>
                 <span style="white-space: nowrap">
-                    @(returnForYear.Modified.ToString("HH:mm"))
+                    @(statementForYear.Modified.ToString("HH:mm"))
                 </span>
             </td>
-            <td class="govuk-table__cell">@(returnForYear.MinEmployees)-@(returnForYear.MaxEmployees)</td>
+            <td class="govuk-table__cell">@(statementForYear.MinTurnover)-@(statementForYear.MaxStatementYears)</td>
             <td class="govuk-table__cell">
-                @(returnForYear.Modifications != null
-                    ? string.Join(", ", returnForYear.Modifications.Split(",", StringSplitOptions.RemoveEmptyEntries))
+                @(statementForYear.Modifications != null
+                    ? string.Join(", ", statementForYear.Modifications.Split(",", StringSplitOptions.RemoveEmptyEntries))
                     : "")
             </td>
-            <td class="govuk-table__cell">@(returnForYear.Status)</td>
+            <td class="govuk-table__cell">@(statementForYear.Status)</td>
             <td class="govuk-table__cell">
-                @if (returnForYear.AccountingDate != previousAccountingDate)
+                @if (statementForYear.SubmissionDeadline != previousSubmissionDeadline)
                 {
-                    <span>@(returnForYear.IsLateSubmission ? "Yes" : "No") - </span>
-                    <a href="@Url.Action("ChangeLateFlag", "AdminReturnLateFlag", new {id = returnForYear.ReturnId})" class="govuk-link">
-                        Change <span class="govuk-visually-hidden"> late submission status for @(returnForYear.GetReportingPeriod())</span>
+                    <span>@(statementForYear.CalculateIsLateSubmission() ? "Yes" : "No") - </span>
+                    <a href="@Url.Action("ChangeLateFlag", "AdminReturnLateFlag", new {id = statementForYear.StatementId})" class="govuk-link">
+                        Change <span class="govuk-visually-hidden"> late submission status for @(statementForYear.GetReportingPeriod())</span>
                     </a>
                 }
             </td>
-            <td class="govuk-table__cell">@(returnForYear.LateReason)</td>
+            <td class="govuk-table__cell">@(statementForYear.LateReason)</td>
         </tr>
-        previousAccountingDate = returnForYear.AccountingDate;
+        previousSubmissionDeadline = statementForYear.SubmissionDeadline;
     }
     </tbody>
 </table>

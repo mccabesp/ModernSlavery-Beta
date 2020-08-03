@@ -1,0 +1,229 @@
+﻿@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model CompliancePageViewModel
+<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @await Html.CustomValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.ReturnToReviewPage);
+            @Html.HiddenFor(m => m.Submitted);
+
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
+
+            <h2 class="govuk-heading-m">
+                Does your modern slavery statement cover the following areas in relation to slavery and human trafficking?
+            </h2>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h2 class="govuk-heading-m">
+                            Your organisation’s structure, business and supply chains
+                        </h2>
+                    </legend>
+                    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesStructure" value="true" class="govuk-radios__input" id="IncludeStructure_True" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="IncludeStructure_True">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesStructure" value="false" class="govuk-radios__input" id="IncludeStructure_False" type="radio" data-aria-controls="conditional-include-structure-conditional">
+                            <label class="govuk-label govuk-radios__label" for="IncludeStructure_False">
+                                No
+                            </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-structure-conditional">
+                            <div class="govuk-form-group @Html.SetErrorClass(model => model.StructureDetails, "govuk-form-group--error")">
+                                <label class="govuk-label" for="include-structure-detail">
+                                    Please provide details
+                                </label>
+                                <textarea asp-for="StructureDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-structure-detail" type="text" maxlength="128">@Model.StructureDetails</textarea>
+                                <span asp-validation-for="StructureDetails" class="govuk-error-message"></span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h2 class="govuk-heading-m">
+                            Policies
+                        </h2>
+                    </legend>
+                    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesPolicies" value="true" class="govuk-radios__input" id="include-policies_True" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="include-policies_True">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesPolicies" value="false" class="govuk-radios__input" id="include-policies_False" type="radio" data-aria-controls="conditional-include-policies-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-policies_False">
+                                No
+                            </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-policies-conditional">
+                            <div class="govuk-form-group @Html.SetErrorClass(model => model.PolicyDetails, "govuk-form-group--error")">
+                                <label class="govuk-label" for="include-policies-detail">
+                                    Please provide details
+                                </label>
+                                <textarea asp-for="PolicyDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-policies-detail" type="text" maxlength="128">@Model.PolicyDetails</textarea>
+                                <span asp-validation-for="PolicyDetails" class="govuk-error-message"></span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h2 class="govuk-heading-m">
+                            Risk assessment and management
+                        </h2>
+                    </legend>
+                    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesRisks" value="true" class="govuk-radios__input" id="include-risks_True" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="include-risks_True">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesRisks" value="false" class="govuk-radios__input" id="include-risks_False" type="radio" data-aria-controls="conditional-include-risks-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-risks_False">
+                                No
+                            </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-risks-conditional">
+                            <div class="govuk-form-group @Html.SetErrorClass(model => model.RisksDetails, "govuk-form-group--error")">
+                                <label class="govuk-label" for="include-risks-detail">
+                                    Please provide details
+                                </label>
+                                <textarea asp-for="RisksDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-risks-detail" maxlength="128">@Model.RisksDetails</textarea>
+                                <span asp-validation-for="RisksDetails" class="govuk-error-message"></span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h2 class="govuk-heading-m">
+                            Due diligence processes
+                        </h2>
+                    </legend>
+                    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesDueDiligence" value="true" class="govuk-radios__input" id="include-methods_True" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="include-methods_True">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesDueDiligence" value="false" class="govuk-radios__input" id="include-methods_False" type="radio" data-aria-controls="conditional-include-dueDiligence-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-methods_False">
+                                No
+                            </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-dueDiligence-conditional">
+                            <div class="govuk-form-group @Html.SetErrorClass(model => model.DueDiligenceDetails, "govuk-form-group--error")">
+                                <label class="govuk-label" for="include-dueDiligence-detail">
+                                    Please provide details
+                                </label>
+                                <textarea asp-for="DueDiligenceDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-methods-detail" maxlength="128">@Model.DueDiligenceDetails</textarea>
+                                <span asp-validation-for="DueDiligenceDetails" class="govuk-error-message"></span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h2 class="govuk-heading-m">
+                            Staff training about slavery and human trafficking
+                        </h2>
+                    </legend>
+                    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesTraining" value="true" class="govuk-radios__input" id="include-training_True" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="include-training_True">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesTraining" value="false" class="govuk-radios__input" id="include-training_False" type="radio" data-aria-controls="conditional-include-training-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-training_False">
+                                No
+                            </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-training-conditional">
+                            <div class="govuk-form-group @Html.SetErrorClass(model => model.TrainingDetails, "govuk-form-group--error")">
+                                <label class="govuk-label" for="include-training-detail">
+                                    Please provide details
+                                </label>
+                                <textarea asp-for="TrainingDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-training-detail" maxlength="128">@Model.TrainingDetails</textarea>
+                                <span asp-validation-for="TrainingDetails" class="govuk-error-message"></span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h2 class="govuk-heading-m">
+                            Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions
+                        </h2>
+                    </legend>
+
+                    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesGoals" value="true" class="govuk-radios__input" id="include-effectiveness_True" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="include-effectiveness_True">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesGoals" value="false" class="govuk-radios__input" id="include-effectiveness_False" type="radio" data-aria-controls="conditional-include-effectiveness-conditional">
+                            <label class="govuk-label govuk-radios__label" for="include-effectiveness_False">
+                                No
+                            </label>
+                        </div>
+                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-effectiveness-conditional">
+                            <div class="govuk-form-group @Html.SetErrorClass(model => model.GoalsDetails, "govuk-form-group--error")">
+                                <label class="govuk-label" for="include-goals-detail">
+                                    Please provide details
+                                </label>
+                                <textarea asp-for="GoalsDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-effectiveness-detail" maxlength="128">@Model.GoalsDetails</textarea>
+                                <span asp-validation-for="GoalsDetails" class="govuk-error-message"></span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Continue
+            </button>
+
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+                Cancel
+            </button>
+        }
+    </div>
+</div>

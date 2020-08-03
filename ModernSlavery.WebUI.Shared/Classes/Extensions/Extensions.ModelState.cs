@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,9 +12,10 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 {
     public static partial class Extensions
     {
-        public static void CleanModelErrors<TModel>(this Controller controller)
+        public static void SetModelCustomErrors<TModel>(this Controller controller, TModel model=default)
         {
-            var containerType = typeof(TModel);
+            var modelType = typeof(TModel);
+
             //Save the old modelstate
             var oldModelState = new ModelStateDictionary();
             foreach (var modelState in controller.ModelState)
@@ -40,7 +42,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                 //Get the validation attributes
                 var propertyInfo = string.IsNullOrWhiteSpace(propertyName)
                     ? null
-                    : containerType.GetPropertyInfo(propertyName);
+                    : modelType.GetPropertyInfo(propertyName);
                 var attributes = propertyInfo == null
                     ? null
                     : propertyInfo.GetCustomAttributes(typeof(ValidationAttribute), false)
@@ -74,7 +76,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                     if (attribute == null) goto addModelError;
 
                     var validatorKey =
-                        $"{containerType.Name}.{propertyName}:{attribute.GetType().Name.TrimSuffix("Attribute")}";
+                        $"{modelType.Name}.{propertyName}:{attribute.GetType().Name.TrimSuffix("Attribute")}";
                     var customError = CustomErrorMessages.GetValidationError(validatorKey);
                     if (customError == null) goto addModelError;
 
@@ -126,6 +128,14 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
         }
 
         public static void AddModelError(this ModelStateDictionary modelState,
+            CustomError error,
+            string propertyName = null,
+            object parameters = null)
+        {
+            AddModelError(modelState, error.Code, propertyName, parameters);
+        }
+
+        public static void AddModelError(this ModelStateDictionary modelState,
             int errorCode,
             string propertyName = null,
             object parameters = null)
@@ -166,6 +176,47 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                     m.Key.EqualsI(propertyName) && m.Value.Errors.Any(e => e.ErrorMessage == description)))
                 {
                     modelState.AddModelError(propertyName, description);
+                }
+            }
+        }
+
+        public static void AddValidationError(this List<ValidationResult> validationResults, int errorCode,
+            string propertyName = null,
+            object parameters = null)
+        {
+            //Try and get the custom error
+            var customError = CustomErrorMessages.GetError(errorCode);
+            if (customError == null)
+                throw new ArgumentException("errorCode", "Cannot find custom error message with this code");
+
+            //Add the error to the modelstate
+            var title = customError.Title;
+            var description = customError.Description;
+
+            //Resolve the parameters
+            if (parameters != null)
+            {
+                title = parameters.Resolve(title);
+                description = parameters.Resolve(description);
+            }
+
+            //add the summary message if it doesnt already exist
+            bool titleExists() => !string.IsNullOrWhiteSpace(title) && validationResults.Any(r => !r.MemberNames.Any() && r.ErrorMessage == title);
+
+            if (!titleExists())validationResults.Add(new ValidationResult(title));
+
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                //If no property then add description as second line of summary
+                if (string.IsNullOrWhiteSpace(propertyName))
+                {
+                    if (!!titleExists())validationResults.Add(new ValidationResult(title));
+                }
+
+                //add the inline message if it doesnt already exist
+                else if(!validationResults.Any(r => r.MemberNames.Any(m => m.EqualsI(propertyName)) && r.ErrorMessage == description)) 
+                {
+                    validationResults.Add(new ValidationResult(description, new[] { propertyName }.AsEnumerable()));
                 }
             }
         }

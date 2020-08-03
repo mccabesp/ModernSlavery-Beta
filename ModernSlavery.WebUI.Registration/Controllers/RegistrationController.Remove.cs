@@ -24,7 +24,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (checkResult != null) return checkResult;
 
             // Decrypt org id
-            if (!orgId.DecryptToId(out var organisationId))
+            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(orgId);
+            if (organisationId==0)
                 return new HttpBadRequestResult($"Cannot decrypt organisation id {orgId}");
 
             // Check the current user has remove permission for this organisation
@@ -34,8 +35,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
 
             // Decrypt user id
-            if (!userId.DecryptToId(out var userIdToRemove))
-                return new HttpBadRequestResult($"Cannot decrypt user id {userId}");
+            long userIdToRemove = SharedBusinessLogic.Obfuscator.DeObfuscate(userId);
+            if (userIdToRemove==0)return new HttpBadRequestResult($"Cannot decrypt user id {userId}");
 
             var userToRemove = VirtualUser;
             if (VirtualUser.UserId != userIdToRemove)
@@ -88,8 +89,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (checkResult != null) return checkResult;
 
             // Decrypt org id
-            if (!model.EncOrganisationId.DecryptToId(out var organisationId))
-                return new HttpBadRequestResult($"Cannot decrypt organisation id {model.EncOrganisationId}");
+            var organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(model.EncOrganisationId);
+            if (organisationId==0)return new HttpBadRequestResult($"Cannot decrypt organisation id {model.EncOrganisationId}");
 
             // Check the current user has permission for this organisation
             var userOrgToUnregister =
@@ -99,7 +100,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
 
             // Decrypt user id
-            if (!model.EncUserId.DecryptToId(out var userIdToRemove))
+            long userIdToRemove = SharedBusinessLogic.Obfuscator.DeObfuscate(model.EncUserId);
+            if (userIdToRemove == 0)
                 return new HttpBadRequestResult($"Cannot decrypt user id '{model.EncUserId}'");
 
             var sourceOrg = userOrgToUnregister.Organisation;

@@ -215,18 +215,21 @@ namespace ModernSlavery.WebUI.GDSDesignSystem
             return htmlHelper.Partial("~/Partials/Radios.cshtml", radioItemViewModel);
         }
 
+
         public static IHtmlContent GovUkRadiosFor<TModel, TProperty>(
             this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TProperty>> propertyLambdaExpression,
             FieldsetViewModel fieldsetOptions = null,
-            HintViewModel hintOptions = null)
+            HintViewModel hintOptions = null,
+            Dictionary<TProperty, Func<object, object>> conditionalOptions = null)
             where TModel : GovUkViewModel
         {
             return RadiosHtmlGenerator.GenerateHtml(
                 htmlHelper,
                 propertyLambdaExpression,
                 fieldsetOptions,
-                hintOptions);
+                hintOptions,
+                conditionalOptions);
         }
 
         public static IHtmlContent GovUkRadioItem(

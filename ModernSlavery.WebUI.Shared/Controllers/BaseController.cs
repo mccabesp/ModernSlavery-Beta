@@ -570,6 +570,10 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 "Scope/DeclareScope"))
                 return null;
 
+            // allow statement
+            if (ControllerName == "Statement")
+                return null;
+
             // if the user doesn't have a selected an organisation then go to the ManageOrgs page
             var userOrg =
                 VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == ReportingOrganisationId);

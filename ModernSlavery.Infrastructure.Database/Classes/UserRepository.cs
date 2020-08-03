@@ -99,7 +99,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         {
             if (userToUpdate is null) throw new ArgumentNullException(nameof(userToUpdate));
 
-            if (newEmailAddress.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(newEmailAddress));
+            if (string.IsNullOrWhiteSpace(newEmailAddress)) throw new ArgumentNullException(nameof(newEmailAddress));
 
             if (userToUpdate.Status != UserStatuses.Active)
                 throw new ArgumentException($"Can only update emails for active users. UserId={userToUpdate.UserId}");
@@ -124,7 +124,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         {
             if (userToUpdate is null) throw new ArgumentNullException(nameof(userToUpdate));
 
-            if (newPassword.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(newPassword));
+            if (string.IsNullOrWhiteSpace(newPassword)) throw new ArgumentNullException(nameof(newPassword));
 
             if (userToUpdate.Status != UserStatuses.Active)
                 throw new ArgumentException(

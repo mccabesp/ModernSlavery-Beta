@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Entities
 {
+    [NotMapped]
     public partial class Return
     {
         public Return()
         {
             Organisations = new HashSet<Organisation>();
-            ReturnStatuses = new HashSet<ReturnStatus>();
+            StatementStatuses = new HashSet<ReturnStatus>();
         }
 
         public long ReturnId { get; set; }
@@ -30,7 +32,7 @@ namespace ModernSlavery.Core.Entities
         public decimal MaleUpperQuartilePayBand { get; set; }
         public decimal FemaleUpperQuartilePayBand { get; set; }
         public string CompanyLinkToGPGInfo { get; set; }
-        public ReturnStatuses Status { get; set; }
+        public StatementStatuses Status { get; set; }
         public DateTime StatusDate { get; set; } = VirtualDateTime.Now;
         public string StatusDetails { get; set; }
         public DateTime Created { get; set; } = VirtualDateTime.Now;
@@ -48,6 +50,6 @@ namespace ModernSlavery.Core.Entities
 
         public virtual Organisation Organisation { get; set; }
         public virtual ICollection<Organisation> Organisations { get; set; }
-        public virtual ICollection<ReturnStatus> ReturnStatuses { get; set; }
+        public virtual ICollection<ReturnStatus> StatementStatuses { get; set; }
     }
 }

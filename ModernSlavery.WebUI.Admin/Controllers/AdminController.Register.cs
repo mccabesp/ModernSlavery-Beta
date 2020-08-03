@@ -350,7 +350,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View(nameof(ReviewRequest), model);
             }
 
@@ -439,7 +439,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    this.CleanModelErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<OrganisationViewModel>();
                     return View("ReviewRequest", model);
                 }
 
@@ -501,7 +501,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)))
                 {
                     ModelState.AddModelError(1132);
-                    this.CleanModelErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<OrganisationViewModel>();
                     return View("ReviewRequest", model);
                 }
 
@@ -650,13 +650,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var orgId = userOrg.OrganisationId;
             var emailAddress = userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress);
 
-            var allDnBOrgs = await _adminService.OrganisationBusinessLogic.DnBOrgsRepository.GetAllDnBOrgsAsync();
-
-            //Delete the organisation if it has no returns, no D&B addresses, is not in D&B, is not in scopes table, and is not registered to another user
+            //Delete the organisation if it has no statement, is not in D&B, is not in scopes table, and is not registered to another user
             if (userOrg.Organisation != null
-                && !userOrg.Organisation.Returns.Any()
-                && !userOrg.Organisation.OrganisationAddresses.Any(a => a.CreatedByUserId == -1 || a.Source == "D&B")
-                && (allDnBOrgs == null || !allDnBOrgs.Any(o => userOrg.Organisation.DUNSNumber == o.DUNSNumber))
+                && !userOrg.Organisation.Statements.Any()
+                && !userOrg.Organisation.OrganisationAddresses.Any(a => a.CreatedByUserId == -1 || a.Source == "Ext")
                 && !userOrg.Organisation.OrganisationScopes.Any()
                 && !await SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                     .AnyAsync(uo =>
@@ -678,7 +675,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     : model.CancellationReason))
             {
                 ModelState.AddModelError(1131);
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View("ConfirmCancellation", model);
             }
 

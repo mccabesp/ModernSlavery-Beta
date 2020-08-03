@@ -141,9 +141,10 @@
     <div class="govuk-width-container">
 
         @(Html.GovUkPhaseBanner(new PhaseBannerViewModel
-         {
-             Phase = "DISCOVERY",
-             Html = @<text>This is a new service – your <a class="govuk-link" asp-action="SendFeedback" asp-controller="shared">feedback</a> will help us to improve it.</text>
+    {
+        Classes= "phase-banner-beta",
+        Phase = "BETA",
+        Html = @<text>This is a new service – your <a class="govuk-link" asp-action="SendFeedback" asp-controller="shared">feedback</a> will help us to improve it.</text>
     }))
         @(RenderSection("BeforeMain", false))
 

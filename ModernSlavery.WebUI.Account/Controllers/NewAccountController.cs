@@ -106,7 +106,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<SignUpViewModel>();
+                this.SetModelCustomErrors<SignUpViewModel>();
                 return View("AboutYou", model);
             }
 
@@ -115,7 +115,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<SignUpViewModel>();
+                this.SetModelCustomErrors<SignUpViewModel>();
                 return View("AboutYou", model);
             }
 
@@ -134,7 +134,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
                     {
                         //A registered user with this email already exists.
                         AddModelError(3001, "EmailAddress");
-                        this.CleanModelErrors<SignUpViewModel>();
+                        this.SetModelCustomErrors<SignUpViewModel>();
                         return View("AboutYou", model);
                     }
 
@@ -146,7 +146,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
                     {
                         AddModelError(3002, "EmailAddress",
                             new {remainingTime = remainingTime.ToFriendly(maxParts: 2)});
-                        this.CleanModelErrors<SignUpViewModel>();
+                        this.SetModelCustomErrors<SignUpViewModel>();
                         return View("AboutYou", model);
                     }
                 }
@@ -320,7 +320,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
                 model.Resend = true;
 
                 //prompt user to click to request a new one
-                this.CleanModelErrors<VerifyViewModel>();
+                this.SetModelCustomErrors<VerifyViewModel>();
                 return View("VerifyEmail", model);
             }
 
@@ -365,7 +365,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
                     AddModelError(3004);
 
                     //Prompt user to request a new verification code
-                    this.CleanModelErrors<VerifyViewModel>();
+                    this.SetModelCustomErrors<VerifyViewModel>();
                     result = View("VerifyEmail", model);
                 }
                 else if (virtualUser.VerifyAttempts >= SharedBusinessLogic.SharedOptions.MaxEmailVerifyAttempts &&

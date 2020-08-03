@@ -18,6 +18,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             _securityHeaders = securityHeaders ?? throw new ArgumentNullException(nameof(securityHeaders));
         }
 
+        [System.Diagnostics.DebuggerHidden()]
         public async Task Invoke(HttpContext httpContext)
         {
             httpContext.Response.OnStarting(

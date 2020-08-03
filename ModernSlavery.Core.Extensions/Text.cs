@@ -52,23 +52,26 @@ namespace ModernSlavery.Core.Extensions
             return Regex.IsMatch(input, "[0-9]");
         }
 
-        public static bool IsNullOrWhiteSpace(this string input, params string[] inputs)
+        public static bool IsAnyNullOrWhiteSpace(params string[] inputs)
         {
-            if (string.IsNullOrWhiteSpace(input)) return true;
-
-            if (inputs.Any(i => string.IsNullOrWhiteSpace(i))) return true;
-
-            return false;
+            return inputs.Any(i => string.IsNullOrWhiteSpace(i));
         }
 
-        public static bool IsAllNullOrWhiteSpace(this string input, params string[] inputs)
+        public static bool IsAnyNull<T>(params T[] inputs)
         {
-            if (!string.IsNullOrWhiteSpace(input)) return true;
-
-            if (inputs.Any(i => !string.IsNullOrWhiteSpace(i))) return true;
-
-            return false;
+            return inputs.Any(i => i==null);
         }
+
+        public static bool IsAllNullOrWhiteSpace(params string[] inputs)
+        {
+            return inputs.All(i => string.IsNullOrWhiteSpace(i));
+        }
+
+        public static bool IsAllNull<T>(params T[] inputs)
+        {
+            return inputs.All(i => i == null);
+        }
+
 
         private const string variablePattern = @"\$\((.*?)\)";
         public static readonly Regex VariableRegex = new Regex(variablePattern, RegexOptions.IgnoreCase);

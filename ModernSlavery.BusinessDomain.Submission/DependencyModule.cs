@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.DependencyInjection;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
 
@@ -27,6 +28,8 @@ namespace ModernSlavery.BusinessDomain.Submission
             builder.RegisterType<SubmissionService>().As<ISubmissionService>().InstancePerLifetimeScope().WithAttributeFiltering();
             builder.RegisterType<SubmissionBusinessLogic>().As<ISubmissionBusinessLogic>().InstancePerLifetimeScope().WithAttributeFiltering();
             builder.RegisterType<DraftFileBusinessLogic>().As<IDraftFileBusinessLogic>().SingleInstance();
+            builder.RegisterType<StatementBusinessLogic>().As<IStatementBusinessLogic>()
+                .InstancePerLifetimeScope().WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

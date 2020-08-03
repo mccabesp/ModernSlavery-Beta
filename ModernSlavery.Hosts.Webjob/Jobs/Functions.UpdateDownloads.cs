@@ -40,7 +40,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 var returnYears = _SharedBusinessLogic.DataRepository.GetAll<Return>()
-                    .Where(r => r.Status == ReturnStatuses.Submitted)
+                    .Where(r => r.Status == StatementStatuses.Submitted)
                     .Select(r => r.AccountingDate.Year)
                     .Distinct()
                     .ToList();
@@ -72,7 +72,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                     var returns = await _SharedBusinessLogic.DataRepository.GetAll<Return>().Where(r =>
                             r.AccountingDate.Year == year
-                            && r.Status == ReturnStatuses.Submitted
+                            && r.Status == StatementStatuses.Submitted
                             && r.Organisation.Status == OrganisationStatuses.Active)
                         .ToListAsync();
                     returns.RemoveAll(r =>

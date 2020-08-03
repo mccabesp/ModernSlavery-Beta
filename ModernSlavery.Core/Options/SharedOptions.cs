@@ -17,6 +17,7 @@ namespace ModernSlavery.Core.Models
 
         }
 
+        public string ApplicationName { get; set; }
         public string ServiceName { get; set; }
         private string _DevelopmentWebroot;
         public string DevelopmentWebroot { get => _DevelopmentWebroot; set => _DevelopmentWebroot = value!=null && value.StartsWith('.') ? Path.GetFullPath(value) : value; }
@@ -167,7 +168,7 @@ namespace ModernSlavery.Core.Models
 
         public string DownloadsLocation { get; set; }
 
-        public string SaveDraftPath { get; set; }
+
         #endregion
 
         public void Validate() 
@@ -200,6 +201,8 @@ namespace ModernSlavery.Core.Models
             else
                 while (PublicReportingDeadline.Date.AddDays(1) < VirtualDateTime.Now)
                     PublicReportingDeadline = new DateTime(PublicReportingDeadline.Year + 1, PublicReportingDeadline.Month, PublicReportingDeadline.Day);
+
+            if (string.IsNullOrWhiteSpace(DataPath)) throw new ConfigurationErrorsException($"{nameof(DataPath)} cannot be empty");
 
             if (exceptions.Count > 0)
             {

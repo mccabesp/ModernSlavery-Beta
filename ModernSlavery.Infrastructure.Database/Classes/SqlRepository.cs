@@ -89,9 +89,19 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             return GetEntities<TEntity>().Find(keyValues);
         }
 
+        public async Task<TEntity> GetAsync<TEntity>(params object[] keyValues) where TEntity : class
+        {
+            return await GetEntities<TEntity>().FindAsync(keyValues);
+        }
+
         public void Insert<TEntity>(TEntity entity) where TEntity : class
         {
             GetEntities<TEntity>().Add(entity);
+        }
+
+        public void Update<TEntity>(TEntity entity) where TEntity : class
+        {
+            GetEntities<TEntity>().Update(entity);
         }
 
         public void Delete<TEntity>(TEntity entity) where TEntity : class

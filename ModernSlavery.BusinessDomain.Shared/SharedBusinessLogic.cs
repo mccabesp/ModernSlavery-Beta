@@ -25,7 +25,8 @@ namespace ModernSlavery.BusinessDomain.Shared
         /// <param name="sectorType">The sector type of the organisation</param>
         /// <param name="year">The starting year of the accounting period. If 0 then uses current accounting period</param>
         /// <returns></returns>
-        DateTime GetAccountingStartDate(SectorTypes sectorType, int year = 0);
+        DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0);
+        DateTime GetReportingDeadline(SectorTypes sectorType, int year = 0);
     }
 
     public class SharedBusinessLogic : ISharedBusinessLogic
@@ -67,9 +68,14 @@ namespace ModernSlavery.BusinessDomain.Shared
         /// <param name="sectorType">The sector type of the organisation</param>
         /// <param name="year">The starting year of the accounting period. If 0 then uses current accounting period</param>
         /// <returns></returns>
-        public DateTime GetAccountingStartDate(SectorTypes sectorType, int year = 0)
+        public DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0)
         {
             return _snapshotDateHelper.GetReportingStartDate(sectorType, year);
+        }
+
+        public DateTime GetReportingDeadline(SectorTypes sectorType, int year = 0)
+        {
+            return _snapshotDateHelper.GetReportingDeadline(sectorType, year);
         }
     }
 }

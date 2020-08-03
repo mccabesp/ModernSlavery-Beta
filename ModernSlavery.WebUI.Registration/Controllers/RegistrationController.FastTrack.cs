@@ -48,7 +48,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<FastTrackViewModel>();
+                this.SetModelCustomErrors<FastTrackViewModel>();
                 return View("FastTrack", model);
             }
 

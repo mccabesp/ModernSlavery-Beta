@@ -32,7 +32,7 @@ namespace ModernSlavery.WebUI.Shared.Options
 
         public class Feature
         {
-            public enum Actions
+            public enum Actions : byte
             {
                 Enable,
                 Disable

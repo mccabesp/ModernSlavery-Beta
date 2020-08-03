@@ -48,27 +48,6 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
         #endregion
 
-        private string DecodeEmployerIdentifier(string employerIdentifier, out ActionResult actionResult)
-        {
-            var result = string.Empty;
-            actionResult = new EmptyResult();
-
-            if (string.IsNullOrWhiteSpace(employerIdentifier))
-                actionResult = new HttpBadRequestResult("Missing employer identifier");
-
-            try
-            {
-                result = HttpUtility.UrlDecode(Encryption.DecryptQuerystring(employerIdentifier));
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, $"Cannot decrypt return id from '{employerIdentifier}'");
-                actionResult = View("CustomError", WebService.ErrorViewModelFactory.Create(400));
-            }
-
-            return result;
-        }
-
         #region Dependencies
 
         public IViewingService ViewingService { get; }
@@ -239,7 +218,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("download-data/{year:int=0}")]
         public async Task<IActionResult> DownloadData(int year = 0)
         {
-            if (year == 0) year = ViewingService.SharedBusinessLogic.GetAccountingStartDate(SectorTypes.Private).Year;
+            if (year == 0) year = ViewingService.SharedBusinessLogic.GetReportingStartDate(SectorTypes.Private).Year;
 
             //Ensure we have a directory
             if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(SharedBusinessLogic.SharedOptions
@@ -284,57 +263,6 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         #endregion
 
         #region Employer details
-
-        [HttpGet("employer-details")]
-        [Obsolete("Please use method 'Employer' instead.")] //, true)]
-        public async Task<IActionResult> EmployerDetails(string e = null, int y = 0, string id = null)
-        {
-            if (!string.IsNullOrWhiteSpace(id))
-            {
-                Organisation organisation;
-
-                try
-                {
-                    var organisationLoadingOutcome =
-                        await ViewingService.OrganisationBusinessLogic.GetOrganisationByEncryptedReturnIdAsync(id);
-
-                    if (organisationLoadingOutcome.Failed)
-                        return organisationLoadingOutcome.ErrorMessage.ToHttpStatusViewResult();
-
-                    organisation = organisationLoadingOutcome.Result;
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex, "Cannot decrypt return id from query string");
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(400));
-                }
-
-                var organisationIdEncrypted = SharedBusinessLogic.Obfuscator.Obfuscate(organisation.OrganisationId);
-                return RedirectToActionPermanent(nameof(Employer), new {employerIdentifier = organisationIdEncrypted});
-            }
-
-            if (string.IsNullOrWhiteSpace(e))
-                return new HttpBadRequestResult("EmployerDetails: \'e\' query parameter was null or white space");
-
-            return RedirectToActionPermanent(nameof(Employer), new {employerIdentifier = e});
-        }
-
-        [HttpGet("employer-{employerIdentifier}")]
-        [Obsolete("Please use method 'Employer' instead.")] // , true)]
-        public IActionResult EmployerDeprecated(string employerIdentifier)
-        {
-            var decodedEmployerIdentifier = DecodeEmployerIdentifier(employerIdentifier, out var actionResult);
-
-            if (string.IsNullOrEmpty(decodedEmployerIdentifier)) return actionResult;
-
-            var employerIdentifierId = employerIdentifier.ToInt32();
-            var shortUrlObfuscatedEmployerIdentifier =
-                ViewingService.SharedBusinessLogic.Obfuscator.Obfuscate(employerIdentifierId);
-
-            return RedirectToActionPermanent(nameof(Employer),
-                new {employerIdentifier = shortUrlObfuscatedEmployerIdentifier});
-        }
-
         [NoCache]
         [HttpGet("~/Employer/{employerIdentifier}")]
         public IActionResult Employer(string employerIdentifier)
@@ -377,28 +305,6 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         #endregion
 
         #region Reports
-
-        [HttpGet("employer-{employerIdentifier}/report-{year}")]
-        [NoCache]
-        [Obsolete("ReportDeprecated is (unsurprisingly) deprecated, please use method 'Report' instead.")] // , true)]
-        public IActionResult ReportDeprecated(string employerIdentifier, int year)
-        {
-            if (year < SharedBusinessLogic.SharedOptions.FirstReportingYear || year > VirtualDateTime.Now.Year)
-                return new HttpBadRequestResult($"Invalid snapshot year {year}");
-
-            var decodedEmployerIdentifier = DecodeEmployerIdentifier(employerIdentifier, out var actionResult);
-
-            if (string.IsNullOrEmpty(decodedEmployerIdentifier)) return actionResult;
-
-            var employerIdentifierId = decodedEmployerIdentifier.ToInt32();
-            var shortUrlObfuscatedEmployerIdentifier =
-                ViewingService.SharedBusinessLogic.Obfuscator.Obfuscate(employerIdentifierId);
-
-            return RedirectToActionPermanent(nameof(Report),
-                new {employerIdentifier = shortUrlObfuscatedEmployerIdentifier, year});
-        }
-
-
         [HttpGet("~/Employer/{employerIdentifier}/{year}")]
         public IActionResult Report(string employerIdentifier, int year)
         {

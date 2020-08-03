@@ -30,9 +30,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 case "CompaniesHouseCheck":
                     await CompaniesHouseCheckAsync(log, true);
                     break;
-                case "DnBImport":
-                    await DnBImportAsync(log, parameters["currentUserId"].ToInt64(-1));
-                    break;
                 case "UpdateFile":
                     await UpdateFileAsync(log, parameters["filePath"], parameters["action"]);
                     break;

@@ -26,14 +26,12 @@ namespace ModernSlavery.BusinessDomain.Registration
             ISharedBusinessLogic sharedBusinessLogic,
             ISubmissionBusinessLogic submissionLogic,
             IScopeBusinessLogic scopeLogic,
-            ISecurityCodeBusinessLogic securityCodeLogic,
-            IDnBOrgsRepository dnBOrgsRepository)
+            ISecurityCodeBusinessLogic securityCodeLogic)
         {
             _sharedBusinessLogic = sharedBusinessLogic;
             _submissionLogic = submissionLogic;
             _scopeLogic = scopeLogic;
             _securityCodeLogic = securityCodeLogic;
-            DnBOrgsRepository = dnBOrgsRepository;
         }
 
         public IQueryable<Organisation> SearchOrganisations(string searchText,int records)
@@ -52,8 +50,6 @@ namespace ModernSlavery.BusinessDomain.Registration
                 .Select(o => o.org);
             return searchResults;
         }
-
-        public IDnBOrgsRepository DnBOrgsRepository { get; }
 
         /// <summary>
         ///     Gets a list of organisations with latest returns and scopes for Organisations download file
@@ -219,7 +215,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public string GetOrganisationSicSectorsString(Organisation organisation, DateTime? maxDate = null, string delimiter = ", ")
         {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1);
+            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType).AddYears(1);
 
             return organisation.GetSicSectorsString(maxDate.Value, delimiter);
         }
@@ -227,7 +223,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public string GetOrganisationSicSource(Organisation organisation, DateTime? maxDate = null)
         {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1);
+            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType).AddYears(1);
 
             return organisation.GetSicSource(maxDate.Value);
         }
@@ -305,7 +301,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 var defaultReturn = new Return
                 {
                     Organisation = organisation,
-                    AccountingDate =_sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType,year),
+                    AccountingDate =_sharedBusinessLogic.GetReportingStartDate(organisation.SectorType,year),
                     Modified = VirtualDateTime.Now
                 };
                 defaultReturn.IsLateSubmission = defaultReturn.CalculateIsLateSubmission();
@@ -403,7 +399,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             //Get the latest sic codes
             var sicCodes = GetOrganisationSicCodes(organisation);
 
-            var submittedReports = organisation.GetSubmittedReports().ToArray();
+            var submittedStatements = organisation.GetSubmittedStatements().ToArray();
 
             var result = new EmployerSearchModel
             {
@@ -414,19 +410,19 @@ namespace ModernSlavery.BusinessDomain.Registration
                 PartialNameForSuffixSearches = organisation.OrganisationName,
                 PartialNameForCompleteTokenSearches = organisation.OrganisationName,
                 Abbreviations = abbreviations.ToArray(),
-                Size = organisation.LatestReturn == null ? 0 : (int)organisation.LatestReturn.OrganisationSize,
+                Size = 0,
                 SicSectionIds = sicCodes.Select(sic => sic.SicCode.SicSectionId.ToString()).Distinct().ToArray(),
                 SicSectionNames = sicCodes.Select(sic => sic.SicCode.SicSection.Description).Distinct().ToArray(),
                 SicCodeIds = sicCodes.Select(sicCode => sicCode.SicCodeId.ToString()).Distinct().ToArray(),
                 Address = organisation.LatestAddress?.GetAddressString(),
-                LatestReportedDate = submittedReports.Select(x => x.Created).FirstOrDefault(),
-                ReportedYears = submittedReports.Select(x => x.AccountingDate.Year.ToString()).ToArray(),
+                LatestReportedDate = submittedStatements.Select(x => x.Created).FirstOrDefault(),
+                ReportedYears = submittedStatements.Select(x => x.SubmissionDeadline.Year.ToString()).ToArray(),
                 ReportedLateYears =
-                    submittedReports.Where(x => x.IsLateSubmission).Select(x => x.AccountingDate.Year.ToString())
+                    submittedStatements.Where(x => x.CalculateIsLateSubmission()).Select(x => x.SubmissionDeadline.Year.ToString())
                         .ToArray(),
-                ReportedExplanationYears = submittedReports
-                    .Where(x => string.IsNullOrEmpty(x.CompanyLinkToGPGInfo) == false)
-                    .Select(x => x.AccountingDate.Year.ToString())
+                ReportedExplanationYears = submittedStatements
+                    .Where(x => string.IsNullOrEmpty(x.StatementUrl) == false)
+                    .Select(x => x.SubmissionDeadline.Year.ToString())
                     .ToArray()
             };
 
@@ -461,7 +457,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public IEnumerable<int> GetOrganisationRecentReportingYears(Organisation organisation,int recentCount)
         {
-            var endYear = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).Year;
+            var endYear = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType).Year;
             var startYear = endYear - (recentCount - 1);
             if (startYear < _sharedBusinessLogic.SharedOptions.FirstReportingYear) startYear = _sharedBusinessLogic.SharedOptions.FirstReportingYear;
 
@@ -486,7 +482,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public bool GetOrganisationWasDissolvedBeforeCurrentAccountingYear(Organisation organisation)
         {
-            var accountingStartDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType);
+            var accountingStartDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType);
             return organisation.GetWasDissolvedBefore(accountingStartDate);
         }
 
@@ -497,7 +493,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         /// <returns>The name of the organisation</returns>
         public OrganisationName GetOrganisationName(Organisation organisation, DateTime? maxDate = null)
         {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate =_sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1);
+            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate =_sharedBusinessLogic.GetReportingStartDate(organisation.SectorType).AddYears(1);
 
             return organisation.GetName(maxDate.Value);
         }
@@ -509,10 +505,10 @@ namespace ModernSlavery.BusinessDomain.Registration
         /// <returns>The address of the organisation</returns>
         public OrganisationAddress GetOrganisationAddress(Organisation organisation, DateTime? maxDate = null, AddressStatuses status = AddressStatuses.Active)
         {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1);
+            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType).AddYears(1);
 
             if (status == AddressStatuses.Active && organisation.LatestAddress != null &&
-                maxDate == _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1)) return organisation.LatestAddress;
+                maxDate == _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType).AddYears(1)) return organisation.LatestAddress;
 
             return organisation.GetAddress(maxDate.Value);
         }
@@ -537,7 +533,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         /// <returns>The name of the organisation</returns>
         public IEnumerable<OrganisationSicCode> GetOrganisationSicCodes(Organisation organisation,DateTime? maxDate = null)
         {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType).AddYears(1);
+            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType).AddYears(1);
 
             return organisation.OrganisationSicCodes.Where(s =>
                 s.Created < maxDate && (s.Retired == null || s.Retired.Value > maxDate));
@@ -574,14 +570,14 @@ namespace ModernSlavery.BusinessDomain.Registration
         //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
         public Return GetOrganisationReturn(Organisation organisation, int year = 0)
         {
-            var accountingStartDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType,year);
+            var accountingStartDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType,year);
             return organisation.GetReturn(year);
         }
 
         //Returns the latest scope for the current accounting date
         public OrganisationScope GetOrganisationCurrentScope(Organisation organisation)
         {
-            var accountingStartDate = _sharedBusinessLogic.GetAccountingStartDate(organisation.SectorType);
+            var accountingStartDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType);
 
             return organisation.GetScope(accountingStartDate);
         }

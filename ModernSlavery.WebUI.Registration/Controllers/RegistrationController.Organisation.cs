@@ -72,7 +72,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             {
                 // either it is fast track, or sectortype mut be set
                 AddModelError(3005, "RegistrationType");
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View("OrganisationType", model);
             }
 
@@ -131,7 +131,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             ModelState.Include("SearchText");
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View("OrganisationSearch", model);
             }
 
@@ -315,7 +315,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    this.CleanModelErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<OrganisationViewModel>();
                     return View("ChooseOrganisation", model);
                 }
 
@@ -431,7 +431,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     && !VirtualUser.UserOrganisations.Any(uo => uo.PINConfirmedDate != null))
                 {
                     AddModelError(3022);
-                    this.CleanModelErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<OrganisationViewModel>();
                     return View("ChooseOrganisation", model);
                 }
 
@@ -472,7 +472,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     if (userOrg != null)
                     {
                         AddModelError(userOrg.PINConfirmedDate == null ? 3021 : 3020);
-                        this.CleanModelErrors<OrganisationViewModel>();
+                        this.SetModelCustomErrors<OrganisationViewModel>();
                         return View("ChooseOrganisation", model);
                     }
 
@@ -493,15 +493,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 //Make sure the organisation has an address
                 if (employer.SectorType == SectorTypes.Public)
                 {
-                    //Get the email domains from the D&B file
-                    if (string.IsNullOrWhiteSpace(employer.EmailDomains))
-                    {
-                        var allDnBOrgs = await _registrationService.OrganisationBusinessLogic.DnBOrgsRepository
-                            .GetAllDnBOrgsAsync();
-                        var dnbOrg = allDnBOrgs?.FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
-                        if (dnbOrg != null) employer.EmailDomains = dnbOrg.EmailDomains;
-                    }
-
                     model.ManualRegistration = false;
                     model.SelectedAuthorised = employer.IsAuthorised(VirtualUser.EmailAddress);
                     if (!model.SelectedAuthorised || !employer.HasAnyAddress())
@@ -672,7 +663,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             ModelState.Exclude(excludes.ToArray());
             if (!ModelState.IsValid)
             {
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View("AddOrganisation", model);
             }
 
@@ -891,7 +882,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     !VirtualUser.UserOrganisations.Any(uo => uo.PINConfirmedDate != null))
                 {
                     AddModelError(3022);
-                    this.CleanModelErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<OrganisationViewModel>();
                     return View(returnAction, model);
                 }
 
@@ -901,7 +892,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (userOrg != null)
             {
                 AddModelError(userOrg.PINConfirmedDate == null ? 3021 : 3020);
-                this.CleanModelErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<OrganisationViewModel>();
                 return View(returnAction, model);
             }
 
@@ -911,15 +902,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             //Make sure the organisation has an address
             if (employer.SectorType == SectorTypes.Public)
             {
-                //Get the email domains from the D&B file
-                if (string.IsNullOrWhiteSpace(employer.EmailDomains))
-                {
-                    var allDnBOrgs = await _registrationService.OrganisationBusinessLogic.DnBOrgsRepository
-                        .GetAllDnBOrgsAsync();
-                    var dnbOrg = allDnBOrgs?.FirstOrDefault(o => o.EmployerReference == employer.EmployerReference);
-                    if (dnbOrg != null) employer.EmailDomains = dnbOrg.EmailDomains;
-                }
-
                 model.ManualAuthorised = employer.IsAuthorised(VirtualUser.EmailAddress);
                 if (!model.ManualAuthorised || !employer.HasAnyAddress()) model.ManualAddress = true;
             }
@@ -1254,7 +1236,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     new CompleteViewModel
                     {
                         OrganisationId = userOrg.OrganisationId,
-                        AccountingDate = _registrationService.SharedBusinessLogic.GetAccountingStartDate(sector.Value)
+                        AccountingDate = _registrationService.SharedBusinessLogic.GetReportingStartDate(sector.Value)
                     });
 
                 //BUG: the return keyword was missing here so no redirection would occur
@@ -1324,7 +1306,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     ScopeStatusDate = now,
                     Status = ScopeRowStatuses.Active,
                     StatusDetails = "Generated by the system",
-                    SnapshotDate = _registrationService.SharedBusinessLogic.GetAccountingStartDate(org.SectorType)
+                    SubmissionDeadline = _registrationService.SharedBusinessLogic.GetReportingStartDate(org.SectorType)
                 };
                 SharedBusinessLogic.DataRepository.Insert(newScope);
                 org.OrganisationScopes.Add(newScope);
@@ -1337,7 +1319,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     ScopeStatusDate = now,
                     Status = ScopeRowStatuses.Active,
                     StatusDetails = "Generated by the system",
-                    SnapshotDate = newScope.SnapshotDate.AddYears(-1)
+                    SubmissionDeadline = newScope.SubmissionDeadline.AddYears(-1)
                 };
                 SharedBusinessLogic.DataRepository.Insert(oldScope);
                 org.OrganisationScopes.Add(oldScope);

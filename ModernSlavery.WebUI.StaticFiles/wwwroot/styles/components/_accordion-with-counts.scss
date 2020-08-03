@@ -1,0 +1,11 @@
+﻿.govuk-checkboxes {
+    counter-reset: checked;
+}
+
+.govuk-checkboxes__item input:checked {
+    counter-increment: checked;
+}
+
+.checkbox-count:before {
+    content: counter(checked);
+}

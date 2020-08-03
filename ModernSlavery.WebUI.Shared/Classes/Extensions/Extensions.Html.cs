@@ -77,6 +77,20 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             return state == null || state.Errors.Count == 0 ? HtmlString.Empty : new HtmlString(errorClassName);
         }
 
+        public static HtmlString SetErrorClass<TModel>(
+           this IHtmlHelper<TModel> htmlHelper,
+           string[] fullHtmlFieldNames,
+           string errorClassName,
+           string noErrorClassName = null)
+        {
+            foreach (var fullHtmlFieldName in fullHtmlFieldNames)
+            {
+                var state = htmlHelper.ViewData.ModelState[fullHtmlFieldName];
+                if (state != null && state.Errors.Count > 0) return new HtmlString(errorClassName);
+            }
+            return string.IsNullOrWhiteSpace(noErrorClassName) ? HtmlString.Empty : new HtmlString(noErrorClassName);
+        }
+
 
         public static HtmlString HiddenFor<TModel>(this IHtmlHelper<TModel> helper, params string[] propertyNames)
         {

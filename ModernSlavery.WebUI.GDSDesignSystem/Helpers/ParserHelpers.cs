@@ -1,10 +1,14 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
 {
@@ -28,6 +32,15 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
             model.AddUnparsedValues(parameterName, unparsedValuesFromRequestForThisProperty);
         }
 
+
+        public static bool IsValueRequiredBasedOnAnother(PropertyInfo property, StringValues parameterValues)
+        {
+            var requiredAttribute = property.GetCustomAttribute<GovUkValidateRequiredIfAttribute>();
+            var valueIsRequired = requiredAttribute != null;
+            var valueIsMissing = parameterValues.Count == 0;
+
+            return valueIsRequired && valueIsMissing;
+        }
 
         public static bool IsValueRequiredAndMissing(PropertyInfo property, StringValues parameterValues)
         {

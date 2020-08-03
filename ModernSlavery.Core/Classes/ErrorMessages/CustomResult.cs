@@ -2,10 +2,39 @@
 
 namespace ModernSlavery.Core.Classes.ErrorMessages
 {
-    [Serializable]
-    public class CustomResult<T>
+    public class BaseCustomErrorResult
+    { }
+
+    public class CustomResult<TSuccess, TError>
+        where TError : BaseCustomErrorResult
     {
-        public CustomResult(T result)
+        public TSuccess Result { get; }
+
+        public TSuccess ErrorRelatedObject { get;}
+
+        public TError ErrorResult { get; }
+
+        public CustomResult(TSuccess result)
+        {
+            Result = result;
+        }
+
+        public CustomResult(TError errorMessage)
+        {
+            ErrorResult = errorMessage;
+        }
+        public CustomResult(TError errorMessage, TSuccess errorRelatedObject)
+            : this(errorMessage)
+        {
+            ErrorRelatedObject = errorRelatedObject;
+        }
+    }
+
+
+    [Serializable]
+    public class CustomResult<TSuccess>
+    {
+        public CustomResult(TSuccess result)
         {
             Result = result;
         }
@@ -25,14 +54,14 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         ///     the organisation before the error happened - that way the calling client should be aware of the org causing the
         ///     issue.
         /// </param>
-        public CustomResult(CustomError errorMessage, T errorRelatedObject)
+        public CustomResult(CustomError errorMessage, TSuccess errorRelatedObject)
             : this(errorMessage)
         {
             ErrorRelatedObject = errorRelatedObject;
         }
 
-        public T ErrorRelatedObject { get; }
-        public T Result { get; }
+        public TSuccess ErrorRelatedObject { get; }
+        public TSuccess Result { get; }
         public CustomError ErrorMessage { get; set; }
         public bool Succeeded => ErrorMessage == null;
         public bool Failed => ErrorMessage != null;

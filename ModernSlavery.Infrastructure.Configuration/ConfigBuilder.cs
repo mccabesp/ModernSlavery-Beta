@@ -24,8 +24,10 @@ namespace ModernSlavery.Infrastructure.Configuration
 
         public ConfigBuilder(Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs)
         {
-            _additionalSettings = additionalSettings;
+            _additionalSettings = additionalSettings ?? new Dictionary<string, string>();
             _commandlineArgs = commandlineArgs;
+
+            _additionalSettings[HostDefaults.ApplicationKey] = Assembly.GetEntryAssembly().GetName().Name;
         }
 
         public void Dispose()
@@ -39,7 +41,9 @@ namespace ModernSlavery.Infrastructure.Configuration
             appBuilder.AddEnvironmentVariables("DOTNET_");
             appBuilder.AddEnvironmentVariables("ASPNETCORE_");
             appBuilder.AddEnvironmentVariables();
+
             if (_commandlineArgs!=null && _commandlineArgs.Any())appBuilder.AddCommandLine(_commandlineArgs);
+            
             _appConfig = appBuilder.Build();
 
             if (_appConfig["WEBSITE_RUN_FROM_PACKAGE"] == "1")

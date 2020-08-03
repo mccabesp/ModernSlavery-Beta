@@ -1,0 +1,65 @@
+﻿@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model PoliciesPageViewModel
+<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @await Html.CustomValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.ReturnToReviewPage);
+            @Html.HiddenFor(m => m.Submitted);
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-heading-l">
+                            @Model.PageTitle
+                        </h1>
+                        <h2 class="govuk-heading-m">
+                            Do your organisation`s modern slavery policies or codes include any of the following provisions?
+                        </h2>
+                    </legend>
+                    <span id="organisation-hint" class="govuk-hint">
+                        Select all that apply
+                    </span>
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        @foreach (var policyType in Model.PolicyTypes)
+                        {
+                            <div class="govuk-checkboxes__item">
+                                <input name="Policies" value="@policyType.Id" id="@($"policy{policyType.Id}")" checked=@(Model.Policies.Contains(policyType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="policies-conditional@(policyType.Id)">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"policy{policyType.Id}")">
+                                    @policyType.Description
+                                </label>
+                            </div>
+                            @if (policyType.Description.Contains("Other"))
+                            {
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPolicies, "govuk-form-group--error")" id="policies-conditional@(policyType.Id)">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="other">
+                                            Please provide detail
+                                        </label>
+                                        <textarea asp-for="OtherPolicies" name="OtherPolicies" class="govuk-textarea" id="policies-other" spellcheck="false" rows="5" maxlength="256">@Model.OtherPolicies</textarea>
+                                        <span asp-validation-for="OtherPolicies" class="govuk-error-message"></span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </fieldset>
+            </div>
+
+            <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Continue
+            </button>
+
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+                Cancel
+            </button>
+        }
+
+    </div>
+
+</div>
