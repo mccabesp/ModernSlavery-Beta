@@ -15,29 +15,18 @@
                     <h1 class="bold-medium">
                         We’ve got your details.
                         <br />
-                        We will review them and get in touch to confirm.
+                        We will review them and get in touch to let you know if your registration was successful.
                     </h1>
                 </div>
                 <div class="bold-small">
-                    What happens next.
-                </div>
-                <p>
-                    The
-                    @if (!string.IsNullOrWhiteSpace(ViewBag.TestUrl))
-                    {
-                        <a data-name="testurl" href="@ViewBag.TestUrl">
-                            Government Equalities Office
-                        </a>
-                    }
-                    else
-                    {
-                        <span>Government Equalities Office</span>
-                    }
-                    will review your details and get in touch within 5 working days to confirm your registration.
-                </p>
+                    What happens next
+                </div>            
                 <p>If we need more information to complete your registration, we will call or email you.</p>
-                <p>If you have not heard from us after 5 working days, please check your junk email folder.</p>
-                <p>For help with your registration, please contact <a href="mailto:@(sharedOptions.MSUReportingEmail)" target="_blank">@sharedOptions.MSUReportingEmail</a></p>
+                <p>If you have not heard from us within 5 working days, check your junk email folder.</p>
+                <p>
+                    If there is still no email from us, or for any other help with your registration, contact 
+                    <a href="mailto:@(sharedOptions.MsuReportingEmail)" target="_blank">@sharedOptions.MsuReportingEmail</a>
+                </p>
                 <div class="bold-small">
                     More options
                 </div>
@@ -45,7 +34,7 @@
                     <a href="@Url.Action("OrganisationType")">Add another organisation</a>
                 </p>
                 <p>
-                    <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Manage Organisations</a>
+                    <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Manage organisations</a>
                 </p>
             </div>
         </div>
