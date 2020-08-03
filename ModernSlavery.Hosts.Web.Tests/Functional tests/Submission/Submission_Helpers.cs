@@ -101,9 +101,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //order is element number on page
             //on your submission page 3 present
-            ui.SetXPath("(//div//label[contains(text(), 'Year')]/following-sibling::input)[" + Order + "])").To(Year);
-            ui.SetXPath("(//div//label[contains(text(), 'Month')]/following-sibling::input)[" + Order + "])").To(Month);
-            ui.SetXPath("(//div//label[contains(text(), 'Day')]/following-sibling::input)[" + Order + "])").To(Day);
+            ui.SetXPath("(//div//label[contains(text(), 'Year')]/following-sibling::input)[" + Order + "]").To(Year);
+            ui.SetXPath("(//div//label[contains(text(), 'Month')]/following-sibling::input)[" + Order + "]").To(Month);
+            ui.SetXPath("(//div//label[contains(text(), 'Day')]/following-sibling::input)[" + Order + "]").To(Day);
         }
 
         public static void NavigateToSubmission(UIContext ui, string Organistion, string YearFrom, string YearTo)
