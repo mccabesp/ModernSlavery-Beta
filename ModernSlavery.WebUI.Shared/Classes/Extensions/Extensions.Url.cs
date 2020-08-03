@@ -67,6 +67,15 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             return helper.Action(actionName, controllerName, routeData ,protocol, host, fragment);
         }
 
+        public static string PageArea(this IUrlHelper helper, string pageName, string areaName, string handlerName=null, object routeValues = null, string protocol = null, string host = null, string fragment = null)
+        {
+            if (string.IsNullOrWhiteSpace(pageName)) throw new ArgumentNullException(nameof(pageName));
+            if (string.IsNullOrWhiteSpace(areaName)) throw new ArgumentNullException(nameof(areaName));
+
+            IDictionary<string, object> routeData = routeValues?.ToDynamic() ?? new Dictionary<string, object>();
+            routeData["Area"] = areaName;
+            return helper.Page(pageName, handlerName, routeData, protocol, host, fragment);
+        }
         public static bool IsAction(this IUrlHelper helper, string actionName, string controllerName=null, string areaName=null)
         {
             var currentUrl= helper.ActionContext.HttpContext.Request.Path.Value;
