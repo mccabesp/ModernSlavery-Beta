@@ -94,7 +94,7 @@ namespace ModernSlavery.Core.Models
         public string AssemblyCopyright => Misc.GetTopAssembly().GetAssemblyCopyright();
         public string DatabaseConnectionName { get; set; } = "ModernSlaveryDatabase";
 
-        public string GpgReportingEmail { get; set; }
+        public string MSUReportingEmail { get; set; }
         public string DataControllerEmail { get; set; }
         public string DataProtectionOfficerEmail { get; set; }
 

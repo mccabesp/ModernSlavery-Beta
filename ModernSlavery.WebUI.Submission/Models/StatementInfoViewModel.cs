@@ -28,13 +28,13 @@ namespace ModernSlavery.WebUI.Submission.Models
             get 
             {
                 if (!SubmissionAvailable && !DraftAvailable)
-                    return "Draft report";
+                    return "Start draft";
                 if (!SubmissionAvailable && DraftAvailable)
-                    return "Edit Draft";
+                    return "Continue";
                 if (SubmissionAvailable && !DraftAvailable)
-                    return "Edit Report";
+                    return "Edit and republish";
                 if (SubmissionAvailable && DraftAvailable)
-                    return "Edit Draft Report";
+                    return "Edit and republish";
                 return null;
             }
         }

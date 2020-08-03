@@ -38,14 +38,14 @@
     <div class="column-full">
         <details>
             <summary>
-                <span class="summary">Need to make changes to your organisation details?</span>
+                <span class="summary">Incorrect details</span>
             </summary>
             <div class="panel panel-border-narrow">
                 <p>
                     If you are a private or voluntary organisation and need to change your organisation name,
                     sector information, or address you should do this via Companies House.
                     Changes that you make will automatically be reflected on this site.
-                    If this information is not available on Companies House, please contact <a href="mailto:@(sharedOptions.GpgReportingEmail)" target="_blank">@sharedOptions.GpgReportingEmail</a>
+                    If this information is not available on Companies House, please contact <a href="mailto:@(sharedOptions.MSUReportingEmail)" target="_blank">@sharedOptions.MSUReportingEmail</a>
                 </p>
             </div>
         </details>
@@ -54,7 +54,7 @@
 <div class="grid-row">
     <div class="column-full">
         <h2 class="heading-medium">
-            Manage reports
+            Manage your submissions
         </h2>
 
         <div class="gpg-manage-reports">
@@ -64,10 +64,12 @@
                     Year
                 </div>
                 <div class="gpg-manage-reports__desc">
-                    Reporting requirement
+                    Submission requirement
                 </div>
-                <div class="gpg-manage-reports__desc gpg-manage-reports__desc--action">
-                    Report status
+                <div class="gpg-manage-reports__desc">
+                    Submission status
+                </div>
+                <div class="gpg-manage-reports__desc">
                 </div>
             </div>
             @await foreach (StatementInfoModel statementInfoModel in Model.StatementInfoModels)
@@ -102,7 +104,7 @@
         else
         {
             <p>
-                The following people are registered to report Modern Slavery statement for this organisation.
+                The following people are registered to report information for this organisation.
             </p>
         }
 
@@ -117,7 +119,7 @@
                             <td style="border: none;" class="org-name">@userFullname</td>
                             <td style="border: none;">
                                 <a href="@Url.ActionArea("RemoveOrganisation","Registration", "Registration", new {orgId = Model.OrganisationIdentifier, userId = encUserId})">
-                                    Remove user from reporting
+                                    Remove user
                                 </a>
                             </td>
                         </tr>
@@ -129,7 +131,7 @@
                         </td>
                         <td style="border: none;">
                             <a href="@Url.ActionArea("RemoveOrganisation","Registration", "Registration", new {orgId = Model.OrganisationIdentifier, userId = Model.CurrentUserIdentifier})">
-                                Remove user from reporting
+                                Remove user
                             </a>
                         </td>
                     </tr>
