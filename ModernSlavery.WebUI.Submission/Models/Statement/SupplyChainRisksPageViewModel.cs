@@ -83,9 +83,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             var validationResults = new List<ValidationResult>();
 
-            if (RelevantRisks.Count(r => r.Id > 0) > 3)
-                validationResults.AddValidationError(3501, nameof(RelevantRisks));
-
             var vulnerableGroupId = RiskTypes.Single(x => x.Description.Equals("Other vulnerable groups")).Id;
             var vulnerableGroupIndex = RelevantRisks.FindIndex(r => r.Id == vulnerableGroupId);
             var otherVulnerableGroup = RelevantRisks.FirstOrDefault(x => x.Id == vulnerableGroupId);
