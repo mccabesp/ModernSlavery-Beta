@@ -14,13 +14,14 @@
             @Html.HiddenFor(m => m.ReturnToReviewPage);
             @Html.HiddenFor(m => m.Submitted);
 
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
+
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        <h1 class="govuk-heading-l">
-                            @Model.PageTitle
-                        </h1>
-                        <h2 class="govuk-heading-m">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading">
                             Which sector does your organisation operate in?
                         </h2>
                     </legend>
@@ -55,8 +56,8 @@
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        <h2 class="govuk-heading-m">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading">
                             What was your turnover or budget during the last financial accounting year?
                         </h2>
                     </legend>

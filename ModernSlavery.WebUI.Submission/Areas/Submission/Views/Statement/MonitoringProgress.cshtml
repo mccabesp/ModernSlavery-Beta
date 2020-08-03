@@ -18,23 +18,27 @@
             </h1>
 
             <div class="govuk-form-group">
-                <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                    <label asp-for="IncludesMeasuringProgress" class="govuk-label govuk-label--m">
-                        Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?
-                    </label>
-                    <div class="govuk-radios__item">
-                        <input asp-for="IncludesMeasuringProgress" value="true" id="IncludeGoals_True" checked="@(Model.IncludesMeasuringProgress==true)" class="govuk-radios__input" type="radio">
-                        <label class="govuk-label govuk-radios__label" asp-for="IncludesMeasuringProgress">
-                            Yes
-                        </label>
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading">
+                            Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?
+                        </h2>
+                    </legend>
+                    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesMeasuringProgress" value="true" id="IncludeGoals_True" checked="@(Model.IncludesMeasuringProgress==true)" class="govuk-radios__input" type="radio">
+                            <label class="govuk-label govuk-radios__label" asp-for="IncludesMeasuringProgress">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input asp-for="IncludesMeasuringProgress" value="false" id="IncludeGoals_False" checked="@(Model.IncludesMeasuringProgress==false)" class="govuk-radios__input" type="radio" data-aria-controls="conditional-include-goals-conditional">
+                            <label class="govuk-label govuk-radios__label" for="IncludeGoals_False">
+                                No
+                            </label>
+                        </div>
                     </div>
-                    <div class="govuk-radios__item">
-                        <input asp-for="IncludesMeasuringProgress" value="false" id="IncludeGoals_False" checked="@(Model.IncludesMeasuringProgress==false)" class="govuk-radios__input" type="radio" data-aria-controls="conditional-include-goals-conditional">
-                        <label class="govuk-label govuk-radios__label" for="IncludeGoals_False">
-                            No
-                        </label>
-                    </div>
-                </div>
+                </fieldset>
             </div>
 
             <div class="govuk-form-group">
@@ -57,7 +61,7 @@
 
             <fieldset class="govuk-fieldset govuk-!-margin-top-6" describedby="GovUk_StatementYears-hint">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                    How many years has your organisation been producing modern slavery statements?
+                    <h2 class="govuk-fieldset__heading">How many years has your organisation been producing modern slavery statements?</h2>
                 </legend>
                 <div class="govuk-form-group ">
                     <span class="govuk-hint" id="GovUk_StatementYears-hint">
