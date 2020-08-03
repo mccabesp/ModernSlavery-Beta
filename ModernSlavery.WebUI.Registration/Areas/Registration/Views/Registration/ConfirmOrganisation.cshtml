@@ -170,22 +170,6 @@
                     </td>
                 </tr>
 
-                <tr>
-                    <td>
-                        Business&nbsp;Sectors (SIC&nbsp;Codes)
-                    </td>
-                    <td>
-                        @if (Model.SicCodes != null && Model.SicCodes.Count > 0)
-                        {
-                            @await Html.PartialAsync("_SicCodeList", Model.SicCodes)
-                        }
-                        else
-                        {
-                            <span>None</span>
-                        }
-                    </td>
-                </tr>
-
                 @if (!string.IsNullOrWhiteSpace(Model.ContactFirstName) || !string.IsNullOrWhiteSpace(Model.ContactFirstName))
                 {
                     <tr class="row dynamic-content publicManual privateManual" style="display: table-row;">

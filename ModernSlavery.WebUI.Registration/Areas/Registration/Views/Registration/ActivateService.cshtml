@@ -15,11 +15,15 @@
             <div class="column-two-thirds">
                 @await Html.CustomValidationSummaryAsync()
                 <h1 class="heading-large">
-                    Please enter your Modern Slavery Reporting service PIN
+                   Enter your registration PIN
                 </h1>
                 <p>
-                    Enter the PIN to enable you to report Modern Slavery information for this organisation.
+                    Enter the PIN we sent you by post to finish registering this organisation.
                 </p>
+                <p>
+                    You will then be able to submit information about this organisation`s modern slavery statement.
+                </p>                    
+               
                 <div class="form-group @Html.SetErrorClass(model => model.PIN, "error") ">
                     @Html.LabelFor(model => model.PIN, "Enter PIN", new {@class = "form-label"})
                     @Html.ValidationMessageFor(model => model.PIN, null, new {@class = "error-danger"})

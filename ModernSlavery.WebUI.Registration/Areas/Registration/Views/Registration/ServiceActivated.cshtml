@@ -6,21 +6,20 @@
 <div class="grid-row">
     <div class="column-two-thirds">
         <div class="govuk-box-highlight">
-            <h1 class="bold-large">You can now publish a Modern Slavery statement on behalf of this organisation.</h1>
+            <h1 class="bold-large">You can now submit a modern slavery statement for this organisation.</h1>
         </div>
         <div class="subsection">
             <dl class="govuk-check-your-answers cya-questions-short">
                 <div>
                     <dt class="cya-question">
-                        Employer name
+                        Organisation name
                     </dt>
                     <dd class="cya-answer">
                         @ViewBag.OrganisationName
                     </dd>
                 </div>
             </dl>
-        </div>
-        <p>You can also specify whether this employer is in scope of the reporting regulations.</p>
+        </div>       
         <br/>
         <p>
             <a class="button" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Continue</a>
