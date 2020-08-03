@@ -6,7 +6,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture, Ignore("Awaiting Submission merge")]
 
-    public class Submission_Complete_Mandatory_Sections : Private_Registration_Success
+    public class Your_Modern_Slavery_Statement_Date_Validation : Private_Registration_Success
     {
         [Test, Order(40)]
         public async Task StartSubmission()
