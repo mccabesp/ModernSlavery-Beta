@@ -50,7 +50,7 @@
         document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
     </script>
 
-    @if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request) && !ViewContext.RouteData.Values["action"].Equals("CookieSettings"))
+    @if (featureSwitchOptions.IsEnabled("CookiePolicyLink") && !CookieHelper.HasSeenLatestCookieMessage(Context.Request) && !ViewContext.RouteData.Values["action"].Equals("CookieSettings"))
     {
         await Html.RenderPartialAsync("~/Views/Components/CookieBanner.cshtml");
     }
@@ -161,16 +161,18 @@
             Href = Url.Page("/ContactUs")
         });
 
-        links.Add(new FooterLinksViewModel
-        {
-            Text = "Cookies",
-            Href = Url.Action("CookieSettings", "Shared")
-        });
-        links.Add(new FooterLinksViewModel
-        {
-            Text = "Privacy Policy",
-            Href = Url.Action("PrivacyPolicy", "Shared")
-        });
+        if (featureSwitchOptions.IsEnabled("CookiePolicyLink"))
+            links.Add(new FooterLinksViewModel
+            {
+                Text = "Cookies",
+                Href = Url.Action("CookieSettings", "Shared")
+            });
+        if (featureSwitchOptions.IsEnabled("PrivacyPolicyLink"))
+            links.Add(new FooterLinksViewModel
+            {
+                Text = "Privacy Policy",
+                Href = Url.Action("PrivacyPolicy", "Shared")
+            });
         if (featureSwitchOptions.IsEnabled("ReportConcernsLink"))
             links.Add(new FooterLinksViewModel
             {

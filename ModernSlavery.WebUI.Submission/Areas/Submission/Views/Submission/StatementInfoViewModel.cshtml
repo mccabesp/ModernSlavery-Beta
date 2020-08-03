@@ -14,11 +14,11 @@
         <div>
             @if (!Model.StatementInfo.RequiredToReport)
             {
-                <span>NOT REQUIRED TO REPORT</span>
+                <span>Not required to submit</span>
             }
             else
             {
-                <span>REQUIRED TO REPORT<!--<br /> by @(reportDateFormatter.FullStartDate)--></span>
+                <span>Required to submit<!--<br /> by @(reportDateFormatter.FullStartDate)--></span>
             }
         </div>
         @if (Model.CanChangeScope)
@@ -29,25 +29,33 @@
         }
     </div>
 
-    <div class="gpg-manage-reports__cell gpg-manage-reports__cell--action">
+    <div class="gpg-manage-reports__cell">
         <div>
             @if (Model.StatementInfo.SubmittedStatementModifiedDate == null)
             {
-                <span>Your organisation has not reported</span>
+                if (Model.DraftAvailable)
+                {
+                    <span>In progress</span>
+                }
+                else
+                {
+                    <span>Not started</span>
+                }
             }
             else
             {
-                <span>Reported </span>
+                <span>Published</span>
                 if (!Model.StatementInfo.RequiredToReport)
                 {
-                    <span>voluntarily</span>
+                    <span> voluntarily</span>
                 }
                 var modifiedDateFormatter = new GDSDateFormatter(Model.StatementInfo.SubmittedStatementModifiedDate.Value);
                 <span> on @modifiedDateFormatter.FullStartDate</span>
             }
         </div>
-        <br />
+    </div>
 
+    <div class="gpg-manage-reports__cell gpg-manage-reports__cell--action">
         <a class="button" id="NewReport@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@Model.EditUrl">
             <span>@Model.ButtonText</span>
         </a>

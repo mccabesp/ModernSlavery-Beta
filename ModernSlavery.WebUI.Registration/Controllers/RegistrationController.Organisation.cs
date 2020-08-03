@@ -1450,7 +1450,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 {
                     var oldSicCodes = org.GetLatestSicCodes();
                     var oldSicCodeIds = org.GetLatestSicCodeIds();
-
                     //Set the sic codes if there arent any sic codes already or new sic codes are from CoHo
                     if (!oldSicCodes.Any()
                         || !newSicCodeIds.SequenceEqual(oldSicCodeIds)

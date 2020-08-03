@@ -538,7 +538,6 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 "Registration/AddOrganisation",
                 "Registration/SelectOrganisation",
                 "Registration/AddAddress",
-                "Registration/AddSector",
                 "Registration/AddContact",
                 "Registration/ConfirmOrganisation",
                 "Registration/RequestReceived",
