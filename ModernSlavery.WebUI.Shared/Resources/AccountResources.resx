@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AllowContact" xml:space="preserve">
-    <value>I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys</value>
+    <value>I'm happy to be contacted for feedback on this service and take part in surveys about modern slavery</value>
   </data>
   <data name="ChangeDetailsSuccessAlert" xml:space="preserve">
     <value>Your details have been updated successfully</value>
