@@ -46,7 +46,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             }
 
             //Create the test host usign the default dependency module and override with a test module
-            TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>();
+            TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>(applicationName:"ModernSlavery.Host.Web");
 
             //Start the test host
             await TestWebHost.StartAsync().ConfigureAwait(false);

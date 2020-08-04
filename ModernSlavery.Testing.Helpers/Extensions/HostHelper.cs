@@ -19,10 +19,23 @@ namespace ModernSlavery.Testing.Helpers
 {
     public static class HostHelper
     {
-        public static IHost CreateTestWebHost<TStartupTestModule>(string environment="Test") where TStartupTestModule : class, IDependencyModule
+        public static IHost CreateTestWebHost<TStartupTestModule>(string environment="Test", string applicationName = null) where TStartupTestModule : class, IDependencyModule
         {
             //Build the web host using the default dependencies
-            var testWebHostBuilder = WebHost.ConfigureWebHostBuilder<TStartupTestModule>(commandlineArgs: new string[] { "--environment", environment});
+            var commandArgs = new List<string>();
+            if (!string.IsNullOrWhiteSpace(environment)) 
+            {
+                commandArgs.Add($"--{HostDefaults.EnvironmentKey}"); 
+                commandArgs.Add(environment); 
+            }
+            
+            if (!string.IsNullOrWhiteSpace(applicationName)) 
+            { 
+                commandArgs.Add($"--{HostDefaults.ApplicationKey}");
+                commandArgs.Add(applicationName); 
+            }
+
+            var testWebHostBuilder = WebHost.ConfigureWebHostBuilder<TStartupTestModule>(commandlineArgs: commandArgs.ToArray());
 
             return testWebHostBuilder.Build();
         }
