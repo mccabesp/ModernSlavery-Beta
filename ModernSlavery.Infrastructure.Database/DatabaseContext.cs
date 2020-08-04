@@ -32,7 +32,7 @@ namespace ModernSlavery.Infrastructure.Database
             if (!string.IsNullOrWhiteSpace(_databaseOptions.ConnectionString))
                 ConnectionString = _databaseOptions.ConnectionString;
 
-            if (databaseOptions.UseMigrations && (string.IsNullOrWhiteSpace(databaseOptions.MigrationAppName) || databaseOptions.MigrationAppName.EqualsI(sharedOptions.ApplicationName)))
+            if (databaseOptions.GetIsMigrationApp())
                 MigrationsApplied=EnsureMigrated();
         }
 

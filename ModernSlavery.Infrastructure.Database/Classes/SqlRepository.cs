@@ -46,6 +46,12 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             return await DbContext.Set<TEntity>().FirstOrDefaultAsync(predicate);
         }
 
+        public async Task<TEntity> SingleOrDefaultAsync<TEntity>(Expression<Func<TEntity, bool>> predicate = null)
+            where TEntity : class
+        {
+            return await DbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
+        }
+
         public async Task<TEntity> FirstOrDefaultByAscendingAsync<TEntity, TKey>(
             Expression<Func<TEntity, TKey>> keySelector, Expression<Func<TEntity, bool>> filterPredicate = null)
             where TEntity : class

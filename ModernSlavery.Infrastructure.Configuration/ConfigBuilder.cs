@@ -45,10 +45,6 @@ namespace ModernSlavery.Infrastructure.Configuration
             
             _appConfig = appBuilder.Build();
 
-            //If the application name is not set from the command line or environment then set it now
-            if (string.IsNullOrWhiteSpace(_appConfig[HostDefaults.ApplicationKey]))
-                _appConfig[HostDefaults.ApplicationKey] = Assembly.GetEntryAssembly().GetName().Name;
-
             if (_appConfig["WEBSITE_RUN_FROM_PACKAGE"] == "1")
             {
                 var appData = _appConfig["HOME"];
@@ -127,6 +123,10 @@ namespace ModernSlavery.Infrastructure.Configuration
             appBuilder.PromoteConfigSources<EnvironmentVariablesConfigurationSource>();
 
             _appConfig = appBuilder.Build();
+
+            //Ensure we have an application name
+            if (string.IsNullOrWhiteSpace(_appConfig[HostDefaults.ApplicationKey]))
+                _appConfig[HostDefaults.ApplicationKey] = Assembly.GetEntryAssembly().GetName().Name;
 
             _appConfig[HostDefaults.EnvironmentKey] = environmentName;
 

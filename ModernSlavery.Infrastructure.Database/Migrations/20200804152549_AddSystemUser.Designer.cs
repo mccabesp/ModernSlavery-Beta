@@ -10,8 +10,8 @@ using ModernSlavery.Infrastructure.Database;
 namespace ModernSlavery.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20200716174316_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20200804152549_AddSystemUser")]
+    partial class AddSystemUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

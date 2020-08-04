@@ -49,7 +49,7 @@ namespace ModernSlavery.Infrastructure.Database
         public void Configure(ILifetimeScope lifetimeScope)
         {
             //Only when migrations is enabled
-            if (_databaseOptions.UseMigrations)
+            if (_databaseOptions.GetIsMigrationApp())
             {
                 //Ensure import files exist on remote storage
                 var fileRepository = lifetimeScope.Resolve<IFileRepository>();
@@ -62,7 +62,8 @@ namespace ModernSlavery.Infrastructure.Database
                     fileRepository.PushRemoteFileAsync(Filenames.StatementRiskTypes, _sharedOptions.DataPath),
                     fileRepository.PushRemoteFileAsync(Filenames.StatementSectorTypes, _sharedOptions.DataPath),
                     fileRepository.PushRemoteFileAsync(Filenames.StatementTrainingTypes, _sharedOptions.DataPath),
-                    fileRepository.PushRemoteFileAsync(Filenames.ImportOrganisations, _sharedOptions.DataPath)
+                    fileRepository.PushRemoteFileAsync(Filenames.ImportPrivateOrganisations, _sharedOptions.DataPath),
+                    fileRepository.PushRemoteFileAsync(Filenames.ImportPublicOrganisations, _sharedOptions.DataPath)
                 );
 
                 //Seed database whenver migrations are applied
@@ -71,7 +72,8 @@ namespace ModernSlavery.Infrastructure.Database
                 {
                     var _dataImporter = lifetimeScope.Resolve<IDataImporter>();
 
-                    _dataImporter.ImportOrganisationsAsync().Wait();
+                    _dataImporter.ImportPrivateOrganisationsAsync(-1).Wait();
+                    _dataImporter.ImportPublicOrganisationsAsync(-1).Wait();
                     _dataImporter.ImportSICSectionsAsync().Wait();
                     _dataImporter.ImportSICCodesAsync().Wait();
                     _dataImporter.ImportStatementDiligenceTypesAsync().Wait();

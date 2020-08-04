@@ -783,14 +783,32 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             model.Uploads.Add(upload);
             #endregion
 
-            #region Show ImportOrganisations Upload
+            #region Show ImportPrivateOrganisations Upload
             upload = new UploadViewModel.Upload
             {
-                Type = Filenames.ImportOrganisations,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ImportOrganisations),
-                Title = "Organisations Import",
-                Description = "Organisations from external data source",
-                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<Organisation>().CountAsync()
+                Type = Filenames.ImportPrivateOrganisations,
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ImportPrivateOrganisations),
+                Title = "Private Organisations Import",
+                Description = "Private Organisations from external data source",
+                DatabaseCount = await SharedBusinessLogic.DataRepository.CountAsync<Organisation>(r=>r.SectorType== SectorTypes.Private)
+            };
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+            {
+                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
+                upload.FileExists = true;
+            }
+
+            model.Uploads.Add(upload);
+            #endregion
+
+            #region Show ImportPublicOrganisations Upload
+            upload = new UploadViewModel.Upload
+            {
+                Type = Filenames.ImportPublicOrganisations,
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ImportPublicOrganisations),
+                Title = "Public Organisations Import",
+                Description = "Public Organisations from external data source",
+                DatabaseCount = await SharedBusinessLogic.DataRepository.CountAsync<Organisation>(r => r.SectorType == SectorTypes.Public)
             };
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
             {
@@ -918,7 +936,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         List<object> records;
                         switch (fileName)
                         {
-                            case var f when f.EqualsI(Filenames.ImportOrganisations):
+                            case var f when f.EqualsI(Filenames.ImportPrivateOrganisations):
+                                records = csvReader.GetRecords<ImportOrganisationModel>().Cast<object>().ToList();
+                                break;
+                            case var f when f.EqualsI(Filenames.ImportPublicOrganisations):
                                 records = csvReader.GetRecords<ImportOrganisationModel>().Cast<object>().ToList();
                                 break;
                             case var f when f.EqualsI(Filenames.SicSections):
@@ -961,8 +982,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         var updateTime = VirtualDateTime.Now.AddMinutes(-2);
                         switch (fileName)
                         {
-                            case var f when f.EqualsI(Filenames.ImportOrganisations):
-                                await _adminService.DataImporter.ImportOrganisationsAsync(true);
+                            case var f when f.EqualsI(Filenames.ImportPrivateOrganisations):
+                                await _adminService.DataImporter.ImportPrivateOrganisationsAsync(VirtualUser.UserId,true);
+                                break;
+                            case var f when f.EqualsI(Filenames.ImportPublicOrganisations):
+                                await _adminService.DataImporter.ImportPublicOrganisationsAsync(VirtualUser.UserId,true);
                                 break;
                             case var f when f.EqualsI(Filenames.SicSections):
                                 await _adminService.DataImporter.ImportSICSectionsAsync(true);
