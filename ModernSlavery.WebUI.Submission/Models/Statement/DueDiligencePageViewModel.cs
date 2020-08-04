@@ -85,7 +85,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             "repayment of recruitment fees",
             "change in policy",
-            "referring victims into government services",
+            "referring victims to government services",
             "supporting victims via NGOs",
             "supporting criminal justice against perpetrator",
             "other"

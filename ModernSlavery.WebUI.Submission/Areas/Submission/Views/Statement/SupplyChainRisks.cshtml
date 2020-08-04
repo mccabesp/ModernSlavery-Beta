@@ -22,7 +22,7 @@
             </h1>
 
             <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                     <h2 class="govuk-fieldset__heading">
                         Which areas are relevant to your organisation when assessing your supply chains for modern slavery risks?
                     </h2>
@@ -58,7 +58,7 @@
                                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass($"RelevantRisks[{relevantIndex}].Details", "govuk-form-group--error")" id="relevant-risks-@(relevantIndex)">
                                                     <div class="govuk-form-group">
                                                         <label class="govuk-label" for="RelevantRisks[@relevantIndex].Details">
-                                                            Please specify the @childType.Description.ToLower()
+                                                            Please specify
                                                         </label>
                                                         <input name="RelevantRisks[@relevantIndex].Details" id="RelevantRisks[@relevantIndex].Details" value="@(Model.RelevantRisks.FirstOrDefault(r=>r.Id==childType.Id)?.Details)" class="govuk-input " type="text" maxlength="256">
                                                         @Html.ValidationMessage($"RelevantRisks[{relevantIndex}].Details", null, new { @class = "govuk-error-message" })
@@ -88,7 +88,7 @@
             </fieldset>
 
             <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                     <h2 class="govuk-fieldset__heading">
                         Which areas of your supply chains do you consider to have the highest risk of modern slavery?
                     </h2>
@@ -147,7 +147,7 @@
             </fieldset>
 
             <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                     <h2 class="govuk-fieldset__heading">
                         Which locations do you believe are at higher risk of modern slavery in your operations and supply chains?
                     </h2>

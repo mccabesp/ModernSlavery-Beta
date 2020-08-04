@@ -33,7 +33,7 @@
 
             <ol class="app-task-list">
                 <li>
-                    <h2 class="govuk-heading-m app-task-list__section">
+                    <h2 class="govuk-heading-s app-task-list__section">
                         <span class="app-task-list__section-number">1. </span> Required information about your statement
                     </h2>
                     <ul class="govuk-list app-task-list__items">
@@ -57,14 +57,14 @@
                 </li>
 
                 <li>
-                    <h2 class="govuk-heading-m app-task-list__section">
+                    <h2 class="govuk-heading-s app-task-list__section">
                         <span class="app-task-list__section-number">2. </span> Additional information about your statement
                     </h2>
                     <ul class="govuk-list app-task-list__items">
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
                                 <a class="govuk-link" href="@Model.OrganisationUrl" aria-describedby="organisation">
-                                    Your Organisation
+                                    Your organisation
                                 </a>
                             </span>
                             <strong class="govuk-tag @(organisationComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="organisation">@(organisationComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
@@ -104,7 +104,7 @@
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
                                 <a class="govuk-link" href="@Model.ProgressUrl" aria-describedby="monitoring-progress">
-                                    Monitoring Progress
+                                    Monitoring progress
                                 </a>
                             </span>
                             <strong class="govuk-tag @(progressComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="monitoring-progress">@(progressComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
