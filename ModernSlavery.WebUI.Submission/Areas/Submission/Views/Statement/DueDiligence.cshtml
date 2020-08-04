@@ -20,26 +20,28 @@
                 @Model.PageTitle
             </h1>
 
-            <h2 class="govuk-heading-m">
-                What methods does your organisation use to monitor working conditions in your operations and supply chain?
-            </h2>
 
             @*TODO: make into a partial view with checkbox counts*@
-
-            <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-                @foreach (var parentType in Model.DiligenceTypes.Where(x => x.ParentId == null))
-                {
-                    <div class="govuk-accordion__section ">
-                        <div class="govuk-accordion__section-header">
-                            <h2 class="govuk-accordion__section-heading">
-                                <span class="govuk-accordion__section-button" id="accordion-default-heading">
-                                    @parentType.Description
-                                </span>
-                            </h2>
-                        </div>
-                        <div id="accordion-default-content-1" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading">
-                            <div class="govuk-form-group">
-                                <fieldset class="govuk-fieldset">
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    <h2 class="govuk-fieldset__heading">
+                        What methods does your organisation use to monitor working conditions in your operations and supply chain?
+                    </h2>
+                </legend>
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.DiligenceTypes, "govuk-form-group--error")">
+                    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-diligence">
+                        <span asp-validation-for="DiligenceTypes" class="govuk-error-message"></span>
+                        @foreach (var parentType in Model.DiligenceTypes.Where(x => x.ParentId == null))
+                        {
+                            <div class="govuk-accordion__section ">
+                                <div class="govuk-accordion__section-header">
+                                    <h3 class="govuk-accordion__section-heading">
+                                        <span class="govuk-accordion__section-button" id="accordion-diligence-heading-@parentType.Id">
+                                            @parentType.Description
+                                        </span>
+                                    </h3>
+                                </div>
+                                <div id="accordion-diligence-content-@parentType.Id" class="govuk-accordion__section-content" aria-labelledby="accordion-diligence-heading-@parentType.Id">
                                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                         @foreach (var childType in Model.DiligenceTypes.Where(t => t.ParentId == parentType.Id))
                                         {
@@ -68,20 +70,20 @@
                                             { diligenceIndex++; }
                                         }
                                     </div>
-                                </fieldset>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
-                }
-            </div>
+                </div>
+            </fieldset>
 
-            <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                        <h2 class="govuk-fieldset__heading">
-                            For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?
-                        </h2>
-                    </legend>
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    <h2 class="govuk-fieldset__heading">
+                        For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?
+                    </h2>
+                </legend>
+                <div class="govuk-form-group">
                     <div class="govuk-hint">
                         Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.
                     </div>
@@ -108,16 +110,16 @@
                             </label>
                         </div>
                     </div>
-                </fieldset>
-            </div>
+                </div>
+            </fieldset>
 
-            <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                        <h2 class="govuk-fieldset__heading">
-                            Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?
-                        </h2>
-                    </legend>
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    <h2 class="govuk-fieldset__heading">
+                        Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?
+                    </h2>
+                </legend>
+                <div class="govuk-form-group">
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
                             <input name="HasSlaveryInstance" id="HasSlaveryInstance_True" checked="@(Model.HasSlaveryInstance==true)" value="true" class="govuk-radios__input" type="radio" data-aria-controls="conditional-has-slavery-instance-conditional">
@@ -202,8 +204,8 @@
                         </div>
 
                     </div>
-                </fieldset>
-            </div>
+                </div>
+            </fieldset>
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Continue
