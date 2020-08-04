@@ -9,7 +9,7 @@ StatementRiskTypeId,ParentRiskTypeId,Category,Description
 8,6,1,Women
 9,6,1,Refugees
 10,6,1,Children
-11,6,1,Other vulnerable groups
+11,6,1,Other vulnerable group(s)
 12,,1,Type of work
 13,12,1,Temporary work
 14,12,1,Seasonal work

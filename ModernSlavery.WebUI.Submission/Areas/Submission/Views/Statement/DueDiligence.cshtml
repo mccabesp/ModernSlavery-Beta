@@ -23,7 +23,7 @@
 
             @*TODO: make into a partial view with checkbox counts*@
             <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                     <h2 class="govuk-fieldset__heading">
                         What methods does your organisation use to monitor working conditions in your operations and supply chain?
                     </h2>
@@ -57,7 +57,7 @@
                                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass($"DueDiligences[{diligenceIndex}].Details", "govuk-form-group--error")" id="conditional-diligence-@parentType.Id-@childType.Id">
                                                     <div class="govuk-form-group">
                                                         <label class="govuk-label" for="@($"DiligenceDetails{childType.Id}")">
-                                                            Please specify other @parentType.Description
+                                                            Please specify 
                                                         </label>
                                                         <input name="DueDiligences[@diligenceIndex].Details" id="@($"DiligenceDetails{childType.Id}")" value="@(Model.DueDiligences.FirstOrDefault(r => r.Id == childType.Id)?.Details)" class="govuk-input" type="text" maxlength="256">
                                                         @Html.ValidationMessage($"DueDiligences[{diligenceIndex}].Details", null, new { @class = "govuk-error-message" })
@@ -79,14 +79,14 @@
             </fieldset>
 
             <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                     <h2 class="govuk-fieldset__heading">
                         For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?
                     </h2>
                 </legend>
                 <div class="govuk-form-group">
                     <div class="govuk-hint">
-                        Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.
+                        Examples include workers with no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.
                     </div>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
@@ -98,9 +98,9 @@
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden @Html.SetErrorClass(model => model.ForcedLabourDetails, "govuk-form-group--error")" id="conditional-has-forced-labour-conditional">
                             <div class="govuk-form-group">
                                 <label class="govuk-label" asp-for="ForcedLabourDetails">
-                                    Please provide detail
+                                    Please provide details
                                 </label>
-                                <textarea asp-for="ForcedLabourDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" type="text" maxlength="512">@Model.ForcedLabourDetails</textarea>
+                                <textarea asp-for="ForcedLabourDetails" class="govuk-textarea" rows="5" type="text" maxlength="512">@Model.ForcedLabourDetails</textarea>
                                 <span asp-validation-for="ForcedLabourDetails" class="govuk-error-message"></span>
                             </div>
                         </div>
@@ -115,7 +115,7 @@
             </fieldset>
 
             <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                     <h2 class="govuk-fieldset__heading">
                         Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?
                     </h2>
@@ -137,7 +137,7 @@
                                 <span asp-validation-for="SlaveryInstanceDetails" class="govuk-error-message"></span>
                             </div>
 
-                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                                 <h2 class="govuk-fieldset__heading">
                                     Did your organisation take any remediation actions in response?
                                 </h2>
@@ -153,9 +153,9 @@
                                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-has-remediation-conditional">
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
-                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                                                 <h2 class="govuk-fieldset__heading">
-                                                    What remediation action did your organisation take in response?
+                                                    What actions did your organisation take?
                                                 </h2>
                                             </legend>
                                             <div class="govuk-checkboxes @Html.SetErrorClass(model => model.SelectedRemediationTypes, "govuk-form-group--error")" data-module="govuk-checkboxes">
