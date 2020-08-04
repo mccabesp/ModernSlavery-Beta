@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             // Decrypt org id
             long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(orgId);
-            if (organisationId==0)
+            if (organisationId == 0)
                 return new HttpBadRequestResult($"Cannot decrypt organisation id {orgId}");
 
             // Check the current user has remove permission for this organisation
@@ -36,7 +36,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             // Decrypt user id
             long userIdToRemove = SharedBusinessLogic.Obfuscator.DeObfuscate(userId);
-            if (userIdToRemove==0)return new HttpBadRequestResult($"Cannot decrypt user id {userId}");
+            if (userIdToRemove == 0) return new HttpBadRequestResult($"Cannot decrypt user id {userId}");
 
             var userToRemove = VirtualUser;
             if (VirtualUser.UserId != userIdToRemove)
@@ -61,7 +61,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 if (remainingTime > TimeSpan.Zero)
                     return View("CustomError",
                         WebService.ErrorViewModelFactory.Create(3023,
-                            new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
+                            new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
             }
 
             // build the view model
@@ -81,7 +81,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [PreventDuplicatePost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        [HttpPost("~/remove-organisation")]
+        [HttpPost("~/remove-organisation/{orgId}/{userId}")]
         public async Task<IActionResult> RemoveOrganisation(RemoveOrganisationModel model)
         {
             // Ensure user has completed the registration process
@@ -90,7 +90,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             // Decrypt org id
             var organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(model.EncOrganisationId);
-            if (organisationId==0)return new HttpBadRequestResult($"Cannot decrypt organisation id {model.EncOrganisationId}");
+            if (organisationId == 0) return new HttpBadRequestResult($"Cannot decrypt organisation id {model.EncOrganisationId}");
 
             // Check the current user has permission for this organisation
             var userOrgToUnregister =

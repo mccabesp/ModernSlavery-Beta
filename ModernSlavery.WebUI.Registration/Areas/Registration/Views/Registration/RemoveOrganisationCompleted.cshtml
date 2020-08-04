@@ -11,20 +11,20 @@
     <div class="column-two-thirds">
         <div class="govuk-box-highlight">
             <h1 class="heading-xlarge">
-                Removal Complete
+                Removal complete
             </h1>
         </div>
 
         @if (controller.CurrentUser.UserId == userId && controller.IsImpersonatingUser == false)
         {
             <p>
-                You have successfully removed yourself from reporting Modern Slavery statement for @Model.OrganisationName. You will receive an email notification shortly.
+                You can no longer submit a modern slavery statement for @Model.OrganisationName. You will receive an email notification shortly.
             </p>
         }
         else
         {
             <p>
-                You have successfully removed @Model.UserName from reporting Modern Slavery statement for @Model.OrganisationName. They will receive an email notification shortly.
+                @Model.UserName can no longer submit a modern slavery statement for @Model.OrganisationName. They will receive an email notification shortly.
             </p>
         }
 
@@ -33,7 +33,7 @@
                 More options
             </div>
             <p>
-                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" )">Manage Organisations</a>
+                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" )">Manage organisations</a>
             </p>
         </div>
     </div>
