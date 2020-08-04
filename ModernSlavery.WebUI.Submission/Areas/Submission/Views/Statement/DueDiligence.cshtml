@@ -45,15 +45,16 @@
                                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                         @foreach (var childType in Model.DiligenceTypes.Where(t => t.ParentId == parentType.Id))
                                         {
+                                            var hasOther = childType.Description.StartsWith("other");
                                             <div class="govuk-checkboxes__item">
-                                                <input name="DueDiligences[@diligenceIndex].Id" value="@childType.Id" id="@($"DiligenceId{childType.Id}")" checked=@(Model.DueDiligences.Any(r => r.Id == childType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="conditional-conditional">
+                                                <input name="DueDiligences[@diligenceIndex].Id" value="@childType.Id" id="@($"DiligenceId{childType.Id}")" checked=@(Model.DueDiligences.Any(r => r.Id == childType.Id)) class="govuk-checkboxes__input" type="checkbox" @(hasOther ? @$"data-aria-controls=conditional-diligence-{parentType.Id}-{childType.Id}" : "")>
                                                 <label class="govuk-label govuk-checkboxes__label" for="@($"DiligenceId{childType.Id}")">
                                                     @childType.Description
                                                 </label>
                                             </div>
-                                            @if (childType.Description.Contains("other type of social audit"))
+                                            @if (hasOther)
                                             {
-                                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass($"DueDiligences[{diligenceIndex}].Details", "govuk-form-group--error")" id="conditional-conditional">
+                                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass($"DueDiligences[{diligenceIndex}].Details", "govuk-form-group--error")" id="conditional-diligence-@parentType.Id-@childType.Id">
                                                     <div class="govuk-form-group">
                                                         <label class="govuk-label" for="@($"DiligenceDetails{childType.Id}")">
                                                             Please specify other @parentType.Description
