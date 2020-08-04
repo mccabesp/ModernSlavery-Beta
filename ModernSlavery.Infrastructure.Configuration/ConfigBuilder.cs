@@ -27,7 +27,6 @@ namespace ModernSlavery.Infrastructure.Configuration
             _additionalSettings = additionalSettings ?? new Dictionary<string, string>();
             _commandlineArgs = commandlineArgs;
 
-            _additionalSettings[HostDefaults.ApplicationKey] = Assembly.GetEntryAssembly().GetName().Name;
         }
 
         public void Dispose()
@@ -45,6 +44,10 @@ namespace ModernSlavery.Infrastructure.Configuration
             if (_commandlineArgs!=null && _commandlineArgs.Any())appBuilder.AddCommandLine(_commandlineArgs);
             
             _appConfig = appBuilder.Build();
+
+            //If the application name is not set from the command line or environment then set it now
+            if (string.IsNullOrWhiteSpace(_appConfig[HostDefaults.ApplicationKey]))
+                _appConfig[HostDefaults.ApplicationKey] = Assembly.GetEntryAssembly().GetName().Name;
 
             if (_appConfig["WEBSITE_RUN_FROM_PACKAGE"] == "1")
             {
