@@ -809,13 +809,13 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
 
-                    b.Property<decimal?>("MaxStatementYears")
+                    b.Property<byte?>("MaxStatementYears")
                         .HasColumnType("tinyint");
 
                     b.Property<int?>("MaxTurnover")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("MinStatementYears")
+                    b.Property<byte>("MinStatementYears")
                         .HasColumnType("tinyint");
 
                     b.Property<int>("MinTurnover")
