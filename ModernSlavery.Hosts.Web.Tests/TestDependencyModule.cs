@@ -43,8 +43,6 @@ namespace ModernSlavery.Hosts.Web.Tests
             //GovNotify uses AppSetting Test key Email:Providers:GovNotify:ApiKey and AllowTestKeyOnly to simulate sending of emails and letters 
 
             //Create and In-memory database
-            var databaseContext = DependencyFactory.CreateInMemoryDatabaseContext();
-            builder.RegisterInstance(databaseContext).As<IDbContext>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
