@@ -4,45 +4,55 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting Submission merge")]
+    [TestFixture]
 
     public class Submission_Areas_Back_Button_Check : Private_Registration_Success
     {
         [Test, Order(40)]
-        public async Task NavigateToOrgRep()
+        public async Task StartSubmission()
         {
+
             ExpectHeader("Select an organisation");
 
-            Click(Submission.OrgName_Blackpool);
+            Click(Submission.OrgName_InterFloor);
 
-            ExpectHeader("Manage your organisations reporting");
+            ExpectHeader(That.Contains, "Manage your organisation's reporting");
+
+
+            Click("Draft report");
+
+            ExpectHeader("Before you start");
+            Click("Start Now");
+
             await Task.CompletedTask;
         }
 
         [Test, Order(42)]
-        public async Task StartSubmission()
+        public async Task YourModernSlaveryStatement()
         {
-            Click("Draft Report");
-
-            ExpectHeader("Before you start");
-            Click("Start now");
 
             ExpectHeader("Your modern slavery statement");
 
-            Click("Save and continue");
 
+            Click("Continue");
+            await Task.CompletedTask;
+        }
+
+        [Test, Order(44)]
+        public async Task AreasCoveredByYourModernSlaveryStatement()
+        {
             ExpectHeader("Areas covered by your modern slavery statement");
-
 
             await Task.CompletedTask;
         }
 
 
-        [Test, Order(44)]
+        [Test, Order(46)]
         public async Task VerifyBackButtonNavigation()
         {
             Click("Back"); 
             ExpectHeader("Your modern slavery statement");
+            await Task.CompletedTask;
 
         }
     }
