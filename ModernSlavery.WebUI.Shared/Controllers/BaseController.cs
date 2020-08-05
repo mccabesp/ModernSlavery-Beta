@@ -507,11 +507,10 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 if (IsAnyAction(
                     "NewAccount/VerifyEmail",
                     "Registration/EmailConfirmed",
-                    "Registration/ReviewRequest",
-                    "Registration/ConfirmCancellation",
-                    "Registration/RequestAccepted",
-                    "Registration/RequestCancelled",
-                    "Registration/ReviewDUNSNumber"))
+                    "Admin/ReviewRequest",
+                    "Admin/ConfirmCancellation",
+                    "Admin/RequestAccepted",
+                    "Admin/RequestCancelled"))
                     return null;
 
                 return RedirectToActionArea("Home", "Admin", "Admin");
@@ -522,11 +521,10 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
             if (ControllerName.EqualsI("admin")
                 || IsAnyAction(
-                    "Registration/ReviewRequest",
-                    "Registration/ReviewDUNSNumber",
-                    "Registration/ConfirmCancellation",
-                    "Registration/RequestAccepted",
-                    "Registration/RequestCancelled"))
+                    "Admin/ReviewRequest",
+                    "Admin/ConfirmCancellation",
+                    "Admin/RequestAccepted",
+                    "Admin/RequestCancelled"))
                 return new HttpForbiddenResult($"User {CurrentUser?.EmailAddress} is not an administrator");
 
             //Allow all steps from email confirmed to organisation chosen
