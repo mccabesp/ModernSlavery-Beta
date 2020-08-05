@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting Submission merge")]
-
     public class Submission_Complete_All_Sections : Private_Registration_Success
     {
         [Test, Order(40)]
@@ -14,11 +12,12 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Select an organisation");
 
-            Click(Submission.OrgName_Blackpool);
+            Click(Submission.OrgName_InterFloor);
 
-            ExpectHeader("Manage your organisations reporting");
+            ExpectHeader(That.Contains, "Manage your organisation's reporting");
 
-            AtRow("2019/20").Click("Draft report");
+            
+            Click("Draft report");
 
             ExpectHeader("Before you start");
             Click("Start Now");
@@ -37,9 +36,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_To_Year, "1");
             Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_To_Year, "2");
 
-            Set("First name").To(Submission.YourMSStatement_First);
-            Set("Last name").To(Submission.YourMSStatement_Last);
-            Set("Job title").To(Submission.YourMSStatement_JobTitle);
+            Set("ApproverFirstName").To(Submission.YourMSStatement_First);
+            Set("ApproverLastName").To(Submission.YourMSStatement_Last);
+            Set("ApproverJobTitle").To(Submission.YourMSStatement_JobTitle);
 
             Submission_Helper.DateSet(this, Submission.YourMSStatement_ApprovalDate_Day, Submission.YourMSStatement_ApprovalDate_Month, Submission.YourMSStatement_ApprovalDate_Year, "3");
 
@@ -52,12 +51,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader("Areas covered by your modern slavery statement");
 
-            AtLabel("Your organisation’s structure, business and supply chains").ClickLabel("Yes");
-            AtLabel("Policiess").ClickLabel("Yes");
-            AtLabel("Risk assessment and management").ClickLabel("Yes");
-            AtLabel("Due diligence processes").ClickLabel("Yes");
-            AtLabel("Staff training about slavery and human trafficking").ClickLabel("Yes");
-            AtLabel("Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions").ClickLabel("Yes");
+            BelowHeader("Your organisation’s structure, business and supply chains").ClickLabel(The.Top, "Yes");
+            BelowHeader("Policies").ClickLabel(The.Top, "Yes");
+            BelowHeader("Risk assessment and management").ClickLabel(The.Top, "Yes");
+            BelowHeader("Due diligence processes").ClickLabel(The.Top, "Yes");
+            BelowHeader("Staff training about slavery and human trafficking").ClickLabel(The.Top, "Yes");
+            BelowHeader("Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions").ClickLabel(The.Top, "Yes");
 
             Click("Continue");
             await Task.CompletedTask;
@@ -66,17 +65,19 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(46)]
         public async Task YourOrganisation()
         { 
-            ExpectHeader("Your organisation");
+            ExpectHeader(That.Contains, "Your organisation");
 
             foreach (var sector in Submission.YourOrganisation_Sectors)
             {
                 ClickLabel(sector);
             }
 
-            Set("What was your turnover or budget during the last financial accounting year?").To(Submission.YourOrganisation_Turnover);
+            //Set("What was your turnover or budget during the last financial accounting year?").To(Submission.YourOrganisation_Turnover);
+            ExpectLabel("Please specify");
+            ClickLabel(Submission.YourOrganisation_Turnover);
+            Set("OtherSector").To("Other details");
             Click("Continue");
 
-            Click("Continue");
             await Task.CompletedTask;
         }
 
@@ -92,7 +93,8 @@ namespace ModernSlavery.Hosts.Web.Tests
                 //fill in other details
                 if (Policy == "Other")
                 {
-                    Set("Please provide detail").To(Submission.Policies_OtherDetails);
+                    Set("OtherPolicies").To(Submission.Policies_OtherDetails);
+                    ExpectLabel("Please provide detail");
                 }
             }
 
@@ -104,7 +106,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SCRPart1()
         {
 
-            ExpectHeader("Supply Chain Risks and due diligence");
+            ExpectHeader(That.Contains, "Supply chain risks and due diligence");
 
             //goods and services
             Submission_Helper.ExpandSection(this, "Goods and Services", "1");

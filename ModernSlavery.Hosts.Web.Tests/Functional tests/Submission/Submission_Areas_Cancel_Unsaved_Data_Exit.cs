@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting Submission merge")]
+    [TestFixture]
 
     public class Submission_Areas_Cancel_Unsaved_Data_Exit : Private_Registration_Success
     {
@@ -13,25 +13,26 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader("Select an organisation");
 
-            Click(Submission.OrgName_Blackpool);
+            Click(Submission.OrgName_InterFloor);
+
+            ExpectHeader(That.Contains, "Manage your organisation's reporting");
 
 
-            ExpectHeader("Manage your organisations reporting");
-
-            Click("Draft Report");
-
+            Click("Draft report");
 
             ExpectHeader("Before you start");
-            Click("Start now");
+            Click("Start Now");
 
-            ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;
         }
 
         [Test, Order(42)]
         public async Task NavigateToAreasPage()
         {
-            Click("Save and continue");
+            ExpectHeader("Your modern slavery statement");
+
+
+            Click("Continue");
 
             ExpectHeader("Areas covered by your modern slavery statement");
 
@@ -41,8 +42,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task FillInDetailsOnAreasPage()
         {
 
-            ClickLabel(The.Top, "Yes");
-            Set("Please provide detail").To("Here are the details");
+            ClickLabel(The.Top, "No");
+            Set("Please provide details").To("Here are the details");
             await Task.CompletedTask;
         }
 

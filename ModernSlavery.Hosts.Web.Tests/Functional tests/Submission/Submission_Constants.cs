@@ -74,7 +74,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public const string YourMSStatement_ApprovalDate_Year = "2020";
 
         public static readonly string[] YourOrganisation_Sectors = new string[] { "Automotive, machinery and heavy electrical equipment", "Charitable / not-for-profit activities", "Cleaning and security services", "Construction, civil engineering and building products", "Consumer services, including accommodation, hospitality, tourism and leisure", "Cosmetics and toiletries", "Defence and aerospace", "Durable consumer goods, including electronics and appliances, home furnishings and other accessories", "Education and research", "Fashion, textiles, apparel and luxury goods", "Financial, insurance and real estate activities", "Food and beverages, agriculture and fishing", "Forestry, timber products, paper and containers and packaging", "Healthcare and pharmaceuticals", "Information technology and telecommunication", "Media, publishing, arts and entertainment", "Mining, metals, chemicals and resources (including oil and gas)", "Professional and administrative services and supplies, including legal, consulting and accounting services", "Public sector", "Transportation, logistics, and storage", "Utilities: gas, water and electricity", "Waste management and recycling", "Other" };
-        public const string YourOrganisation_Turnover = "£60 million - £100 million";
+        public const string YourOrganisation_Turnover = "£60 million to £100 million";
 
         public static readonly string[] Policies_SelectedPolicies = new string[] { "Freedom of association", "Prohibits discrimination", "Other" };
         public  const string Policies_OtherDetails = "We have many other policies in place";
