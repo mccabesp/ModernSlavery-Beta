@@ -18,18 +18,18 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         //Update the search indexes
-        public async Task UpdateSearchAsync([TimerTrigger("00:01:00:00", RunOnStartup = true)]
+        public async Task UpdateSearchIndexesAsync([TimerTrigger("00:01:00:00", RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {
             try
             {
-                await UpdateAllSearchIndexesAsync(log);
+                await UpdateAllSearchIndexesAsync(log).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", ex.Message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", ex.Message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -39,18 +39,18 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             log.LogInformation($"-- Started the updating of index {_EmployerSearchRepository.IndexName}");
             await UpdateSearchAsync(log, _EmployerSearchRepository, _EmployerSearchRepository.IndexName, userEmail,
-                force);
+                force).ConfigureAwait(false);
             log.LogInformation($"-- Updating of index {_EmployerSearchRepository.IndexName} completed");
             log.LogInformation($"-- Started the updating of index {_SicCodeSearchRepository.IndexName}");
             await UpdateSearchAsync(log, _SicCodeSearchRepository, _SicCodeSearchRepository.IndexName, userEmail,
-                force);
+                force).ConfigureAwait(false);
             log.LogInformation($"-- Updating of index {_SicCodeSearchRepository.IndexName} completed");
         }
 
         public async Task UpdateSearchAsync(ILogger log, string userEmail = null, bool force = false)
         {
             await UpdateSearchAsync(log, _EmployerSearchRepository, _EmployerSearchRepository.IndexName, userEmail,
-                force);
+                force).ConfigureAwait(false);
         }
 
         private async Task UpdateSearchAsync<T>(ILogger log,
@@ -67,12 +67,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                await searchRepositoryToUpdate.CreateIndexIfNotExistsAsync(indexNameToUpdate);
+                await searchRepositoryToUpdate.CreateIndexIfNotExistsAsync(indexNameToUpdate).ConfigureAwait(false);
 
                 if (typeof(T) == typeof(EmployerSearchModel))
-                    await AddDataToIndexAsync(log);
+                    await AddDataToIndexAsync(log).ConfigureAwait(false);
                 else if (typeof(T) == typeof(SicCodeSearchModel))
-                    await AddDataToSicCodesIndexAsync(log);
+                    await AddDataToSicCodesIndexAsync(log).ConfigureAwait(false);
                 else
                     throw new ArgumentException($"Type {typeof(T)} is not a valid type.");
 
@@ -82,7 +82,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         await _Messenger.SendMessageAsync(
                             "UpdateSearchIndexes complete",
                             userEmail,
-                            "The update of the search indexes completed successfully.");
+                            "The update of the search indexes completed successfully.").ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -97,7 +97,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         private async Task AddDataToSicCodesIndexAsync(ILogger log)
         {
-            var listOfSicCodeRecords = await GetListOfSicCodeSearchModelsFromFileAsync(log);
+            var listOfSicCodeRecords = await GetListOfSicCodeSearchModelsFromFileAsync(log).ConfigureAwait(false);
 
             if (listOfSicCodeRecords == null || !listOfSicCodeRecords.Any())
             {
@@ -105,13 +105,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 return;
             }
 
-            await _SicCodeSearchRepository.RefreshIndexDataAsync(listOfSicCodeRecords);
+            await _SicCodeSearchRepository.RefreshIndexDataAsync(listOfSicCodeRecords).ConfigureAwait(false);
         }
 
         private async Task AddDataToIndexAsync(ILogger log)
         {
             var allOrgs = _SharedBusinessLogic.DataRepository.GetAll<Organisation>();
-            var allOrgsList = await allOrgs.ToListAsync();
+            var allOrgsList = await allOrgs.ToListAsync().ConfigureAwait(false);
 
             //Remove the test organisations
             if (!string.IsNullOrWhiteSpace(_SharedBusinessLogic.SharedOptions.TestPrefix))
@@ -120,11 +120,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             var lookupResult = SearchBusinessLogic.LookupSearchableOrganisations(allOrgsList);
             if (Debugger.IsAttached) lookupResult = lookupResult.Take(100);
-            var listOfSicCodeRecords = await GetListOfSicCodeSearchModelsFromFileAsync(log);
+            var listOfSicCodeRecords = await GetListOfSicCodeSearchModelsFromFileAsync(log).ConfigureAwait(false);
             var selection = lookupResult.Select(o => _OrganisationBusinessLogic.CreateEmployerSearchModel(o, false, listOfSicCodeRecords));
             var selectionList = selection.ToList();
 
-            if (selectionList.Any()) await _EmployerSearchRepository.RefreshIndexDataAsync(selectionList);
+            if (selectionList.Any()) await _EmployerSearchRepository.RefreshIndexDataAsync(selectionList).ConfigureAwait(false);
         }
 
         private async Task<List<SicCodeSearchModel>> GetListOfSicCodeSearchModelsFromFileAsync(ILogger log)
@@ -134,7 +134,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 var files = await _SharedBusinessLogic.FileRepository.GetFilesAsync(
-                    _SharedBusinessLogic.SharedOptions.DataPath, Filenames.SicSectorSynonyms);
+                    _SharedBusinessLogic.SharedOptions.DataPath, Filenames.SicSectorSynonyms).ConfigureAwait(false);
                 var sicSectorSynonymsFilePath = files.OrderByDescending(f => f).FirstOrDefault();
 
                 #region Pattern
@@ -159,7 +159,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 #region File exist
 
                 var fileExists =
-                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(sicSectorSynonymsFilePath);
+                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(sicSectorSynonymsFilePath).ConfigureAwait(false);
                 if (!fileExists)
                 {
                     var fileDoesNotExistMessage = $"File does not exist {sicSectorSynonymsFilePath}.";
@@ -173,7 +173,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 var csv =
                     await _SharedBusinessLogic.FileRepository.ReadCSVAsync<SicCodeSearchModel>(
-                        sicSectorSynonymsFilePath);
+                        sicSectorSynonymsFilePath).ConfigureAwait(false);
 
                 listOfSicCodeRecords = csv.OrderBy(o => o.SicCodeId).ToList();
 

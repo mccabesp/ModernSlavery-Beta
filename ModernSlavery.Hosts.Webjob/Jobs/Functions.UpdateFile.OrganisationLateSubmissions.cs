@@ -22,10 +22,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateOrganisationLateSubmissions))
-                    && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
+                    && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
                     return;
 
-                await UpdateOrganisationLateSubmissionsAsync(filePath, log);
+                await UpdateOrganisationLateSubmissionsAsync(filePath, log).ConfigureAwait(false);
 
                 log.LogDebug($"Executed {nameof(UpdateOrganisationLateSubmissions)}:successfully");
             }
@@ -34,7 +34,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed {nameof(UpdateOrganisationLateSubmissions)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -53,7 +53,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 var records = _SubmissionBusinessLogic.GetLateSubmissions();
-                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
+                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath).ConfigureAwait(false);
             }
             finally
             {

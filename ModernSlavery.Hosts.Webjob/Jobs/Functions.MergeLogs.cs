@@ -21,7 +21,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 //Backup the log files first
-                await ArchiveAzureStorageAsync();
+                await ArchiveAzureStorageAsync().ConfigureAwait(false);
 
                 var actions = new List<Task>();
 
@@ -64,7 +64,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 #endregion
 
-                await Task.WhenAll(actions);
+                await Task.WhenAll(actions).ConfigureAwait(false);
 
                 log.LogDebug($"Executed {nameof(MergeLogs)} successfully");
             }
@@ -73,7 +73,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(MergeLogs)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -82,7 +82,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private async Task MergeCsvLogsAsync<T>(ILogger log, string logPath, string prefix, string extension = ".csv")
         {
             //Get all the daily log files
-            var files = await _SharedBusinessLogic.FileRepository.GetFilesAsync(logPath, $"{prefix}_*{extension}");
+            var files = await _SharedBusinessLogic.FileRepository.GetFilesAsync(logPath, $"{prefix}_*{extension}").ConfigureAwait(false);
             var fileList = files.OrderBy(o => o).ToList();
 
             //Get all files before today
@@ -107,13 +107,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     var monthLog = Path.Combine(logPath, $"{prefix}_{date:yyMM}{extension}");
 
                     //Read all the records from this daily log file
-                    var records = await _SharedBusinessLogic.FileRepository.ReadCSVAsync<T>(file);
+                    var records = await _SharedBusinessLogic.FileRepository.ReadCSVAsync<T>(file).ConfigureAwait(false);
 
                     //Add the records to its monthly log file
-                    await _SharedBusinessLogic.FileRepository.AppendCsvRecordsAsync(monthLog, records);
+                    await _SharedBusinessLogic.FileRepository.AppendCsvRecordsAsync(monthLog, records).ConfigureAwait(false);
 
                     //Delete this daily log file
-                    await _SharedBusinessLogic.FileRepository.DeleteFileAsync(file);
+                    await _SharedBusinessLogic.FileRepository.DeleteFileAsync(file).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -143,26 +143,26 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     if (logDate >= archiveDeadline) continue;
 
                     var archivePath = Path.Combine(logPath, year.ToString());
-                    if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(archivePath))
-                        await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(archivePath);
+                    if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(archivePath).ConfigureAwait(false))
+                        await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(archivePath).ConfigureAwait(false);
 
                     //Ensure we have a unique filename
                     var ext = Path.GetExtension(file);
                     var archiveFilePath = Path.Combine(archivePath, fileName) + ext;
 
                     var c = 0;
-                    while (await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(archiveFilePath))
+                    while (await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(archiveFilePath).ConfigureAwait(false))
                     {
                         c++;
                         archiveFilePath = Path.Combine(archivePath, fileName) + $" ({c}){ext}";
                     }
 
                     //Copy to the archive folder
-                    await _SharedBusinessLogic.FileRepository.CopyFileAsync(file, archiveFilePath, false);
+                    await _SharedBusinessLogic.FileRepository.CopyFileAsync(file, archiveFilePath, false).ConfigureAwait(false);
 
                     //Delete the old file
-                    if (await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(archiveFilePath))
-                        await _SharedBusinessLogic.FileRepository.DeleteFileAsync(file);
+                    if (await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(archiveFilePath).ConfigureAwait(false))
+                        await _SharedBusinessLogic.FileRepository.DeleteFileAsync(file).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {

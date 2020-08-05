@@ -23,9 +23,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateUsers)) &&
-                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath)) return;
+                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false)) return;
 
-                await UpdateUsersAsync(filePath);
+                await UpdateUsersAsync(filePath).ConfigureAwait(false);
                 log.LogDebug($"Executed {nameof(UpdateUsers)}:successfully");
             }
             catch (Exception ex)
@@ -33,7 +33,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed {nameof(UpdateUsers)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -50,7 +50,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(UpdateUsers));
             try
             {
-                var users = await _SharedBusinessLogic.DataRepository.GetAll<User>().ToListAsync();
+                var users = await _SharedBusinessLogic.DataRepository.GetAll<User>().ToListAsync().ConfigureAwait(false);
                 var records = users.Where(u => !_authorisationBusinessLogic.IsAdministrator(u))
                     .OrderBy(u => u.Lastname)
                     .Select(
@@ -76,7 +76,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             u.Created
                         })
                     .ToList();
-                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
+                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath).ConfigureAwait(false);
             }
             finally
             {

@@ -21,12 +21,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                await UpdateDownloadFilesAsync(log);
+                await UpdateDownloadFilesAsync(log).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", ex.Message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", ex.Message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -49,8 +49,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var downloadsLocation = _SharedBusinessLogic.SharedOptions.DownloadsLocation;
 
                 //Ensure we have a directory
-                if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(downloadsLocation))
-                    await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(downloadsLocation);
+                if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(downloadsLocation).ConfigureAwait(false))
+                    await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(downloadsLocation).ConfigureAwait(false);
 
                 foreach (var year in returnYears)
                 {
@@ -58,14 +58,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                     var downloadFilePattern = $"GPGData_{year}-{year + 1}.csv";
                     var files = await _SharedBusinessLogic.FileRepository.GetFilesAsync(downloadsLocation,
-                        downloadFilePattern);
+                        downloadFilePattern).ConfigureAwait(false);
                     var oldDownloadFilePath = files.FirstOrDefault();
 
                     //Skip if the file already exists and is newer than 1 hour or older than 1 year
                     if (oldDownloadFilePath != null && !force)
                     {
                         var lastWriteTime =
-                            await _SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(oldDownloadFilePath);
+                            await _SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(oldDownloadFilePath).ConfigureAwait(false);
                         if (lastWriteTime.AddHours(1) >= VirtualDateTime.Now ||
                             lastWriteTime.AddYears(2) <= VirtualDateTime.Now) continue;
                     }
@@ -74,7 +74,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             r.AccountingDate.Year == year
                             && r.Status == StatementStatuses.Submitted
                             && r.Organisation.Status == OrganisationStatuses.Active)
-                        .ToListAsync();
+                        .ToListAsync().ConfigureAwait(false);
                     returns.RemoveAll(r =>
                         r.Organisation.OrganisationName.StartsWithI(_SharedBusinessLogic.SharedOptions.TestPrefix));
 
@@ -90,9 +90,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     {
                         if (downloadData.Any())
                             await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, downloadData,
-                                newFilePath, oldDownloadFilePath);
+                                newFilePath, oldDownloadFilePath).ConfigureAwait(false);
                         else if (!string.IsNullOrWhiteSpace(oldDownloadFilePath))
-                            await _SharedBusinessLogic.FileRepository.DeleteFileAsync(oldDownloadFilePath);
+                            await _SharedBusinessLogic.FileRepository.DeleteFileAsync(oldDownloadFilePath).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -106,7 +106,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         await _Messenger.SendMessageAsync(
                             "UpdateDownloadFiles complete",
                             userEmail,
-                            "The update of the download files completed successfully.");
+                            "The update of the download files completed successfully.").ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {

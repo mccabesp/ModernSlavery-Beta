@@ -2,13 +2,32 @@
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ModernSlavery.BusinessDomain.Registration
 {
     public class RegistrationService : IRegistrationService
     {
+        public IAuditLogger BadSicLog { get; }
+        public IAuditLogger RegistrationLog { get; }
+        public IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
+        public IScopeBusinessLogic ScopeBusinessLogic { get; }
+        public IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
+        public ISharedBusinessLogic SharedBusinessLogic { get; }
+        public ISearchBusinessLogic SearchBusinessLogic { get; }
+        public IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
+        public IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
+        public IUserRepository UserRepository { get; }
+        public IPinInThePostService PinInThePostService { get; }
+        public IPostcodeChecker PostcodeChecker { get; }
+
+
         public RegistrationService(
             [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog,
             [KeyFilter(Filenames.RegistrationLog)] IAuditLogger registrationLog,
@@ -39,20 +58,22 @@ namespace ModernSlavery.BusinessDomain.Registration
             PostcodeChecker = postcodeChecker;
         }
 
-        public IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
+        public async Task SetIsUkAddressesAsync()
+        {
+            var addresses = SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(a => a.IsUkAddress==null);
+            foreach (var org in addresses) await SetIsUkAddressAsync(org);
+        }
 
-        public IAuditLogger BadSicLog { get; }
-        public IAuditLogger RegistrationLog { get; }
+        public async Task SetIsUkAddressAsync(OrganisationAddress address)
+        {
+            if (address == null) throw new ArgumentNullException(nameof(address));
+            if (string.IsNullOrWhiteSpace(address.PostCode)) throw new ArgumentNullException(nameof(address.PostCode));
 
-        public IPinInThePostService PinInThePostService { get; }
-        public IPostcodeChecker PostcodeChecker { get; }
+            //Check if the address is a valid UK postcode
+            address.IsUkAddress = await PostcodeChecker.IsValidPostcode(address.PostCode);
 
-        public ISharedBusinessLogic SharedBusinessLogic { get; }
-        public IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
-        public IScopeBusinessLogic ScopeBusinessLogic { get; }
-        public ISearchBusinessLogic SearchBusinessLogic { get; }
-        public IUserRepository UserRepository { get; }
-        public IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
-        public IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
+            //Save the address
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+        }
     }
 }

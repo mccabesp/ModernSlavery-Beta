@@ -19,37 +19,37 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             switch (Filenames.GetRootFilename(fileName))
             {
                 case Filenames.Organisations:
-                    await UpdateOrganisationsAsync(filePath);
+                    await UpdateOrganisationsAsync(filePath).ConfigureAwait(false);
                     break;
                 case Filenames.Users:
-                    await UpdateUsersAsync(filePath);
+                    await UpdateUsersAsync(filePath).ConfigureAwait(false);
                     break;
                 case Filenames.Registrations:
-                    await UpdateRegistrationsAsync(log, filePath);
+                    await UpdateRegistrationsAsync(log, filePath).ConfigureAwait(false);
                     break;
                 case Filenames.RegistrationAddresses:
-                    await UpdateRegistrationAddressesAsync(filePath, log);
+                    await UpdateRegistrationAddressesAsync(filePath, log).ConfigureAwait(false);
                     break;
                 case Filenames.UnverifiedRegistrations:
-                    await UpdateUnverifiedRegistrationsAsync(log, filePath);
+                    await UpdateUnverifiedRegistrationsAsync(log, filePath).ConfigureAwait(false);
                     break;
                 case Filenames.SendInfo:
-                    await UpdateUsersToSendInfoAsync(filePath);
+                    await UpdateUsersToSendInfoAsync(filePath).ConfigureAwait(false);
                     break;
                 case Filenames.AllowFeedback:
-                    await UpdateUsersToContactForFeedbackAsync(filePath);
+                    await UpdateUsersToContactForFeedbackAsync(filePath).ConfigureAwait(false);
                     break;
                 case Filenames.OrganisationScopes:
-                    await UpdateScopesAsync(filePath);
+                    await UpdateScopesAsync(filePath).ConfigureAwait(false);
                     break;
                 case Filenames.OrganisationSubmissions:
-                    await UpdateSubmissionsAsync(filePath);
+                    await UpdateSubmissionsAsync(filePath).ConfigureAwait(false);
                     break;
                 case Filenames.OrganisationLateSubmissions:
-                    await UpdateOrganisationLateSubmissionsAsync(filePath, log);
+                    await UpdateOrganisationLateSubmissionsAsync(filePath, log).ConfigureAwait(false);
                     break;
                 case Filenames.OrphanOrganisations:
-                    await UpdateOrphanOrganisationsAsync(filePath, log);
+                    await UpdateOrphanOrganisationsAsync(filePath, log).ConfigureAwait(false);
                     break;
             }
         }
@@ -78,12 +78,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             for (var year = endYear; year >= startYear; year--)
             {
-                var records = await fillRecordsAsync(year);
+                var records = await fillRecordsAsync(year).ConfigureAwait(false);
 
                 filePath = $"{prefix}_{year}-{(year + 1).ToTwoDigitYear()}{extension}";
                 if (!string.IsNullOrWhiteSpace(path)) filePath = Path.Combine(path, filePath);
 
-                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
+                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath).ConfigureAwait(false);
             }
         }
 
@@ -94,12 +94,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             var extension = Path.GetExtension(filePath);
             var prefix = fileName.BeforeFirst("_");
 
-            var records = await fillRecordsAsync();
+            var records = await fillRecordsAsync().ConfigureAwait(false);
 
             filePath = $"{prefix}_{year}-{(year + 1).ToTwoDigitYear()}{extension}";
             if (!string.IsNullOrWhiteSpace(path)) filePath = Path.Combine(path, filePath);
 
-            await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
+            await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath).ConfigureAwait(false);
         }
     }
 }

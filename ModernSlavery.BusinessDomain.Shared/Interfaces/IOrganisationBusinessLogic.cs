@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure.Management.WebSites.Models;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
@@ -122,5 +123,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         Task<CustomResult<Organisation>> ExpireOrganisationSecurityCodeAsync(string employerRef);
         Task<CustomBulkResult<Organisation>> ExpireOrganisationSecurityCodesInBulkAsync();
         IQueryable<Organisation> SearchOrganisations(string searchText,int records);
+        Task FixLatestAddressesAsync();
+        Task FixLatestScopesAsync();
+        Task FixLatestStatementsAsync();
+        Task FixLatestRegistrationsAsync();
     }
 }

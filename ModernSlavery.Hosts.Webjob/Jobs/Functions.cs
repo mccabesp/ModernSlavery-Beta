@@ -26,6 +26,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private readonly IScopeBusinessLogic _ScopeBusinessLogic;
         private readonly ISubmissionBusinessLogic _SubmissionBusinessLogic;
         private readonly IOrganisationBusinessLogic _OrganisationBusinessLogic;
+        private readonly IRegistrationService _RegistrationService;
         public readonly ISearchBusinessLogic SearchBusinessLogic;
         private readonly IGovNotifyAPI govNotifyApi;
         private readonly UpdateFromCompaniesHouseService _updateFromCompaniesHouseService;
@@ -43,6 +44,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
             ISubmissionBusinessLogic submissionBusinessLogic,
             IOrganisationBusinessLogic organisationBusinessLogic,
+            IRegistrationService registrationService,
             ISearchBusinessLogic searchBusinessLogic,
             IGovNotifyAPI govNotifyApi,
             UpdateFromCompaniesHouseService updateFromCompaniesHouseService,
@@ -58,6 +60,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             _SicCodeSearchRepository = sicCodeSearchRepository;
             _SubmissionBusinessLogic = submissionBusinessLogic;
             _OrganisationBusinessLogic = organisationBusinessLogic;
+            _RegistrationService = registrationService;
             SearchBusinessLogic = searchBusinessLogic;
             _updateFromCompaniesHouseService = updateFromCompaniesHouseService;
             _authorisationBusinessLogic = authorisationBusinessLogic;

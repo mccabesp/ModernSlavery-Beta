@@ -17,13 +17,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 //Initialise any unknown scope statuses
-                var changedOrgs = await _ScopeBusinessLogic.SetScopeStatusesAsync();
+                var changedOrgs = await _ScopeBusinessLogic.SetScopeStatusesAsync().ConfigureAwait(false);
 
                 //Initialise the presumed scoped
-                changedOrgs.AddRange(await _ScopeBusinessLogic.SetPresumedScopesAsync());
+                changedOrgs.AddRange(await _ScopeBusinessLogic.SetPresumedScopesAsync().ConfigureAwait(false));
 
                 //Update the search indexes
-                if (changedOrgs.Count > 0) await SearchBusinessLogic.UpdateSearchIndexAsync(changedOrgs.ToArray());
+                if (changedOrgs.Count > 0) await SearchBusinessLogic.UpdateSearchIndexAsync(changedOrgs.ToArray()).ConfigureAwait(false);
 
                 log.LogDebug($"Executed {nameof(SetPresumedScopes)} successfully");
             }
@@ -32,7 +32,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(SetPresumedScopes)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }

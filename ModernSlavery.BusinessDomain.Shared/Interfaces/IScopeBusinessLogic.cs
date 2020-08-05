@@ -60,7 +60,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         IEnumerable<ScopesFileModel> GetScopesFileModelByYear(int year);
         Task<HashSet<Organisation>> SetScopeStatusesAsync();
         Task<HashSet<Organisation>> SetPresumedScopesAsync();
-        bool FillMissingScopes(Organisation org);
+        Task<bool> SetPresumedScopesAsync(Organisation org);
         Task<HashSet<OrganisationMissingScope>> FindOrgsWhereScopeNotSetAsync();
 
         /// <summary>

@@ -1,5 +1,7 @@
-﻿using ModernSlavery.Core.Interfaces;
+﻿using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using System.Threading.Tasks;
 
 namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
@@ -17,5 +19,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         IUserRepository UserRepository { get; }
         IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
         IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
+
+        Task SetIsUkAddressAsync(OrganisationAddress address);
+        Task SetIsUkAddressesAsync();
     }
 }
