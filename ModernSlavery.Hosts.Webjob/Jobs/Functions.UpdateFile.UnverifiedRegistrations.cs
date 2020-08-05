@@ -13,50 +13,57 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-        public async Task UpdateRegistrations([TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
+        public async Task UpdateUnverifiedRegistrations(
+            [TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {
             try
             {
-                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.Registrations);
+                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath,
+                    Filenames.UnverifiedRegistrations);
 
                 //Dont execute on startup if file already exists
-                if (!StartedJobs.Contains(nameof(UpdateRegistrations)) &&
-                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath)) return;
+                if (!StartedJobs.Contains(nameof(UpdateUnverifiedRegistrations))
+                    && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
+                    return;
 
-                await UpdateRegistrationsAsync(log, filePath);
-
-                log.LogDebug($"Executed {nameof(UpdateRegistrations)}:successfully");
+                await UpdateUnverifiedRegistrationsAsync(log, filePath).ConfigureAwait(false);
+                log.LogDebug($"Executed {nameof(UpdateUnverifiedRegistrations)}:successfully");
             }
             catch (Exception ex)
             {
-                var message = $"Failed {nameof(UpdateRegistrations)}:{ex.Message}";
+                var message = $"Failed {nameof(UpdateUnverifiedRegistrations)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
             finally
             {
-                StartedJobs.Add(nameof(UpdateRegistrations));
+                StartedJobs.Add(nameof(UpdateUnverifiedRegistrations));
             }
         }
 
-        public async Task UpdateRegistrationsAsync(ILogger log, string filePath)
+        /// <summary>
+        ///     Generates a csv file of all unverified user registrations from the database
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="log"></param>
+        public async Task UpdateUnverifiedRegistrationsAsync(ILogger log, string filePath)
         {
-            if (RunningJobs.Contains(nameof(UpdateRegistrations)))
+            if (RunningJobs.Contains(nameof(UpdateUnverifiedRegistrations)))
             {
-                log.LogDebug($"'{nameof(UpdateRegistrations)}' is already running.");
+                log.LogWarning($"'{nameof(UpdateUnverifiedRegistrations)}' is already running.");
                 return;
             }
 
-            RunningJobs.Add(nameof(UpdateRegistrations));
+            RunningJobs.Add(nameof(UpdateUnverifiedRegistrations));
             try
             {
-                var userOrgs = _SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>().Where(uo =>
-                        uo.User.Status == UserStatuses.Active && uo.PINConfirmedDate != null)
+                var userOrgs = _SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
+                    .Where(uo => uo.PINConfirmedDate == null)
                     .OrderBy(uo => uo.Organisation.OrganisationName)
                     .Include(uo => uo.Organisation.LatestScope)
                     .Include(uo => uo.User)
@@ -89,11 +96,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             Address = uo.Address?.GetAddressString()
                         })
                     .ToList();
-                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
+                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath).ConfigureAwait(false);
             }
             finally
             {
-                RunningJobs.Remove(nameof(UpdateRegistrations));
+                RunningJobs.Remove(nameof(UpdateUnverifiedRegistrations));
             }
         }
     }

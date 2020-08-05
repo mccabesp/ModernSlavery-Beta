@@ -30,7 +30,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(funcName) &&
-                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
+                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
                 {
                     log.LogDebug($"Skipped {funcName} at start up.");
                     return;
@@ -39,7 +39,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 // Flag the UpdateRegistrationAddresses web job as started
                 StartedJobs.Add(funcName);
 
-                await UpdateRegistrationAddressesAsync(filePath, log);
+                await UpdateRegistrationAddressesAsync(filePath, log).ConfigureAwait(false);
 
                 log.LogDebug($"Executed {funcName}:successfully");
             }
@@ -48,7 +48,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed {funcName}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -71,7 +71,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 RunningJobs.Add(funcName);
 
                 // Cache the latest registration addresses
-                var latestRegistrationAddresses = await GetLatestRegistrationAddressesAsync();
+                var latestRegistrationAddresses = await GetLatestRegistrationAddressesAsync().ConfigureAwait(false);
 
                 // Write yearly records to csv files
                 await WriteRecordsPerYearAsync(
@@ -83,9 +83,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             // get organisation scope and submission per year
                             var returnByYear =
                                 await _SubmissionBusinessLogic.GetLatestSubmissionBySnapshotYearAsync(
-                                    model.OrganisationId, year);
+                                    model.OrganisationId, year).ConfigureAwait(false);
                             var scopeByYear =
-                                await _ScopeBusinessLogic.GetLatestScopeBySnapshotYearAsync(model.OrganisationId, year);
+                                await _ScopeBusinessLogic.GetLatestScopeBySnapshotYearAsync(model.OrganisationId, year).ConfigureAwait(false);
 
                             // update file model with year data
                             model.HasSubmitted = returnByYear == null ? "False" : "True";
@@ -93,7 +93,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         }
 
                         return latestRegistrationAddresses;
-                    });
+                    }).ConfigureAwait(false);
             }
             finally
             {
@@ -110,7 +110,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 .Include(uo => uo.LatestAddress)
                 .Include(uo => uo.LatestStatement)
                 .Include(uo => uo.LatestScope)
-                .ToListAsync();
+                .ToListAsync().ConfigureAwait(false);
 
             return verifiedOrgs.Select(
                     vo =>

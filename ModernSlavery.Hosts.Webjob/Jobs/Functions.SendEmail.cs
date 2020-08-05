@@ -30,14 +30,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             if (parameters is SendGeoMessageModel)
             {
                 var pars = (SendGeoMessageModel) parameters;
-                if (!await _Messenger.SendGeoMessageAsync(pars.subject, pars.message, pars.test))
+                if (!await _Messenger.SendGeoMessageAsync(pars.subject, pars.message, pars.test).ConfigureAwait(false))
                     throw new Exception("Could not send email message to GEO for queued message:" + queueMessage);
             }
             else
             {
                 try
                 {
-                    await _Messenger.SendEmailTemplateAsync((EmailTemplate) parameters);
+                    await _Messenger.SendEmailTemplateAsync((EmailTemplate) parameters).ConfigureAwait(false);
                 }
                 catch
                 {
@@ -63,7 +63,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             //Send Email to GEO reporting errors
             await _Messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR",
-                "Could not send email for queued message:" + queueMessage);
+                "Could not send email for queued message:" + queueMessage).ConfigureAwait(false);
         }
     }
 }

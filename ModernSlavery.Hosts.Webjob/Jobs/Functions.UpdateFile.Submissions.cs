@@ -23,11 +23,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 if (!StartedJobs.Contains(nameof(UpdateSubmissions))
                     && await _SharedBusinessLogic.FileRepository.GetAnyFileExistsAsync(
                         _SharedBusinessLogic.SharedOptions.DownloadsPath,
-                        $"{Path.GetFileNameWithoutExtension(Filenames.OrganisationSubmissions)}*{Path.GetExtension(Filenames.OrganisationSubmissions)}")
+                        $"{Path.GetFileNameWithoutExtension(Filenames.OrganisationSubmissions)}*{Path.GetExtension(Filenames.OrganisationSubmissions)}").ConfigureAwait(false)
                 )
                     return;
 
-                await UpdateSubmissionsAsync(filePath);
+                await UpdateSubmissionsAsync(filePath).ConfigureAwait(false);
 
                 log.LogDebug($"Executed {nameof(UpdateSubmissions)}:successfully");
             }
@@ -36,7 +36,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed {nameof(UpdateSubmissions)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }

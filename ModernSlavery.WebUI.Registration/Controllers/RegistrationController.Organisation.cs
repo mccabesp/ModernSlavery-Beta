@@ -1634,7 +1634,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     {
                         await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-                        _registrationService.ScopeBusinessLogic.FillMissingScopes(tempUserOrg.Organisation);
+                        await _registrationService.ScopeBusinessLogic.SetPresumedScopesAsync(tempUserOrg.Organisation);
 
                         if (tempUserOrg.PINConfirmedDate != null)
                             tempUserOrg.Organisation.LatestRegistration = tempUserOrg;

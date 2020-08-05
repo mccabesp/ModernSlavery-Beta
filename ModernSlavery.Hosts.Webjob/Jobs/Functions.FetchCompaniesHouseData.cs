@@ -1,52 +1,59 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
         [Singleton(Mode = SingletonMode.Listener)]
-        public void FetchCompaniesHouseData([TimerTrigger("*/5 * * * *")] TimerInfo timer)
+        public async Task UpdateFromCompaniesHouseAsync([TimerTrigger("*/5 * * * *")] TimerInfo timer,ILogger log)
         {
             try
             {
-                var runId = Guid.NewGuid().ToString("N").Substring(0, 8);
-                _CustomLogger.Information($"Fetch companies house data web job has been started. Run id {runId}");
+                await UpdateFromCompaniesHouseAsync().ConfigureAwait(false);
 
-                UpdateFromCompaniesHouse(runId);
+                log.LogDebug($"Executed {nameof(UpdateFromCompaniesHouseAsync)} successfully");
 
-                _CustomLogger.Information($"Fetch companies house data web job has been finished. Run id {runId}");
             }
             catch (Exception ex)
             {
-                var message = $"Failed fetch companies house webjob({nameof(FetchCompaniesHouseData)})";
-                _CustomLogger.Error(message, ex);
+                var message = $"Failed webjob ({nameof(UpdateFromCompaniesHouseAsync)}):{ex.Message}:{ex.GetDetailsText()}";
+
+                //Send Email to GEO reporting errors
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                //Rethrow the error
                 throw;
             }
         }
 
-        private void UpdateFromCompaniesHouse(string runId)
+        private async Task UpdateFromCompaniesHouseAsync()
         {
-            var maxNumCallCompaniesHouseApi =
-                _SharedBusinessLogic.SharedOptions.MaxNumCallsCompaniesHouseApiPerFiveMins;
+            if (RunningJobs.Contains(nameof(UpdateFromCompaniesHouseAsync))) return;
 
-            for (var i = 0; i < maxNumCallCompaniesHouseApi; i++)
+            RunningJobs.Add(nameof(UpdateFromCompaniesHouseAsync));
+
+            try
             {
-                var organisationId = _SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .Where(org =>
-                        !org.OptedOutFromCompaniesHouseUpdate && org.CompanyNumber != null && org.CompanyNumber != "")
-                    .OrderByDescending(org => org.LastCheckedAgainstCompaniesHouse == null)
-                    .ThenBy(org => org.LastCheckedAgainstCompaniesHouse)
-                    .Select(org => org.OrganisationId)
-                    .FirstOrDefault();
+                var lastCheck = VirtualDateTime.Now.AddMinutes(-5);
 
-                _CustomLogger.Information(
-                    $"Start update companies house data organisation id {organisationId}. Run id {runId}");
-                _updateFromCompaniesHouseService.UpdateOrganisationDetails(organisationId);
-                _CustomLogger.Information(
-                    $"End update companies house data organisation id {organisationId}. Run id {runId}");
+                var organisations = _SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                    .Where(org => !org.OptedOutFromCompaniesHouseUpdate && org.CompanyNumber != null && org.CompanyNumber != "" && (org.LastCheckedAgainstCompaniesHouse == null || org.LastCheckedAgainstCompaniesHouse < lastCheck))
+                    .OrderByDescending(org => org.LastCheckedAgainstCompaniesHouse)
+                    .Take(_SharedBusinessLogic.SharedOptions.MaxNumCallsCompaniesHouseApiPerFiveMins);
+
+                foreach (var organisation in organisations)
+                {
+                    await _updateFromCompaniesHouseService.UpdateOrganisationDetailsAsync(organisation).ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                RunningJobs.Remove(nameof(UpdateFromCompaniesHouseAsync));
             }
         }
     }

@@ -13,50 +13,48 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-        public async Task UpdateUsersToContactForFeedback(
-            [TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
+        public async Task UpdateUsersToSendInfo([TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {
             try
             {
-                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.AllowFeedback);
+                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.SendInfo);
 
                 //Dont execute on startup if file already exists
-                if (!StartedJobs.Contains(nameof(UpdateUsersToContactForFeedback))
-                    && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
-                    return;
+                if (!StartedJobs.Contains(nameof(UpdateUsersToSendInfo)) &&
+                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false)) return;
 
-                await UpdateUsersToContactForFeedbackAsync(filePath);
-                log.LogDebug($"Executed {nameof(UpdateUsersToContactForFeedback)}:successfully");
+                await UpdateUsersToSendInfoAsync(filePath).ConfigureAwait(false);
+                log.LogDebug($"Executed {nameof(UpdateUsersToSendInfo)}:successfully");
             }
             catch (Exception ex)
             {
-                var message = $"Failed {nameof(UpdateUsersToContactForFeedback)}:{ex.Message}";
+                var message = $"Failed {nameof(UpdateUsersToSendInfo)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
             finally
             {
-                StartedJobs.Add(nameof(UpdateUsersToContactForFeedback));
+                StartedJobs.Add(nameof(UpdateUsersToSendInfo));
             }
         }
 
-        public async Task UpdateUsersToContactForFeedbackAsync(string filePath)
+        public async Task UpdateUsersToSendInfoAsync(string filePath)
         {
-            if (RunningJobs.Contains(nameof(UpdateUsersToContactForFeedback))) return;
+            if (RunningJobs.Contains(nameof(UpdateUsersToSendInfo))) return;
 
-            RunningJobs.Add(nameof(UpdateUsersToContactForFeedback));
+            RunningJobs.Add(nameof(UpdateUsersToSendInfo));
             try
             {
                 var users = await _SharedBusinessLogic.DataRepository.GetAll<User>().Where(user =>
                         user.Status == UserStatuses.Active
                         && user.UserSettings.Any(us =>
-                            us.Key == UserSettingKeys.AllowContact && us.Value.ToLower() == "true"))
-                    .ToListAsync();
+                            us.Key == UserSettingKeys.SendUpdates && us.Value.ToLower() == "true"))
+                    .ToListAsync().ConfigureAwait(false);
                 var records = users.Select(
                         u => new
                         {
@@ -72,11 +70,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             u.ContactOrganisation
                         })
                     .ToList();
-                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath);
+                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath).ConfigureAwait(false);
             }
             finally
             {
-                RunningJobs.Remove(nameof(UpdateUsersToContactForFeedback));
+                RunningJobs.Remove(nameof(UpdateUsersToSendInfo));
             }
         }
     }

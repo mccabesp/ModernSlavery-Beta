@@ -67,7 +67,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 #endif
             var records = new List<OrganisationsFileModel>();
 
-            await foreach (var o in orgs.ToAsyncEnumerable())
+            foreach (var o in orgs)
             {
                 var record = new OrganisationsFileModel
                 {
@@ -106,9 +106,8 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public virtual async Task SetUniqueEmployerReferencesAsync()
         {
-            var orgs = _sharedBusinessLogic.DataRepository.GetAll<Organisation>().Where(o => o.EmployerReference == null)
-                .ToAsyncEnumerable();
-            await foreach (var org in orgs) await SetUniqueEmployerReferenceAsync(org);
+            var orgs = _sharedBusinessLogic.DataRepository.GetAll<Organisation>().Where(o => o.EmployerReference == null);
+            foreach (var org in orgs) await SetUniqueEmployerReferenceAsync(org);
         }
 
         public virtual async Task SetUniqueEmployerReferenceAsync(Organisation organisation)
@@ -686,6 +685,29 @@ namespace ModernSlavery.BusinessDomain.Registration
             };
         }
 
+        public async Task FixLatestAddressesAsync()
+        {
+            foreach (var organisation in _sharedBusinessLogic.DataRepository.GetAll<Organisation>().Where(o=>o.LatestAddress==null && o.OrganisationAddresses.Any(a=>a.Status== AddressStatuses.Active)))
+                organisation.FixLatestAddress();
+        }
+
+        public async Task FixLatestScopesAsync()
+        {
+            foreach (var organisation in _sharedBusinessLogic.DataRepository.GetAll<Organisation>().Where(o => o.LatestScope == null && o.OrganisationScopes.Any(a => a.Status == ScopeRowStatuses.Active)))
+                organisation.FixLatestScope();
+        }
+
+        public async Task FixLatestStatementsAsync()
+        {
+            foreach (var organisation in _sharedBusinessLogic.DataRepository.GetAll<Organisation>().Where(o => o.LatestStatement== null && o.Statements.Any(a => a.Status == StatementStatuses.Submitted)))
+                organisation.FixLatestStatement();
+        }
+
+        public async Task FixLatestRegistrationsAsync()
+        {
+            foreach (var organisation in _sharedBusinessLogic.DataRepository.GetAll<Organisation>().Where(o => o.LatestRegistration == null && o.UserOrganisations.Any(a => a.PINConfirmedDate != null)))
+                organisation.FixLatestRegistration();
+        }
         #endregion
     }
 }

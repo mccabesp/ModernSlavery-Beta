@@ -14,14 +14,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                await CompaniesHouseCheckAsync(log);
+                await CompaniesHouseCheckAsync(log).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 var message = $"Failed webjob ({nameof(CompaniesHouseCheck)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }

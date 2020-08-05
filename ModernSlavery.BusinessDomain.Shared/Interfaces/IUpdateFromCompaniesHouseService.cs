@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Models.CompaniesHouse;
 
@@ -14,9 +15,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 
         bool IsCompanyNameEqual(OrganisationName organisationName, string companyName);
         bool SicCodesEqual(IEnumerable<OrganisationSicCode> sicCodes, IEnumerable<string> companiesHouseSicCodes);
-        void UpdateOrganisationDetails(long organisationId);
-        void UpdateSicCode(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
-        void UpdateAddress(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
-        void UpdateName(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
+        Task UpdateOrganisationDetailsAsync(Organisation organisation);
+        Task UpdateSicCodeAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
+        Task UpdateAddressAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
+        Task UpdateNameAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
     }
 }

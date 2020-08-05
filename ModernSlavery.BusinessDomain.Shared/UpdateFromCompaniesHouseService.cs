@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
@@ -19,7 +20,7 @@ namespace ModernSlavery.BusinessDomain.Shared
         private readonly IDataRepository _DataRepository;
         private readonly IPostcodeChecker _PostcodeChecker;
         private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
-        public UpdateFromCompaniesHouseService(IEventLogger customLogger, IDataRepository dataRepository,IOrganisationBusinessLogic organisationBusinessLogic,
+        public UpdateFromCompaniesHouseService(IEventLogger customLogger, IDataRepository dataRepository, IOrganisationBusinessLogic organisationBusinessLogic,
             ICompaniesHouseAPI companiesHouseAPI, IPostcodeChecker postcodeChecker)
         {
             _CustomLogger = customLogger;
@@ -112,68 +113,48 @@ namespace ModernSlavery.BusinessDomain.Shared
                 companiesHouseSicCodes.Select(sic => int.Parse(sic)));
         }
 
-        public void UpdateOrganisationDetails(long organisationId)
+        public async Task UpdateOrganisationDetailsAsync(Organisation organisation)
         {
-            _CustomLogger.Debug($"Loading organisation - OrganisationId({organisationId})");
-            var organisation = _DataRepository.Get<Organisation>(organisationId);
-
-            _CustomLogger.Debug($"Updating LastCheckedAgainstCompaniesHouse - OrganisationId({organisationId})");
-            organisation.LastCheckedAgainstCompaniesHouse = VirtualDateTime.Now;
-            _DataRepository.SaveChangesAsync().Wait();
+            if (organisation == null) throw new ArgumentNullException(nameof(organisation));
 
             try
             {
-                _CustomLogger.Debug($"Calling CoHo API - OrganisationId({organisationId})");
-                var organisationFromCompaniesHouse =
-                    _CompaniesHouseAPI.GetCompanyAsync(organisation.CompanyNumber).Result;
+                var organisationFromCompaniesHouse = _CompaniesHouseAPI.GetCompanyAsync(organisation.CompanyNumber).Result;
 
-                _CustomLogger.Debug($"Starting transaction - OrganisationId({organisationId})");
-                _DataRepository.BeginTransactionAsync(
-                        async () =>
-                        {
-                            try
-                            {
-                                _CustomLogger.Debug($"Updating SIC codes - OrganisationId({organisationId})");
-                                UpdateSicCode(organisation, organisationFromCompaniesHouse);
+                try
+                {
+                    await UpdateSicCodeAsync(organisation, organisationFromCompaniesHouse);
 
-                                _CustomLogger.Debug($"Updating Address - OrganisationId({organisationId})");
-                                UpdateAddress(organisation, organisationFromCompaniesHouse);
+                    await UpdateAddressAsync(organisation, organisationFromCompaniesHouse);
 
-                                _CustomLogger.Debug($"Updating Name - OrganisationId({organisationId})");
-                                UpdateName(organisation, organisationFromCompaniesHouse);
+                    await UpdateNameAsync(organisation, organisationFromCompaniesHouse);
 
-                                _CustomLogger.Debug($"Saving - OrganisationId({organisationId})");
-                                _DataRepository.SaveChangesAsync().Wait();
-                                _DataRepository.CommitTransaction();
-
-                                _CustomLogger.Debug($"Saved - OrganisationId({organisationId})");
-                            }
-                            catch (Exception ex)
-                            {
-                                var message =
-                                    $"Update from Companies House: Failed to update database, organisation id = {organisationId}";
-                                _CustomLogger.Error(message, ex);
-                                _DataRepository.RollbackTransaction();
-                            }
-                        })
-                    .Wait();
+                    organisation.LastCheckedAgainstCompaniesHouse = VirtualDateTime.Now;
+                    await _DataRepository.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    var message = $"Update from Companies House: Failed to update database, organisation id = {organisation.OrganisationId}";
+                    _CustomLogger.Error(message, ex);
+                }
             }
             catch (Exception ex)
             {
-                var message =
-                    $"Update from Companies House: Failed to get company data from companies house, organisation id = {organisationId}";
+                var message = $"Update from Companies House: Failed to get company data from companies house, organisation id = {organisation.OrganisationId}";
                 _CustomLogger.Error(message, ex);
+                return;
             }
+
         }
 
-        public void UpdateSicCode(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
+        public async Task UpdateSicCodeAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
         {
             var companySicCodes = organisationFromCompaniesHouse.SicCodes ?? new List<string>();
             RetireExtraSicCodes(organisation, companySicCodes);
             AddNewSicCodes(organisation, companySicCodes);
         }
 
-        public void UpdateAddress(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
+        public async Task UpdateAddressAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
         {
             var companiesHouseAddress = organisationFromCompaniesHouse.RegisteredOfficeAddress;
             var newOrganisationAddressFromCompaniesHouse =
@@ -194,7 +175,7 @@ namespace ModernSlavery.BusinessDomain.Shared
             _DataRepository.Insert(newOrganisationAddressFromCompaniesHouse);
         }
 
-        public void UpdateName(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
+        public async Task UpdateNameAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
         {
             var companyNameFromCompaniesHouse = organisationFromCompaniesHouse.CompanyName;
             companyNameFromCompaniesHouse = FirstHundredChars(companyNameFromCompaniesHouse);
@@ -203,7 +184,9 @@ namespace ModernSlavery.BusinessDomain.Shared
 
             var nameToAdd = new OrganisationName
             {
-                Organisation = organisation, Name = companyNameFromCompaniesHouse, Source = SourceOfChange,
+                Organisation = organisation,
+                Name = companyNameFromCompaniesHouse,
+                Source = SourceOfChange,
                 Created = VirtualDateTime.Now
             };
             organisation.OrganisationNames.Add(nameToAdd);
@@ -235,7 +218,9 @@ namespace ModernSlavery.BusinessDomain.Shared
                 {
                     var sicCodeToBeAdded = new OrganisationSicCode
                     {
-                        Organisation = organisation, SicCodeId = sicCodeId, Source = SourceOfChange,
+                        Organisation = organisation,
+                        SicCodeId = sicCodeId,
+                        Source = SourceOfChange,
                         Created = VirtualDateTime.Now
                     };
                     organisation.OrganisationSicCodes.Add(sicCodeToBeAdded);

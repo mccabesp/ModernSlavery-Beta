@@ -159,17 +159,19 @@ namespace ModernSlavery.Core.Entities
 
         public OrganisationAddress GetLatestAddress(AddressStatuses status = AddressStatuses.Active)
         {
-            var addressStatus = OrganisationAddresses.SelectMany(a =>
-                    a.AddressStatuses.Where(s => s.Status == status))
-                .OrderByDescending(s => s.StatusDate)
-                .FirstOrDefault();
-
-            if (addressStatus != null && addressStatus.Address.Status == status) return addressStatus.Address;
-
-            if (LatestAddress != null && LatestAddress.Status == status) return LatestAddress;
-
-            return null;
+            return OrganisationAddresses.OrderByDescending(a => a.Created).SingleOrDefault(a => a.Status == AddressStatuses.Active);
         }
+
+        public void FixLatestAddress(OrganisationAddress newAddress = null)
+        {
+            if (newAddress != null && newAddress.Status != AddressStatuses.Active) throw new ArgumentException($"Cannot set latest address with status={newAddress.Status}");
+
+            //Get the sorted addresses
+            var addresses = OrganisationAddresses.OrderBy(a => a.Created).ToList();
+            if (newAddress == null) newAddress = addresses.LastOrDefault(a => a.Status == AddressStatuses.Active);
+            LatestAddress = newAddress;
+        }
+
         /// <summary>
         ///     Returns the latest organisation name before specified date/time
         /// </summary>
@@ -184,19 +186,6 @@ namespace ModernSlavery.Core.Entities
         }
         #endregion
 
-        #region Returns
-        //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
-        public Return GetReturn(int year)
-        {
-            return null;// Returns.Where(r => r.Status == StatementStatuses.Submitted && r.AccountingDate.Year == year).OrderByDescending(r => r.StatusDate).FirstOrDefault();
-        }
-
-        public IEnumerable<Return> GetSubmittedReports()
-        {
-            return null;// Returns.Where(r => r.Status == StatementStatuses.Submitted).OrderByDescending(r => r.AccountingDate);
-        }
-        #endregion
-
         #region Statements
         //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
         public Statement GetStatement(int year)
@@ -204,6 +193,16 @@ namespace ModernSlavery.Core.Entities
             return Statements.Where(r => r.Status == StatementStatuses.Submitted && r.SubmissionDeadline.Year == year)
                 .OrderByDescending(r => r.StatusDate)
                 .FirstOrDefault();
+        }
+
+        public void FixLatestStatement(Statement newStatement = null)
+        {
+            if (newStatement != null && newStatement.Status != StatementStatuses.Submitted) throw new ArgumentException($"Cannot set latest statement with status={newStatement.Status}");
+
+            //Get the sorted statementes
+            var statements = Statements.OrderBy(a => a.SubmissionDeadline).ThenBy(a => a.Created).ToList();
+            if (newStatement == null) newStatement = statements.LastOrDefault(a => a.Status == StatementStatuses.Submitted);
+            LatestStatement = newStatement;
         }
 
         public IEnumerable<Statement> GetSubmittedStatements()
@@ -223,6 +222,16 @@ namespace ModernSlavery.Core.Entities
         {
             return OrganisationScopes.OrderByDescending(s=>s.SubmissionDeadline).FirstOrDefault(orgScope =>
                 orgScope.Status == ScopeRowStatuses.Active);
+        }
+
+        public void FixLatestScope(OrganisationScope newScope = null)
+        {
+            if (newScope != null && newScope.Status != ScopeRowStatuses.Active) throw new ArgumentException($"Cannot set latest scope with status={newScope.Status}");
+
+            //Get the sorted scopes
+            var scopes = OrganisationScopes.OrderBy(a => a.SubmissionDeadline).ThenBy(s => s.ScopeStatusDate).ToList();
+            if (newScope == null) newScope = scopes.LastOrDefault(a => a.Status == ScopeRowStatuses.Active);
+            LatestScope = newScope;
         }
 
         //Returns the scope for the specified accounting date
@@ -376,6 +385,16 @@ namespace ModernSlavery.Core.Entities
             return UserOrganisations.Where(uo => uo.PINConfirmedDate != null)
                 .OrderByDescending(uo => uo.PINConfirmedDate)
                 .FirstOrDefault();
+        }
+
+        public void FixLatestRegistration(UserOrganisation newRegistration = null)
+        {
+            if (newRegistration != null && newRegistration.PINConfirmedDate == null) throw new ArgumentException($"Cannot set latest registration to no confirmed date");
+
+            //Get the sorted statementes
+            var userOrganisations = UserOrganisations.OrderBy(a => a.PINConfirmedDate).ToList();
+            if (newRegistration == null) newRegistration = userOrganisations.LastOrDefault(a => a.PINConfirmedDate != null);
+            LatestRegistration = newRegistration;
         }
         #endregion
 

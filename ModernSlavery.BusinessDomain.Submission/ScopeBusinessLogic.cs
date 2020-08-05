@@ -263,7 +263,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var changedOrgs = new HashSet<Organisation>();
 
             foreach (var org in missingOrgs)
-                if (FillMissingScopes(org.Organisation))
+                if (await SetPresumedScopesAsync(org.Organisation))
                     changedOrgs.Add(org.Organisation);
 
             if (changedOrgs.Count > 0) await _sharedBusinessLogic.DataRepository.SaveChangesAsync();
@@ -271,7 +271,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             return changedOrgs;
         }
 
-        public bool FillMissingScopes(Organisation org)
+        public async Task<bool> SetPresumedScopesAsync(Organisation org)
         {
             var firstYear = _sharedBusinessLogic.SharedOptions.FirstReportingYear;
             var currentSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(org.SectorType);

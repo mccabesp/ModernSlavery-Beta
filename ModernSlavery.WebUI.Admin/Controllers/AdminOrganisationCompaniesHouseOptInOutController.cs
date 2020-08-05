@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared;
@@ -52,7 +53,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpPost("organisation/{id}/coho-sync/opt-in")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public IActionResult OptIn(long id, AdminChangeCompaniesHouseOptInOutViewModel viewModel)
+        public async Task<IActionResult> OptIn(long id, AdminChangeCompaniesHouseOptInOutViewModel viewModel)
         {
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
@@ -67,7 +68,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 return View("OptIn", viewModel);
             }
 
-            updateFromCompaniesHouseService.UpdateOrganisationDetails(organisation.OrganisationId);
+            await updateFromCompaniesHouseService.UpdateOrganisationDetailsAsync(organisation);
 
             organisation.OptedOutFromCompaniesHouseUpdate = false;
             _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
