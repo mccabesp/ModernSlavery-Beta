@@ -69,7 +69,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             AtRow("Registered address").Expect(Registration.RegisteredAddress_InterFloor);
             Click("Confirm");
 
-            ExpectHeader("We're sending a PIN by post to the following name & address:");
+            ExpectHeader("We're sending a PIN by post to the following name and address:");
             await Task.CompletedTask;
 
         }
@@ -105,9 +105,10 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ClickText(Registration.OrgName_InterFloor);
 
-            ExpectHeader("Please enter your Modern Slavery Reporting service PIN");
+            ExpectHeader("Enter your registration PIN");
 
-            Expect("Enter the PIN to enable you to report Modern Slavery information for this organisation.");
+            Expect("Enter the PIN we sent you by post to finish registering this organisation.");
+            Expect("You will then be able to submit information about this organisation`s modern slavery statement.");
 
             Set("Enter PIN").To(Pin);
 
