@@ -288,16 +288,12 @@ namespace ModernSlavery.Core.Classes
             remotePath = Path.Combine(remotePath, fileName);
             var remoteExists = await fileRepository.GetFileExistsAsync(remotePath);
 
+            //Dont overwrite if remote is newer than local unless explicit override set
             if (remoteExists)
             {
-                //Dont overwite remote file if it exists (unless local is newer)
-                if (!OverwriteIfNewer) return false;
-
-                //Dont overwrite remote file unless local file is newer
-                var remoteLastWriteTime = await fileRepository.GetLastWriteTimeAsync(localPath);
-                var localLastWriteTime = File.GetLastWriteTime(remotePath);
-
-                if (remoteLastWriteTime >= localLastWriteTime) return false;
+                var remoteLastWriteTime = await fileRepository.GetLastWriteTimeAsync(remotePath);
+                var localLastWriteTime = File.GetLastWriteTime(localPath); 
+                if (remoteLastWriteTime >= localLastWriteTime && !OverwriteIfNewer) return false;
             }
 
             //Overwrite remote 
