@@ -183,15 +183,28 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public static void ExpandSection(UIContext ui, string SectionName, string SectionOrder = "1")
         {
-            //todo define how to expand/colaspe section based on section name and order
-            ui.ClickXPath("...");
+            if (SectionOrder == "1")
+            {
+                ui.ClickText(SectionOrder);
+            }
+            else if (SectionOrder == "2")
+            {
+                ui.Below(The.Top, SectionOrder).ClickText(SectionOrder);
+            }
 
         }
 
         public static void ColapseSection(UIContext ui, string SectionName, string SectionOrder = "1")
         {
-            //todo define how to expand/colaspe section based on section name and order
-            ui.ClickXPath("...");
+            if (SectionOrder == "1")
+            {
+                ui.ClickText(SectionOrder);
+            }
+            else if (SectionOrder == "2")
+            {
+                ui.Below(The.Top, SectionOrder).ClickText(SectionOrder);
+            }
+
         }
 
         public static void CountrySelect (UIContext ui, string Continent, string[] Countries) 
