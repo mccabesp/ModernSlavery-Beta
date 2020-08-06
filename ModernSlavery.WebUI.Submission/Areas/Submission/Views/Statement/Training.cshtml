@@ -30,14 +30,14 @@
                         @foreach (var trainingType in Model.TrainingTypes)
                         {
                             <div class="govuk-checkboxes__item">
-                                <input name="Training" value="@trainingType.Id" id="@($"training{trainingType.Id}")" checked=@(Model.Training.Contains(trainingType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="training-conditional">
+                                <input name="Training" value="@trainingType.Id" id="@($"training{trainingType.Id}")" checked=@(Model.Training.Contains(trainingType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="training-conditional-@(trainingType.Id)">
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"training{trainingType.Id}")">
                                     @trainingType.Description
                                 </label>
                             </div>
                             @if (trainingType.Description.Equals("Other"))
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTraining, "govuk-form-group--error")" id="training-conditional">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTraining, "govuk-form-group--error")" id="training-conditional-@(trainingType.Id)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
                                             Please specify
