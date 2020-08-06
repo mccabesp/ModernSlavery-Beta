@@ -89,7 +89,7 @@
     {
         <script type="text/javascript">document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
     }
-    @if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request))
+    @if (featureSwitchOptions.IsEnabled("CookiePolicyLink") && !CookieHelper.HasSeenLatestCookieMessage(Context.Request))
     {
         await Html.RenderPartialAsync("~/Views/Components/CookieBanner.cshtml");
     }
@@ -217,12 +217,18 @@
                         <li>
                             <a asp-page="/ContactUs">Contact Us</a>
                         </li>
-                        <li>
-                            <a asp-action="CookieSettings" asp-controller="Shared">Cookies</a>
-                        </li>
-                        <li>
-                            <a asp-action="PrivacyPolicy" asp-controller="Shared">Privacy Policy</a>
-                        </li>
+                        @if (featureSwitchOptions.IsEnabled("CookiePolicyLink"))
+                        {
+                            <li>
+                                <a asp-action="CookieSettings" asp-controller="Shared">Cookies</a>
+                            </li>
+                        }
+                        @if (featureSwitchOptions.IsEnabled("PrivacyPolicyLink"))
+                        {
+                            <li>
+                                <a asp-action="PrivacyPolicy" asp-controller="Shared">Privacy Policy</a>
+                            </li>
+                        }
                         @if (featureSwitchOptions.IsEnabled("ReportConcernsLink"))
                         {
                             <li>

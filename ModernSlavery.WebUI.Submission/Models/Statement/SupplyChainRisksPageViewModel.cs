@@ -83,10 +83,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             var validationResults = new List<ValidationResult>();
 
-            if (RelevantRisks.Count(r => r.Id > 0) > 3)
-                validationResults.AddValidationError(3501, nameof(RelevantRisks));
-
-            var vulnerableGroupId = RiskTypes.Single(x => x.Description.Equals("Other vulnerable groups")).Id;
+            var vulnerableGroupId = RiskTypes.Single(x => x.Description.Equals("Other vulnerable group(s)")).Id;
             var vulnerableGroupIndex = RelevantRisks.FindIndex(r => r.Id == vulnerableGroupId);
             var otherVulnerableGroup = RelevantRisks.FirstOrDefault(x => x.Id == vulnerableGroupId);
             if (otherVulnerableGroup != null && string.IsNullOrWhiteSpace(otherVulnerableGroup.Details))
@@ -121,11 +118,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 var regionRiskIndex = LocationRisks.FindIndex(r => r.Id == region.Id);
 
                 //Get all the child country ids
-                var countryIds = RiskTypes.Where(t => t.ParentId == region.Id).Select(c=>c.Id).ToSortedSet();
+                var countryIds = RiskTypes.Where(t => t.ParentId == region.Id).Select(c => c.Id).ToSortedSet();
 
                 //if a child of the region is also selected the nthrow an error
-                if (LocationRisks.Any(l=> countryIds.Contains(l.Id)))
-                    validationResults.AddValidationError(3505, $"LocationRisks[{regionRiskIndex}].Id",new { regionName=region.Description});
+                if (LocationRisks.Any(l => countryIds.Contains(l.Id)))
+                    validationResults.AddValidationError(3505, $"LocationRisks[{regionRiskIndex}].Id", new { regionName = region.Description });
 
             }
 
@@ -139,7 +136,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            var vulnerableGroup = RiskTypes.Single(x => x.Description.Equals("Other vulnerable groups"));
+            var vulnerableGroup = RiskTypes.Single(x => x.Description.Equals("Other vulnerable group(s)"));
             var typeOfWork = RiskTypes.Single(x => x.Description.Equals("Other type of work"));
             var sector = RiskTypes.Single(x => x.Description.Equals("Other sector"));
 

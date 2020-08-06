@@ -34,7 +34,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             [GovUkRadioCheckboxLabelText(Text = "This is the first time")]
             Year1 = 1,
 
-            [GovUkRadioCheckboxLabelText(Text = "1 to 5 Years")]
+            [GovUkRadioCheckboxLabelText(Text = "1 to 5 years")]
             Years1To5 = 2,
 
             [GovUkRadioCheckboxLabelText(Text = "More than 5 years")]

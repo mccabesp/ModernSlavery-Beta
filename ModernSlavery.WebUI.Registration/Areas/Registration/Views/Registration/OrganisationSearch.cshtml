@@ -6,7 +6,7 @@
 <div id="organisation-search-content">
     <div class="grid-row">
         <div class="column-full">
-            @Html.ActionLink("Back", "OrganisationType", null, null, new {@class = "link-back"})
+            @Html.ActionLink("Back", "OrganisationType", null, null, new { @class = "link-back" })
         </div>
     </div>
 
@@ -14,6 +14,8 @@
     {
         @Html.AntiForgeryToken()
         @Html.HiddenFor(m => m.SectorType)
+        @Html.HiddenFor(model => model.RegistrationType)
+
         @Html.HiddenFor(m => m.ManualRegistration)
 
         <input type="submit" style="display: none" name="command" value="search">
@@ -24,13 +26,13 @@
 
                     <span>Find your organisation</span>
                 </h1>
-                @Html.ValidationMessageFor(model => model.SearchText, null, new {@class = "error-danger"})
+                @Html.ValidationMessageFor(model => model.SearchText, null, new { @class = "error-danger" })
 
                 <div class="gov-uk-c-searchbar">
                     <div class="gov-uk-l-searchbar__table">
                         <div class="gov-uk-l-searchbar__cell">
                             <label for="SearchText" class="visually-hidden">field to search by organisation name</label>
-                            @Html.CustomEditorFor(model => model.SearchText, new {@class = "gov-uk-c-searchbar__input", placeholder = Model.SectorType == SectorTypes.Public ? "Organisation name" : "Organisation name or company no"})
+                            @Html.CustomEditorFor(model => model.SearchText, new { @class = "gov-uk-c-searchbar__input", placeholder = Model.SectorType == SectorTypes.Public ? "Organisation name" : "Organisation name or company no" })
                         </div>
                         <div class="gov-uk-l-searchbar__cell">
                             <button class="gov-uk-c-searchbar__submit gov-uk-c-searchbar__submit--blue" id="NextStep" name="command" value="search" title="Search" type="submit">Search</button>
@@ -41,10 +43,11 @@
                 @if (!string.IsNullOrWhiteSpace(Model.SearchText) && Model.Employers != null && Model.Employers.Results.Count < 1)
                 {
                     <div class="zero-results">
-                        <h2 class="heading-medium">0 employers found that match your search</h2>
+                        <h2 class="heading-medium">0 organisations found that match your search</h2>
                         <h2>Please try:</h2>
                         <ul class="list list-bullet">
-                            <li>searching again using different employer name</li>
+                            <li>checking the spelling</li>
+                            <li>searching again using a different organisation name</li>
 
                         </ul>
                         <details role="group">

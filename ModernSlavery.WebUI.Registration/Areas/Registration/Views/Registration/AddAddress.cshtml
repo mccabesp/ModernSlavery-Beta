@@ -39,6 +39,7 @@
         @Html.HiddenFor(model => model.OtherValue)
         @Html.HiddenFor(model => model.SearchText)
         @Html.HiddenFor(model => model.SectorType)
+        @Html.HiddenFor(model => model.RegistrationType)
         @Html.HiddenFor(model => model.SelectedEmployerIndex)
         @Html.HiddenFor(model => model.SicSource)
         @Html.HiddenFor(model => model.ManualRegistration)
@@ -51,43 +52,42 @@
             <div class="column-two-thirds">
                 @await Html.CustomValidationSummaryAsync()
                 <h1 class="heading-large">
-                    Address of the organisation you're reporting for
+                    Your organisation's address
                 </h1>
                 <div class="dynamic-content default-content">
-                    <p>Enter the correspondence address for the organisation whose Modern Slavery statement you’re reporting.</p>
-
-                    <h2 class="heading-medium">Organisation address</h2>
+                    <p>Enter the correspondence address of the organisation you want to register.</p>
+                   
                     <div class="form-group @Html.SetErrorClass(model => model.Address1, "error") form-group-compound">
-                        @Html.LabelFor(model => model.Address1, new {@class = "form-label col-md-2"})
+                        @Html.LabelFor(model => model.Address1, "Address 1", new {@class = "form-label col-md-2"})
                         @Html.ValidationMessageFor(model => model.Address1, "", new {@class = "error-danger"})
                         <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.Address1, new {@class = "form-control"})
+                            @Html.CustomEditorFor(model => model.Address1, new { @class = "form-control" })
                         </div>
                     </div>
                     <div class="form-group @Html.SetErrorClass(model => model.Address2, "error")">
-                        @Html.LabelFor(model => model.Address2, new {@class = "form-label col-md-2 visuallyhidden"})
+                        @Html.LabelFor(model => model.Address2, "Address 2", new {@class = "form-label col-md-2"})
                         @Html.ValidationMessageFor(model => model.Address2, "", new {@class = "error-danger"})
                         <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.Address2, new {@class = "form-control", placeholder = "optional"})
+                            @Html.CustomEditorFor(model => model.Address2, new { @class = "form-control", placeholder = "optional" })
                         </div>
                     </div>
                     <div class="form-group @Html.SetErrorClass(model => model.Address3, "error")">
-                        @Html.LabelFor(model => model.Address3, new {@class = "form-label col-md-2"})
+                        @Html.LabelFor(model => model.Address3, "Address 3", new {@class = "form-label col-md-2"})
                         @Html.ValidationMessageFor(model => model.Address3, "", new {@class = "error-danger"})
                         <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.Address3, new {@class = "form-control"})
+                            @Html.CustomEditorFor(model => model.Address3, new { @class = "form-control" })
                         </div>
                     </div>
 
                     <div class="form-group @Html.SetErrorClass(model => model.Postcode, "error")">
-                        @Html.LabelFor(model => model.Postcode, new {@class = "form-label col-md-2"})
-                        @Html.ValidationMessageFor(model => model.Postcode, "", new {@class = "error-danger"})
+                        @Html.LabelFor(model => model.Postcode, new { @class = "form-label col-md-2" })
+                        @Html.ValidationMessageFor(model => model.Postcode, "", new { @class = "error-danger" })
                         <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.Postcode, new {@class = "form-control form-control-1-4"})
+                            @Html.CustomEditorFor(model => model.Postcode, new { @class = "form-control form-control-1-4" })
                         </div>
                     </div>
                     <br><br>
-                    <input class="button" type="submit" role="button" name="command" value="Continue" aria-label="Continue"/>
+                    <input class="button" type="submit" role="button" name="command" value="Continue" aria-label="Continue" />
                 </div>
             </div>
         </div>

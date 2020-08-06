@@ -19,7 +19,7 @@
                 @Model.PageTitle
             </h1>
 
-            <h2 class="govuk-heading-m">
+            <h2 class="govuk-heading-s">
                 Provide a link to the modern slavery statement on your organisation's website
             </h2>
             <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementUrl, "govuk-form-group--error")">
@@ -30,10 +30,10 @@
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="reporting-start-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        <h1 class="govuk-heading-m">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">
                             What period does this statement cover?
-                        </h1>
+                        </h2>
                     </legend>
                     <span id="reporting-start-hint" class="govuk-hint">
                         For example, 31 3 1980
@@ -103,26 +103,26 @@
             </div>
 
             <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                    <h1 class="govuk-heading-m">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                    <h2 class="govuk-fieldset__heading">
                         What is the name of the director (or equivalent) that signed off your statement?
-                    </h1>
+                    </h2>
                 </legend>
 
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverFirstName, "govuk-form-group--error")">
-                    <label asp-for="ApproverFirstName" class="govuk-label"></label>
+                    <label asp-for="ApproverFirstName" class="govuk-label">First name</label>
                     <input asp-for="ApproverFirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
                     <span asp-validation-for="ApproverFirstName" class="govuk-error-message"></span>
                 </div>
 
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverLastName, "govuk-form-group--error")">
-                    <label asp-for="ApproverLastName" class="govuk-label"></label>
+                    <label asp-for="ApproverLastName" class="govuk-label">Last name</label>
                     <input asp-for="ApproverLastName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
                     <span asp-validation-for="ApproverLastName" class="govuk-error-message"></span>
                 </div>
 
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverJobTitle, "govuk-form-group--error")">
-                    <label asp-for="ApproverJobTitle" class="govuk-label"></label>
+                    <label asp-for="ApproverJobTitle" class="govuk-label">Job title</label>
                     <input asp-for="ApproverJobTitle" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
                     <span asp-validation-for="ApproverJobTitle" class="govuk-error-message"></span>
                 </div>
@@ -130,10 +130,10 @@
 
             <div class="govuk-form-group @Html.SetErrorClass(new[] {nameof(Model.ApprovedDay),nameof(Model.ApprovedMonth),nameof(Model.ApprovedYear)}, "govuk-form-group--error")">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="statement-approved-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        <h1 class="govuk-heading-m">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">
                             What date was your statement approved by the board or equivalent management body?
-                        </h1>
+                        </h2>
                     </legend>
                     <span id="statement-approved-hint" class="govuk-hint">
                         For example, 31 3 1980
@@ -172,7 +172,7 @@
                 </fieldset>
             </div>
 
-            <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Continue
             </button>
 

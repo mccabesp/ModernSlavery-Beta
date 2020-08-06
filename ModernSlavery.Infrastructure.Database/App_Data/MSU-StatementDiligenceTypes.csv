@@ -7,11 +7,11 @@ StatementDiligenceTypeId,ParentDiligenceTypeId,Description
 6,1,with central or local government
 7,1,with multi-stakeholder initiatives
 8,,Social audits
-9,8,by organisation's own staff
+9,8,by your own staff
 10,8,by a third party
 11,8,announced audits
 12,8,unannounced audits
 13,8,other type of social audit
-14,,Anonymous grievance mechanism
+14,,Anonymous grievance mechanisms
 15,14,whistleblowing services
 16,14,worker voice technology

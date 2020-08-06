@@ -17,7 +17,7 @@
                     Verify your email address
                 </h1>
                 <p>
-                    We have sent you a confirmation email to <br/>
+                    We have sent a confirmation email to <br/>
                     @if (!string.IsNullOrWhiteSpace(ViewBag.VerifyCode))
                     {
                         <a href="@Url.Action("VerifyEmail", new {code = ViewBag.VerifyCode, login = Model.EmailAddress})">
@@ -29,7 +29,7 @@
                         <b id="SavedEmailAddress">@Model.EmailAddress</b>
                     }
                 </p>
-                <p>Follow the instructions in the email to continue your sign up.</p>
+                <p>Follow the instructions in the email to finish creating your account.</p>
                 <h2 class="heading-small">No email yet?</h2>
                 <p>Our email can take a few minutes to arrive. If you can’t see it in your inbox, check your junk mail folder.</p>
             }

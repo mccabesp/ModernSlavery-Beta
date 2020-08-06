@@ -12,13 +12,14 @@
             @Html.HiddenFor(m => m.ReturnToReviewPage);
             @Html.HiddenFor(m => m.Submitted);
 
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
+
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="training-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        <h1 class="govuk-heading-l">
-                            @Model.PageTitle
-                        </h1>
-                        <h2 class="govuk-heading-m">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">
                             Have you provided training on modern slavery and trafficking during the past year, or any other activities to raise awareness? If so, who was this for?
                         </h2>
                     </legend>
@@ -29,14 +30,14 @@
                         @foreach (var trainingType in Model.TrainingTypes)
                         {
                             <div class="govuk-checkboxes__item">
-                                <input name="Training" value="@trainingType.Id" id="@($"training{trainingType.Id}")" checked=@(Model.Training.Contains(trainingType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="training-conditional">
+                                <input name="Training" value="@trainingType.Id" id="@($"training{trainingType.Id}")" checked=@(Model.Training.Contains(trainingType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="training-conditional-@(trainingType.Id)">
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"training{trainingType.Id}")">
                                     @trainingType.Description
                                 </label>
                             </div>
                             @if (trainingType.Description.Equals("Other"))
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTraining, "govuk-form-group--error")" id="training-conditional">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTraining, "govuk-form-group--error")" id="training-conditional-@(trainingType.Id)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
                                             Please specify
@@ -52,7 +53,7 @@
             </div>
 
 
-            <button class="govuk-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Continue
             </button>
 

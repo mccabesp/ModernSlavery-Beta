@@ -291,7 +291,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        [HttpPost("review-request")]
+        [HttpPost("review-request/{code}")]
         public async Task<IActionResult> ReviewRequest(OrganisationViewModel model, string command)
         {
             //Ensure user has completed the registration process
@@ -342,6 +342,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 nameof(model.MutualNumber),
                 nameof(model.OtherName),
                 nameof(model.OtherValue));
+
+            excludes.Add(nameof(model.RegistrationType));
 
             //Exclude the DUNS number when declining
             if (command.EqualsI("decline")) excludes.Add(nameof(model.DUNSNumber));
@@ -610,7 +612,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             //If cancel button clicked the n return to review page
-            if (command.EqualsI("Cancel")) return RedirectToAction("ReviewRequest");
+            if (command.EqualsI("Cancel")) return RedirectToAction("ReviewRequest", new { code = model.ReviewCode });
 
             //Unwrap code
             UserOrganisation userOrg;

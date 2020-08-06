@@ -17,9 +17,9 @@
             if (!User.Identity.IsAuthenticated)
             {
                 <p>
-                    You will need to create an account to register organisations for Modern Slavery reporting.
+                    To submit a modern slavery statement, you first need to create an account.
                     <br />
-                    If you already have an account please <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">sign in</a> to report data and manage your organisations.
+                    If you already have an account please <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">sign in</a> to submit information or manage your organisations.
                 </p>
             }
 
@@ -47,8 +47,7 @@
             <fieldset>
                 <legend>
                     <h2 class="heading-medium">Your details</h2>
-                </legend>
-                <p>Enter your name and job title.</p>
+                </legend>              
                 <div class="form-group @Html.SetErrorClass(model => model.FirstName, "error") ">
                     @Html.LabelFor(model => model.FirstName, new { @class = "form-label" })
                     @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "error-message" })
@@ -74,14 +73,14 @@
 
             <fieldset>
                 <legend>
-                    <h2 class="heading-medium">Create password</h2>
+                    <h2 class="heading-medium">Create a password</h2>
                 </legend>
                 <div class="text">
                     <p>Your password must be at least 8 characters long.</p>
                     <p>It must also have at least one of <u>each</u> of the following:</p>
                     <ul class="list list-bullet">
                         <li>lower-case letter</li>
-                        <li>capital letter and</li>
+                        <li>capital letter</li>
                         <li>number</li>
                     </ul>
                 </div>
@@ -102,9 +101,9 @@
             </fieldset>
 
             <fieldset>
-                <legend class="visually-hidden">Your email preferences</legend>
-                <p>We will only use your contact details to send you information relating to Modern Slavery reporting and, with your consent, for the following purpose.</p>
-
+                <legend>
+                    <h2 class="heading-medium">Contact Preferences</h2>
+                </legend>                
                 <div class="multiple-choice @Html.SetErrorClass(model => model.SendUpdates, "error")">
                     @Html.CheckBoxFor(model => model.SendUpdates, new { @class = "form-control" })
                     @Html.LabelFor(m => m.SendUpdates, new { @class = "form-label" })
