@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModernSlavery.Infrastructure.Database;
 
 namespace ModernSlavery.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20200806145017_UpdateFeedback")]
+    partial class UpdateFeedback
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,10 +110,6 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasColumnName("DifficultyId")
                         .HasColumnType("tinyint");
 
-                    b.Property<byte?>("WhyVisitMSUSite")
-                       .HasColumnName("WhyVisitMSUSiteId")
-                       .HasColumnType("tinyint");
-
                     b.Property<string>("EmailAddress")
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
@@ -119,6 +117,10 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(20)")
                         .HasMaxLength(20);
+
+                    b.Property<byte?>("WhyVisitMSUSite")
+                        .HasColumnName("WhyVisitMSUSiteId")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("FeedbackId");
 
