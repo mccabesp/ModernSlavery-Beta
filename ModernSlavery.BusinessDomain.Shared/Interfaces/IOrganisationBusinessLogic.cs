@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Azure.Management.WebSites.Models;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
@@ -56,7 +55,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         IEnumerable<string> GetOrganisationSectors(string sicCodes);
 
         Organisation GetOrganisationById(long organisationId);
-        IEnumerable<Return> GetOrganisationRecentReports(Organisation organisation,int recentCount);
+        IEnumerable<Statement> GetOrganisationRecentStatements(Organisation organisation,int recentCount);
 
         EmployerSearchModel CreateEmployerSearchModel(Organisation organisation, bool keyOnly = false,
             List<SicCodeSearchModel> listOfSicCodeSearchModels = null);
@@ -105,7 +104,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
             string employerReference,
             string securityCode);
 
-        Return GetOrganisationReturn(Organisation organisation, int year = 0);
+        Statement GetOrganisationStatement(Organisation organisation, int year = 0);
         Task<Organisation> GetOrganisationByEmployerReferenceOrThrowAsync(string employerReference);
 
         Task<CustomResult<Organisation>> CreateOrganisationSecurityCodeAsync(string employerRef,

@@ -55,25 +55,6 @@ namespace ModernSlavery.BusinessDomain.Registration
             PublicSectorRepository = publicSectorRepository;
             UserRepository = userRepository;
             PinInThePostService = pinInThePostService;
-            PostcodeChecker = postcodeChecker;
-        }
-
-        public async Task SetIsUkAddressesAsync()
-        {
-            var addresses = SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(a => a.IsUkAddress==null);
-            foreach (var org in addresses) await SetIsUkAddressAsync(org);
-        }
-
-        public async Task SetIsUkAddressAsync(OrganisationAddress address)
-        {
-            if (address == null) throw new ArgumentNullException(nameof(address));
-            if (string.IsNullOrWhiteSpace(address.PostCode)) throw new ArgumentNullException(nameof(address.PostCode));
-
-            //Check if the address is a valid UK postcode
-            address.IsUkAddress = await PostcodeChecker.IsValidPostcode(address.PostCode);
-
-            //Save the address
-            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
         }
     }
 }

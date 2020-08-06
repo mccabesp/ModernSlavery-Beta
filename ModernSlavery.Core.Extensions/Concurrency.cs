@@ -20,10 +20,10 @@ namespace ModernSlavery.Core.Extensions
 
             while (taskList.Count > 0)
             {
-                completedTask = await Task.WhenAny(taskList);
+                completedTask = await Task.WhenAny(taskList).ConfigureAwait(false);
                 taskList.Remove(completedTask);
 
-                if (predicate(await completedTask))
+                if (predicate(await completedTask.ConfigureAwait(false)))
                 {
                     cancellationToken.Cancel(false);
                     break;

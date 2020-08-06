@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure.Management.WebSites.Models;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes;
@@ -12,6 +13,7 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using User = ModernSlavery.Core.Entities.User;
 
 namespace ModernSlavery.BusinessDomain.Registration
 {
@@ -90,9 +92,9 @@ namespace ModernSlavery.BusinessDomain.Registration
                     SecurityCodeCreatedDateTime = o.SecurityCodeCreatedDateTime
                 };
 
-                var latestReturn =
-                    await _submissionLogic.GetLatestSubmissionBySnapshotYearAsync(o.OrganisationId, year);
-                var latestScope = await _scopeLogic.GetLatestScopeBySnapshotYearAsync(o.OrganisationId, year);
+                var latestReturn =await _submissionLogic.GetLatestSubmissionBySnapshotYearAsync(o.OrganisationId, year);
+                var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(o.SectorType, year);
+                var latestScope = await _scopeLogic.GetLatestScopeByReportingDeadlineAsync(o.OrganisationId, reportingDeadline);
 
                 record.LatestReturn = latestReturn?.Modified;
                 record.ScopeStatus = latestScope?.ScopeStatus;
@@ -144,11 +146,12 @@ namespace ModernSlavery.BusinessDomain.Registration
             bool saveToDatabase)
         {
             var org = await GetOrganisationByEmployerReferenceOrThrowAsync(employerRef);
+            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(org.SectorType, changeScopeToSnapshotYear);
             return await _scopeLogic.AddScopeAsync(
                 org,
                 scopeStatus,
                 currentUser,
-                changeScopeToSnapshotYear,
+                reportingDeadline,
                 changeScopeToComment,
                 saveToDatabase);
         }
@@ -293,19 +296,18 @@ namespace ModernSlavery.BusinessDomain.Registration
             return _sharedBusinessLogic.DataRepository.Get<Organisation>(organisationId);
         }
 
-        public IEnumerable<Return> GetOrganisationRecentReports(Organisation organisation,int recentCount)
+        public IEnumerable<Statement> GetOrganisationRecentStatements(Organisation organisation,int recentCount)
         {
             foreach (var year in GetOrganisationRecentReportingYears(organisation,recentCount))
             {
-                var defaultReturn = new Return
+                var defaultStatement = new Statement
                 {
                     Organisation = organisation,
-                    AccountingDate =_sharedBusinessLogic.GetReportingStartDate(organisation.SectorType,year),
+                    SubmissionDeadline =_sharedBusinessLogic.GetReportingDeadline(organisation.SectorType,year),
                     Modified = VirtualDateTime.Now
                 };
-                defaultReturn.IsLateSubmission = defaultReturn.CalculateIsLateSubmission();
 
-                yield return  organisation.GetReturn(year) ?? defaultReturn;
+                yield return  organisation.GetStatement(year) ?? defaultStatement;
             }
         }
         public EmployerRecord CreateEmployerRecord(Organisation org, long userId = 0)
@@ -417,7 +419,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 LatestReportedDate = submittedStatements.Select(x => x.Created).FirstOrDefault(),
                 ReportedYears = submittedStatements.Select(x => x.SubmissionDeadline.Year.ToString()).ToArray(),
                 ReportedLateYears =
-                    submittedStatements.Where(x => x.CalculateIsLateSubmission()).Select(x => x.SubmissionDeadline.Year.ToString())
+                    submittedStatements.Where(x => x.IsLateSubmission()).Select(x => x.SubmissionDeadline.Year.ToString())
                         .ToArray(),
                 ReportedExplanationYears = submittedStatements
                     .Where(x => string.IsNullOrEmpty(x.StatementUrl) == false)
@@ -566,11 +568,12 @@ namespace ModernSlavery.BusinessDomain.Registration
                 o.EmployerReference.ToUpper() == employerReference.ToUpper() && o.SecurityCode == securityCode);
         }
 
+
         //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
-        public Return GetOrganisationReturn(Organisation organisation, int year = 0)
+        public Statement GetOrganisationStatement(Organisation organisation, int year = 0)
         {
-            var accountingStartDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType,year);
-            return organisation.GetReturn(year);
+            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, year);
+            return organisation.GetStatement(year);
         }
 
         //Returns the latest scope for the current accounting date

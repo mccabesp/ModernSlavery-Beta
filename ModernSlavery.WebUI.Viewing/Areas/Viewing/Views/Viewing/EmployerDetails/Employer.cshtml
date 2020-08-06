@@ -83,7 +83,7 @@
             </div>
         </div>
 
-        @foreach (var report in OrganisationBusinessLogic.GetOrganisationRecentReports(organisation,ViewingOptions.ShowReportYearCount))
+        @foreach (var report in OrganisationBusinessLogic.GetOrganisationRecentStatements(organisation,ViewingOptions.ShowReportYearCount))
         {
             <div class="grid-row">
                 <div class="column-full">
@@ -95,19 +95,19 @@
                                 <span class="heading-small">@report.GetReportingPeriod()</span>
                             </td>
                             <td style="border-bottom: none;">
-                                <partial name="Parts/_ReportStatusBadge.cshtml" model="new ReportStatusBadgeViewModel {IsLateSubmission = report.IsLateSubmission, IsVoluntarySubmission = report.IsVoluntarySubmission()}"/>
+                                <partial name="Parts/_ReportStatusBadge.cshtml" model="new ReportStatusBadgeViewModel {IsLateSubmission = report.IsLateSubmission(), IsVoluntarySubmission = report.IsVoluntarySubmission()}"/>
                             </td>
                         </tr>
-                        @if (report.ReturnId == 0)
+                        @if (report.StatementId == 0)
                         {
                             <tr>
                                 <td colspan="2" style="border-bottom: none;">
-                                    @if (organisation.GetIsInscope(report.AccountingDate))
+                                    @if (organisation.GetIsInscope(report.SubmissionDeadline))
                                     {
                                         <span>
                                             This organisation
-                                            @(report.AccountingDate.Year == SnapshotDateHelper.CurrentSnapshotYear ? "is" : "was")
-                                            required to report by @(report.AccountingDate.AddYears(1).AddDays(-1).ToString("d MMMM yyyy"))
+                                            @(report.SubmissionDeadline.Year == SnapshotDateHelper.CurrentSnapshotYear ? "is" : "was")
+                                            required to report by @(report.SubmissionDeadline.AddYears(1).AddDays(-1).ToString("d MMMM yyyy"))
                                         </span>
                                     }
                                     else
@@ -121,26 +121,26 @@
                         {
                             <tr>
                                 <td colspan="2" style="border-bottom: none;">
-                                    @Html.ActionLink("View Report", "Report", new {employerIdentifier, year = report.AccountingDate.Year}, new {style = "font-size: 19px!important;"})
+                                    @Html.ActionLink("View Report", "Report", new {employerIdentifier, year = report.SubmissionDeadline.Year}, new {style = "font-size: 19px!important;"})
                                 </td>
                             </tr>
                             <tr>
                                 <td colspan="2" style="border-bottom: none;">
-                                    This data has been taken from @(report.AccountingDate.ToString("d MMMM yyyy"))
+                                    This data has been taken from @(report.SubmissionDeadline.ToString("d MMMM yyyy"))
                                 </td>
                             </tr>
                         }
-                        @if (report.ReturnId > 0 && organisation.SectorType == SectorTypes.Private)
+                        @if (report.StatementId > 0 && organisation.SectorType == SectorTypes.Private)
                         {
                             <tr>
                                 <td colspan="2" style="border-bottom: none;">
 
                                     <div class="heading-xsmall" style="font-weight: bold">Person responsible</div>
                                     <div>
-                                        <span>@report.FirstName @report.LastName</span>
+                                        <span>@report.ApproverFirstName @report.ApproverLastName</span>
                                     </div>
                                     <div>
-                                        <span>(@report.JobTitle)</span>
+                                        <span>(@report.ApproverJobTitle)</span>
                                     </div>
 
                                 </td>

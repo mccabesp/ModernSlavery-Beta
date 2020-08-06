@@ -27,11 +27,10 @@ namespace ModernSlavery.BusinessDomain.Submission
         ///     Returns the latest scope status for an organisation and snapshot year
         /// </summary>
         /// <param name="organisationId"></param>
-        /// <param name="snapshotYear"></param>
-        public virtual async Task<ScopeStatuses> GetLatestScopeStatusForSnapshotYearAsync(long organisationId,
-            int snapshotYear)
+        /// <param name="reportingDeadline"></param>
+        public virtual async Task<ScopeStatuses> GetLatestScopeStatusForReportingDeadlineAsync(long organisationId,DateTime reportingDeadline)
         {
-            var latestScope = await GetLatestScopeBySnapshotYearAsync(organisationId, snapshotYear);
+            var latestScope = await GetLatestScopeByReportingDeadlineAsync(organisationId, reportingDeadline);
             if (latestScope == null) return ScopeStatuses.Unknown;
 
             return latestScope.ScopeStatus;
@@ -41,10 +40,10 @@ namespace ModernSlavery.BusinessDomain.Submission
         ///     Returns the latest scope status for an organisation and snapshot year
         /// </summary>
         /// <param name="organisationId"></param>
-        /// <param name="snapshotYear"></param>
-        public virtual ScopeStatuses GetLatestScopeStatusForSnapshotYear(Organisation org, int snapshotYear = 0)
+        /// <param name="reportingDeadline"></param>
+        public virtual ScopeStatuses GetLatestScopeStatusForReportingDeadline(Organisation org, DateTime? reportingDeadline = null)
         {
-            var latestScope = GetLatestScopeBySnapshotYear(org, snapshotYear);
+            var latestScope = GetLatestScopeByReportingDeadline(org, reportingDeadline);
             if (latestScope == null) return ScopeStatuses.Unknown;
 
             return latestScope.ScopeStatus;
@@ -54,13 +53,12 @@ namespace ModernSlavery.BusinessDomain.Submission
         ///     Returns the latest scope for an organisation
         /// </summary>
         /// <param name="employerReference"></param>
-        public virtual async Task<OrganisationScope> GetScopeByEmployerReferenceAsync(string employerReference,
-            int snapshotYear = 0)
+        public virtual async Task<OrganisationScope> GetScopeByEmployerReferenceAsync(string employerReference,DateTime? reportingDeadline = null)
         {
             var org = await GetOrgByEmployerReferenceAsync(employerReference);
             if (org == null) return null;
 
-            return GetLatestScopeBySnapshotYear(org, snapshotYear);
+            return GetLatestScopeByReportingDeadline(org, reportingDeadline);
         }
 
         /// <summary>
@@ -113,18 +111,16 @@ namespace ModernSlavery.BusinessDomain.Submission
         public virtual async Task<CustomResult<OrganisationScope>> AddScopeAsync(Organisation organisation,
             ScopeStatuses newStatus,
             User currentUser,
-            int snapshotYear,
+            DateTime reportingDeadline,
             string comment,
             bool saveToDatabase)
         {
-            snapshotYear = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType,snapshotYear)
-                .Year;
+            reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType,reportingDeadline.Year);
 
-            var oldOrgScope = organisation.GetScopeOrThrow(snapshotYear);
+            var oldOrgScope = organisation.GetScopeOrThrow(reportingDeadline);
 
             if (oldOrgScope.ScopeStatus == newStatus)
-                return new CustomResult<OrganisationScope>(
-                    InternalMessages.SameScopesCannotBeUpdated(newStatus, oldOrgScope.ScopeStatus, snapshotYear));
+                return new CustomResult<OrganisationScope>(InternalMessages.SameScopesCannotBeUpdated(newStatus, oldOrgScope.ScopeStatus, reportingDeadline));
 
             // When Organisation is Found Then Save New Scope Record With New Status
             var newScope = new OrganisationScope
@@ -231,6 +227,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 .OrderBy(os => os.SubmissionDeadline)
                 .ThenBy(os => os.OrganisationId)
                 .ThenByDescending(os => os.ScopeStatusDate);
+
             var changedOrgs = new HashSet<Organisation>();
             foreach (var scope in scopes)
             {
@@ -274,15 +271,15 @@ namespace ModernSlavery.BusinessDomain.Submission
         public async Task<bool> SetPresumedScopesAsync(Organisation org)
         {
             var firstYear = _sharedBusinessLogic.SharedOptions.FirstReportingYear;
-            var currentSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(org.SectorType);
-            var currentSnapshotYear = currentSnapshotDate.Year;
+            var currentDeadline = _sharedBusinessLogic.GetReportingDeadline(org.SectorType);
+            var currentDeadlineYear = currentDeadline.Year;
             var prevYearScope = ScopeStatuses.Unknown;
             var neverDeclaredScope = true;
             var changed = false;
 
-            for (var snapshotYear = firstYear; snapshotYear <= currentSnapshotYear; snapshotYear++)
+            for (var reportingDeadline = firstYear; reportingDeadline <= currentDeadlineYear; reportingDeadline++)
             {
-                var scope = org.GetScope(snapshotYear);
+                var scope = org.GetScope(reportingDeadline);
 
                 // if we already have a scope then flag (prevYearScope, neverDeclaredScope) and skip this year
                 if (scope != null && scope.ScopeStatus != ScopeStatuses.Unknown)
@@ -293,7 +290,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 }
 
                 // determine the snapshot date from year
-                var snapshotDate = new DateTime(snapshotYear, currentSnapshotDate.Month, currentSnapshotDate.Day);
+                var deadline = new DateTime(reportingDeadline, currentDeadline.Month, currentDeadline.Day);
 
                 // determine if need to presume scope
                 var shouldPresumeScope = neverDeclaredScope
@@ -304,8 +301,8 @@ namespace ModernSlavery.BusinessDomain.Submission
                 // presumed scope from created date
                 if (shouldPresumeScope)
                 {
-                    var createdAfterSnapshotYear = org.Created >= snapshotDate.AddYears(1);
-                    if (createdAfterSnapshotYear)
+                    var createdAfterDeadlineYear = org.Created >= deadline;
+                    if (createdAfterDeadlineYear)
                         prevYearScope = ScopeStatuses.PresumedOutOfScope;
                     else
                         prevYearScope = ScopeStatuses.PresumedInScope;
@@ -321,7 +318,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 }
 
                 // update the scope status
-                SetPresumedScope(org, prevYearScope, snapshotDate);
+                SetPresumedScope(org, prevYearScope, deadline);
 
                 changed = true;
             }
@@ -347,21 +344,21 @@ namespace ModernSlavery.BusinessDomain.Submission
             var orgsWithMissingScope = new HashSet<OrganisationMissingScope>();
             foreach (var org in allOrgs)
             {
-                var currentSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(org.SectorType);
-                var currentYear = currentSnapshotDate.Year;
-                var missingSnapshotYears = new List<int>();
+                var currentDeadline = _sharedBusinessLogic.GetReportingDeadline(org.SectorType);
+                var currentYear = currentDeadline.Year;
+                var missingYears = new List<int>();
 
                 // for all snapshot years check if scope exists
                 for (var year = firstYear; year <= currentYear; year++)
                 {
                     var scope = org.GetScope(year);
-                    if (scope == null || scope.ScopeStatus == ScopeStatuses.Unknown) missingSnapshotYears.Add(year);
+                    if (scope == null || scope.ScopeStatus == ScopeStatuses.Unknown) missingYears.Add(year);
                 }
 
                 // collect
-                if (missingSnapshotYears.Count > 0)
+                if (missingYears.Count > 0)
                     orgsWithMissingScope.Add(
-                        new OrganisationMissingScope {Organisation = org, MissingSnapshotYears = missingSnapshotYears});
+                        new OrganisationMissingScope {Organisation = org, MissingYears = missingYears});
             }
 
             return orgsWithMissingScope;
@@ -372,11 +369,11 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// </summary>
         /// <param name="org"></param>
         /// <param name="scopeStatus"></param>
-        /// <param name="snapshotDate"></param>
+        /// <param name="reportingDeadline"></param>
         /// <param name="currentUser"></param>
         public virtual OrganisationScope SetPresumedScope(Organisation org,
             ScopeStatuses scopeStatus,
-            DateTime snapshotDate,
+            DateTime reportingDeadline,
             User currentUser = null)
         {
             //Ensure scopestatus is presumed
@@ -384,19 +381,19 @@ namespace ModernSlavery.BusinessDomain.Submission
                 throw new ArgumentOutOfRangeException(nameof(scopeStatus));
 
             //Check no previous scopes
-            if (org.OrganisationScopes.Any(os => os.SubmissionDeadline == snapshotDate))
+            if (org.OrganisationScopes.Any(os => os.SubmissionDeadline == reportingDeadline))
                 throw new ArgumentException(
-                    $"A scope already exists for snapshot year {snapshotDate.Year} for organisation employer reference '{org.EmployerReference}'",
+                    $"A scope already exists for reporting deadline year {reportingDeadline.Year} for organisation employer reference '{org.EmployerReference}'",
                     nameof(scopeStatus));
 
             //Check for conflict with previous years scope
-            if (snapshotDate.Year > _sharedBusinessLogic.SharedOptions.FirstReportingYear)
+            if (reportingDeadline.Year-1 > _sharedBusinessLogic.SharedOptions.FirstReportingYear)
             {
-                var previousScope = GetLatestScopeStatusForSnapshotYear(org, snapshotDate.Year - 1);
+                var previousScope = GetLatestScopeStatusForReportingDeadline(org, reportingDeadline.AddYears(- 1));
                 if (previousScope == ScopeStatuses.InScope && scopeStatus == ScopeStatuses.PresumedOutOfScope
                     || previousScope == ScopeStatuses.OutOfScope && scopeStatus == ScopeStatuses.PresumedInScope)
                     throw new ArgumentException(
-                        $"Cannot set {scopeStatus} for snapshot year {snapshotDate.Year} when previos year was {previousScope} for organisation employer reference '{org.EmployerReference}'",
+                        $"Cannot set {scopeStatus} for snapshot year {reportingDeadline.Year} when previos year was {previousScope} for organisation employer reference '{org.EmployerReference}'",
                         nameof(scopeStatus));
             }
 
@@ -409,7 +406,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 ScopeStatus = scopeStatus,
                 Status = ScopeRowStatuses.Active,
                 StatusDetails = "Generated by the system",
-                SubmissionDeadline = snapshotDate
+                SubmissionDeadline = reportingDeadline
             };
 
             org.OrganisationScopes.Add(newScope);
@@ -436,30 +433,25 @@ namespace ModernSlavery.BusinessDomain.Submission
         ///     Gets the latest scope for the specified organisation id and snapshot year
         /// </summary>
         /// <param name="organisationId"></param>
-        /// <param name="snapshotYear"></param>
-        public virtual async Task<OrganisationScope> GetLatestScopeBySnapshotYearAsync(long organisationId,
-            int snapshotYear = 0)
+        /// <param name="reportingDeadline"></param>
+        public virtual async Task<OrganisationScope> GetLatestScopeByReportingDeadlineAsync(long organisationId, DateTime? reportingDeadline = null)
         {
             var org = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == organisationId);
-            if (org == null)
-                throw new ArgumentException($"Cannot find organisation with id {organisationId}",
-                    nameof(organisationId));
+            if (org == null)throw new ArgumentException($"Cannot find organisation with id {organisationId}",nameof(organisationId));
 
-            return GetLatestScopeBySnapshotYear(org, snapshotYear);
+            return GetLatestScopeByReportingDeadline(org, reportingDeadline);
         }
 
         /// <summary>
         ///     Gets the latest scope for the specified organisation id and snapshot year
         /// </summary>
         /// <param name="organisationId"></param>
-        /// <param name="snapshotYear"></param>
-        public virtual OrganisationScope GetLatestScopeBySnapshotYear(Organisation organisation, int snapshotYear = 0)
+        /// <param name="reportingDeadline"></param>
+        public virtual OrganisationScope GetLatestScopeByReportingDeadline(Organisation organisation, DateTime? reportingDeadline = null)
         {
-            if (snapshotYear == 0)
-                snapshotYear = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType).Year;
+            if (reportingDeadline == null)reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
 
-            var orgScope = organisation.OrganisationScopes
-                .SingleOrDefault(s => s.SubmissionDeadline.Year == snapshotYear && s.Status == ScopeRowStatuses.Active);
+            var orgScope = organisation.OrganisationScopes.SingleOrDefault(s => s.SubmissionDeadline == reportingDeadline && s.Status == ScopeRowStatuses.Active);
 
             return orgScope;
         }

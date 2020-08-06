@@ -1074,7 +1074,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     if (employer.IsUkAddress.HasValue)
                         model.IsUkAddress = employer.IsUkAddress;
                     else
-                        model.IsUkAddress = await _registrationService.PostcodeChecker.IsValidPostcode(employer.PostCode)
+                        model.IsUkAddress = await _postcodeChecker.IsValidPostcode(employer.PostCode)
                             ? true
                             : (bool?)null;
                 }

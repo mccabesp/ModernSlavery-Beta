@@ -400,19 +400,19 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.EmployerReference}");
 
             //Get the current snapshot date
-            var snapshotDate = SharedBusinessLogic.GetReportingStartDate(userOrg.Organisation.SectorType).AddYears(-1);
-            if (snapshotDate.Year < SharedBusinessLogic.SharedOptions.FirstReportingYear)
-                return new HttpBadRequestResult($"Snapshot year {snapshotDate.Year} is invalid");
+            var reportingDeadline = SharedBusinessLogic.GetReportingDeadline(userOrg.Organisation.SectorType).AddYears(-2);
+            if (reportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingYear)
+                return new HttpBadRequestResult($"Snapshot year {reportingDeadline} is invalid");
 
             var scopeStatus =
-                await SubmissionService.ScopeBusinessLogic.GetLatestScopeStatusForSnapshotYearAsync(organisationId,
-                    snapshotDate.Year);
+                await SubmissionService.ScopeBusinessLogic.GetLatestScopeStatusForReportingDeadlineAsync(organisationId,
+                    reportingDeadline);
             if (scopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope))
                 return new HttpBadRequestResult("Explicit scope is already set");
 
             // build the view model
             var model = new DeclareScopeModel
-                {OrganisationName = userOrg.Organisation.OrganisationName, SnapshotDate = snapshotDate};
+                {OrganisationName = userOrg.Organisation.OrganisationName, ReportingDeadline = reportingDeadline };
 
             return View(model);
         }
@@ -445,14 +445,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     $"User {VirtualUser?.EmailAddress} has not completed registeration for organisation {userOrg.Organisation.EmployerReference}");
 
             //Check the year parameters
-            if (model.SnapshotDate.Year < SharedBusinessLogic.SharedOptions.FirstReportingYear ||
-                model.SnapshotDate.Year > VirtualDateTime.Now.Year)
-                return new HttpBadRequestResult($"Snapshot year {model.SnapshotDate.Year} is invalid");
+            if (model.ReportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingYear ||
+                model.ReportingDeadline.Year > VirtualDateTime.Now.Year)
+                return new HttpBadRequestResult($"Snapshot year {model.ReportingDeadline.Year} is invalid");
 
             //Check if we need the current years scope
             var scopeStatus =
-                await SubmissionService.ScopeBusinessLogic.GetLatestScopeStatusForSnapshotYearAsync(organisationId,
-                    model.SnapshotDate.Year);
+                await SubmissionService.ScopeBusinessLogic.GetLatestScopeStatusForReportingDeadlineAsync(organisationId,
+                    model.ReportingDeadline);
             if (scopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope))
                 return new HttpBadRequestResult("Explicit scope is already set");
 
@@ -479,7 +479,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 ScopeStatus = model.ScopeStatus.Value,
                 Status = ScopeRowStatuses.Active,
                 ScopeStatusDate = VirtualDateTime.Now,
-                SubmissionDeadline = model.SnapshotDate
+                SubmissionDeadline = model.ReportingDeadline
             };
 
             //Save the new declared scopes

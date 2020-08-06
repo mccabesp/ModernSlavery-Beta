@@ -249,20 +249,20 @@ namespace ModernSlavery.Core.Entities
         }
 
 
-        public OrganisationScope GetScope(int snapshotYear)
+        public OrganisationScope GetScope(int deadlineYear)
         {
             return OrganisationScopes.FirstOrDefault(orgScope =>
                 orgScope.Status == ScopeRowStatuses.Active
-                && orgScope.SubmissionDeadline.Year == snapshotYear);
+                && orgScope.SubmissionDeadline.Year == deadlineYear);
         }
 
-        public OrganisationScope GetScopeOrThrow(int snapshotYear)
+        public OrganisationScope GetScopeOrThrow(DateTime reportingDeadline)
         {
-            var organisationScope = GetScope(snapshotYear);
+            var organisationScope = GetScope(reportingDeadline);
 
             if (organisationScope == null)
                 throw new ArgumentOutOfRangeException(
-                    $"Cannot find an scope with status 'Active' for snapshotYear '{snapshotYear}' linked to organisation '{OrganisationName}', employerReference '{EmployerReference}'.");
+                    $"Cannot find an scope with status 'Active' for reporting deadling '{reportingDeadline}' linked to organisation '{OrganisationName}', employerReference '{EmployerReference}'.");
 
             return organisationScope;
         }
@@ -298,22 +298,24 @@ namespace ModernSlavery.Core.Entities
             return DateOfCessation != null;
         }
 
-        public void SetStatus(OrganisationStatuses status, long byUserId, string details = null)
+        public OrganisationStatus SetStatus(OrganisationStatuses status, long byUserId, string details = null)
         {
-            if (status == Status && details == StatusDetails) return;
+            if (status == Status && details == StatusDetails) return null;
 
-            OrganisationStatuses.Add(
-                new OrganisationStatus
-                {
-                    OrganisationId = OrganisationId,
-                    Status = status,
-                    StatusDate = VirtualDateTime.Now,
-                    StatusDetails = details,
-                    ByUserId = byUserId
-                });
+            var organisationStatus = new OrganisationStatus
+            {
+                OrganisationId = OrganisationId,
+                Status = status,
+                StatusDate = VirtualDateTime.Now,
+                StatusDetails = details,
+                ByUserId = byUserId
+            };
+            OrganisationStatuses.Add(organisationStatus);
+                
             Status = status;
             StatusDate = VirtualDateTime.Now;
             StatusDetails = details;
+            return organisationStatus;
         }
 
         /// <summary>

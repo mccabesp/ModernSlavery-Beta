@@ -8,6 +8,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
+        [Disable]
         public async Task CompaniesHouseCheck([TimerTrigger(typeof(MidnightSchedule))]
             TimerInfo timer,
             ILogger log)
