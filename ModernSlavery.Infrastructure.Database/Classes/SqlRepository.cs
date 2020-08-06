@@ -122,6 +122,13 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             await DbContext.SaveChangesAsync();
         }
 
+        public async Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity = false) where TEntity : class
+        {
+            if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
+
+            await DbContext.BulkInsertAsync(entities,setOutputIdentity);
+        }
+
         public void UpdateChangesInBulk<TEntity>(IEnumerable<TEntity> listOfOrganisations) where TEntity : class
         {
             DbContext.UpdateChangesInBulk(listOfOrganisations);

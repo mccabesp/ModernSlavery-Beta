@@ -46,5 +46,6 @@ namespace ModernSlavery.Core.Interfaces
         Task SaveChangesAsync();
 
         void UpdateChangesInBulk<TEntity>(IEnumerable<TEntity> listOfOrganisations) where TEntity : class;
+        Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity = false) where TEntity : class;
     }
 }
