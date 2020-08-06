@@ -1,16 +1,16 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Core.Classes.ErrorMessages
 {
     public class InternalMessages
     {
-        public static CustomError SameScopesCannotBeUpdated(ScopeStatuses newScopeStatus, ScopeStatuses oldScopeStatus,
-            int snapshotYear)
+        public static CustomError SameScopesCannotBeUpdated(ScopeStatuses newScopeStatus, ScopeStatuses oldScopeStatus,DateTime reportingDeadline)
         {
             return new CustomError(
                 4006,
-                $"Unable to update to {newScopeStatus} as the record for {snapshotYear} is already showing as {oldScopeStatus}");
+                $"Unable to update to {newScopeStatus} as the record for {reportingDeadline} is already showing as {oldScopeStatus}");
         }
 
         public static CustomError OrganisationRevertOnlyRetiredErrorMessage(string organisationName,

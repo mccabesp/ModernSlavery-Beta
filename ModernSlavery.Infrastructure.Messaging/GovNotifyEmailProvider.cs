@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
@@ -22,7 +23,8 @@ namespace ModernSlavery.Infrastructure.Messaging
             GovNotifyOptions govNotifyOptions,
             SharedOptions sharedOptions,
             ILogger<GovNotifyEmailProvider> logger,
-            [KeyFilter(Filenames.EmailSendLog)] IAuditLogger emailSendLog)
+            [KeyFilter(Filenames.EmailSendLog)] IAuditLogger emailSendLog
+            )
             : base(sharedOptions, emailTemplateRepo, logger, emailSendLog)
         {
             Options = govNotifyOptions
@@ -42,7 +44,7 @@ namespace ModernSlavery.Infrastructure.Messaging
                 else if (!Options.ApiTestKey.StartsWith("test_only-"))
                     throw new ArgumentException("GovNotify Api Test Key must start with 'test_only-'", nameof(Options.ApiTestKey));
             }
-
+            
             // create the clients
             var notifyHttpWrapper = new HttpClientWrapper(httpClient);
             if (!Options.AllowTestKeyOnly) ProductionClient = new NotificationClient(notifyHttpWrapper, Options.ApiKey);
@@ -94,6 +96,14 @@ namespace ModernSlavery.Infrastructure.Messaging
         public GovNotifyOptions Options { get; }
 
         #endregion
+
+        public static void SetupHttpClient(HttpClient httpClient, string apiServer)
+        {
+            httpClient.BaseAddress = new Uri(apiServer);
+            httpClient.DefaultRequestHeaders.Clear();
+            httpClient.DefaultRequestHeaders.ConnectionClose = false;
+            ServicePointManager.FindServicePoint(httpClient.BaseAddress).ConnectionLeaseTimeout = 60 * 1000;
+        }
 
         public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
         {

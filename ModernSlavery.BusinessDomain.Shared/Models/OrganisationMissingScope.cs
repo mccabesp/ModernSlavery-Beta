@@ -7,6 +7,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
     {
         public Organisation Organisation { get; set; }
 
-        public List<int> MissingSnapshotYears { get; set; }
+        public List<int> MissingYears { get; set; }
     }
 }

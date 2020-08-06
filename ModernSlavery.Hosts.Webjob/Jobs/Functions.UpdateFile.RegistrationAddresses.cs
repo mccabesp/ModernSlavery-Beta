@@ -85,7 +85,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 await _SubmissionBusinessLogic.GetLatestSubmissionBySnapshotYearAsync(
                                     model.OrganisationId, year).ConfigureAwait(false);
                             var scopeByYear =
-                                await _ScopeBusinessLogic.GetLatestScopeBySnapshotYearAsync(model.OrganisationId, year).ConfigureAwait(false);
+                                await _ScopeBusinessLogic.GetLatestScopeByReportingDeadlineAsync(model.OrganisationId, returnByYear.AccountingDate).ConfigureAwait(false);
 
                             // update file model with year data
                             model.HasSubmitted = returnByYear == null ? "False" : "True";

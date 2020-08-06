@@ -46,7 +46,7 @@ namespace ModernSlavery.Core.Entities
             return $"{SubmissionDeadline.AddYears(-1).ToString("yyyy")}/{SubmissionDeadline.ToString("yy")}";
         }
 
-        public bool CalculateIsLateSubmission()
+        public bool IsLateSubmission()
         {
             return Modified > SubmissionDeadline
                    && this.MinTurnover >= MinComplienceTurnover

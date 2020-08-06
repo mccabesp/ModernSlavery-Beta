@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
@@ -35,12 +37,25 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                await _RegistrationService.SetIsUkAddressesAsync().ConfigureAwait(false);
+                var addresses = _SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(a => a.IsUkAddress == null);
+                foreach (var org in addresses) await SetIsUkAddressAsync(org);
             }
             finally
             {
                 RunningJobs.Remove(nameof(SetIsUkAddressesAsync));
             }
+        }
+
+        public async Task SetIsUkAddressAsync(OrganisationAddress address)
+        {
+            if (address == null) throw new ArgumentNullException(nameof(address));
+            if (string.IsNullOrWhiteSpace(address.PostCode)) throw new ArgumentNullException(nameof(address.PostCode));
+
+            //Check if the address is a valid UK postcode
+            address.IsUkAddress = await _PostCodeChecker.IsValidPostcode(address.PostCode);
+
+            //Save the address
+            await _SharedBusinessLogic.DataRepository.SaveChangesAsync();
         }
     }
 }
