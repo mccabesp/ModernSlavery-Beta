@@ -66,7 +66,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click("Sign in");
 
-            ExpectHeader("Sign in");
+            ExpectHeader("Sign in or create an account");
 
             BelowHeader("No account yet?");
             Click("Create an account");
@@ -91,7 +91,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Confirm password").To(_password);
 
             ClickLabel("I would like to receive information about webinars, events and new guidance");
-            ClickLabel("I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys");
+            ClickLabel("I'm happy to be contacted for feedback on this service and take part in surveys about modern slavery");
 
             await Task.CompletedTask;
         }
@@ -111,9 +111,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ExtractVerifyURL()
         {
            
-            Expect(What.Contains, "We have sent you a confirmation email to");
+            Expect(What.Contains, "We have sent a confirmation email to");
             Expect(What.Contains, _email);
-            Expect(What.Contains, "Follow the instructions in the email to continue your sign up.");
+            Expect(What.Contains, "Follow the instructions in the email to finish creating your account.");
 
 
             //get email verification link
@@ -136,11 +136,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click(The.Bottom, "Sign In");
             ExpectHeader("You've confirmed your email address");
 
-            Expect("To complete the registration process for Modern Slavery reporting please continue.");
-            Click("Continue");
-
-            ExpectHeader("Privacy Policy");
-
+            Expect("To finish creating your account, select continue.");
             Click("Continue");
 
             
