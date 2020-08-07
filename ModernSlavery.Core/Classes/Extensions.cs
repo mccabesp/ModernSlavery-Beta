@@ -66,6 +66,7 @@ namespace ModernSlavery.Core.Classes
                 config.ShouldQuote = (field, context) => true;
                 config.TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim;
                 config.MissingFieldFound = null;
+                config.IgnoreReferences=true; //Otherwise virtual properties are set with weird values
                 if (!validateHeaders)config.HeaderValidated = null;
 
                 using (var csvReader = new CsvReader(textReader, config))
