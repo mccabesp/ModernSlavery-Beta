@@ -13,6 +13,8 @@
     <None Remove="appsettings.PROD.json" />
     <None Remove="appsettings.QAT.json" />
     <None Remove="AppSettings.secret.json" />
+    <None Remove="appsettings.UR.json" />
+    <None Remove="appsettings.UR.secret.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +52,11 @@
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
+    <Content Include="appsettings.UR.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
     <Content Include="appsettings.secret.json" Condition="Exists('appsettings.secret.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>appsettings.json</DependentUpon>
@@ -71,6 +78,12 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
     <Content Include="appsettings.PROD.secret.json" Condition="Exists('appsettings.PROD.secret.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+
+    <Content Include="appsettings.UR.secret.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>appsettings.secret.json</DependentUpon>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
