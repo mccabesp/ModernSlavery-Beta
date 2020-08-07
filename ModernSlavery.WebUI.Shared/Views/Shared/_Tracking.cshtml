@@ -5,6 +5,7 @@
 
 @inject JavaScriptSnippet snippet
 @inject SharedOptions sharedOptions
+@inject TestOptions testOptions;  
 @inject ApplicationInsightsOptions appInsightsOptions
 @{
     var cookieSettings = CookieHelper.GetCookieSettingsCookie(Context.Request);
@@ -58,7 +59,7 @@
         deleteCookie('_gat');
     }
 
-    @if (cookieSettings.GoogleAnalyticsGpg || cookieSettings.GoogleAnalyticsGovUk)
+    @if (cookieSettings.GoogleAnalyticsGpg || cookieSettings.GoogleAnalyticsGovUk || testOptions.ForceGoogleAnalyticsTracking)
     {
         @:initialiseGoogleAnalytics();
     }
@@ -66,17 +67,19 @@
     {
         @:deleteGoogleAnalyticsCookies();
     }
-    @if (cookieSettings.GoogleAnalyticsGpg)
+    @if (cookieSettings.GoogleAnalyticsGpg || testOptions.ForceGoogleAnalyticsTracking)
     {
         @:sendGpgPageView();
     }
-    @if (cookieSettings.GoogleAnalyticsGovUk && sharedOptions.SendGoogleAnalyticsDataToGovUk)
+    @if ((cookieSettings.GoogleAnalyticsGovUk || testOptions.ForceGoogleAnalyticsTracking) && sharedOptions.SendGoogleAnalyticsDataToGovUk)
     {
         @:sendGovUkPageView();
     }
 </script>
 
-@if (cookieSettings.ApplicationInsights && snippet != null && !string.IsNullOrWhiteSpace(appInsightsOptions.InstrumentationKey))
+@if ((cookieSettings.ApplicationInsights || testOptions.ForceApplicationInsightsTracking) &&
+  snippet != null &&
+  !string.IsNullOrWhiteSpace(appInsightsOptions.InstrumentationKey))
 {
     @Html.Raw(snippet.FullScript)
 }
