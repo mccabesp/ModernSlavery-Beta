@@ -120,6 +120,11 @@ namespace ModernSlavery.Infrastructure.Configuration
                 }
         }
 
+        public static bool ContainsSecretFiles(this IConfiguration config)
+        {
+            var configRoot = (Microsoft.Extensions.Configuration.ConfigurationRoot)config;
+            return configRoot.Providers.OfType<FileConfigurationProvider>().Any(p => p.Source.Path.ContainsI(".secret."));
+        }
 
         public static Dictionary<string, string> ToDictionary(this IConfiguration config, string sectionName = null, bool ignoreEmpty=false)
         {
