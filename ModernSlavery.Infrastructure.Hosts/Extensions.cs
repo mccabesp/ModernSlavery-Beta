@@ -48,7 +48,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             appConfig.SetupThreadCulture();
 
             //Set the content root to the bin folder if in development mode
-            if (appConfig.IsDevelopment()) appConfig[HostDefaults.ContentRootKey] = System.AppDomain.CurrentDomain.BaseDirectory;
+            if (appConfig.IsDevelopment() || appConfig.ContainsSecretFiles()) appConfig[HostDefaults.ContentRootKey] = System.AppDomain.CurrentDomain.BaseDirectory;
 
             //Set the content root from the confif or environment
             var contentRoot = appConfig[HostDefaults.ContentRootKey];
