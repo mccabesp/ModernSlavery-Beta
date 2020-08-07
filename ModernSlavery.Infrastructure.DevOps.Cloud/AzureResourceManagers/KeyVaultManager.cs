@@ -59,11 +59,13 @@ namespace ModernSlavery.Infrastructure.DevOps.Cloud.AzureResourceManagers
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(value)) throw new ArgumentNullException(nameof(value));
 
-            var secret = _vault.Secrets.GetByName(name);
+            name = name.Replace(":", "--");
+
+            var secret = _vault.Secrets.List().FirstOrDefault(s => s.Name.EqualsI(name));
             if (secret == null)
-                _vault.Secrets.Define(name).WithValue(value);
+                _vault.Secrets.Define(name).WithValue(value).Create();
             else
-                secret.Update().WithValue(value);
+                secret.Update().WithValue(value).Apply();
         }
 
         public Dictionary<string, string> GetValues(string sectionName = null)
@@ -88,12 +90,7 @@ namespace ModernSlavery.Infrastructure.DevOps.Cloud.AzureResourceManagers
 
             settings.Keys.ForEach(key =>
             {
-                var newKey = key.Replace(":", "--");
-                var secret = _vault.Secrets.GetByName(newKey);
-                if (secret == null)
-                    _vault.Secrets.Define(newKey).WithValue(settings[key]);
-                else
-                    secret.Update().WithValue(settings[key]);
+                SetValue(key, settings[key]);
             });
             return null;
         }
