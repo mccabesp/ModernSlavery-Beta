@@ -5,6 +5,7 @@
     // set this so the layout rendering sees an anonymous user
     ViewData["signed-out"] = true;
     ViewData["PageTitle"] = "Sign out - Modern Slavery reporting service - GOV.UK";
+    var ClientName = "Submit or view a modern slavery statement";
 }
 @section Head {
     <script type="text/javascript">
@@ -18,15 +19,15 @@
 <div class="grid-row">
     <div class="column-two-thirds">
         <div class="govuk-box-highlight">
-            <h1 class="bold-large">Signed Out</h1>
+            <h1 class="bold-large">Signed out</h1>
         </div>
-        <p>You are now signed out of the @(Model.ClientName ?? "Modern Slavery reporting service").</p>
+        <p>You are now signed out of the @ClientName.</p>
 
         @if (Model.PostLogoutRedirectUri != null)
         {
             <div>
                 <div class="subsection panel-indent">
-                    <div class="bold-small">Click the button below to return to the <span>@Model.ClientName</span></div>
+                    <div class="bold-small">To sign back in to the service, select continue below.</div>
                 </div>
 
                 <p></p>
@@ -37,11 +38,11 @@
         {
             <div hide="model.redirectUrl">
                 <div class="subsection panel-indent">
-                    <div class="bold-small">Click the button below to sign in again</div>
+                    <div class="bold-small">Click the button below to sign in again.</div>
                 </div>
 
                 <p></p>
-                <a class="button" href="/manage-organisations" role="button">Sign In</a>
+                <a class="button" href="/manage-organisations" role="button">Sign in</a>
             </div>
         }
     </div>

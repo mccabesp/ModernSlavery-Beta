@@ -107,7 +107,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             if (!SharedBusinessLogic.SharedOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
                 return View("CustomError",
                     WebService.ErrorViewModelFactory.Create(1133,
-                        new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
+                        new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
 
             //Ensure user has not completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -117,7 +117,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             ClearStash();
 
             //Start new password reset
-            return View("PasswordReset", new ResetViewModel());
+            return View("../NewAccount/PasswordReset", new ResetViewModel());
         }
 
         [SpamProtection(5)]
@@ -136,7 +136,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
                 : lastPasswordResetDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes) -
                   VirtualDateTime.Now;
             if (!SharedBusinessLogic.SharedOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
-                ModelState.AddModelError(3026, null, new {remainingTime = remainingTime.ToFriendly(maxParts: 2)});
+                ModelState.AddModelError(3026, null, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) });
 
             if (!ModelState.IsValid)
             {
@@ -210,7 +210,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             {
                 resetCode = Encryption.EncryptQuerystring(VirtualUser.UserId + ":" +
                                                           VirtualDateTime.Now.ToSmallDateTime());
-                var resetUrl = Url.Action("NewPassword", "Account", new {code = resetCode}, "https");
+                var resetUrl = Url.Action("NewPassword", "Account", new { code = resetCode }, "https");
                 if (!await SharedBusinessLogic.SendEmailService.SendResetPasswordNotificationAsync(resetUrl,
                     VirtualUser.EmailAddress))
                     return false;

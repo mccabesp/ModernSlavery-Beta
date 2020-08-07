@@ -21,29 +21,29 @@
                 @Model.PageTitle
             </h1>
 
-            <h2 class="govuk-heading-m">
-                Which areas are relevant to your organisation when assessing your supply chains for modern slavery risks?
-            </h2>
-
-            <div class="govuk-accordion @Html.SetErrorClass(model => model.RelevantRisks, "govuk-form-group--error")" data-module="govuk-accordion" id="accordion-relevant-risks">
-                <span asp-validation-for="RelevantRisks" class="govuk-error-message"></span>
-
-                @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
-                {
-                    <div class="govuk-accordion__section accordion-with-counts">
-                        <div class="govuk-accordion__section-header">
-                            <h2 class="govuk-accordion__section-heading">
-                                <span class="govuk-accordion__section-button" id="accordion-relevant-risks-heading-@parentType.Id">
-                                    @parentType.Description
-                                </span>
-                            </h2>
-                        </div>
-                        <div id="accordion-relevant-risks-content-@parentType.Id" class="govuk-accordion__section-content" aria-labelledby="accordion-relevant-risks-heading-@parentType.Id">
-                            <div class="govuk-form-group">
-                                <fieldset class="govuk-fieldset">
-                                    <span class="govuk-hint" id="GovUk_Sectors-hint">
-                                        Select all that apply.
-                                    </span>
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                    <h2 class="govuk-fieldset__heading">
+                        Which areas are relevant to your organisation when assessing your supply chains for modern slavery risks?
+                    </h2>
+                </legend>
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.RelevantRisks, "govuk-form-group--error")">
+                    <span class="govuk-hint govuk-!-margin-bottom-0" id="GovUk_Sectors-hint">
+                        Select all that apply
+                    </span>
+                    <div class="govuk-accordion " data-module="govuk-accordion" id="accordion-relevant-risks">
+                        <span asp-validation-for="RelevantRisks" class="govuk-error-message"></span>
+                        @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
+                        {
+                            <div class="govuk-accordion__section accordion-with-counts">
+                                <div class="govuk-accordion__section-header">
+                                    <h3 class="govuk-accordion__section-heading">
+                                        <span class="govuk-accordion__section-button" id="accordion-relevant-risks-heading-@parentType.Id">
+                                            @parentType.Description
+                                        </span>
+                                    </h3>
+                                </div>
+                                <div id="accordion-relevant-risks-content-@parentType.Id" class="govuk-accordion__section-content" aria-labelledby="accordion-relevant-risks-heading-@parentType.Id">
                                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                         @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
                                         {
@@ -58,7 +58,7 @@
                                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass($"RelevantRisks[{relevantIndex}].Details", "govuk-form-group--error")" id="relevant-risks-@(relevantIndex)">
                                                     <div class="govuk-form-group">
                                                         <label class="govuk-label" for="RelevantRisks[@relevantIndex].Details">
-                                                            Please specify the @childType.Description.ToLower()
+                                                            Please specify
                                                         </label>
                                                         <input name="RelevantRisks[@relevantIndex].Details" id="RelevantRisks[@relevantIndex].Details" value="@(Model.RelevantRisks.FirstOrDefault(r=>r.Id==childType.Id)?.Details)" class="govuk-input " type="text" maxlength="256">
                                                         @Html.ValidationMessage($"RelevantRisks[{relevantIndex}].Details", null, new { @class = "govuk-error-message" })
@@ -73,42 +73,43 @@
                                         }
                                     </div>
                                     @*<span class="checkbox-count">Selected</span>*@
-                                </fieldset>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
-                }
-            </div>
+                </div>
 
-            <div class="govuk-form-group">
-                <label asp-for="OtherRelevantRisks" class="govuk-label" for="address-town">
-                    If you want to specify an area not mentioned above, please provide details
-                </label>
-                <textarea asp-for="OtherRelevantRisks" class="govuk-textarea" rows="5" maxlength="256">@Model.OtherRelevantRisks</textarea>
-            </div>
+                <div class="govuk-form-group">
+                    <label asp-for="OtherRelevantRisks" class="govuk-label" for="address-town">
+                        If you want to specify an area not mentioned above, please provide details
+                    </label>
+                    <textarea asp-for="OtherRelevantRisks" class="govuk-textarea" rows="5" maxlength="256">@Model.OtherRelevantRisks</textarea>
+                </div>
+            </fieldset>
 
-            <h2 class="govuk-heading-l">
-                Which areas of your supply chains do you consider to have the highest risk of modern slavery?
-                <span class="govuk-hint" id="GovUk_Sectors-hint">
-                    Select up to 3 areas
-                </span>
-            </h2>
-            <div class="govuk-accordion @Html.SetErrorClass(model => model.HighRisks, "govuk-form-group--error")" data-module="govuk-accordion" id="accordion-high-risks">
-                <span asp-validation-for="HighRisks" class="govuk-error-message"></span>
-                @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
-                {
-
-                    <div class="govuk-accordion__section accordion-with-counts">
-                        <div class="govuk-accordion__section-header">
-                            <h2 class="govuk-accordion__section-heading">
-                                <span class="govuk-accordion__section-button" id="accordion-high-risks-heading-@parentType.Id">
-                                    @parentType.Description
-                                </span>
-                            </h2>
-                        </div>
-                        <div id="accordion-high-risks-content-@parentType.Id" class="govuk-accordion__section-content" aria-labelledby="accordion-high-risks-heading-@parentType.Id">
-                            <div class="govuk-form-group">
-                                <fieldset class="govuk-fieldset">
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                    <h2 class="govuk-fieldset__heading">
+                        Which areas of your supply chains do you consider to have the highest risk of modern slavery?
+                    </h2>
+                </legend>
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.HighRisks, "govuk-form-group--error")">
+                    <span class="govuk-hint govuk-!-margin-bottom-0" id="GovUk_Sectors-hint">
+                        Select up to 3 areas
+                    </span>
+                    <div class="govuk-accordion " data-module="govuk-accordion" id="accordion-high-risks">
+                        <span asp-validation-for="HighRisks" class="govuk-error-message"></span>
+                        @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "RiskArea" && t.ParentId == null))
+                        {
+                            <div class="govuk-accordion__section accordion-with-counts">
+                                <div class="govuk-accordion__section-header">
+                                    <h3 class="govuk-accordion__section-heading">
+                                        <span class="govuk-accordion__section-button" id="accordion-high-risks-heading-@parentType.Id">
+                                            @parentType.Description
+                                        </span>
+                                    </h3>
+                                </div>
+                                <div id="accordion-high-risks-content-@parentType.Id" class="govuk-accordion__section-content" aria-labelledby="accordion-high-risks-heading-@parentType.Id">
                                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                         @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
                                         {
@@ -131,68 +132,75 @@
                                         }
                                     </div>
                                     @*<span class="checkbox-count">Selected</span>*@
-                                </fieldset>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
-                }
-            </div>
-            <div class="govuk-form-group">
-                <label asp-for="OtherHighRisks" class="govuk-label">
-                    If you want to specify an area not mentioned above, please provide details
-                </label>
-                <textarea asp-for="OtherHighRisks" class="govuk-textarea" rows="5" maxlength="256">@Model.OtherHighRisks</textarea>
-            </div>
+                </div>
 
-            <h2 class="govuk-heading-l">
-                Which locations do you believe are at higher risk of modern slavery in your operations and supply chains?
-            </h2>
-            <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-location-risks">
-                @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "Location" && t.ParentId == null))
-                {
+                <div class="govuk-form-group">
+                    <label asp-for="OtherHighRisks" class="govuk-label">
+                        If you want to specify an area not mentioned above, please provide details
+                    </label>
+                    <textarea asp-for="OtherHighRisks" class="govuk-textarea" rows="5" maxlength="256">@Model.OtherHighRisks</textarea>
+                </div>
+            </fieldset>
 
-                    <div class="govuk-accordion__section accordion-with-counts govuk-accordion__section--expanded">
-                        <div class="govuk-accordion__section-header">
-                            <h2 class="govuk-accordion__section-heading">
-                                <span class="govuk-accordion__section-button" id="accordion-location-risks-heading-@parentType.Id">
-                                    @parentType.Description
-                                </span>
-                            </h2>
-                        </div>
-                        <div id="accordion-location-risks-content-@parentType.Id" class="govuk-accordion__section-content" aria-labelledby="accordion-location-risks-heading-@parentType.Id">
-                            <div class="govuk-form-group @Html.SetErrorClass($"LocationRisks[{locationIndex}].Id", "govuk-form-group--error")">
-                                <fieldset class="govuk-fieldset">
-                                    @Html.ValidationMessage($"LocationRisks[{locationIndex}].Id", null, new { @class = "govuk-error-message" })
-                                    <div class="govuk-checkboxes">
-                                        <div class="govuk-checkboxes__item">
-                                            <input name="LocationRisks[@locationIndex].Details" type="hidden">
-                                            <input name="LocationRisks[@locationIndex].Id" value="@parentType.Id" id="@($"LocationId{parentType.Id}")" checked=@(Model.LocationRisks.Any(r => r.Id == parentType.Id)) class="govuk-checkboxes__input" type="checkbox">
-                                            <label class="govuk-label govuk-checkboxes__label" for="@($"LocationId{parentType.Id}")">
-                                                All
-                                            </label>
-                                        </div>
-
-                                        @{ locationIndex++; }
-                                        @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
-                                        {
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                    <h2 class="govuk-fieldset__heading">
+                        Which locations do you believe are at higher risk of modern slavery in your operations and supply chains?
+                    </h2>
+                </legend>
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.LocationRisks, "govuk-form-group--error")">
+                    <span class="govuk-hint govuk-!-margin-bottom-0" id="GovUk_Sectors-hint">
+                        Select all that apply
+                    </span>
+                    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-location-risks">
+                        @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "Location" && t.ParentId == null))
+                        {
+                            <div class="govuk-accordion__section accordion-with-counts">
+                                <div class="govuk-accordion__section-header">
+                                    <h3 class="govuk-accordion__section-heading">
+                                        <span class="govuk-accordion__section-button" id="accordion-location-risks-heading-@parentType.Id">
+                                            @parentType.Description
+                                        </span>
+                                    </h3>
+                                </div>
+                                <div id="accordion-location-risks-content-@parentType.Id" class="govuk-accordion__section-content" aria-labelledby="accordion-location-risks-heading-@parentType.Id">
+                                    <div class="govuk-form-group @Html.SetErrorClass($"LocationRisks[{locationIndex}].Id", "govuk-form-group--error")">
+                                        @Html.ValidationMessage($"LocationRisks[{locationIndex}].Id", null, new { @class = "govuk-error-message" })
+                                        <div class="govuk-checkboxes">
                                             <div class="govuk-checkboxes__item">
                                                 <input name="LocationRisks[@locationIndex].Details" type="hidden">
-                                                <input name="LocationRisks[@locationIndex].Id" value="@childType.Id" id="@($"LocationId{childType.Id}")" checked=@(Model.LocationRisks.Any(r => r.Id == childType.Id)) class="govuk-checkboxes__input" type="checkbox">
-                                                <label class="govuk-label govuk-checkboxes__label" for="@($"LocationId{childType.Id}")">
-                                                    @childType.Description
+                                                <input name="LocationRisks[@locationIndex].Id" value="@parentType.Id" id="@($"LocationId{parentType.Id}")" checked=@(Model.LocationRisks.Any(r => r.Id == parentType.Id)) class="govuk-checkboxes__input" type="checkbox">
+                                                <label class="govuk-label govuk-checkboxes__label" for="@($"LocationId{parentType.Id}")">
+                                                    All
                                                 </label>
                                             </div>
 
-                                            { locationIndex++; }
-                                        }
+                                            @{ locationIndex++; }
+                                            @foreach (var childType in Model.RiskTypes.Where(t => t.ParentId == parentType.Id))
+                                            {
+                                                <div class="govuk-checkboxes__item">
+                                                    <input name="LocationRisks[@locationIndex].Details" type="hidden">
+                                                    <input name="LocationRisks[@locationIndex].Id" value="@childType.Id" id="@($"LocationId{childType.Id}")" checked=@(Model.LocationRisks.Any(r => r.Id == childType.Id)) class="govuk-checkboxes__input" type="checkbox">
+                                                    <label class="govuk-label govuk-checkboxes__label" for="@($"LocationId{childType.Id}")">
+                                                        @childType.Description
+                                                    </label>
+                                                </div>
+
+                                                { locationIndex++; }
+                                            }
+                                        </div>
+                                        @*<span class="checkbox-count">Selected</span>*@
                                     </div>
-                                    @*<span class="checkbox-count">Selected</span>*@
-                                </fieldset>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
-                }
-            </div>
+                </div>
+            </fieldset>
 
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">

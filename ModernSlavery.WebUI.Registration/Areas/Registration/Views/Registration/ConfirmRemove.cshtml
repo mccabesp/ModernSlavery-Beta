@@ -23,7 +23,7 @@
                 <h1 class="heading-large">
                     Confirm removal of user
                 </h1>
-                <p>You are about to remove the following user from reporting Modern Slavery statement for this organisation.</p>
+                <p>Once the user has been removed, they will no longer be able to submit a modern slavery statement for this organisation.</p>
                 <dl class="govuk-check-your-answers cya-questions-short">
                     <div>
                         <dt class="cya-question">
@@ -60,7 +60,7 @@
                         <button type="submit" class="button button-warning" name="id">Remove user</button>
                     </p>
                     <p>
-                        <a href="@Url.Action("ManageOrganisation", new {organisationIdentifier = Model.EncOrganisationId})">Cancel</a>
+                       <a href="@(Url.ActionArea("ManageOrganisation", "Submission", "Submission", new {organisationIdentifier = Model.EncOrganisationId}))">Cancel</a>
                     </p>
                 </div>
             </div>

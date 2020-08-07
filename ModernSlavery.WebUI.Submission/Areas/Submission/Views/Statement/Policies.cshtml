@@ -18,7 +18,7 @@
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
                             Do your organisation`s modern slavery policies or codes include any of the following provisions?
                         </h2>
@@ -40,7 +40,7 @@
                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPolicies, "govuk-form-group--error")" id="policies-conditional@(policyType.Id)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
-                                            Please provide detail
+                                            Please provide details
                                         </label>
                                         <textarea asp-for="OtherPolicies" name="OtherPolicies" class="govuk-textarea" id="policies-other" spellcheck="false" rows="5" maxlength="256">@Model.OtherPolicies</textarea>
                                         <span asp-validation-for="OtherPolicies" class="govuk-error-message"></span>

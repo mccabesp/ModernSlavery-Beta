@@ -1,8 +1,8 @@
 ﻿@using ModernSlavery.WebUI.Shared.Interfaces
-@using ModernSlavery.WebUI.Shared.Options
-@inject IWebService WebService
+@using ModernSlavery.Core.Models
+
 @{
-    var ClientName = "Modern Slavery reporting service";
+    var ClientName = "Submit a modern slavery statement service";
     Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = $"Session expired - {ClientName} - GOV.UK";
 }
@@ -10,7 +10,7 @@
 <div class="grid-row">
     <div class="column-two-thirds">
         <div class="govuk-box-highlight">
-            <h1 class="bold-large">Session Expired</h1>
+            <h1 class="bold-large">Session expired</h1>
         </div>
         <p>Your session has expired and you are now signed out of the <span>@ClientName</span>.</p>
 
@@ -20,7 +20,7 @@
             </div>
 
             <p></p>
-            <a class="button" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" role="button">Sign In</a>
+            <a class="button" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" role="button">Sign in</a>
         </div>
     </div>
 </div>
