@@ -83,7 +83,7 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
 
-    <Content Include="appsettings.UR.secret.json">
+    <Content Include="appsettings.UR.secret.json" Condition="Exists('appsettings.UR.secret.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>appsettings.secret.json</DependentUpon>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
