@@ -216,7 +216,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             {
                 CompareViewService.SortColumn = null;
                 CompareViewService.SortAscending = true;
-                year = SharedBusinessLogic.SharedOptions.FirstReportingYear;
+                year = SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear;
             }
 
             //Load employers from querystring (via shared email)
@@ -301,7 +301,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpPost("~/compare-employers/{year:int=0}")]
         public IActionResult CompareEmployers(string command, int year = 0)
         {
-            if (year == 0) year = SharedBusinessLogic.SharedOptions.FirstReportingYear;
+            if (year == 0) year = SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear;
 
             var args = command.AfterFirst(":");
             command = command.BeforeFirst(":");
@@ -328,7 +328,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("download-compare-data")]
         public async Task<IActionResult> DownloadCompareData(int year = 0)
         {
-            if (year == 0) year = SharedBusinessLogic.SharedOptions.FirstReportingYear;
+            if (year == 0) year = SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear;
 
             var result = await CompareEmployers(year) as ViewResult;
             var viewModel = result.Model as CompareViewModel;

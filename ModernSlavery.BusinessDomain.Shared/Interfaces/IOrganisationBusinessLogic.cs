@@ -62,7 +62,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 
         EmployerRecord CreateEmployerRecord(Organisation org, long userId = 0);
 
-        IEnumerable<int> GetOrganisationRecentReportingYears(Organisation organisation,int recentCount);
         bool GetOrganisationIsOrphan(Organisation organisation);
 
         bool GetOrganisationWasDissolvedBeforeCurrentAccountingYear(Organisation organisation);

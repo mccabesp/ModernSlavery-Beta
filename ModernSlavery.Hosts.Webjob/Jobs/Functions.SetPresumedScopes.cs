@@ -18,13 +18,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 //Initialise any unknown scope statuses
-                var changedOrgs = await _ScopeBusinessLogic.SetScopeStatusesAsync().ConfigureAwait(false);
+                var changedOrgs = await _scopeBusinessLogic.FixScopeRowStatusesAsync().ConfigureAwait(false);
 
                 //Initialise the presumed scoped
-                changedOrgs.AddRange(await _ScopeBusinessLogic.SetPresumedScopesAsync().ConfigureAwait(false));
+                changedOrgs.AddRange(await _scopeBusinessLogic.SetPresumedScopesAsync().ConfigureAwait(false));
 
                 //Update the search indexes
-                if (changedOrgs.Count > 0) await SearchBusinessLogic.UpdateSearchIndexAsync(changedOrgs.ToArray()).ConfigureAwait(false);
+                if (changedOrgs.Count > 0 && !_searchOptions.Disabled) await _searchBusinessLogic.UpdateSearchIndexAsync(changedOrgs.ToArray()).ConfigureAwait(false);
 
                 log.LogDebug($"Executed {nameof(SetPresumedScopes)} successfully");
             }

@@ -2,6 +2,7 @@
 using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared.Classes;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Interfaces;
 using System;
 using System.Collections.Generic;

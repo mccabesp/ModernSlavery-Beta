@@ -29,43 +29,42 @@ namespace ModernSlavery.Infrastructure.Search
         private readonly Lazy<Task<ISearchServiceClient>> _serviceClient;
         private readonly TelemetryClient _telemetryClient;
         public readonly IAuditLogger SearchLog;
-        private readonly SharedOptions SharedOptions;
+        private readonly SharedOptions _sharedOptions;
+        private readonly SearchOptions _searchOptions;
 
         public AzureEmployerSearchRepository(
             SharedOptions sharedOptions,
+            SearchOptions searchOptions,
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog,
-            string serviceName,
-            string indexName,
             IMapper autoMapper,
-            string adminApiKey = null,
-            string queryApiKey = null,
-            TelemetryClient telemetryClient = null,
-            bool disabled = false)
+            TelemetryClient telemetryClient = null)
         {
-            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
-            Disabled = disabled;
-            if (disabled)
+            _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
+            _searchOptions = searchOptions ?? throw new ArgumentNullException(nameof(searchOptions));
+
+            Disabled = searchOptions.Disabled;
+            if (Disabled)
             {
                 Console.WriteLine($"{nameof(AzureEmployerSearchRepository)} is disabled");
                 return;
             }
             _autoMapper = autoMapper;
             SearchLog = searchLog;
-            IndexName = indexName.ToLower();
+            IndexName = searchOptions.EmployerIndexName.ToLower();
 
-            if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentNullException(nameof(serviceName));
+            if (string.IsNullOrWhiteSpace(searchOptions.ServiceName)) throw new ArgumentNullException(nameof(searchOptions.ServiceName));
 
-            if (string.IsNullOrWhiteSpace(adminApiKey) && string.IsNullOrWhiteSpace(queryApiKey))
-                throw new ArgumentNullException($"You must provide '{nameof(adminApiKey)}' or '{nameof(queryApiKey)}'");
+            if (string.IsNullOrWhiteSpace(searchOptions.AdminApiKey) && string.IsNullOrWhiteSpace(searchOptions.QueryApiKey))
+                throw new ArgumentNullException($"You must provide '{nameof(searchOptions.AdminApiKey)}' or '{nameof(searchOptions.QueryApiKey)}'");
 
-            if (!string.IsNullOrWhiteSpace(adminApiKey) && !string.IsNullOrWhiteSpace(queryApiKey))
-                throw new ArgumentException($"Cannot specify both '{nameof(adminApiKey)}' and '{nameof(queryApiKey)}'");
+            if (!string.IsNullOrWhiteSpace(searchOptions.AdminApiKey) && !string.IsNullOrWhiteSpace(searchOptions.QueryApiKey))
+                throw new ArgumentException($"Cannot specify both '{nameof(searchOptions.AdminApiKey)}' and '{nameof(searchOptions.QueryApiKey)}'");
 
             _serviceClient = new Lazy<Task<ISearchServiceClient>>(
                 async () =>
                 {
                     //Get the service client
-                    var _serviceClient = new SearchServiceClient(serviceName, new SearchCredentials(adminApiKey));
+                    var _serviceClient = new SearchServiceClient(searchOptions.ServiceName, new SearchCredentials(searchOptions.AdminApiKey));
 
                     //Ensure the index exists
                     await CreateIndexIfNotExistsAsync(_serviceClient, IndexName).ConfigureAwait(false);
@@ -77,17 +76,17 @@ namespace ModernSlavery.Infrastructure.Search
                 async () =>
                 {
                     //Get the index client
-                    if (!string.IsNullOrWhiteSpace(adminApiKey))
+                    if (!string.IsNullOrWhiteSpace(searchOptions.AdminApiKey))
                     {
                         var serviceClient = await _serviceClient.Value;
                         return serviceClient.Indexes.GetClient(IndexName);
                     }
 
-                    if (!string.IsNullOrWhiteSpace(queryApiKey))
-                        return new SearchIndexClient(serviceName, IndexName, new SearchCredentials(queryApiKey));
+                    if (!string.IsNullOrWhiteSpace(searchOptions.QueryApiKey))
+                        return new SearchIndexClient(searchOptions.ServiceName, IndexName, new SearchCredentials(searchOptions.QueryApiKey));
 
                     throw new ArgumentNullException(
-                        $"You must provide '{nameof(adminApiKey)}' or '{nameof(queryApiKey)}'");
+                        $"You must provide '{nameof(searchOptions.AdminApiKey)}' or '{nameof(searchOptions.QueryApiKey)}'");
                 });
         }
 
@@ -129,8 +128,8 @@ namespace ModernSlavery.Infrastructure.Search
                 throw new ArgumentNullException(nameof(newRecords), "You must supply at least one record to index");
 
             //Remove all test organisations
-            if (!string.IsNullOrWhiteSpace(SharedOptions.TestPrefix))
-                newRecords = newRecords.Where(e => !e.Name.StartsWithI(SharedOptions.TestPrefix));
+            if (!string.IsNullOrWhiteSpace(_sharedOptions.TestPrefix))
+                newRecords = newRecords.Where(e => !e.Name.StartsWithI(_sharedOptions.TestPrefix));
 
             //Ensure the records are ordered by name
             newRecords = newRecords.OrderBy(o => o.Name);

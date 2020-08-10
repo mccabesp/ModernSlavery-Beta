@@ -8,9 +8,9 @@
 @{
     int endYear = SnapshotDateHelper.CurrentSnapshotYear;
     int startYear = endYear - (ViewingOptions.ShowReportYearCount - 1);
-    if (startYear < SnapshotDateHelper.FirstReportingYear)
+    if (startYear < SnapshotDateHelper.FirstReportingDeadlineYear)
     {
-        startYear = SnapshotDateHelper.FirstReportingYear;
+        startYear = SnapshotDateHelper.FirstReportingDeadlineYear;
     }
 }
 <div class="no-print">

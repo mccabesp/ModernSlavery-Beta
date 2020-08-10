@@ -85,7 +85,7 @@ namespace ModernSlavery.Core.Entities
 
         public ScopeStatuses GetScopeStatus()
         {
-            return Organisation.GetScopeStatus(AccountingDate);
+            return Organisation.GetActiveScopeStatus(AccountingDate);
         }
 
         public bool CalculateIsLateSubmission()

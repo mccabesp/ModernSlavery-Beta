@@ -401,11 +401,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             //Get the current snapshot date
             var reportingDeadline = SharedBusinessLogic.GetReportingDeadline(userOrg.Organisation.SectorType).AddYears(-2);
-            if (reportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingYear)
+            if (reportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear)
                 return new HttpBadRequestResult($"Snapshot year {reportingDeadline} is invalid");
 
             var scopeStatus =
-                await SubmissionService.ScopeBusinessLogic.GetLatestScopeStatusForReportingDeadlineAsync(organisationId,
+                await SubmissionService.ScopeBusinessLogic.GetScopeStatusByReportingDeadlineOrLatestAsync(organisationId,
                     reportingDeadline);
             if (scopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope))
                 return new HttpBadRequestResult("Explicit scope is already set");
@@ -445,13 +445,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     $"User {VirtualUser?.EmailAddress} has not completed registeration for organisation {userOrg.Organisation.EmployerReference}");
 
             //Check the year parameters
-            if (model.ReportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingYear ||
+            if (model.ReportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear ||
                 model.ReportingDeadline.Year > VirtualDateTime.Now.Year)
                 return new HttpBadRequestResult($"Snapshot year {model.ReportingDeadline.Year} is invalid");
 
             //Check if we need the current years scope
             var scopeStatus =
-                await SubmissionService.ScopeBusinessLogic.GetLatestScopeStatusForReportingDeadlineAsync(organisationId,
+                await SubmissionService.ScopeBusinessLogic.GetScopeStatusByReportingDeadlineOrLatestAsync(organisationId,
                     model.ReportingDeadline);
             if (scopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope))
                 return new HttpBadRequestResult("Explicit scope is already set");

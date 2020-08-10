@@ -23,14 +23,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                var azureStorageConnectionString = _StorageOptions.AzureConnectionString;
+                var azureStorageConnectionString = _storageOptions.AzureConnectionString;
                 if (azureStorageConnectionString.Equals("UseDevelopmentStorage=true")) return;
 
                 var connectionString = azureStorageConnectionString.ConnectionStringToDictionary();
 
                 var azureStorageAccount = connectionString["AccountName"];
                 var azureStorageKey = connectionString["AccountKey"];
-                var azureStorageShareName = _StorageOptions.AzureShareName;
+                var azureStorageShareName = _storageOptions.AzureShareName;
 
                 //Take the snapshot
                 await TakeSnapshotAsync(azureStorageAccount, azureStorageKey, azureStorageShareName).ConfigureAwait(false);
@@ -74,14 +74,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                var azureStorageConnectionString = _StorageOptions.AzureConnectionString;
+                var azureStorageConnectionString = _storageOptions.AzureConnectionString;
                 if (azureStorageConnectionString.Equals("UseDevelopmentStorage=true")) return;
 
                 var connectionString = azureStorageConnectionString.ConnectionStringToDictionary();
 
                 var azureStorageAccount = connectionString["AccountName"];
                 var azureStorageKey = connectionString["AccountKey"];
-                var azureStorageShareName = _StorageOptions.AzureShareName;
+                var azureStorageShareName = _storageOptions.AzureShareName;
 
                 //Take the snapshot
                 await TakeSnapshotAsync(azureStorageAccount, azureStorageKey, azureStorageShareName).ConfigureAwait(false);
