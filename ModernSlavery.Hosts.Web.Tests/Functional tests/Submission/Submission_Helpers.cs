@@ -11,11 +11,26 @@ namespace ModernSlavery.Hosts.Web.Tests
 {
     class Submission_Helper
     {
+        public static void NavigateTo_SubmissionStarted(UIContext ui, string Organistion, string YearFromTo, string SectionText)
+        {
+            //navigate to org page
+            ui.Click("Mange Organisations");
+            ui.ExpectHeader("Select an organisation");
+
+            //select org
+            ui.Click(Organistion);
+
+            //select year's report
+            ui.AtRow(YearFromTo).ClickText("Continue");
+            ui.ExpectHeader("Review before submitting");
+
+            //select section
+            ui.Click(SectionText);
+        }
 
         public static void NavigateYourMSStatement(UIContext ui, string Organistion, string Year)
         {
             ui.Click("Mange Organisations");
-            ui.ExpectHeader("Submit a modern slavery statement");
             ui.ExpectHeader("Select an organisation");
         }
         public static void NavigateToAreasCovered(UIContext ui, string Organistion, string Year)
@@ -185,9 +200,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             if (SectionOrder == "1")
             {
-                ui.ClickText(SectionOrder);
+                ui.ClickText(SectionName);
             }
-            else if (SectionOrder == "2")
+            else if (SectionName == "2")
             {
                 ui.Below(The.Top, SectionOrder).ClickText(SectionOrder);
             }
