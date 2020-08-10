@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
 using Newtonsoft.Json.Linq;
@@ -203,6 +204,39 @@ namespace ModernSlavery.Infrastructure.Configuration
             {
                 source.Optional = optional;
                 source.ReloadOnChange = reloadOnChange;
+            }
+        }
+
+
+        public static void EnsureJsonFiles(this IConfigurationBuilder configBuilder, string environment, bool includeSecrets=false)
+        {
+            var configLoaded = configBuilder.Sources.OfType<JsonConfigurationSource>().Any(s => s.Path.EqualsI("appsettings.json"));
+            if (configLoaded) throw new Exception("Attempt to load appsettings which are already loaded");
+
+            configBuilder.AddJsonFile("appsettings.json", false, false);
+
+            configBuilder.AddJsonFile($"appsettings.{environment}.json", true, false);
+
+            var provider = configBuilder.GetFileProvider() as PhysicalFileProvider;
+
+            var directory=new DirectoryInfo(Path.Combine(provider.Root, "App_Settings"));
+
+            foreach (var file in directory.GetFiles("appsettings.json", SearchOption.AllDirectories))
+                configBuilder.AddJsonFile(file.FullName, false, false);
+
+            foreach (var file in directory.GetFiles($"appsettings.{environment}.json", SearchOption.AllDirectories))
+                configBuilder.AddJsonFile(file.FullName, false, false);
+
+            if (includeSecrets)
+            {
+                configBuilder.AddJsonFile("appsettings.secret.json", true, false);
+                configBuilder.AddJsonFile($"appsettings.{environment}.secret.json", true, false);
+
+                foreach (var file in directory.GetFiles("appsettings.secret.json", SearchOption.AllDirectories))
+                    configBuilder.AddJsonFile(file.FullName, false, false);
+
+                foreach (var file in directory.GetFiles($"appsettings.{environment}.secret.json", SearchOption.AllDirectories))
+                    configBuilder.AddJsonFile(file.FullName, false, false);
             }
         }
 
