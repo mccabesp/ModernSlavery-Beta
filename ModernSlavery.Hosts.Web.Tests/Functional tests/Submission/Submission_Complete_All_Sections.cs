@@ -14,10 +14,10 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click(Submission.OrgName_InterFloor);
 
-            ExpectHeader(That.Contains, "Manage your organisation's reporting");
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             
-            Click("Draft report");
+            Click("Start Draft");
 
             ExpectHeader("Before you start");
             Click("Start Now");
@@ -36,9 +36,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_To_Year, "1");
             Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_To_Year, "2");
 
-            Set("ApproverFirstName").To(Submission.YourMSStatement_First);
-            Set("ApproverLastName").To(Submission.YourMSStatement_Last);
-            Set("ApproverJobTitle").To(Submission.YourMSStatement_JobTitle);
+            Set("First name").To(Submission.YourMSStatement_First);
+            Set("Last name").To(Submission.YourMSStatement_Last);
+            Set("Job title").To(Submission.YourMSStatement_JobTitle);
 
             Submission_Helper.DateSet(this, Submission.YourMSStatement_ApprovalDate_Day, Submission.YourMSStatement_ApprovalDate_Month, Submission.YourMSStatement_ApprovalDate_Year, "3");
 
@@ -94,7 +94,7 @@ namespace ModernSlavery.Hosts.Web.Tests
                 if (Policy == "Other")
                 {
                     Set("OtherPolicies").To(Submission.Policies_OtherDetails);
-                    ExpectLabel("Please provide detail");
+                    ExpectLabel("Please provide details");
                 }
             }
 
