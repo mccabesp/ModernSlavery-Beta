@@ -1,15 +1,8 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Autofac;
-using Microsoft.Azure.WebJobs.Host;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using ModernSlavery.Core.Extensions;
 using ModernSlavery.Hosts.Webjob.Jobs;
 using ModernSlavery.Infrastructure.Hosts;
-using Extensions = ModernSlavery.Infrastructure.Hosts.Extensions;
-using ModernSlavery.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace ModernSlavery.Hosts.Webjob
@@ -25,18 +18,18 @@ namespace ModernSlavery.Hosts.Webjob
             //NOTE: Leave this here to ensure function dependencies resolve on startup rather than when each function method is invoked
             //      It is also also useful when debugging individual jobs locally
 
-            var functions = host.Services.GetService<Functions>();
-            var logger = host.Services.GetService<ILogger>();
+            //var functions = host.Services.GetService<Functions>();
+            //var logger = host.Services.GetService<ILogger>();
 
-            functions.SetPresumedScopes(null, logger).Wait();
+            //functions.SetPresumedScopes(null, logger).Wait();
 
-            functions.FixLatestAsync(null, logger).Wait();
+            //functions.FixLatestAsync(null, logger).Wait();
 
-            functions.UpdateFromCompaniesHouseAsync(null, logger).Wait();
+            //functions.UpdateFromCompaniesHouseAsync(null, logger).Wait();
 
-            functions.SendEmail(null, logger).Wait();
+            //functions.SendEmail(null, logger).Wait();
 
-            functions.SendNotifyEmail(null, logger).Wait();
+            //functions.SendNotifyEmail(null, logger).Wait();
 
             //Run the host
             await host.RunAsync().ConfigureAwait(false);

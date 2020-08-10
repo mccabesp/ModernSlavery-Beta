@@ -11,7 +11,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         [Singleton(Mode = SingletonMode.Listener)]
-        public async Task UpdateFromCompaniesHouseAsync([TimerTrigger("*/5 * * * *")] TimerInfo timer,ILogger log)
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task UpdateFromCompaniesHouseAsync([TimerTrigger(typeof(MidnightSchedule))] TimerInfo timer,ILogger log)
         {
             try
             {

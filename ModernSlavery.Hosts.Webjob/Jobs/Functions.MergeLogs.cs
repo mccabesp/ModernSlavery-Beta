@@ -14,7 +14,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         //Merge all event log files from all instances into 1 single file per month
-        public async Task MergeLogs([TimerTrigger("01:00:00:00", RunOnStartup = true)]
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task MergeLogs([TimerTrigger("%MergeLogs%", RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {

@@ -14,6 +14,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         /// <summary>
         ///     Ensures only latest organisation address is active one
         /// </summary>
+        [Disable(typeof(DisableWebjobProvider))]
         public async Task FixOrganisationAddresses([TimerTrigger(typeof(OncePerWeekendRandomSchedule))]
             TimerInfo timer,
             ILogger log)

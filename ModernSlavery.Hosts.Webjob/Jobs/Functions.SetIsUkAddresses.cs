@@ -11,7 +11,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         //Ensure all addresses have are known to be UK or not
-        public async Task SetIsUkAddressesAsync([TimerTrigger("01:00:00:00")] TimerInfo timer, ILogger log)
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task SetIsUkAddressesAsync([TimerTrigger("%SetIsUkAddressesAsync%")] TimerInfo timer, ILogger log)
         {
             try
             {

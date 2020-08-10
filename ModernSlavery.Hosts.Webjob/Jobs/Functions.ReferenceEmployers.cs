@@ -9,7 +9,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         //Ensure all organisations have a unique employer reference
-        public async Task ReferenceEmployers([TimerTrigger("01:00:00:00")] TimerInfo timer, ILogger log)
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task ReferenceEmployers([TimerTrigger("%ReferenceEmployers%")] TimerInfo timer, ILogger log)
         {
             try
             {

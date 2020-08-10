@@ -19,6 +19,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             new ConcurrentDictionary<string, SemaphoreSlim>(StringComparer.OrdinalIgnoreCase);
 
         [Singleton(Mode = SingletonMode.Listener)] //Ensures execution on only one instance with one listener
+        [Disable(typeof(DisableWebjobProvider))]
         public async Task LogEvent([QueueTrigger(QueueNames.LogEvent)] string queueMessage, ILogger log)
         {
             //Retrieve long messages from file storage
@@ -106,6 +107,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         }
 
         [Singleton(Mode = SingletonMode.Listener)] //Ensures execution on only one instance with one listener
+        [Disable(typeof(DisableWebjobProvider))]
         public async Task LogRecord([QueueTrigger(QueueNames.LogRecord)] string queueMessage, ILogger log)
         {
             //Retrieve long messages from file storage
