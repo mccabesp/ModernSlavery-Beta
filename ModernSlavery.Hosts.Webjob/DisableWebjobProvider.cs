@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
+using ModernSlavery.Core.Attributes;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Hosts.Webjob
 {
@@ -10,11 +12,10 @@ namespace ModernSlavery.Hosts.Webjob
     //This only applies to timed-functions
     public class DisableWebjobProvider
     {
-        private readonly Dictionary<string, bool> DisabledWebjobsSettings = new Dictionary<string, bool>();
-
-        public DisableWebjobProvider(IConfiguration config)
+        private readonly WebjobsOptions _webjobOptions;
+        public DisableWebjobProvider(WebjobsOptions webjobOptions)
         {
-            config.GetSection("DisabledWebjobs").Bind(DisabledWebjobsSettings);
+            _webjobOptions = webjobOptions;
         }
 
         public bool IsDisabled(MethodInfo method)
@@ -22,13 +23,13 @@ namespace ModernSlavery.Hosts.Webjob
             //Check using the full name first
             var methodName = method.Name;
 
-            if (!DisabledWebjobsSettings.ContainsKey(method.Name) && method.IsAsyncMethod())
+            if (!_webjobOptions.ContainsKey(method.Name) && method.IsAsyncMethod())
             {
                 var i = method.Name.LastIndexOf("Async", StringComparison.OrdinalIgnoreCase);
                 if (i > 0) methodName = method.Name.Substring(0, i);
             }
 
-            return DisabledWebjobsSettings.ContainsKey(methodName) ? DisabledWebjobsSettings[methodName] : false;
+            return _webjobOptions.IsDisabled(methodName);
         }
     }
 }
