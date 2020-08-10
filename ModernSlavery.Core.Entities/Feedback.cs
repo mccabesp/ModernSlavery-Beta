@@ -7,6 +7,11 @@ namespace ModernSlavery.Core.Entities
     {
         public long FeedbackId { get; set; }
 
+        #region WhyVisitMSUSite
+        public WhyVisitMSUSite? WhyVisitMSUSite { get; set; }
+
+        #endregion
+
         #region DifficultyTypes
 
         public DifficultyTypes? Difficulty { get; set; }
@@ -20,68 +25,16 @@ namespace ModernSlavery.Core.Entities
 
         public DateTime CreatedDate { get; set; }
 
-        #region HowDidYouHearAboutGpg
+    }
+    public enum WhyVisitMSUSite : byte
+    {
+        SubmittedAStatement = 0,
+        Viewed1OrMoreStatements = 1,
+        SubmittedAndViewedStatements = 2,
 
-        public bool? NewsArticle { get; set; }
-
-        public bool? SocialMedia { get; set; }
-
-        public bool? CompanyIntranet { get; set; }
-
-        public bool? EmployerUnion { get; set; }
-
-        public bool? InternetSearch { get; set; }
-
-        public bool? Charity { get; set; }
-
-        public bool? LobbyGroup { get; set; }
-
-        public bool? Report { get; set; }
-
-        public bool? OtherSource { get; set; }
-
-        public string OtherSourceText { get; set; }
-
-        #endregion
-
-        #region WhyVisitGpgSite
-
-        public bool? FindOutAboutGpg { get; set; }
-
-        public bool? ReportOrganisationGpgData { get; set; }
-
-        public bool? CloseOrganisationGpg { get; set; }
-
-        public bool? ViewSpecificOrganisationGpg { get; set; }
-
-        public bool? ActionsToCloseGpg { get; set; }
-
-        public bool? OtherReason { get; set; }
-
-        public string OtherReasonText { get; set; }
-
-        #endregion
-
-        #region WhoAreYou
-
-        public bool? EmployeeInterestedInOrganisationData { get; set; }
-
-        public bool? ManagerInvolvedInGpgReport { get; set; }
-
-        public bool? ResponsibleForReportingGpg { get; set; }
-
-        public bool? PersonInterestedInGeneralGpg { get; set; }
-
-        public bool? PersonInterestedInSpecificOrganisationGpg { get; set; }
-
-        public bool? OtherPerson { get; set; }
-
-        public string OtherPersonText { get; set; }
-
-        #endregion
     }
 
-    public enum DifficultyTypes:byte
+    public enum DifficultyTypes : byte
     {
         VeryEasy = 0,
         Easy = 1,
@@ -89,4 +42,6 @@ namespace ModernSlavery.Core.Entities
         Difficult = 3,
         VeryDifficult = 4
     }
+
+
 }

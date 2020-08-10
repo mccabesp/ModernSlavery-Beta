@@ -55,7 +55,7 @@ namespace ModernSlavery.Infrastructure.Database
 
                 entity.Property(e => e.Action).HasColumnName("ActionId");
 
-                entity.HasOne(e => e.OriginalUser).WithMany().HasForeignKey(e=>e.OriginalUserId);
+                entity.HasOne(e => e.OriginalUser).WithMany().HasForeignKey(e => e.OriginalUserId);
                 entity.HasOne(e => e.ImpersonatedUser).WithMany().HasForeignKey(e => e.ImpersonatedUserId);
                 entity.HasOne(e => e.Organisation).WithMany().HasForeignKey(e => e.OrganisationId);
             });
@@ -93,6 +93,8 @@ namespace ModernSlavery.Infrastructure.Database
 
             modelBuilder.Entity<Feedback>(entity =>
             {
+                entity.Property(e => e.WhyVisitMSUSite).HasColumnName("WhyVisitMSUSiteId");
+
                 entity.Property(e => e.Difficulty).HasColumnName("DifficultyId");
 
                 entity.Property(e => e.EmailAddress).HasMaxLength(255);
@@ -166,7 +168,7 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.HasOne(d => d.LatestScope).WithMany().HasForeignKey(e => e.LatestScopeId);
 
-                    entity.HasOne(d => d.LatestRegistration).WithMany().HasForeignKey(p=> new { p.LatestRegistrationOrganisationId, p.LatestRegistrationUserId });
+                    entity.HasOne(d => d.LatestRegistration).WithMany().HasForeignKey(p => new { p.LatestRegistrationOrganisationId, p.LatestRegistrationUserId });
 
                     entity.HasOne(d => d.LatestPublicSectorType).WithMany().HasForeignKey(e => e.LatestPublicSectorTypeId);
                 });
@@ -573,7 +575,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.StatementTrainingType)
-                        .WithMany(e=>e.StatementTraining)
+                        .WithMany(e => e.StatementTraining)
                         .HasForeignKey(e => e.StatementTrainingTypeId);
 
                     entity.HasOne(e => e.Statement)
@@ -614,7 +616,7 @@ namespace ModernSlavery.Infrastructure.Database
                 {
                     entity.HasKey(e => e.StatementDiligenceTypeId);
                     entity.Property(e => e.StatementDiligenceTypeId).ValueGeneratedNever();
-                    
+
                     entity.HasIndex(e => e.ParentDiligenceTypeId);
 
                     entity.Property(e => e.Description)
@@ -653,7 +655,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.StatementPolicyType)
-                        .WithMany(e=>e.StatementPolicies)
+                        .WithMany(e => e.StatementPolicies)
                         .HasForeignKey(e => e.StatementPolicyTypeId);
 
                     entity.HasOne(e => e.Statement)
@@ -673,7 +675,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.StatementRiskType)
-                        .WithMany(e=> e.StatementRelevantRisks)
+                        .WithMany(e => e.StatementRelevantRisks)
                         .HasForeignKey(e => e.StatementRiskTypeId);
 
                     entity.HasOne(e => e.Statement)
@@ -693,7 +695,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.StatementRiskType)
-                        .WithMany(e=> e.StatementHighRisks)
+                        .WithMany(e => e.StatementHighRisks)
                         .HasForeignKey(e => e.StatementRiskTypeId);
 
                     entity.HasOne(e => e.Statement)
@@ -735,7 +737,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.StatementRiskType)
-                        .WithMany(e=>e.StatementLocationRisks)
+                        .WithMany(e => e.StatementLocationRisks)
                         .HasForeignKey(e => e.StatementRiskTypeId);
 
                     entity.HasOne(e => e.Statement)
@@ -801,7 +803,7 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasForeignKey(d => d.StatementId);
 
                     entity.HasOne(d => d.StatementSectorType)
-                        .WithMany(d=>d.StatementSectors)
+                        .WithMany(d => d.StatementSectors)
                         .HasForeignKey(d => d.StatementSectorTypeId);
                 });
 
@@ -859,7 +861,7 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.Property(e => e.Method).HasColumnName("MethodId");
 
-                    entity.HasOne(d => d.Address).WithMany(e=>e.UserOrganisations).HasForeignKey(e => e.AddressId);
+                    entity.HasOne(d => d.Address).WithMany(e => e.UserOrganisations).HasForeignKey(e => e.AddressId);
 
                     entity.HasOne(d => d.Organisation)
                         .WithMany(p => p.UserOrganisations)
