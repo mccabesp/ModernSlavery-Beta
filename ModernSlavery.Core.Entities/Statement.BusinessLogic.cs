@@ -39,7 +39,7 @@ namespace ModernSlavery.Core.Entities
         }
         public ScopeStatuses GetScopeStatus()
         {
-            return Organisation.GetScopeStatus(SubmissionDeadline);
+            return Organisation.GetActiveScopeStatus(SubmissionDeadline);
         }
         public string GetReportingPeriod()
         {

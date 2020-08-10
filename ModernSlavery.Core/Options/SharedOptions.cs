@@ -22,7 +22,7 @@ namespace ModernSlavery.Core.Models
         private string _DevelopmentWebroot;
         public string DevelopmentWebroot { get => _DevelopmentWebroot; set => _DevelopmentWebroot = value != null && value.StartsWith('.') ? Path.GetFullPath(value) : value; }
 
-        public int FirstReportingYear { get; set; } = 2020;
+        public int FirstReportingDeadlineYear { get; set; } = 2020;
         public DateTime PrivateReportingDeadline { get; set; }
         public DateTime PublicReportingDeadline { get; set; }
 
@@ -190,7 +190,7 @@ namespace ModernSlavery.Core.Models
             if (string.IsNullOrWhiteSpace(CertFilepath) && !string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing CertFilepath"));
             if (!string.IsNullOrWhiteSpace(CertFilepath) && string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing CertPassword"));
 
-            if (FirstReportingYear == 0 || FirstReportingYear > VirtualDateTime.Now.Year) exceptions.Add(new ConfigurationErrorsException($"Invalid FirstReportingYear: {FirstReportingYear}."));
+            if (FirstReportingDeadlineYear == 0 || FirstReportingDeadlineYear > VirtualDateTime.Now.Year) exceptions.Add(new ConfigurationErrorsException($"Invalid FirstReportingDeadlineYear: {FirstReportingDeadlineYear}."));
             if (PrivateReportingDeadline == DateTime.MinValue)
                 exceptions.Add(new ConfigurationErrorsException($"Invalid PrivateReportingDeadline: {PrivateReportingDeadline}."));
             else

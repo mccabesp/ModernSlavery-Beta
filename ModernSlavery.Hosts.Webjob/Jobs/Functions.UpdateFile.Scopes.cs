@@ -57,7 +57,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             {
                 await WriteRecordsPerYearAsync(
                         filePath,
-                        year => Task.FromResult(_ScopeBusinessLogic.GetScopesFileModelByYear(year).ToList()))
+                        year => Task.FromResult(_scopeBusinessLogic.GetScopesFileModelByYear(year).ToList()))
                     .ConfigureAwait(false);
             }
             finally

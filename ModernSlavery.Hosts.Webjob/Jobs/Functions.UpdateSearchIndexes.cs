@@ -23,7 +23,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
-            try
+            if (!_searchOptions.Disabled)
+                try
             {
                 await UpdateAllSearchIndexesAsync(log).ConfigureAwait(false);
             }
@@ -119,7 +120,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 allOrgsList.RemoveAll(
                     o => o.OrganisationName.StartsWithI(_SharedBusinessLogic.SharedOptions.TestPrefix));
 
-            var lookupResult = SearchBusinessLogic.LookupSearchableOrganisations(allOrgsList);
+            var lookupResult = _searchBusinessLogic.LookupSearchableOrganisations(allOrgsList);
             if (Debugger.IsAttached) lookupResult = lookupResult.Take(100);
             var listOfSicCodeRecords = await GetListOfSicCodeSearchModelsFromFileAsync(log).ConfigureAwait(false);
             var selection = lookupResult.Select(o => _OrganisationBusinessLogic.CreateEmployerSearchModel(o, false, listOfSicCodeRecords));

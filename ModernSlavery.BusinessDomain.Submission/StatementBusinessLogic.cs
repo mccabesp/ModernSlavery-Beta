@@ -356,7 +356,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         private void CheckReportingDeadline(Organisation organisation, DateTime reportingDeadline)
         {
-            var firstDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, _sharedBusinessLogic.SharedOptions.FirstReportingYear);
+            var firstDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, _sharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear);
             var currentDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
 
             if (reportingDeadline < firstDeadline || reportingDeadline > currentDeadline.AddDays(1)) throw new ArgumentOutOfRangeException(nameof(reportingDeadline));
@@ -441,7 +441,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var statementInfoModel = new StatementInfoModel
             {
                 ReportingDeadline = reportingDeadline,
-                ScopeStatus = organisation.GetScopeStatus(reportingDeadline)
+                ScopeStatus = organisation.GetActiveScopeStatus(reportingDeadline)
             };
 
             //Get the submitted statement info
@@ -461,7 +461,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public async IAsyncEnumerable<StatementInfoModel> GetStatementInfoModelsAsync(Organisation organisation)
         {
-            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, _sharedBusinessLogic.SharedOptions.FirstReportingYear);
+            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, _sharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear);
             var currentReportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
             while (reportingDeadline <= currentReportingDeadline)
             {

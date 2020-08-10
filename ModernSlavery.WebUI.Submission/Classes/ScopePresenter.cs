@@ -67,7 +67,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             model.EnterCodes.EmployerReference = org.EmployerReference;
 
             // get the scope info for this year
-            var scope = ScopeBusinessLogic.GetLatestScopeByReportingDeadline(org, model.AccountingDate.AddYears(1));
+            var scope = ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org, model.AccountingDate.AddYears(1));
             if (scope != null)
                 model.ThisScope = new ScopeViewModel
                 {
@@ -79,7 +79,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
                 };
 
             // get the scope info for last year
-            scope = ScopeBusinessLogic.GetLatestScopeByReportingDeadline(org, model.AccountingDate);
+            scope = ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org, model.AccountingDate);
             if (scope != null)
                 model.LastScope = new ScopeViewModel
                 {
@@ -164,7 +164,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
                 throw new ArgumentOutOfRangeException(nameof(reportingDeadline));
 
             // skip saving a presumed scope when an active scope already exists for the snapshot year
-            if (await ScopeBusinessLogic.GetLatestScopeByReportingDeadlineAsync(org.OrganisationId, reportingDeadline) !=
+            if (await ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org.OrganisationId, reportingDeadline) !=
                 null) return;
 
             // create the new OrganisationScope

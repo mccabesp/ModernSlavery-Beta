@@ -194,6 +194,12 @@ namespace ModernSlavery.Core.Entities
                 .OrderByDescending(r => r.StatusDate)
                 .FirstOrDefault();
         }
+        public Statement GetStatement(DateTime reportingDeadline)
+        {
+            return Statements.Where(r => r.Status == StatementStatuses.Submitted && r.SubmissionDeadline == reportingDeadline)
+                .OrderByDescending(r => r.StatusDate)
+                .FirstOrDefault();
+        }
 
         public void FixLatestStatement(Statement newStatement = null)
         {
@@ -213,58 +219,39 @@ namespace ModernSlavery.Core.Entities
         #endregion
 
         #region Scope
-        public bool GetIsInscope(DateTime submissionDeadline)
+        //Returns the scope for the specified accounting date
+        public OrganisationScope GetActiveScope(DateTime submissionDeadline)
         {
-            return !GetScopeStatus(submissionDeadline).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
+            return OrganisationScopes.FirstOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline == submissionDeadline);
         }
 
-        public OrganisationScope GetLatestScope()
+        public OrganisationScope GetActiveScope(int reportingDeadlineYear)
         {
-            return OrganisationScopes.OrderByDescending(s=>s.SubmissionDeadline).FirstOrDefault(orgScope =>
-                orgScope.Status == ScopeRowStatuses.Active);
+            return OrganisationScopes.FirstOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline.Year == reportingDeadlineYear);
+        }
+
+        public ScopeStatuses GetActiveScopeStatus(DateTime submissionDeadline)
+        {
+            var scope = GetActiveScope(submissionDeadline);
+            return scope == null ? ScopeStatuses.Unknown : scope.ScopeStatus;
+        }
+
+        public OrganisationScope GetLatestActiveScope()
+        {
+            return OrganisationScopes.OrderByDescending(s => s.SubmissionDeadline).FirstOrDefault(orgScope =>
+                  orgScope.Status == ScopeRowStatuses.Active);
+        }
+
+        public bool GetIsInscope(DateTime submissionDeadline)
+        {
+            return !GetActiveScopeStatus(submissionDeadline).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
         }
 
         public void FixLatestScope(OrganisationScope newScope = null)
         {
             if (newScope != null && newScope.Status != ScopeRowStatuses.Active) throw new ArgumentException($"Cannot set latest scope with status={newScope.Status}");
 
-            //Get the sorted scopes
-            var scopes = OrganisationScopes.OrderBy(a => a.SubmissionDeadline).ThenBy(s => s.ScopeStatusDate).ToList();
-            if (newScope == null) newScope = scopes.LastOrDefault(a => a.Status == ScopeRowStatuses.Active);
-            LatestScope = newScope;
-        }
-
-        //Returns the scope for the specified accounting date
-        public OrganisationScope GetScope(DateTime submissionDeadline)
-        {
-            return OrganisationScopes.FirstOrDefault(s =>
-                s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline == submissionDeadline);
-        }
-
-
-        public ScopeStatuses GetScopeStatus(DateTime submissionDeadline)
-        {
-            var scope = GetScope(submissionDeadline);
-            return scope == null ? ScopeStatuses.Unknown : scope.ScopeStatus;
-        }
-
-
-        public OrganisationScope GetScope(int deadlineYear)
-        {
-            return OrganisationScopes.FirstOrDefault(orgScope =>
-                orgScope.Status == ScopeRowStatuses.Active
-                && orgScope.SubmissionDeadline.Year == deadlineYear);
-        }
-
-        public OrganisationScope GetScopeOrThrow(DateTime reportingDeadline)
-        {
-            var organisationScope = GetScope(reportingDeadline);
-
-            if (organisationScope == null)
-                throw new ArgumentOutOfRangeException(
-                    $"Cannot find an scope with status 'Active' for reporting deadling '{reportingDeadline}' linked to organisation '{OrganisationName}', employerReference '{EmployerReference}'.");
-
-            return organisationScope;
+            LatestScope = newScope ?? OrganisationScopes.OrderBy(a => a.SubmissionDeadline).ThenBy(s => s.ScopeStatusDate).LastOrDefault(a => a.Status == ScopeRowStatuses.Active);
         }
         #endregion
 

@@ -34,11 +34,7 @@ namespace ModernSlavery.Infrastructure.Search
 
             builder.RegisterType<AzureEmployerSearchRepository>()
                 .As<ISearchRepository<EmployerSearchModel>>()
-                .SingleInstance()
-                .WithParameter("serviceName", _options.ServiceName)
-                .WithParameter("indexName", _options.EmployerIndexName)
-                .WithParameter("adminApiKey", _options.AdminApiKey)
-                .WithParameter("disabled", _options.Disabled).WithAttributeFiltering();
+                .SingleInstance().WithAttributeFiltering();
 
             builder.RegisterType<AzureSicCodeSearchRepository>()
                 .As<ISearchRepository<SicCodeSearchModel>>()

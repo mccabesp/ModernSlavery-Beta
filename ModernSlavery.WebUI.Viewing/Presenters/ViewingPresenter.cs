@@ -264,7 +264,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         public List<OptionSelect> GetReportingYearOptions(IEnumerable<int> filterSnapshotYears)
         {
             // setup the filters
-            var firstYear = _sharedBusinessLogic.SharedOptions.FirstReportingYear;
+            var firstYear = _sharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear;
             var currentYear = _sharedBusinessLogic.GetReportingStartDate(SectorTypes.Public).Year;
             var allYears = new List<int>();
             for (var year = firstYear; year <= currentYear; year++) allYears.Add(year);

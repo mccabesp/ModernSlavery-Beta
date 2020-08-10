@@ -311,7 +311,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             if (string.IsNullOrWhiteSpace(employerIdentifier))
                 return new HttpBadRequestResult("Missing employer identifier");
 
-            if (year < SharedBusinessLogic.SharedOptions.FirstReportingYear || year > VirtualDateTime.Now.Year)
+            if (year < SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear || year > VirtualDateTime.Now.Year)
                 return new HttpBadRequestResult($"Invalid snapshot year {year}");
 
             #region Load organisation

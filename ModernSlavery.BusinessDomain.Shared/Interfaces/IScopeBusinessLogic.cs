@@ -9,38 +9,41 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
     public interface IScopeBusinessLogic
     {
-        // scope repo
+        Task<OrganisationScope> GetScopeByIdAsync(long organisationScopeId);
 
-        // nso repo
-
-        // business logic
+        #region GetScopeByReportingDeadlineOrLatest
         /// <summary>
-        ///     Returns the latest scope status for an organisation and snapshot year
+        ///     Gets the latest scope for the specified organisation or for a specified reporting deadline
         /// </summary>
         /// <param name="organisationId"></param>
         /// <param name="reportingDeadline"></param>
-        Task<ScopeStatuses> GetLatestScopeStatusForReportingDeadlineAsync(long organisationId,DateTime reportingDeadline);
+        Task<OrganisationScope> GetScopeByReportingDeadlineOrLatestAsync(long organisationId, DateTime? reportingDeadline = null);
 
+    
         /// <summary>
-        ///     Returns the latest scope for an organisation
-        /// </summary>
-        /// <param name="employerReference"></param>
-        /// <param name="reportingDeadline"></param>
-        Task<OrganisationScope> GetScopeByEmployerReferenceAsync(string employerReference, DateTime? reportingDeadline = null);
-
-        /// <summary>
-        ///     Gets the latest scope for the specified organisation id and snapshot year
+        ///     Gets the latest scope for the specified organisation or for a specified reporting deadline
         /// </summary>
         /// <param name="organisationId"></param>
         /// <param name="reportingDeadline"></param>
-        Task<OrganisationScope> GetLatestScopeByReportingDeadlineAsync(long organisationId, DateTime? reportingDeadline = null);
+        OrganisationScope GetScopeByReportingDeadlineOrLatestAsync(Organisation organisation, DateTime? reportingDeadline = null);
+        #endregion
 
+        #region GetScopeStatusByReportingDeadlineOrLatest
         /// <summary>
-        ///     Gets the latest scope for the specified organisation id and snapshot year
+        ///     Gets the latest scope status for the specified organisation or for a specified reporting deadline
         /// </summary>
         /// <param name="organisationId"></param>
         /// <param name="reportingDeadline"></param>
-        OrganisationScope GetLatestScopeByReportingDeadline(Organisation organisation, DateTime? reportingDeadline = null);
+        Task<ScopeStatuses> GetScopeStatusByReportingDeadlineOrLatestAsync(long organisationId,DateTime reportingDeadline);
+
+        /// <summary>
+        /// Gets the latest scope status for the specified organisation or for a specified reporting deadline
+        /// </summary>
+        /// <param name="org"></param>
+        /// <param name="reportingDeadline"></param>
+        /// <returns></returns>
+        ScopeStatuses GetScopeStatusByReportingDeadlineOrLatestAsync(Organisation organisation, DateTime? reportingDeadline = null);
+        #endregion
 
         /// <summary>
         ///     Creates a new scope record using an existing scope and applies a new status
@@ -49,22 +52,22 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="newStatus"></param>
         Task<OrganisationScope> UpdateScopeStatusAsync(long existingOrgScopeId,ScopeStatuses newStatus);
 
-        Task<CustomResult<OrganisationScope>> AddScopeAsync(Organisation organisation,
-            ScopeStatuses newStatus,
-            User currentUser,
-            DateTime reportingDeadline,
-            string comment,
-            bool saveToDatabase);
+        Task<CustomResult<OrganisationScope>> AddScopeAsync(Organisation organisation,ScopeStatuses newStatus,User currentUser,DateTime reportingDeadline,string comment,bool saveToDatabase);
 
-        Task SaveScopeAsync(Organisation org, bool saveToDatabase = true,params OrganisationScope[] newScopes);
+        Task SaveScopeAsync(Organisation organisation, bool saveToDatabase = true,params OrganisationScope[] newScopes);
 
-        Task SaveScopesAsync(Organisation org, IEnumerable<OrganisationScope> newScopes,bool saveToDatabase = true);
+        Task SaveScopesAsync(Organisation organisation, IEnumerable<OrganisationScope> newScopes,bool saveToDatabase = true);
 
         IEnumerable<ScopesFileModel> GetScopesFileModelByYear(int year);
-        Task<HashSet<Organisation>> SetScopeStatusesAsync();
+
+        /// <summary>
+        /// Ensure only latest scope for each year is active and rest are retired
+        /// </summary>
+        /// <returns></returns>
+        Task<HashSet<Organisation>> FixScopeRowStatusesAsync();
+
         Task<HashSet<Organisation>> SetPresumedScopesAsync();
-        Task<bool> SetPresumedScopesAsync(Organisation org);
-        Task<HashSet<OrganisationMissingScope>> FindOrgsWhereScopeNotSetAsync();
+        Task<bool> SetPresumedScopesAsync(Organisation organisation);
 
         /// <summary>
         ///     Adds a new scope and updates the latest scope (if required)
@@ -73,13 +76,10 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="scopeStatus"></param>
         /// <param name="reportingDeadline"></param>
         /// <param name="currentUser"></param>
-        OrganisationScope SetPresumedScope(Organisation org,
-            ScopeStatuses scopeStatus,
-            DateTime reportingDeadline,
-            User currentUser = null);
+        OrganisationScope SetPresumedScopeStatus(Organisation organisation, ScopeStatuses scopeStatus, DateTime reportingDeadline, User currentUser = null);
 
-        Task<Organisation> GetOrgByEmployerReferenceAsync(string employerReference);
-        Task<OrganisationScope> GetScopeByIdAsync(long organisationScopeId);
+        Task<IList<OrganisationMissingScope>> FindOrgsWhereScopeNotSetAsync();
+
 
         Task<OrganisationScope> GetPendingScopeRegistrationAsync(string emailAddress);
     }

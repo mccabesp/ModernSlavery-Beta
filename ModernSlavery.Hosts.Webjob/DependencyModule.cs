@@ -86,8 +86,6 @@ namespace ModernSlavery.Hosts.Webjob
 
             // Need to register webJob class in Autofac as well
             builder.RegisterType<Functions>().InstancePerDependency();
-            builder.RegisterType<TestJob1>().InstancePerDependency();
-            builder.RegisterType<TestJob2>().InstancePerDependency();
             builder.RegisterType<DisableWebjobProvider>().SingleInstance();
 
         }

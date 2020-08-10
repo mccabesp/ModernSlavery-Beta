@@ -8,6 +8,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Hosts.Webjob.Classes;
+using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Infrastructure.Storage;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
@@ -15,7 +16,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         #region Dependencies
-        private readonly StorageOptions _StorageOptions;
+        private readonly StorageOptions _storageOptions;
+        private readonly SearchOptions _searchOptions;
         private readonly IEventLogger _CustomLogger;
         private readonly IAuditLogger _BadSicLog;
         private readonly IAuditLogger _ManualChangeLog;
@@ -23,11 +25,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private readonly ISharedBusinessLogic _SharedBusinessLogic;
         private readonly ISearchRepository<EmployerSearchModel> _EmployerSearchRepository;
         private readonly ISearchRepository<SicCodeSearchModel> _SicCodeSearchRepository;
-        private readonly IScopeBusinessLogic _ScopeBusinessLogic;
+        private readonly IScopeBusinessLogic _scopeBusinessLogic;
         private readonly ISubmissionBusinessLogic _SubmissionBusinessLogic;
         private readonly IOrganisationBusinessLogic _OrganisationBusinessLogic;
         private readonly IPostcodeChecker _PostCodeChecker;
-        public readonly ISearchBusinessLogic SearchBusinessLogic;
+        public readonly ISearchBusinessLogic _searchBusinessLogic;
         private readonly IGovNotifyAPI govNotifyApi;
         private readonly UpdateFromCompaniesHouseService _updateFromCompaniesHouseService;
         private readonly IReportingDeadlineHelper _snapshotDateHelper;
@@ -35,6 +37,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         #endregion
         public Functions(
             StorageOptions storageOptions,
+            SearchOptions searchOptions,
             IEventLogger customLogger,
             [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog,
             [KeyFilter(Filenames.ManualChangeLog)] IAuditLogger manualChangeLog,
@@ -42,6 +45,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             ISharedBusinessLogic sharedBusinessLogic,
             ISearchRepository<EmployerSearchModel> employerSearchRepository,
             ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
+            IScopeBusinessLogic scopeBusinessLogic,
             ISubmissionBusinessLogic submissionBusinessLogic,
             IOrganisationBusinessLogic organisationBusinessLogic,
             IPostcodeChecker postCodeChecker,
@@ -50,7 +54,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             UpdateFromCompaniesHouseService updateFromCompaniesHouseService,
             IAuthorisationBusinessLogic authorisationBusinessLogic)
         {
-            _StorageOptions = storageOptions;
+            _storageOptions = storageOptions;
+            _searchOptions = searchOptions;
             _CustomLogger = customLogger;
             _BadSicLog = badSicLog;
             _ManualChangeLog = manualChangeLog;
@@ -58,10 +63,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             _SharedBusinessLogic = sharedBusinessLogic;
             _EmployerSearchRepository = employerSearchRepository;
             _SicCodeSearchRepository = sicCodeSearchRepository;
+            _scopeBusinessLogic = scopeBusinessLogic;
             _SubmissionBusinessLogic = submissionBusinessLogic;
             _OrganisationBusinessLogic = organisationBusinessLogic;
             _PostCodeChecker = postCodeChecker;
-            SearchBusinessLogic = searchBusinessLogic;
+            _searchBusinessLogic = searchBusinessLogic;
             _updateFromCompaniesHouseService = updateFromCompaniesHouseService;
             _authorisationBusinessLogic = authorisationBusinessLogic;
             this.govNotifyApi = govNotifyApi;

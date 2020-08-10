@@ -64,7 +64,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             var datePart = fileName.AfterLast("_", includeWhenNoSeparator: false);
 
             var endYear = _snapshotDateHelper.GetReportingStartDate(SectorTypes.Private).Year;
-            var startYear = _SharedBusinessLogic.SharedOptions.FirstReportingYear;
+            var startYear = _SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear;
             if (!string.IsNullOrWhiteSpace(datePart))
             {
                 var start = datePart.BeforeFirst("-").ToInt32().ToFourDigitYear();
