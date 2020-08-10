@@ -1,12 +1,10 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
@@ -19,7 +17,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         //Remove any unverified users their addresses, UserOrgs, Org and addresses and archive to zip
-        public async Task PurgeUsers([TimerTrigger("01:00:00:00")] TimerInfo timer, ILogger log)
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task PurgeUsers([TimerTrigger("%PurgeUsers%")] TimerInfo timer, ILogger log)
         {
             try
             {
@@ -66,7 +65,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         }
 
         //Remove any incomplete registrations
-        public async Task PurgeRegistrations([TimerTrigger("01:00:00:00")] TimerInfo timer, ILogger log)
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task PurgeRegistrations([TimerTrigger("%PurgeRegistrations%")] TimerInfo timer, ILogger log)
         {
             try
             {
@@ -116,7 +116,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         }
 
         //Remove any unverified users their addresses, UserOrgs, Org and addresses and archive to zip
-        public async Task PurgeOrganisations([TimerTrigger("01:00:00:00", RunOnStartup = true)]
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task PurgeOrganisations([TimerTrigger("%PurgeOrganisations%", RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {
@@ -214,7 +215,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         }
 
         //Remove retired copies of GPG data
-        public async Task PurgeGPGData([TimerTrigger("01:00:00:00")] TimerInfo timer, ILogger log)
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task PurgeGPGData([TimerTrigger("%PurgeGPGData%")] TimerInfo timer, ILogger log)
         {
             try
             {
@@ -256,7 +258,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         //Remove test users and organisations
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task PurgeTestDataAsync([TimerTrigger("00:12:00:00", RunOnStartup = true)]
+        public async Task PurgeTestDataAsync([TimerTrigger("%PurgeTestDataAsync%", RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {

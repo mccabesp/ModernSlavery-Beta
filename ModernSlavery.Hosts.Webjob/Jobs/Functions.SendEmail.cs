@@ -20,6 +20,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         /// <param name="queueMessage"></param>
         /// <param name="log"></param>
         [Singleton] //Ensures execution on only one instance
+        [Disable(typeof(DisableWebjobProvider))]
         public async Task SendEmail([QueueTrigger(QueueNames.SendEmail)] string queueMessage, ILogger log)
         {
             var wrapper = JsonConvert.DeserializeObject<QueueWrapper>(queueMessage);

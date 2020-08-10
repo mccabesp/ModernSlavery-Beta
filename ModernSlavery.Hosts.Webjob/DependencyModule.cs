@@ -20,11 +20,7 @@ using ModernSlavery.Hosts.Webjob.Jobs;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.Infrastructure.Storage.FileRepositories;
-using Microsoft.Extensions.DependencyInjection;
-using System.Net;
 using System.Net.Http;
-using ModernSlavery.Infrastructure.Database.Classes;
 
 namespace ModernSlavery.Hosts.Webjob
 {
@@ -58,6 +54,9 @@ namespace ModernSlavery.Hosts.Webjob
 
             //Register the AutoMapper configurations in all domain assemblies
             services.AddAutoMapper(_sharedOptions.IsDevelopment());
+
+            //Add the custom webjob name resolver
+            services.AddSingleton<INameResolver,WebjobNameResolver>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -87,30 +86,15 @@ namespace ModernSlavery.Hosts.Webjob
 
             // Need to register webJob class in Autofac as well
             builder.RegisterType<Functions>().InstancePerDependency();
+            builder.RegisterType<TestJob1>().InstancePerDependency();
+            builder.RegisterType<TestJob2>().InstancePerDependency();
             builder.RegisterType<DisableWebjobProvider>().SingleInstance();
+
         }
 
 
         public void Configure(ILifetimeScope lifetimeScope)
-        {
-            //Add configuration here
-            var webjobHostBuilder = lifetimeScope.Resolve<IWebJobsBuilder>();
-
-            webjobHostBuilder.AddAzureStorageCoreServices();
-            webjobHostBuilder.AddAzureStorage(
-                queueConfig =>
-                {
-                    queueConfig.BatchSize = 1; //Process queue messages 1 item per time per job function
-                        },
-                blobConfig =>
-                {
-                            //Configure blobs here
-                });
-
-            webjobHostBuilder.AddServiceBus();
-            webjobHostBuilder.AddEventHubs();
-            webjobHostBuilder.AddTimers();
-
+        {  
             var applicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>(); 
             var config = lifetimeScope.Resolve<IConfiguration>();
             var fileRepository = lifetimeScope.Resolve<IFileRepository>();

@@ -16,6 +16,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
+        [Disable(typeof(DisableWebjobProvider))]
         public async Task TakeSnapshotAsync([TimerTrigger(typeof(MidnightSchedule))]
             TimerInfo timer,
             ILogger log)

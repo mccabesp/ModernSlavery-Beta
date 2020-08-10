@@ -13,6 +13,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         [Singleton(Mode = SingletonMode.Listener)] //Ensures execution on only one instance with one listener
+        [Disable(typeof(DisableWebjobProvider))]
         public async Task ExecuteWebjob([QueueTrigger(QueueNames.ExecuteWebJob)]
             string queueMessage,
             ILogger log)

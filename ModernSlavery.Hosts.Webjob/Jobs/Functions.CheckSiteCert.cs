@@ -9,7 +9,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-        public async Task CheckSiteCertAsync([TimerTrigger("01:00:00:00")] TimerInfo timer, ILogger log)
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task CheckSiteCertAsync([TimerTrigger("%CheckSiteCertAsync%")] TimerInfo timer, ILogger log)
         {
             try
             {

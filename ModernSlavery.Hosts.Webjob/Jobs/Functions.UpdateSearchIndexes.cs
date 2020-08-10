@@ -18,7 +18,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         //Update the search indexes
-        public async Task UpdateSearchIndexesAsync([TimerTrigger("00:01:00:00", RunOnStartup = true)]
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task UpdateSearchIndexesAsync([TimerTrigger("%UpdateSearchIndexesAsync%", RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {

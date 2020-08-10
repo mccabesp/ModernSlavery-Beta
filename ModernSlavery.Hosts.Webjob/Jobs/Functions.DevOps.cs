@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
@@ -15,8 +12,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         ///     Once per weekend execute healthchecks on database and file storage and report faults to logs and email to GEO
         ///     admins
         /// </summary>
-        [Disable]
-        public async Task Storage_HealthCheck([TimerTrigger(typeof(OncePerWeekendRandomSchedule))]
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task StorageHealthCheck([TimerTrigger(typeof(OncePerWeekendRandomSchedule))]
             TimerInfo timer,
             ILogger log)
         {
@@ -72,8 +69,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             catch (Exception ex)
             {
-                var message = $"Failed webjob ({nameof(Storage_HealthCheck)}):{ex.Message}:{ex.GetDetailsText()}";
-                log.LogError(ex, $"Failed webjob ({nameof(Storage_HealthCheck)})");
+                var message = $"Failed webjob ({nameof(StorageHealthCheck)}):{ex.Message}:{ex.GetDetailsText()}";
+                log.LogError(ex, $"Failed webjob ({nameof(StorageHealthCheck)})");
 
                 //Send Email to GEO reporting errors
                 await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
