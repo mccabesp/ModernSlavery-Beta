@@ -13,15 +13,17 @@ namespace ModernSlavery.Hosts.Web.Tests
     {
         public static void NavigateTo_SubmissionStarted(UIContext ui, string Organistion, string YearFromTo, string SectionText)
         {
+            ui.Goto("/");
+
             //navigate to org page
-            ui.Click("Mange Organisations");
+            ui.Click("Manage Organisations");
             ui.ExpectHeader("Select an organisation");
 
             //select org
             ui.Click(Organistion);
 
             //select year's report
-            ui.AtRow(YearFromTo).ClickText("Continue");
+            ui.RightOfText(YearFromTo).Click(The.Top, "Continue");
             ui.ExpectHeader("Review before submitting");
 
             //select section
