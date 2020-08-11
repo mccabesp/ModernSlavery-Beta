@@ -690,27 +690,52 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public async Task FixLatestAddressesAsync()
         {
-            foreach (var organisation in _dataRepository.GetAll<Organisation>().Where(o=>o.LatestAddress==null && o.OrganisationAddresses.Any(a=>a.Status== AddressStatuses.Active)))
+            var organisations = _dataRepository.GetAll<Organisation>().Where(o => o.LatestAddress == null && o.OrganisationAddresses.Any(a => a.Status == AddressStatuses.Active)).ToList();
+            organisations.SelectMany(o => o.OrganisationAddresses).ToList();
+
+            Parallel.ForEach(organisations, organisation =>
+            {
                 organisation.FixLatestAddress();
+            });
+            await _dataRepository.SaveChangesAsync();
         }
 
         public async Task FixLatestScopesAsync()
         {
-            foreach (var organisation in _dataRepository.GetAll<Organisation>().Where(o => o.LatestScope == null && o.OrganisationScopes.Any(a => a.Status == ScopeRowStatuses.Active)))
+            var organisations = _dataRepository.GetAll<Organisation>().Where(o => o.LatestScope == null && o.OrganisationScopes.Any(a => a.Status == ScopeRowStatuses.Active)).ToList();
+            organisations.SelectMany(o => o.OrganisationScopes).ToList();
+
+            Parallel.ForEach(organisations, organisation =>
+            {
                 organisation.FixLatestScope();
+            });
+            await _dataRepository.SaveChangesAsync();
         }
 
         public async Task FixLatestStatementsAsync()
         {
-            foreach (var organisation in _dataRepository.GetAll<Organisation>().Where(o => o.LatestStatement== null && o.Statements.Any(a => a.Status == StatementStatuses.Submitted)))
+            var organisations = _dataRepository.GetAll<Organisation>().Where(o => o.LatestStatement == null && o.Statements.Any(a => a.Status == StatementStatuses.Submitted)).ToList();
+            organisations.SelectMany(o => o.Statements).ToList();
+
+            Parallel.ForEach(organisations, organisation =>
+            {
                 organisation.FixLatestStatement();
+            });
+            await _dataRepository.SaveChangesAsync();
         }
 
         public async Task FixLatestRegistrationsAsync()
         {
-            foreach (var organisation in _dataRepository.GetAll<Organisation>().Where(o => o.LatestRegistration == null && o.UserOrganisations.Any(a => a.PINConfirmedDate != null)))
+            var organisations = _dataRepository.GetAll<Organisation>().Where(o => o.LatestRegistration == null && o.UserOrganisations.Any(a => a.PINConfirmedDate != null)).ToList();
+            organisations.SelectMany(o => o.UserOrganisations).ToList();
+
+            Parallel.ForEach(organisations, organisation =>
+            {
                 organisation.FixLatestRegistration();
+            });
+            await _dataRepository.SaveChangesAsync();
         }
         #endregion
+
     }
 }

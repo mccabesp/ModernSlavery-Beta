@@ -2,6 +2,7 @@
 using Autofac.Features.AttributeFilters;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.BusinessDomain.Shared.Classes;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Extensions;
@@ -31,7 +32,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private readonly IPostcodeChecker _PostCodeChecker;
         public readonly ISearchBusinessLogic _searchBusinessLogic;
         private readonly IGovNotifyAPI govNotifyApi;
-        private readonly UpdateFromCompaniesHouseService _updateFromCompaniesHouseService;
+        private readonly CompaniesHouseService _companiesHouseService;
         private readonly IReportingDeadlineHelper _snapshotDateHelper;
         private readonly IAuthorisationBusinessLogic _authorisationBusinessLogic;
         #endregion
@@ -51,7 +52,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             IPostcodeChecker postCodeChecker,
             ISearchBusinessLogic searchBusinessLogic,
             IGovNotifyAPI govNotifyApi,
-            UpdateFromCompaniesHouseService updateFromCompaniesHouseService,
+            CompaniesHouseService companiesHouseService,
             IAuthorisationBusinessLogic authorisationBusinessLogic)
         {
             _storageOptions = storageOptions;
@@ -68,7 +69,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             _OrganisationBusinessLogic = organisationBusinessLogic;
             _PostCodeChecker = postCodeChecker;
             _searchBusinessLogic = searchBusinessLogic;
-            _updateFromCompaniesHouseService = updateFromCompaniesHouseService;
+            _companiesHouseService = companiesHouseService;
             _authorisationBusinessLogic = authorisationBusinessLogic;
             this.govNotifyApi = govNotifyApi;
         }

@@ -10,6 +10,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.CompaniesHouse;
+using ModernSlavery.Core.Options;
 using Newtonsoft.Json;
 using Polly;
 using Polly.Extensions.Http;
@@ -20,20 +21,18 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
     {
         private readonly string _apiKey;
 
-        private readonly CompaniesHouseOptions _options;
+        private readonly CompaniesHouseOptions _companiesHouseOptions;
         private readonly SharedOptions _sharedOptions;
         private readonly HttpClient _httpClient;
 
-        public CompaniesHouseAPI(CompaniesHouseOptions options, SharedOptions sharedOptions, HttpClient httpClient)
+
+        public CompaniesHouseAPI(CompaniesHouseOptions companiesHouseOptions, SharedOptions sharedOptions, HttpClient httpClient)
         {
-            _options = options ?? throw new ArgumentNullException("You must provide the companies house options",nameof(CompaniesHouseOptions));
+            _companiesHouseOptions = companiesHouseOptions ?? throw new ArgumentNullException("You must provide the companies house options",nameof(CompaniesHouseOptions));
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(sharedOptions));
-            _apiKey = _options.ApiKey;
-            MaxRecords = _options.MaxRecords;
+            _apiKey = _companiesHouseOptions.ApiKey;
         }
-
-        public int MaxRecords { get; }
 
         public async Task<PagedResult<EmployerRecord>> SearchEmployersAsync(string searchText, int page, int pageSize,
             bool test = false)
@@ -72,7 +71,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             await page1task;
 
             //Calculate the maximum page size
-            var maxPages = (int) Math.Ceiling((double) MaxRecords / page1task.Result.PageSize);
+            var maxPages = (int) Math.Ceiling((double)_companiesHouseOptions.MaxResponseCompanies / page1task.Result.PageSize);
             maxPages = page1task.Result.PageCount > maxPages ? maxPages : page1task.Result.PageCount;
 
             //Add a task for ll pages from 2 upwards to maxpages

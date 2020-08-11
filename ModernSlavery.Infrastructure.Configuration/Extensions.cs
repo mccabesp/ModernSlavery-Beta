@@ -196,6 +196,12 @@ namespace ModernSlavery.Infrastructure.Configuration
         public static void EnsureJsonFile(this IConfigurationBuilder configBuilder, string path, bool optional, bool reloadOnChange)
         {
             var sources = configBuilder.Sources.OfType<JsonConfigurationSource>().ToList();
+            if (Path.IsPathRooted(path))
+            {
+                var provider = configBuilder.GetFileProvider() as PhysicalFileProvider;
+
+                path = Path.GetRelativePath(provider.Root,path);
+            }
 
             var source = sources.FirstOrDefault(s => s.Path == path);
             if (source == null)
@@ -213,30 +219,53 @@ namespace ModernSlavery.Infrastructure.Configuration
             var configLoaded = configBuilder.Sources.OfType<JsonConfigurationSource>().Any(s => s.Path.EqualsI("appsettings.json"));
             if (configLoaded) throw new Exception("Attempt to load appsettings which are already loaded");
 
-            configBuilder.AddJsonFile("appsettings.json", false, false);
+            configBuilder.EnsureJsonFile("appsettings.json", false, false);
 
-            configBuilder.AddJsonFile($"appsettings.{environment}.json", true, false);
+            configBuilder.EnsureJsonFile($"appsettings.{environment}.json", true, false);
 
             var provider = configBuilder.GetFileProvider() as PhysicalFileProvider;
 
             var directory=new DirectoryInfo(Path.Combine(provider.Root, "App_Settings"));
 
-            foreach (var file in directory.GetFiles("appsettings.json", SearchOption.AllDirectories))
-                configBuilder.AddJsonFile(file.FullName, false, false);
+            //Get all json files in App_Settings folder
+            var allSettings = directory.GetFiles("*.json", SearchOption.AllDirectories);
 
-            foreach (var file in directory.GetFiles($"appsettings.{environment}.json", SearchOption.AllDirectories))
-                configBuilder.AddJsonFile(file.FullName, false, false);
+            //Get all environment.json files in App_Settings folder
+            var environmentSettings = allSettings.Where(f => f.Name.EndsWithI($".{environment}.json"));
+
+            //Get all .secret.json files in App_Settings folder
+            var secretSettings = allSettings.Where(f => f.Name.EndsWithI($".secret.json"));
+
+            //Remove all the environment and secret settings from the top *.json settings
+            allSettings = allSettings.Except(environmentSettings).Except(secretSettings).ToArray();
+
+            
+            //Register all the top *.json
+            foreach (var file in allSettings)
+                configBuilder.EnsureJsonFile(file.FullName, false, false);
+
+            //Register all the top *.environment.json
+            foreach (var file in environmentSettings)
+                configBuilder.EnsureJsonFile(file.FullName, false, false);
 
             if (includeSecrets)
             {
-                configBuilder.AddJsonFile("appsettings.secret.json", true, false);
-                configBuilder.AddJsonFile($"appsettings.{environment}.secret.json", true, false);
+                configBuilder.EnsureJsonFile("appsettings.secret.json", true, false);
+                configBuilder.EnsureJsonFile($"appsettings.{environment}.secret.json", true, false);
 
-                foreach (var file in directory.GetFiles("appsettings.secret.json", SearchOption.AllDirectories))
-                    configBuilder.AddJsonFile(file.FullName, false, false);
+                //Get all environment.secret.json files in App_Settings folder
+                var environmentSecretSettings = secretSettings.Where(f => f.Name.EndsWithI($".{environment}.secret.json"));
 
-                foreach (var file in directory.GetFiles($"appsettings.{environment}.secret.json", SearchOption.AllDirectories))
-                    configBuilder.AddJsonFile(file.FullName, false, false);
+                //Remove all the environment and secret settings from the top *.secret.json settings
+                secretSettings = secretSettings.Except(environmentSecretSettings).ToArray();
+
+                //Register the top *.secret.json settings
+                foreach (var file in secretSettings)
+                    configBuilder.EnsureJsonFile(file.FullName, false, false);
+
+                //Register the top *.secret.json settings
+                foreach (var file in environmentSecretSettings)
+                    configBuilder.EnsureJsonFile(file.FullName, false, false);
             }
         }
 

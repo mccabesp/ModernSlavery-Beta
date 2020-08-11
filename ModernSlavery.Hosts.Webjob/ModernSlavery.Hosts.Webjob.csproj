@@ -71,8 +71,7 @@
     </AdditionalFiles>
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
-    <None Include="App_Settings\Webjobs\AppSettings.json" />
-    <None Include="App_Settings\Webjobs\AppSettings.Development.json" />
+    <None Include="App_Settings\Webjobs.json" />
   </ItemGroup>
 
 </Project>

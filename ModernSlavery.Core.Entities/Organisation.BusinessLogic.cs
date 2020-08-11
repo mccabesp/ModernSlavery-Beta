@@ -167,7 +167,7 @@ namespace ModernSlavery.Core.Entities
             if (newAddress != null && newAddress.Status != AddressStatuses.Active) throw new ArgumentException($"Cannot set latest address with status={newAddress.Status}");
 
             //Get the sorted addresses
-            var addresses = OrganisationAddresses.OrderBy(a => a.Created).ToList();
+            var addresses = OrganisationAddresses.OrderBy(a => a.Created);
             if (newAddress == null) newAddress = addresses.LastOrDefault(a => a.Status == AddressStatuses.Active);
             LatestAddress = newAddress;
         }
