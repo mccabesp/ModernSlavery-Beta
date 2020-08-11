@@ -117,7 +117,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         //Remove any unverified users their addresses, UserOrgs, Org and addresses and archive to zip
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task PurgeOrganisations([TimerTrigger("%PurgeOrganisations%", RunOnStartup = true)]
+        public async Task PurgeOrganisations([TimerTrigger("%PurgeOrganisations%")]
             TimerInfo timer,
             ILogger log)
         {
@@ -258,7 +258,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         //Remove test users and organisations
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task PurgeTestDataAsync([TimerTrigger("%PurgeTestDataAsync%", RunOnStartup = true)]
+        public async Task PurgeTestDataAsync([TimerTrigger("%PurgeTestDataAsync%")]
             TimerInfo timer,
             ILogger log)
         {

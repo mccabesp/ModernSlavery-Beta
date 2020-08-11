@@ -11,7 +11,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task UpdateScopes([TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
+        public async Task UpdateScopes([TimerTrigger(typeof(EveryWorkingHourSchedule))]
             TimerInfo timer,
             ILogger log)
         {

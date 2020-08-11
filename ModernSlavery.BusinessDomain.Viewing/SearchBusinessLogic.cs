@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
@@ -8,30 +9,32 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.BusinessDomain.Viewing
 {
     public class SearchBusinessLogic : ISearchBusinessLogic
     {
+        public SearchOptions SearchOptions { get; }
+        public ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; set; }
+        public ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
+        public IAuditLogger SearchLog { get; }
+
         public SearchBusinessLogic(
+            SearchOptions searchOptions,
             ISearchRepository<EmployerSearchModel> employerSearchRepository,
             ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
             IOrganisationBusinessLogic organisationBusinessLogic,
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog
         )
         {
+            SearchOptions = searchOptions;
             EmployerSearchRepository = employerSearchRepository;
             SicCodeSearchRepository = sicCodeSearchRepository;
             _organisationBusinessLogic = organisationBusinessLogic;
             SearchLog = searchLog;
         }
-
-        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
-        public ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; set; }
-        public ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
-
-        public IAuditLogger SearchLog { get; }
-
 
         //Returns a list of organisaations to include in search indexes
         public IEnumerable<Organisation> LookupSearchableOrganisations(IList<Organisation> organisations)

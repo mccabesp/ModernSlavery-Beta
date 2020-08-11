@@ -1,8 +1,7 @@
 ﻿using ModernSlavery.Core.Attributes;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Options;
 
-namespace ModernSlavery.Infrastructure.Search
+namespace ModernSlavery.Core.Options
 {
     [Options("SearchService")]
     public class SearchOptions : IOptions

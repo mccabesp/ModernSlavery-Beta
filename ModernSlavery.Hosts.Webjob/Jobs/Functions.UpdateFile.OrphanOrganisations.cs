@@ -17,7 +17,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task UpdateOrphanOrganisationsAsync([TimerTrigger(typeof(MidnightSchedule), RunOnStartup = true)]
+        public async Task UpdateOrphanOrganisationsAsync([TimerTrigger(typeof(MidnightSchedule))]
             TimerInfo timer,
             ILogger log)
         {
