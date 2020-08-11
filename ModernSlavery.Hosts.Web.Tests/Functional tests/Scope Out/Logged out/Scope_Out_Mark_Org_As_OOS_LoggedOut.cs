@@ -18,7 +18,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     [TestFixture, Ignore("Awaiting Scope Merge")]
 
-    public class Scope_Out_Mark_Org_As_OOS : UITest
+    public class Scope_Out_Mark_Org_As_OOS_LoggedOut : UITest
     {
         private string EmployerReference;
 
