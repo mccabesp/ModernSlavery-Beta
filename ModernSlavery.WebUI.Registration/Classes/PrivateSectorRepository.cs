@@ -81,7 +81,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
                 try
                 {
                     searchResults =
-                        await _CompaniesHouseAPI.SearchEmployersAsync(searchText, 1, _CompaniesHouseAPI.MaxRecords,
+                        await _CompaniesHouseAPI.SearchEmployersAsync(searchText, 1, _CompaniesHouseAPI.MaxResponseCompanies,
                             test);
                     remoteTotal = searchResults.Results.Count;
                 }
@@ -131,8 +131,8 @@ namespace ModernSlavery.WebUI.Registration.Classes
             }
 
             var result = new PagedResult<EmployerRecord>();
-            result.VirtualRecordTotal = searchResults.ActualRecordTotal > _CompaniesHouseAPI.MaxRecords
-                ? _CompaniesHouseAPI.MaxRecords
+            result.VirtualRecordTotal = searchResults.ActualRecordTotal > _CompaniesHouseAPI.MaxResponseCompanies
+                ? _CompaniesHouseAPI.MaxResponseCompanies
                 : searchResults.ActualRecordTotal;
             result.ActualRecordTotal = searchResults.ActualRecordTotal;
             result.CurrentPage = page;

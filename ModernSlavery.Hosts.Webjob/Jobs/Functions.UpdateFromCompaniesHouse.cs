@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
@@ -12,14 +10,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     {
         [Singleton(Mode = SingletonMode.Listener)]
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task UpdateFromCompaniesHouseAsync([TimerTrigger(typeof(MidnightSchedule))] TimerInfo timer,ILogger log)
+        public async Task UpdateFromCompaniesHouseAsync([TimerTrigger("%UpdateFromCompaniesHouseAsync%")] TimerInfo timer,ILogger log)
         {
             try
             {
                 await UpdateFromCompaniesHouseAsync().ConfigureAwait(false);
 
                 log.LogDebug($"Executed {nameof(UpdateFromCompaniesHouseAsync)} successfully");
-
             }
             catch (Exception ex)
             {
@@ -40,17 +37,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                var lastCheck = VirtualDateTime.Now.AddMinutes(-5);
-
-                var organisations = _SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .Where(org => !org.OptedOutFromCompaniesHouseUpdate && org.CompanyNumber != null && org.CompanyNumber != "" && (org.LastCheckedAgainstCompaniesHouse == null || org.LastCheckedAgainstCompaniesHouse < lastCheck))
-                    .OrderByDescending(org => org.LastCheckedAgainstCompaniesHouse)
-                    .Take(_SharedBusinessLogic.SharedOptions.MaxNumCallsCompaniesHouseApiPerFiveMins);
-
-                foreach (var organisation in organisations)
-                {
-                    await _updateFromCompaniesHouseService.UpdateOrganisationDetailsAsync(organisation).ConfigureAwait(false);
-                }
+                await _companiesHouseService.UpdateOrganisationsAsync();
             }
             finally
             {

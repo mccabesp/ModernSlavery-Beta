@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.BusinessDomain.Shared.Classes;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
@@ -23,13 +23,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
         private readonly ICompaniesHouseAPI companiesHouseApi;
-        private readonly UpdateFromCompaniesHouseService updateFromCompaniesHouseService;
+        private readonly CompaniesHouseService updateFromCompaniesHouseService;
 
         public AdminOrganisationCompaniesHouseOptInOutController(
             IAdminService adminService, 
             AuditLogger auditLogger,
             ICompaniesHouseAPI companiesHouseApi,
-            UpdateFromCompaniesHouseService updateFromCompaniesHouseService)
+            CompaniesHouseService updateFromCompaniesHouseService)
         {
             _adminService = adminService;
             this.auditLogger = auditLogger;
@@ -68,7 +68,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 return View("OptIn", viewModel);
             }
 
-            await updateFromCompaniesHouseService.UpdateOrganisationDetailsAsync(organisation);
+            await updateFromCompaniesHouseService.UpdateOrganisationAsync(organisation);
 
             organisation.OptedOutFromCompaniesHouseUpdate = false;
             _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();

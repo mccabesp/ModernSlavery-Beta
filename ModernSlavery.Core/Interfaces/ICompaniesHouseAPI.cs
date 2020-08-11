@@ -7,8 +7,6 @@ namespace ModernSlavery.Core.Interfaces
 {
     public interface ICompaniesHouseAPI
     {
-        int MaxRecords { get; }
-
         Task<PagedResult<EmployerRecord>> SearchEmployersAsync(string searchText, int page, int pageSize,
             bool test = false);
 

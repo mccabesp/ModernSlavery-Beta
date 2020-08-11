@@ -250,6 +250,26 @@ namespace ModernSlavery.Core.Extensions
             foreach (var item in collection) targetCollection.Add(item);
         }
 
+        public static void RemoveRange<T>(this HashSet<T> targetCollection, params T[] pars)
+        {
+            RemoveRange(targetCollection, pars.AsEnumerable());
+        }
+
+        public static void RemoveRange<T>(this HashSet<T> targetCollection, IEnumerable<T> collection)
+        {
+            foreach (var item in collection) targetCollection.Remove(item);
+        }
+
+        public static void RemoveRange<T>(this SortedSet<T> targetCollection, params T[] pars)
+        {
+            RemoveRange(targetCollection, pars.AsEnumerable());
+        }
+
+        public static void RemoveRange<T>(this SortedSet<T> targetCollection, IEnumerable<T> collection)
+        {
+            foreach (var item in collection) targetCollection.Remove(item);
+        }
+
         public static List<string> RemoveI(this List<string> source, params string[] collection)
         {
             foreach (var item in collection)

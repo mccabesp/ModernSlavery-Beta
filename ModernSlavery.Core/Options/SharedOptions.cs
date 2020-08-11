@@ -111,7 +111,6 @@ namespace ModernSlavery.Core.Models
         public string CertPassword { get; set; }
 
         public bool SkipSpamProtection { get; set; }
-        public int MaxNumCallsCompaniesHouseApiPerFiveMins { get; set; } = 500;
 
         public int[] ReminderEmailDays
         {
