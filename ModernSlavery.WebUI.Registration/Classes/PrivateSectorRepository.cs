@@ -9,6 +9,7 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Registration.Classes
@@ -16,6 +17,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
     public class PrivateSectorRepository : IPagedRepository<EmployerRecord>
     {
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
+        private readonly CompaniesHouseOptions _companiesHouseOptions;
         private readonly IDataRepository _DataRepository;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -27,7 +29,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
             IHttpContextAccessor httpContextAccessor,
             IHttpSession session,
             IDataRepository dataRepository,
-            ICompaniesHouseAPI companiesHouseAPI,
+            ICompaniesHouseAPI companiesHouseAPI, CompaniesHouseOptions companiesHouseOptions,
             IOrganisationBusinessLogic organisationBusinessLogic)
         {
             SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
@@ -35,6 +37,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
             _Session = session;
             _DataRepository = dataRepository;
             _CompaniesHouseAPI = companiesHouseAPI;
+            _companiesHouseOptions = companiesHouseOptions;
             _organisationBusinessLogic = organisationBusinessLogic;
         }
 
@@ -81,7 +84,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
                 try
                 {
                     searchResults =
-                        await _CompaniesHouseAPI.SearchEmployersAsync(searchText, 1, _CompaniesHouseAPI.MaxResponseCompanies,
+                        await _CompaniesHouseAPI.SearchEmployersAsync(searchText, 1, _companiesHouseOptions.MaxResponseCompanies,
                             test);
                     remoteTotal = searchResults.Results.Count;
                 }
@@ -131,8 +134,8 @@ namespace ModernSlavery.WebUI.Registration.Classes
             }
 
             var result = new PagedResult<EmployerRecord>();
-            result.VirtualRecordTotal = searchResults.ActualRecordTotal > _CompaniesHouseAPI.MaxResponseCompanies
-                ? _CompaniesHouseAPI.MaxResponseCompanies
+            result.VirtualRecordTotal = searchResults.ActualRecordTotal > _companiesHouseOptions.MaxResponseCompanies
+                ? _companiesHouseOptions.MaxResponseCompanies
                 : searchResults.ActualRecordTotal;
             result.ActualRecordTotal = searchResults.ActualRecordTotal;
             result.CurrentPage = page;

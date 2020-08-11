@@ -8,8 +8,8 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 using ModernSlavery.Hosts.Webjob.Classes;
-using ModernSlavery.Infrastructure.Search;
 using ModernSlavery.Infrastructure.Storage;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs

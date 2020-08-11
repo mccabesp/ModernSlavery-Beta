@@ -12,7 +12,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     {
         [Disable(typeof(DisableWebjobProvider))]
         public async Task UpdateOrganisationLateSubmissions(
-            [TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
+            [TimerTrigger(typeof(EveryWorkingHourSchedule))]
             TimerInfo timer,
             ILogger log)
         {

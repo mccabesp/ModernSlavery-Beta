@@ -16,7 +16,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     {
         //Update data for viewing service
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task UpdateDownloadFiles([TimerTrigger("%UpdateDownloadFiles%", RunOnStartup = true)]
+        public async Task UpdateDownloadFiles([TimerTrigger("%UpdateDownloadFiles%")]
             TimerInfo timer,
             ILogger log)
         {

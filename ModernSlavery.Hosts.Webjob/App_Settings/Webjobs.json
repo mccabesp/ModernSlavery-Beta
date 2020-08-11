@@ -5,15 +5,14 @@
       "Action": "Disable",
       "Trigger": "01:00:00:00"
     },
-    "CompaniesHouseCheck": { "Action": "Disable" },
-    "ExecuteWebjob": { "Action": "Disable" },
+    "ExecuteWebjob": { "Action": "Enable" },
     "FixLatestAsync": {
       "Action": "Enable",
       "Trigger": "00:01:00:00"
     },
-    "FixOrganisationAddresses": { "Action": "Disable" },
-    "LogEvent": { "Action": "Disable" },
-    "LogRecord": { "Action": "Disable" },
+    "FixOrganisationAddresses": { "Action": "Enable" },
+    "LogEvent": { "Action": "Enable" },
+    "LogRecord": { "Action": "Enable" },
     "MergeLogs": {
       "Action": "Disable",
       "Trigger": "01:00:00:00"
@@ -42,10 +41,10 @@
       "Action": "Enable",
       "Trigger": "01:00:00:00"
     },
-    "SendEmail": { "Action": "Disable" },
-    "SendNotifyEmail": { "Action": "Disable" },
+    "SendEmail": { "Action": "Enable" },
+    "SendNotifyEmail": { "Action": "Enable" },
     "SendReminderEmails": {
-      "Action": "Disable",
+      "Action": "Enable",
       "Trigger": "00:01:00:00"
     },
     "SetIsUkAddressesAsync": {
