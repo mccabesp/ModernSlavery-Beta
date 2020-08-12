@@ -10,6 +10,7 @@ namespace ModernSlavery.Core.Entities
     {
         public Statement()
         {
+            StatementOrganisations = new HashSet<StatementOrganisation>();
             Sectors = new HashSet<StatementSector>();
             Policies = new HashSet<StatementPolicy>();
             Training = new HashSet<StatementTraining>();
@@ -48,6 +49,14 @@ namespace ModernSlavery.Core.Entities
 
         #endregion
 
+        #region OrganisationsPage
+        public short IncludedOrganisationCount { get; set; }
+
+        public short ExcludedOrganisationCount { get; set; }
+
+        public virtual ICollection<StatementOrganisation> StatementOrganisations { get; set; }
+
+        #endregion
         #region Statement Page
 
         public string StatementUrl { get; set; }
@@ -173,9 +182,5 @@ namespace ModernSlavery.Core.Entities
         public byte? MaxStatementYears { get; set; }
 
         #endregion
-
-        public short IncludedOrganisationCount { get; set; }
-
-        public short ExcludedOrganisationCount { get; set; }
     }
 }
