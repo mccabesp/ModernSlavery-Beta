@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (checkResult != null) return checkResult;
 
             var model = new OrganisationViewModel();
-            model.Employers = new PagedResult<EmployerRecord>();
+            model.Employers = new PagedResult<OrganisationRecord>();
             StashModel(model);
             if (VirtualUser.UserOrganisations.Any())
                 model.BackAction = Url.ActionArea("ManageOrganisations", "Submission", "Submission");
@@ -774,7 +774,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     o => o.OrganisationName,
                     o => orgIds.Contains(o.OrganisationId));
 
-            model.ManualEmployers = employers.Select(o => _registrationService.OrganisationBusinessLogic.CreateEmployerRecord(o)).ToList();
+            model.ManualEmployers = employers.Select(o => _registrationService.OrganisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
 
             //Ensure exact match shown at top
             if (model.ManualEmployers != null && model.ManualEmployers.Count > 1)
@@ -960,7 +960,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             //Get the sic codes from companies house
-            EmployerRecord employer = null;
+            OrganisationRecord employer = null;
             if (!model.ManualRegistration) employer = model.GetManualEmployer() ?? model.GetSelectedEmployer();
 
             #region Get the sic codes if there isnt any
@@ -1167,7 +1167,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             var authorised = false;
             var hasAddress = false;
-            EmployerRecord employer = null;
+            OrganisationRecord employer = null;
             if (!model.ManualRegistration)
             {
                 employer = model.GetManualEmployer();
@@ -1262,7 +1262,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             UserOrganisation userOrg = null;
             var authorised = false;
             var hasAddress = false;
-            EmployerRecord employer = null;
+            OrganisationRecord employer = null;
             var now = VirtualDateTime.Now;
             if (!model.ManualRegistration)
             {
@@ -1669,7 +1669,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             #region Update search indexes, log bad SIC codes and send registration request
 
             //Add or remove this organisation to/from the search index
-            if (saved && !_registrationService.SearchBusinessLogic.SearchOptions.Disabled) await _registrationService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
+            if (saved && !_registrationService.SearchBusinessLogic.SearchOptions.Disabled) await _registrationService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(userOrg.Organisation);
 
             //Log the bad sic codes here to ensure organisation identifiers have been created when saved
             if (badSicCodes.Count > 0)

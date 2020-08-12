@@ -9,6 +9,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         ISubmissionBusinessLogic SubmissionBusinessLogic { get; }
         IScopeBusinessLogic ScopeBusinessLogic { get; }
         IDraftFileBusinessLogic DraftFileBusinessLogic { get; }
-        IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
+        IPagedRepository<OrganisationRecord> PrivateSectorRepository { get; }
     }
 }

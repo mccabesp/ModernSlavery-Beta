@@ -4,29 +4,26 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Extensions;
+using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 
 namespace ModernSlavery.WebUI.Viewing.Models
 {
     [Serializable]
-    public class EmployerSearchParameters
+    public class OrganisationSearchParameters
     {
         public string Keywords { get; set; }
 
-        public IEnumerable<char> FilterSicSectionIds { get; set; }
+        public IEnumerable<short> FilterSectorTypeIds { get; set; }
 
-        public IEnumerable<int> FilterEmployerSizes { get; set; }
+        public IEnumerable<byte> FilterTurnoverRanges { get; set; }
 
         public IEnumerable<int> FilterReportedYears { get; set; }
 
         public IEnumerable<int> FilterCodeIds { get; set; }
 
-        public IEnumerable<int> FilterReportingStatus { get; set; }
-
         public int Page { get; set; } = 1;
 
         public string SearchFields { get; set; }
-
-        public SearchTypes SearchType { get; set; }
 
         public SearchModes SearchMode { get; set; }
 
@@ -54,15 +51,15 @@ namespace ModernSlavery.WebUI.Viewing.Models
         {
             var queryFilter = new List<string>();
 
-            if (FilterSicSectionIds != null && FilterSicSectionIds.Any())
+            if (FilterSectorTypeIds != null && FilterSectorTypeIds.Any())
             {
-                var sectorQuery = FilterSicSectionIds.Select(x => $"id eq '{x}'");
+                var sectorQuery = FilterSectorTypeIds.Select(x => $"id eq '{x}'");
                 queryFilter.Add($"SicSectionIds/any(id: {string.Join(" or ", sectorQuery)})");
             }
 
-            if (FilterEmployerSizes != null && FilterEmployerSizes.Any())
+            if (FilterTurnoverRanges != null && FilterTurnoverRanges.Any())
             {
-                var sizeQuery = FilterEmployerSizes.Select(x => $"Size eq {x}");
+                var sizeQuery = FilterTurnoverRanges.Select(x => $"Size eq {x}");
                 queryFilter.Add($"({string.Join(" or ", sizeQuery)})");
             }
 
@@ -78,27 +75,6 @@ namespace ModernSlavery.WebUI.Viewing.Models
                 anyReportedYearParam = "ReportedYear: " +
                                        string.Join(" or ", FilterReportedYears.Select(x => $"ReportedYear eq '{x}'"));
                 queryFilter.Add($"ReportedYears/any({anyReportedYearParam})");
-            }
-
-            if (FilterReportingStatus != null && FilterReportingStatus.Any())
-            {
-                var statusQuery = new List<string>();
-                foreach (var status in FilterReportingStatus)
-                {
-                    var reportStatus = (SearchReportingStatusFilter) status;
-                    if (reportStatus == SearchReportingStatusFilter.ExplanationProvidedByEmployer)
-                        statusQuery.Add($"ReportedExplanationYears/any({anyReportedYearParam})");
-                    else if (reportStatus == SearchReportingStatusFilter.ReportedLate)
-                        statusQuery.Add($"ReportedLateYears/any({anyReportedYearParam})");
-                    else if (reportStatus == SearchReportingStatusFilter.ReportedInTheLast7Days)
-                        statusQuery.Add(
-                            $"LatestReportedDate gt {VirtualDateTime.UtcNow.Date.AddDays(-7).ToString("O")}");
-                    else if (reportStatus == SearchReportingStatusFilter.ReportedInTheLast30Days)
-                        statusQuery.Add(
-                            $"LatestReportedDate gt {VirtualDateTime.UtcNow.Date.AddDays(-30).ToString("O")}");
-                }
-
-                queryFilter.Add($"({string.Join(" or ", statusQuery.ToArray())})");
             }
 
             return string.Join(" and ", queryFilter);

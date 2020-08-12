@@ -123,12 +123,23 @@ namespace ModernSlavery.Core.Entities
         /// </summary>
         /// <param name="accountingDate">Ignore name changes after this date/time - if empty returns the latest name</param>
         /// <returns>The name of the organisation</returns>
-        public OrganisationName GetName(DateTime accountingDate)
+        public OrganisationName GetName(DateTime reportingDeadline)
         {
-            return OrganisationNames.Where(n => n.Created < accountingDate)
+            return OrganisationNames.Where(n => n.Created < reportingDeadline)
                 .OrderByDescending(n => n.Created)
                 .FirstOrDefault();
         }
+
+        /// <summary>
+        /// Returns the prevuous name of the organisation before a specific date
+        /// </summary>
+        /// <returns></returns>
+        public string GetPreviousName(DateTime? reportingDeadline = null)
+        {
+            if (reportingDeadline.HasValue)return OrganisationNames.Where(n => n.Created < reportingDeadline.Value).OrderByDescending(n => n.Created).Skip(1).Select(n => n.Name).FirstOrDefault();
+            return OrganisationNames.OrderByDescending(n => n.Created).Skip(1).Select(n => n.Name).FirstOrDefault();
+        }
+
         public OrganisationName GetLatestName()
         {
             return OrganisationNames

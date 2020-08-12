@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Core.Interfaces
 {
@@ -25,7 +26,6 @@ namespace ModernSlavery.Core.Interfaces
 
         Task<PagedResult<T>> SearchAsync(string searchText,
             int currentPage,
-            SearchTypes searchType,
             int pageSize = 20,
             string searchFields = null,
             string selectFields = null,
@@ -34,5 +34,6 @@ namespace ModernSlavery.Core.Interfaces
             string filter = null,
             string highlights = null,
             SearchModes searchMode = SearchModes.Any);
+        Task<IList<OrganisationSearchModel>> ListKeysAsync(Dictionary<string, List<string>> filterFields);
     }
 }

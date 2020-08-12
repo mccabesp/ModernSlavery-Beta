@@ -102,7 +102,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             var sector = model.SectorType;
             var authorised = false;
-            EmployerRecord employer = null;
+            OrganisationRecord employer = null;
             if (!model.ManualRegistration)
             {
                 employer = model.GetManualEmployer();

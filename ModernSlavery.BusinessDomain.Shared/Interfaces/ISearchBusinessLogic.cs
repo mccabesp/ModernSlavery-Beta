@@ -11,9 +11,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
     {
         SearchOptions SearchOptions { get; }
         IAuditLogger SearchLog { get; }
-        ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; set; }
-        ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
-        IEnumerable<Organisation> LookupSearchableOrganisations(IList<Organisation> organisations);
-        Task UpdateSearchIndexAsync(params Organisation[] organisations);
+        ISearchRepository<OrganisationSearchModel> OrganisationSearchRepository { get; set; }
+        Task UpdateOrganisationSearchIndexAsync();
+        Task UpdateOrganisationSearchIndexAsync(IEnumerable<Organisation> organisations);
+        Task UpdateOrganisationSearchIndexAsync(Organisation organisation);
     }
 }

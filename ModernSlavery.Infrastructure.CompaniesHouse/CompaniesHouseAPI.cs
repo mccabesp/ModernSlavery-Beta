@@ -34,14 +34,14 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             _apiKey = _companiesHouseOptions.ApiKey;
         }
 
-        public async Task<PagedResult<EmployerRecord>> SearchEmployersAsync(string searchText, int page, int pageSize,
+        public async Task<PagedResult<OrganisationRecord>> SearchEmployersAsync(string searchText, int page, int pageSize,
             bool test = false)
         {
             if (searchText.IsNumber()) searchText = searchText.PadLeft(8, '0');
 
-            var employersPage = new PagedResult<EmployerRecord>
+            var employersPage = new PagedResult<OrganisationRecord>
             {
-                PageSize = pageSize, CurrentPage = page, Results = new List<EmployerRecord>()
+                PageSize = pageSize, CurrentPage = page, Results = new List<OrganisationRecord>()
             };
 
             if (test)
@@ -50,7 +50,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                 employersPage.VirtualRecordTotal = 1;
 
                 var id = Numeric.Rand(100000, int.MaxValue - 1);
-                var employer = new EmployerRecord
+                var employer = new OrganisationRecord
                 {
                     OrganisationName = _sharedOptions.TestPrefix + "_Ltd_" + id,
                     CompanyNumber = ("_" + id).Left(10),
@@ -66,7 +66,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             }
 
             //Get the first page of results and the total records, number of pages, and page size
-            var tasks = new List<Task<PagedResult<EmployerRecord>>>();
+            var tasks = new List<Task<PagedResult<OrganisationRecord>>>();
             var page1task = SearchEmployersAsync(searchText, 1, pageSize);
             await page1task;
 
@@ -133,11 +133,11 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             }
         }
 
-        private async Task<PagedResult<EmployerRecord>> SearchEmployersAsync(string searchText, int page, int pageSize)
+        private async Task<PagedResult<OrganisationRecord>> SearchEmployersAsync(string searchText, int page, int pageSize)
         {
-            var employersPage = new PagedResult<EmployerRecord>
+            var employersPage = new PagedResult<OrganisationRecord>
             {
-                PageSize = pageSize, CurrentPage = page, Results = new List<EmployerRecord>()
+                PageSize = pageSize, CurrentPage = page, Results = new List<OrganisationRecord>()
             };
 
             var json = await GetCompaniesAsync(searchText, page, employersPage.PageSize);
@@ -151,7 +151,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                 if (employersPage.ActualRecordTotal > 0)
                     foreach (var company in companies.items)
                     {
-                        var employer = new EmployerRecord();
+                        var employer = new OrganisationRecord();
                         employer.OrganisationName = company.title;
                         employer.NameSource = "CoHo";
                         employer.CompanyNumber = company.company_number;

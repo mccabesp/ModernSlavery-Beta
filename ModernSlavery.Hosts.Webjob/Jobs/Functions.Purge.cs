@@ -166,7 +166,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                     org.DateOfCessation
                                 }),
                             null);
-                        var searchRecord = _OrganisationBusinessLogic.CreateEmployerSearchModel(org, true);
+                        var searchRecord = _OrganisationBusinessLogic.CreateOrganisationSearchModel(org, true);
 
                         await _SharedBusinessLogic.DataRepository.BeginTransactionAsync(
                             async () =>
@@ -194,7 +194,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 }
                             }).ConfigureAwait(false);
                         //Remove this organisation from the search index
-                        await _EmployerSearchRepository.RemoveFromIndexAsync(new[] {searchRecord}).ConfigureAwait(false);
+                        await _OrganisationSearchRepository.RemoveFromIndexAsync(new[] {searchRecord}).ConfigureAwait(false);
 
                         await _ManualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
                         count++;

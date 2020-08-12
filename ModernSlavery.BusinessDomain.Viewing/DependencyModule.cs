@@ -25,7 +25,6 @@ namespace ModernSlavery.BusinessDomain.Viewing
             //Add registrations here
             builder.RegisterType<SearchBusinessLogic>().As<ISearchBusinessLogic>().InstancePerLifetimeScope().WithAttributeFiltering();
             builder.RegisterType<ViewingService>().As<IViewingService>().InstancePerLifetimeScope();
-            builder.RegisterType<CompareBusinessLogic>().As<ICompareBusinessLogic>().InstancePerLifetimeScope();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

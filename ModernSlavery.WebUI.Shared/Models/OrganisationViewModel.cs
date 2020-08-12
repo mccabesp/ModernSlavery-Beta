@@ -204,10 +204,10 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         public int MatchedReferenceCount { get; set; }
 
-        public List<EmployerRecord> ManualEmployers { get; set; }
+        public List<OrganisationRecord> ManualEmployers { get; set; }
         public int ManualEmployerIndex { get; set; }
 
-        public EmployerRecord GetManualEmployer()
+        public OrganisationRecord GetManualEmployer()
         {
             if (ManualEmployerIndex > -1 && ManualEmployers != null && ManualEmployerIndex < ManualEmployers.Count)
                 return ManualEmployers[ManualEmployerIndex];
@@ -241,11 +241,11 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         #region Selected Employer details
 
-        public PagedResult<EmployerRecord> Employers { get; set; }
+        public PagedResult<OrganisationRecord> Employers { get; set; }
 
         public int SelectedEmployerIndex { get; set; }
 
-        public EmployerRecord GetSelectedEmployer()
+        public OrganisationRecord GetSelectedEmployer()
         {
             if (SelectedEmployerIndex > -1
                 && Employers != null

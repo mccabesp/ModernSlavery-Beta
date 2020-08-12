@@ -7,17 +7,23 @@ using ModernSlavery.Core.Models;
 namespace ModernSlavery.Infrastructure.Search
 {
     [Serializable]
-    public class AzureEmployerSearchModel : EmployerSearchModel
+    public class AzureEmployerSearchModel : OrganisationSearchModel
     {
         #region Organisation Properties
 
-        [Key] public override string OrganisationId { get; set; }
+        [Key] public override string SearchDocumentKey { get; set; }
 
         [IsSearchable]
         [Analyzer(AnalyzerName.AsString.EnLucene)]
         [IsFilterable]
         [IsSortable]
         public override string Name { get; set; }
+
+        [IsFilterable]
+        public override long OrganisationId { get; set; }
+
+        [IsFilterable]
+        public override long StatementId { get; set; }
 
         [IsSearchable]
         [Analyzer(AnalyzerName.AsString.EnLucene)]
@@ -34,24 +40,15 @@ namespace ModernSlavery.Infrastructure.Search
         [IsFilterable]
         [IsSortable]
         [IsFacetable]
-        public override int Size { get; set; }
+        public override byte Turnover { get; set; }
 
-        [IsFilterable] [IsFacetable] public override string[] SicSectionIds { get; set; }
+        [IsFilterable] 
+        [IsFacetable] 
+        public override short[] SectorTypeIds { get; set; }
 
-        [IsSearchable]
-        [IsFilterable]
-        [IsFacetable]
-        public override string[] SicCodeIds { get; set; }
-
-        [IsSearchable] public override string[] SicCodeListOfSynonyms { get; set; }
-
-        [IsFilterable] [IsFacetable] public override string[] ReportedYears { get; set; }
-
-        [IsFilterable] [IsFacetable] public override DateTimeOffset LatestReportedDate { get; set; }
-
-        [IsFilterable] [IsFacetable] public override string[] ReportedLateYears { get; set; }
-
-        [IsFilterable] [IsFacetable] public override string[] ReportedExplanationYears { get; set; }
+        [IsFilterable] 
+        [IsFacetable] 
+        public override string StatementDeadlineYear { get; set; }
 
         #endregion
     }

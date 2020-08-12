@@ -41,8 +41,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(d => d.StatementEndDate, opt => opt.MapFrom(s => s.StatementEndDate == DateTime.MinValue ? (DateTime?)null : s.StatementEndDate))
                 .ForMember(d => d.ApprovedDate, opt => opt.MapFrom(s => s.ApprovedDate == DateTime.MinValue ? (DateTime?)null : s.ApprovedDate))
                 .ForMember(d => d.OrganisationName, opt => opt.MapFrom(s => s.Organisation.OrganisationName))
-                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.YearRanges>(s.MinStatementYears, s.MaxStatementYears == null ? 0 : s.MaxStatementYears.Value)))
-                .ForMember(d => d.Turnover, opt => opt.MapFrom(s => Enums.GetEnumFromRange<StatementModel.TurnoverRanges>(s.MinTurnover, s.MaxTurnover == null ? 0 : s.MaxTurnover.Value)))
+                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => StatementModel.GetStatementYears(s)))
+                .ForMember(d => d.Turnover, opt => opt.MapFrom(s => StatementModel.GetTurnover(s)))
                 .ForMember(dest => dest.Modifications, opt => opt.MapFrom(s=>string.IsNullOrWhiteSpace(s.Modifications) ? null : JsonConvert.DeserializeObject<List<AutoMap.Diff>>(s.Modifications)))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.Sectors, opt => opt.MapFrom(st => st.Sectors.Select(s => s.StatementSectorTypeId)))
@@ -276,6 +276,16 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         public YearRanges StatementYears { get; set; }
 
         #endregion
+
+        public static YearRanges GetStatementYears(Statement statement)
+        {
+            return Enums.GetEnumFromRange<YearRanges>(statement.MinStatementYears, statement.MaxStatementYears == null ? 0 : statement.MaxStatementYears.Value);
+        }
+
+        public static TurnoverRanges GetTurnover(Statement statement)
+        {
+            return Enums.GetEnumFromRange<TurnoverRanges>(statement.MinTurnover, statement.MaxTurnover == null ? 0 : statement.MaxTurnover.Value);
+        }
 
         public bool IsEmpty()
         {

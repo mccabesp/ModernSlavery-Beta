@@ -33,15 +33,9 @@ namespace ModernSlavery.Infrastructure.Search
                 .As<ISearchServiceClient>()
                 .SingleInstance();
 
-            builder.RegisterType<AzureEmployerSearchRepository>()
-                .As<ISearchRepository<EmployerSearchModel>>()
+            builder.RegisterType<AzureOrganisationSearchRepository>()
+                .As<ISearchRepository<OrganisationSearchModel>>()
                 .SingleInstance().WithAttributeFiltering();
-
-            builder.RegisterType<AzureSicCodeSearchRepository>()
-                .As<ISearchRepository<SicCodeSearchModel>>()
-                .SingleInstance()
-                .WithParameter("indexName", _options.SicCodeIndexName)
-                .WithParameter("disabled", _options.Disabled).WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

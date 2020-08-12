@@ -24,7 +24,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 changedOrgs.AddRange(await _scopeBusinessLogic.SetPresumedScopesAsync().ConfigureAwait(false));
 
                 //Update the search indexes
-                if (changedOrgs.Count > 0 && !_searchOptions.Disabled) await _searchBusinessLogic.UpdateSearchIndexAsync(changedOrgs.ToArray()).ConfigureAwait(false);
+                if (changedOrgs.Count > 0 && !_searchOptions.Disabled) await _searchBusinessLogic.UpdateOrganisationSearchIndexAsync(changedOrgs.ToArray()).ConfigureAwait(false);
 
                 log.LogDebug($"Executed {nameof(SetPresumedScopes)} successfully");
             }

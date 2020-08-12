@@ -83,7 +83,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         {
                             // get organisation scope and submission per year
                             var returnByYear =
-                                await _SubmissionBusinessLogic.GetLatestSubmissionBySnapshotYearAsync(
+                                await _SubmissionBusinessLogic.GetLatestStatementBySnapshotYearAsync(
                                     model.OrganisationId, year).ConfigureAwait(false);
                             var scopeByYear =
                                 await _scopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(model.OrganisationId, returnByYear.AccountingDate).ConfigureAwait(false);

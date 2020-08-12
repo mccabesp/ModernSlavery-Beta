@@ -34,13 +34,13 @@ namespace ModernSlavery.WebUI.Registration
         {
             //Register public and private repositories
             builder.RegisterType<PublicSectorRepository>()
-                .As<IPagedRepository<EmployerRecord>>()
-                .Keyed<IPagedRepository<EmployerRecord>>("Public")
+                .As<IPagedRepository<OrganisationRecord>>()
+                .Keyed<IPagedRepository<OrganisationRecord>>("Public")
                 .InstancePerLifetimeScope();
 
             builder.RegisterType<PrivateSectorRepository>()
-                .As<IPagedRepository<EmployerRecord>>()
-                .Keyed<IPagedRepository<EmployerRecord>>("Private")
+                .As<IPagedRepository<OrganisationRecord>>()
+                .Keyed<IPagedRepository<OrganisationRecord>>("Private")
                 .InstancePerLifetimeScope();
 
             builder.RegisterType<RegistrationPresenter>()
