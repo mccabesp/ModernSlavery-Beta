@@ -65,10 +65,10 @@ namespace ModernSlavery.Hosts.Web.Tests
             await TestWebHost?.StopAsync();
 
             //Release the webhost resources
-            TestWebHost?.Dispose();
+            //TestWebHost?.Dispose();
 
             //Dispose of the webdriver service
-            WebDriverService?.DisposeService();
+           // WebDriverService?.DisposeService();
 
             //NOTE: these dont seem yet to upload so using DevOps task to publish instead till we can get working
             //Publish all log files on failure
