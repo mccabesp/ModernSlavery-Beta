@@ -15,14 +15,16 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click(Submission.OrgName_InterFloor);
 
-            ExpectHeader(That.Contains, "Manage your organisation's reporting");
 
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            Click("Draft report");
+            Click("Start Draft");
+
 
             ExpectHeader("Before you start");
-            Click("Start Now");
+            Click("Start now");
 
+            ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;
         }
 
@@ -53,7 +55,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //cancel in this route should return to unsaved data screen
             Click("Cancel");
 
-            ExpectHeader("You have unsaved data");
+            ExpectHeader("You have unsaved data, what do you want to do?");
 
             await Task.CompletedTask;
         }
@@ -61,11 +63,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(48)]
         public async Task ExitWithoutSaving()
         {
-            ExpectHeader("What do you want to do?");
+            ExpectHeader("You have unsaved data, what do you want to do?");
 
-            Click("Exit without saving");
+            Click("Exit and lose changes");
 
-            ExpectHeader("Select an organisation");
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             await Task.CompletedTask;
         }
@@ -73,21 +75,16 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(50)]
         public async Task NavigateBackToAreasPage()
         {
-            Click(Submission.OrgName_Blackpool);
-
-            ExpectHeader("Manage your organisations reporting");
-
-            Click("Draft Report");
-
+            Click("Start Draft");
 
             ExpectHeader("Before you start");
             Click("Start now");
 
             ExpectHeader("Your modern slavery statement");
 
-            Click("Save and continue");
-
-            ExpectHeader("Areas covered by your modern slavery statement");
+            Click("Continue"); 
+            
+            ExpectHeader(That.Contains, "Areas covered by your modern slavery statement");
             await Task.CompletedTask;
         }
 

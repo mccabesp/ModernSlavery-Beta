@@ -11,19 +11,20 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(40)]
         public async Task StartSubmission()
         {
-
             ExpectHeader("Select an organisation");
 
             Click(Submission.OrgName_InterFloor);
 
-            ExpectHeader(That.Contains, "Manage your organisation's reporting");
 
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            Click("Draft report");
+            Click("Start Draft");
+
 
             ExpectHeader("Before you start");
-            Click("Start Now");
+            Click("Start now");
 
+            ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;
         }
 
