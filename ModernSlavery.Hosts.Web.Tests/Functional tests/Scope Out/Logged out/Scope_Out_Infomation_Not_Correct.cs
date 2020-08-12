@@ -53,84 +53,18 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Confirm your organisation’s details");
             await Task.CompletedTask;
         }
-
-        [Test, Order(28)]
-        public async Task VerifyOrgDetails()
-        {
-            RightOfText("Name").Expect(Submission.OrgName_InterFloor);
-            RightOfText("Reference").Expect(EmployerReference);
-            //todo await helper implementation for address logic
-            RightOfText("Registered address").Expect("");
-            await Task.CompletedTask;
-        }
-
-        [Test, Order(30)]
-        public async Task ContinueonVerifyDetailsLeadsToTelUsWhy()
-        {
-            Click("Confirm and Continue");
-
-            ExpectHeader("Tell us why your organisation is not required to publish a modern slavery statement");
-
-
-            await Task.CompletedTask;
-        }
-
-        [Test, Order(32)]
-        public async Task SelectingOtherOptionMakesPleaseSpecifyFieldAppear()
-        {
-            ExpectNo("Please specify");
-
-            ClickLabel("Other");
-
-            Expect("Please specify");
-
-            await Task.CompletedTask;
-        }
-
-        [Test, Order(34)]
-        public async Task EnterOtherDetails()
-        {
-            Set("Other").To("Here are the reasons why.");
-
-            await Task.CompletedTask;
-        }
-
-        [Test, Order(36)]
-        public async Task EnterContactDetails()
-        {
-            Set("First name").To(Create_Account.roger_first);
-            Set("Last name").To(Create_Account.roger_last);
-            Set("Job title").To(Create_Account.roger_job_title);
-            Set("Email address").To(Create_Account.roger_email);
-
-            await Task.CompletedTask;
-        }
+               
 
         [Test, Order(38)]
-        public async Task ContinueOnTellUsWhyFormLeadsToCheckYourAnswers()
-        {
-            Click("Continue");
-            ExpectHeader("Check your answers before sending");
-            await Task.CompletedTask;
-        }
-
-        [Test, Order(38)]
-        public async Task CheckDetails()
+        public async Task CheckIncorrectDetailsLink()
         {
             //info not correct, click link
             ExpectLink("modernslaverystatements@homeoffice.gov.uk");
 
-            Click("modernslaverystatements@homeoffice.gov.uk");
-
+            ExpectXPath("//a[@href = 'modernslaverystatements@homeoffice.gov.uk'");
 
             await Task.CompletedTask;
         }
 
-        [Test, Order(38)]
-        public async Task VerifyEmailTemplate()
-        {
-            //todo figure out how this can be tested
-            throw new NotImplementedException();
-        }
     }
 }
