@@ -20,7 +20,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     public class Scope_Out_Mark_Org_As_OOS_LoggedOut : UITest
     {
-        private string EmployerReference;
+       protected string EmployerReference;
 
         [Test, Order(20)]
         public async Task AddOrgToDb()
