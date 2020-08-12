@@ -15,7 +15,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.1")
+                .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -108,10 +108,6 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasColumnName("DifficultyId")
                         .HasColumnType("tinyint");
 
-                    b.Property<byte?>("WhyVisitMSUSite")
-                       .HasColumnName("WhyVisitMSUSiteId")
-                       .HasColumnType("tinyint");
-
                     b.Property<string>("EmailAddress")
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
@@ -119,6 +115,10 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(20)")
                         .HasMaxLength(20);
+
+                    b.Property<byte?>("WhyVisitMSUSite")
+                        .HasColumnName("WhyVisitMSUSiteId")
+                        .HasColumnType("tinyint");
 
                     b.HasKey("FeedbackId");
 
@@ -1609,7 +1609,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasForeignKey("OrganisationId");
 
                     b.HasOne("ModernSlavery.Core.Entities.Statement", "Statement")
-                        .WithMany()
+                        .WithMany("StatementOrganisations")
                         .HasForeignKey("StatementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

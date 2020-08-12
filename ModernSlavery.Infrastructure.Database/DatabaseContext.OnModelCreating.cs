@@ -759,7 +759,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.Statement)
-                        .WithMany()
+                        .WithMany(s=>s.StatementOrganisations)
                         .HasForeignKey(e => e.StatementId);
 
                     entity.HasOne(e => e.Organisation)
