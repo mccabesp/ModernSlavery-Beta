@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
+using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 
 namespace ModernSlavery.WebUI.Viewing.Models
 {
@@ -27,19 +28,16 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
         public List<OptionSelect> SectorOptions { get; set; }
         public List<OptionSelect> ReportingYearOptions { get; set; }
-        public List<OptionSelect> ReportingStatusOptions { get; internal set; }
-        public List<OptionSelect> SizeOptions { get; internal set; }
+        public List<OptionSelect> TurnoverOptions { get; internal set; }
 
         public string search { get; set; }
 
-        public IEnumerable<char> s { get; set; }
-        public IEnumerable<int> es { get; set; }
+        public IEnumerable<short> s { get; set; }
+        public IEnumerable<byte> tr { get; set; }
         public IEnumerable<int> y { get; set; }
-        public IEnumerable<int> st { get; set; }
         public int p { get; set; }
-        public string t { get; set; }
 
-        public PagedResult<EmployerSearchModel> Employers { get; set; }
+        public PagedResult<OrganisationSearchModel> Employers { get; set; }
 
         public int EmployerStartIndex
         {
@@ -89,7 +87,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
         {
             get
             {
-                if (_sizeFilterInfo == null) _sizeFilterInfo = OptionSelect.GetCheckedString(SizeOptions);
+                if (_sizeFilterInfo == null) _sizeFilterInfo = OptionSelect.GetCheckedString(TurnoverOptions);
 
                 return _sizeFilterInfo;
             }
@@ -117,16 +115,16 @@ namespace ModernSlavery.WebUI.Viewing.Models
             }
         }
 
-        public EmployerSearchModel GetEmployer(string employerIdentifier)
-        {
-            //Get the employer from the last search results
-            return Employers?.Results?.FirstOrDefault(e => e.OrganisationIdEncrypted == employerIdentifier);
-        }
+        //public OrganisationSearchModel GetEmployer(string employerIdentifier)
+        //{
+        //    //Get the employer from the last search results
+        //    return Employers?.Results?.FirstOrDefault(e => e.OrganisationIdEncrypted == employerIdentifier);
+        //}
 
         [Serializable]
-        public class SicSection
+        public class SectorTypeViewModel
         {
-            public string SicSectionCode { get; set; }
+            public short SectorTypeId { get; set; }
 
             public string Description { get; set; }
         }

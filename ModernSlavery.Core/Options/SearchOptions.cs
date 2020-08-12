@@ -9,8 +9,7 @@ namespace ModernSlavery.Core.Options
         public string ServiceName { get; set; }
         public string AdminApiKey { get; set; }
         public string QueryApiKey { get; set; }
-        public string EmployerIndexName { get; set; } = nameof(EmployerSearchModel);
-        public string SicCodeIndexName { get; set; } = nameof(SicCodeSearchModel);
+        public string OrganisationIndexName { get; set; } = nameof(OrganisationSearchModel);
         public bool Disabled { get; set; }
         public bool CacheResults { get; set; }
     }

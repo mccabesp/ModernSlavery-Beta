@@ -32,7 +32,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Repo
 
-        public virtual async Task<Return> GetSubmissionByReturnIdAsync(long returnId)
+        public virtual async Task<Return> GetStatementByIdAsync(long returnId)
         {
             return await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Return>(o => o.ReturnId == returnId);
         }
@@ -43,7 +43,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// <param name="organisationId"></param>
         /// <param name="snapshotYear"></param>
         /// <returns></returns>
-        public virtual async Task<Return> GetLatestSubmissionBySnapshotYearAsync(long organisationId, int snapshotYear)
+        public virtual async Task<Return> GetLatestStatementBySnapshotYearAsync(long organisationId, int snapshotYear)
         {
             var orgSubmission = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Return>(
                 s => s.AccountingDate.Year == snapshotYear
@@ -53,7 +53,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             return orgSubmission;
         }
 
-        public IEnumerable<Return> GetAllSubmissionsByOrganisationIdAndSnapshotYear(long organisationId,
+        public IEnumerable<Return> GetAllStatementsByOrganisationIdAndSnapshotYear(long organisationId,
             int snapshotYear)
         {
             return _sharedBusinessLogic.DataRepository.GetAll<Return>().Where(s =>
@@ -65,35 +65,35 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// </summary>
         /// <param name="year"></param>
         /// <returns></returns>
-        public virtual IEnumerable<SubmissionsFileModel> GetSubmissionsFileModelByYear(int year)
+        public virtual IEnumerable<StatementsFileModel> GetStatementsFileModelByYear(int year)
         {
             var scopes = _sharedBusinessLogic.DataRepository.GetAll<OrganisationScope>()
                 .Where(os => os.SubmissionDeadline.Year == year && os.Status == ScopeRowStatuses.Active)
                 .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SubmissionDeadline}).ToList();
 
-            var returns = _sharedBusinessLogic.DataRepository.GetAll<Return>()
-                .Where(r => r.AccountingDate.Year == year && r.Status == StatementStatuses.Submitted).ToList();
+            var statements = _sharedBusinessLogic.DataRepository.GetAll<Statement>()
+                .Where(r => r.SubmissionDeadline.Year == year && r.Status == StatementStatuses.Submitted).ToList();
 
 #if DEBUG
-            if (Debugger.IsAttached) returns = returns.Take(100).ToList();
+            if (Debugger.IsAttached) statements = statements.Take(100).ToList();
 #endif
 
             // perform left join
-            var records = returns.AsQueryable().GroupJoin(
+            var records = statements.AsQueryable().GroupJoin(
                     // join
                     scopes.AsQueryable(),
                     // on
                     // inner
-                    r => new {r.OrganisationId, r.AccountingDate.Year},
+                    r => new {r.OrganisationId, r.SubmissionDeadline.Year},
                     // outer
                     os => new {os.OrganisationId, os.SubmissionDeadline.Year},
                     // into
                     (r, os) => new {r, os = os.FirstOrDefault()})
                 .ToList()
                 .Select(
-                    j => new SubmissionsFileModel
+                    j => new StatementsFileModel
                     {
-                        ReturnId = j.r.ReturnId,
+                        StatementId = j.r.StatementId,
                         OrganisationId = j.r.OrganisationId,
                         OrganisationName = j.r.Organisation.OrganisationName,
                         DUNSNumber = j.r.Organisation.DUNSNumber,
@@ -102,25 +102,11 @@ namespace ModernSlavery.BusinessDomain.Submission
                         SectorType = j.r.Organisation.SectorType,
                         ScopeStatus = j.os?.ScopeStatus,
                         ScopeStatusDate = j.os?.ScopeStatusDate,
-                        AccountingDate = j.r.AccountingDate,
+                        SubmissionDeadline = j.r.SubmissionDeadline,
                         ModifiedDate = j.r.Modified,
-                        DiffMeanBonusPercent = j.r.DiffMeanBonusPercent,
-                        DiffMeanHourlyPayPercent = j.r.DiffMeanHourlyPayPercent,
-                        DiffMedianBonusPercent = j.r.DiffMedianBonusPercent,
-                        DiffMedianHourlyPercent = j.r.DiffMedianHourlyPercent,
-                        FemaleLowerPayBand = j.r.FemaleLowerPayBand,
-                        FemaleMedianBonusPayPercent = j.r.FemaleMedianBonusPayPercent,
-                        FemaleMiddlePayBand = j.r.FemaleMiddlePayBand,
-                        FemaleUpperPayBand = j.r.FemaleUpperPayBand,
-                        FemaleUpperQuartilePayBand = j.r.FemaleUpperQuartilePayBand,
-                        MaleLowerPayBand = j.r.MaleLowerPayBand,
-                        MaleMedianBonusPayPercent = j.r.MaleMedianBonusPayPercent,
-                        MaleMiddlePayBand = j.r.MaleMiddlePayBand,
-                        MaleUpperPayBand = j.r.MaleUpperPayBand,
-                        MaleUpperQuartilePayBand = j.r.MaleUpperQuartilePayBand,
-                        CompanyLink = j.r.CompanyLinkToGPGInfo,
-                        ResponsiblePerson = j.r.ResponsiblePerson,
-                        OrganisationSize = j.r.OrganisationSize.GetAttribute<DisplayAttribute>().Name,
+                        StatementUrl = j.r.StatementUrl,
+                        ApprovingPerson = j.r.ApprovingPerson,
+                        Turnover = StatementsFileModel.GetTurnover(j.r).ToString(),
                         Modifications = j.r.Modifications,
                         EHRCResponse = j.r.EHRCResponse
                     });
@@ -219,60 +205,60 @@ namespace ModernSlavery.BusinessDomain.Submission
                     });
         }
 
-        public ReturnViewModel ConvertSubmissionReportToReturnViewModel(Return reportToConvert)
+        public ReturnViewModel ConvertStatementToReturnViewModel(Statement statement)
         {
             var model = new ReturnViewModel
             {
-                SectorType = reportToConvert.Organisation.SectorType,
-                ReturnId = reportToConvert.ReturnId,
-                OrganisationId = reportToConvert.OrganisationId,
-                DiffMeanBonusPercent = reportToConvert.DiffMeanBonusPercent,
-                DiffMeanHourlyPayPercent = reportToConvert.DiffMeanHourlyPayPercent,
-                DiffMedianBonusPercent = reportToConvert.DiffMedianBonusPercent,
-                DiffMedianHourlyPercent = reportToConvert.DiffMedianHourlyPercent,
-                FemaleLowerPayBand = reportToConvert.FemaleLowerPayBand,
-                FemaleMedianBonusPayPercent = reportToConvert.FemaleMedianBonusPayPercent,
-                FemaleMiddlePayBand = reportToConvert.FemaleMiddlePayBand,
-                FemaleUpperPayBand = reportToConvert.FemaleUpperPayBand,
-                FemaleUpperQuartilePayBand = reportToConvert.FemaleUpperQuartilePayBand,
-                MaleLowerPayBand = reportToConvert.MaleLowerPayBand,
-                MaleMedianBonusPayPercent = reportToConvert.MaleMedianBonusPayPercent,
-                MaleMiddlePayBand = reportToConvert.MaleMiddlePayBand,
-                MaleUpperPayBand = reportToConvert.MaleUpperPayBand,
-                MaleUpperQuartilePayBand = reportToConvert.MaleUpperQuartilePayBand,
-                JobTitle = reportToConvert.JobTitle,
-                FirstName = reportToConvert.FirstName,
-                LastName = reportToConvert.LastName,
-                CompanyLinkToGPGInfo = reportToConvert.CompanyLinkToGPGInfo,
-                AccountingDate = reportToConvert.AccountingDate,
-                Address = reportToConvert.Organisation.GetAddressString(reportToConvert.StatusDate),
-                LatestAddress = reportToConvert.Organisation.LatestAddress?.GetAddressString(),
-                EHRCResponse = reportToConvert.EHRCResponse.ToString(),
-                IsVoluntarySubmission = reportToConvert.IsVoluntarySubmission(),
-                IsLateSubmission = reportToConvert.IsLateSubmission
+                SectorType = statement.Organisation.SectorType,
+                ReturnId = statement.StatementId,
+                OrganisationId = statement.OrganisationId,
+                DiffMeanBonusPercent = statement.DiffMeanBonusPercent,
+                DiffMeanHourlyPayPercent = statement.DiffMeanHourlyPayPercent,
+                DiffMedianBonusPercent = statement.DiffMedianBonusPercent,
+                DiffMedianHourlyPercent = statement.DiffMedianHourlyPercent,
+                FemaleLowerPayBand = statement.FemaleLowerPayBand,
+                FemaleMedianBonusPayPercent = statement.FemaleMedianBonusPayPercent,
+                FemaleMiddlePayBand = statement.FemaleMiddlePayBand,
+                FemaleUpperPayBand = statement.FemaleUpperPayBand,
+                FemaleUpperQuartilePayBand = statement.FemaleUpperQuartilePayBand,
+                MaleLowerPayBand = statement.MaleLowerPayBand,
+                MaleMedianBonusPayPercent = statement.MaleMedianBonusPayPercent,
+                MaleMiddlePayBand = statement.MaleMiddlePayBand,
+                MaleUpperPayBand = statement.MaleUpperPayBand,
+                MaleUpperQuartilePayBand = statement.MaleUpperQuartilePayBand,
+                JobTitle = statement.JobTitle,
+                FirstName = statement.FirstName,
+                LastName = statement.LastName,
+                CompanyLinkToGPGInfo = statement.CompanyLinkToGPGInfo,
+                AccountingDate = statement.AccountingDate,
+                Address = statement.Organisation.GetAddressString(statement.StatusDate),
+                LatestAddress = statement.Organisation.LatestAddress?.GetAddressString(),
+                EHRCResponse = statement.EHRCResponse.ToString(),
+                IsVoluntarySubmission = statement.IsVoluntarySubmission(),
+                IsLateSubmission = statement.IsLateSubmission
             };
 
             if (model.Address.EqualsI(model.LatestAddress)) model.LatestAddress = null;
 
-            model.OrganisationName = reportToConvert.Organisation.GetName(reportToConvert.StatusDate)?.Name
-                                     ?? reportToConvert.Organisation.OrganisationName;
-            model.LatestOrganisationName = reportToConvert.Organisation.OrganisationName;
+            model.OrganisationName = statement.Organisation.GetName(statement.StatusDate)?.Name
+                                     ?? statement.Organisation.OrganisationName;
+            model.LatestOrganisationName = statement.Organisation.OrganisationName;
 
-            model.Sector = reportToConvert.Organisation.GetSicSectorsString(reportToConvert.StatusDate);
-            model.LatestSector = reportToConvert.Organisation.GetLatestSicSectorsString();
+            model.Sector = statement.Organisation.GetSicSectorsString(statement.StatusDate);
+            model.LatestSector = statement.Organisation.GetLatestSicSectorsString();
 
-            model.OrganisationSize = reportToConvert.OrganisationSize;
-            model.Modified = reportToConvert.Modified;
+            model.TurnoverRange = statement.Turnover;
+            model.Modified = statement.Modified;
 
             model.IsInScopeForThisReportYear =
-                reportToConvert.Organisation.GetIsInscope(reportToConvert.AccountingDate);
+                statement.Organisation.GetIsInscope(statement.AccountingDate);
 
             return model;
         }
 
         public CustomResult<Return> GetSubmissionByOrganisationAndYear(Organisation organisation, int year)
         {
-            var reports = GetAllSubmissionsByOrganisationIdAndSnapshotYear(organisation.OrganisationId, year);
+            var reports = GetAllStatementsByOrganisationIdAndSnapshotYear(organisation.OrganisationId, year);
 
             if (!reports.Any())
                 return new CustomResult<Return>(

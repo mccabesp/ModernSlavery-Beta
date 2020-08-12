@@ -24,8 +24,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private readonly IAuditLogger _ManualChangeLog;
         private readonly IMessenger _Messenger;
         private readonly ISharedBusinessLogic _SharedBusinessLogic;
-        private readonly ISearchRepository<EmployerSearchModel> _EmployerSearchRepository;
-        private readonly ISearchRepository<SicCodeSearchModel> _SicCodeSearchRepository;
+        private readonly ISearchRepository<OrganisationSearchModel> _OrganisationSearchRepository;
         private readonly IScopeBusinessLogic _scopeBusinessLogic;
         private readonly ISubmissionBusinessLogic _SubmissionBusinessLogic;
         private readonly IOrganisationBusinessLogic _OrganisationBusinessLogic;
@@ -44,8 +43,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             [KeyFilter(Filenames.ManualChangeLog)] IAuditLogger manualChangeLog,
             IMessenger messenger,
             ISharedBusinessLogic sharedBusinessLogic,
-            ISearchRepository<EmployerSearchModel> employerSearchRepository,
-            ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
+            ISearchRepository<OrganisationSearchModel> organisationSearchRepository,
             IScopeBusinessLogic scopeBusinessLogic,
             ISubmissionBusinessLogic submissionBusinessLogic,
             IOrganisationBusinessLogic organisationBusinessLogic,
@@ -62,8 +60,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             _ManualChangeLog = manualChangeLog;
             _Messenger = messenger;
             _SharedBusinessLogic = sharedBusinessLogic;
-            _EmployerSearchRepository = employerSearchRepository;
-            _SicCodeSearchRepository = sicCodeSearchRepository;
+            _OrganisationSearchRepository = organisationSearchRepository;
             _scopeBusinessLogic = scopeBusinessLogic;
             _SubmissionBusinessLogic = submissionBusinessLogic;
             _OrganisationBusinessLogic = organisationBusinessLogic;

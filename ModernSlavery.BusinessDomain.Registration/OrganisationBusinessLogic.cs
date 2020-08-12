@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Management.WebSites.Models;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
@@ -100,7 +101,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                     SecurityCodeCreatedDateTime = o.SecurityCodeCreatedDateTime
                 };
 
-                var latestReturn =await _submissionLogic.GetLatestSubmissionBySnapshotYearAsync(o.OrganisationId, year);
+                var latestReturn =await _submissionLogic.GetLatestStatementBySnapshotYearAsync(o.OrganisationId, year);
                 var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(o.SectorType, year);
                 var latestScope = await _scopeLogic.GetScopeByReportingDeadlineOrLatestAsync(o.OrganisationId, reportingDeadline);
 
@@ -198,7 +199,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         {
             var decryptedReturnId = _obfuscator.DeObfuscate(encryptedReturnId);
 
-            var result = await _submissionLogic.GetSubmissionByReturnIdAsync(decryptedReturnId.ToInt64());
+            var result = await _submissionLogic.GetStatementByIdAsync(decryptedReturnId.ToInt64());
 
             if (result == null)
                 return new CustomResult<Organisation>(
@@ -318,7 +319,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 yield return  organisation.GetStatement(reportingDeadline) ?? defaultStatement;
             }
         }
-        public EmployerRecord CreateEmployerRecord(Organisation org, long userId = 0)
+        public OrganisationRecord CreateOrganisationRecord(Organisation org, long userId = 0)
         {
             OrganisationAddress address = null;
             if (userId > 0) address = org.UserOrganisations.FirstOrDefault(uo => uo.UserId == userId)?.Address;
@@ -326,7 +327,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             if (address == null) address = org.LatestAddress;
 
             if (address == null)
-                return new EmployerRecord
+                return new OrganisationRecord
                 {
                     OrganisationId = org.OrganisationId,
                     SectorType = org.SectorType,
@@ -346,7 +347,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                         StringComparer.OrdinalIgnoreCase)
                 };
 
-            return new EmployerRecord
+            return new OrganisationRecord
             {
                 OrganisationId = org.OrganisationId,
                 SectorType = org.SectorType,
@@ -377,93 +378,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                     StringComparer.OrdinalIgnoreCase)
             };
         }
-        public EmployerSearchModel CreateEmployerSearchModel(Organisation organisation, bool keyOnly = false,
-            List<SicCodeSearchModel> listOfSicCodeSearchModels = null)
-        {
-            if (keyOnly) return new EmployerSearchModel { OrganisationId = organisation.OrganisationId.ToString() };
-
-
-            // Get the last two names for the org. Most recent name first
-            var names = organisation.OrganisationNames.Select(n => n.Name).Reverse().Take(2).ToArray();
-
-            var abbreviations = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
-            names.ForEach(n => abbreviations.Add(n.ToAbbr()));
-            names.ForEach(n => abbreviations.Add(n.ToAbbr(".")));
-            var excludes = new[]
-                {"Ltd", "Limited", "PLC", "Corporation", "Incorporated", "LLP", "The", "And", "&", "For", "Of", "To"};
-            names.ForEach(n => abbreviations.Add(n.ToAbbr(excludeWords: excludes)));
-            names.ForEach(n => abbreviations.Add(n.ToAbbr(".", excludeWords: excludes)));
-
-            abbreviations.RemoveWhere(a => string.IsNullOrWhiteSpace(a));
-            abbreviations.Remove(organisation.OrganisationName);
-
-            // extract the prev org name (if exists)
-            var prevOrganisationName = "";
-            if (names.Length > 1)
-            {
-                prevOrganisationName = names[names.Length - 1];
-                abbreviations.Remove(prevOrganisationName);
-            }
-
-            //Get the latest sic codes
-            var sicCodes = GetOrganisationSicCodes(organisation);
-
-            var submittedStatements = organisation.GetSubmittedStatements().ToArray();
-
-            var result = new EmployerSearchModel
-            {
-                OrganisationId = organisation.OrganisationId.ToString(),
-                OrganisationIdEncrypted = _obfuscator.Obfuscate(organisation.OrganisationId),
-                Name = organisation.OrganisationName,
-                PreviousName = prevOrganisationName,
-                PartialNameForSuffixSearches = organisation.OrganisationName,
-                PartialNameForCompleteTokenSearches = organisation.OrganisationName,
-                Abbreviations = abbreviations.ToArray(),
-                Size = 0,
-                SicSectionIds = sicCodes.Select(sic => sic.SicCode.SicSectionId.ToString()).Distinct().ToArray(),
-                SicSectionNames = sicCodes.Select(sic => sic.SicCode.SicSection.Description).Distinct().ToArray(),
-                SicCodeIds = sicCodes.Select(sicCode => sicCode.SicCodeId.ToString()).Distinct().ToArray(),
-                Address = organisation.LatestAddress?.GetAddressString(),
-                LatestReportedDate = submittedStatements.Select(x => x.Created).FirstOrDefault(),
-                ReportedYears = submittedStatements.Select(x => x.SubmissionDeadline.Year.ToString()).ToArray(),
-                ReportedLateYears =
-                    submittedStatements.Where(x => x.IsLateSubmission()).Select(x => x.SubmissionDeadline.Year.ToString())
-                        .ToArray(),
-                ReportedExplanationYears = submittedStatements
-                    .Where(x => string.IsNullOrEmpty(x.StatementUrl) == false)
-                    .Select(x => x.SubmissionDeadline.Year.ToString())
-                    .ToArray()
-            };
-
-            if (listOfSicCodeSearchModels != null)
-                result.SicCodeListOfSynonyms = GetListOfSynonyms(result.SicCodeIds, listOfSicCodeSearchModels);
-
-            return result;
-        }
-
-        private string[] GetListOfSynonyms(string[] resultSicCodeIds,
-            List<SicCodeSearchModel> listOfSicCodeSearchModels)
-        {
-            var result = new List<string>();
-
-            foreach (var resultSicCodeId in resultSicCodeIds)
-            {
-                var sicCodeSearchModel = listOfSicCodeSearchModels.FirstOrDefault(x => x.SicCodeId == resultSicCodeId);
-
-                if (sicCodeSearchModel == null) continue;
-
-                result.Add(sicCodeSearchModel.SicCodeDescription);
-
-                if (sicCodeSearchModel.SicCodeListOfSynonyms != null &&
-                    sicCodeSearchModel.SicCodeListOfSynonyms.Length > 0)
-                    result.AddRange(sicCodeSearchModel.SicCodeListOfSynonyms);
-            }
-
-            return result.Any()
-                ? result.ToArray()
-                : null;
-        }
-
+       
         public bool GetOrganisationIsOrphan(Organisation organisation)
         {
             return organisation.Status == OrganisationStatuses.Active

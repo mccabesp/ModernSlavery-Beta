@@ -23,18 +23,18 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 {
     public partial class AdminController
     {
-        private async Task<long> UpdateSearchIndexesAsync(string parameters, string comment, StringWriter writer,
+        private async Task<long> UpdateOrganisationSearchIndexesAsync(string parameters, string comment, StringWriter writer,
             bool test)
         {
             if (!string.IsNullOrWhiteSpace(parameters)) throw new ArgumentException("ERROR: parameters must be empty");
 
-            var count = await _adminService.EmployerSearchRepository.GetDocumentCountAsync();
+            var count = await _adminService.OrganisationSearchRepository.GetDocumentCountAsync();
             if (!test)
             {
                 await _adminService.ExecuteWebjobQueue.AddMessageAsync(
-                    new QueueWrapper($"command=UpdateSearch&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
+                    new QueueWrapper($"command=UpdateOrganisationSearch&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
                 writer.WriteLine(
-                    $"An email will be sent to '{CurrentUser.EmailAddress}' when the background task '{nameof(UpdateSearchIndexesAsync)}' has completed");
+                    $"An email will be sent to '{CurrentUser.EmailAddress}' when the background task '{nameof(UpdateOrganisationSearchIndexesAsync)}' has completed");
             }
 
             return count;
@@ -45,7 +45,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             if (!string.IsNullOrWhiteSpace(parameters)) throw new ArgumentException("ERROR: parameters must be empty");
 
-            var count = await _adminService.EmployerSearchRepository.GetDocumentCountAsync();
+            var count = await _adminService.OrganisationSearchRepository.GetDocumentCountAsync();
             if (!test)
             {
                 await _adminService.ExecuteWebjobQueue.AddMessageAsync(
@@ -180,7 +180,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 ScopeStatuses.InScope, test);
                             break;
                         case "Update search indexes":
-                            count = await UpdateSearchIndexesAsync(model.Parameters, model.Comment, writer, test);
+                            count = await UpdateOrganisationSearchIndexesAsync(model.Parameters, model.Comment, writer, test);
                             break;
                         case "Update GPG download data files":
                             count = await UpdateDownloadFilesAsync(model.Parameters, model.Comment, writer, test);
@@ -486,7 +486,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 //todo: writer.WriteLine(Color.Green, $"INFO: Changes saved to database, attempting to update search index.");
 
-                await _adminService.SearchBusinessLogic.UpdateSearchIndexAsync(listOfModifiedOrgs.ToArray());
+                await _adminService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(listOfModifiedOrgs.ToArray());
                 //todo: writer.WriteLine(Color.Green, $"INFO: Search index updated successfully.");
             }
 
@@ -1469,7 +1469,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     await _adminService.ManualChangeLog.WriteAsync(manualChangeLogModel);
                     await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-                    await _adminService.SearchBusinessLogic.UpdateSearchIndexAsync(org);
+                    await _adminService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(org);
                 }
 
                 count++;
@@ -1550,7 +1550,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
                         //Add or remove this organisation to/from the search index
-                        await _adminService.SearchBusinessLogic.UpdateSearchIndexAsync(org);
+                        await _adminService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(org);
                     }
                 }
 

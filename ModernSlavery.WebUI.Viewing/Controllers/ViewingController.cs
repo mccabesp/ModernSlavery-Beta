@@ -21,6 +21,7 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Viewing.Models;
 using ModernSlavery.WebUI.Viewing.Presenters;
 
@@ -103,7 +104,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         public async Task<IActionResult> SearchResults([FromQuery] SearchResultsQuery searchQuery)
         {
             //Ensure search service is enabled
-            if (ViewingService.SearchBusinessLogic.EmployerSearchRepository.Disabled)
+            if (ViewingService.SearchBusinessLogic.OrganisationSearchRepository.Disabled)
                 return View("CustomError",
                     WebService.ErrorViewModelFactory.Create(1151, new {featureName = "Search Service"}));
 
@@ -121,7 +122,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             if (!searchQuery.TryValidateSearchParams(out var result)) return result;
 
             // generate result view model
-            var searchParams = AutoMapper.Map<EmployerSearchParameters>(searchQuery);
+            var searchParams = AutoMapper.Map<OrganisationSearchParameters>(searchQuery);
             var model = await ViewingPresenter.SearchAsync(searchParams);
 
             ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
@@ -148,7 +149,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             if (!searchQuery.TryValidateSearchParams(out var result)) return result;
 
             // generate result view model
-            var searchParams = AutoMapper.Map<EmployerSearchParameters>(searchQuery);
+            var searchParams = AutoMapper.Map<OrganisationSearchParameters>(searchQuery);
             var model = await ViewingPresenter.SearchAsync(searchParams);
 
             ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
@@ -165,19 +166,6 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
                     {ErrorCode = HttpStatusCode.BadRequest, ErrorMessage = "Cannot search for a null or empty value"});
 
             var matches = await ViewingPresenter.SuggestEmployerNameAsync(search.Trim());
-
-            return Json(new {Matches = matches});
-        }
-
-        [ResponseCache(CacheProfileName = "SuggestSicCodeJs")]
-        [HttpGet("suggest-sic-code-js")]
-        public async Task<JsonResult> SuggestSicCodeJsAsync(string search)
-        {
-            if (string.IsNullOrEmpty(search))
-                return Json(new
-                    {ErrorCode = HttpStatusCode.BadRequest, ErrorMessage = "Cannot search for a null or empty value"});
-
-            var matches = await ViewingPresenter.GetListOfSicCodeSuggestionsAsync(search.Trim());
 
             return Json(new {Matches = matches});
         }
@@ -306,7 +294,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
         #region Reports
         [HttpGet("~/Employer/{employerIdentifier}/{year}")]
-        public IActionResult Report(string employerIdentifier, int year)
+        public async Task<IActionResult> Report(string employerIdentifier, int year)
         {
             if (string.IsNullOrWhiteSpace(employerIdentifier))
                 return new HttpBadRequestResult("Missing employer identifier");
@@ -338,7 +326,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
             #region Load latest submission
 
-            ReturnViewModel model;
+            StatementModel model;
 
             try
             {
@@ -348,8 +336,15 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
                 if (getLatestSubmissionLoadingOutcome.Failed)
                     return getLatestSubmissionLoadingOutcome.ErrorMessage.ToHttpStatusViewResult();
 
-                model = ViewingService.SubmissionBusinessLogic.ConvertSubmissionReportToReturnViewModel(
-                    getLatestSubmissionLoadingOutcome.Result);
+                var reportingDeadline = SharedBusinessLogic.GetReportingDeadline(foundOrganisation.SectorType, year);
+                var outcome = await ViewingService.StatementBusinessLogic.GetLatestSubmittedStatementModelAsync(foundOrganisation.OrganisationId, reportingDeadline);
+
+                if (outcome.Fail)
+                {
+                    //TODO: 
+                    throw new NotImplementedException();
+                }
+                model = outcome.Result;
             }
             catch (Exception ex)
             {
@@ -372,7 +367,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             if (!searchQuery.TryValidateSearchParams(out var result)) return result;
 
             // generate compare list
-            var searchParams = AutoMapper.Map<EmployerSearchParameters>(searchQuery);
+            var searchParams = AutoMapper.Map<OrganisationSearchParameters>(searchQuery);
 
             // set maximum search size
             searchParams.Page = 1;
@@ -381,9 +376,9 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
             // add any new items to the compare list
             var resultIds = searchResultsModel.Employers.Results
-                .Where(employer => ComparePresenter.BasketContains(employer.OrganisationIdEncrypted) == false)
+                .Where(employer => ComparePresenter.BasketContains(ViewingPresenter.Obfuscator.Obfuscate(employer.OrganisationId)) == false)
                 .Take(ComparePresenter.MaxCompareBasketCount - ComparePresenter.BasketItemCount)
-                .Select(employer => employer.OrganisationIdEncrypted)
+                .Select(employer => ViewingPresenter.Obfuscator.Obfuscate(employer.OrganisationId))
                 .ToArray();
 
             ComparePresenter.AddRangeToBasket(resultIds);

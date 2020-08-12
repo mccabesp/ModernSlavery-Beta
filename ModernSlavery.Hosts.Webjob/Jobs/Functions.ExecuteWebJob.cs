@@ -34,8 +34,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 case "UpdateFile":
                     await UpdateFileAsync(log, parameters["filePath"], parameters["action"]).ConfigureAwait(false);
                     break;
-                case "UpdateSearch":
-                    await UpdateSearchAsync(log, parameters["userEmail"], true).ConfigureAwait(false);
+                case "UpdateOrganisationSearch":
+                    await UpdateOrganisationSearchAsync(log, parameters["userEmail"], true).ConfigureAwait(false);
                     break;
                 case "UpdateDownloadFiles":
                     await UpdateDownloadFilesAsync(log, parameters["userEmail"], true).ConfigureAwait(false);

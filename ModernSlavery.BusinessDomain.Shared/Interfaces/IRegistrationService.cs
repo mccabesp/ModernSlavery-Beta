@@ -16,7 +16,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         IScopeBusinessLogic ScopeBusinessLogic { get; }
         ISearchBusinessLogic SearchBusinessLogic { get; }
         IUserRepository UserRepository { get; }
-        IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
-        IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
+        IPagedRepository<OrganisationRecord> PrivateSectorRepository { get; }
+        IPagedRepository<OrganisationRecord> PublicSectorRepository { get; }
     }
 }

@@ -264,7 +264,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var orgs =
                     await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                         .Where(o => orgIds.Contains(o.OrganisationId)).ToListAsync();
-                model.ManualEmployers = orgs.Select(o => _adminService.OrganisationBusinessLogic.CreateEmployerRecord(o)).ToList();
+                model.ManualEmployers = orgs.Select(o => _adminService.OrganisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
             }
 
             //Ensure exact match shown at top
@@ -556,7 +556,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 await _adminService.OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(userOrg.Organisation);
 
             //Add or remove this organisation to/from the search index
-            await _adminService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
+            await _adminService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(userOrg.Organisation);
 
             //Save the model for the redirect
             StashModel(model);
@@ -666,7 +666,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 SharedBusinessLogic.DataRepository.Delete(userOrg.Organisation);
             }
 
-            var searchRecord = _adminService.OrganisationBusinessLogic.CreateEmployerSearchModel(userOrg.Organisation, true);
+            var searchRecord = _adminService.OrganisationBusinessLogic.CreateOrganisationSearchModel(userOrg.Organisation, true);
             SharedBusinessLogic.DataRepository.Delete(userOrg);
 
             //Send the declined email to the applicant
@@ -685,7 +685,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Remove this organisation from the search index
-            await _adminService.SearchBusinessLogic.EmployerSearchRepository.RemoveFromIndexAsync(new[] {searchRecord});
+            await _adminService.SearchBusinessLogic.OrganisationSearchRepository.RemoveFromIndexAsync(new[] {searchRecord});
 
             //Save the model for the redirect
             StashModel(model);

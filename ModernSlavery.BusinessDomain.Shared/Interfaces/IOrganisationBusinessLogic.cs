@@ -57,10 +57,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         Organisation GetOrganisationById(long organisationId);
         IEnumerable<Statement> GetOrganisationRecentStatements(Organisation organisation,int recentCount);
 
-        EmployerSearchModel CreateEmployerSearchModel(Organisation organisation, bool keyOnly = false,
-            List<SicCodeSearchModel> listOfSicCodeSearchModels = null);
-
-        EmployerRecord CreateEmployerRecord(Organisation org, long userId = 0);
+        OrganisationRecord CreateOrganisationRecord(Organisation org, long userId = 0);
 
         bool GetOrganisationIsOrphan(Organisation organisation);
 

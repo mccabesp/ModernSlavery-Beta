@@ -19,7 +19,7 @@ namespace ModernSlavery.Core.Entities
         }
 
         [NotMapped]
-        public OrganisationSizes OrganisationSize
+        public TurnoverRanges TurnoverRange
         {
             get
             {
