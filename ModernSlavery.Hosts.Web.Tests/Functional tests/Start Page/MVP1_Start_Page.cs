@@ -43,7 +43,6 @@ namespace ModernSlavery.Hosts.Web.Tests
             () => { Expect("are legally required to publish an annual modern slavery statement in the UK"); },
             () => { Expect("answer some questions about your statement"); },
             () => { Expect("have chosen to publish a modern slavery statement voluntarily"); }) ;
-
             await Task.CompletedTask;
         }
 

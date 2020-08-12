@@ -56,8 +56,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [TearDown]
         public void TearDown()
         {
-            //if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
-            //TeardownTest();
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
+            TeardownTest();
         }
         [Test, Order(1)]
         public async Task GoToCreateAccountPage()

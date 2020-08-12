@@ -94,6 +94,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Expect("To finish creating your account, select continue.");
             await Task.CompletedTask;
+
         }
 
         [Test, Order(60)]
