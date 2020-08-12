@@ -88,7 +88,6 @@ namespace ModernSlavery.Core.Models
         public string TestPrefix { get; set; }
         public string WhoNeedsToReportGuidanceLink { get; set; }
 
-        public string CompanyNumberRegexError { get; set; }
         public Version Version => Misc.GetTopAssembly().GetName().Version;
         public DateTime AssemblyDate => Misc.GetTopAssembly().GetAssemblyCreationTime();
         public string AssemblyCopyright => Misc.GetTopAssembly().GetAssemblyCopyright();

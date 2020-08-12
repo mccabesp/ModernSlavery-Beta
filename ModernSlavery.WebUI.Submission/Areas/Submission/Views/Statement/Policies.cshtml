@@ -7,7 +7,7 @@
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm())
         {
-            @await Html.CustomValidationSummaryAsync();
+            @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ReturnToReviewPage);
             @Html.HiddenFor(m => m.Submitted);

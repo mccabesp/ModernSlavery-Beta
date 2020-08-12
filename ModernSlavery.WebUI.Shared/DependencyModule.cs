@@ -51,8 +51,6 @@ namespace ModernSlavery.WebUI.Shared
         {
             //Configure dependencies here
             PasswordAttribute.SharedOptions = _sharedOptions;
-            CompanyNumberAttribute.SharedOptions = _sharedOptions;
-            DUNSNumberAttribute.SharedOptions = _sharedOptions;
             PinAttribute.SharedOptions = _sharedOptions;
             SpamProtectionAttribute.SharedOptions = _sharedOptions;
         }
