@@ -33,7 +33,7 @@
                         <span asp-validation-for="DiligenceTypes" class="govuk-error-message"></span>
                         @foreach (var parentType in Model.DiligenceTypes.Where(x => x.ParentId == null))
                         {
-                            <div class="govuk-accordion__section ">
+                            <div class="govuk-accordion__section accordion-with-counts">
                                 <div class="govuk-accordion__section-header">
                                     <h3 class="govuk-accordion__section-heading">
                                         <span class="govuk-accordion__section-button" id="accordion-diligence-heading-@parentType.Id">
@@ -52,7 +52,7 @@
                                                     @childType.Description
                                                 </label>
                                             </div>
-                                            @if (hasOther)
+                                                                                        @if (hasOther)
                                             {
                                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass($"DueDiligences[{diligenceIndex}].Details", "govuk-form-group--error")" id="conditional-diligence-@parentType.Id-@childType.Id">
                                                     <div class="govuk-form-group">
@@ -71,6 +71,11 @@
                                             { diligenceIndex++; }
                                         }
                                     </div>
+                                </div>
+                                <div class="total">
+                                    <h3 class="govuk-body-m">
+                                        <span>(</span><span class="checkbox-count"> Selected)</span>
+                                    </h3>
                                 </div>
                             </div>
                         }

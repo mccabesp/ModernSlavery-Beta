@@ -12,6 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\styles\**" />
+    <Content Remove="wwwroot\styles\**" />
+    <EmbeddedResource Remove="wwwroot\styles\**" />
+    <None Remove="wwwroot\styles\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
