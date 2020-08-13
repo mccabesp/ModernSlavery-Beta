@@ -17,3 +17,6 @@
 // this file overrides some of the GovUK properties
 // and it needs to come after the file copied from the GovUK Prototype kit
 @import "./components/_step-by-step-navigation-gpg";
+
+//this is for styling the accordions and checkbox counters
+@import "./components/_accordion-with-counts";

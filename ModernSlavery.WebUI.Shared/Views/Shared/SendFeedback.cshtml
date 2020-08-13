@@ -47,7 +47,7 @@
                     {
                         Legend = new LegendViewModel
                         {
-                            Text = "How easy or difficult is it to use the service?",
+                            Text = "How easy or difficult was it to use the service?",
                             Classes = "govuk-fieldset__legend--m"
                         },
                         Classes = "govuk-!-margin-top-6"
@@ -95,9 +95,7 @@
                 </fieldset>
 
                 <div class="govuk-inset-text">
-                    If you are having difficulties with the Submit or view a modern slavery statement please email
-                    <a href="@(sharedOptions.MsuReportingEmail)" class="govuk-link">@sharedOptions.MsuReportingEmail</a>
-                    so that we can get back to you quickly.
+                    If you're having difficulty using this service, please email <a href="@(sharedOptions.MsuReportingEmail)" class="govuk-link">@sharedOptions.MsuReportingEmail</a> and we'll get back to you quickly.
                 </div>
 
                 @(Html.GovUkButton(new ButtonViewModel
