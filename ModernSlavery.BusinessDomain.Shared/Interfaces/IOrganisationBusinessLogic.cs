@@ -34,9 +34,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
             ScopeStatuses scopeStatus,
             bool saveToDatabase);
 
-        CustomResult<Organisation> LoadInfoFromEmployerIdentifier(string employerIdentifier);
-        CustomResult<Organisation> LoadInfoFromActiveEmployerIdentifier(string employerIdentifier);
-        Task<CustomResult<Organisation>> GetOrganisationByEncryptedReturnIdAsync(string encryptedReturnId);
+        CustomResult<Organisation> LoadInfoFromOrganisationId(long organisationId);
+        CustomResult<Organisation> LoadInfoFromActiveOrganisationId(long organisationId);
         string GetOrganisationSicSectorsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ");
         string GetOrganisationSicSource(Organisation organisation, DateTime? maxDate = null);
         string GetOrganisationSicSectionIdsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ");
@@ -101,7 +100,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
             string securityCode);
 
         Statement GetOrganisationStatement(Organisation organisation, int year = 0);
-        Task<Organisation> GetOrganisationByEmployerReferenceOrThrowAsync(string employerReference);
 
         Task<CustomResult<Organisation>> CreateOrganisationSecurityCodeAsync(string employerRef,
             DateTime securityCodeExpiryDateTime);

@@ -2,6 +2,7 @@
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
@@ -100,6 +101,15 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Try and get the organisation
             var organisation = await _sharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId);
             if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId), $"Invalid organisationId {organisationId}");
+
+            //Check the reporting deadlin
+            return await FindLatestSubmittedStatementAsync(organisation, reportingDeadline);
+        }
+
+        public async Task<Statement> FindLatestSubmittedStatementAsync(Organisation organisation, DateTime reportingDeadline)
+        {
+            //Validate method parameters
+            if (organisation==null) throw new ArgumentNullException(nameof(organisation));
 
             //Check the reporting deadlin
             CheckReportingDeadline(organisation, reportingDeadline);

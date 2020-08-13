@@ -53,8 +53,8 @@ namespace ModernSlavery.Core.Models
         public DateTime PrivacyChangedDate { get; set; }
         public int EmailVerificationExpiryHours { get; set; }
         public int EmailVerificationMinResendHours { get; set; }
-        public int EmployerCodeLength { get; set; }
-        public int EmployerPageSize { get; set; }
+        public int OrganisationCodeLength { get; set; }
+        public int OrganisationPageSize { get; set; }
         public string WEBSITE_HOSTNAME { get; set; }
 
         public string SiteAuthority => $"https://{WEBSITE_HOSTNAME}/";
@@ -79,7 +79,7 @@ namespace ModernSlavery.Core.Models
         public string SecurityCodeChars { get; set; } = "123456789ABCDEFGHKLMNPQRSTUXYZ";
         public int SecurityCodeLength { get; set; } = 8;
         public int SecurityCodeExpiryDays { get; set; } = 90;
-        public string EmployerCodeChars { get; set; }
+        public string OrganisationCodeChars { get; set; }
         public string PasswordRegex { get; set; }
         public string PasswordRegexError { get; set; }
         public string PinChars { get; set; }

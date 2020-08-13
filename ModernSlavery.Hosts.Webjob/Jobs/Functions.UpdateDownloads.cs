@@ -71,16 +71,16 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             lastWriteTime.AddYears(2) <= VirtualDateTime.Now) continue;
                     }
 
-                    var returns = await _SharedBusinessLogic.DataRepository.GetAll<Return>().Where(r =>
-                            r.AccountingDate.Year == year
+                    var statements = await _SharedBusinessLogic.DataRepository.GetAll<Statement>().Where(r =>
+                            r.SubmissionDeadline.Year == year
                             && r.Status == StatementStatuses.Submitted
                             && r.Organisation.Status == OrganisationStatuses.Active)
                         .ToListAsync().ConfigureAwait(false);
-                    returns.RemoveAll(r =>
+                    statements.RemoveAll(r =>
                         r.Organisation.OrganisationName.StartsWithI(_SharedBusinessLogic.SharedOptions.TestPrefix));
 
-                    var downloadData = returns.ToList()
-                        .Select(r => DownloadResult.Create(r))
+                    var downloadData = statements.ToList()
+                        .Select(r => DownloadModel.Create(r))
                         .OrderBy(d => d.EmployerName)
                         .ToList();
 

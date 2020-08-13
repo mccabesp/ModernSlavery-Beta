@@ -84,7 +84,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
                 try
                 {
                     searchResults =
-                        await _CompaniesHouseAPI.SearchEmployersAsync(searchText, 1, _companiesHouseOptions.MaxResponseCompanies,
+                        await _CompaniesHouseAPI.SearchOrganisationsAsync(searchText, 1, _companiesHouseOptions.MaxResponseCompanies,
                             test);
                     remoteTotal = searchResults.Results.Count;
                 }

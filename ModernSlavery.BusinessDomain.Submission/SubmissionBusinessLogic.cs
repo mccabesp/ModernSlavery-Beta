@@ -205,57 +205,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                     });
         }
 
-        public ReturnViewModel ConvertStatementToReturnViewModel(Statement statement)
-        {
-            var model = new ReturnViewModel
-            {
-                SectorType = statement.Organisation.SectorType,
-                ReturnId = statement.StatementId,
-                OrganisationId = statement.OrganisationId,
-                DiffMeanBonusPercent = statement.DiffMeanBonusPercent,
-                DiffMeanHourlyPayPercent = statement.DiffMeanHourlyPayPercent,
-                DiffMedianBonusPercent = statement.DiffMedianBonusPercent,
-                DiffMedianHourlyPercent = statement.DiffMedianHourlyPercent,
-                FemaleLowerPayBand = statement.FemaleLowerPayBand,
-                FemaleMedianBonusPayPercent = statement.FemaleMedianBonusPayPercent,
-                FemaleMiddlePayBand = statement.FemaleMiddlePayBand,
-                FemaleUpperPayBand = statement.FemaleUpperPayBand,
-                FemaleUpperQuartilePayBand = statement.FemaleUpperQuartilePayBand,
-                MaleLowerPayBand = statement.MaleLowerPayBand,
-                MaleMedianBonusPayPercent = statement.MaleMedianBonusPayPercent,
-                MaleMiddlePayBand = statement.MaleMiddlePayBand,
-                MaleUpperPayBand = statement.MaleUpperPayBand,
-                MaleUpperQuartilePayBand = statement.MaleUpperQuartilePayBand,
-                JobTitle = statement.JobTitle,
-                FirstName = statement.FirstName,
-                LastName = statement.LastName,
-                CompanyLinkToGPGInfo = statement.CompanyLinkToGPGInfo,
-                AccountingDate = statement.AccountingDate,
-                Address = statement.Organisation.GetAddressString(statement.StatusDate),
-                LatestAddress = statement.Organisation.LatestAddress?.GetAddressString(),
-                EHRCResponse = statement.EHRCResponse.ToString(),
-                IsVoluntarySubmission = statement.IsVoluntarySubmission(),
-                IsLateSubmission = statement.IsLateSubmission
-            };
-
-            if (model.Address.EqualsI(model.LatestAddress)) model.LatestAddress = null;
-
-            model.OrganisationName = statement.Organisation.GetName(statement.StatusDate)?.Name
-                                     ?? statement.Organisation.OrganisationName;
-            model.LatestOrganisationName = statement.Organisation.OrganisationName;
-
-            model.Sector = statement.Organisation.GetSicSectorsString(statement.StatusDate);
-            model.LatestSector = statement.Organisation.GetLatestSicSectorsString();
-
-            model.TurnoverRange = statement.Turnover;
-            model.Modified = statement.Modified;
-
-            model.IsInScopeForThisReportYear =
-                statement.Organisation.GetIsInscope(statement.AccountingDate);
-
-            return model;
-        }
-
         public CustomResult<Return> GetSubmissionByOrganisationAndYear(Organisation organisation, int year)
         {
             var reports = GetAllStatementsByOrganisationIdAndSnapshotYear(organisation.OrganisationId, year);

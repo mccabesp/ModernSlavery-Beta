@@ -29,6 +29,7 @@ namespace ModernSlavery.Core.Models
 
         #region Organisation Properties
         public virtual long OrganisationId { get; set; }
+        public virtual string CompanyNumber { get; set; }
         public virtual long StatementId { get; set; }
         public virtual string Name { get; set; }
         public virtual string PreviousName { get; set; }

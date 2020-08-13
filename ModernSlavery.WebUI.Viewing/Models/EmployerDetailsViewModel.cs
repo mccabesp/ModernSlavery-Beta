@@ -3,14 +3,14 @@ using ModernSlavery.WebUI.Viewing.Classes;
 
 namespace ModernSlavery.WebUI.Viewing.Models
 {
-    public class EmployerDetailsViewModel
+    public class OrganisationDetailsViewModel
     {
         public Organisation Organisation { get; set; }
 
         public string LastSearchUrl { get; set; }
 
-        public string EmployerBackUrl { get; set; }
+        public string OrganisationBackUrl { get; set; }
 
-        public SessionList<string> ComparedEmployers { get; set; }
+        public SessionList<string> ComparedOrganisations { get; set; }
     }
 }

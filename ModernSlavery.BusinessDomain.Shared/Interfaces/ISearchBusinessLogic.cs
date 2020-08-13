@@ -12,6 +12,10 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         SearchOptions SearchOptions { get; }
         IAuditLogger SearchLog { get; }
         ISearchRepository<OrganisationSearchModel> OrganisationSearchRepository { get; set; }
+
+        Task<IEnumerable<OrganisationSearchModel>> GetOrganisationSearchIndexesAsync(Organisation organisation);
+        Task RemoveOrganisationSearchIndexesAsync(Organisation organisation);
+        Task RemoveSearchIndexesAsync(IEnumerable<OrganisationSearchModel> searchIndexes);
         Task UpdateOrganisationSearchIndexAsync();
         Task UpdateOrganisationSearchIndexAsync(IEnumerable<Organisation> organisations);
         Task UpdateOrganisationSearchIndexAsync(Organisation organisation);

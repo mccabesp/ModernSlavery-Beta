@@ -42,15 +42,15 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
                 $"Generation of security codes cannot be performed for retired organisations. Organisation '{organisationName}' employerReference '{employerReference}' has status '{status}'.");
         }
 
-        public static CustomError HttpBadRequestCausedByInvalidEmployerIdentifier(string employerIdentifier)
+        public static CustomError HttpBadRequestCausedByInvalidEmployerIdentifier(string organisationIdentifier)
         {
-            return new CustomError(HttpStatusCode.BadRequest, $"Bad employer identifier {employerIdentifier}");
+            return new CustomError(HttpStatusCode.BadRequest, $"Bad employer identifier {organisationIdentifier}");
         }
 
-        public static CustomError HttpNotFoundCausedByOrganisationIdNotInDatabase(string employerIdentifier)
+        public static CustomError HttpNotFoundCausedByOrganisationIdNotInDatabase(string organisationIdentifier)
         {
             return new CustomError(HttpStatusCode.NotFound,
-                $"Employer: Could not find organisation '{employerIdentifier}'");
+                $"Employer: Could not find organisation '{organisationIdentifier}'");
         }
 
         public static CustomError HttpGoneCausedByOrganisationBeingInactive(OrganisationStatuses organisationStatus)

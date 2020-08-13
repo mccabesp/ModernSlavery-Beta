@@ -19,6 +19,9 @@ namespace ModernSlavery.Infrastructure.Search
         [IsSortable]
         public override string Name { get; set; }
 
+        [IsSearchable]
+        public override string CompanyNumber { get; set; }
+
         [IsFilterable]
         public override long OrganisationId { get; set; }
 

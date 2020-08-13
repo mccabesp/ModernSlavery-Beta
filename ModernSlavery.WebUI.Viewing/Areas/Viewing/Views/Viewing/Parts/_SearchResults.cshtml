@@ -1,0 +1,34 @@
+﻿@model SearchViewModel
+@inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
+
+<ul id="SearchResults" class="results">
+    @foreach (var organisation in Model.Organisations.Results)
+    {
+        var organisationIdentifier = Obfuscator.Obfuscate(organisation.OrganisationId);
+        <li class="document">
+            <div class="comparison-table">
+                <div class="comparison-organisation-container">
+                    <h2>
+                        @Html.ActionLink(organisation.Name, "Organisation", "Viewing", new { organisationIdentifier }, new { data_name = "ViewLink", data_id = organisationIdentifier })
+                    </h2>
+                    @if (string.IsNullOrWhiteSpace(organisation.PreviousName) == false)
+                    {
+                        <div class="panel font-xsmall">
+                            <div>Previously known as</div>
+                            <strong>@organisation.PreviousName</strong>
+                        </div>
+                    }
+                    <address>@organisation.Address</address>
+                    @if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
+                    {
+                        <dl class="metadata">
+                            <dt class="metadata-text-label">Company Number</dt>
+                            <dd class="metadata-text-value">@organisation.CompanyNumber</dd>
+                        </dl>
+                    }
+                </div>
+            </div>
+        </li>
+    }
+</ul>
+<partial name="Pagination.cshtml" model="Model" />

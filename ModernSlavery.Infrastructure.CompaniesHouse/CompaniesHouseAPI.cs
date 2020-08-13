@@ -34,7 +34,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             _apiKey = _companiesHouseOptions.ApiKey;
         }
 
-        public async Task<PagedResult<OrganisationRecord>> SearchEmployersAsync(string searchText, int page, int pageSize,
+        public async Task<PagedResult<OrganisationRecord>> SearchOrganisationsAsync(string searchText, int page, int pageSize,
             bool test = false)
         {
             if (searchText.IsNumber()) searchText = searchText.PadLeft(8, '0');

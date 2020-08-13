@@ -18,10 +18,10 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
         public string ShareEmailUrl { get; set; }
 
-        public string ShareEmailSubject => "Comparing employer%27s gender pay gaps";
+        public string ShareEmailSubject => "Comparing organisation%27s gender pay gaps";
 
         public string ShareEmailBody =>
-            $"Hi there,%0A%0AI compared these employers on GOV.UK. Thought you'd like to see the results...%0A%0A{ShareEmailUrl}%0A%0A";
+            $"Hi there,%0A%0AI compared these organisations on GOV.UK. Thought you'd like to see the results...%0A%0A{ShareEmailUrl}%0A%0A";
 
         public bool SortAscending { get; set; }
 
