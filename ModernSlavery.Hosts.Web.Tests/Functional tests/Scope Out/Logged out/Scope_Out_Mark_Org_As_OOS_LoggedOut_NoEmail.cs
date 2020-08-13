@@ -18,18 +18,14 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     [TestFixture, Ignore("Awaiting Scope Merge")]
 
-    public class Scope_Out_Mark_Org_As_OOS_LoggedIn : CreateAccount
+    public class Scope_Out_Mark_Org_As_OOS_LoggedOut_NoEmail : UITest
     {
-        private string EmployerReference;
-        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
+       protected string EmployerReference;
 
-        public Scope_Out_Mark_Org_As_OOS_LoggedIn() : base(_firstname, _lastname, _title, _email, _password)
-        {
-        }
         [Test, Order(20)]
         public async Task AddOrgToDb()
         {
-            //EmployerReference = ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(Submission.OrgName_InterFloor, "ABCD1234");
+            //EmployerReference =  ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(Submission.OrgName_InterFloor, "ABCD1234");
 
             await Task.CompletedTask;
         }
@@ -99,7 +95,16 @@ namespace ModernSlavery.Hosts.Web.Tests
             await Task.CompletedTask;
         }
 
-       
+        [Test, Order(36)]
+        public async Task EnterContactDetails()
+        {
+            Set("First name").To(Create_Account.roger_first);
+            Set("Last name").To(Create_Account.roger_last);
+            Set("Job title").To(Create_Account.roger_job_title);
+            Set("Email address").To(Create_Account.roger_email);
+
+            await Task.CompletedTask;
+        }
 
         [Test, Order(38)]
         public async Task ContinueOnTellUsWhyFormLeadsToCheckYourAnswers()
@@ -110,7 +115,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
         [Test, Order(38)]
-        public async Task CheckDetails()
+        public async Task CheckDetails_DontAskForEmail()
         {
             RightOfText("Name").Expect(Submission.OrgName_InterFloor);
             RightOfText("Reference").Expect(EmployerReference);
@@ -118,15 +123,16 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOfText("Registered address").Expect("");
 
             RightOfText("Reason your organisation is not required to publish a modern slavery statement on your website").Expect("Other");
-            RightOfText("Contact name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last);
+            RightOfText("Contact name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last) ;
             //todo await helper implementation for address logic
             RightOfText("Job title").Expect("Create_Account.roger_job_title");
             RightOfText("Contact email").Expect(Create_Account.roger_email);
 
+
             await Task.CompletedTask;
         }
 
-        [Test, Order(40)]
+        [Test, Order(38)]
         public async Task ConfirmAndSendLeadsToConfirmationPage()
         {
             Click("Confirm and send");
@@ -135,19 +141,20 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
         [Test, Order(42)]
-        public async Task CompletePageContentCheck ()
+        public async Task CompletePageContentCheck()
         {
             Click("Confirm and send");
             ExpectHeader("Declaration complete");
 
             Expect("You have declared your organisation is not required to publish a modern slavery statement");
 
-            Expect("We have sent you a confirmation email. We will contact you if we need more information.");
+            //shouldn't see we have sent an email text, only we will contact
+            Expect("We will contact you if we need more information.");
 
             ExpectHeader("Produced a statement voluntarily?");
             Expect("If you are not legally required to publish a modern slavery statement, but have produced one voluntarily, you can still submit it to our service.");
             Expect(What.Contains, "To submit a modern slavery statement to our service, ");
-            ExpectLink(That.Contains,"create an account");
+            ExpectLink(That.Contains, "create an account");
             Expect(What.Contains, " and register your organisation.");
             await Task.CompletedTask;
         }

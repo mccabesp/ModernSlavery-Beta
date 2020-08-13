@@ -128,6 +128,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOfText("Job title").Expect("Create_Account.roger_job_title");
             RightOfText("Contact email").Expect(Create_Account.roger_email);
 
+            ClickLabel("I would like to receive a confirmation email");
+
             await Task.CompletedTask;
         }
 
@@ -136,6 +138,24 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Confirm and send");
             ExpectHeader("Declaration complete");
+            await Task.CompletedTask;
+        }
+
+        [Test, Order(42)]
+        public async Task CompletePageContentCheck()
+        {
+            Click("Confirm and send");
+            ExpectHeader("Declaration complete");
+
+            Expect("You have declared your organisation is not required to publish a modern slavery statement");
+
+            Expect("We have sent you a confirmation email. We will contact you if we need more information.");
+
+            ExpectHeader("Produced a statement voluntarily?");
+            Expect("If you are not legally required to publish a modern slavery statement, but have produced one voluntarily, you can still submit it to our service.");
+            Expect(What.Contains, "To submit a modern slavery statement to our service, ");
+            ExpectLink(That.Contains, "create an account");
+            Expect(What.Contains, " and register your organisation.");
             await Task.CompletedTask;
         }
     }
