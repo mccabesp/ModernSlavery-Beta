@@ -112,11 +112,14 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(38)]
         public async Task CheckDetails()
         {
+            ExpectHeader("Organisation details");
+
             RightOfText("Name").Expect(Submission.OrgName_InterFloor);
             RightOfText("Reference").Expect(EmployerReference);
             //todo await helper implementation for address logic
             RightOfText("Registered address").Expect("");
 
+            ExpectHeader("Declaration");
             RightOfText("Reason your organisation is not required to publish a modern slavery statement on your website").Expect("Other");
             RightOfText("Contact name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last);
             //todo await helper implementation for address logic
