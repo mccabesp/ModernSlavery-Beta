@@ -102,21 +102,6 @@ namespace ModernSlavery.Infrastructure.Search
             await CreateIndexIfNotExistsAsync(serviceClient, indexName);
         }
 
-        public async Task RefreshIndexDataAsync(IEnumerable<OrganisationSearchModel> allRecords)
-        {
-            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
-
-            //Add (or update) the records to the index
-            await AddOrUpdateIndexDataAsync(allRecords);
-
-            //Get the old records which will need deleting
-            var indexedRecords = await ListAsync(nameof(OrganisationSearchModel.SearchDocumentKey));
-            var oldRecords = indexedRecords.Except(allRecords);
-
-            //Delete the old records
-            if (oldRecords.Any()) await RemoveFromIndexAsync(oldRecords);
-        }
-
         /// <summary>
         ///     Adds all new records to index
         /// </summary>
@@ -248,7 +233,7 @@ namespace ModernSlavery.Infrastructure.Search
             return result;
         }
 
-        public async Task<IList<OrganisationSearchModel>> ListAsync(string selectFields = null)
+        public async Task<IList<OrganisationSearchModel>> ListAsync(string selectFields = null, string filter=null)
         {
             if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
@@ -257,38 +242,7 @@ namespace ModernSlavery.Infrastructure.Search
             var resultsList = new List<OrganisationSearchModel>();
             do
             {
-                var searchResults = await SearchAsync(null,currentPage,selectFields: selectFields);
-                totalPages = searchResults.PageCount;
-                resultsList.AddRange(searchResults.Results);
-                currentPage++;
-            } while (currentPage < totalPages);
-
-            return resultsList;
-        }
-
-        public async Task<IList<OrganisationSearchModel>> ListKeysAsync(Dictionary<string,List<string>> filterFields)
-        {
-            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
-
-            var queryFilter = new List<string>();
-
-            foreach (var key in filterFields.Keys)
-            {
-                var FilterSectorTypeIds = filterFields[key];
-                if (FilterSectorTypeIds != null && FilterSectorTypeIds.Any())
-                {
-                    var sectorQuery = FilterSectorTypeIds.Select(x => $"id eq '{x}'");
-                    queryFilter.Add($"{key}/any(id: {string.Join(" or ", sectorQuery)})");
-                }
-            }
-            var filter=string.Join(" and ", queryFilter);
-
-            long totalPages = 0;
-            var currentPage = 1;
-            var resultsList = new List<OrganisationSearchModel>();
-            do
-            {
-                var searchResults = await SearchAsync(null, currentPage,filter:filter);
+                var searchResults = await SearchAsync(null,currentPage,selectFields: selectFields, filter:filter);
                 totalPages = searchResults.PageCount;
                 resultsList.AddRange(searchResults.Results);
                 currentPage++;
@@ -459,7 +413,7 @@ namespace ModernSlavery.Infrastructure.Search
                     {"SearchParameters", HttpUtility.UrlDecode(sp.ToString())}
                 };
 
-                _telemetryClient?.TrackEvent("Gpg_Search", telemetryProperties);
+                _telemetryClient?.TrackEvent("msu_Search", telemetryProperties);
 
                 await SearchLog.WriteAsync(telemetryProperties);
             }
@@ -508,14 +462,14 @@ namespace ModernSlavery.Infrastructure.Search
                     nameof(OrganisationSearchModel.Abbreviations))
             };
 
-            var charFilterRemoveAmpersand = new MappingCharFilter("gpg_remove_Ampersand", new List<string> {"&=>"});
-            var charFilterRemoveDot = new MappingCharFilter("gpg_remove_Dot", new List<string> {".=>"});
+            var charFilterRemoveAmpersand = new MappingCharFilter("msu_remove_Ampersand", new List<string> {"&=>"});
+            var charFilterRemoveDot = new MappingCharFilter("msu_remove_Dot", new List<string> {".=>"});
             var charFilterRemoveLtdInfoCaseInsensitive = new PatternReplaceCharFilter(
-                "gpg_patternReplaceCharFilter_Ltd",
+                "msu_patternReplaceCharFilter_Ltd",
                 "(?i)(limited|ltd|llp| uk|\\(uk\\)|-uk)[\\.]*",
                 string.Empty); // case insensitive 'limited' 'ltd', 'llp', ' uk', '(uk)', '-uk' followed by zero or more dots (to cater for ltd. and some mis-punctuated limited..)
             var charFilterRemoveWhitespace = new PatternReplaceCharFilter(
-                "gpg_patternReplaceCharFilter_removeWhitespace",
+                "msu_patternReplaceCharFilter_removeWhitespace",
                 "\\s",
                 string.Empty);
 
@@ -526,24 +480,24 @@ namespace ModernSlavery.Infrastructure.Search
             };
 
             var edgeNGramTokenFilterFront =
-                new EdgeNGramTokenFilterV2("gpg_edgeNGram_front", 3, 300, EdgeNGramTokenFilterSide.Front);
+                new EdgeNGramTokenFilterV2("msu_edgeNGram_front", 3, 300, EdgeNGramTokenFilterSide.Front);
             var edgeNGramTokenFilterBack =
-                new EdgeNGramTokenFilterV2("gpg_edgeNGram_back", 3, 300, EdgeNGramTokenFilterSide.Back);
+                new EdgeNGramTokenFilterV2("msu_edgeNGram_back", 3, 300, EdgeNGramTokenFilterSide.Back);
             index.TokenFilters = new List<TokenFilter> {edgeNGramTokenFilterFront, edgeNGramTokenFilterBack};
 
-            var standardTokenizer = new StandardTokenizerV2("gpg_standard_v2_tokenizer");
-            var keywordTokenizer = new KeywordTokenizerV2("gpg_keyword_v2_tokenizer");
+            var standardTokenizer = new StandardTokenizerV2("msu_standard_v2_tokenizer");
+            var keywordTokenizer = new KeywordTokenizerV2("msu_keyword_v2_tokenizer");
 
             index.Tokenizers = new List<Tokenizer> {standardTokenizer, keywordTokenizer};
 
             var suffixAnalyzer = new CustomAnalyzer(
-                "gpg_suffix",
+                "msu_suffix",
                 standardTokenizer.Name,
                 new List<TokenFilterName> {TokenFilterName.Lowercase, edgeNGramTokenFilterBack.Name},
                 new List<CharFilterName> {charFilterRemoveAmpersand.Name, charFilterRemoveLtdInfoCaseInsensitive.Name});
 
             var completeTokenAnalyzer = new CustomAnalyzer(
-                "gpg_prefix_completeToken",
+                "msu_prefix_completeToken",
                 keywordTokenizer.Name,
                 new List<TokenFilterName> {TokenFilterName.Lowercase, edgeNGramTokenFilterFront.Name},
                 new List<CharFilterName>

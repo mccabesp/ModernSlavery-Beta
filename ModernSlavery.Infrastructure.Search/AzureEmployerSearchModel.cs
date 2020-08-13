@@ -26,7 +26,7 @@ namespace ModernSlavery.Infrastructure.Search
         public override long OrganisationId { get; set; }
 
         [IsFilterable]
-        public override long StatementId { get; set; }
+        public override long? StatementId { get; set; }
 
         [IsSearchable]
         [Analyzer(AnalyzerName.AsString.EnLucene)]
@@ -34,7 +34,7 @@ namespace ModernSlavery.Infrastructure.Search
 
         [IsSearchable] public override string PartialNameForSuffixSearches { get; set; }
 
-        [IsSearchable] public string PartialNameForCompleteTokenSearches { get; set; }
+        [IsSearchable] public override string PartialNameForCompleteTokenSearches { get; set; }
 
         [IsSearchable]
         [Analyzer(AnalyzerName.AsString.EnLucene)]
@@ -43,15 +43,15 @@ namespace ModernSlavery.Infrastructure.Search
         [IsFilterable]
         [IsSortable]
         [IsFacetable]
-        public override byte Turnover { get; set; }
+        public override int? Turnover { get; set; }
 
         [IsFilterable] 
         [IsFacetable] 
-        public override short[] SectorTypeIds { get; set; }
+        public override int[] SectorTypeIds { get; set; }
 
         [IsFilterable] 
         [IsFacetable] 
-        public override string StatementDeadlineYear { get; set; }
+        public override int? StatementDeadlineYear { get; set; }
 
         #endregion
     }
