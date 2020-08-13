@@ -40,9 +40,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                var returnYears = _SharedBusinessLogic.DataRepository.GetAll<Return>()
+                var returnYears = _SharedBusinessLogic.DataRepository.GetAll<Statement>()
                     .Where(r => r.Status == StatementStatuses.Submitted)
-                    .Select(r => r.AccountingDate.Year)
+                    .Select(r => r.SubmissionDeadline.Year)
                     .Distinct()
                     .ToList();
 

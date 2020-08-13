@@ -160,18 +160,18 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
                 SendUserAddedToOrganisationEmail(emailAddress, organisation.OrganisationName, addedUser.Fullname);
         }
 
-        public void SendSuccessfulSubmissionEmailToRegisteredUsers(Return postedReturn, string reportLink,
+        public void SendSuccessfulSubmissionEmailToRegisteredUsers(Statement postedStatement, string reportLink,
             string submittedOrUpdated)
         {
-            var emailAddressesForOrganisation = postedReturn.Organisation.UserOrganisations
+            var emailAddressesForOrganisation = postedStatement.Organisation.UserOrganisations
                 .Select(uo => uo.User.EmailAddress);
 
             foreach (var emailAddress in emailAddressesForOrganisation)
                 SendSuccessfulSubmissionEmail(
                     emailAddress,
-                    postedReturn.Organisation.OrganisationName,
+                    postedStatement.Organisation.OrganisationName,
                     submittedOrUpdated,
-                    postedReturn.GetReportingPeriod(),
+                    postedStatement.GetReportingPeriod(),
                     reportLink);
         }
 

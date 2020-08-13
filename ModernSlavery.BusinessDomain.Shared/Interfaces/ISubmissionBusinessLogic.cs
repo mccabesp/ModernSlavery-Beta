@@ -18,9 +18,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="organisationId"></param>
         /// <param name="snapshotYear"></param>
         /// <returns></returns>
-        Task<Return> GetLatestStatementBySnapshotYearAsync(long organisationId, int snapshotYear);
+        Task<Statement> GetLatestStatementBySnapshotYearAsync(long organisationId, int snapshotYear);
 
-        IEnumerable<Return> GetAllStatementsByOrganisationIdAndSnapshotYear(long organisationId,
+        IEnumerable<Statement> GetAllStatementsByOrganisationIdAndReportingDeadlineYear(long organisationId,
             int snapshotYear);
 
         /// <summary>
@@ -36,6 +36,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <returns></returns>
         IEnumerable<LateSubmissionsFileModel> GetLateSubmissions();
 
-        CustomResult<Return> GetSubmissionByOrganisationAndYear(Organisation organisation, int year);
+        CustomResult<Statement> GetSubmissionByOrganisationAndYear(Organisation organisation, int year);
     }
 }

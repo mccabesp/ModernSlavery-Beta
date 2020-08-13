@@ -93,7 +93,7 @@
                                 <span class="heading-small">@report.GetReportingPeriod()</span>
                             </td>
                             <td style="border-bottom: none;">
-                                <partial name="Parts/_ReportStatusBadge.cshtml" model="new ReportStatusBadgeViewModel {IsLateSubmission = report.IsLateSubmission(), IsVoluntarySubmission = report.IsVoluntarySubmission()}"/>
+                                <partial name="Parts/_ReportStatusBadge.cshtml" model="new ReportStatusBadgeViewModel {IsLateSubmission = report.IsLateSubmission, IsVoluntarySubmission = report.IsVoluntarySubmission()}"/>
                             </td>
                         </tr>
                         @if (report.StatementId == 0)

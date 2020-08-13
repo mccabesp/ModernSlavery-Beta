@@ -32,32 +32,32 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         #region Repo
 
-        public virtual async Task<Return> GetStatementByIdAsync(long returnId)
+        public virtual async Task<Statement> GetStatementByIdAsync(long statementId)
         {
-            return await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Return>(o => o.ReturnId == returnId);
+            return await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Statement>(o => o.StatementId == statementId);
         }
 
         /// <summary>
-        ///     Gets the latest submitted return for the specified organisation id and snapshot year
+        ///     Gets the latest submitted statement for the specified organisation id and snapshot year
         /// </summary>
         /// <param name="organisationId"></param>
-        /// <param name="snapshotYear"></param>
+        /// <param name="deadlineYear"></param>
         /// <returns></returns>
-        public virtual async Task<Return> GetLatestStatementBySnapshotYearAsync(long organisationId, int snapshotYear)
+        public virtual async Task<Statement> GetLatestStatementBySnapshotYearAsync(long organisationId, int deadlineYear)
         {
-            var orgSubmission = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Return>(
-                s => s.AccountingDate.Year == snapshotYear
+            var orgSubmission = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Statement>(
+                s => s.SubmissionDeadline.Year == deadlineYear
                      && s.OrganisationId == organisationId
                      && s.Status == StatementStatuses.Submitted);
 
             return orgSubmission;
         }
 
-        public IEnumerable<Return> GetAllStatementsByOrganisationIdAndSnapshotYear(long organisationId,
-            int snapshotYear)
+        public IEnumerable<Statement> GetAllStatementsByOrganisationIdAndReportingDeadlineYear(long organisationId,
+            int deadlineYear)
         {
-            return _sharedBusinessLogic.DataRepository.GetAll<Return>().Where(s =>
-                s.OrganisationId == organisationId && s.AccountingDate.Year == snapshotYear);
+            return _sharedBusinessLogic.DataRepository.GetAll<Statement>().Where(s =>
+                s.OrganisationId == organisationId && s.SubmissionDeadline.Year == deadlineYear);
         }
 
         /// <summary>
@@ -121,21 +121,21 @@ namespace ModernSlavery.BusinessDomain.Submission
         public virtual IEnumerable<LateSubmissionsFileModel> GetLateSubmissions()
         {
             // get the snapshot dates to filter submissions by
-            var curPrivateSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(SectorTypes.Private);
-            var curPublicSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(SectorTypes.Public);
-            var prevPrivateSnapshotDate = curPrivateSnapshotDate.AddYears(-1);
-            var prevPublicSnapshotDate = curPublicSnapshotDate.AddYears(-1);
+            var curPrivateReportingDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(SectorTypes.Private);
+            var curPublicReportingDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(SectorTypes.Public);
+            var prevPrivateReportingDeadlineDate = curPrivateReportingDeadlineDate.AddYears(-1);
+            var prevPublicReportingDeadlineDate = curPublicReportingDeadlineDate.AddYears(-1);
 
             // create return table query
-            var lateSubmissions = _sharedBusinessLogic.DataRepository.GetAll<Return>()
+            var lateSubmissions = _sharedBusinessLogic.DataRepository.GetAll<Statement>()
                 // filter only reports for the previous sector reporting start date and modified after their previous sector reporting end date
                 .Where(
                     r => r.Organisation.SectorType == SectorTypes.Private
-                         && r.AccountingDate == prevPrivateSnapshotDate
-                         && r.Modified >= curPrivateSnapshotDate
+                         && r.SubmissionDeadline == prevPrivateReportingDeadlineDate
+                         && r.Modified >= curPrivateReportingDeadlineDate
                          || r.Organisation.SectorType == SectorTypes.Public
-                         && r.AccountingDate == prevPublicSnapshotDate
-                         && r.Modified >= curPublicSnapshotDate)
+                         && r.SubmissionDeadline == prevPublicReportingDeadlineDate
+                         && r.Modified >= curPublicReportingDeadlineDate)
                 // ensure we only return new, modified figures or modified SRO records
                 .Where(
                     r => string.IsNullOrEmpty(r.Modifications)
@@ -148,22 +148,20 @@ namespace ModernSlavery.BusinessDomain.Submission
                         r.OrganisationId,
                         r.Organisation.OrganisationName,
                         r.Organisation.SectorType,
-                        r.ReturnId,
-                        r.AccountingDate,
+                        r.StatementId,
+                        r.SubmissionDeadline,
                         r.LateReason,
                         r.Created,
                         r.Modified,
                         r.Modifications,
-                        r.FirstName,
-                        r.LastName,
-                        r.JobTitle,
+                        r.ApprovingPerson,
                         r.EHRCResponse
                     }).ToList();
 
             // create scope table query
             var activeScopes = _sharedBusinessLogic.DataRepository.GetAll<OrganisationScope>()
                 .Where(os =>
-                    os.SubmissionDeadline.Year == prevPrivateSnapshotDate.Year && os.Status == ScopeRowStatuses.Active)
+                    os.SubmissionDeadline.Year == prevPrivateReportingDeadlineDate.Year && os.Status == ScopeRowStatuses.Active)
                 .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SubmissionDeadline}).ToList();
 
             // perform a left join on lateSubmissions and activeScopes
@@ -172,7 +170,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     activeScopes.AsQueryable(),
                     // on
                     // inner
-                    r => new {r.OrganisationId, r.AccountingDate.Year},
+                    r => new {r.OrganisationId, r.SubmissionDeadline.Year},
                     // outer
                     os => new {os.OrganisationId, os.SubmissionDeadline.Year},
                     // into
@@ -191,8 +189,8 @@ namespace ModernSlavery.BusinessDomain.Submission
                         OrganisationId = j.r.OrganisationId,
                         OrganisationName = j.r.OrganisationName,
                         OrganisationSectorType = j.r.SectorType,
-                        ReportId = j.r.ReturnId,
-                        ReportSnapshotDate = j.r.AccountingDate,
+                        ReportId = j.r.StatementId,
+                        ReportingDeadline = j.r.SubmissionDeadline,
                         ReportLateReason = j.r.LateReason,
                         ReportSubmittedDate = j.r.Created,
                         ReportModifiedDate = j.r.Modified,
@@ -200,34 +198,30 @@ namespace ModernSlavery.BusinessDomain.Submission
                         ReportPersonResonsible =
                             j.r.SectorType == SectorTypes.Public
                                 ? "Not required"
-                                : $"{j.r.FirstName} {j.r.LastName} ({j.r.JobTitle})",
+                                : j.r.ApprovingPerson,
                         ReportEHRCResponse = j.r.EHRCResponse
                     });
         }
 
-        public CustomResult<Return> GetSubmissionByOrganisationAndYear(Organisation organisation, int year)
+        public CustomResult<Statement> GetSubmissionByOrganisationAndYear(Organisation organisation, int year)
         {
-            var reports = GetAllStatementsByOrganisationIdAndSnapshotYear(organisation.OrganisationId, year);
+            var reports = GetAllStatementsByOrganisationIdAndReportingDeadlineYear(organisation.OrganisationId, year);
 
             if (!reports.Any())
-                return new CustomResult<Return>(
+                return new CustomResult<Statement>(
                     InternalMessages.HttpNotFoundCausedByOrganisationReturnNotInDatabase(_sharedBusinessLogic.Obfuscator.Obfuscate(organisation.OrganisationId),
                         year));
 
             var result = reports.OrderByDescending(r => r.Status == StatementStatuses.Submitted)
                 .ThenByDescending(r => r.StatusDate)
                 .FirstOrDefault();
-            if (!result.IsSubmitted())
-                return new CustomResult<Return>(
-                    InternalMessages.HttpGoneCausedByReportNotHavingBeenSubmitted(result.AccountingDate.Year,
+            if (result.Status!=StatementStatuses.Submitted)
+                return new CustomResult<Statement>(
+                    InternalMessages.HttpGoneCausedByReportNotHavingBeenSubmitted(result.SubmissionDeadline.Year,
                         result.Status.ToString()));
 
-            return new CustomResult<Return>(result);
+            return new CustomResult<Statement>(result);
         }
-
-        #endregion
-
-        #region Entities
 
         #endregion
     }

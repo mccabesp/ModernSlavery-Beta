@@ -144,6 +144,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         [IgnoreMap]
         public IList<AutoMap.Diff> Modifications { get; set; }
         public bool EHRCResponse { get; set; }
+        public bool IsLateSubmission { get; set; }
+
         public string LateReason { get; set; }
         public short IncludedOrganisationCount { get; set; }
 

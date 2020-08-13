@@ -5,9 +5,9 @@ using ModernSlavery.WebUI.GDSDesignSystem.Models;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
-    public class AdminReturnLateFlagViewModel : GovUkViewModel
+    public class AdminStatementLateFlagViewModel : GovUkViewModel
     {
-        public Return Return { get; set; }
+        public Statement Statement { get; set; }
 
         public bool? NewLateFlag { set; get; }
 
