@@ -16,7 +16,7 @@ namespace ModernSlavery.Core.Entities
         {
             AddressStatus = new HashSet<AddressStatus>();
             OrganisationStatus = new HashSet<OrganisationStatus>();
-            ReturnStatus = new HashSet<ReturnStatus>();
+            StatementStatusesByUser = new HashSet<StatementStatus>();
             UserOrganisations = new HashSet<UserOrganisation>();
             UserSettings = new HashSet<UserSetting>();
             UserStatusesByUser = new HashSet<UserStatus>();
@@ -102,7 +102,7 @@ namespace ModernSlavery.Core.Entities
 
         public virtual ICollection<AddressStatus> AddressStatus { get; set; }
         public virtual ICollection<OrganisationStatus> OrganisationStatus { get; set; }
-        public virtual ICollection<ReturnStatus> ReturnStatus { get; set; }
+        public virtual ICollection<StatementStatus> StatementStatusesByUser { get; set; }
         public virtual ICollection<UserOrganisation> UserOrganisations { get; set; }
         public virtual ICollection<UserSetting> UserSettings { get; set; }
         public virtual ICollection<UserStatus> UserStatusesByUser { get; set; }

@@ -74,6 +74,7 @@ namespace ModernSlavery.Core.Entities
         public string ApproverJobTitle { get; set; }
 
         public DateTime ApprovedDate { get; set; }
+        public bool IsLateSubmission { get; set; }
 
         #endregion
 

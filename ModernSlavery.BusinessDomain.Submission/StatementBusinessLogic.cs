@@ -629,6 +629,9 @@ namespace ModernSlavery.BusinessDomain.Submission
                 newStatement.Modifications = modifications.Any() ? JsonConvert.SerializeObject(modifications, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore }) : null;
             }
 
+            //Set whether thestatement is late
+            newStatement.IsLateSubmission = newStatement.GetIsLateSubmission();
+
             //Save the changes to the database
             await _sharedBusinessLogic.DataRepository.SaveChangesAsync();
 

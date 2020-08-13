@@ -826,7 +826,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.Property(e => e.Status).HasColumnName("StatusId");
 
                     entity.HasOne(e => e.ByUser)
-                        .WithMany()
+                        .WithMany(u=>u.StatementStatusesByUser)
                         .HasForeignKey(e => e.ByUserId);
 
                     entity.HasOne(e => e.Statement)

@@ -187,54 +187,40 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var logRecords = new List<SubmissionLogModel>();
 
                 //Create the first log file
-                foreach (var @return in SharedBusinessLogic.DataRepository.GetAll<Return>().OrderBy(r => r.StatusDate))
+                foreach (var statement in SharedBusinessLogic.DataRepository.GetAll<Statement>().OrderBy(r => r.StatusDate))
                 {
                     //Dont log return for test organisations
-                    if (@return.Organisation.OrganisationName.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+                    if (statement.Organisation.OrganisationName.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
                         continue;
 
-                    var status = await SharedBusinessLogic.DataRepository.GetAll<ReturnStatus>()
+                    var status = await SharedBusinessLogic.DataRepository.GetAll<StatementStatus>()
                         .FirstOrDefaultAsync(
-                            rs => rs.ReturnId == @return.ReturnId && rs.Status == @return.Status &&
-                                  rs.StatusDate == @return.StatusDate);
+                            rs => rs.StatementId == statement.StatementId && rs.Status == statement.Status &&
+                                  rs.StatusDate == statement.StatusDate);
 
                     //Log the submission
                     if (status == null)
                         Logger.LogError(
-                            $"Could not find status '{@return.Status}' for return '{@return.ReturnId}' at '{@return.StatusDate}' while creating return history");
+                            $"Could not find status '{statement.Status}' for return '{statement.StatementId}' at '{statement.StatusDate}' while creating return history");
                     else
                         logRecords.Add(
                             new SubmissionLogModel
                             {
-                                StatusDate = @return.Created,
+                                StatusDate = statement.Created,
                                 Status = StatementStatuses.Submitted,
                                 Details = "",
-                                Sector = @return.Organisation.SectorType,
-                                ReturnId = @return.ReturnId,
-                                AccountingDate = @return.AccountingDate.ToShortDateString(),
-                                OrganisationId = @return.OrganisationId,
-                                EmployerName = @return.Organisation.OrganisationName,
-                                Address = @return.Organisation.LatestAddress?.GetAddressString(
+                                Sector = statement.Organisation.SectorType,
+                                StatementId = statement.StatementId,
+                                AccountingDate = statement.SubmissionDeadline.ToShortDateString(),
+                                OrganisationId = statement.OrganisationId,
+                                EmployerName = statement.Organisation.OrganisationName,
+                                Address = statement.Organisation.LatestAddress?.GetAddressString(
                                     "," + Environment.NewLine),
-                                CompanyNumber = @return.Organisation.CompanyNumber,
-                                SicCodes = @return.Organisation.GetSicCodeIdsString(@return.StatusDate,
+                                CompanyNumber = statement.Organisation.CompanyNumber,
+                                SicCodes = statement.Organisation.GetSicCodeIdsString(statement.StatusDate,
                                     "," + Environment.NewLine),
-                                DiffMeanHourlyPayPercent = @return.DiffMeanHourlyPayPercent,
-                                DiffMedianHourlyPercent = @return.DiffMedianHourlyPercent,
-                                DiffMeanBonusPercent = @return.DiffMeanBonusPercent,
-                                DiffMedianBonusPercent = @return.DiffMedianBonusPercent,
-                                MaleMedianBonusPayPercent = @return.MaleMedianBonusPayPercent,
-                                FemaleMedianBonusPayPercent = @return.FemaleMedianBonusPayPercent,
-                                MaleLowerPayBand = @return.MaleLowerPayBand,
-                                FemaleLowerPayBand = @return.FemaleLowerPayBand,
-                                MaleMiddlePayBand = @return.MaleMiddlePayBand,
-                                FemaleMiddlePayBand = @return.FemaleMiddlePayBand,
-                                MaleUpperPayBand = @return.MaleUpperPayBand,
-                                FemaleUpperPayBand = @return.FemaleUpperPayBand,
-                                MaleUpperQuartilePayBand = @return.MaleUpperQuartilePayBand,
-                                FemaleUpperQuartilePayBand = @return.FemaleUpperQuartilePayBand,
-                                CompanyLinkToGPGInfo = @return.CompanyLinkToGPGInfo,
-                                ResponsiblePerson = @return.ResponsiblePerson,
+                                StatementUrl = statement.StatementUrl,
+                                ApprovingPerson = statement.ApprovingPerson,
                                 UserFirstname = status.ByUser.Firstname,
                                 UserLastname = status.ByUser.Lastname,
                                 UserJobtitle = status.ByUser.JobTitle,

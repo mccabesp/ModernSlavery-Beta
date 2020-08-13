@@ -33,7 +33,7 @@ namespace ModernSlavery.Core.Models
                 ApprovingPerson = statement.ApprovingPerson,
                 Turnover = statement.GetAttribute<DisplayAttribute>().Name,
                 CurrentName = statement.Organisation?.OrganisationName,
-                SubmittedAfterTheDeadline = statement.IsLateSubmission(),
+                SubmittedAfterTheDeadline = statement.IsLateSubmission,
                 DueDate = statement.SubmissionDeadline.AddYears(1),
                 DateSubmitted = statement.Modified
             };
