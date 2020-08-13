@@ -98,23 +98,52 @@ namespace ModernSlavery.BusinessDomain.Viewing
             var newSearchModels = LookupSearchableOrganisations(organisation).SelectMany(o => GetOrganisationSearchModelKeys(o));
 
             //Get the old indexes for statements
-            var oldSearchModels = new HashSet<OrganisationSearchModel>();
-            var filter = new Dictionary<string, List<string>>();
-            filter[nameof(OrganisationSearchModel.StatementId)] = organisation.Statements.Select(s => s.StatementId.ToString()).ToList();
-            oldSearchModels.AddRange(await OrganisationSearchRepository.ListKeysAsync(filter));
-
-            //Get the old indexed for orgs with no statements
-            filter.Clear();
-            filter[nameof(OrganisationSearchModel.OrganisationId)] = new[] { organisation.OrganisationId.ToString() }.ToList();
-            filter[nameof(OrganisationSearchModel.StatementDeadlineYear)] = new []{"'null'"}.ToList();
-            oldSearchModels.AddRange(await OrganisationSearchRepository.ListKeysAsync(filter));
+            var retiredModels = await GetOrganisationSearchIndexesAsync(organisation);
 
             //Batch update the included organisations
             if (newSearchModels.Any())await OrganisationSearchRepository.AddOrUpdateIndexDataAsync(newSearchModels);
 
             //Remove the retired models
-            var retiredModels = oldSearchModels.Except(newSearchModels);
-            if (retiredModels.Any()) await OrganisationSearchRepository.RemoveFromIndexAsync(retiredModels).ConfigureAwait(false);
+            retiredModels = retiredModels.Except(newSearchModels).ToList();
+            await RemoveSearchIndexesAsync(retiredModels);
+        }
+
+        //Remove an organisation from the search indexes
+        public async Task RemoveOrganisationSearchIndexesAsync(Organisation organisation)
+        {
+
+            //Get the old indexes for statements
+            var retiredModels = await GetOrganisationSearchIndexesAsync(organisation);
+
+            //Remove the retired models
+            await RemoveSearchIndexesAsync(retiredModels);
+        }
+
+        public async Task RemoveSearchIndexesAsync(IEnumerable<OrganisationSearchModel> searchIndexes)
+        {
+            //Remove the indexes
+            if (searchIndexes.Any()) await OrganisationSearchRepository.RemoveFromIndexAsync(searchIndexes).ConfigureAwait(false);
+        }
+
+        //Remove an organisation from the search indexes
+        public async Task<IEnumerable<OrganisationSearchModel>> GetOrganisationSearchIndexesAsync(Organisation organisation)
+        {
+            //Ensure we have an organisation
+            if (organisation == null) throw new ArgumentNullException(nameof(organisation));
+
+            //Get the old indexes for statements
+            var indexModels = new HashSet<OrganisationSearchModel>();
+            var filter = new Dictionary<string, List<string>>();
+            filter[nameof(OrganisationSearchModel.StatementId)] = organisation.Statements.Select(s => s.StatementId.ToString()).ToList();
+            indexModels.AddRange(await OrganisationSearchRepository.ListKeysAsync(filter));
+
+            //Get the old indexed for orgs with no statements
+            filter.Clear();
+            filter[nameof(OrganisationSearchModel.OrganisationId)] = new[] { organisation.OrganisationId.ToString() }.ToList();
+            filter[nameof(OrganisationSearchModel.StatementDeadlineYear)] = new[] { "'null'" }.ToList();
+            indexModels.AddRange(await OrganisationSearchRepository.ListKeysAsync(filter));
+
+            return indexModels.AsEnumerable();
         }
 
         #region Create SearchModels

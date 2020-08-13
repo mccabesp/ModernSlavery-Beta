@@ -53,7 +53,7 @@
 </h1>
 
 <p class="govuk-body">
-    <a href="@Url.ActionArea("Employer", "Viewing", "Viewing",new {employerIdentifier = Obfuscator.Obfuscate(Model.OrganisationId)})"
+    <a href="@Url.ActionArea("Employer", "Viewing", "Viewing",new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId)})"
        class="govuk-link">
         '@(Model.OrganisationName)' on viewing service
     </a>
@@ -251,7 +251,7 @@
                     @(statementForYear.SubmissionDeadline.ToString("d MMM yyyy"))
                 </th>
                 <td class="govuk-table__cell" rowspan="@(Model.Statements.Count(s => s.SubmissionDeadline == statementForYear.SubmissionDeadline))">
-                    <a href="@Url.ActionArea("Report", "Viewing", "Viewing", new {employerIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = statementForYear.SubmissionDeadline.Year})"
+                    <a href="@Url.ActionArea("Report", "Viewing", "Viewing", new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = statementForYear.SubmissionDeadline.Year})"
                        class="govuk-link">
                         @(statementForYear.SubmissionDeadline.Year)
                     </a>

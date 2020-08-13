@@ -36,7 +36,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <returns></returns>
         IEnumerable<LateSubmissionsFileModel> GetLateSubmissions();
 
-        ReturnViewModel ConvertStatementToReturnViewModel(Statement statementToConvert);
         CustomResult<Return> GetSubmissionByOrganisationAndYear(Organisation organisation, int year);
     }
 }

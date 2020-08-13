@@ -18,42 +18,6 @@ namespace ModernSlavery.Core.Entities
             }
         }
 
-        [NotMapped]
-        public TurnoverRanges TurnoverRange
-        {
-            get
-            {
-                OrganisationSizes orgSize;
-
-                switch (MaxEmployees)
-                {
-                    case 249:
-                        orgSize = OrganisationSizes.Employees0To249;
-                        break;
-                    case 499:
-                        orgSize = OrganisationSizes.Employees250To499;
-                        break;
-                    case 999:
-                        orgSize = OrganisationSizes.Employees500To999;
-                        break;
-                    case 4999:
-                        orgSize = OrganisationSizes.Employees1000To4999;
-                        break;
-                    case 19999:
-                        orgSize = OrganisationSizes.Employees5000to19999;
-                        break;
-                    case int.MaxValue:
-                        orgSize = OrganisationSizes.Employees20000OrMore;
-                        break;
-                    default:
-                        orgSize = OrganisationSizes.NotProvided;
-                        break;
-                }
-
-                return orgSize;
-            }
-        }
-
         public override bool Equals(object obj)
         {
             // Check for null values and compare run-time types.
@@ -88,19 +52,7 @@ namespace ModernSlavery.Core.Entities
             return Organisation.GetActiveScopeStatus(AccountingDate);
         }
 
-        public bool CalculateIsLateSubmission()
-        {
-            return Modified > AccountingDate.AddYears(1)
-                   && OrganisationSize != OrganisationSizes.Employees0To249
-                   && GetScopeStatus().IsAny(ScopeStatuses.InScope, ScopeStatuses.PresumedInScope);
-        }
 
-        public bool IsVoluntarySubmission()
-        {
-            return ReturnId > 0
-                   && OrganisationSize.IsAny(OrganisationSizes.Employees0To249)
-                   && GetScopeStatus().IsAny(ScopeStatuses.OutOfScope, ScopeStatuses.PresumedOutOfScope);
-        }
 
         public void SetStatus(StatementStatuses status, long byUserId, string details = null)
         {

@@ -166,7 +166,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                     org.DateOfCessation
                                 }),
                             null);
-                        var searchRecord = _OrganisationBusinessLogic.CreateOrganisationSearchModel(org, true);
+
+                        var searchRecords = await _searchBusinessLogic.GetOrganisationSearchIndexesAsync(org);
 
                         await _SharedBusinessLogic.DataRepository.BeginTransactionAsync(
                             async () =>
@@ -194,7 +195,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 }
                             }).ConfigureAwait(false);
                         //Remove this organisation from the search index
-                        await _OrganisationSearchRepository.RemoveFromIndexAsync(new[] {searchRecord}).ConfigureAwait(false);
+                        await _OrganisationSearchRepository.RemoveFromIndexAsync(searchRecords).ConfigureAwait(false);
 
                         await _ManualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
                         count++;
@@ -216,38 +217,38 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         //Remove retired copies of GPG data
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task PurgeGPGData([TimerTrigger("%PurgeGPGData%")] TimerInfo timer, ILogger log)
+        public async Task PurgeStatementData([TimerTrigger("%PurgeStatementData%")] TimerInfo timer, ILogger log)
         {
             try
             {
                 var deadline =
                     VirtualDateTime.Now.AddDays(0 - _SharedBusinessLogic.SharedOptions.PurgeRetiredReturnDays);
-                var returns = await _SharedBusinessLogic.DataRepository.GetAll<Return>()
+                var statements = await _SharedBusinessLogic.DataRepository.GetAll<Statement>()
                     .Where(r => r.StatusDate < deadline &&
                                 (r.Status == StatementStatuses.Retired || r.Status == StatementStatuses.Deleted))
                     .ToListAsync().ConfigureAwait(false);
 
-                foreach (var @return in returns)
+                foreach (var statement in statements)
                 {
                     var logItem = new ManualChangeLogModel(
-                        nameof(PurgeGPGData),
+                        nameof(PurgeStatementData),
                         ManualActions.Delete,
                         AppDomain.CurrentDomain.FriendlyName,
-                        nameof(@return.ReturnId),
-                        @return.ReturnId.ToString(),
+                        nameof(statement.StatementId),
+                        statement.StatementId.ToString(),
                         null,
-                        JsonConvert.SerializeObject(DownloadResult.Create(@return)),
+                        JsonConvert.SerializeObject(DownloadModel.Create(statement)),
                         null);
-                    _SharedBusinessLogic.DataRepository.Delete(@return);
+                    _SharedBusinessLogic.DataRepository.Delete(statement);
                     await _SharedBusinessLogic.DataRepository.SaveChangesAsync().ConfigureAwait(false);
                     await _ManualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
                 }
 
-                log.LogDebug($"Executed {nameof(PurgeGPGData)} successfully");
+                log.LogDebug($"Executed {nameof(PurgeStatementData)} successfully");
             }
             catch (Exception ex)
             {
-                var message = $"Failed webjob ({nameof(PurgeGPGData)}):{ex.Message}:{ex.GetDetailsText()}";
+                var message = $"Failed webjob ({nameof(PurgeStatementData)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
                 await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);

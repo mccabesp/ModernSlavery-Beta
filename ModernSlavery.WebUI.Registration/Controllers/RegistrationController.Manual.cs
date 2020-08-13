@@ -31,7 +31,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             //Pre-populate address from selected employer
-            var employer = model.ManualRegistration ? null : model.GetManualEmployer() ?? model.GetSelectedEmployer();
+            var employer = model.ManualRegistration ? null : model.GetManualOrganisation() ?? model.GetSelectedOrganisation();
 
             if (employer != null)
             {
@@ -62,8 +62,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var m = UnstashModel<OrganisationViewModel>();
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            model.Employers = m.Employers;
-            model.ManualEmployers = m.ManualEmployers;
+            model.Organisations = m.Organisations;
+            model.ManualOrganisations = m.ManualOrganisations;
 
             //Exclude the contact details
             var excludes = new HashSet<string>();
@@ -105,7 +105,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             OrganisationRecord employer = null;
             if (!model.ManualRegistration)
             {
-                employer = model.GetManualEmployer();
+                employer = model.GetManualOrganisation();
 
                 if (employer != null)
                 {
@@ -113,7 +113,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 }
                 else
                 {
-                    employer = model.GetSelectedEmployer();
+                    employer = model.GetSelectedOrganisation();
                     authorised = model.SelectedAuthorised;
                 }
             }
@@ -197,8 +197,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var m = UnstashModel<OrganisationViewModel>();
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            model.Employers = m.Employers;
-            model.ManualEmployers = m.ManualEmployers;
+            model.Organisations = m.Organisations;
+            model.ManualOrganisations = m.ManualOrganisations;
 
             //Exclude the organisation details
             var excludes = new HashSet<string>();

@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (checkResult != null) return checkResult;
 
             var model = new OrganisationViewModel();
-            model.Employers = new PagedResult<OrganisationRecord>();
+            model.Organisations = new PagedResult<OrganisationRecord>();
             StashModel(model);
             if (VirtualUser.UserOrganisations.Any())
                 model.BackAction = Url.ActionArea("ManageOrganisations", "Submission", "Submission");
@@ -58,7 +58,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var m = UnstashModel<OrganisationViewModel>();
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            model.Employers = m.Employers;
+            model.Organisations = m.Organisations;
 
             ModelState.Clear();
 
@@ -139,10 +139,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var m = UnstashModel<OrganisationViewModel>();
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            model.Employers = m.Employers;
+            model.Organisations = m.Organisations;
             model.ManualRegistration = true;
             model.BackAction = "OrganisationSearch";
-            model.SelectedEmployerIndex = -1;
+            model.SelectedOrganisationIndex = -1;
             model.OrganisationName = null;
             model.CompanyNumber = null;
             model.Address1 = null;
@@ -159,10 +159,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 case SectorTypes.Private:
                     try
                     {
-                        model.Employers = await _registrationService.PrivateSectorRepository.SearchAsync(
+                        model.Organisations = await _registrationService.PrivateSectorRepository.SearchAsync(
                             model.SearchText,
                             1,
-                            SharedBusinessLogic.SharedOptions.EmployerPageSize,
+                            SharedBusinessLogic.SharedOptions.OrganisationPageSize,
                             VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
                     }
                     catch (Exception ex)
@@ -172,7 +172,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         CompaniesHouseFailures++;
                         if (CompaniesHouseFailures < 3)
                         {
-                            model.Employers?.Results?.Clear();
+                            model.Organisations?.Results?.Clear();
                             StashModel(model);
                             ModelState.AddModelError(1141);
                             return View(model);
@@ -187,10 +187,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
                     break;
                 case SectorTypes.Public:
-                    model.Employers = await _registrationService.PublicSectorRepository.SearchAsync(
+                    model.Organisations = await _registrationService.PublicSectorRepository.SearchAsync(
                         model.SearchText,
                         1,
-                        SharedBusinessLogic.SharedOptions.EmployerPageSize,
+                        SharedBusinessLogic.SharedOptions.OrganisationPageSize,
                         VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
 
                     break;
@@ -215,7 +215,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             StashModel(model);
 
             //Search again if no results
-            if (model.Employers.Results.Count < 1) return View("OrganisationSearch", model);
+            if (model.Organisations.Results.Count < 1) return View("OrganisationSearch", model);
 
             //Go to step 5 with results
             if (Request.Query["fail"].ToBoolean())
@@ -291,11 +291,11 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var m = UnstashModel<OrganisationViewModel>();
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            model.Employers = m.Employers;
+            model.Organisations = m.Organisations;
 
-            var nextPage = m.Employers.CurrentPage;
+            var nextPage = m.Organisations.CurrentPage;
 
-            model.SelectedEmployerIndex = -1;
+            model.SelectedOrganisationIndex = -1;
             model.OrganisationName = null;
             model.CompanyNumber = null;
             model.Address1 = null;
@@ -324,7 +324,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
             else if (command == "pageNext")
             {
-                if (nextPage >= model.Employers.PageCount) throw new Exception("Cannot go past last page");
+                if (nextPage >= model.Organisations.PageCount) throw new Exception("Cannot go past last page");
 
                 nextPage++;
                 doSearch = true;
@@ -339,7 +339,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             else if (command.StartsWithI("page_"))
             {
                 var page = command.AfterFirst("page_").ToInt32();
-                if (page < 1 || page > model.Employers.PageCount) throw new Exception("Invalid page selected");
+                if (page < 1 || page > model.Organisations.PageCount) throw new Exception("Invalid page selected");
 
                 if (page != nextPage)
                 {
@@ -355,10 +355,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     case SectorTypes.Private:
                         try
                         {
-                            model.Employers = await _registrationService.PrivateSectorRepository.SearchAsync(
+                            model.Organisations = await _registrationService.PrivateSectorRepository.SearchAsync(
                                 model.SearchText,
                                 nextPage,
-                                SharedBusinessLogic.SharedOptions.EmployerPageSize,
+                                SharedBusinessLogic.SharedOptions.OrganisationPageSize,
                                 VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
                         }
                         catch (Exception ex)
@@ -368,7 +368,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             CompaniesHouseFailures++;
                             if (CompaniesHouseFailures < 3)
                             {
-                                model.Employers?.Results?.Clear();
+                                model.Organisations?.Results?.Clear();
                                 StashModel(model);
                                 ModelState.AddModelError(1141);
                                 return View(model);
@@ -396,10 +396,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         break;
 
                     case SectorTypes.Public:
-                        model.Employers = await _registrationService.PublicSectorRepository.SearchAsync(
+                        model.Organisations = await _registrationService.PublicSectorRepository.SearchAsync(
                             model.SearchText,
                             nextPage,
-                            SharedBusinessLogic.SharedOptions.EmployerPageSize,
+                            SharedBusinessLogic.SharedOptions.OrganisationPageSize,
                             VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
                         break;
 
@@ -411,7 +411,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 StashModel(model);
 
                 //Go back if no results
-                if (model.Employers.Results.Count < 1) return RedirectToAction("OrganisationSearch");
+                if (model.Organisations.Results.Count < 1) return RedirectToAction("OrganisationSearch");
 
                 //Otherwise show results
                 return View("ChooseOrganisation", model);
@@ -420,7 +420,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (command.StartsWithI("employer_"))
             {
                 var employerIndex = command.AfterFirst("employer_").ToInt32();
-                var employer = model.Employers.Results[employerIndex];
+                var employer = model.Organisations.Results[employerIndex];
 
                 //Ensure employers from companies house have a sector
                 if (employer.SectorType == SectorTypes.Unknown) employer.SectorType = model.SectorType.Value;
@@ -487,7 +487,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     employer.OrganisationId = org.OrganisationId;
                 }
 
-                model.SelectedEmployerIndex = employerIndex;
+                model.SelectedOrganisationIndex = employerIndex;
 
 
                 //Make sure the organisation has an address
@@ -520,7 +520,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             ModelState.Clear();
 
             //If we havend selected one the reshow same view
-            if (model.SelectedEmployerIndex < 0) return View("ChooseOrganisation", model);
+            if (model.SelectedOrganisationIndex < 0) return View("ChooseOrganisation", model);
 
             model.ConfirmReturnAction = nameof(ChooseOrganisation);
             StashModel(model);
@@ -573,7 +573,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var m = UnstashModel<OrganisationViewModel>();
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            model.Employers = m.Employers;
+            model.Organisations = m.Organisations;
 
             //Exclude the address details
             var excludes = new HashSet<string>();
@@ -759,7 +759,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             model.ManualRegistration = true;
-            model.ManualEmployerIndex = -1;
+            model.ManualOrganisationIndex = -1;
             model.NameSource = VirtualUser.EmailAddress;
 
             if (!orgIds.Any())
@@ -774,24 +774,24 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     o => o.OrganisationName,
                     o => orgIds.Contains(o.OrganisationId));
 
-            model.ManualEmployers = employers.Select(o => _registrationService.OrganisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
+            model.ManualOrganisations = employers.Select(o => _registrationService.OrganisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
 
             //Ensure exact match shown at top
-            if (model.ManualEmployers != null && model.ManualEmployers.Count > 1)
+            if (model.ManualOrganisations != null && model.ManualOrganisations.Count > 1)
             {
-                var index = model.ManualEmployers.FindIndex(e => e.OrganisationName.EqualsI(model.OrganisationName));
+                var index = model.ManualOrganisations.FindIndex(e => e.OrganisationName.EqualsI(model.OrganisationName));
                 if (index > 0)
                 {
-                    model.ManualEmployers.Insert(0, model.ManualEmployers[index]);
-                    model.ManualEmployers.RemoveAt(index + 1);
+                    model.ManualOrganisations.Insert(0, model.ManualOrganisations[index]);
+                    model.ManualOrganisations.RemoveAt(index + 1);
                 }
             }
 
             if (model.MatchedReferenceCount == 1)
             {
-                model.ManualEmployerIndex = 0;
+                model.ManualOrganisationIndex = 0;
                 StashModel(model);
-                return await SelectOrganisation(VirtualUser, model, model.ManualEmployerIndex, nameof(AddOrganisation));
+                return await SelectOrganisation(VirtualUser, model, model.ManualOrganisationIndex, nameof(AddOrganisation));
             }
 
             StashModel(model);
@@ -841,7 +841,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 if (model.MatchedReferenceCount > 0) throw new ArgumentException(nameof(model.MatchedReferenceCount));
 
                 model.ManualRegistration = true;
-                model.ManualEmployerIndex = -1;
+                model.ManualOrganisationIndex = -1;
                 model.AddressReturnAction = nameof(SelectOrganisation);
                 StashModel(model);
                 return RedirectToAction("AddAddress");
@@ -859,10 +859,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             if (employerIndex < 0) return new HttpBadRequestResult($"Invalid employer index {employerIndex}");
 
-            model.ManualEmployerIndex = employerIndex;
+            model.ManualOrganisationIndex = employerIndex;
             model.ManualAuthorised = false;
 
-            var employer = model.GetManualEmployer();
+            var employer = model.GetManualOrganisation();
 
             var org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                 .FirstOrDefault(o => o.OrganisationId == employer.OrganisationId);
@@ -961,7 +961,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //Get the sic codes from companies house
             OrganisationRecord employer = null;
-            if (!model.ManualRegistration) employer = model.GetManualEmployer() ?? model.GetSelectedEmployer();
+            if (!model.ManualRegistration) employer = model.GetManualOrganisation() ?? model.GetSelectedOrganisation();
 
             #region Get the sic codes if there isnt any
 
@@ -1117,8 +1117,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var m = UnstashModel<OrganisationViewModel>();
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            model.Employers = m.Employers;
-            model.ManualEmployers = m.ManualEmployers;
+            model.Organisations = m.Organisations;
+            model.ManualOrganisations = m.ManualOrganisations;
             if (!command.EqualsI("confirm"))
             {
                 m.AddressReturnAction = nameof(ConfirmOrganisation);
@@ -1170,7 +1170,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             OrganisationRecord employer = null;
             if (!model.ManualRegistration)
             {
-                employer = model.GetManualEmployer();
+                employer = model.GetManualOrganisation();
                 if (employer != null)
                 {
                     authorised = model.ManualAuthorised;
@@ -1178,7 +1178,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 }
                 else
                 {
-                    employer = model.GetSelectedEmployer();
+                    employer = model.GetSelectedOrganisation();
                     authorised = model.SelectedAuthorised;
                     if (employer != null) hasAddress = employer.HasAnyAddress();
                 }
@@ -1266,7 +1266,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var now = VirtualDateTime.Now;
             if (!model.ManualRegistration)
             {
-                employer = model.GetManualEmployer();
+                employer = model.GetManualOrganisation();
 
                 if (employer != null)
                 {
@@ -1275,7 +1275,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 }
                 else
                 {
-                    employer = model.GetSelectedEmployer();
+                    employer = model.GetSelectedOrganisation();
                     authorised = model.SelectedAuthorised;
                     if (employer != null) hasAddress = employer.HasAnyAddress();
                 }

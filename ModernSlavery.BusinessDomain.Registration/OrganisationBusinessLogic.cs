@@ -26,12 +26,14 @@ namespace ModernSlavery.BusinessDomain.Registration
         private readonly ISecurityCodeBusinessLogic _securityCodeLogic;
         private readonly IObfuscator _obfuscator;
         private readonly ISubmissionBusinessLogic _submissionLogic;
+        private readonly IStatementBusinessLogic _statementBusinessLogic;
         private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
 
         public OrganisationBusinessLogic(SharedOptions sharedOptions,
             IDataRepository dataRepository, IReportingDeadlineHelper reportingDeadlineHelper,
             IObfuscator obfuscator,
             ISubmissionBusinessLogic submissionLogic,
+            IStatementBusinessLogic statementBusinessLogic,
             IScopeBusinessLogic scopeLogic,
             ISecurityCodeBusinessLogic securityCodeLogic)
         {
@@ -41,6 +43,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
             _obfuscator = obfuscator;
             _submissionLogic = submissionLogic;
+            _statementBusinessLogic = statementBusinessLogic;
             _scopeLogic = scopeLogic;
             _securityCodeLogic = securityCodeLogic;
         }
@@ -137,8 +140,8 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public virtual string GenerateEmployerReference()
         {
-            return Crypto.GeneratePasscode(_sharedOptions.EmployerCodeChars.ToCharArray(),
-                _sharedOptions.EmployerCodeLength);
+            return Crypto.GeneratePasscode(_sharedOptions.OrganisationCodeChars.ToCharArray(),
+                _sharedOptions.OrganisationCodeLength);
         }
 
         public virtual string GeneratePINCode()
@@ -165,49 +168,25 @@ namespace ModernSlavery.BusinessDomain.Registration
                 saveToDatabase);
         }
 
-        public CustomResult<Organisation> LoadInfoFromEmployerIdentifier(string employerIdentifier)
+        public CustomResult<Organisation> LoadInfoFromOrganisationId(long organisationId)
         {
-            var organisationId = _obfuscator.DeObfuscate(employerIdentifier);
-
-            if (organisationId == 0)
-                return new CustomResult<Organisation>(
-                    InternalMessages.HttpBadRequestCausedByInvalidEmployerIdentifier(employerIdentifier));
-
             var organisation = GetOrganisationById(organisationId);
 
-            if (organisation == null)
-                return new CustomResult<Organisation>(
-                    InternalMessages.HttpNotFoundCausedByOrganisationIdNotInDatabase(employerIdentifier));
+            if (organisation == null)return new CustomResult<Organisation>(InternalMessages.HttpNotFoundCausedByOrganisationIdNotInDatabase(organisationId.ToString()));
 
             return new CustomResult<Organisation>(organisation);
         }
 
 
-        public virtual CustomResult<Organisation> LoadInfoFromActiveEmployerIdentifier(string employerIdentifier)
+        public virtual CustomResult<Organisation> LoadInfoFromActiveOrganisationId(long organisationId)
         {
-            var result = LoadInfoFromEmployerIdentifier(employerIdentifier);
+            var result = LoadInfoFromOrganisationId(organisationId);
 
             if (!result.Failed && !result.Result.IsActive())
                 return new CustomResult<Organisation>(
                     InternalMessages.HttpGoneCausedByOrganisationBeingInactive(result.Result.Status));
 
             return result;
-        }
-
-
-        public async Task<CustomResult<Organisation>> GetOrganisationByEncryptedReturnIdAsync(string encryptedReturnId)
-        {
-            var decryptedReturnId = _obfuscator.DeObfuscate(encryptedReturnId);
-
-            var result = await _submissionLogic.GetStatementByIdAsync(decryptedReturnId.ToInt64());
-
-            if (result == null)
-                return new CustomResult<Organisation>(
-                    InternalMessages.HttpNotFoundCausedByReturnIdNotInDatabase(encryptedReturnId));
-
-            var organisation = GetOrganisationById(result.OrganisationId);
-
-            return new CustomResult<Organisation>(organisation);
         }
 
         private async Task<IEnumerable<Organisation>> GetAllActiveOrPendingOrganisationsOrThrowAsync()

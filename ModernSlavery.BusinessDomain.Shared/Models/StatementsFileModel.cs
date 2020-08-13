@@ -10,8 +10,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         public long StatementId { get; set; }
         public long OrganisationId { get; set; }
         public string OrganisationName { get; set; }
-        public string DUNSNumber { get; set; }
         public string EmployerReference { get; set; }
+        public string DUNSNumber { get; set; }
+        public string ManualOrganisations { get; set; }
         public string CompanyNumber { get; set; }
         public SectorTypes SectorType { get; set; }
         public ScopeStatuses? ScopeStatus { get; set; }

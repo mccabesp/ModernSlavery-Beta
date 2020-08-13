@@ -46,5 +46,9 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Classes\StatementTypes\" />
+  </ItemGroup>
+
 
 </Project>

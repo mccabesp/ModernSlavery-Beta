@@ -36,7 +36,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
             return p > 0;
         }
 
-        public bool IsEmployerTurnoverValid()
+        public bool IsOrganisationTurnoverValid()
         {
             // if null then we won't filter on this so its valid
             if (tr == null) return true;
@@ -56,7 +56,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
             if (!IsPageValid()) exception = new HttpBadRequestResult($"OrganisationSearch: Invalid page {p}");
 
-            if (!IsEmployerTurnoverValid())
+            if (!IsOrganisationTurnoverValid())
                 exception = new HttpBadRequestResult($"OrganisationSearch: Invalid Turnover {tr.ToDelimitedString()}");
 
             return exception == null;
