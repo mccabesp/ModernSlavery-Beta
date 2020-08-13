@@ -13,8 +13,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
-            if (!_searchOptions.Disabled)
-                try
+            if (_searchOptions.Disabled) return;
+
+            try
             {
                 await UpdateOrganisationSearchAsync(log).ConfigureAwait(false);
             }
@@ -44,7 +45,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 if (force && !string.IsNullOrWhiteSpace(userEmail))
                     try
                     {
-                        await _Messenger.SendMessageAsync("UpdateOrganisationSearchIndexes complete",userEmail,"The update of the search indexes completed successfully.").ConfigureAwait(false);
+                        await _Messenger.SendMessageAsync("UpdateOrganisationSearchIndexes complete", userEmail, "The update of the search indexes completed successfully.").ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {

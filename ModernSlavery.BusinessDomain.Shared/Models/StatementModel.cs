@@ -19,6 +19,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(d => d.MaxStatementYears, opt => opt.MapFrom(s => s.StatementYears.GetAttribute<RangeAttribute>().Maximum))
                 .ForMember(d => d.MinTurnover, opt => opt.MapFrom(s => s.Turnover.GetAttribute<RangeAttribute>().Minimum))
                 .ForMember(d => d.MaxTurnover, opt => opt.MapFrom(s => s.Turnover.GetAttribute<RangeAttribute>().Maximum))
+                .ForMember(dest => dest.IncludedOrganisationCount, opt => opt.Ignore())
+                .ForMember(dest => dest.ExcludedOrganisationCount, opt => opt.Ignore())
+                .ForMember(dest => dest.StatementOrganisations, opt => opt.Ignore())
                 .ForMember(dest => dest.Sectors, opt => opt.Ignore())
                 .ForMember(dest => dest.Policies, opt => opt.Ignore())
                 .ForMember(dest => dest.RelevantRisks, opt => opt.Ignore())
@@ -27,6 +30,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.Diligences, opt => opt.Ignore())
                 .ForMember(dest => dest.Training, opt => opt.Ignore())
                 .ForMember(dest => dest.StatementId, opt => opt.Ignore())
+                .ForMember(dest => dest.EHRCResponse, opt => opt.Ignore())
+                .ForMember(dest => dest.IsLateSubmission, opt => opt.Ignore())
                 .ForMember(dest => dest.Created, opt => opt.Ignore())
                 .ForMember(dest => dest.Modified, opt => opt.Ignore())
                 .ForMember(dest => dest.Organisation, opt => opt.Ignore())
@@ -150,8 +155,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         public short IncludedOrganisationCount { get; set; }
 
         public short ExcludedOrganisationCount { get; set; }
-        public DateTime Modified { get; set; } = VirtualDateTime.Now;
-        public DateTime Created { get; set; } = VirtualDateTime.Now;
+        public DateTime Modified { get; set; }
+        public DateTime Created { get; set; }
 
         #region Step 1 - your statement
 
