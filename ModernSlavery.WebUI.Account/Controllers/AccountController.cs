@@ -188,7 +188,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             //show confirmation
             ViewBag.EmailAddress = VirtualUser.EmailAddress;
-            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            if (SharedBusinessLogic.SharedOptions.ShowEmailVerifyLink || VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
                 ViewBag.TestUrl = Url.Action(
                     "NewPassword",
                     "Account",
@@ -198,6 +198,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
                             VirtualUser.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime())
                     },
                     "https");
+
 
             return View("PasswordResetSent");
         }
