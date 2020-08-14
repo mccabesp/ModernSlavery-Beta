@@ -2,10 +2,9 @@
 
 namespace ModernSlavery.Core.Options
 {
-    [Options("TestOptions")]
-    public class TestOptions : IOptions
+    [Options("Email")]
+    public class EmailOptions : IOptions
     {
-        public bool ForceApplicationInsightsTracking { get; set; }
-        public bool ForceGoogleAnalyticsTracking { get; set; }
+        public string AdminDistributionList { get; set; }
     }
 }
