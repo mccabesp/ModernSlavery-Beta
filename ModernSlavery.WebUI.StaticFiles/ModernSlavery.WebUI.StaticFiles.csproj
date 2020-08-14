@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="5.0.0" />
-    <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
     <PackageReference Include="BuildWebCompiler" Version="1.12.405" />
     <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" />
   </ItemGroup>
@@ -35,10 +34,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="wwwroot\**">
+    <Content Update="wwwroot\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </None>
+    </Content>
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
