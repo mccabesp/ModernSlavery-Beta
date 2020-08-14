@@ -35,10 +35,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\**">
+    <None Update="wwwroot\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
