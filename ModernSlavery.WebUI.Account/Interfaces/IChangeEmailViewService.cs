@@ -9,5 +9,7 @@ namespace ModernSlavery.WebUI.Account.Interfaces
         Task<ModelStateDictionary> InitiateChangeEmailAsync(string newEmailAddress, User currentUser);
 
         Task<ModelStateDictionary> CompleteChangeEmailAsync(string code, User currentUser);
+        string CreateEmailVerificationCode(string newEmailAddress, User user);
+        string GenerateChangeEmailVerificationUrl(string code);
     }
 }

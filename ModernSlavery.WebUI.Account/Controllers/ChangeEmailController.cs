@@ -74,6 +74,17 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             var changeEmailModel = Encryption.DecryptModel<ChangeEmailStatusViewModel>(data);
 
+            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) || SharedBusinessLogic.SharedOptions.ShowEmailVerifyLink)
+            {
+                // generate verify code
+                var code = ChangeEmailService.CreateEmailVerificationCode(changeEmailModel.NewEmail, VirtualUser);
+
+                // generate the verify url
+                var returnVerifyUrl = ChangeEmailService.GenerateChangeEmailVerificationUrl(code);
+
+                ViewBag.VerifyUrl = returnVerifyUrl;
+            }
+
             return View(nameof(ChangeEmailPending), changeEmailModel);
         }
 
