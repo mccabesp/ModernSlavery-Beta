@@ -38,66 +38,72 @@
                     <span id="reporting-start-hint" class="govuk-hint">
                         For example, 31 3 1980
                     </span>
-                    <div class="govuk-grid-row">
-                        <div class="govuk-date-input govuk-grid-column-one-half @Html.SetErrorClass(new[] {nameof(Model.StatementStartDay),nameof(Model.StatementStartMonth),nameof(Model.StatementStartYear)}, "govuk-form-group--error")" id="reporting-start">
-                            <div class="govuk-date-input__item">
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label govuk-date-input__label"  asp-for="StatementStartDay">
-                                        Day
-                                    </label>
-                                    <input asp-for="StatementStartDay" class="govuk-input govuk-date-input__input govuk-input--width-2" type="number" min="1" max="31" inputmode="number" placeholder="DD">
+                    <div class="app-date-range__container">
+                        <div class="app-date-range__child">
+                            <div class="govuk-date-input  @Html.SetErrorClass(new[] {nameof(Model.StatementStartDay),nameof(Model.StatementStartMonth),nameof(Model.StatementStartYear)}, "govuk-form-group--error")" id="reporting-start">
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" asp-for="StatementStartDay">
+                                            Day
+                                        </label>
+                                        <input asp-for="StatementStartDay" class="govuk-input govuk-date-input__input govuk-input--width-2" type="number" min="1" max="31" inputmode="number" placeholder="DD">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="govuk-date-input__item">
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label govuk-date-input__label" asp-for="StatementStartMonth">
-                                        Month
-                                    </label>
-                                    <input asp-for="StatementStartMonth" class="govuk-input govuk-date-input__input govuk-input--width-2" type="number" min="1" max="12" inputmode="number" placeholder="MM">
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" asp-for="StatementStartMonth">
+                                            Month
+                                        </label>
+                                        <input asp-for="StatementStartMonth" class="govuk-input govuk-date-input__input govuk-input--width-2" type="number" min="1" max="12" inputmode="number" placeholder="MM">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="govuk-date-input__item">
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label govuk-date-input__label" asp-for="StatementStartYear">
-                                        Year
-                                    </label>
-                                    <input asp-for="StatementStartYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="number" min="@Model.MinStartYear" max="@Model.MaxStartYear"  inputmode="number" placeholder="YYYY">
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" asp-for="StatementStartYear">
+                                            Year
+                                        </label>
+                                        <input asp-for="StatementStartYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="number" min="@Model.MinStartYear" max="@Model.MaxStartYear" inputmode="number" placeholder="YYYY">
+                                    </div>
                                 </div>
-                            </div>
-                            <span asp-validation-for="StatementStartDay" class="govuk-error-message"></span>
-                            <span asp-validation-for="StatementStartMonth" class="govuk-error-message"></span>
-                            <span asp-validation-for="StatementStartYear" class="govuk-error-message"></span>
-                        </div>
-
-                    <div class="govuk-date-input govuk-grid-column-one-half @Html.SetErrorClass(new[] {nameof(Model.StatementEndDay),nameof(Model.StatementEndMonth),nameof(Model.StatementEndYear)}, "govuk-form-group--error")" id="reporting-end">
-                        <div class="govuk-date-input__item">
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" asp-for="StatementEndDay">
-                                    Day
-                                </label>
-                                <input asp-for="StatementEndDay" class="govuk-input govuk-date-input__input govuk-input--width-2" type="number" min="1" max="31" inputmode="number" placeholder="DD">
+                                <span asp-validation-for="StatementStartDay" class="govuk-error-message"></span>
+                                <span asp-validation-for="StatementStartMonth" class="govuk-error-message"></span>
+                                <span asp-validation-for="StatementStartYear" class="govuk-error-message"></span>
                             </div>
                         </div>
-                        <div class="govuk-date-input__item">
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" asp-for="StatementEndMonth">
-                                    Month
-                                </label>
-                                <input asp-for="StatementEndMonth" class="govuk-input govuk-date-input__input govuk-input--width-2" type="number" min="1" max="12" inputmode="number" placeholder="MM">
+                        <div class="app-date-range__child">
+                            <p class="govuk-body">to</p>
+                        </div>
+                        <div class="app-date-range__child">
+                            <div class="govuk-date-input @Html.SetErrorClass(new[] {nameof(Model.StatementEndDay),nameof(Model.StatementEndMonth),nameof(Model.StatementEndYear)}, "govuk-form-group--error")" id="reporting-end">
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" asp-for="StatementEndDay">
+                                            Day
+                                        </label>
+                                        <input asp-for="StatementEndDay" class="govuk-input govuk-date-input__input govuk-input--width-2" type="number" min="1" max="31" inputmode="number" placeholder="DD">
+                                    </div>
+                                </div>
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" asp-for="StatementEndMonth">
+                                            Month
+                                        </label>
+                                        <input asp-for="StatementEndMonth" class="govuk-input govuk-date-input__input govuk-input--width-2" type="number" min="1" max="12" inputmode="number" placeholder="MM">
+                                    </div>
+                                </div>
+                                <div class="govuk-date-input__item">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label govuk-date-input__label" asp-for="StatementEndYear">
+                                            Year
+                                        </label>
+                                        <input asp-for="StatementEndYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="number" min="@Model.MinEndYear" max="@Model.MaxEndYear" inputmode="number" placeholder="YYYY">
+                                    </div>
+                                </div>
+                                <span asp-validation-for="StatementEndDay" class="govuk-error-message"></span>
+                                <span asp-validation-for="StatementEndMonth" class="govuk-error-message"></span>
+                                <span asp-validation-for="StatementEndYear" class="govuk-error-message"></span>
                             </div>
                         </div>
-                        <div class="govuk-date-input__item">
-                            <div class="govuk-form-group">
-                                <label class="govuk-label govuk-date-input__label" asp-for="StatementEndYear">
-                                    Year
-                                </label>
-                                <input asp-for="StatementEndYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="number" min="@Model.MinEndYear" max="@Model.MaxEndYear" inputmode="number" placeholder="YYYY">
-                            </div>
-                        </div>
-                        <span asp-validation-for="StatementEndDay" class="govuk-error-message"></span>
-                        <span asp-validation-for="StatementEndMonth" class="govuk-error-message"></span>
-                        <span asp-validation-for="StatementEndYear" class="govuk-error-message"></span>
-                    </div>
                     </div>
                 </fieldset>
             </div>
