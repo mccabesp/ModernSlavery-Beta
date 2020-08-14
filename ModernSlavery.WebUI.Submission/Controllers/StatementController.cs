@@ -10,6 +10,7 @@ using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Submission.Models;
 using ModernSlavery.WebUI.Submission.Models.Statement;
 using ModernSlavery.WebUI.Submission.Presenters;
 using Newtonsoft.Json;
@@ -33,7 +34,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             : base(logger, webService, sharedBusinessLogic)
         {
             SubmissionPresenter = submissionPresenter;
-
         }
 
         #region General notes
@@ -320,7 +320,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             //Show the correct view
-            return View("BeforeYouStart",GetYourStatementUrl());
+            return View("BeforeYouStart", new BeforeYouStartViewModel { BackUrl = GetReturnUrl(), ContinueUrl = GetYourStatementUrl() });
         }
         #endregion
 
