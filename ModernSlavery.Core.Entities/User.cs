@@ -103,6 +103,7 @@ namespace ModernSlavery.Core.Entities
         public virtual ICollection<AddressStatus> AddressStatus { get; set; }
         public virtual ICollection<OrganisationStatus> OrganisationStatus { get; set; }
         public virtual ICollection<StatementStatus> StatementStatusesByUser { get; set; }
+        public virtual ICollection<ReminderEmail> ReminderEmails { get; set; }
         public virtual ICollection<UserOrganisation> UserOrganisations { get; set; }
         public virtual ICollection<UserSetting> UserSettings { get; set; }
         public virtual ICollection<UserStatus> UserStatusesByUser { get; set; }

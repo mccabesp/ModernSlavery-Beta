@@ -32,7 +32,7 @@ namespace ModernSlavery.Infrastructure.Database
                         Set<UserOrganisation>().Where(uo => uo.User.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
                         Set<UserOrganisation>().Where(uo => uo.Organisation.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
                         Set<Organisation>().Where(o => o.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
-                        Set<ReminderEmail>().Where(r => r.User.FirstName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<ReminderEmail>().Where(r => r.User.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
                         Set<User>().Where(u => u.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
                     }
                     else
@@ -45,7 +45,7 @@ namespace ModernSlavery.Infrastructure.Database
                         Set<UserOrganisation>().Where(uo => uo.Created < deadline.Value && uo.User.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
                         Set<UserOrganisation>().Where(uo => uo.Created < deadline.Value && uo.Organisation.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
                         Set<Organisation>().Where(o => o.Created < deadline.Value && o.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
-                        Set<ReminderEmail>().Where(r => r.Created < deadline.Value && r.User.FirstName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<ReminderEmail>().Where(r => r.Created < deadline.Value && r.User.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
                         Set<User>().Where(u => u.Created < deadline.Value && u.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
                     }
                     transaction.Commit();
