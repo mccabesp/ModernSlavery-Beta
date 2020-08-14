@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using System;
@@ -48,6 +49,11 @@ namespace ModernSlavery.Testing.Helpers
         public static IDataRepository GetDataRepository(this IHost host)
         {
             return host.Services.GetRequiredService<IDataRepository>();
+        }
+
+        public static DatabaseContext GetDatabaseContext(this IHost host)
+        {
+            return host.Services.GetRequiredService<DatabaseContext>();
         }
 
         public static IFileRepository GetFileRepository(this IHost host)
