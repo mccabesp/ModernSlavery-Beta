@@ -133,7 +133,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             switch (viewModel)
             {
                 case YourStatementPageViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : null;
+                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetReturnUrl();
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetComplianceUrl();
                     break;
