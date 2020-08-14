@@ -132,7 +132,7 @@ namespace ModernSlavery.WebUI.Account.ViewServices
             await SendEmailService.SendChangeEmailCompletedVerificationAsync(newEmailAddress);
         }
 
-        private string CreateEmailVerificationCode(string newEmailAddress, User user)
+        public string CreateEmailVerificationCode(string newEmailAddress, User user)
         {
             return Encryption.EncryptModel(
                 new ChangeEmailVerificationToken
@@ -142,7 +142,7 @@ namespace ModernSlavery.WebUI.Account.ViewServices
                 });
         }
 
-        private string GenerateChangeEmailVerificationUrl(string code)
+        public string GenerateChangeEmailVerificationUrl(string code)
         {
             // generate the return url
             return UrlHelper.Action<ChangeEmailController>(
