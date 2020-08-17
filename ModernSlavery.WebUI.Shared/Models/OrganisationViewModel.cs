@@ -68,7 +68,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         [Required]
         [StringLength(
             100,
-            ErrorMessage = "You must enter an employers name or company number between 3 and 100 characters in length",
+            ErrorMessage = "You must enter an organisations name or company number between 3 and 100 characters in length",
             MinimumLength = 3)]
         [DisplayName("Search")]
         public string SearchText { get; set; }
@@ -200,79 +200,79 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         #endregion
 
-        #region Manual Employers
+        #region Manual Organisations
 
         public int MatchedReferenceCount { get; set; }
 
-        public List<EmployerRecord> ManualEmployers { get; set; }
-        public int ManualEmployerIndex { get; set; }
+        public List<OrganisationRecord> ManualOrganisations { get; set; }
+        public int ManualOrganisationIndex { get; set; }
 
-        public EmployerRecord GetManualEmployer()
+        public OrganisationRecord GetManualOrganisation()
         {
-            if (ManualEmployerIndex > -1 && ManualEmployers != null && ManualEmployerIndex < ManualEmployers.Count)
-                return ManualEmployers[ManualEmployerIndex];
+            if (ManualOrganisationIndex > -1 && ManualOrganisations != null && ManualOrganisationIndex < ManualOrganisations.Count)
+                return ManualOrganisations[ManualOrganisationIndex];
 
             return null;
         }
 
         public Dictionary<string, string> GetReferences(int i)
         {
-            if (ManualEmployers == null || i >= ManualEmployers.Count) return null;
+            if (ManualOrganisations == null || i >= ManualOrganisations.Count) return null;
 
-            var employer = ManualEmployers[i];
+            var organisation = ManualOrganisations[i];
             var results = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            if (!string.IsNullOrWhiteSpace(employer.DUNSNumber)) results["DUNS No"] = employer.DUNSNumber;
+            if (!string.IsNullOrWhiteSpace(organisation.DUNSNumber)) results["DUNS No"] = organisation.DUNSNumber;
 
-            if (!string.IsNullOrWhiteSpace(employer.CompanyNumber)) results["Company No"] = employer.CompanyNumber;
+            if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber)) results["Company No"] = organisation.CompanyNumber;
 
-            foreach (var key in employer.References.Keys)
+            foreach (var key in organisation.References.Keys)
                 if (key.EqualsI(nameof(CharityNumber)))
-                    results["Charity No"] = employer.References[nameof(CharityNumber)];
+                    results["Charity No"] = organisation.References[nameof(CharityNumber)];
                 else if (key.EqualsI(nameof(MutualNumber)))
-                    results["Mutual No"] = employer.References[nameof(MutualNumber)];
+                    results["Mutual No"] = organisation.References[nameof(MutualNumber)];
                 else
-                    results[key] = employer.References[key];
+                    results[key] = organisation.References[key];
 
             return results;
         }
 
         #endregion
 
-        #region Selected Employer details
+        #region Selected Organisation details
 
-        public PagedResult<EmployerRecord> Employers { get; set; }
+        public PagedResult<OrganisationRecord> Organisations { get; set; }
 
-        public int SelectedEmployerIndex { get; set; }
+        public int SelectedOrganisationIndex { get; set; }
 
-        public EmployerRecord GetSelectedEmployer()
+        public OrganisationRecord GetSelectedOrganisation()
         {
-            if (SelectedEmployerIndex > -1
-                && Employers != null
-                && Employers.Results != null
-                && SelectedEmployerIndex < Employers.Results.Count)
-                return Employers.Results[SelectedEmployerIndex];
+            if (SelectedOrganisationIndex > -1
+                && Organisations != null
+                && Organisations.Results != null
+                && SelectedOrganisationIndex < Organisations.Results.Count)
+                return Organisations.Results[SelectedOrganisationIndex];
 
             return null;
         }
 
-        public int EmployerStartIndex
+        public int OrganisationStartIndex
         {
             get
             {
-                if (Employers == null || Employers.Results == null || Employers.Results.Count < 1) return 1;
+                if (Organisations == null || Organisations.Results == null || Organisations.Results.Count < 1) return 1;
 
-                return Employers.CurrentPage * Employers.PageSize - Employers.PageSize + 1;
+                return Organisations.CurrentPage * Organisations.PageSize - Organisations.PageSize + 1;
             }
         }
 
-        public int EmployerEndIndex
+        public int OrganisationEndIndex
         {
             get
             {
-                if (Employers == null || Employers.Results == null || Employers.Results.Count < 1) return 1;
+                if (Organisations == null || Organisations.Results == null || Organisations.Results.Count < 1) return 1;
 
-                return EmployerStartIndex + Employers.Results.Count - 1;
+                return OrganisationStartIndex + Organisations.Results.Count - 1;
             }
         }
 
@@ -280,13 +280,13 @@ namespace ModernSlavery.WebUI.Shared.Models
         {
             get
             {
-                if (Employers == null || Employers.PageCount <= 5) return 1;
+                if (Organisations == null || Organisations.PageCount <= 5) return 1;
 
-                if (Employers.CurrentPage < 4) return 1;
+                if (Organisations.CurrentPage < 4) return 1;
 
-                if (Employers.CurrentPage + 2 > Employers.PageCount) return Employers.PageCount - 4;
+                if (Organisations.CurrentPage + 2 > Organisations.PageCount) return Organisations.PageCount - 4;
 
-                return Employers.CurrentPage - 2;
+                return Organisations.CurrentPage - 2;
             }
         }
 
@@ -294,11 +294,11 @@ namespace ModernSlavery.WebUI.Shared.Models
         {
             get
             {
-                if (Employers == null) return 1;
+                if (Organisations == null) return 1;
 
-                if (Employers.PageCount <= 5) return Employers.PageCount;
+                if (Organisations.PageCount <= 5) return Organisations.PageCount;
 
-                if (PagerStartIndex + 4 > Employers.PageCount) return Employers.PageCount;
+                if (PagerStartIndex + 4 > Organisations.PageCount) return Organisations.PageCount;
 
                 return PagerStartIndex + 4;
             }

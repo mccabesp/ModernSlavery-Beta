@@ -11,7 +11,7 @@ using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.WebUI.Registration.Classes
 {
-    public class PublicSectorRepository : IPagedRepository<EmployerRecord>
+    public class PublicSectorRepository : IPagedRepository<OrganisationRecord>
     {
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
         private readonly IDataRepository _DataRepository;
@@ -28,18 +28,18 @@ namespace ModernSlavery.WebUI.Registration.Classes
             _organisationBusinessLogic = organisationBusinessLogic;
         }
 
-        public async Task<PagedResult<EmployerRecord>> SearchAsync(string searchText, int page, int pageSize,
+        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize,
             bool test = false)
         {
-            var result = new PagedResult<EmployerRecord>();
+            var result = new PagedResult<OrganisationRecord>();
             if (test)
             {
-                var employers = new List<EmployerRecord>();
+                var employers = new List<OrganisationRecord>();
 
                 var min = await _DataRepository.CountAsync<Organisation>();
 
                 var id = Numeric.Rand(min, int.MaxValue - 1);
-                var employer = new EmployerRecord
+                var employer = new OrganisationRecord
                 {
                     OrganisationName = _sharedOptions.TestPrefix + "_GovDept_" + id,
                     CompanyNumber = ("_" + id).Left(10),
@@ -72,7 +72,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
             result.VirtualRecordTotal = searchResultsList.Count;
             result.CurrentPage = page;
             result.PageSize = pageSize;
-            result.Results = searchResultsList.Page(pageSize, page).Select(o => _organisationBusinessLogic.CreateEmployerRecord(o)).ToList();
+            result.Results = searchResultsList.Page(pageSize, page).Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
             return result;
         }
 
@@ -90,12 +90,12 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
         #region Properties
 
-        public void Delete(EmployerRecord entity)
+        public void Delete(OrganisationRecord entity)
         {
             throw new NotImplementedException();
         }
 
-        public void Insert(EmployerRecord entity)
+        public void Insert(OrganisationRecord entity)
         {
             throw new NotImplementedException();
         }

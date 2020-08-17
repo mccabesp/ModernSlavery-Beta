@@ -12,13 +12,13 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
 {
     public interface IComparePresenter
     {
-        Lazy<SessionList<string>> ComparedEmployers { get; }
+        Lazy<SessionList<string>> ComparedOrganisations { get; }
 
         int MaxCompareBasketShareCount { get; }
 
         int MaxCompareBasketCount { get; }
 
-        string LastComparedEmployerList { get; set; }
+        string LastComparedOrganisationList { get; set; }
 
         string SortColumn { get; set; }
 
@@ -26,19 +26,19 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
 
         int BasketItemCount { get; }
 
-        void AddToBasket(string encEmployerId);
+        void AddToBasket(string encOrganisationId);
 
-        void AddRangeToBasket(string[] encEmployerIds);
+        void AddRangeToBasket(string[] encOrganisationIds);
 
-        void RemoveFromBasket(string encEmployerId);
+        void RemoveFromBasket(string encOrganisationId);
 
         void ClearBasket();
 
-        void LoadComparedEmployersFromCookie();
+        void LoadComparedOrganisationsFromCookie();
 
-        void SaveComparedEmployersToCookie(HttpRequest request);
+        void SaveComparedOrganisationsToCookie(HttpRequest request);
 
-        bool BasketContains(params string[] encEmployerIds);
+        bool BasketContains(params string[] encOrganisationIds);
     }
 
     public class ComparePresenter : IComparePresenter
@@ -49,34 +49,34 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             Options = options;
             HttpContext = httpContext.HttpContext;
             Session = session;
-            ComparedEmployers = new Lazy<SessionList<string>>(CreateCompareSessionList(Session));
+            ComparedOrganisations = new Lazy<SessionList<string>>(CreateCompareSessionList(Session));
         }
 
         public IOptionsSnapshot<ViewingOptions> Options { get; }
 
-        public void LoadComparedEmployersFromCookie()
+        public void LoadComparedOrganisationsFromCookie()
         {
             var value = HttpContext.GetRequestCookieValue(CookieNames.LastCompareQuery);
 
             if (string.IsNullOrWhiteSpace(value)) return;
 
-            var employerIds = value.SplitI(",");
+            var organisationIds = value.SplitI(",");
 
             ClearBasket();
 
-            if (employerIds.Any()) AddRangeToBasket(employerIds);
+            if (organisationIds.Any()) AddRangeToBasket(organisationIds);
         }
 
-        public void SaveComparedEmployersToCookie(HttpRequest request)
+        public void SaveComparedOrganisationsToCookie(HttpRequest request)
         {
-            var employerIds = ComparedEmployers.Value.ToList();
+            var organisationIds = ComparedOrganisations.Value.ToList();
 
             var cookieSettings = CookieHelper.GetCookieSettingsCookie(request);
             if (cookieSettings.RememberSettings)
                 //Save into the cookie
                 HttpContext.SetResponseCookie(
                     CookieNames.LastCompareQuery,
-                    employerIds.ToDelimitedString(),
+                    organisationIds.ToDelimitedString(),
                     VirtualDateTime.Now.AddMonths(1),
                     secure: true);
         }
@@ -86,7 +86,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             return new SessionList<string>(
                 session,
                 nameof(ComparePresenter),
-                nameof(ComparedEmployers));
+                nameof(ComparedOrganisations));
         }
 
         #region Dependencies
@@ -99,12 +99,12 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
 
         #region Properties
 
-        public Lazy<SessionList<string>> ComparedEmployers { get; }
+        public Lazy<SessionList<string>> ComparedOrganisations { get; }
 
-        public string LastComparedEmployerList
+        public string LastComparedOrganisationList
         {
-            get => Session["LastComparedEmployerList"].ToStringOrNull();
-            set => Session["LastComparedEmployerList"] = value;
+            get => Session["LastComparedOrganisationList"].ToStringOrNull();
+            set => Session["LastComparedOrganisationList"] = value;
         }
 
         public string SortColumn
@@ -125,7 +125,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             set => Session["SortAscending"] = value;
         }
 
-        public int BasketItemCount => ComparedEmployers.Value.Count;
+        public int BasketItemCount => ComparedOrganisations.Value.Count;
 
         public int MaxCompareBasketCount => Options.Value.MaxCompareBasketCount;
 
@@ -135,31 +135,31 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
 
         #region Basket Methods
 
-        public void AddToBasket(string encEmployerId)
+        public void AddToBasket(string encOrganisationId)
         {
-            var newBasketCount = ComparedEmployers.Value.Count + 1;
-            if (newBasketCount <= MaxCompareBasketCount) ComparedEmployers.Value.Add(encEmployerId);
+            var newBasketCount = ComparedOrganisations.Value.Count + 1;
+            if (newBasketCount <= MaxCompareBasketCount) ComparedOrganisations.Value.Add(encOrganisationId);
         }
 
-        public void AddRangeToBasket(string[] encEmployerIds)
+        public void AddRangeToBasket(string[] encOrganisationIds)
         {
-            var newBasketCount = ComparedEmployers.Value.Count + encEmployerIds.Length;
-            if (newBasketCount <= MaxCompareBasketCount) ComparedEmployers.Value.Add(encEmployerIds);
+            var newBasketCount = ComparedOrganisations.Value.Count + encOrganisationIds.Length;
+            if (newBasketCount <= MaxCompareBasketCount) ComparedOrganisations.Value.Add(encOrganisationIds);
         }
 
-        public void RemoveFromBasket(string encEmployerId)
+        public void RemoveFromBasket(string encOrganisationId)
         {
-            ComparedEmployers.Value.Remove(encEmployerId);
+            ComparedOrganisations.Value.Remove(encOrganisationId);
         }
 
         public void ClearBasket()
         {
-            ComparedEmployers.Value.Clear();
+            ComparedOrganisations.Value.Clear();
         }
 
-        public bool BasketContains(params string[] encEmployerIds)
+        public bool BasketContains(params string[] encOrganisationIds)
         {
-            return ComparedEmployers.Value.Contains(encEmployerIds);
+            return ComparedOrganisations.Value.Contains(encOrganisationIds);
         }
 
         #endregion

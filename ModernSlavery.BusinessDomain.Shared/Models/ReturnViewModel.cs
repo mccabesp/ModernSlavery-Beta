@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using ModernSlavery.Core.Entities;
+using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 
 namespace ModernSlavery.BusinessDomain.Shared.Models
 {
@@ -146,7 +147,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         public string LatestAddress { get; set; }
         public string OrganisationName { get; set; }
         public string LatestOrganisationName { get; set; }
-        public OrganisationSizes OrganisationSize { get; set; }
+        public TurnoverRanges TurnoverRange { get; set; }
         public string Sector { get; set; }
         public string LatestSector { get; set; }
         public bool IsDifferentFromDatabase { get; set; }
@@ -225,7 +226,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                    || !string.IsNullOrWhiteSpace(JobTitle)
                    || !string.IsNullOrWhiteSpace(FirstName)
                    || !string.IsNullOrWhiteSpace(LastName)
-                   || OrganisationSize > 0
+                   || TurnoverRange > 0
                    || !string.IsNullOrWhiteSpace(CompanyLinkToGPGInfo);
         }
 

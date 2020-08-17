@@ -211,15 +211,15 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         public Uri UrlReferrer => HttpContext.GetUrlReferrer();
 
 
-        public string EmployerBackUrl
+        public string OrganisationBackUrl
         {
-            get => Session["EmployerBackUrl"] as string;
+            get => Session["OrganisationBackUrl"] as string;
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
-                    Session.Remove("EmployerBackUrl");
+                    Session.Remove("OrganisationBackUrl");
                 else
-                    Session["EmployerBackUrl"] = value;
+                    Session["OrganisationBackUrl"] = value;
             }
         }
 

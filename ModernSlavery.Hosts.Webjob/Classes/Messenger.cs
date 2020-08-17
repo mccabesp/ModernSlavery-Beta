@@ -66,7 +66,7 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                         SmtpOptions.Username2,
                         SmtpOptions.Password2,
                         SmtpOptions.Port2,
-                        test: test);
+                        test: test).ConfigureAwait(false);
                     await GpgEmailProvider.EmailSendLog.WriteAsync(
                         new EmailSendLogModel
                         {
@@ -76,7 +76,7 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                             Server = $"{SmtpOptions.Server2}:{SmtpOptions.Port2}",
                             Username = SmtpOptions.Username2,
                             Details = message
-                        });
+                        }).ConfigureAwait(false);
                     successCount++;
                 }
                 catch (Exception ex1)
@@ -111,7 +111,7 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                         SmtpOptions.Username2,
                         SmtpOptions.Password2,
                         SmtpOptions.Port2,
-                        test: test);
+                        test: test).ConfigureAwait(false);
                     await GpgEmailProvider.EmailSendLog.WriteAsync(
                         new EmailSendLogModel
                         {
@@ -121,7 +121,7 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                             Server = $"{SmtpOptions.Server2}:{SmtpOptions.Port2}",
                             Username = SmtpOptions.Username2,
                             Details = message
-                        });
+                        }).ConfigureAwait(false);
                     successCount++;
                 }
                 catch (Exception ex1)
@@ -134,7 +134,7 @@ namespace ModernSlavery.Hosts.Webjob.Classes
 
         public async Task SendEmailTemplateAsync<TTemplate>(TTemplate parameters) where TTemplate : EmailTemplate
         {
-            await GpgEmailProvider.SendEmailTemplateAsync(parameters);
+            await GpgEmailProvider.SendEmailTemplateAsync(parameters).ConfigureAwait(false);
         }
 
         #endregion

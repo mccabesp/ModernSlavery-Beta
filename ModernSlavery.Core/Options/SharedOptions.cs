@@ -22,7 +22,7 @@ namespace ModernSlavery.Core.Models
         private string _DevelopmentWebroot;
         public string DevelopmentWebroot { get => _DevelopmentWebroot; set => _DevelopmentWebroot = value != null && value.StartsWith('.') ? Path.GetFullPath(value) : value; }
 
-        public int FirstReportingYear { get; set; } = 2020;
+        public int FirstReportingDeadlineYear { get; set; } = 2020;
         public DateTime PrivateReportingDeadline { get; set; }
         public DateTime PublicReportingDeadline { get; set; }
 
@@ -53,8 +53,8 @@ namespace ModernSlavery.Core.Models
         public DateTime PrivacyChangedDate { get; set; }
         public int EmailVerificationExpiryHours { get; set; }
         public int EmailVerificationMinResendHours { get; set; }
-        public int EmployerCodeLength { get; set; }
-        public int EmployerPageSize { get; set; }
+        public int OrganisationCodeLength { get; set; }
+        public int OrganisationPageSize { get; set; }
         public string WEBSITE_HOSTNAME { get; set; }
 
         public string SiteAuthority => $"https://{WEBSITE_HOSTNAME}/";
@@ -79,7 +79,7 @@ namespace ModernSlavery.Core.Models
         public string SecurityCodeChars { get; set; } = "123456789ABCDEFGHKLMNPQRSTUXYZ";
         public int SecurityCodeLength { get; set; } = 8;
         public int SecurityCodeExpiryDays { get; set; } = 90;
-        public string EmployerCodeChars { get; set; }
+        public string OrganisationCodeChars { get; set; }
         public string PasswordRegex { get; set; }
         public string PasswordRegexError { get; set; }
         public string PinChars { get; set; }
@@ -111,7 +111,6 @@ namespace ModernSlavery.Core.Models
         public string CertPassword { get; set; }
 
         public bool SkipSpamProtection { get; set; }
-        public int MaxNumCallsCompaniesHouseApiPerFiveMins { get; set; } = 500;
 
         public int[] ReminderEmailDays
         {
@@ -186,10 +185,11 @@ namespace ModernSlavery.Core.Models
                 if (string.IsNullOrWhiteSpace(CertThumprint)) exceptions.Add(new ConfigurationErrorsException("CertThumprint cannot be empty in Production environment."));
             }
 
+            if (string.IsNullOrWhiteSpace(ApplicationName)) exceptions.Add(new ConfigurationErrorsException($"Missing ApplicationName"));
             if (string.IsNullOrWhiteSpace(CertFilepath) && !string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing CertFilepath"));
             if (!string.IsNullOrWhiteSpace(CertFilepath) && string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing CertPassword"));
 
-            if (FirstReportingYear == 0 || FirstReportingYear > VirtualDateTime.Now.Year) exceptions.Add(new ConfigurationErrorsException($"Invalid FirstReportingYear: {FirstReportingYear}."));
+            if (FirstReportingDeadlineYear == 0 || FirstReportingDeadlineYear > VirtualDateTime.Now.Year) exceptions.Add(new ConfigurationErrorsException($"Invalid FirstReportingDeadlineYear: {FirstReportingDeadlineYear}."));
             if (PrivateReportingDeadline == DateTime.MinValue)
                 exceptions.Add(new ConfigurationErrorsException($"Invalid PrivateReportingDeadline: {PrivateReportingDeadline}."));
             else

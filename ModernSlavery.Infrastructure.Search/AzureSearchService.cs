@@ -5,14 +5,11 @@ namespace ModernSlavery.Infrastructure.Search
 {
     public class AzureSearchService
     {
-        public ISearchRepository<EmployerSearchModel> SearchRepository;
-        public ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository;
+        public ISearchRepository<OrganisationSearchModel> SearchRepository;
 
-        public AzureSearchService(ISearchRepository<EmployerSearchModel> searchRepository,
-            ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository)
+        public AzureSearchService(ISearchRepository<OrganisationSearchModel> searchRepository)
         {
             SearchRepository = searchRepository;
-            SicCodeSearchRepository = sicCodeSearchRepository;
         }
     }
 }

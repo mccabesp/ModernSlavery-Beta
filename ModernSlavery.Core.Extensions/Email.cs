@@ -116,12 +116,12 @@ namespace ModernSlavery.Core.Extensions
             if (!test)
             {
                 if (attachment == null)
-                    await mySmtpClient.SendMailAsync(myMail);
+                    await mySmtpClient.SendMailAsync(myMail).ConfigureAwait(false);
                 else
                     using (var stream = new MemoryStream(attachment))
                     {
                         myMail.Attachments.Add(new Attachment(stream, attachmentFilename));
-                        await mySmtpClient.SendMailAsync(myMail);
+                        await mySmtpClient.SendMailAsync(myMail).ConfigureAwait(false);
                     }
             }
         }

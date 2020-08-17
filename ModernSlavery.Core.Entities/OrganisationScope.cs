@@ -4,7 +4,7 @@ using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Entities
 {
-    public class OrganisationScope
+    public partial class OrganisationScope
     {
         public OrganisationScope()
         {

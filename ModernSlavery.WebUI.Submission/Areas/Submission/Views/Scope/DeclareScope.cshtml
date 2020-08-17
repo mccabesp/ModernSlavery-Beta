@@ -14,7 +14,7 @@
         @using (Html.BeginForm(null, null, FormMethod.Post, new {@class = "form", autocomplete = "off"}))
         {
             @Html.AntiForgeryToken()
-            @Html.HiddenFor(m => m.SnapshotDate)
+            @Html.HiddenFor(m => m.ReportingDeadline)
             @Html.HiddenFor(m => m.OrganisationName)
 
             <h1 class="heading-large">
@@ -22,7 +22,7 @@
                 <span>We need more information</span>
             </h1>
 
-            <p>Was your organisation required to report for snapshot date @Model.SnapshotDate.ToString("d MMMM yyyy")?</p>
+            <p>Was your organisation required to report for reporting deadline @Model.ReportingDeadline.ToString("d MMMM yyyy")?</p>
             @Html.ValidationMessageFor(model => model.ScopeStatus, null, new {@class = "error-danger"})
             <div class="form-group @Html.SetErrorClass(model => model.ScopeStatus, "error")">
                 <fieldset>

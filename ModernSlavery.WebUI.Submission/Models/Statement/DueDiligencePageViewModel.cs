@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.Submission.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,6 +8,7 @@ using System.Linq;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Binding;
+using ModernSlavery.Core.Classes.StatementTypeIndexes;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {

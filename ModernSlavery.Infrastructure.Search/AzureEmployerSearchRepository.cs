@@ -15,11 +15,12 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 using Index = Microsoft.Azure.Search.Models.Index;
 
 namespace ModernSlavery.Infrastructure.Search
 {
-    public class AzureEmployerSearchRepository : ISearchRepository<EmployerSearchModel>
+    public class AzureOrganisationSearchRepository : ISearchRepository<OrganisationSearchModel>
     {
         private const string suggestorName = "sgOrgName";
         private const string synonymMapName = "desc-synonymmap";
@@ -29,43 +30,42 @@ namespace ModernSlavery.Infrastructure.Search
         private readonly Lazy<Task<ISearchServiceClient>> _serviceClient;
         private readonly TelemetryClient _telemetryClient;
         public readonly IAuditLogger SearchLog;
-        private readonly SharedOptions SharedOptions;
+        private readonly SharedOptions _sharedOptions;
+        private readonly SearchOptions _searchOptions;
 
-        public AzureEmployerSearchRepository(
+        public AzureOrganisationSearchRepository(
             SharedOptions sharedOptions,
+            SearchOptions searchOptions,
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog,
-            string serviceName,
-            string indexName,
             IMapper autoMapper,
-            string adminApiKey = null,
-            string queryApiKey = null,
-            TelemetryClient telemetryClient = null,
-            bool disabled = false)
+            TelemetryClient telemetryClient = null)
         {
-            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
-            Disabled = disabled;
-            if (disabled)
+            _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
+            _searchOptions = searchOptions ?? throw new ArgumentNullException(nameof(searchOptions));
+
+            Disabled = searchOptions.Disabled;
+            if (Disabled)
             {
-                Console.WriteLine($"{nameof(AzureEmployerSearchRepository)} is disabled");
+                Console.WriteLine($"{nameof(AzureOrganisationSearchRepository)} is disabled");
                 return;
             }
             _autoMapper = autoMapper;
             SearchLog = searchLog;
-            IndexName = indexName.ToLower();
+            IndexName = searchOptions.OrganisationIndexName.ToLower();
 
-            if (string.IsNullOrWhiteSpace(serviceName)) throw new ArgumentNullException(nameof(serviceName));
+            if (string.IsNullOrWhiteSpace(searchOptions.ServiceName)) throw new ArgumentNullException(nameof(searchOptions.ServiceName));
 
-            if (string.IsNullOrWhiteSpace(adminApiKey) && string.IsNullOrWhiteSpace(queryApiKey))
-                throw new ArgumentNullException($"You must provide '{nameof(adminApiKey)}' or '{nameof(queryApiKey)}'");
+            if (string.IsNullOrWhiteSpace(searchOptions.AdminApiKey) && string.IsNullOrWhiteSpace(searchOptions.QueryApiKey))
+                throw new ArgumentNullException($"You must provide '{nameof(searchOptions.AdminApiKey)}' or '{nameof(searchOptions.QueryApiKey)}'");
 
-            if (!string.IsNullOrWhiteSpace(adminApiKey) && !string.IsNullOrWhiteSpace(queryApiKey))
-                throw new ArgumentException($"Cannot specify both '{nameof(adminApiKey)}' and '{nameof(queryApiKey)}'");
+            if (!string.IsNullOrWhiteSpace(searchOptions.AdminApiKey) && !string.IsNullOrWhiteSpace(searchOptions.QueryApiKey))
+                throw new ArgumentException($"Cannot specify both '{nameof(searchOptions.AdminApiKey)}' and '{nameof(searchOptions.QueryApiKey)}'");
 
             _serviceClient = new Lazy<Task<ISearchServiceClient>>(
                 async () =>
                 {
                     //Get the service client
-                    var _serviceClient = new SearchServiceClient(serviceName, new SearchCredentials(adminApiKey));
+                    var _serviceClient = new SearchServiceClient(searchOptions.ServiceName, new SearchCredentials(searchOptions.AdminApiKey));
 
                     //Ensure the index exists
                     await CreateIndexIfNotExistsAsync(_serviceClient, IndexName).ConfigureAwait(false);
@@ -77,17 +77,17 @@ namespace ModernSlavery.Infrastructure.Search
                 async () =>
                 {
                     //Get the index client
-                    if (!string.IsNullOrWhiteSpace(adminApiKey))
+                    if (!string.IsNullOrWhiteSpace(searchOptions.AdminApiKey))
                     {
                         var serviceClient = await _serviceClient.Value;
                         return serviceClient.Indexes.GetClient(IndexName);
                     }
 
-                    if (!string.IsNullOrWhiteSpace(queryApiKey))
-                        return new SearchIndexClient(serviceName, IndexName, new SearchCredentials(queryApiKey));
+                    if (!string.IsNullOrWhiteSpace(searchOptions.QueryApiKey))
+                        return new SearchIndexClient(searchOptions.ServiceName, IndexName, new SearchCredentials(searchOptions.QueryApiKey));
 
                     throw new ArgumentNullException(
-                        $"You must provide '{nameof(adminApiKey)}' or '{nameof(queryApiKey)}'");
+                        $"You must provide '{nameof(searchOptions.AdminApiKey)}' or '{nameof(searchOptions.QueryApiKey)}'");
                 });
         }
 
@@ -96,41 +96,26 @@ namespace ModernSlavery.Infrastructure.Search
 
         public async Task CreateIndexIfNotExistsAsync(string indexName)
         {
-            if (Disabled) throw new Exception($"{nameof(AzureEmployerSearchRepository)} is disabled");
+            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
             var serviceClient = await _serviceClient.Value;
             await CreateIndexIfNotExistsAsync(serviceClient, indexName);
-        }
-
-        public async Task RefreshIndexDataAsync(IEnumerable<EmployerSearchModel> allRecords)
-        {
-            if (Disabled) throw new Exception($"{nameof(AzureEmployerSearchRepository)} is disabled");
-
-            //Add (or update) the records to the index
-            await AddOrUpdateIndexDataAsync(allRecords);
-
-            //Get the old records which will need deleting
-            var indexedRecords = await ListAsync(nameof(EmployerSearchModel.OrganisationId));
-            var oldRecords = indexedRecords.Except(allRecords);
-
-            //Delete the old records
-            if (oldRecords.Any()) await RemoveFromIndexAsync(oldRecords);
         }
 
         /// <summary>
         ///     Adds all new records to index
         /// </summary>
         /// <param name="newRecords">The new or existing records which should be indexed.</param>
-        public async Task AddOrUpdateIndexDataAsync(IEnumerable<EmployerSearchModel> newRecords)
+        public async Task AddOrUpdateIndexDataAsync(IEnumerable<OrganisationSearchModel> newRecords)
         {
-            if (Disabled) throw new Exception($"{nameof(AzureEmployerSearchRepository)} is disabled");
+            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
             if (newRecords == null || !newRecords.Any())
                 throw new ArgumentNullException(nameof(newRecords), "You must supply at least one record to index");
 
             //Remove all test organisations
-            if (!string.IsNullOrWhiteSpace(SharedOptions.TestPrefix))
-                newRecords = newRecords.Where(e => !e.Name.StartsWithI(SharedOptions.TestPrefix));
+            if (!string.IsNullOrWhiteSpace(_sharedOptions.TestPrefix))
+                newRecords = newRecords.Where(e => !e.Name.StartsWithI(_sharedOptions.TestPrefix));
 
             //Ensure the records are ordered by name
             newRecords = newRecords.OrderBy(o => o.Name);
@@ -178,9 +163,9 @@ namespace ModernSlavery.Infrastructure.Search
         ///     Removes old records from index
         /// </summary>
         /// <param name="oldRecords">The old records which should be deleted from the index.</param>
-        public async Task<int> RemoveFromIndexAsync(IEnumerable<EmployerSearchModel> oldRecords)
+        public async Task<int> RemoveFromIndexAsync(IEnumerable<OrganisationSearchModel> oldRecords)
         {
-            if (Disabled) throw new Exception($"{nameof(AzureEmployerSearchRepository)} is disabled");
+            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
             if (oldRecords == null || !oldRecords.Any())
                 throw new ArgumentNullException(nameof(oldRecords), "You must supply at least one record to index");
@@ -234,34 +219,30 @@ namespace ModernSlavery.Infrastructure.Search
             return deleteCount;
         }
 
-        public async Task<EmployerSearchModel> GetAsync(string key, string selectFields = null)
+        public async Task<OrganisationSearchModel> GetAsync(string key, string selectFields = null)
         {
-            if (Disabled) throw new Exception($"{nameof(AzureEmployerSearchRepository)} is disabled");
+            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
             //Limit result fields
             var selectedFields = string.IsNullOrWhiteSpace(selectFields) ? null : selectFields.SplitI().ToList();
 
             var indexClient = await _indexClient.Value;
 
-            var result = await indexClient.Documents.GetAsync<EmployerSearchModel>(key, selectedFields);
+            var result = await indexClient.Documents.GetAsync<OrganisationSearchModel>(key, selectedFields);
 
             return result;
         }
 
-        public async Task<IList<EmployerSearchModel>> ListAsync(string selectFields = null)
+        public async Task<IList<OrganisationSearchModel>> ListAsync(string selectFields = null, string filter=null)
         {
-            if (Disabled) throw new Exception($"{nameof(AzureEmployerSearchRepository)} is disabled");
+            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
             long totalPages = 0;
             var currentPage = 1;
-            var resultsList = new List<EmployerSearchModel>();
+            var resultsList = new List<OrganisationSearchModel>();
             do
             {
-                var searchResults = await SearchAsync(
-                    null,
-                    currentPage,
-                    SearchTypes.NotSet,
-                    selectFields: selectFields);
+                var searchResults = await SearchAsync(null,currentPage,selectFields: selectFields, filter:filter);
                 totalPages = searchResults.PageCount;
                 resultsList.AddRange(searchResults.Results);
                 currentPage++;
@@ -272,13 +253,13 @@ namespace ModernSlavery.Infrastructure.Search
 
         public async Task<long> GetDocumentCountAsync()
         {
-            if (Disabled) throw new Exception($"{nameof(AzureEmployerSearchRepository)} is disabled");
+            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
             var serviceClient = await _serviceClient.Value;
 
             if (!await serviceClient.Indexes.ExistsAsync(IndexName)) return 0;
 
-            var searchResults = await SearchAsync(null, 1, SearchTypes.NotSet);
+            var searchResults = await SearchAsync(null, 1);
             return searchResults.ActualRecordTotal;
         }
 
@@ -296,13 +277,13 @@ namespace ModernSlavery.Infrastructure.Search
         /// </param>
         /// <param name="maxRecords">Maximum number of suggestions to return (default=10)</param>
         /// </param>
-        public async Task<IEnumerable<KeyValuePair<string, EmployerSearchModel>>> SuggestAsync(string searchText,
+        public async Task<IEnumerable<KeyValuePair<string, OrganisationSearchModel>>> SuggestAsync(string searchText,
             string searchFields = null,
             string selectFields = null,
             bool fuzzy = true,
             int maxRecords = 10)
         {
-            if (Disabled) throw new Exception($"{nameof(AzureEmployerSearchRepository)} is disabled");
+            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
             // Execute search based on query string
             var sp = new SuggestParameters {UseFuzzyMatching = fuzzy, Top = maxRecords};
@@ -316,9 +297,9 @@ namespace ModernSlavery.Infrastructure.Search
             var indexClient = await _indexClient.Value;
 
             var results =
-                await indexClient.Documents.SuggestAsync<EmployerSearchModel>(searchText, suggestorName, sp);
+                await indexClient.Documents.SuggestAsync<OrganisationSearchModel>(searchText, suggestorName, sp);
             var suggestions =
-                results?.Results.Select(s => new KeyValuePair<string, EmployerSearchModel>(s.Text, s.Document));
+                results?.Results.Select(s => new KeyValuePair<string, OrganisationSearchModel>(s.Text, s.Document));
 
             return suggestions;
         }
@@ -373,9 +354,8 @@ namespace ModernSlavery.Infrastructure.Search
         ///         For example, highlight=title-3,description-10 returns up to 3 highlighted hits from the title field and up to
         ///         10 hits from the description field. <max # of highlights> must be an integer between 1 and 1000 inclusive.
         /// </param>
-        public async Task<PagedResult<EmployerSearchModel>> SearchAsync(string searchText,
+        public async Task<PagedResult<OrganisationSearchModel>> SearchAsync(string searchText,
             int currentPage,
-            SearchTypes searchType,
             int pageSize = 20,
             string searchFields = null,
             string selectFields = null,
@@ -385,7 +365,7 @@ namespace ModernSlavery.Infrastructure.Search
             string highlights = null,
             SearchModes searchMode = SearchModes.Any)
         {
-            if (Disabled) throw new Exception($"{nameof(AzureEmployerSearchRepository)} is disabled");
+            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
             var indexClient = await _indexClient.Value;
 
@@ -417,7 +397,7 @@ namespace ModernSlavery.Infrastructure.Search
 
             //Execute the search
             var
-                results = await indexClient.Documents.SearchAsync<EmployerSearchModel>(searchText, sp);
+                results = await indexClient.Documents.SearchAsync<OrganisationSearchModel>(searchText, sp);
 
             //Return the total records
             var totalRecords = results.Count.Value;
@@ -430,11 +410,10 @@ namespace ModernSlavery.Infrastructure.Search
                     {"TimeStamp", VirtualDateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")},
                     {"QueryTerms", searchText},
                     {"ResultCount", totalRecords.ToString()},
-                    {"SearchType", searchType.ToString()},
                     {"SearchParameters", HttpUtility.UrlDecode(sp.ToString())}
                 };
 
-                _telemetryClient?.TrackEvent("Gpg_Search", telemetryProperties);
+                _telemetryClient?.TrackEvent("msu_Search", telemetryProperties);
 
                 await SearchLog.WriteAsync(telemetryProperties);
             }
@@ -450,7 +429,7 @@ namespace ModernSlavery.Infrastructure.Search
                 }
 
             //Return the results
-            var searchResults = new PagedResult<EmployerSearchModel>
+            var searchResults = new PagedResult<OrganisationSearchModel>
             {
                 Results = results.Results.Select(r => r.Document).ToList(),
                 CurrentPage = currentPage,
@@ -468,7 +447,7 @@ namespace ModernSlavery.Infrastructure.Search
         /// <returns>The existing or new index</returns>
         private async Task CreateIndexIfNotExistsAsync(ISearchServiceClient serviceClient, string indexName)
         {
-            if (Disabled) throw new Exception($"{nameof(AzureEmployerSearchRepository)} is disabled");
+            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
             if (await serviceClient.Indexes.ExistsAsync(indexName)) return;
 
@@ -478,19 +457,19 @@ namespace ModernSlavery.Infrastructure.Search
             {
                 new Suggester(
                     suggestorName,
-                    nameof(EmployerSearchModel.Name),
-                    nameof(EmployerSearchModel.PreviousName),
-                    nameof(EmployerSearchModel.Abbreviations))
+                    nameof(OrganisationSearchModel.Name),
+                    nameof(OrganisationSearchModel.PreviousName),
+                    nameof(OrganisationSearchModel.Abbreviations))
             };
 
-            var charFilterRemoveAmpersand = new MappingCharFilter("gpg_remove_Ampersand", new List<string> {"&=>"});
-            var charFilterRemoveDot = new MappingCharFilter("gpg_remove_Dot", new List<string> {".=>"});
+            var charFilterRemoveAmpersand = new MappingCharFilter("msu_remove_Ampersand", new List<string> {"&=>"});
+            var charFilterRemoveDot = new MappingCharFilter("msu_remove_Dot", new List<string> {".=>"});
             var charFilterRemoveLtdInfoCaseInsensitive = new PatternReplaceCharFilter(
-                "gpg_patternReplaceCharFilter_Ltd",
+                "msu_patternReplaceCharFilter_Ltd",
                 "(?i)(limited|ltd|llp| uk|\\(uk\\)|-uk)[\\.]*",
                 string.Empty); // case insensitive 'limited' 'ltd', 'llp', ' uk', '(uk)', '-uk' followed by zero or more dots (to cater for ltd. and some mis-punctuated limited..)
             var charFilterRemoveWhitespace = new PatternReplaceCharFilter(
-                "gpg_patternReplaceCharFilter_removeWhitespace",
+                "msu_patternReplaceCharFilter_removeWhitespace",
                 "\\s",
                 string.Empty);
 
@@ -501,24 +480,24 @@ namespace ModernSlavery.Infrastructure.Search
             };
 
             var edgeNGramTokenFilterFront =
-                new EdgeNGramTokenFilterV2("gpg_edgeNGram_front", 3, 300, EdgeNGramTokenFilterSide.Front);
+                new EdgeNGramTokenFilterV2("msu_edgeNGram_front", 3, 300, EdgeNGramTokenFilterSide.Front);
             var edgeNGramTokenFilterBack =
-                new EdgeNGramTokenFilterV2("gpg_edgeNGram_back", 3, 300, EdgeNGramTokenFilterSide.Back);
+                new EdgeNGramTokenFilterV2("msu_edgeNGram_back", 3, 300, EdgeNGramTokenFilterSide.Back);
             index.TokenFilters = new List<TokenFilter> {edgeNGramTokenFilterFront, edgeNGramTokenFilterBack};
 
-            var standardTokenizer = new StandardTokenizerV2("gpg_standard_v2_tokenizer");
-            var keywordTokenizer = new KeywordTokenizerV2("gpg_keyword_v2_tokenizer");
+            var standardTokenizer = new StandardTokenizerV2("msu_standard_v2_tokenizer");
+            var keywordTokenizer = new KeywordTokenizerV2("msu_keyword_v2_tokenizer");
 
             index.Tokenizers = new List<Tokenizer> {standardTokenizer, keywordTokenizer};
 
             var suffixAnalyzer = new CustomAnalyzer(
-                "gpg_suffix",
+                "msu_suffix",
                 standardTokenizer.Name,
                 new List<TokenFilterName> {TokenFilterName.Lowercase, edgeNGramTokenFilterBack.Name},
                 new List<CharFilterName> {charFilterRemoveAmpersand.Name, charFilterRemoveLtdInfoCaseInsensitive.Name});
 
             var completeTokenAnalyzer = new CustomAnalyzer(
-                "gpg_prefix_completeToken",
+                "msu_prefix_completeToken",
                 keywordTokenizer.Name,
                 new List<TokenFilterName> {TokenFilterName.Lowercase, edgeNGramTokenFilterFront.Name},
                 new List<CharFilterName>
@@ -531,20 +510,20 @@ namespace ModernSlavery.Infrastructure.Search
 
             index.Analyzers = new List<Analyzer> {suffixAnalyzer, completeTokenAnalyzer};
 
-            index.Fields.First(f => f.Name == nameof(EmployerSearchModel.PartialNameForSuffixSearches)).Analyzer =
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForSuffixSearches)).Analyzer =
                 suffixAnalyzer.Name;
-            index.Fields.First(f => f.Name == nameof(EmployerSearchModel.PartialNameForSuffixSearches)).SynonymMaps =
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForSuffixSearches)).SynonymMaps =
                 new[] {synonymMapName};
 
-            index.Fields.First(f => f.Name == nameof(EmployerSearchModel.PartialNameForCompleteTokenSearches))
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForCompleteTokenSearches))
                     .Analyzer =
                 completeTokenAnalyzer.Name;
-            index.Fields.First(f => f.Name == nameof(EmployerSearchModel.PartialNameForCompleteTokenSearches))
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForCompleteTokenSearches))
                     .SynonymMaps =
                 new[] {synonymMapName};
 
-            index.Fields.First(f => f.Name == nameof(EmployerSearchModel.Name)).SynonymMaps = new[] {synonymMapName};
-            index.Fields.First(f => f.Name == nameof(EmployerSearchModel.PreviousName)).SynonymMaps =
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.Name)).SynonymMaps = new[] {synonymMapName};
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PreviousName)).SynonymMaps =
                 new[] {synonymMapName};
 
             //Add the synonyms if they dont already exist

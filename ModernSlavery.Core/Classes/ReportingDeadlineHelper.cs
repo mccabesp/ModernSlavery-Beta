@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -10,25 +13,25 @@ namespace ModernSlavery.Core.Classes
     {
         private readonly SharedOptions _sharedOptions;
 
-        private int? _firstReportingYear;
+        private int? _firstReportingDeadlineYear;
 
         public ReportingDeadlineHelper(SharedOptions sharedOptions)
         {
             _sharedOptions= sharedOptions;
         }
 
-        public int FirstReportingYear
+        public int FirstReportingDeadlineYear
         {
             get
             {
-                if (!_firstReportingYear.HasValue)
-                    _firstReportingYear = _sharedOptions.FirstReportingYear;
-                return _firstReportingYear.Value;
+                if (!_firstReportingDeadlineYear.HasValue)
+                    _firstReportingDeadlineYear = _sharedOptions.FirstReportingDeadlineYear;
+                return _firstReportingDeadlineYear.Value;
             }
             set
             {
-                _firstReportingYear = value;
-                _sharedOptions.FirstReportingYear = value;
+                _firstReportingDeadlineYear = value;
+                _sharedOptions.FirstReportingDeadlineYear = value;
             }
         }
 
@@ -64,7 +67,7 @@ namespace ModernSlavery.Core.Classes
 
             return reportingStartDate< now ? reportingStartDate.AddYears(-1) : reportingStartDate;
         }
-        public DateTime GetReportingDeadline(SectorTypes sectorType, int year = 0)
+        public DateTime GetReportingDeadline(SectorTypes sectorType, int reportingDeadlineYear = 0)
         {
             var now = VirtualDateTime.Now;
 
@@ -85,11 +88,33 @@ namespace ModernSlavery.Core.Classes
                         "Cannot calculate accounting date for this sector type");
             }
 
-            if (year == 0) year = now.Year;
+            if (reportingDeadlineYear == 0) reportingDeadlineYear = now.Year;
 
-            var reportingDeadline = new DateTime(year, tempMonth, tempDay).Date;
+            var reportingDeadline = new DateTime(reportingDeadlineYear, tempMonth, tempDay).Date;
 
             return reportingDeadline < now ? reportingDeadline.AddYears(1) : reportingDeadline;
+        }
+
+        public IList<DateTime> GetReportingDeadlines(SectorTypes sectorType, int recentYears = 0)
+        {
+            var firstReportingDeadline = GetFirstReportingDeadline(sectorType);
+            var currentReportingDeadline = GetReportingDeadline(sectorType);
+
+            var deadlines = new SortedSet<DateTime>();
+            var deadline = currentReportingDeadline;
+            var years = recentYears;
+            while (deadline >= firstReportingDeadline && (recentYears==0 || years>0))
+            {
+                deadlines.Add(deadline);
+                deadline=deadline.AddYears(-1);
+                years--;
+            }
+            return deadlines.ToList();
+        }
+
+        public DateTime GetFirstReportingDeadline(SectorTypes sectorType)
+        {
+            return GetReportingDeadline(sectorType, FirstReportingDeadlineYear);
         }
     }
 }

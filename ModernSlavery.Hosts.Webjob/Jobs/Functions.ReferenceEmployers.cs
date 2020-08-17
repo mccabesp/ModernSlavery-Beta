@@ -9,11 +9,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         //Ensure all organisations have a unique employer reference
-        public async Task ReferenceEmployers([TimerTrigger("01:00:00:00")] TimerInfo timer, ILogger log)
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task ReferenceEmployers([TimerTrigger("%ReferenceEmployers%")] TimerInfo timer, ILogger log)
         {
             try
             {
-                await ReferenceEmployersAsync();
+                await ReferenceEmployersAsync().ConfigureAwait(false);
                 log.LogDebug($"Executed {nameof(ReferenceEmployers)} successfully");
             }
             catch (Exception ex)
@@ -21,7 +22,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(ReferenceEmployers)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -35,7 +36,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                await _OrganisationBusinessLogic.SetUniqueEmployerReferencesAsync();
+                await _OrganisationBusinessLogic.SetUniqueEmployerReferencesAsync().ConfigureAwait(false);
             }
             finally
             {

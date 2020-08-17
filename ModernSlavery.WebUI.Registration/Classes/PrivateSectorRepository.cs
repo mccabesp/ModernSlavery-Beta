@@ -9,13 +9,15 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Registration.Classes
 {
-    public class PrivateSectorRepository : IPagedRepository<EmployerRecord>
+    public class PrivateSectorRepository : IPagedRepository<OrganisationRecord>
     {
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
+        private readonly CompaniesHouseOptions _companiesHouseOptions;
         private readonly IDataRepository _DataRepository;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -27,7 +29,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
             IHttpContextAccessor httpContextAccessor,
             IHttpSession session,
             IDataRepository dataRepository,
-            ICompaniesHouseAPI companiesHouseAPI,
+            ICompaniesHouseAPI companiesHouseAPI, CompaniesHouseOptions companiesHouseOptions,
             IOrganisationBusinessLogic organisationBusinessLogic)
         {
             SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
@@ -35,20 +37,21 @@ namespace ModernSlavery.WebUI.Registration.Classes
             _Session = session;
             _DataRepository = dataRepository;
             _CompaniesHouseAPI = companiesHouseAPI;
+            _companiesHouseOptions = companiesHouseOptions;
             _organisationBusinessLogic = organisationBusinessLogic;
         }
 
-        public void Delete(EmployerRecord entity)
+        public void Delete(OrganisationRecord entity)
         {
             throw new NotImplementedException();
         }
 
-        public void Insert(EmployerRecord entity)
+        public void Insert(OrganisationRecord entity)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<PagedResult<EmployerRecord>> SearchAsync(string searchText, int page, int pageSize,
+        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize,
             bool test = false)
         {
             if (searchText.IsNumber()) searchText = searchText.PadLeft(8, '0');
@@ -81,7 +84,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
                 try
                 {
                     searchResults =
-                        await _CompaniesHouseAPI.SearchEmployersAsync(searchText, 1, _CompaniesHouseAPI.MaxRecords,
+                        await _CompaniesHouseAPI.SearchOrganisationsAsync(searchText, 1, _companiesHouseOptions.MaxResponseCompanies,
                             test);
                     remoteTotal = searchResults.Results.Count;
                 }
@@ -93,7 +96,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
                             "Bad Gateway",
                             "the connected party did not properly respond after a period of time")
                         && localResults.Count > 0)
-                        searchResults = new PagedResult<EmployerRecord>();
+                        searchResults = new PagedResult<OrganisationRecord>();
                     else
                         throw;
                 }
@@ -119,9 +122,9 @@ namespace ModernSlavery.WebUI.Registration.Classes
                     if (localResults.Count > 0)
                     {
                         if (test) //Make sure test employer is first
-                            searchResults.Results.AddRange(localResults.Select(o => _organisationBusinessLogic.CreateEmployerRecord(o)));
+                            searchResults.Results.AddRange(localResults.Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)));
                         else
-                            searchResults.Results.InsertRange(0, localResults.Select(o => _organisationBusinessLogic.CreateEmployerRecord(o)));
+                            searchResults.Results.InsertRange(0, localResults.Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)));
 
                         searchResults.ActualRecordTotal += localTotal;
                     }
@@ -130,9 +133,9 @@ namespace ModernSlavery.WebUI.Registration.Classes
                 if (!test) SaveSearch(searchText, searchResults, remoteTotal);
             }
 
-            var result = new PagedResult<EmployerRecord>();
-            result.VirtualRecordTotal = searchResults.ActualRecordTotal > _CompaniesHouseAPI.MaxRecords
-                ? _CompaniesHouseAPI.MaxRecords
+            var result = new PagedResult<OrganisationRecord>();
+            result.VirtualRecordTotal = searchResults.ActualRecordTotal > _companiesHouseOptions.MaxResponseCompanies
+                ? _companiesHouseOptions.MaxResponseCompanies
                 : searchResults.ActualRecordTotal;
             result.ActualRecordTotal = searchResults.ActualRecordTotal;
             result.CurrentPage = page;
@@ -153,19 +156,19 @@ namespace ModernSlavery.WebUI.Registration.Classes
             _Session.Remove("LastPrivateSearchRemoteTotal");
         }
 
-        public void SaveSearch(string searchText, PagedResult<EmployerRecord> results, int remoteTotal)
+        public void SaveSearch(string searchText, PagedResult<OrganisationRecord> results, int remoteTotal)
         {
             _Session["LastPrivateSearchText"] = searchText;
             _Session["LastPrivateSearchResults"] = results;
             _Session["LastPrivateSearchRemoteTotal"] = remoteTotal;
         }
 
-        public PagedResult<EmployerRecord> LoadSearch(string searchText)
+        public PagedResult<OrganisationRecord> LoadSearch(string searchText)
         {
             var lastSearchText = _Session["LastPrivateSearchText"] as string;
             var remoteTotal = _Session["LastPrivateSearchRemoteTotal"].ToInt32();
 
-            PagedResult<EmployerRecord> result = null;
+            PagedResult<OrganisationRecord> result = null;
 
             if (!SharedOptions.IsProduction()
                 && _httpContextAccessor.HttpContext != null
@@ -179,8 +182,8 @@ namespace ModernSlavery.WebUI.Registration.Classes
             }
             else
             {
-                result = _Session.Get<PagedResult<EmployerRecord>>("LastPrivateSearchResults");
-                if (result == null) result = new PagedResult<EmployerRecord>();
+                result = _Session.Get<PagedResult<OrganisationRecord>>("LastPrivateSearchResults");
+                if (result == null) result = new PagedResult<OrganisationRecord>();
             }
 
             return result;

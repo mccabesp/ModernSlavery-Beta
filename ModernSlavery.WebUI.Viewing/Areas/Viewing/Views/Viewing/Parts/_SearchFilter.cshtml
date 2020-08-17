@@ -1,0 +1,48 @@
+﻿@model SearchViewModel
+@{
+    var turnover = new FilterGroup
+    {
+        Id = "TurnoverFilter",
+        Group = "tr",
+        Label = "Annual Turnover",
+        Expanded = false,
+        Metadata = Model.TurnoverOptions
+    };
+
+    var sectors = new FilterGroup
+    {
+        Id = "SectorFilter",
+        Group = "s",
+        Label = "Sector",
+        Expanded = false,
+        Metadata = Model.SectorOptions,
+        MaxHeight = "300px"
+    };
+
+    var years = new FilterGroup
+    {
+        Id = "ReportingYearFilter",
+        Group = "y",
+        Label = "Reporting year",
+        Expanded = false,
+        Metadata = Model.ReportingYearOptions
+    };
+}
+
+<a id="ClearFilters" href="search-results?search=@(Model.search)">Clear all filters</a>
+
+<div class="filter-divider"></div>
+
+<partial name="Parts/_SearchOptionSelect" model="turnover"/>
+
+<div class="filter-divider"></div>
+
+<partial name="Parts/_SearchOptionSelect" model="sectors"/>
+
+<div class="filter-divider"></div>
+
+<partial name="Parts/_SearchOptionSelect" model="years"/>
+
+<div class="filter-divider"></div>
+
+<input id="UpdateFilterParams" class="button button-update js-update-filters" type="submit" value="Update results"/>

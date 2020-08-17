@@ -2,7 +2,7 @@
 {
     public class CompareBasketViewModel
     {
-        public bool CanAddEmployers { get; set; }
+        public bool CanAddOrganisations { get; set; }
 
         public bool CanViewCompare { get; set; }
 
