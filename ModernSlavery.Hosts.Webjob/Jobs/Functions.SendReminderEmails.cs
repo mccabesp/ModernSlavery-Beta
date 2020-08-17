@@ -5,7 +5,6 @@ using Autofac;
 using Microsoft.Azure.WebJobs;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
@@ -13,7 +12,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         // This trigger is set to run every hour, on the hour
-        public void SendReminderEmails([TimerTrigger("0 * * * *")] TimerInfo timer)
+        [Disable(typeof(DisableWebjobProvider))]
+        public void SendReminderEmails([TimerTrigger("%SendReminderEmails%")] TimerInfo timer)
         {
             var start = VirtualDateTime.Now;
             _CustomLogger.Information("SendReminderEmails Function started", start);

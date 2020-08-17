@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Submission.Classes;
 using ModernSlavery.WebUI.Submission.Models;
@@ -29,11 +30,6 @@ namespace ModernSlavery.WebUI.Submission
         public void ConfigureServices(IServiceCollection services)
         {
             //Register service dependencies here
-            services.AddSingleton<SectorTypeIndex>();
-            services.AddSingleton<PolicyTypeIndex>();
-            services.AddSingleton<RiskTypeIndex>();
-            services.AddSingleton<DiligenceTypeIndex>();
-            services.AddSingleton<TrainingTypeIndex>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

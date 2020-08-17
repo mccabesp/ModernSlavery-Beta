@@ -13,6 +13,7 @@ using Microsoft.Net.Http.Headers;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
@@ -21,6 +22,7 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Viewing.Models;
 using ModernSlavery.WebUI.Viewing.Presenters;
 
@@ -73,8 +75,8 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
         public IActionResult Index()
         {
-            //Clear the default back url of the employer hub pages
-            EmployerBackUrl = null;
+            //Clear the default back url of the organisation hub pages
+            OrganisationBackUrl = null;
             ReportBackUrl = null;
 
             if (WebService.FeatureSwitchOptions.IsEnabled("ReportingStepByStep"))
@@ -92,6 +94,32 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
         #endregion
 
+        #region Page Handling Methods
+        /// <summary>
+        /// Returns an ActionResult to handle any StatementErrors
+        /// </summary>
+        /// <param name="errors">A List of Statement Errors and their description</param>
+        /// <returns>The IActionResult to execute</returns>
+        private IActionResult HandleStatementErrors(IEnumerable<(StatementErrors Error, string Message)> errors)
+        {
+            //Return full page errors which return to the ManageOrganisation page
+            var error = errors.FirstOrDefault();
+            switch (error.Error)
+            {
+                case StatementErrors.NotFound:
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1152, error));
+                case StatementErrors.Unauthorised:
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1153));
+                case StatementErrors.Locked:
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1154, error));
+                case StatementErrors.TooLate:
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1155));
+                default:
+                    throw new NotImplementedException($"{nameof(StatementErrors)} type '{error.Error}' is not recognised");
+            }
+        }
+        #endregion
+
         #region Search
 
         /// <summary>
@@ -103,32 +131,32 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         public async Task<IActionResult> SearchResults([FromQuery] SearchResultsQuery searchQuery)
         {
             //Ensure search service is enabled
-            if (ViewingService.SearchBusinessLogic.EmployerSearchRepository.Disabled)
+            if (ViewingService.SearchBusinessLogic.OrganisationSearchRepository.Disabled)
                 return View("CustomError",
                     WebService.ErrorViewModelFactory.Create(1151, new {featureName = "Search Service"}));
 
             //When never searched in this session
             if (string.IsNullOrWhiteSpace(SearchPresenter.LastSearchParameters))
-                //If no compare employers in session then load employers from the cookie
+                //If no compare organisations in session then load organisations from the cookie
                 if (ComparePresenter.BasketItemCount == 0)
-                    ComparePresenter.LoadComparedEmployersFromCookie();
+                    ComparePresenter.LoadComparedOrganisationsFromCookie();
 
-            //Clear the default back url of the employer hub pages
-            EmployerBackUrl = null;
+            //Clear the default back url of the organisation hub pages
+            OrganisationBackUrl = null;
             ReportBackUrl = null;
 
             // ensure parameters are valid
             if (!searchQuery.TryValidateSearchParams(out var result)) return result;
 
             // generate result view model
-            var searchParams = AutoMapper.Map<EmployerSearchParameters>(searchQuery);
+            var searchParams = AutoMapper.Map<OrganisationSearchParameters>(searchQuery);
             var model = await ViewingPresenter.SearchAsync(searchParams);
 
             ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
 
             ViewBag.BasketViewModel = new CompareBasketViewModel
             {
-                CanAddEmployers = false, CanViewCompare = ComparePresenter.BasketItemCount > 1, CanClearCompare = true
+                CanAddOrganisations = false, CanViewCompare = ComparePresenter.BasketItemCount > 1, CanClearCompare = true
             };
 
             return View("Finder/SearchResults", model);
@@ -139,8 +167,8 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("search-results-js")]
         public async Task<IActionResult> SearchResultsJs([FromQuery] SearchResultsQuery searchQuery)
         {
-            //Clear the default back url of the employer hub pages
-            EmployerBackUrl = null;
+            //Clear the default back url of the organisation hub pages
+            OrganisationBackUrl = null;
             ReportBackUrl = null;
 
 
@@ -148,38 +176,12 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             if (!searchQuery.TryValidateSearchParams(out var result)) return result;
 
             // generate result view model
-            var searchParams = AutoMapper.Map<EmployerSearchParameters>(searchQuery);
+            var searchParams = AutoMapper.Map<OrganisationSearchParameters>(searchQuery);
             var model = await ViewingPresenter.SearchAsync(searchParams);
 
             ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
 
-            return PartialView("Finder/Parts/MainContent", model);
-        }
-
-        [ResponseCache(CacheProfileName = "SuggestEmployerNameJs")]
-        [HttpGet("suggest-employer-name-js")]
-        public async Task<IActionResult> SuggestEmployerNameJs(string search)
-        {
-            if (string.IsNullOrEmpty(search))
-                return Json(new
-                    {ErrorCode = HttpStatusCode.BadRequest, ErrorMessage = "Cannot search for a null or empty value"});
-
-            var matches = await ViewingPresenter.SuggestEmployerNameAsync(search.Trim());
-
-            return Json(new {Matches = matches});
-        }
-
-        [ResponseCache(CacheProfileName = "SuggestSicCodeJs")]
-        [HttpGet("suggest-sic-code-js")]
-        public async Task<JsonResult> SuggestSicCodeJsAsync(string search)
-        {
-            if (string.IsNullOrEmpty(search))
-                return Json(new
-                    {ErrorCode = HttpStatusCode.BadRequest, ErrorMessage = "Cannot search for a null or empty value"});
-
-            var matches = await ViewingPresenter.GetListOfSicCodeSuggestionsAsync(search.Trim());
-
-            return Json(new {Matches = matches});
+            return PartialView("Parts/_SearchMainContent", model);
         }
 
         #endregion
@@ -262,108 +264,58 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
         #endregion
 
-        #region Employer details
+        #region Organisation details
         [NoCache]
-        [HttpGet("~/Employer/{employerIdentifier}")]
-        public IActionResult Employer(string employerIdentifier)
+        [HttpGet("~/Organisation/{organisationIdentifier}")]
+        public IActionResult Organisation(string organisationIdentifier)
         {
-            if (string.IsNullOrWhiteSpace(employerIdentifier))
-                return new HttpBadRequestResult("Missing employer identifier");
+            if (string.IsNullOrWhiteSpace(organisationIdentifier))
+                return new HttpBadRequestResult("Missing organisation identifier");
 
             CustomResult<Organisation> organisationLoadingOutcome;
 
             try
             {
-                organisationLoadingOutcome =
-                    ViewingService.OrganisationBusinessLogic.LoadInfoFromActiveEmployerIdentifier(employerIdentifier);
+                long organisationId = ViewingPresenter.Obfuscator.DeObfuscate(organisationIdentifier);
+                organisationLoadingOutcome = ViewingService.OrganisationBusinessLogic.LoadInfoFromActiveOrganisationId(organisationId);
 
                 if (organisationLoadingOutcome.Failed)
                     return organisationLoadingOutcome.ErrorMessage.ToHttpStatusViewResult();
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, $"Cannot decrypt return employerIdentifier from '{employerIdentifier}'");
+                Logger.LogError(ex, $"Cannot decrypt return organisationIdentifier from '{organisationIdentifier}'");
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(400));
             }
 
             //Clear the default back url of the report page
             ReportBackUrl = null;
 
-            ViewBag.BasketViewModel = new CompareBasketViewModel {CanAddEmployers = true, CanViewCompare = true};
+            ViewBag.BasketViewModel = new CompareBasketViewModel {CanAddOrganisations = true, CanViewCompare = true};
 
             return View(
-                "EmployerDetails/Employer",
-                new EmployerDetailsViewModel
+                "OrganisationDetails/Organisation",
+                new OrganisationDetailsViewModel
                 {
                     Organisation = organisationLoadingOutcome.Result,
                     LastSearchUrl = SearchPresenter.GetLastSearchUrl(),
-                    EmployerBackUrl = EmployerBackUrl,
-                    ComparedEmployers = ComparePresenter.ComparedEmployers.Value
+                    OrganisationBackUrl = OrganisationBackUrl,
+                    ComparedOrganisations = ComparePresenter.ComparedOrganisations.Value
                 });
         }
 
         #endregion
 
         #region Reports
-        [HttpGet("~/Employer/{employerIdentifier}/{year}")]
-        public IActionResult Report(string employerIdentifier, int year)
+        [HttpGet("~/Organisation/{organisationIdentifier}/{year}")]
+        public async Task<IActionResult> Report(string organisationIdentifier, int year)
         {
-            if (string.IsNullOrWhiteSpace(employerIdentifier))
-                return new HttpBadRequestResult("Missing employer identifier");
+            //Get the latest statement data for this organisation, reporting year
+            var openResult = await ViewingPresenter.GetStatementViewModelAsync(organisationIdentifier, year);
+            if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
-            if (year < SharedBusinessLogic.SharedOptions.FirstReportingYear || year > VirtualDateTime.Now.Year)
-                return new HttpBadRequestResult($"Invalid snapshot year {year}");
-
-            #region Load organisation
-
-            CustomResult<Organisation> organisationLoadingOutcome;
-
-            try
-            {
-                organisationLoadingOutcome =
-                    ViewingService.OrganisationBusinessLogic.LoadInfoFromActiveEmployerIdentifier(employerIdentifier);
-
-                if (organisationLoadingOutcome.Failed)
-                    return organisationLoadingOutcome.ErrorMessage.ToHttpStatusViewResult();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, $"Cannot decrypt return employerIdentifier from '{employerIdentifier}'");
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(400));
-            }
-
-            var foundOrganisation = organisationLoadingOutcome.Result;
-
-            #endregion
-
-            #region Load latest submission
-
-            ReturnViewModel model;
-
-            try
-            {
-                var getLatestSubmissionLoadingOutcome =
-                    ViewingService.SubmissionBusinessLogic.GetSubmissionByOrganisationAndYear(foundOrganisation, year);
-
-                if (getLatestSubmissionLoadingOutcome.Failed)
-                    return getLatestSubmissionLoadingOutcome.ErrorMessage.ToHttpStatusViewResult();
-
-                model = ViewingService.SubmissionBusinessLogic.ConvertSubmissionReportToReturnViewModel(
-                    getLatestSubmissionLoadingOutcome.Result);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(
-                    ex,
-                    $"Exception processing the return information for Organisation '{foundOrganisation.OrganisationId}:{foundOrganisation.OrganisationName}'");
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(400));
-            }
-
-            #endregion
-
-            ViewBag.BasketViewModel = new CompareBasketViewModel {CanAddEmployers = true, CanViewCompare = true};
-
-            return View("EmployerDetails/Report", model);
+            var viewModel = openResult.Result;
+            return View("OrganisationDetails/Report", viewModel);
         }
 
         [HttpGet("add-search-results-to-compare")]
@@ -372,7 +324,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             if (!searchQuery.TryValidateSearchParams(out var result)) return result;
 
             // generate compare list
-            var searchParams = AutoMapper.Map<EmployerSearchParameters>(searchQuery);
+            var searchParams = AutoMapper.Map<OrganisationSearchParameters>(searchQuery);
 
             // set maximum search size
             searchParams.Page = 1;
@@ -380,16 +332,16 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             var searchResultsModel = await ViewingPresenter.SearchAsync(searchParams);
 
             // add any new items to the compare list
-            var resultIds = searchResultsModel.Employers.Results
-                .Where(employer => ComparePresenter.BasketContains(employer.OrganisationIdEncrypted) == false)
+            var resultIds = searchResultsModel.Organisations.Results
+                .Where(organisation => ComparePresenter.BasketContains(ViewingPresenter.Obfuscator.Obfuscate(organisation.OrganisationId)) == false)
                 .Take(ComparePresenter.MaxCompareBasketCount - ComparePresenter.BasketItemCount)
-                .Select(employer => employer.OrganisationIdEncrypted)
+                .Select(organisation => ViewingPresenter.Obfuscator.Obfuscate(organisation.OrganisationId))
                 .ToArray();
 
             ComparePresenter.AddRangeToBasket(resultIds);
 
             // save the results to the cookie
-            ComparePresenter.SaveComparedEmployersToCookie(Request);
+            ComparePresenter.SaveComparedOrganisationsToCookie(Request);
 
             return RedirectToAction(nameof(SearchResults), searchQuery);
         }

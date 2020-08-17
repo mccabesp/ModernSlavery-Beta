@@ -4,6 +4,7 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
+using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 
 namespace ModernSlavery.WebUI.Viewing.Models
 {
@@ -19,19 +20,13 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public string search { get; set; }
 
         // Sector
-        public IEnumerable<char> s { get; set; }
+        public IEnumerable<short> s { get; set; }
 
-        // Employer Size
-        public IEnumerable<int> es { get; set; }
+        // Turnover Range
+        public IEnumerable<int> tr { get; set; }
 
         // Reporting Year
         public IEnumerable<int> y { get; set; }
-
-        // Reporting Status
-        public IEnumerable<int> st { get; set; }
-
-        // Employer Type
-        public SearchTypes t { get; set; } = SearchTypes.ByEmployerName;
 
         // Page
         public int p { get; set; } = 1;
@@ -41,44 +36,28 @@ namespace ModernSlavery.WebUI.Viewing.Models
             return p > 0;
         }
 
-        public bool IsEmployerSizeValid()
+        public bool IsOrganisationTurnoverValid()
         {
             // if null then we won't filter on this so its valid
-            if (es == null) return true;
+            if (tr == null) return true;
 
-            foreach (var size in es)
-                // ensure we have a valid org size
-                if (!Enum.IsDefined(typeof(OrganisationSizes), size))
+            foreach (var turnover in tr)
+                // ensure we have a valid org turnover
+                if (!Enum.IsDefined(typeof(TurnoverRanges), turnover))
                     return false;
 
             return true;
         }
 
-        public bool IsReportingStatusValid()
-        {
-            // if null then we won't filter on this so its valid
-            if (st == null) return true;
-
-            foreach (var value in st)
-                // ensure we have a valid enum entry
-                if (!Enum.IsDefined(typeof(SearchReportingStatusFilter), value))
-                    return false;
-
-            return true;
-        }
 
         public bool TryValidateSearchParams(out HttpStatusViewResult exception)
         {
             exception = null;
 
-            if (!IsPageValid()) exception = new HttpBadRequestResult($"EmployerSearch: Invalid page {p}");
+            if (!IsPageValid()) exception = new HttpBadRequestResult($"OrganisationSearch: Invalid page {p}");
 
-            if (!IsEmployerSizeValid())
-                exception = new HttpBadRequestResult($"EmployerSearch: Invalid EmployerSize {es.ToDelimitedString()}");
-
-            if (!IsReportingStatusValid())
-                exception = new HttpBadRequestResult(
-                    $"EmployerSearch: Invalid ReportingStatus {st.ToDelimitedString()}");
+            if (!IsOrganisationTurnoverValid())
+                exception = new HttpBadRequestResult($"OrganisationSearch: Invalid Turnover {tr.ToDelimitedString()}");
 
             return exception == null;
         }

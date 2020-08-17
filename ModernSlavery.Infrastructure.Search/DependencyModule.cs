@@ -6,6 +6,7 @@ using Microsoft.Azure.Search;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Search
 {
@@ -32,19 +33,9 @@ namespace ModernSlavery.Infrastructure.Search
                 .As<ISearchServiceClient>()
                 .SingleInstance();
 
-            builder.RegisterType<AzureEmployerSearchRepository>()
-                .As<ISearchRepository<EmployerSearchModel>>()
-                .SingleInstance()
-                .WithParameter("serviceName", _options.ServiceName)
-                .WithParameter("indexName", _options.EmployerIndexName)
-                .WithParameter("adminApiKey", _options.AdminApiKey)
-                .WithParameter("disabled", _options.Disabled).WithAttributeFiltering();
-
-            builder.RegisterType<AzureSicCodeSearchRepository>()
-                .As<ISearchRepository<SicCodeSearchModel>>()
-                .SingleInstance()
-                .WithParameter("indexName", _options.SicCodeIndexName)
-                .WithParameter("disabled", _options.Disabled).WithAttributeFiltering();
+            builder.RegisterType<AzureOrganisationSearchRepository>()
+                .As<ISearchRepository<OrganisationSearchModel>>()
+                .SingleInstance().WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

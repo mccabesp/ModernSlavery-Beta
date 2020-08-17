@@ -46,6 +46,12 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             return await DbContext.Set<TEntity>().FirstOrDefaultAsync(predicate);
         }
 
+        public async Task<TEntity> SingleOrDefaultAsync<TEntity>(Expression<Func<TEntity, bool>> predicate = null)
+            where TEntity : class
+        {
+            return await DbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
+        }
+
         public async Task<TEntity> FirstOrDefaultByAscendingAsync<TEntity, TKey>(
             Expression<Func<TEntity, TKey>> keySelector, Expression<Func<TEntity, bool>> filterPredicate = null)
             where TEntity : class
@@ -114,6 +120,13 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
 
             await DbContext.SaveChangesAsync();
+        }
+
+        public async Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity = false) where TEntity : class
+        {
+            if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
+
+            await DbContext.BulkInsertAsync(entities,setOutputIdentity);
         }
 
         public void UpdateChangesInBulk<TEntity>(IEnumerable<TEntity> listOfOrganisations) where TEntity : class

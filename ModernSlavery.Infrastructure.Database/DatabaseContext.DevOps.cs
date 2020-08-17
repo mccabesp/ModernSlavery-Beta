@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Data;
+using System.Linq;
+using EFCore.BulkExtensions;
 using Microsoft.Data.SqlClient;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Infrastructure.Database
 {
@@ -14,34 +17,46 @@ namespace ModernSlavery.Infrastructure.Database
             if (string.IsNullOrWhiteSpace(_sharedOptions.TestPrefix))
                 throw new ArgumentNullException(nameof(_sharedOptions.TestPrefix));
 
-            if (deadline == null || deadline.Value == DateTime.MinValue)
+            using (var transaction = Database.BeginTransaction())
             {
-                ExecuteSqlCommand(
-                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN organisations O ON O.OrganisationId=UO.OrganisationId where O.OrganisationName like '{_sharedOptions.TestPrefix}%'");
-                ExecuteSqlCommand(
-                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN Users U ON U.UserId=UO.UserId where U.Firstname like '{_sharedOptions.TestPrefix}%'");
-                ExecuteSqlCommand(
-                    $"UPDATE Organisations WITH (ROWLOCK) SET LatestAddressId=null, LatestRegistration_OrganisationId=null,LatestRegistration_UserId=null,LatestReturnId=null,LatestScopeId=null where OrganisationName like '{_sharedOptions.TestPrefix}%'");
-                ExecuteSqlCommand($"DELETE Users WITH (ROWLOCK) where Firstname like '{_sharedOptions.TestPrefix}%'");
-                ExecuteSqlCommand(
-                    $"DELETE Organisations WITH (ROWLOCK) where OrganisationName like '{_sharedOptions.TestPrefix}%'");
-            }
-            else
-            {
-                var dl = deadline.Value.ToString("yyyy-MM-dd HH:mm:ss");
-                ExecuteSqlCommand(
-                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN organisations O ON O.OrganisationId=UO.OrganisationId where O.OrganisationName like '{_sharedOptions.TestPrefix}%' AND UO.Created<'{dl}'");
-                ExecuteSqlCommand(
-                    $"UPDATE UO SET AddressId=null FROM UserOrganisations UO WITH (ROWLOCK) JOIN Users U ON U.UserId=UO.UserId where U.Firstname like '{_sharedOptions.TestPrefix}%' AND UO.Created<'{dl}'");
-                ExecuteSqlCommand(
-                    $"UPDATE Organisations WITH (ROWLOCK) SET LatestAddressId=null, LatestRegistration_OrganisationId=null,LatestRegistration_UserId=null,LatestReturnId=null,LatestScopeId=null where OrganisationName like '{_sharedOptions.TestPrefix}%' AND Created<'{dl}'");
-                ExecuteSqlCommand(
-                    $"DELETE Users WITH (ROWLOCK) where Firstname like '{_sharedOptions.TestPrefix}%' AND Created<'{dl}'");
-                ExecuteSqlCommand(
-                    $"DELETE Organisations WITH (ROWLOCK) where OrganisationName like '{_sharedOptions.TestPrefix}%' AND Created<'{dl}'");
+                try
+                {
+
+                    if (deadline == null || deadline.Value == DateTime.MinValue)
+                    {
+                        Set<AuditLog>().Where(a => a.OriginalUser != null && a.OriginalUser.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<AuditLog>().Where(a => a.ImpersonatedUser != null && a.OriginalUser.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<Feedback>().Where(f => f.EmailAddress.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<Organisation>().Where(o => o.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchUpdate(o => new Organisation { LatestAddressId = null, LatestStatementId = null, LatestPublicSectorTypeId = null, LatestRegistrationOrganisationId = null, LatestRegistrationUserId = null, LatestScopeId = null });
+                        Set<StatementOrganisation>().Where(o => o != null && o.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchUpdate(o => new StatementOrganisation { OrganisationId = null });
+                        Set<UserOrganisation>().Where(uo => uo.User.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<UserOrganisation>().Where(uo => uo.Organisation.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<Organisation>().Where(o => o.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<ReminderEmail>().Where(r => r.User.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<User>().Where(u => u.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                    }
+                    else
+                    {
+                        Set<AuditLog>().Where(a => a.CreatedDate < deadline.Value && a.OriginalUser != null && a.OriginalUser.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<AuditLog>().Where(a => a.CreatedDate < deadline.Value && a.ImpersonatedUser != null && a.OriginalUser.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<Feedback>().Where(f => f.CreatedDate < deadline.Value && f.EmailAddress.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<Organisation>().Where(o => o.Created < deadline.Value && o.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchUpdate(o => new Organisation { LatestAddressId = null, LatestStatementId = null, LatestPublicSectorTypeId = null, LatestRegistrationOrganisationId = null, LatestRegistrationUserId = null, LatestScopeId = null });
+                        Set<StatementOrganisation>().Where(o => o != null && o.Created < deadline.Value && o.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchUpdate(o => new StatementOrganisation { OrganisationId = null });
+                        Set<UserOrganisation>().Where(uo => uo.Created < deadline.Value && uo.User.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<UserOrganisation>().Where(uo => uo.Created < deadline.Value && uo.Organisation.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<Organisation>().Where(o => o.Created < deadline.Value && o.OrganisationName.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<ReminderEmail>().Where(r => r.Created < deadline.Value && r.User.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                        Set<User>().Where(u => u.Created < deadline.Value && u.Firstname.StartsWith(_sharedOptions.TestPrefix, StringComparison.OrdinalIgnoreCase)).BatchDelete();
+                    }
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
         }
-
 
         private void ExecuteSqlCommand(string query, int timeOut = 120)
         {

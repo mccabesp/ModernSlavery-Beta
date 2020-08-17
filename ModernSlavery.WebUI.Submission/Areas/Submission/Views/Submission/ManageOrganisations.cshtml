@@ -47,7 +47,7 @@
 
                     var encOrgId = Obfuscator.Obfuscate(userOrg.OrganisationId.ToString());
                     var latestStatement = userOrg.Organisation.LatestStatement;
-                    var scopeStatus = userOrg.Organisation.GetScopeStatus(accountingDate);
+                    var scopeStatus = userOrg.Organisation.GetActiveScopeStatus(accountingDate);
                     var address = userOrg.Organisation.GetLatestAddress()?.GetAddressString();
 
                     <tr>

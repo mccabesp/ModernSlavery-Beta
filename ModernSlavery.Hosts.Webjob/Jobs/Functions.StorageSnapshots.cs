@@ -16,26 +16,27 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
+        [Disable(typeof(DisableWebjobProvider))]
         public async Task TakeSnapshotAsync([TimerTrigger(typeof(MidnightSchedule))]
             TimerInfo timer,
             ILogger log)
         {
             try
             {
-                var azureStorageConnectionString = _StorageOptions.AzureConnectionString;
+                var azureStorageConnectionString = _storageOptions.AzureConnectionString;
                 if (azureStorageConnectionString.Equals("UseDevelopmentStorage=true")) return;
 
                 var connectionString = azureStorageConnectionString.ConnectionStringToDictionary();
 
                 var azureStorageAccount = connectionString["AccountName"];
                 var azureStorageKey = connectionString["AccountKey"];
-                var azureStorageShareName = _StorageOptions.AzureShareName;
+                var azureStorageShareName = _storageOptions.AzureShareName;
 
                 //Take the snapshot
-                await TakeSnapshotAsync(azureStorageAccount, azureStorageKey, azureStorageShareName);
+                await TakeSnapshotAsync(azureStorageAccount, azureStorageKey, azureStorageShareName).ConfigureAwait(false);
 
                 //Get the list of snapshots
-                var response = await ListSnapshotsAsync(azureStorageAccount, azureStorageKey, azureStorageShareName);
+                var response = await ListSnapshotsAsync(azureStorageAccount, azureStorageKey, azureStorageShareName).ConfigureAwait(false);
                 var count = 0;
                 if (!string.IsNullOrWhiteSpace(response))
                 {
@@ -51,7 +52,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         if (date > deadline) continue;
 
                         await DeleteSnapshotAsync(log, azureStorageAccount, azureStorageKey, azureStorageShareName,
-                            snapshot);
+                            snapshot).ConfigureAwait(false);
                         count++;
                     }
                 }
@@ -63,7 +64,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob:{nameof(TakeSnapshotAsync)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -73,17 +74,17 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                var azureStorageConnectionString = _StorageOptions.AzureConnectionString;
+                var azureStorageConnectionString = _storageOptions.AzureConnectionString;
                 if (azureStorageConnectionString.Equals("UseDevelopmentStorage=true")) return;
 
                 var connectionString = azureStorageConnectionString.ConnectionStringToDictionary();
 
                 var azureStorageAccount = connectionString["AccountName"];
                 var azureStorageKey = connectionString["AccountKey"];
-                var azureStorageShareName = _StorageOptions.AzureShareName;
+                var azureStorageShareName = _storageOptions.AzureShareName;
 
                 //Take the snapshot
-                await TakeSnapshotAsync(azureStorageAccount, azureStorageKey, azureStorageShareName);
+                await TakeSnapshotAsync(azureStorageAccount, azureStorageKey, azureStorageShareName).ConfigureAwait(false);
 
                 log.LogDebug($"Executed {nameof(TakeSnapshotAsync)} successfully");
             }
@@ -127,7 +128,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             headers.Add("x-ms-date", dt.ToString("R"));
             headers.Add("x-ms-version", version);
             headers.Add("Authorization", authorizationHeader);
-            var json = await WebRequestAsync(HttpMethods.Put, url, headers: headers);
+            var json = await WebRequestAsync(HttpMethods.Put, url, headers: headers).ConfigureAwait(false);
             return headers["x-ms-snapshot"];
         }
 
@@ -165,7 +166,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             headers.Add("x-ms-date", dt.ToString("R"));
             headers.Add("x-ms-version", version);
             headers.Add("Authorization", authorizationHeader);
-            var response = await WebRequestAsync(HttpMethods.Get, url, headers: headers);
+            var response = await WebRequestAsync(HttpMethods.Get, url, headers: headers).ConfigureAwait(false);
             return response;
         }
 
@@ -206,7 +207,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             headers.Add("x-ms-date", dt.ToString("R"));
             headers.Add("x-ms-version", version);
             headers.Add("Authorization", authorizationHeader);
-            var response = await WebRequestAsync(HttpMethods.Delete, url, headers: headers);
+            var response = await WebRequestAsync(HttpMethods.Delete, url, headers: headers).ConfigureAwait(false);
 
             log.LogDebug($"{nameof(DeleteSnapshotAsync)}: successfully deleted snapshot:{snapshot}");
 
@@ -229,14 +230,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             const string logZipDir = @"\Archive\";
 
             //Ensure the archive directory exists
-            if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(logZipDir))
-                await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(logZipDir);
+            if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(logZipDir).ConfigureAwait(false))
+                await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(logZipDir).ConfigureAwait(false);
 
             //Create the zip file path using todays date
             var logZipFilePath = Path.Combine(logZipDir, $"{VirtualDateTime.Now.ToString("yyyyMMdd")}.zip");
 
             //Dont zip if we have one for today
-            if (await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(logZipFilePath)) return;
+            if (await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(logZipFilePath).ConfigureAwait(false)) return;
 
             var zipDir = Url.UrlToDirSeparator(Path.Combine(_SharedBusinessLogic.FileRepository.RootDir, logZipDir));
 
@@ -245,11 +246,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var files = 0;
                 using (var zipStream = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
                 {
-                    foreach (var dir in await _SharedBusinessLogic.FileRepository.GetDirectoriesAsync("\\", null, true))
+                    foreach (var dir in await _SharedBusinessLogic.FileRepository.GetDirectoriesAsync("\\", null, true).ConfigureAwait(false))
                     {
                         if (Url.UrlToDirSeparator($"{dir}\\").StartsWithI(zipDir)) continue;
 
-                        foreach (var file in await _SharedBusinessLogic.FileRepository.GetFilesAsync(dir, "*.*"))
+                        foreach (var file in await _SharedBusinessLogic.FileRepository.GetFilesAsync(dir, "*.*").ConfigureAwait(false))
                         {
                             var dirFile = Url.UrlToDirSeparator(file);
 
@@ -259,7 +260,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             var entry = zipStream.CreateEntry(dirFile);
                             using (var entryStream = entry.Open())
                             {
-                                await _SharedBusinessLogic.FileRepository.ReadAsync(dirFile, entryStream);
+                                await _SharedBusinessLogic.FileRepository.ReadAsync(dirFile, entryStream).ConfigureAwait(false);
                                 files++;
                             }
                         }
@@ -269,7 +270,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 if (files == 0) return;
 
                 fileStream.Position = 0;
-                await _SharedBusinessLogic.FileRepository.WriteAsync(logZipFilePath, fileStream);
+                await _SharedBusinessLogic.FileRepository.WriteAsync(logZipFilePath, fileStream).ConfigureAwait(false);
             }
         }
     }

@@ -13,13 +13,13 @@
         </p>
         <div>
             <h2 class="heading-medium">
-                Employers who have published their Modern Slavery figures
+                Organisations who have published their Modern Slavery figures
             </h2>
             <table class="download-table" data-downloadcount="@Model.Downloads.Count">
                 <thead>
                 <tr>
                     <th scope="col">Reporting year</th>
-                    <th scope="col" class="numeric">Number of employers</th>
+                    <th scope="col" class="numeric">Number of organisations</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -35,7 +35,7 @@
                             <td data-prefix="Reporting year">
                                 <a download="true" data-name="download" data-index="@i" href="@Model.Downloads[i].Url" target="_blank">@Model.Downloads[i].Title </a><span class="info"> (@Model.Downloads[i].Extension.ToUpper(), @Model.Downloads[i].Size)</span>
                             </td>
-                            <td data-prefix="Number of employers" class="numeric"> @Model.Downloads[i].Count </td>
+                            <td data-prefix="Number of organisations" class="numeric"> @Model.Downloads[i].Count </td>
                         </tr>
                     }
                 }

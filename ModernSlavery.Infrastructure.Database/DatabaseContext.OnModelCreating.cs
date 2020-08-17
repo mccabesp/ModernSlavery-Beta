@@ -421,6 +421,10 @@ namespace ModernSlavery.Infrastructure.Database
             {
                 entity.HasKey(e => e.ReminderEmailId);
                 entity.Property(e => e.SectorType).HasColumnName("SectorTypeId");
+
+                entity.HasOne(d => d.User)
+                .WithMany(p => p.ReminderEmails)
+                .HasForeignKey(d => d.UserId);
             });
             #endregion
 
@@ -759,7 +763,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.HasIndex(e => e.StatementId);
 
                     entity.HasOne(e => e.Statement)
-                        .WithMany()
+                        .WithMany(s => s.StatementOrganisations)
                         .HasForeignKey(e => e.StatementId);
 
                     entity.HasOne(e => e.Organisation)
@@ -826,7 +830,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.Property(e => e.Status).HasColumnName("StatusId");
 
                     entity.HasOne(e => e.ByUser)
-                        .WithMany()
+                        .WithMany(u => u.StatementStatusesByUser)
                         .HasForeignKey(e => e.ByUserId);
 
                     entity.HasOne(e => e.Statement)

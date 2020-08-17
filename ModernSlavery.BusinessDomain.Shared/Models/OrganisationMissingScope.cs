@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.BusinessDomain.Shared.Models
@@ -7,6 +8,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
     {
         public Organisation Organisation { get; set; }
 
-        public List<int> MissingSnapshotYears { get; set; }
+        public List<DateTime> MissingDeadlines { get; set; }
     }
 }

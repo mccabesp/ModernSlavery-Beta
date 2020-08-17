@@ -1,0 +1,16 @@
+﻿@model SearchViewModel
+
+<div>
+    <partial name="Parts/_SearchResultsInfo" model="Model"/>
+</div>
+
+<div>
+    @if (Model.Organisations.Results.Count < 1)
+    {
+        <partial name="Parts/_SearchNoResults" model="Model"/>
+    }
+    else
+    {
+        <partial name="Parts/_SearchResults" model="Model"/>
+    }
+</div>

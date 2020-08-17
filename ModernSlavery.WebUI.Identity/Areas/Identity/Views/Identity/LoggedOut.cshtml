@@ -7,7 +7,15 @@
     ViewData["PageTitle"] = "Sign out - Modern Slavery reporting service - GOV.UK";
     var ClientName = "Submit or view a modern slavery statement";
 }
-
+@section Head {
+    <script type="text/javascript">
+        var uri = window.location.toString();
+        if (uri.indexOf("?") > 0) {
+            var clean_uri = uri.substring(0, uri.indexOf("?"));
+            window.history.replaceState({}, document.title, clean_uri);
+        }
+    </script>
+}
 <div class="grid-row">
     <div class="column-two-thirds">
         <div class="govuk-box-highlight">

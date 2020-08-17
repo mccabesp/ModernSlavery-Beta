@@ -2,11 +2,13 @@
 using Autofac.Features.AttributeFilters;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using ModernSlavery.BusinessDomain.Shared;
+using ModernSlavery.BusinessDomain.Shared.Classes;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 using ModernSlavery.Hosts.Webjob.Classes;
 using ModernSlavery.Infrastructure.Storage;
 
@@ -15,51 +17,56 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         #region Dependencies
-        private readonly StorageOptions _StorageOptions;
+        private readonly StorageOptions _storageOptions;
+        private readonly SearchOptions _searchOptions;
         private readonly IEventLogger _CustomLogger;
         private readonly IAuditLogger _BadSicLog;
         private readonly IAuditLogger _ManualChangeLog;
         private readonly IMessenger _Messenger;
         private readonly ISharedBusinessLogic _SharedBusinessLogic;
-        private readonly ISearchRepository<EmployerSearchModel> _EmployerSearchRepository;
-        private readonly ISearchRepository<SicCodeSearchModel> _SicCodeSearchRepository;
-        private readonly IScopeBusinessLogic _ScopeBusinessLogic;
+        private readonly ISearchRepository<OrganisationSearchModel> _OrganisationSearchRepository;
+        private readonly IScopeBusinessLogic _scopeBusinessLogic;
         private readonly ISubmissionBusinessLogic _SubmissionBusinessLogic;
         private readonly IOrganisationBusinessLogic _OrganisationBusinessLogic;
-        public readonly ISearchBusinessLogic SearchBusinessLogic;
+        private readonly IPostcodeChecker _PostCodeChecker;
+        public readonly ISearchBusinessLogic _searchBusinessLogic;
         private readonly IGovNotifyAPI govNotifyApi;
-        private readonly UpdateFromCompaniesHouseService _updateFromCompaniesHouseService;
+        private readonly CompaniesHouseService _companiesHouseService;
         private readonly IReportingDeadlineHelper _snapshotDateHelper;
         private readonly IAuthorisationBusinessLogic _authorisationBusinessLogic;
         #endregion
         public Functions(
             StorageOptions storageOptions,
+            SearchOptions searchOptions,
             IEventLogger customLogger,
             [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog,
             [KeyFilter(Filenames.ManualChangeLog)] IAuditLogger manualChangeLog,
             IMessenger messenger,
             ISharedBusinessLogic sharedBusinessLogic,
-            ISearchRepository<EmployerSearchModel> employerSearchRepository,
-            ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
+            ISearchRepository<OrganisationSearchModel> organisationSearchRepository,
+            IScopeBusinessLogic scopeBusinessLogic,
             ISubmissionBusinessLogic submissionBusinessLogic,
             IOrganisationBusinessLogic organisationBusinessLogic,
+            IPostcodeChecker postCodeChecker,
             ISearchBusinessLogic searchBusinessLogic,
             IGovNotifyAPI govNotifyApi,
-            UpdateFromCompaniesHouseService updateFromCompaniesHouseService,
+            CompaniesHouseService companiesHouseService,
             IAuthorisationBusinessLogic authorisationBusinessLogic)
         {
-            _StorageOptions = storageOptions;
+            _storageOptions = storageOptions;
+            _searchOptions = searchOptions;
             _CustomLogger = customLogger;
             _BadSicLog = badSicLog;
             _ManualChangeLog = manualChangeLog;
             _Messenger = messenger;
             _SharedBusinessLogic = sharedBusinessLogic;
-            _EmployerSearchRepository = employerSearchRepository;
-            _SicCodeSearchRepository = sicCodeSearchRepository;
+            _OrganisationSearchRepository = organisationSearchRepository;
+            _scopeBusinessLogic = scopeBusinessLogic;
             _SubmissionBusinessLogic = submissionBusinessLogic;
             _OrganisationBusinessLogic = organisationBusinessLogic;
-            SearchBusinessLogic = searchBusinessLogic;
-            _updateFromCompaniesHouseService = updateFromCompaniesHouseService;
+            _PostCodeChecker = postCodeChecker;
+            _searchBusinessLogic = searchBusinessLogic;
+            _companiesHouseService = companiesHouseService;
             _authorisationBusinessLogic = authorisationBusinessLogic;
             this.govNotifyApi = govNotifyApi;
         }

@@ -7,5 +7,6 @@
         IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
         ISearchBusinessLogic SearchBusinessLogic { get; }
         ISubmissionBusinessLogic SubmissionBusinessLogic { get; }
+        IStatementBusinessLogic StatementBusinessLogic { get; }
     }
 }

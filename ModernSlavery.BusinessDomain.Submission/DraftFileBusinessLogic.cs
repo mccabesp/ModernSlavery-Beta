@@ -273,7 +273,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             var jsonSerializerSettings = new JsonSerializerSettings
             {
-                Error = delegate(object sender, ErrorEventArgs args)
+                Error = delegate (object sender, ErrorEventArgs args)
                 {
                     exceptions.Add(new Exception(args.ErrorContext.Error.Message));
                     args.ErrorContext.Handled = true;
@@ -297,7 +297,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 NullValueHandling = NullValueHandling.Ignore,
                 DefaultValueHandling = DefaultValueHandling.Ignore,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                Error = delegate(object sender, ErrorEventArgs args)
+                Error = delegate (object sender, ErrorEventArgs args)
                 {
                     exceptions.Add(new Exception(args.ErrorContext.Error.Message));
                     args.ErrorContext.Handled = true;
