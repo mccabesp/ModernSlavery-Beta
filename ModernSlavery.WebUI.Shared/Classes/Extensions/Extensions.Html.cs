@@ -115,8 +115,20 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             helper.ViewBag.ValidationSummaryMessage = validationSummaryMessage;
             helper.ViewBag.ExcludePropertyErrors = excludePropertyErrors;
 
-            return await helper.PartialAsync("_ValidationSummary");
+            return await helper.PartialAsync("_CustomValidationSummary");
         }
+
+        public static async Task<IHtmlContent> GovUkValidationSummaryAsync(this IHtmlHelper helper,
+            bool excludePropertyErrors = true,
+            string validationSummaryMessage = "The following errors were detected",
+            object htmlAttributes = null)
+        {
+            helper.ViewBag.ValidationSummaryMessage = validationSummaryMessage;
+            helper.ViewBag.ExcludePropertyErrors = excludePropertyErrors;
+
+            return await helper.PartialAsync("_GovUkValidationSummary");
+        }
+
         public static string GetExpressionText<TModel, TResult>(
          this IHtmlHelper<TModel> htmlHelper,
          Expression<Func<TModel, TResult>> expression)

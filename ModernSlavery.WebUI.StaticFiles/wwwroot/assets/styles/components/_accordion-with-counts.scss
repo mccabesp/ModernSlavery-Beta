@@ -1,0 +1,46 @@
+﻿
+.govuk-accordion__section-header {
+    counter-reset: checked-sum;
+}
+
+input[type="checkbox"] {
+    &:checked {
+        counter-increment: checked-sum;
+    }
+
+}
+
+.checkbox-count {
+    &::before {
+        content: counter(checked-sum);
+    }
+}
+.govuk-accordion__section.accordion-with-counts {
+    display: grid;
+}
+
+.govuk-accordion__section-header {
+    grid-row: 1;
+    grid-column: 1/3;
+}
+
+.total {
+    grid-row: 1;
+    grid-column: 1/3;
+    margin-top: 18px;
+    margin-left: 65%;
+
+    h3 {
+        color: $govuk-link-colour;
+    }
+}
+
+.all-checkbox:checked ~ .children {
+    display: none;
+}
+
+.children {
+    position: relative;
+    margin-top: 10px;
+    left: -40px;
+}

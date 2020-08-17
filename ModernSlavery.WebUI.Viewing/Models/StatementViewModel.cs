@@ -17,7 +17,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
             CreateMap<StatementModel.RisksModel, StatementViewModel.RiskViewModel>();
             CreateMap<StatementModel.DiligenceModel, StatementViewModel.DueDiligenceViewModel>();
 
-            CreateMap<StatementModel, StatementViewModel>();
+            CreateMap<StatementModel, StatementViewModel>().DisableCtorValidation();
         }
     }
 
@@ -86,23 +86,31 @@ namespace ModernSlavery.WebUI.Viewing.Models
             [Display(Description = "1 to 5 years")]
             Years1To5 = 2,
 
-            [Display(Description="More than 5 years")]
+            [Display(Description = "More than 5 years")]
             Over5Years = 3,
         }
         #endregion
 
         #region General Properties
         public long StatementId { get; set; }
+        [IgnoreMap]
         public DateTime StatementDeadline { get; set; }
         public long OrganisationId { get; set; }
         public string OrganisationName { get; set; }
+        [IgnoreMap]
         public string EncryptedOrganisationId { get; set; }
+        [IgnoreMap]
         public SectorTypes SectorType { get; set; }
         public DateTime Modified { get; set; }
+        [IgnoreMap]
         public string ReturnUrl { get; set; }
+        [IgnoreMap]
         public bool IsVoluntarySubmission { get; set; }
+        [IgnoreMap]
         public bool IsLateSubmission { get; set; }
+        [IgnoreMap]
         public bool ShouldProvideLateReason { get; set; }
+        [IgnoreMap]
         public bool IsInScopeForThisReportingYear { get; set; }
         #endregion
 
@@ -110,6 +118,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public string StatementUrl { get; set; }
         public DateTime StatementStartDate { get; set; }
         public DateTime StatementEndDate { get; set; }
+        [IgnoreMap]
         public string Approver { get; set; }
         public DateTime ApprovedDate { get; set; }
         #endregion
