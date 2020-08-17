@@ -12,8 +12,9 @@ using NUnit.Framework.Interfaces;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [Order (2)]
-    public  abstract class CreateAccount : UITest
+    [TestFixture]
+
+    public abstract class CreateAccount : UITest
     {
         string _firstname; string _lastname; string _title; string _email; string _password;
         private string _webAuthority;
@@ -25,23 +26,26 @@ namespace ModernSlavery.Hosts.Web.Tests
             _firstname = firstname; _lastname = lastname; _title = title; _email = email; _password = password;
         }
 
-        //[OneTimeSetUp]
-        //public void RunBeforeAnyTests()
-        //{
-        //    //Get the url from the test web host
-        //    _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
-        //    if (Debugger.IsAttached) Debug.WriteLine($"Kestrel authority: {_webAuthority}");
-        //    Console.WriteLine($"Kestrel authority: {_webAuthority}");
+        [OneTimeSetUp]
+        public void RunBeforeAnyTests()
+        {
 
-        //    //Get the data repository from the test web host
-        //    _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
+            
+            //Get the url from the test web host
+            _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
+            if (Debugger.IsAttached) Debug.WriteLine($"Kestrel authority: {_webAuthority}");
+            Console.WriteLine($"Kestrel authority: {_webAuthority}");
 
-        //    //Get the file repository from the test web host
-        //    _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
-        //    if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
-        //    Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
+            //Get the data repository from the test web host
+            _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
 
-        //}
+            //Get the file repository from the test web host
+            _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
+            if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
+            Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
+
+
+        }
         private bool TestRunFailed = false;
 
         [SetUp]
@@ -53,12 +57,18 @@ namespace ModernSlavery.Hosts.Web.Tests
                 SetupTest(TestContext.CurrentContext.Test.Name);
         }
 
+
+
+
         [TearDown]
         public void TearDown()
         {
+
             if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
-            TeardownTest();
+
         }
+
+        
         [Test, Order(1)]
         public async Task GoToCreateAccountPage()
         {
