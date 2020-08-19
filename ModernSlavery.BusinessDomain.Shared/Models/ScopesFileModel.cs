@@ -26,9 +26,13 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public string ContactEmailAddress { get; set; }
 
+        public string ContactJobTitle { get; set; }
+
         public bool? ReadGuidance { get; set; }
 
         public string Reason { get; set; }
+
+        public string TurnOver { get; set; }
         public string CampaignId { get; set; }
     }
 }

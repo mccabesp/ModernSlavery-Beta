@@ -19,9 +19,11 @@ namespace ModernSlavery.Core.Entities
         public DateTime RegisterStatusDate { get; set; } = VirtualDateTime.Now;
         public string ContactFirstname { get; set; }
         public string ContactLastname { get; set; }
+        public string ContactJobTitle { get; set; }
         public string ContactEmailAddress { get; set; }
         public bool? ReadGuidance { get; set; }
         public string Reason { get; set; }
+        public string TurnOver { get; set; }
         public string CampaignId { get; set; }
         public DateTime SubmissionDeadline { get; set; }
         public ScopeRowStatuses Status { get; set; }

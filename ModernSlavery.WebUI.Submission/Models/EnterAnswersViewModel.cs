@@ -1,41 +1,79 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using AutoMapper;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
     [Serializable]
-    public class EnterAnswersViewModel
+    public class EnterAnswersViewModel : IValidatableObject
     {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "You must provide a reason for being out of scope")]
-        public string Reason { get; set; }
+        public string[] ReasonOptions = new[]
+        {
+         "Its turnover or budget is less than £36 million per year",
+         "It does not provide goods or services",
+         "It does not have a business presence in the UK",
+         "It is in administration or liquidation, has closed or is dormant, or has merged with another organisation",
+         "Other"
+        };
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "You must tell us if you have read the guidance")]
-        public string ReadGuidance { get; set; }
+        public List<string> SelectedReasonOptions { get; set; } = new List<string>();
 
-        [Display(Name = "Please give a brief explanation in 200 characters or less")]
-        [Required(AllowEmptyStrings = false,
-            ErrorMessage = "You must provide your other reason for being out of scope")]
-        [MaxLength(200, ErrorMessage = "Your reason can only be 200 characters or less")]
+        [MaxLength(256)]
         public string OtherReason { get; set; }
 
-        [Display(Name = "First name")]
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter your first name")]
+        public string TurnOver { get; set; }
+
+        public string Reason
+        {
+            get
+            {
+                var selectedReasonOptions = new List<string>(SelectedReasonOptions.Where(s => !string.IsNullOrWhiteSpace(s)));
+
+                if (selectedReasonOptions.Contains("Other"))
+                {
+                    selectedReasonOptions.Remove("Other");
+                    selectedReasonOptions.Add(OtherReason);
+                }
+
+                return selectedReasonOptions.ToDelimitedString(Environment.NewLine);
+            }
+            set
+            {
+                var selectedReasonOptions = new List<string>(value.SplitI(Environment.NewLine).Where(s => !string.IsNullOrWhiteSpace(s)));
+
+                //Set the selected types
+                SelectedReasonOptions.Clear();
+                for (int i = selectedReasonOptions.Count - 1; i >= 0; i--)
+                {
+                    if (ReasonOptions.ContainsI(selectedReasonOptions[i]))
+                    {
+                        SelectedReasonOptions.Add(selectedReasonOptions[i]);
+                        selectedReasonOptions.RemoveAt(i);
+                    }
+                }
+                OtherReason = selectedReasonOptions.ToDelimitedString(Environment.NewLine);
+                if (!string.IsNullOrWhiteSpace(OtherReason)) SelectedReasonOptions.Add("Other");
+            }
+        }
+
+        public string ReadGuidance { get; set; }
+
+        [Required]
         public string FirstName { get; set; }
 
-        [Display(Name = "Last name")]
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter your last name")]
+        [Required]
         public string LastName { get; set; }
 
-        [EmailAddress]
-        [Display(Name = "Email address")]
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please enter your email address")]
-        public string EmailAddress { get; set; }
+        public string JobTitle { get; set; }
 
-        [Display(Name = "Confirm your email address")]
-        [Compare("EmailAddress", ErrorMessage = "The email addresses do not match")]
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Please confirm your email address")]
-        public string ConfirmEmailAddress { get; set; }
+        [EmailAddress]
+        [Required]
+        public string EmailAddress { get; set; }
 
         public bool HasName => !string.IsNullOrEmpty(FirstName + LastName);
 
@@ -47,5 +85,22 @@ namespace ModernSlavery.WebUI.Submission.Models
 
             return null;
         }
+
+        public bool RequiresEmailConfirmation { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var validationResults = new List<ValidationResult>();
+
+            if (!SelectedReasonOptions.Any())
+                validationResults.AddValidationError(2115, nameof(SelectedReasonOptions));
+
+            if (SelectedReasonOptions.Contains("Other") && string.IsNullOrWhiteSpace(OtherReason))
+                validationResults.AddValidationError(2117, nameof(OtherReason));
+
+            return validationResults;
+        }
     }
+
+
 }

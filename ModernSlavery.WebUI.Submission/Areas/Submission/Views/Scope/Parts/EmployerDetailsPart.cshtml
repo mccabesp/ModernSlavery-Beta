@@ -2,7 +2,7 @@
 
 
 @await Html.PartialModelAsync(new CheckYourAnswers(
-    new CheckYourAnswer("Employer reference", Model.EnterCodes.EmployerReference.ToUpper(), "EmployerReferenceAnswer"),
-    new CheckYourAnswer("Employer name", Model.OrganisationName, "EmployerNameAnswer"),
-    new CheckYourAnswer("Address", Model.OrgAddressHtml, "OrgAddressAnswer")
+    new CheckYourAnswer("Reference", Model.EnterCodes.EmployerReference.ToUpper(), "EmployerReferenceAnswer"),
+    new CheckYourAnswer("Name", Model.OrganisationName, "EmployerNameAnswer"),
+    new CheckYourAnswer("Registered Address", Model.OrgAddressHtml, "OrgAddressAnswer")
     ))
