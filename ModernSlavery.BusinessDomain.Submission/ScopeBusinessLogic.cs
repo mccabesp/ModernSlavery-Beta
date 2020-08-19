@@ -24,7 +24,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         public ScopeBusinessLogic(IDataRepository dataRepository, IReportingDeadlineHelper reportingDeadlineHelper, IAuthorisationBusinessLogic authorisationBusinessLogic)
         {
             _dataRepository = dataRepository;
-            _reportingDeadlineHelper=reportingDeadlineHelper;
+            _reportingDeadlineHelper = reportingDeadlineHelper;
             _authorisationBusinessLogic = authorisationBusinessLogic;
         }
 
@@ -55,7 +55,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         #endregion
 
         #region GetScopeStatusByReportingDeadlineOrLatest
-        public virtual async Task<ScopeStatuses> GetScopeStatusByReportingDeadlineOrLatestAsync(long organisationId,DateTime reportingDeadline)
+        public virtual async Task<ScopeStatuses> GetScopeStatusByReportingDeadlineOrLatestAsync(long organisationId, DateTime reportingDeadline)
         {
             var latestScope = await GetScopeByReportingDeadlineOrLatestAsync(organisationId, reportingDeadline);
             if (latestScope == null) return ScopeStatuses.Unknown;
@@ -72,9 +72,9 @@ namespace ModernSlavery.BusinessDomain.Submission
         }
         #endregion
 
-        public virtual async Task<OrganisationScope> UpdateScopeStatusAsync(long existingOrgScopeId,ScopeStatuses newStatus)
+        public virtual async Task<OrganisationScope> UpdateScopeStatusAsync(long existingOrgScopeId, ScopeStatuses newStatus)
         {
-            var oldScope =await _dataRepository.GetAsync<OrganisationScope>(existingOrgScopeId);
+            var oldScope = await _dataRepository.GetAsync<OrganisationScope>(existingOrgScopeId);
 
             // when OrganisationScope isn't found then throw ArgumentOutOfRangeException
             if (oldScope == null)
@@ -82,7 +82,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     nameof(existingOrgScopeId),
                     $"Cannot find organisation with OrganisationScopeId: {existingOrgScopeId}");
 
-            var organisation = await _dataRepository.FirstOrDefaultAsync<Organisation>(o =>o.OrganisationId == oldScope.OrganisationId);
+            var organisation = await _dataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == oldScope.OrganisationId);
             // when Organisation isn't found then throw ArgumentOutOfRangeException
             if (organisation == null)
                 throw new ArgumentOutOfRangeException(
@@ -96,8 +96,10 @@ namespace ModernSlavery.BusinessDomain.Submission
                 ContactEmailAddress = oldScope.ContactEmailAddress,
                 ContactFirstname = oldScope.ContactFirstname,
                 ContactLastname = oldScope.ContactLastname,
+                ContactJobTitle = oldScope.ContactJobTitle,
                 ReadGuidance = oldScope.ReadGuidance,
                 Reason = oldScope.Reason,
+                TurnOver = oldScope.TurnOver,
                 ScopeStatus = newStatus,
                 ScopeStatusDate = VirtualDateTime.Now,
                 RegisterStatus = oldScope.RegisterStatus,
@@ -118,7 +120,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             bool saveToDatabase)
         {
             var oldOrgScope = organisation.GetActiveScope(reportingDeadline);
-            if (oldOrgScope == null)throw new ArgumentOutOfRangeException($"Cannot find an scope with status 'Active' for reporting deadling '{reportingDeadline}' linked to organisation '{organisation.OrganisationName}', employerReference '{organisation.EmployerReference}'.");
+            if (oldOrgScope == null) throw new ArgumentOutOfRangeException($"Cannot find an scope with status 'Active' for reporting deadling '{reportingDeadline}' linked to organisation '{organisation.OrganisationName}', employerReference '{organisation.EmployerReference}'.");
 
             if (oldOrgScope.ScopeStatus == newStatus)
                 return new CustomResult<OrganisationScope>(InternalMessages.SameScopesCannotBeUpdated(newStatus, oldOrgScope.ScopeStatus, reportingDeadline));
@@ -132,10 +134,12 @@ namespace ModernSlavery.BusinessDomain.Submission
                 ContactEmailAddress = currentUser.EmailAddress,
                 ContactFirstname = currentUser.Firstname,
                 ContactLastname = currentUser.Lastname,
+                ContactJobTitle = currentUser.JobTitle,
                 ReadGuidance = oldOrgScope.ReadGuidance,
                 Reason = !string.IsNullOrEmpty(comment)
                     ? comment
                     : oldOrgScope.Reason,
+                TurnOver = oldOrgScope.TurnOver,
                 ScopeStatus = newStatus,
                 ScopeStatusDate = VirtualDateTime.Now,
                 StatusDetails = _authorisationBusinessLogic.IsAdministrator(currentUser)
@@ -209,8 +213,10 @@ namespace ModernSlavery.BusinessDomain.Submission
                     ContactEmailAddress = o.ContactEmailAddress,
                     ContactFirstname = o.ContactFirstname,
                     ContactLastname = o.ContactLastname,
+                    ContactJobTitle = o.ContactJobTitle,
                     ReadGuidance = o.ReadGuidance,
                     Reason = o.Reason,
+                    TurnOver = o.TurnOver,
                     CampaignId = o.CampaignId
                 });
 
@@ -342,16 +348,16 @@ namespace ModernSlavery.BusinessDomain.Submission
              {
                  var missingDeadlines = new List<DateTime>();
 
-                // for all snapshot years check if scope exists
-                var deadlines = org.SectorType == SectorTypes.Private ? privateDeadlines : publicDeadlines;
+                 // for all snapshot years check if scope exists
+                 var deadlines = org.SectorType == SectorTypes.Private ? privateDeadlines : publicDeadlines;
                  foreach (var reportingDeadline in deadlines)
                  {
                      var scope = org.GetActiveScope(reportingDeadline);
                      if (scope == null || scope.ScopeStatus == ScopeStatuses.Unknown) missingDeadlines.Add(reportingDeadline);
                  }
 
-                // collect
-                if (missingDeadlines.Count > 0)
+                 // collect
+                 if (missingDeadlines.Count > 0)
                      orgsWithMissingScope.Add(
                          new OrganisationMissingScope { Organisation = org, MissingDeadlines = missingDeadlines });
              });
@@ -377,12 +383,12 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Check no previous scopes
             if (org.OrganisationScopes.Any(os => os.SubmissionDeadline == reportingDeadline))
-                throw new ArgumentException($"A scope already exists for reporting deadline year {reportingDeadline.Year} for organisation employer reference '{org.EmployerReference}'",nameof(scopeStatus));
+                throw new ArgumentException($"A scope already exists for reporting deadline year {reportingDeadline.Year} for organisation employer reference '{org.EmployerReference}'", nameof(scopeStatus));
 
             //Check for conflict with previous years scope
-            if (reportingDeadline.Year-1 > _reportingDeadlineHelper.FirstReportingDeadlineYear)
+            if (reportingDeadline.Year - 1 > _reportingDeadlineHelper.FirstReportingDeadlineYear)
             {
-                var previousScope = GetScopeStatusByReportingDeadlineOrLatestAsync(org, reportingDeadline.AddYears(- 1));
+                var previousScope = GetScopeStatusByReportingDeadlineOrLatestAsync(org, reportingDeadline.AddYears(-1));
                 if (previousScope == ScopeStatuses.InScope && scopeStatus == ScopeStatuses.PresumedOutOfScope
                     || previousScope == ScopeStatuses.OutOfScope && scopeStatus == ScopeStatuses.PresumedInScope)
                     throw new ArgumentException(
@@ -396,6 +402,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 ContactEmailAddress = currentUser?.EmailAddress,
                 ContactFirstname = currentUser?.Firstname,
                 ContactLastname = currentUser?.Lastname,
+                ContactJobTitle = currentUser?.JobTitle,
                 ScopeStatus = scopeStatus,
                 Status = ScopeRowStatuses.Active,
                 StatusDetails = "Generated by the system",

@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
 
     public class ScopePresenter : IScopePresenter
     {
-        private readonly IOrganisationBusinessLogic _organisationBusinessLogic; 
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
         private readonly ISearchBusinessLogic _searchBusinessLogic;
 
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
@@ -48,8 +48,18 @@ namespace ModernSlavery.WebUI.Submission.Classes
         public virtual async Task<ScopingViewModel> CreateScopingViewModelAsync(EnterCodesViewModel enterCodes,
             User currentUser)
         {
-            // when NonStarterOrg doesn't exist then return
-            return null;
+            // when NonStarterOrg doesn't exist then return null
+            var org = await _organisationBusinessLogic.GetOrganisationByEmployerReferenceAndSecurityCodeAsync(enterCodes.EmployerReference, enterCodes.SecurityToken);
+            if (org == null) return null;
+
+            var scope = CreateScopingViewModel(org, currentUser);
+            //TODO: clarify if we should be showing this security token when navigate back to page or if it's a security issue?
+            scope.EnterCodes.SecurityToken = org.SecurityCode;
+            scope.IsSecurityCodeExpired = org.HasSecurityCodeExpired();
+
+            return scope;
+
+
         }
 
         public virtual ScopingViewModel CreateScopingViewModel(Organisation org, User currentUser)
@@ -126,10 +136,10 @@ namespace ModernSlavery.WebUI.Submission.Classes
                     ContactEmailAddress = model.EnterAnswers.EmailAddress,
                     ContactFirstname = model.EnterAnswers.FirstName,
                     ContactLastname = model.EnterAnswers.LastName,
+                    ContactJobTitle = model.EnterAnswers.JobTitle,
                     ReadGuidance = model.EnterAnswers.HasReadGuidance(),
-                    Reason = model.EnterAnswers.Reason != "Other"
-                        ? model.EnterAnswers.Reason
-                        : model.EnterAnswers.OtherReason,
+                    Reason = model.EnterAnswers.Reason,
+                    TurnOver = model.EnterAnswers.TurnOver,
                     ScopeStatus = model.IsOutOfScopeJourney ? ScopeStatuses.OutOfScope : ScopeStatuses.InScope,
                     CampaignId = model.CampaignId,
                     // set the snapshot date according to sector
@@ -158,7 +168,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
 
             // can only save a presumed scope in the prev or current snapshot year
             var currentReportingDeadline = _sharedBusinessLogic.GetReportingDeadline(org.SectorType);
-            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(org.SectorType,reportingDeadlineYear);
+            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(org.SectorType, reportingDeadlineYear);
 
             if (reportingDeadline.Year > currentReportingDeadline.Year || reportingDeadline.Year < currentReportingDeadline.Year - 1)
                 throw new ArgumentOutOfRangeException(nameof(reportingDeadline));
@@ -174,6 +184,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
                 ContactEmailAddress = model.EnterAnswers.EmailAddress,
                 ContactFirstname = model.EnterAnswers.FirstName,
                 ContactLastname = model.EnterAnswers.LastName,
+                ContactJobTitle = model.EnterAnswers.JobTitle,
                 ReadGuidance = model.EnterAnswers.HasReadGuidance(),
                 Reason = "",
                 ScopeStatus = model.IsOutOfScopeJourney

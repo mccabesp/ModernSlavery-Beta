@@ -1,50 +1,50 @@
-﻿@{
-    Layout = "~/Views/DfeTemplate.cshtml";
+﻿
+@{
+    Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Identifying your organisation - Modern Slavery reporting service";
 }
 @model EnterCodesViewModel
-<div class="grid-row">
-    <div class="column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new {@class = "form", autocomplete = "off"}))
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off" }))
         {
             @Html.AntiForgeryToken()
             @Html.SpamProtectionTimeStamp()
-            @await Html.CustomValidationSummaryAsync(false)
+            @await Html.GovUkValidationSummaryAsync();           
 
-            <h1 class="heading-large">
-                <span>Identifying your organisation</span>
+            <h1 class="govuk-heading-l">
+                <span>Are you legally required to publish a modern slavery statement on your website?</span>
             </h1>
 
-            <p>
-                To let us know that you're <u>not</u> in scope of the Modern Slavery reporting regulations we need to identify your organisation.
+            <p class="govuk-body-l">
+                We sent you a letter telling you we think your organisation is legally required to publish an annual modern slavery statement on your website. If this is not correct please let us know so we can update our records.
             </p>
-            <p>
-                If your organisation is required to report, please <a href="@Url.Action(nameof(SubmissionController.ManageOrganisations))" class="nowrap">register or manage your organisation</a>.
+            <p class="govuk-body">
+                Enter the organisation reference and security code provided in the letter we sent you. We will then ask you to confirm your organisation is not required to publish a modern slavery statement and give a reason.
             </p>
 
-            <div class="panel">You can find your employer reference and security code on the letter you have received from the Government Equalities Office.</div>
-
-            <fieldset>
-                <div id="EmployerReferenceGroup" class="form-group @Html.SetErrorClass(nameof(EnterCodesViewModel.EmployerReference), "error")">
-                    @Html.LabelFor(model => model.EmployerReference, "Enter your employer reference", new {@class = "form-label"})
-                    @Html.ValidationMessage(nameof(EnterCodesViewModel.EmployerReference), null, new {id = "EmployerReferenceError", @class = "error-message"})
-                    @Html.CustomEditorFor(model => model.EmployerReference, new {@class = "form-control", style = "text-transform: uppercase;"})
+            <fieldset class="govuk-fieldset">
+                <div id="EmployerReferenceGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterCodesViewModel.EmployerReference), "govuk-form-group--error")">
+                    <label asp-for="EmployerReference" class="govuk-label">Organisation reference</label>
+                    <input asp-for="EmployerReference" class="govuk-input govuk-!-width-two-thirds" style="text-transform:uppercase" />
+                    <span asp-validation-for="EmployerReference" class="govuk-error-message"></span>
                 </div>
-                <div id="SecurityTokenGroup" class="form-group @Html.SetErrorClass(nameof(EnterCodesViewModel.SecurityToken), "error")">
-                    @Html.LabelFor(model => model.SecurityToken, "Enter your security code", new {@class = "form-label"})
-                    @Html.ValidationMessage(nameof(EnterCodesViewModel.SecurityToken), null, new {id = "SecurityTokenError", @class = "error-message"})
-                    @Html.CustomEditorFor(model => model.SecurityToken, new {@class = "form-control", style = "text-transform: uppercase;"})
+                
+                <div id="SecurityTokenGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterCodesViewModel.SecurityToken), "govuk-form-group--error")">
+                    <label asp-for="SecurityToken" class="govuk-label">Security code</label>
+                    <input asp-for="SecurityToken" class="govuk-input govuk-!-width-two-thirds" style="text-transform:uppercase" />
+                    <span asp-validation-for="SecurityToken" class="govuk-error-message"></span>
                 </div>
             </fieldset>
 
-            <p class="text">
-                Please continue to confirm your organisation and provide further information. You
-                will have the opportunity to review this information before submitting.
-            </p>
-
-            <div class="form-group">
-                <input type="submit" class="button" value="Continue"/>
+            <div class="govuk-inset-text">
+                <a href="https://www.gov.uk/guidance/publish-an-annual-modern-slavery-statement" target="_blank">Guidance</a> is available to help you work out whether your organisation is required to publish a modern slavery statement.
             </div>
+
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" value="Continue">
+                Continue
+            </button>
+
         }
     </div>
 </div>
