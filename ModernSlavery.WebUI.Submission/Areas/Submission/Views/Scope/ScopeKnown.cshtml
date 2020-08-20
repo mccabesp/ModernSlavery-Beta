@@ -2,6 +2,7 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Scope already known - Modern Slavery reporting service";
+    var controller = ViewData["Controller"] as BaseController;
 }
 <a class="govuk-back-link" href="@Url.Action("OutOfScope")">Back</a>
 <div class="govuk-grid-row">
@@ -24,9 +25,12 @@
                 If you are not legally required to publish a modern slavery statement, you can still create a statement voluntarily and submit it to our service.
             </p>
 
-            <div class="govuk-inset-text">
-                To submit a modern slavery statement to our service, <a href="/sign-up">create an account</a> and register your organisation.
-            </div>
-        }
-    </div>
+            @if (controller.CurrentUser == null)
+            {
+                <div class="govuk-inset-text">
+                    To submit a modern slavery statement to our service, <a href="/sign-up">create an account</a> and register your organisation.
+                </div>
+            }
+            }
+        </div>
 </div>

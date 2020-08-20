@@ -2,6 +2,7 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Review your information - Modern Slavery reporting service";
+    var controller = ViewData["Controller"] as BaseController;
 }
 <a class="govuk-back-link" href="@Url.Action("EnterOutOfScopeAnswers")">Back</a>
 <div class="govuk-grid-row">
@@ -26,18 +27,20 @@
     </div>
             @await Html.PartialAsync("Parts/AnswersPart", Model)
 
+            @if (controller.CurrentUser == null)
+            {
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
                     <div class="govuk-checkboxes">
-                        <div class="govuk-checkboxes__item">                          
-                            <input name="@(Model.EnterAnswers.RequiresEmailConfirmation)" checked=@(Model.EnterAnswers.RequiresEmailConfirmation) value="@(Model.EnterAnswers.RequiresEmailConfirmation)" class="govuk-checkboxes__input" type="checkbox">
-                                 <label class="govuk-label govuk-checkboxes__label">
-                                      I would like to receive a confirmation email
-                                  </label>
+                        <div class="govuk-checkboxes__item">
+                            @Html.CheckBoxFor(model => model.EnterAnswers.RequiresEmailConfirmation, new { @class = "govuk-checkboxes__input" })
+                            @Html.LabelFor(model => model.EnterAnswers.RequiresEmailConfirmation," I would like to recieve a confirmation email", new { @class = "govuk-label govuk-checkboxes__label" })                          
                         </div>
-                    </div>
+        </div>
+                   
                 </fieldset>
             </div>
+            }
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" value="Confirm and send">
                 Confirm and send
