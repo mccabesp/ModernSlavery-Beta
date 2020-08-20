@@ -6,7 +6,7 @@
     Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Tell us why your organisation is not in scope - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
-    var backLink = Model.IsChangeJourney && Model.IsOutOfScopeJourney ? Model.StartUrl : Url.Action("ConfirmOutOfScopeDetails");
+    var backLink = Model.IsChangeJourney && Model.IsOutOfScopeJourney ? Model.StartUrl : Url.ActionArea("ConfirmOutOfScopeDetails", "Scope", "Submission");
     var reasonIndex = 0;
 }
 <a class="govuk-back-link" href="@backLink">Back</a>
@@ -40,7 +40,7 @@
                                         <label class="govuk-label" for="other">
                                             What is your organistion’s annual turnover or budget?
                                         </label>
-                                        <input name="@nameof(EnterAnswersViewModel.TurnOver)" class="govuk-input" value="@(Model.EnterAnswers.TurnOver)" maxlength="128" />                                       
+                                        <input name="@nameof(EnterAnswersViewModel.TurnOver)" class="govuk-input" value="@(Model.EnterAnswers.TurnOver)" maxlength="128" />
                                         <span asp-validation-for="EnterAnswers.TurnOver" class="govuk-error-message"></span>
                                     </div>
                                 </div>
@@ -99,7 +99,7 @@
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" value="Continue">
                 Continue
-            </button>          
+            </button>
         }
     </div>
 </div>

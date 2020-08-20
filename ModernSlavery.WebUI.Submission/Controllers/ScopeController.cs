@@ -538,8 +538,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var stateModel = ScopePresentation.CreateScopingViewModel(userOrg.Organisation, CurrentUser);
 
             // Get the latest scope for the reporting year
-            var latestScope = stateModel.ThisScope.SnapshotDate.Year == reportingDeadlineYear ? stateModel.ThisScope :
-                stateModel.LastScope.SnapshotDate.Year == reportingDeadlineYear ? stateModel.LastScope : null;
+            var latestScope = stateModel.ThisScope?.SnapshotDate.Year == reportingDeadlineYear ? stateModel.ThisScope :
+                stateModel.LastScope;
+            //TODO: check logic for this one
+            // stateModel.LastScope.SnapshotDate.Year == reportingDeadlineYear ? stateModel.LastScope : null;
 
             // Set the return url
             stateModel.StartUrl = Url.Action("ManageOrganisation",
