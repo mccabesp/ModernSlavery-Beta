@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting Submission merge")]
+    [TestFixture]
 
     public class Submission_Complete_Mandatory_Sections : Private_Registration_Success
     {
@@ -14,22 +14,24 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Select an organisation");
 
-            Click(Submission.OrgName_Blackpool);
+            Click(Submission.OrgName_InterFloor);
 
-            ExpectHeader("Manage your organisations reporting");
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            AtRow("2019/20").Click("Draft report");
+
+            Click("Start Draft");
 
             ExpectHeader("Before you start");
             Click("Start Now");
 
-            ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;
         }
 
         [Test, Order(42)]
-        public async Task CompleteYourModernSlaverySection()
+        public async Task YourModernSlaveryStatement()
         {
+
+            ExpectHeader("Your modern slavery statement");
 
             Set("URL").To(Submission.YourMSStatement_URL);
 
@@ -43,29 +45,88 @@ namespace ModernSlavery.Hosts.Web.Tests
             Submission_Helper.DateSet(this, Submission.YourMSStatement_ApprovalDate_Day, Submission.YourMSStatement_ApprovalDate_Month, Submission.YourMSStatement_ApprovalDate_Year, "3");
 
             Click("Continue");
-
             await Task.CompletedTask;
         }
 
         [Test, Order(44)]
-        public async Task CompleteAreasCoveredSection()
+        public async Task AreasCoveredByYourModernSlaveryStatement()
         {
             ExpectHeader("Areas covered by your modern slavery statement");
 
-            AtLabel("Your organisation’s structure, business and supply chains").ClickLabel("Yes");
-            AtLabel("Policies").ClickLabel("Yes");
-            AtLabel("Risk assessment and management").ClickLabel("Yes");
-            AtLabel("Due diligence processes").ClickLabel("Yes");
-            AtLabel("Staff training about slavery and human trafficking").ClickLabel("Yes");
-            AtLabel("Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions").ClickLabel("Yes");
+            BelowHeader("Your organisation’s structure, business and supply chains").ClickLabel(The.Top, "Yes");
+            BelowHeader("Policies").ClickLabel(The.Top, "Yes");
+            BelowHeader("Risk assessment and management").ClickLabel(The.Top, "Yes");
+            BelowHeader("Due diligence processes").ClickLabel(The.Top, "Yes");
+            BelowHeader("Staff training about slavery and human trafficking").ClickLabel(The.Top, "Yes");
+            BelowHeader("Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions").ClickLabel(The.Top, "Yes");
 
             Click("Continue");
-
-            ExpectHeader("Supply Chain Risks and due diligence");
-
+            ExpectHeader(That.Contains, "Your organisation");
 
             await Task.CompletedTask;
         }
+
+        [Test, Order(46)]
+        public async Task NavigatePastOptionalSections()
+        {
+            
+            Click("Continue");
+            ExpectHeader("Policies");
+
+            Click("Continue");
+            ExpectHeader(That.Contains, "Supply chain risks and due diligence");
+
+            Click("Continue");
+            ExpectHeader(That.Contains, "Supply chain risks and due diligence");
+
+            Click("Continue");
+            ExpectHeader("Training");
+
+            Click("Continue");
+            ExpectHeader("Monitoring progress");
+
+            Click("Continue");
+            ExpectHeader("Review before submitting");
+
+            await Task.CompletedTask;
+        }
+
+        [Test, Order(47)]
+        public async Task OptionalSectionsIncomplete()
+        {
+            //mandaotry sections should be completed
+            RightOf("Your modern Slavery statement").Expect("Completed");
+            RightOf("Areas covered by your modern statement").Expect("Completed");
+
+            //optional sections incomplete
+            RightOf("Your organisation").Expect("Not Completed");
+            RightOf("Policies").Expect("Not Completed");
+            RightOf("Supply chain risks and due diligence (part 1)").Expect("Not Completed");
+            RightOf("Supply chain risks and due diligence (part 2)").Expect("Not Completed");
+            RightOf("Training").Expect("Not Completed");
+            RightOf("Monitoring progress").Expect("Not Completed");
+            await Task.CompletedTask;
+        }
+
+        [Test, Order(48)]
+        public async Task ExpectButtons()
+        {
+            ExpectButton("Confirm and submit");
+            ExpectButton("Exit and save Changes");
+            ExpectButton("Exit and lose Changes");
+            await Task.CompletedTask;
+        }
+          [Test, Order(49)]
+        public async Task ExitAndSaveChanges()
+        {  
+        Click("Exit and save Changes");
+
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+
+            await Task.CompletedTask;
+        }
+
+
 
     }
 }
