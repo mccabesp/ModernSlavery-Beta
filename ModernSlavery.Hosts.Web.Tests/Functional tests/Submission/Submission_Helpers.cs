@@ -32,14 +32,23 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public static void NavigateYourMSStatement(UIContext ui, string Organistion, string Year)
         {
-            ui.Click("Mange Organisations");
+            ui.Goto("/");
             ui.ExpectHeader("Select an organisation");
+
+            ui.Click(Organistion);
+
+            ui.ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+
+            ui.RightOf(Year).Click("Start draft");
+
+            ui.ExpectHeader("Before you start");
+            ui.Click("Start now");
+            ui.ExpectHeader("Your modern slavery statement");
         }
         public static void NavigateToAreasCovered(UIContext ui, string Organistion, string Year)
         {
             NavigateYourMSStatement(ui, Organistion, Year);
             ui.Click("Continue");
-            ui.ExpectHeader("Submit a modern slavery statement");
 
             ui.ExpectHeader("Areas covered by your modern slavery statement");
         }
@@ -47,7 +56,6 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             NavigateToAreasCovered(ui, Organistion, Year);
             ui.Click("Continue");
-            ui.ExpectHeader("Submit a modern slavery statement");
 
             ui.ExpectHeader("Your organisation");
         }
@@ -55,19 +63,14 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             NavigateToYourOrganisation(ui, Organistion, Year);
             ui.Click("Continue");
-            ui.ExpectHeader("Submit a modern slavery statement");
-
-            ui.ExpectHeader("Submit a modern slavery statement");
-
             ui.ExpectHeader("Policies");
         }
         public static void NavigateToSupplyChainRisks1(UIContext ui, string Organistion, string Year)
         {
             NavigateToPolicies(ui, Organistion, Year);
             ui.Click("Continue");
-            ui.ExpectHeader("Submit a modern slavery statement");
 
-            ui.ExpectHeader("Supply Chain Risks and due diligence");
+            ui.ExpectHeader(That.Contains, "Supply chain risks and due diligence");
             //ensure we are on the correct part of this section
             //there are 2
             ui.Expect("Part 1");
@@ -76,9 +79,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             NavigateToSupplyChainRisks1(ui, Organistion, Year);
             ui.Click("Continue");
-            ui.ExpectHeader("Submit a modern slavery statement");
 
-            ui.ExpectHeader("Supply Chain Risks and due diligence");
+            ui.ExpectHeader(That.Contains, "Supply chain risks and due diligence");
+            
             //ensure we are on the correct part of this section
             //there are 2
             ui.Expect("Part 2");
@@ -87,7 +90,6 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             NavigateToSupplyChainRisks2(ui, Organistion, Year);
             ui.Click("Continue");
-            ui.ExpectHeader("Submit a modern slavery statement");
 
             ui.ExpectHeader("Training");
         }
@@ -95,7 +97,6 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             NavigateToTraining(ui, Organistion, Year);
             ui.Click("Continue");
-            ui.ExpectHeader("Submit a modern slavery statement");
 
             ui.ExpectHeader("Monitoring progress");
         }
