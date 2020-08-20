@@ -82,7 +82,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public static readonly string[] SupplyChainRisks_SelectedGoodsAndServices = new string[] { "Goods not for resale", "Services for sale"};
 
-        public static readonly string[] SupplyChainRisks_SelectedVulnerableGroups = new string[] { "Migrants", "Children", "Other vulnerable groups" };
+        public static readonly string[] SupplyChainRisks_SelectedVulnerableGroups = new string[] { "Migrants", "Children", "Other vulnerable group(s)" };
         public const string SupplyChainRisks_OtherVulernableGroupsDetails = "People who are at risk.";
 
         public static readonly string[] SupplyChainRisks_SelectedTypeOfWorks = new string[] { "Seasonal work", "Hazardous work", "Other type of work" };
@@ -94,7 +94,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public static readonly string[] SupplyChainRisks_SelectedCountriesAfrica = new string[] { "Benin, Republic of", "Reunion", "Burkina Faso" };
         public static readonly string[] SupplyChainRisks_SelectedCountriesAsia = new string[] { "Afghanistan, Islamic Republic of", "Japan", "Mongolia", "Turkmenistan", "United Nations Neutral Zone" };
-        public static readonly string[] SupplyChainRisks_SelectedCountriesEurope = new string[] { "Georgia", "Reunion", "United Kingdom of Great Britain & Northern Ireland" };
+        public static readonly string[] SupplyChainRisks_SelectedCountriesEurope = new string[] { "Georgia", "Romania", "United Kingdom of Great Britain & Northern Ireland" };
         public static readonly string[] SupplyChainRisks_SelectedCountriesNorthAmerica = new string[] { "Anguilla", "Martinique", "Cuba, Republic of" };
         public static readonly string[] SupplyChainRisks_SelectedCountriesOceania = new string[] { "New Zealand"};
         public static readonly string[] SupplyChainRisks_SelectedCountriesSouthAmerica = new string[] { "French Guiana", "Peru, Republic of"};
@@ -102,7 +102,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public static readonly string[] SupplyChainRisks_SelectedPartnerships = new string[] { "with civil society organisations", "with central or local government", "with multi-stakeholder initiatives" };
 
-        public static readonly string[] SupplyChainRisks_SelectedSocialAudits= new string[] { "by a third party", "other"};
+        public static readonly string[] SupplyChainRisks_SelectedSocialAudits= new string[] { "by a third party", "other type of social audit" };
         public const string SupplyChainRisks_OtherSocialAudits = "Another audit";
 
         public static readonly string[] SupplyChainRisks_SelectedGrievanceMechanisms = new string[] { "whistleblowing services", "worker voice technology"};
@@ -113,7 +113,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public static readonly string[] SupplyChainRisks_SelectedRemediationActions = new string[] { "repayment of recruitment fees", "other" };
 
-        public static readonly string[] SelectedTrainings = new string[] { "C-Suite", "Whole organisation", "Suppliers", "other" };
+        public static readonly string[] SelectedTrainings = new string[] { "Procurement", "Whole organisation", "Suppliers", "Other" };
         public const string OtherTrainings = "We had a group session.";
 
         public const string MonitoringProgress = "Keeping detailed notes";

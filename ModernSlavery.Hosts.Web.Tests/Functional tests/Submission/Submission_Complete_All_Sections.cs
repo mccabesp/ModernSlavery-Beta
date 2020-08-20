@@ -112,9 +112,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             Submission_Helper.ExpandSection(this, "Goods and Services", "1");
             foreach (var GoodOrService in Submission.SupplyChainRisks_SelectedGoodsAndServices)
             {
-                NearHeader("Goods and Services").Click(GoodOrService);               
+                NearHeader(The.Top, "Goods and Services").Click(GoodOrService);               
             }
-            NearHeader("Goods and Services").Expect(Submission.SupplyChainRisks_SelectedGoodsAndServices.Length + " Selected");
+            //NearHeader(The.Top, "Goods and Services").Expect(Submission.SupplyChainRisks_SelectedGoodsAndServices.Length + " Selected");
             Submission_Helper.ColapseSection(this, "Goods and Services", "1");
 
             //Vulnerable Groups
@@ -122,13 +122,13 @@ namespace ModernSlavery.Hosts.Web.Tests
             
             foreach (var VulnerableGroup in Submission.SupplyChainRisks_SelectedVulnerableGroups)
             {
-                NearHeader("Vulnerable groups").ClickLabel(VulnerableGroup);
-                if (VulnerableGroup == "Other vulnerable groups")
+                NearHeader(The.Top, "Vulnerable groups").ClickLabel(VulnerableGroup);
+                if (VulnerableGroup == "Other vulnerable group(s)")
                 {
-                    Set("Please specify the vulnerable group and explain why").To(Submission.SupplyChainRisks_OtherVulernableGroupsDetails);
+                    Set("Please specify").To(Submission.SupplyChainRisks_OtherVulernableGroupsDetails);
                 }
             }
-            NearHeader("Vulnerable groups").Expect(Submission.SupplyChainRisks_SelectedVulnerableGroups.Length + " Selected");
+           // NearHeader(The.Top, "Vulnerable groups").Expect(Submission.SupplyChainRisks_SelectedVulnerableGroups.Length + " Selected");
             
             Submission_Helper.ColapseSection(this, "Goods and Services", "1");
 
@@ -138,13 +138,13 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             foreach (var TypeOfWork in Submission.SupplyChainRisks_SelectedTypeOfWorks)
             {
-                NearHeader("Type of work").ClickLabel(TypeOfWork);
+                NearHeader(The.Top, "Type of work").ClickLabel(TypeOfWork);
                 if (TypeOfWork == "Other type of work")
                 {
-                    Set("Please specify the other type of work and explain why").To(Submission.SupplyChainRisks_OtherTypeOfWorkDetails);
+                    BelowHeader(The.Top, "Type of work").Set(The.Top, "Please specify").To(Submission.SupplyChainRisks_OtherTypeOfWorkDetails);
                 }
             }
-            NearHeader("Type of work").Expect(Submission.SupplyChainRisks_SelectedTypeOfWorks.Length + " Selected");
+            //NearHeader(The.Top, "Type of work").Expect(Submission.SupplyChainRisks_SelectedTypeOfWorks.Length + " Selected");
 
             Submission_Helper.ColapseSection(this, "Type of work", "1");
 
@@ -153,22 +153,35 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             foreach (var Sector in Submission.SupplyChainRisks_SelectedSectors)
             {
-                NearHeader("Sectors").ClickLabel(Sector);
+                NearHeader(The.Top, "Sectors").ClickLabel(Sector);
                
                     if (Sector == "Other sector")
                     {
-                    Set("Please specify the other sector and explain why").To(Submission.SupplyChainRisks_OtherSectorDetails);
+                    BelowHeader(The.Top, "Sectors").Set(The.Top, "Please specify").To(Submission.SupplyChainRisks_OtherSectorDetails);
                     }            
             }
 
             Set("If you want to specify an area not mentioned above, please provide details").To(Submission.SuppliChainRisks_OtherArea);
 
 
-            NearHeader("Sectors").Expect(Submission.SupplyChainRisks_SelectedSectors.Length + " Selected");
+            //NearHeader(The.Top, "Sectors").Expect(What.Contains, Submission.SupplyChainRisks_SelectedSectors.Length.ToString() + " Selected");
             
             
             
             Submission_Helper.ColapseSection(this, "Type of work", "1");
+
+            //goods and services - highest risk
+            Submission_Helper.ExpandSection(this, "Goods and Services", "2");
+            foreach (var GoodOrService in Submission.SupplyChainRisks_SelectedGoodsAndServices)
+            {
+                NearHeader(The.Bottom, "Goods and Services").Click(GoodOrService);
+                NearHeader(The.Bottom, "Goods and Services").Below(GoodOrService).Set(The.Top).To(GoodOrService + "Details");
+            }
+            Submission_Helper.ColapseSection(this, "Goods and Services", "2");
+
+            
+
+            Set("If you want to specify an area not mentioned above, please provide details").To(Submission.SuppliChainRisks_OtherArea);
 
 
             //countries
@@ -181,10 +194,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             Submission_Helper.CountrySelect(this, "Antarctica", Submission.SupplyChainRisks_SelectedCountriesAntarctica);
             
             Click("Continue");
-            ExpectHeader("Supply Chain and Due diligence");
+            ExpectHeader(That.Contains, "Supply chain risks and due diligence");
 
 
-            Click("Continue");
             await Task.CompletedTask;
         }
 
@@ -196,24 +208,51 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //social audits
             Submission_Helper.ChekcboxSelector(this, "Social audits", Submission.SupplyChainRisks_SelectedSocialAudits, 
-                OtherOption: "other",
-                OtherFieldLabel: "Please specify the other social audits",
+                OtherOption: "other type of social audit",
+                OtherFieldLabel: "Please specify",
                 OtherDetails: Submission.SupplyChainRisks_OtherSocialAudits);
 
             //Anonymous grievance mechanism
-            Submission_Helper.ChekcboxSelector(this, "Anonymous grievance mechanism", Submission.SupplyChainRisks_SelectedGrievanceMechanisms);
+            Submission_Helper.ChekcboxSelector(this, "Anonymous grievance mechanisms", Submission.SupplyChainRisks_SelectedGrievanceMechanisms);
 
             //indicators
-            BelowHeader("For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?").Set("Examples include no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.").To("Yes");
-            BelowHeader("For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?").Set(The.Top, "Provide detail").To(Submission.SupplyChainRisks_IndicatorDetails);
+            BelowHeader("For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?").Expect("Examples include workers with no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.");
 
+            BelowHeader("For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?").ClickLabel(The.Top, "Yes");
+
+            BelowHeader("For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?").Set(The.Top, "Please provide details").To(Submission.SupplyChainRisks_IndicatorDetails);
 
             //instances
-            BelowHeader("Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?").Click(The.Top, "Yes");
-            BelowHeader("Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?").Set(The.Top, "Provide detail").To(Submission.SupplyChainRisks_InStanceDetails);
+            BelowHeader("Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?").ClickLabel(The.Top, "Yes");
+            BelowHeader("Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?").Set(The.Top, "Please provide details").To(Submission.SupplyChainRisks_InStanceDetails);
 
             //Remidiation Actions
-            Submission_Helper.ChekcboxSelector(this, "What remediation action did your organisation take in response?", Submission.SupplyChainRisks_SelectedRemediationActions);
+            BelowHeader("Did your organisation take any remediation actions in response?").ClickLabel(The.Top, "Yes");
+
+            //label[contains(text(), 'repayment of recruitment fees')]/preceding-sibling::input
+            //sSubmission_Helper.ChekcboxSelector(this, "What actions did your organisation take?", Submission.SupplyChainRisks_SelectedRemediationActions, NeedExpand: false);
+            //ClickXPath("/html/body/div/main/div/div/form/fieldset[3]/div/div/div[2]/div[2]/div[2]/div/fieldset/div/div[1]/input");
+            //foreach (var Action in Submission.SupplyChainRisks_SelectedRemediationActions)
+            //{
+            //    ClickXPath("//label[contains(text(), '" + Action +"')]/preceding-sibling::input");
+
+            //    if (Action == "other")
+            //    {
+            //        Set(The.Bottom, "Please specify").To("Other details");
+            //    }
+            //}
+
+            ClickHeader("What actions did your organisation take?");
+            Press(Keys.Tab);
+            Press(Keys.Space);
+            for (int i = 0; i < 5; i++)
+            {
+                Press(Keys.Tab);
+            }
+            Press(Keys.Space);
+
+            Set("OtherRemediation").To("Other details");
+
 
             Click("Continue");
             ExpectHeader("Training");
@@ -226,8 +265,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //Training
             Submission_Helper.ChekcboxSelector(this, "Training", Submission.SelectedTrainings,
-                OtherOption: "other",
-                OtherFieldLabel: "Please specify",
+                OtherOption: "Other",
+                OtherFieldLabel: "OtherTraining",
                 OtherDetails: Submission.OtherTrainings,
                 NeedExpand: false);
 
@@ -239,34 +278,34 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(56)]
         public async Task MonitoringProgress()
         {
-            BelowHeader("Does you modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?").ClickLabel("Yes");
+            BelowHeader("Does your modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?").ClickLabel("No");
 
             Set("How is your organisation measuring progress towards these goals?").To(Submission.MonitoringProgress);
-            Set("What were your key achievements in relation to reducing modern slavery during the period covered by this statement?").To(Submission.MonitoringAchievements);
+            BelowLabel("What were your key achievements in relation to reducing modern slavery during the period covered by this statement?").Set(The.Top).To(Submission.MonitoringAchievements);
 
-            Set("If your statement is for a group of organisations, please select the answer that applies to the organisation with the longest history of producing statements.").To("1 - 5 years");
+            BelowHeader("How many years has your organisation been producing modern slavery statements?").Below("If your statement is for a group of organisations, please select the answer that applies to the organisation with the longest history of producing statements.").ClickLabel("1 to 5 years");
 
             Click("Continue");
-            ExpectHeader("Review 2019 to 2020 group report for" + Submission.OrgName_Blackpool);
+            ExpectHeader("Review before submitting");
 
             //all sections should be completed
-            AtRow("Your modern Slavery statement").Expect("Completed");
-            AtRow("Areas covered by your modern slavery statement").Expect("Completed");
+            RightOf("Your modern Slavery statement").Expect("Completed");
+            RightOf("Areas covered by your modern statement").Expect("Completed");
 
-            //all other sections incomplete 
 
-            AtRow("Your organisation").Expect("Completed");
-            AtRow("Policies").Expect("Completed");
-            AtRow("Supply chain risks and due diligence (part 1)").Expect("Completed");
-            AtRow("Supply chain risks and due diligence (part 2)").Expect("Completed");
-            AtRow("Training").Expect("Completed");
-            AtRow("Monitoring progress").Expect("Completed");
+            RightOf("Your organisation").Expect("Completed");
+            RightOf("Policies").Expect("Completed");
+            RightOf("Supply chain risks and due diligence (part 1)").Expect("Completed");
+            RightOf("Supply chain risks and due diligence (part 2)").Expect("Completed");
+            RightOf("Training").Expect("Completed");
+            RightOf("Monitoring progress").Expect("Completed");
 
             ExpectButton("Confirm and submit");
-            ExpectButton("Save draft");
+            ExpectButton("Exit and save Changes");
+            ExpectButton("Exit and lose Changes");
 
-            Click("Save draft");
-            ExpectHeader("Select an organisation");
+            Click("Exit and save Changes");
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");            
 
             await Task.CompletedTask;
         }
