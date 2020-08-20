@@ -21,12 +21,13 @@
                 <span>Yes</span>
             }
         </div>
-        @if (Model.CanChangeScope)
-        {
+        @*TODO: get CanChangeScope flag working*@
+        @*@if (Model.CanChangeScope)
+        {*@
             <div>
-                <a id="ChangeScope@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@(Url.Action("ChangeOrganisationScope", new {organisationIdentifier = Model.OrganisationIdentifier, reportingDeadlineYear=reportDateFormatter.StartYear}))">Change</a>
+                <a id="ChangeScope@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@(Url.ActionArea("ChangeOrganisationScope", "Scope", "Submission", new {organisationIdentifier = Model.OrganisationIdentifier, reportingDeadlineYear=reportDateFormatter.StartYear}))">Change</a>
             </div>
-        }
+        @*}*@
     </div>
 
     <div class="gpg-manage-reports__cell">
