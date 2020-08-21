@@ -296,7 +296,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOf("Your organisation").Expect("Completed");
             RightOf("Policies").Expect("Completed");
             RightOf("Supply chain risks and due diligence (part 1)").Expect("Completed");
-            RightOf("Supply chain risks and due diligence (part 2)").Expect("Completed");
+            RightOf("Supply chain risks and due diligence (part 2)").Expect("Comzpleted");
             RightOf("Training").Expect("Completed");
             RightOf("Monitoring progress").Expect("Completed");
 

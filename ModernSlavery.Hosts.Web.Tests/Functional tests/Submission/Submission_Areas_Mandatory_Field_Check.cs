@@ -4,29 +4,37 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting Submission merge")]
+    [TestFixture]
 
     public class Submission_Areas_Mandatory_Field_Check : Private_Registration_Success
     {
         [Test, Order(40)]
-        public async Task NavigateToAreasPage()
+        public async Task StartSubmission()
         {
             ExpectHeader("Select an organisation");
 
-            Click(Submission.OrgName_Blackpool);
+            Click(Submission.OrgName_InterFloor);
 
 
-            ExpectHeader("Manage your organisations reporting");
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            Click("Draft Report");
+            Click("Start Draft");
 
 
             ExpectHeader("Before you start");
             Click("Start now");
 
             ExpectHeader("Your modern slavery statement");
+            await Task.CompletedTask;
+        }
 
-            Click("Save and continue");
+        [Test, Order(41)]
+        public async Task NavigateToAreasPage()
+        {
+            ExpectHeader("Your modern slavery statement");
+
+
+            Click("Continue");
 
             ExpectHeader("Areas covered by your modern slavery statement");
 
