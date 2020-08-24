@@ -16,7 +16,7 @@ using ModernSlavery.Core.Entities;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("Awaiting Scope Merge")]
+    [TestFixture]
 
     public class Scope_Out_Declaration_Complete_Content_Check : Scope_Out_Mark_Org_As_OOS_LoggedOut
     {

@@ -26,26 +26,26 @@ namespace ModernSlavery.Hosts.Web.Tests
             _firstname = firstname; _lastname = lastname; _title = title; _email = email; _password = password;
         }
 
-        [OneTimeSetUp]
-        public void RunBeforeAnyTests()
-        {
+        //[OneTimeSetUp]
+        //public void RunBeforeAnyTests()
+        //{
 
             
-            //Get the url from the test web host
-            _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
-            if (Debugger.IsAttached) Debug.WriteLine($"Kestrel authority: {_webAuthority}");
-            Console.WriteLine($"Kestrel authority: {_webAuthority}");
+        //    //Get the url from the test web host
+        //    _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
+        //    if (Debugger.IsAttached) Debug.WriteLine($"Kestrel authority: {_webAuthority}");
+        //    Console.WriteLine($"Kestrel authority: {_webAuthority}");
 
-            //Get the data repository from the test web host
-            _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
+        //    //Get the data repository from the test web host
+        //    _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
 
-            //Get the file repository from the test web host
-            _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
-            if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
-            Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
+        //    //Get the file repository from the test web host
+        //    _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
+        //    if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
+        //    Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
 
-
-        }
+        //    //Testing.Helpers.Extensions.DatabaseHelper.DeleteAllTestRecords(TestRunSetup.TestWebHost, DateTime.Now);
+        //}
         private bool TestRunFailed = false;
 
         [SetUp]

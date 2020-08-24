@@ -54,6 +54,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             var baseUrl = TestWebHost.GetHostAddress();
             TestContext.Progress.WriteLine($"Test Host started on endpoint: {baseUrl}");
             WebDriverService = UITest.SetupWebDriverService(baseUrl: baseUrl);
+
+            //ModernSlavery.Testing.Helpers.Extensions.DatabaseHelper.ResetDatabase(TestWebHost);
         }
 
         [OneTimeTearDown]
