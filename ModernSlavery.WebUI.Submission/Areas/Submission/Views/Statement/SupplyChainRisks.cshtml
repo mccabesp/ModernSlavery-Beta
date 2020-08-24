@@ -242,7 +242,14 @@
     <script>
         (function () {
             "use strict";
+
+            LimitRisks();
+
             $('input[id^=HighId]').on('change', function (evt) {
+                LimitRisks();
+            });
+
+            function LimitRisks() {
                 var checkedCount = $('input[id^=HighId]:checked').length;
                 if (checkedCount >= 3) {
                     $('input[id^=HighId]:not(:checked)').attr("disabled", "disabled")
@@ -250,7 +257,7 @@
                 else {
                     $('input[id^=HighId]').removeAttr("disabled")
                 }
-            });
+            }
         }());
     </script>
 }
