@@ -20,8 +20,7 @@ using ModernSlavery.Hosts.Webjob.Jobs;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.Infrastructure.Storage.FileRepositories;
-using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
 
 namespace ModernSlavery.Hosts.Webjob
 {
@@ -29,18 +28,25 @@ namespace ModernSlavery.Hosts.Webjob
     {
         private readonly ILogger _logger;
         private readonly SharedOptions _sharedOptions;
+        private readonly GovNotifyOptions _govNotifyOptions;
 
         public DependencyModule(
             ILogger<DependencyModule> logger, 
-            SharedOptions sharedOptions)
+            SharedOptions sharedOptions,
+            GovNotifyOptions govNotifyOptions)
         {
             _logger = logger;
             _sharedOptions = sharedOptions;
+            _govNotifyOptions = govNotifyOptions;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider))
+            services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider),
+                httpClient =>
+                {
+                    GovNotifyEmailProvider.SetupHttpClient(httpClient, _govNotifyOptions.ApiServer);
+                })
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10))
                 .AddPolicyHandler(GovNotifyEmailProvider.GetRetryPolicy());
 
@@ -48,6 +54,9 @@ namespace ModernSlavery.Hosts.Webjob
 
             //Register the AutoMapper configurations in all domain assemblies
             services.AddAutoMapper(_sharedOptions.IsDevelopment());
+
+            //Add the custom webjob name resolver
+            services.AddSingleton<INameResolver,WebjobNameResolver>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -65,36 +74,25 @@ namespace ModernSlavery.Hosts.Webjob
                 .WithParameter("seed", _sharedOptions.ObfuscationSeed);
 
             // Register email provider dependencies
-            builder.RegisterType<GovNotifyEmailProvider>().SingleInstance().WithAttributeFiltering();
+            builder.RegisterType<GovNotifyEmailProvider>()
+                .SingleInstance()
+                .WithAttributeFiltering()
+                .WithParameter(
+                    (p, ctx) => p.ParameterType == typeof(HttpClient),
+                    (p, ctx) => ctx.Resolve<IHttpClientFactory>().CreateClient(nameof(GovNotifyEmailProvider)));
+
             builder.RegisterType<SmtpEmailProvider>().SingleInstance().WithAttributeFiltering();
             builder.RegisterType<EmailProvider>().SingleInstance().WithAttributeFiltering();
 
             // Need to register webJob class in Autofac as well
             builder.RegisterType<Functions>().InstancePerDependency();
             builder.RegisterType<DisableWebjobProvider>().SingleInstance();
+
         }
 
 
         public void Configure(ILifetimeScope lifetimeScope)
-        {
-            //Add configuration here
-            var webjobHostBuilder = lifetimeScope.Resolve<IWebJobsBuilder>();
-
-            webjobHostBuilder.AddAzureStorageCoreServices();
-            webjobHostBuilder.AddAzureStorage(
-                queueConfig =>
-                {
-                    queueConfig.BatchSize = 1; //Process queue messages 1 item per time per job function
-                        },
-                blobConfig =>
-                {
-                            //Configure blobs here
-                });
-
-            webjobHostBuilder.AddServiceBus();
-            webjobHostBuilder.AddEventHubs();
-            webjobHostBuilder.AddTimers();
-
+        {  
             var applicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>(); 
             var config = lifetimeScope.Resolve<IConfiguration>();
             var fileRepository = lifetimeScope.Resolve<IFileRepository>();

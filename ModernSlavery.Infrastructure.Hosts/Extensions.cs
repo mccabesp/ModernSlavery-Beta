@@ -29,7 +29,7 @@ namespace ModernSlavery.Infrastructure.Hosts
 {
     public static partial class Extensions
     {
-        public static (IHostBuilder HostBuilder, DependencyBuilder DependencyBuilder, IConfiguration AppConfig) CreateGenericHost<TStartupModule>(string applicationName = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
+        public static (IHostBuilder HostBuilder, DependencyBuilder DependencyBuilder, IConfiguration AppConfig) CreateGenericHost<TStartupModule>(Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
             //Create an unhandled exception handler forthe app domain
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -48,7 +48,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             appConfig.SetupThreadCulture();
 
             //Set the content root to the bin folder if in development mode
-            if (appConfig.IsDevelopment()) appConfig[HostDefaults.ContentRootKey] = System.AppDomain.CurrentDomain.BaseDirectory;
+            if (appConfig.IsDevelopment() || appConfig.ContainsSecretFiles()) appConfig[HostDefaults.ContentRootKey] = System.AppDomain.CurrentDomain.BaseDirectory;
 
             //Set the content root from the confif or environment
             var contentRoot = appConfig[HostDefaults.ContentRootKey];

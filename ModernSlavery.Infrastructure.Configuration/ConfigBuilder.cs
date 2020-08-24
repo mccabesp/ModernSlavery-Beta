@@ -27,7 +27,6 @@ namespace ModernSlavery.Infrastructure.Configuration
             _additionalSettings = additionalSettings ?? new Dictionary<string, string>();
             _commandlineArgs = commandlineArgs;
 
-            _additionalSettings[HostDefaults.ApplicationKey] = Assembly.GetEntryAssembly().GetName().Name;
         }
 
         public void Dispose()
@@ -68,14 +67,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             appBuilder.SetFileProvider(new PhysicalFileProvider(AppDomain.CurrentDomain.BaseDirectory));
 
             //Add the root and environment appsettings files
-            appBuilder.EnsureJsonFile("appsettings.json", false, true);
-            appBuilder.EnsureJsonFile($"appsettings.{environmentName}.json", true, true);
-            if (Debugger.IsAttached || _appConfig.IsDevelopment() || _appConfig.IsTest())
-            {
-                appBuilder.EnsureJsonFile("appsettings.secret.json", true, true);
-                appBuilder.EnsureJsonFile($"appsettings.{environmentName}.secret.json", true, true);
-            }
-
+            appBuilder.EnsureJsonFiles(environmentName, Debugger.IsAttached || _appConfig.IsDevelopment() || _appConfig.IsTest());
             _appConfig = appBuilder.Build();
 
             //Add the azure key vault to configuration
@@ -124,6 +116,10 @@ namespace ModernSlavery.Infrastructure.Configuration
             appBuilder.PromoteConfigSources<EnvironmentVariablesConfigurationSource>();
 
             _appConfig = appBuilder.Build();
+
+            //Ensure we have an application name
+            if (string.IsNullOrWhiteSpace(_appConfig[HostDefaults.ApplicationKey]))
+                _appConfig[HostDefaults.ApplicationKey] = Assembly.GetEntryAssembly().GetName().Name;
 
             _appConfig[HostDefaults.EnvironmentKey] = environmentName;
 

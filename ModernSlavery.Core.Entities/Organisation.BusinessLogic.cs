@@ -123,12 +123,23 @@ namespace ModernSlavery.Core.Entities
         /// </summary>
         /// <param name="accountingDate">Ignore name changes after this date/time - if empty returns the latest name</param>
         /// <returns>The name of the organisation</returns>
-        public OrganisationName GetName(DateTime accountingDate)
+        public OrganisationName GetName(DateTime reportingDeadline)
         {
-            return OrganisationNames.Where(n => n.Created < accountingDate)
+            return OrganisationNames.Where(n => n.Created < reportingDeadline)
                 .OrderByDescending(n => n.Created)
                 .FirstOrDefault();
         }
+
+        /// <summary>
+        /// Returns the prevuous name of the organisation before a specific date
+        /// </summary>
+        /// <returns></returns>
+        public string GetPreviousName(DateTime? reportingDeadline = null)
+        {
+            if (reportingDeadline.HasValue)return OrganisationNames.Where(n => n.Created < reportingDeadline.Value).OrderByDescending(n => n.Created).Skip(1).Select(n => n.Name).FirstOrDefault();
+            return OrganisationNames.OrderByDescending(n => n.Created).Skip(1).Select(n => n.Name).FirstOrDefault();
+        }
+
         public OrganisationName GetLatestName()
         {
             return OrganisationNames
@@ -159,17 +170,19 @@ namespace ModernSlavery.Core.Entities
 
         public OrganisationAddress GetLatestAddress(AddressStatuses status = AddressStatuses.Active)
         {
-            var addressStatus = OrganisationAddresses.SelectMany(a =>
-                    a.AddressStatuses.Where(s => s.Status == status))
-                .OrderByDescending(s => s.StatusDate)
-                .FirstOrDefault();
-
-            if (addressStatus != null && addressStatus.Address.Status == status) return addressStatus.Address;
-
-            if (LatestAddress != null && LatestAddress.Status == status) return LatestAddress;
-
-            return null;
+            return OrganisationAddresses.OrderByDescending(a => a.Created).SingleOrDefault(a => a.Status == AddressStatuses.Active);
         }
+
+        public void FixLatestAddress(OrganisationAddress newAddress = null)
+        {
+            if (newAddress != null && newAddress.Status != AddressStatuses.Active) throw new ArgumentException($"Cannot set latest address with status={newAddress.Status}");
+
+            //Get the sorted addresses
+            var addresses = OrganisationAddresses.OrderBy(a => a.Created);
+            if (newAddress == null) newAddress = addresses.LastOrDefault(a => a.Status == AddressStatuses.Active);
+            LatestAddress = newAddress;
+        }
+
         /// <summary>
         ///     Returns the latest organisation name before specified date/time
         /// </summary>
@@ -184,19 +197,6 @@ namespace ModernSlavery.Core.Entities
         }
         #endregion
 
-        #region Returns
-        //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
-        public Return GetReturn(int year)
-        {
-            return null;// Returns.Where(r => r.Status == StatementStatuses.Submitted && r.AccountingDate.Year == year).OrderByDescending(r => r.StatusDate).FirstOrDefault();
-        }
-
-        public IEnumerable<Return> GetSubmittedReports()
-        {
-            return null;// Returns.Where(r => r.Status == StatementStatuses.Submitted).OrderByDescending(r => r.AccountingDate);
-        }
-        #endregion
-
         #region Statements
         //Returns the latest return for the specified accounting year or the latest ever if no accounting year is 
         public Statement GetStatement(int year)
@@ -204,6 +204,22 @@ namespace ModernSlavery.Core.Entities
             return Statements.Where(r => r.Status == StatementStatuses.Submitted && r.SubmissionDeadline.Year == year)
                 .OrderByDescending(r => r.StatusDate)
                 .FirstOrDefault();
+        }
+        public Statement GetStatement(DateTime reportingDeadline)
+        {
+            return Statements.Where(r => r.Status == StatementStatuses.Submitted && r.SubmissionDeadline == reportingDeadline)
+                .OrderByDescending(r => r.StatusDate)
+                .FirstOrDefault();
+        }
+
+        public void FixLatestStatement(Statement newStatement = null)
+        {
+            if (newStatement != null && newStatement.Status != StatementStatuses.Submitted) throw new ArgumentException($"Cannot set latest statement with status={newStatement.Status}");
+
+            //Get the sorted statementes
+            var statements = Statements.OrderBy(a => a.SubmissionDeadline).ThenBy(a => a.Created).ToList();
+            if (newStatement == null) newStatement = statements.LastOrDefault(a => a.Status == StatementStatuses.Submitted);
+            LatestStatement = newStatement;
         }
 
         public IEnumerable<Statement> GetSubmittedStatements()
@@ -214,48 +230,39 @@ namespace ModernSlavery.Core.Entities
         #endregion
 
         #region Scope
-        public bool GetIsInscope(DateTime submissionDeadline)
-        {
-            return !GetScopeStatus(submissionDeadline).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
-        }
-
-        public OrganisationScope GetLatestScope()
-        {
-            return OrganisationScopes.OrderByDescending(s=>s.SubmissionDeadline).FirstOrDefault(orgScope =>
-                orgScope.Status == ScopeRowStatuses.Active);
-        }
-
         //Returns the scope for the specified accounting date
-        public OrganisationScope GetScope(DateTime submissionDeadline)
+        public OrganisationScope GetActiveScope(DateTime submissionDeadline)
         {
-            return OrganisationScopes.FirstOrDefault(s =>
-                s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline == submissionDeadline);
+            return OrganisationScopes.FirstOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline == submissionDeadline);
         }
 
-
-        public ScopeStatuses GetScopeStatus(DateTime submissionDeadline)
+        public OrganisationScope GetActiveScope(int reportingDeadlineYear)
         {
-            var scope = GetScope(submissionDeadline);
+            return OrganisationScopes.FirstOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline.Year == reportingDeadlineYear);
+        }
+
+        public ScopeStatuses GetActiveScopeStatus(DateTime submissionDeadline)
+        {
+            var scope = GetActiveScope(submissionDeadline);
             return scope == null ? ScopeStatuses.Unknown : scope.ScopeStatus;
         }
 
-
-        public OrganisationScope GetScope(int snapshotYear)
+        public OrganisationScope GetLatestActiveScope()
         {
-            return OrganisationScopes.FirstOrDefault(orgScope =>
-                orgScope.Status == ScopeRowStatuses.Active
-                && orgScope.SubmissionDeadline.Year == snapshotYear);
+            return OrganisationScopes.OrderByDescending(s => s.SubmissionDeadline).FirstOrDefault(orgScope =>
+                  orgScope.Status == ScopeRowStatuses.Active);
         }
 
-        public OrganisationScope GetScopeOrThrow(int snapshotYear)
+        public bool GetIsInscope(DateTime submissionDeadline)
         {
-            var organisationScope = GetScope(snapshotYear);
+            return !GetActiveScopeStatus(submissionDeadline).IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.OutOfScope);
+        }
 
-            if (organisationScope == null)
-                throw new ArgumentOutOfRangeException(
-                    $"Cannot find an scope with status 'Active' for snapshotYear '{snapshotYear}' linked to organisation '{OrganisationName}', employerReference '{EmployerReference}'.");
+        public void FixLatestScope(OrganisationScope newScope = null)
+        {
+            if (newScope != null && newScope.Status != ScopeRowStatuses.Active) throw new ArgumentException($"Cannot set latest scope with status={newScope.Status}");
 
-            return organisationScope;
+            LatestScope = newScope ?? OrganisationScopes.OrderBy(a => a.SubmissionDeadline).ThenBy(s => s.ScopeStatusDate).LastOrDefault(a => a.Status == ScopeRowStatuses.Active);
         }
         #endregion
 
@@ -289,22 +296,24 @@ namespace ModernSlavery.Core.Entities
             return DateOfCessation != null;
         }
 
-        public void SetStatus(OrganisationStatuses status, long byUserId, string details = null)
+        public OrganisationStatus SetStatus(OrganisationStatuses status, long byUserId, string details = null)
         {
-            if (status == Status && details == StatusDetails) return;
+            if (status == Status && details == StatusDetails) return null;
 
-            OrganisationStatuses.Add(
-                new OrganisationStatus
-                {
-                    OrganisationId = OrganisationId,
-                    Status = status,
-                    StatusDate = VirtualDateTime.Now,
-                    StatusDetails = details,
-                    ByUserId = byUserId
-                });
+            var organisationStatus = new OrganisationStatus
+            {
+                OrganisationId = OrganisationId,
+                Status = status,
+                StatusDate = VirtualDateTime.Now,
+                StatusDetails = details,
+                ByUserId = byUserId
+            };
+            OrganisationStatuses.Add(organisationStatus);
+                
             Status = status;
             StatusDate = VirtualDateTime.Now;
             StatusDetails = details;
+            return organisationStatus;
         }
 
         /// <summary>
@@ -376,6 +385,16 @@ namespace ModernSlavery.Core.Entities
             return UserOrganisations.Where(uo => uo.PINConfirmedDate != null)
                 .OrderByDescending(uo => uo.PINConfirmedDate)
                 .FirstOrDefault();
+        }
+
+        public void FixLatestRegistration(UserOrganisation newRegistration = null)
+        {
+            if (newRegistration != null && newRegistration.PINConfirmedDate == null) throw new ArgumentException($"Cannot set latest registration to no confirmed date");
+
+            //Get the sorted statementes
+            var userOrganisations = UserOrganisations.OrderBy(a => a.PINConfirmedDate).ToList();
+            if (newRegistration == null) newRegistration = userOrganisations.LastOrDefault(a => a.PINConfirmedDate != null);
+            LatestRegistration = newRegistration;
         }
         #endregion
 

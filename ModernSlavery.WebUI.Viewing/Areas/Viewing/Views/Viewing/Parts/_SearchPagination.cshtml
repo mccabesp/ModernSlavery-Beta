@@ -1,0 +1,41 @@
+﻿@model SearchViewModel
+@{
+    var showPrev = Model.Organisations.CurrentPage > 1;
+    var showNext = Model.Organisations.CurrentPage < Model.Organisations.PageCount;
+
+    var prevPage = showPrev ? Model.Organisations.CurrentPage - 1 : -1;
+    var nextPage = showNext ? Model.Organisations.CurrentPage + 1 : -1;
+}
+@if (Model.Organisations.Results.Count > 0)
+{
+    <div class="grid-row">
+        <div class="pagination-container" data-pagecount="@Model.Organisations.PageCount" data-currentpage="@Model.Organisations.CurrentPage">
+
+            @if (showPrev)
+            {
+                <div class="column-half" style="padding: 0">
+                    <div class="pagination pagination-prev">
+                        <a href="@Url.WithQuery("SearchResults", new {p = Model.Organisations.CurrentPage - 1})">
+                            Previous
+                            <span class="visuallyhidden"> Page </span>
+                            <span class="pagination-numbers" data-total="@Model.Organisations.PageCount">@(Model.Organisations.CurrentPage - 1) of @Model.Organisations.PageCount</span>
+                        </a>
+                    </div>
+                </div>
+            }
+
+            @if (showNext)
+            {
+                <div class="column-half">
+                    <div class="pagination pagination-next">
+                        <a href="@Url.WithQuery("SearchResults", new {p = Model.Organisations.CurrentPage + 1})">
+                            Next
+                            <span class="visuallyhidden"> Page </span>
+                            <span class="pagination-numbers" data-total="@Model.Organisations.PageCount">@(Model.Organisations.CurrentPage + 1) of @Model.Organisations.PageCount</span>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

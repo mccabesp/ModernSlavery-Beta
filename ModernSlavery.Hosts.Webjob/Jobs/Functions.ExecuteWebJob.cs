@@ -13,6 +13,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         [Singleton(Mode = SingletonMode.Listener)] //Ensures execution on only one instance with one listener
+        [Disable(typeof(DisableWebjobProvider))]
         public async Task ExecuteWebjob([QueueTrigger(QueueNames.ExecuteWebJob)]
             string queueMessage,
             ILogger log)
@@ -28,22 +29,22 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             switch (command)
             {
                 case "CompaniesHouseCheck":
-                    await CompaniesHouseCheckAsync(log, true);
+                    await CompaniesHouseCheckAsync(log, true).ConfigureAwait(false);
                     break;
                 case "UpdateFile":
-                    await UpdateFileAsync(log, parameters["filePath"], parameters["action"]);
+                    await UpdateFileAsync(log, parameters["filePath"], parameters["action"]).ConfigureAwait(false);
                     break;
-                case "UpdateSearch":
-                    await UpdateSearchAsync(log, parameters["userEmail"], true);
+                case "UpdateOrganisationSearch":
+                    await UpdateOrganisationSearchAsync(log, parameters["userEmail"], true).ConfigureAwait(false);
                     break;
                 case "UpdateDownloadFiles":
-                    await UpdateDownloadFilesAsync(log, parameters["userEmail"], true);
+                    await UpdateDownloadFilesAsync(log, parameters["userEmail"], true).ConfigureAwait(false);
                     break;
                 case "TakeSnapshot":
-                    await TakeSnapshotAsync(log);
+                    await TakeSnapshotAsync(log).ConfigureAwait(false);
                     break;
                 case "FixOrganisationsNames":
-                    await FixOrganisationsNamesAsync(log, parameters["userEmail"], parameters["comment"]);
+                    await FixOrganisationsNamesAsync(log, parameters["userEmail"], parameters["comment"]).ConfigureAwait(false);
                     break;
                 default:
                     throw new Exception("Could not execute webjob:" + queueMessage);
@@ -59,7 +60,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             log.LogError($"Could not execute Webjob, Details: {queueMessage}");
 
             //Send Email to GEO reporting errors
-            await _Messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not execute Webjob:" + queueMessage);
+            await _Messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not execute Webjob:" + queueMessage).ConfigureAwait(false);
         }
     }
 }

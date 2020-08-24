@@ -43,11 +43,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @for (var i = 0; i < Model.ManualEmployers.Count; i++)
+                        @for (var i = 0; i < Model.ManualOrganisations.Count; i++)
                         {
                             <tr>
                                 <td>
-                                    @Model.ManualEmployers[i].OrganisationName <span>@Model.ManualEmployers[i].GetFullAddress()</span>
+                                    @Model.ManualOrganisations[i].OrganisationName <span>@Model.ManualOrganisations[i].GetFullAddress()</span>
                                 </td>
                                 <td>
                                     @{ var references = Model.GetReferences(i); }

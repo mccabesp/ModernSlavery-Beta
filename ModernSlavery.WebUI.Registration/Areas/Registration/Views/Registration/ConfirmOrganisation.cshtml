@@ -26,7 +26,7 @@
         @Html.AntiForgeryToken()
 
         @Html.HiddenFor(m => m.SearchText)
-        @Html.HiddenFor(m => m.SelectedEmployerIndex)
+        @Html.HiddenFor(m => m.SelectedOrganisationIndex)
         @Html.HiddenFor(m => m.CompanyNumber)
         @Html.HiddenFor(model => model.CharityNumber)
         @Html.HiddenFor(model => model.MutualNumber)
@@ -68,7 +68,7 @@
         @Html.HiddenFor(model => model.ContactPhoneNumber)
 
         @Html.HiddenFor(model => model.ManualAddress)
-        @Html.HiddenFor(model => model.ManualEmployerIndex)
+        @Html.HiddenFor(model => model.ManualOrganisationIndex)
         @Html.HiddenFor(model => model.MatchedReferenceCount)
 
         @Html.HiddenFor(model => model.ManualRegistration)

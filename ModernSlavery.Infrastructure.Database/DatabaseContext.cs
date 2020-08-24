@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using EFCore.BulkExtensions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -32,7 +33,7 @@ namespace ModernSlavery.Infrastructure.Database
             if (!string.IsNullOrWhiteSpace(_databaseOptions.ConnectionString))
                 ConnectionString = _databaseOptions.ConnectionString;
 
-            if (databaseOptions.UseMigrations && (string.IsNullOrWhiteSpace(databaseOptions.MigrationAppName) || databaseOptions.MigrationAppName.EqualsI(sharedOptions.ApplicationName)))
+            if (databaseOptions.GetIsMigrationApp())
                 MigrationsApplied=EnsureMigrated();
         }
 
@@ -94,6 +95,11 @@ namespace ModernSlavery.Infrastructure.Database
         public new DbSet<TEntity> Set<TEntity>() where TEntity : class
         {
             return base.Set<TEntity>();
+        }
+
+        public async Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity=false) where TEntity : class
+        {
+            await DbContextBulkExtensions.BulkInsertAsync(this,entities.ToList(), b=> { b.SetOutputIdentity = setOutputIdentity; b.PreserveInsertOrder = setOutputIdentity; });
         }
 
         /// <summary>
@@ -216,8 +222,6 @@ namespace ModernSlavery.Infrastructure.Database
         public virtual DbSet<OrganisationScope> OrganisationScope { get; set; }
         public virtual DbSet<OrganisationSicCode> OrganisationSicCode { get; set; }
         public virtual DbSet<OrganisationStatus> OrganisationStatus { get; set; }
-        public virtual DbSet<Return> Return { get; set; }
-        public virtual DbSet<ReturnStatus> ReturnStatus { get; set; }
         public virtual DbSet<SicCode> SicCodes { get; set; }
         public virtual DbSet<SicSection> SicSections { get; set; }
         public virtual DbSet<User> User { get; set; }

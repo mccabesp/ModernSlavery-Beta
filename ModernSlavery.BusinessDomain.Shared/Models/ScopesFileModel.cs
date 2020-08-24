@@ -11,8 +11,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public long OrganisationId { get; set; }
         public string OrganisationName { get; set; }
-        public string DUNSNumber { get; set; }
         public string EmployerReference { get; set; }
+        public string DUNSNumber { get; set; }
+        public string ManualOrganisations { get; set; }
         public ScopeStatuses ScopeStatus { get; set; }
         public DateTime ScopeStatusDate { get; set; } = VirtualDateTime.Now;
         public RegisterStatuses RegisterStatus { get; set; }
@@ -25,9 +26,13 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public string ContactEmailAddress { get; set; }
 
+        public string ContactJobTitle { get; set; }
+
         public bool? ReadGuidance { get; set; }
 
         public string Reason { get; set; }
+
+        public string TurnOver { get; set; }
         public string CampaignId { get; set; }
     }
 }

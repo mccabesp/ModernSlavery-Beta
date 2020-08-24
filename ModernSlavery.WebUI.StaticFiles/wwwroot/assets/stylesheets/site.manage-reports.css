@@ -3,24 +3,36 @@
     width: 100%;
 }
 
-.gpg-manage-reports__row { display: table-row; }
+.gpg-manage-reports__row {
+    display: table-row;
+}
 
-.gpg-manage-reports__head { display: table-row; }
+.gpg-manage-reports__head {
+    display: table-row;
+}
 
 .gpg-manage-reports__cell, .gpg-manage-reports__desc {
     display: table-cell;
     padding: 10px 10px 10px 0;
 }
 
-.gpg-manage-reports__cell { border-bottom: 1px solid #bfc1c3; vertical-align:middle; }
+.gpg-manage-reports__cell {
+    border-bottom: 1px solid #bfc1c3;
+    vertical-align: middle;
+}
 
 .gpg-manage-reports__desc {
     border: 1px solid black;
     border-left: none;
     border-right: none;
     font-weight: bold;
+    max-width: 220px;
 }
 
-.gpg-manage-reports__desc--action, .gpg-manage-reports__cell--action { text-align:center; }
+.gpg-manage-reports__desc--action, .gpg-manage-reports__cell--action {
+    text-align: center;
+}
 
-.gpg-manage-reports__cell--year { font-weight: bold; }
+.gpg-manage-reports__cell--year {
+    font-weight: bold;
+}

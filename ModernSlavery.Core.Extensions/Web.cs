@@ -68,16 +68,16 @@ namespace ModernSlavery.Core.Extensions
                     }
 
 
-                    using (var response = httpMethod == HttpMethods.Get ? await client.GetAsync(url) :
-                        httpMethod == HttpMethods.Delete ? await client.DeleteAsync(url) :
-                        httpMethod == HttpMethods.Post ? await client.PostAsync(url, httpContent) :
-                        httpMethod == HttpMethods.Put ? await client.PutAsync(url, httpContent) :
-                        httpMethod == HttpMethods.Patch ? await client.PatchAsync(url, httpContent) :
+                    using (var response = httpMethod == HttpMethods.Get ? await client.GetAsync(url).ConfigureAwait(false) :
+                        httpMethod == HttpMethods.Delete ? await client.DeleteAsync(url).ConfigureAwait(false) :
+                        httpMethod == HttpMethods.Post ? await client.PostAsync(url, httpContent).ConfigureAwait(false) :
+                        httpMethod == HttpMethods.Put ? await client.PutAsync(url, httpContent).ConfigureAwait(false) :
+                        httpMethod == HttpMethods.Patch ? await client.PatchAsync(url, httpContent).ConfigureAwait(false) :
                         throw new ArgumentOutOfRangeException(nameof(httpMethod),
                             "HttpMethod must be Get, Delete, Post or Put"))
                     {
                         response.EnsureSuccessStatusCode();
-                        var responseBody = await response.Content.ReadAsStringAsync();
+                        var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                         if (headers != null)
                             foreach (var header in response.Headers)
                                 headers[header.Key] = header.Value.Distinct().ToDelimitedString();

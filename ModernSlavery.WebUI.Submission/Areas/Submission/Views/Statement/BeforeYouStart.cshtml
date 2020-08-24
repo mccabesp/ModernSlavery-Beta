@@ -1,7 +1,8 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model string
+@model BeforeYouStartViewModel
+<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">
@@ -54,7 +55,7 @@
             The information you provide us with will be published on our viewing service.
         </p>
 
-        <a href="@Model" class="govuk-button govuk-button--start">
+        <a href="@Model.ContinueUrl" class="govuk-button govuk-button--start">
             Start now <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
                 <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z"></path>
             </svg>

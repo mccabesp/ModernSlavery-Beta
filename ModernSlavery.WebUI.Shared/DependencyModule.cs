@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes;
@@ -31,6 +32,13 @@ namespace ModernSlavery.WebUI.Shared
         {
             //Add the custom url helper
             services.AddSingleton<IUrlHelperFactory,CustomUrlHelperFactory>();
+
+            //Register service dependencies here
+            services.AddSingleton<SectorTypeIndex>();
+            services.AddSingleton<PolicyTypeIndex>();
+            services.AddSingleton<RiskTypeIndex>();
+            services.AddSingleton<DiligenceTypeIndex>();
+            services.AddSingleton<TrainingTypeIndex>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

@@ -17,6 +17,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         /// <param name="queueMessage"></param>
         /// <param name="log"></param>
         [Singleton] //Ensures execution on only one instance
+        [Disable(typeof(DisableWebjobProvider))]
         public async Task SendNotifyEmail([QueueTrigger(QueueNames.SendNotifyEmail)]
             CloudQueueMessage queueMessage,
             ILogger log)

@@ -95,30 +95,6 @@ namespace ModernSlavery.Core.Entities
         RegisterCancelled = 4
     }
 
-    public enum OrganisationSizes: byte
-    {
-        [Display(Name = "Not Provided")] [Range(0, 0)]
-        NotProvided = 0,
-
-        [Display(Name = "Less than 250")] [Range(0, 249)]
-        Employees0To249 = 1,
-
-        [Display(Name = "250 to 499")] [Range(250, 499)]
-        Employees250To499 = 2,
-
-        [Display(Name = "500 to 999")] [Range(500, 999)]
-        Employees500To999 = 3,
-
-        [Display(Name = "1000 to 4999")] [Range(1000, 4999)]
-        Employees1000To4999 = 4,
-
-        [Display(Name = "5000 to 19,999")] [Range(5000, 19999)]
-        Employees5000to19999 = 5,
-
-        [Display(Name = "20,000 or more")] [Range(20000, int.MaxValue)]
-        Employees20000OrMore = 6
-    }
-
     public enum AuditedAction:byte
     {
         [Display(Name = "Change late flag")] AdminChangeLateFlag = 0,

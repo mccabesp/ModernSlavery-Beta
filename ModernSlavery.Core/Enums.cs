@@ -29,13 +29,6 @@ namespace ModernSlavery.Core
         [EnumMember(Value = "all")] All
     }
 
-    public enum SearchTypes : byte
-    {
-        ByEmployerName = 1,
-        BySectorType = 2,
-        NotSet = 99
-    }
-
     public enum SearchReportingStatusFilter : byte
     {
         [Display(Name = "Reported in the last 7 days")]
@@ -48,5 +41,14 @@ namespace ModernSlavery.Core
 
         [Display(Name = "Reported with extra information")]
         ExplanationProvidedByEmployer
+    }
+
+    public enum StatementErrors : byte
+    {
+        Unknown = 0,
+        NotFound = 1,
+        Unauthorised = 2,
+        Locked = 3,
+        TooLate = 4,
     }
 }

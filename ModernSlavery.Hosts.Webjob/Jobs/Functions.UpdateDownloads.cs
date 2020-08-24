@@ -15,18 +15,19 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         //Update data for viewing service
-        public async Task UpdateDownloadFiles([TimerTrigger("00:01:00:00", RunOnStartup = true)]
+        [Disable(typeof(DisableWebjobProvider))]
+        public async Task UpdateDownloadFiles([TimerTrigger("%UpdateDownloadFiles%")]
             TimerInfo timer,
             ILogger log)
         {
             try
             {
-                await UpdateDownloadFilesAsync(log);
+                await UpdateDownloadFilesAsync(log).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", ex.Message);
+                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", ex.Message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -39,9 +40,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                var returnYears = _SharedBusinessLogic.DataRepository.GetAll<Return>()
+                var returnYears = _SharedBusinessLogic.DataRepository.GetAll<Statement>()
                     .Where(r => r.Status == StatementStatuses.Submitted)
-                    .Select(r => r.AccountingDate.Year)
+                    .Select(r => r.SubmissionDeadline.Year)
                     .Distinct()
                     .ToList();
 
@@ -49,8 +50,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var downloadsLocation = _SharedBusinessLogic.SharedOptions.DownloadsLocation;
 
                 //Ensure we have a directory
-                if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(downloadsLocation))
-                    await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(downloadsLocation);
+                if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(downloadsLocation).ConfigureAwait(false))
+                    await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(downloadsLocation).ConfigureAwait(false);
 
                 foreach (var year in returnYears)
                 {
@@ -58,28 +59,28 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                     var downloadFilePattern = $"GPGData_{year}-{year + 1}.csv";
                     var files = await _SharedBusinessLogic.FileRepository.GetFilesAsync(downloadsLocation,
-                        downloadFilePattern);
+                        downloadFilePattern).ConfigureAwait(false);
                     var oldDownloadFilePath = files.FirstOrDefault();
 
                     //Skip if the file already exists and is newer than 1 hour or older than 1 year
                     if (oldDownloadFilePath != null && !force)
                     {
                         var lastWriteTime =
-                            await _SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(oldDownloadFilePath);
+                            await _SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(oldDownloadFilePath).ConfigureAwait(false);
                         if (lastWriteTime.AddHours(1) >= VirtualDateTime.Now ||
                             lastWriteTime.AddYears(2) <= VirtualDateTime.Now) continue;
                     }
 
-                    var returns = await _SharedBusinessLogic.DataRepository.GetAll<Return>().Where(r =>
-                            r.AccountingDate.Year == year
+                    var statements = await _SharedBusinessLogic.DataRepository.GetAll<Statement>().Where(r =>
+                            r.SubmissionDeadline.Year == year
                             && r.Status == StatementStatuses.Submitted
                             && r.Organisation.Status == OrganisationStatuses.Active)
-                        .ToListAsync();
-                    returns.RemoveAll(r =>
+                        .ToListAsync().ConfigureAwait(false);
+                    statements.RemoveAll(r =>
                         r.Organisation.OrganisationName.StartsWithI(_SharedBusinessLogic.SharedOptions.TestPrefix));
 
-                    var downloadData = returns.ToList()
-                        .Select(r => DownloadResult.Create(r))
+                    var downloadData = statements.ToList()
+                        .Select(r => DownloadModel.Create(r))
                         .OrderBy(d => d.EmployerName)
                         .ToList();
 
@@ -90,9 +91,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     {
                         if (downloadData.Any())
                             await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, downloadData,
-                                newFilePath, oldDownloadFilePath);
+                                newFilePath, oldDownloadFilePath).ConfigureAwait(false);
                         else if (!string.IsNullOrWhiteSpace(oldDownloadFilePath))
-                            await _SharedBusinessLogic.FileRepository.DeleteFileAsync(oldDownloadFilePath);
+                            await _SharedBusinessLogic.FileRepository.DeleteFileAsync(oldDownloadFilePath).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -106,7 +107,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         await _Messenger.SendMessageAsync(
                             "UpdateDownloadFiles complete",
                             userEmail,
-                            "The update of the download files completed successfully.");
+                            "The update of the download files completed successfully.").ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {

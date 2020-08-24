@@ -53,8 +53,8 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             {
                 if (CacheSearchResults)
                 {
-                    if (value == null || value.Employers == null || value.Employers.Results == null ||
-                        value.Employers.Results.Count == 0)
+                    if (value == null || value.Organisations == null || value.Organisations.Results == null ||
+                        value.Organisations.Results.Count == 0)
                         Session.Remove("LastSearchResults");
                     else
                         Session["LastSearchResults"] = value;

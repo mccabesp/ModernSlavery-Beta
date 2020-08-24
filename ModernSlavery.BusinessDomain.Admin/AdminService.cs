@@ -22,10 +22,9 @@ namespace ModernSlavery.BusinessDomain.Admin
             ISubmissionBusinessLogic submissionBusinessLogic,
             IUserRepository userRepository,
             [KeyFilter(QueueNames.ExecuteWebJob)] IQueue executeWebjobQueue,
-            [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
-            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository,
-            ISearchRepository<EmployerSearchModel> employerSearchRepository,
-            ISearchRepository<SicCodeSearchModel> sicCodeSearchRepository,
+            [KeyFilter("Private")] IPagedRepository<OrganisationRecord> privateSectorRepository,
+            [KeyFilter("Public")] IPagedRepository<OrganisationRecord> publicSectorRepository,
+            ISearchRepository<OrganisationSearchModel> organisationSearchRepository,
             ISharedBusinessLogic sharedBusinessLogic,
             IDataImporter dataImporter
         )
@@ -43,8 +42,7 @@ namespace ModernSlavery.BusinessDomain.Admin
             PrivateSectorRepository = privateSectorRepository;
             PublicSectorRepository = publicSectorRepository;
 
-            EmployerSearchRepository = employerSearchRepository;
-            SicCodeSearchRepository = sicCodeSearchRepository;
+            OrganisationSearchRepository = organisationSearchRepository;
             SharedBusinessLogic = sharedBusinessLogic;
 
             DataImporter = dataImporter;
@@ -60,12 +58,11 @@ namespace ModernSlavery.BusinessDomain.Admin
         public ISearchBusinessLogic SearchBusinessLogic { get; set; }
         public ISubmissionBusinessLogic SubmissionBusinessLogic { get; }
         public IUserRepository UserRepository { get; }
-        public IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
-        public IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
+        public IPagedRepository<OrganisationRecord> PrivateSectorRepository { get; }
+        public IPagedRepository<OrganisationRecord> PublicSectorRepository { get; }
         public IQueue ExecuteWebjobQueue { get; }
 
-        public ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; }
-        public ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
+        public ISearchRepository<OrganisationSearchModel> OrganisationSearchRepository { get; }
         public ISharedBusinessLogic SharedBusinessLogic { get; }
 
         public async Task LogSubmission(IOrderedEnumerable<SubmissionLogModel> logRecords)

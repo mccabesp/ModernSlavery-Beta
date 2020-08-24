@@ -8,6 +8,8 @@ namespace ModernSlavery.Infrastructure.Messaging
     {
         public bool? Enabled { get; set; }
 
+        public string ApiServer { get; set; } = "https://api.notifications.service.gov.uk";
+
         public string ClientReference { get; set; } = "ModernSlaveryAlphaTest";
 
         public string ApiKey { get; set; }

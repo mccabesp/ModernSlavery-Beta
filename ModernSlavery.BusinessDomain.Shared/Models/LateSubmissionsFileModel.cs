@@ -10,7 +10,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         public string OrganisationName { get; set; }
         public SectorTypes OrganisationSectorType { get; set; }
         public long ReportId { get; set; }
-        public DateTime ReportSnapshotDate { get; set; }
+        public DateTime ReportingDeadline { get; set; }
         public string ReportLateReason { get; set; }
         public DateTime ReportSubmittedDate { get; set; }
         public DateTime ReportModifiedDate { get; set; }

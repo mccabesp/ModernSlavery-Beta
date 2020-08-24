@@ -34,9 +34,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
             ScopeStatuses scopeStatus,
             bool saveToDatabase);
 
-        CustomResult<Organisation> LoadInfoFromEmployerIdentifier(string employerIdentifier);
-        CustomResult<Organisation> LoadInfoFromActiveEmployerIdentifier(string employerIdentifier);
-        Task<CustomResult<Organisation>> GetOrganisationByEncryptedReturnIdAsync(string encryptedReturnId);
+        CustomResult<Organisation> LoadInfoFromOrganisationId(long organisationId);
+        CustomResult<Organisation> LoadInfoFromActiveOrganisationId(long organisationId);
         string GetOrganisationSicSectorsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ");
         string GetOrganisationSicSource(Organisation organisation, DateTime? maxDate = null);
         string GetOrganisationSicSectionIdsString(Organisation org, DateTime? maxDate = null, string delimiter = ", ");
@@ -55,14 +54,10 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         IEnumerable<string> GetOrganisationSectors(string sicCodes);
 
         Organisation GetOrganisationById(long organisationId);
-        IEnumerable<Return> GetOrganisationRecentReports(Organisation organisation,int recentCount);
+        IEnumerable<Statement> GetOrganisationRecentStatements(Organisation organisation,int recentCount);
 
-        EmployerSearchModel CreateEmployerSearchModel(Organisation organisation, bool keyOnly = false,
-            List<SicCodeSearchModel> listOfSicCodeSearchModels = null);
+        OrganisationRecord CreateOrganisationRecord(Organisation org, long userId = 0);
 
-        EmployerRecord CreateEmployerRecord(Organisation org, long userId = 0);
-
-        IEnumerable<int> GetOrganisationRecentReportingYears(Organisation organisation,int recentCount);
         bool GetOrganisationIsOrphan(Organisation organisation);
 
         bool GetOrganisationWasDissolvedBeforeCurrentAccountingYear(Organisation organisation);
@@ -104,8 +99,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
             string employerReference,
             string securityCode);
 
-        Return GetOrganisationReturn(Organisation organisation, int year = 0);
-        Task<Organisation> GetOrganisationByEmployerReferenceOrThrowAsync(string employerReference);
+        Statement GetOrganisationStatement(Organisation organisation, int year = 0);
 
         Task<CustomResult<Organisation>> CreateOrganisationSecurityCodeAsync(string employerRef,
             DateTime securityCodeExpiryDateTime);
@@ -122,5 +116,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         Task<CustomResult<Organisation>> ExpireOrganisationSecurityCodeAsync(string employerRef);
         Task<CustomBulkResult<Organisation>> ExpireOrganisationSecurityCodesInBulkAsync();
         IQueryable<Organisation> SearchOrganisations(string searchText,int records);
+        Task FixLatestAddressesAsync();
+        Task FixLatestScopesAsync();
+        Task FixLatestStatementsAsync();
+        Task FixLatestRegistrationsAsync();
     }
 }

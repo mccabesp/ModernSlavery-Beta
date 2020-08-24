@@ -8,24 +8,25 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-        public async Task CompaniesHouseCheck([TimerTrigger(typeof(MidnightSchedule))]
-            TimerInfo timer,
-            ILogger log)
-        {
-            try
-            {
-                await CompaniesHouseCheckAsync(log);
-            }
-            catch (Exception ex)
-            {
-                var message = $"Failed webjob ({nameof(CompaniesHouseCheck)}):{ex.Message}:{ex.GetDetailsText()}";
+        //[Disable(typeof(DisableWebjobProvider))]
+        //public async Task CompaniesHouseCheck([TimerTrigger(typeof(MidnightSchedule))]
+        //    TimerInfo timer,
+        //    ILogger log)
+        //{
+        //    try
+        //    {
+        //        await CompaniesHouseCheckAsync(log).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var message = $"Failed webjob ({nameof(CompaniesHouseCheck)}):{ex.Message}:{ex.GetDetailsText()}";
 
-                //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message);
-                //Rethrow the error
-                throw;
-            }
-        }
+        //        //Send Email to GEO reporting errors
+        //        await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+        //        //Rethrow the error
+        //        throw;
+        //    }
+        //}
 
         public async Task CompaniesHouseCheckAsync(ILogger log, bool all = false)
         {

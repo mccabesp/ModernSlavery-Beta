@@ -54,7 +54,8 @@ namespace ModernSlavery.Core
         public const string StannpSendLog = "MSU-StannpSendLog.csv";
         public const string SearchLog = "MSU-searchLog.csv";
         public const string UserLog = "MSU-UserLog.csv";
-        public const string ImportOrganisations = "MSU-ImportOrganisations.csv";
+        public const string ImportPrivateOrganisations = "MSU-ImportPrivateOrganisations.csv";
+        public const string ImportPublicOrganisations = "MSU-ImportPublicOrganisations.csv";
 
         public static string GetRootFilename(string filePath)
         {

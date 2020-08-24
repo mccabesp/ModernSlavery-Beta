@@ -22,7 +22,7 @@ namespace ModernSlavery.Core.Extensions
 
         public static async Task WaitForAllAsync<TSource>(this IEnumerable<TSource> source, Func<TSource, Task> method)
         {
-            await Task.WhenAll(source.Select(async s => await method(s)));
+            await Task.WhenAll(source.Select(async s => await method(s).ConfigureAwait(false))).ConfigureAwait(false);
         }
 
         public static TValue GetAttributeValue<TAttribute, TValue>(this Type type,

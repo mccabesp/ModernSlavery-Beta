@@ -202,8 +202,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                     user = await _userRepository.FindByEmailAsync(model.Username, UserStatuses.New,
                         UserStatuses.Active);
                 }
-
-                if (user != null)
+                if (user != null && user.UserId>0)
                 {
                     if (SharedBusinessLogic.AuthenticationBusinessLogic.GetUserLoginLockRemaining(user) > TimeSpan.Zero)
                     {

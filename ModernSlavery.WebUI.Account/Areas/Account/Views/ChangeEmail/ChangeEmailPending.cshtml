@@ -25,7 +25,16 @@
                     New email
                 </dt>
                 <dd class="cya-answer">
-                    @Model.NewEmail
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.VerifyCode))
+                    {
+                    <a href="@ViewBag.VerifyUrl">
+                        @Model.NewEmail
+                    </a>
+                    }
+                    else
+                    {
+                        @Model.NewEmail
+                    }
                 </dd>
             </div>
         </dl>
@@ -36,6 +45,7 @@
         <p>
             We have sent a verification email to your new address.
         </p>
+
 
         <p>
             Click on the verification link within 24 hours to confirm your change of email address.
