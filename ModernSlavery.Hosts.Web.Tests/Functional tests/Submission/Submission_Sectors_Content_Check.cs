@@ -4,15 +4,15 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting Submission merge")]
+    [TestFixture]
 
-    public class Submission_Sectors_Content_Check : Private_Registration_Success
+    public class Submission_YourOrg_Content_Check : Private_Registration_Success
     {
         [Test, Order(40)]
-        public async Task NavigateToSectorsPage()
+        public async Task NavigateToYourOrgPage()
         {
 
-            Submission_Helper.NavigateToYourOrganisation(this, Submission.OrgName_Blackpool, "2019/2020");
+            Submission_Helper.NavigateToYourOrganisation(this, Submission.OrgName_InterFloor, "2019 to 2020");
             await Task.CompletedTask;
         }
 

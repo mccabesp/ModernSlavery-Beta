@@ -1,10 +1,12 @@
 ﻿using Geeks.Pangolin;
+using Geeks.Pangolin.Core.Helper;
+using Geeks.Pangolin.Helper.UIContext;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting Submission merge")]
+    [TestFixture]
 
     public class Submission_Areas_Content_Check : Private_Registration_Success
     {
@@ -13,12 +15,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader("Select an organisation");
 
-            Click(Submission.OrgName_Blackpool);
+            Click(Submission.OrgName_InterFloor);
 
 
-            ExpectHeader("Manage your organisations reporting");
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            Click("Draft Report");
+            Click("Start Draft");
 
 
             ExpectHeader("Before you start");
@@ -29,41 +31,58 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
         [Test, Order(42)]
-        public async Task ContinueLeadsToAreasPage()
+        public async Task NavigateToAreasPage()
         {
-            Click("Save and continue");
+            ExpectHeader("Your modern slavery statement");
+
+
+            Click("Continue");
 
             ExpectHeader("Areas covered by your modern slavery statement");
-            ExpectText("Does your modern slavery statement cover the following areas in relation to slavery and human trafficking?");
 
             await Task.CompletedTask;
+        
         }
         [Test, Order(44)]
         public async Task VerifyAreaPageContent()
         {
-            AtLabel("Your organisation’s structure, business and supply chains").ExpectLabel("Yes");
-            AtLabel("Your organisation’s structure, business and supply chains").ExpectLabel("No");
-            //field should now appears
-            AtLabel("Your organisation’s structure, business and supply chains").ClickLabel("Yes");
-            ExpectField("Please provide details");
+            ExpectText("Does your modern slavery statement cover the following areas in relation to slavery and human trafficking?");
+            ExpectText("If you select 'no', please tell us why this area is not covered.");
 
-            AtLabel("Policies").ExpectLabel("Yes");
-            AtLabel("Policies").ExpectLabel("No");
-            AtLabel("Risk assessment and management").ExpectLabel("Yes");
-            AtLabel("Risk assessment and management").ExpectLabel("No");
-            AtLabel("4. The areas of your business and supply chains where there is a risk of slavery and human trafficking taking place, and the steps you have taken to assess and manage that risk?").ExpectLabel("Yes");
-            AtLabel("4. The areas of your business and supply chains where there is a risk of slavery and human trafficking taking place, and the steps you have taken to assess and manage that risk?").ExpectLabel("No");
-            AtLabel("Due diligence processes").ExpectLabel("Yes");
-            AtLabel("Due diligence processes").ExpectLabel("No"); 
-            AtLabel("Staff training about slavery and human trafficking").ExpectLabel("Yes");
-            AtLabel("Staff training about slavery and human trafficking").ExpectLabel("No");
-            AtLabel("Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions").ExpectLabel("Yes");
-            AtLabel("Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions").ExpectLabel("No");
+            for (int i = 0; i < (Submission.AreaHeaders.Length -1); i++)
+            {
+                AreaContentCheck(this, Submission.AreaHeaders[i], Submission.AreaHeaders[i + 1]);
+            }
 
             ExpectButton("Save and continue");
             ExpectButton("Cancel");
             await Task.CompletedTask;
 
+        }
+
+        private static void AreaContentCheck(UIContext ui, string SectionHeader, string NextSectionHeader = null)         
+        {
+            ui.ExpectHeader(SectionHeader);
+
+            if (NextSectionHeader.HasValue())
+            {
+                ui.BelowHeader(SectionHeader).AboveHeader(NextSectionHeader).ExpectLabel("Yes");
+                ui.BelowHeader(SectionHeader).AboveHeader(NextSectionHeader).ExpectLabel("No");
+
+                ui.BelowHeader(SectionHeader).AboveHeader(NextSectionHeader).ClickLabel("No");
+                ui.BelowHeader(SectionHeader).AboveHeader(NextSectionHeader).ExpectField("Please provide details");
+                ui.BelowHeader(SectionHeader).AboveHeader(NextSectionHeader).ClickLabel("Yes");
+                ui.BelowHeader(SectionHeader).AboveHeader(NextSectionHeader).ExpectNoField("Please provide details");
+            }
+            else
+            {
+                ui.BelowHeader(SectionHeader).ExpectLabel("Yes");
+                ui.BelowHeader(SectionHeader).ExpectLabel("No");
+                ui.BelowHeader(SectionHeader).ClickLabel("No");
+                ui.BelowHeader(SectionHeader).ExpectField("Please provide details");
+                ui.BelowHeader(SectionHeader).ClickLabel("Yes");
+                ui.BelowHeader(SectionHeader).ExpectNoField("Please provide details");
+            }
         }
     }
 }

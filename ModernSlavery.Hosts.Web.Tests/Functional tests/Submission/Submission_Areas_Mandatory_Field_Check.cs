@@ -8,35 +8,11 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     public class Submission_Areas_Mandatory_Field_Check : Private_Registration_Success
     {
-        [Test, Order(40)]
-        public async Task StartSubmission()
-        {
-            ExpectHeader("Select an organisation");
-
-            Click(Submission.OrgName_InterFloor);
-
-
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
-
-            Click("Start Draft");
-
-
-            ExpectHeader("Before you start");
-            Click("Start now");
-
-            ExpectHeader("Your modern slavery statement");
-            await Task.CompletedTask;
-        }
-
         [Test, Order(41)]
         public async Task NavigateToAreasPage()
         {
-            ExpectHeader("Your modern slavery statement");
-
-
-            Click("Continue");
-
-            ExpectHeader("Areas covered by your modern slavery statement");
+            Submission_Helper.NavigateToAreasCovered(this, Submission.OrgName_InterFloor, "2019 to 2020");
+            
 
             await Task.CompletedTask;
         }
@@ -44,20 +20,20 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task OpenDetailsPopUp()
         {
-            AtLabel("Your organisation’s structure, business and supply chains").ClickLabel("Yes");
+            Below("Your organisation’s structure, business and supply chains").ClickLabel(The.Top, "No");
             await Task.CompletedTask;
         }
 
         [Test, Order(44)]
         public async Task ClickingContinueTriggersValidation()
         {
-            Click("Save and continue");
+            Click("Continue");
 
             ExpectHeader("There is a problem");
-            Expect("Please provide the detail");
+            Expect("Missing details");
 
             //inline error tbc
-            AtLabel("Please provide details").Expect("Please provide the detail");
+            BelowField("Please provide details").Expect("Enter details");
         }
     }
 }
