@@ -23,26 +23,30 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //if chosing "other" details must be provided
             ClickLabel("Other");
-            ClearField("Please specify");
+            ClearField("OtherTraining");
             await Task.CompletedTask;
         }
 
         [Test, Order(44)]
         public async Task SubmittingFormWithoutOptionsCausesValidation()
         {
-            Click("Save and continue");
+            Click("Continue");
 
             Expect("There is a problem");
-            Expect("Please provide `other` details");
+            Expect("Missing details");
+
+            BelowField("OtherTraining").Expect("Enter details");
             await Task.CompletedTask;
         }
 
         [Test, Order(46)]
         public async Task FormCanBeSubmittedWithDetailsGiven()
         {
-            Set("Please specify").To("details");
-            Click("Save and continue");
+            Set("OtherTraining").To("details");
+            Click("Continue");
             ExpectHeader("Monitoring progress");
+            await Task.CompletedTask;
+
         }
     }
 }
