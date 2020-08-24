@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting Submission merge")]
+    [TestFixture]
 
     public class Submission_Areas_Cancel_Unsaved_Data_Save : Private_Registration_Success
     {
@@ -13,12 +13,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader("Select an organisation");
 
-            Click(Submission.OrgName_Blackpool);
+            Click(Submission.OrgName_InterFloor);
 
 
-            ExpectHeader("Manage your organisations reporting");
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            Click("Draft Report");
+            Click("Start Draft");
 
 
             ExpectHeader("Before you start");
@@ -31,7 +31,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(42)]
         public async Task NavigateToAreasPage()
         {
-            Click("Save and continue");
+            ExpectHeader("Your modern slavery statement");
+
+
+            Click("Continue");
 
             ExpectHeader("Areas covered by your modern slavery statement");
 
@@ -41,8 +44,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task FillInDetailsOnAreasPage()
         {
 
-            ClickLabel(The.Top, "Yes");
-            Set("Please provide detail").To("Here are the details");
+            ClickLabel(The.Top, "No");
+            Set("Please provide details").To("Here are the details");
             await Task.CompletedTask;
         }
 
@@ -52,7 +55,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //cancel in this route should return to unsaved data screen
             Click("Cancel");
 
-            ExpectHeader("You have unsaved data");
+            ExpectHeader("You have unsaved data, what do you want to do?");
 
             await Task.CompletedTask;
         }
@@ -60,13 +63,15 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(48)]
         public async Task SaveTheData()
         {
-            ExpectHeader("What do you want to do?");
+            ExpectHeader("You have unsaved data, what do you want to do?");
 
-            Click("Save the data");
 
-            ExpectHeader("Select an organisation");
+            Click("Exit and save changes");
 
-            Expect("You`ve saved a draft of your Modern Slavery statement for 2020/21");
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+
+
+            Expect("In progress");
 
             await Task.CompletedTask;
         }
@@ -75,17 +80,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateBackToAreasPage()
         {
             Click("Continue");
-            Click(Submission.OrgName_Blackpool);
 
-            ExpectHeader("Manage your organisations reporting");
+            ExpectHeader("Review before submitting");
 
-            Click("Continue");
-            Click("Continue");
-
-
-            ExpectHeader("Your modern slavery statement");
-
-            Click("Save and continue");
+            Click("Areas covered by your modern statement");
 
             ExpectHeader("Areas covered by your modern slavery statement");
             await Task.CompletedTask;
@@ -94,9 +92,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(52)]
         public async Task VerifyDataHasBeenSaved()
         {
-            //data should not have been saved 
+            //data should have been saved 
 
-            ExpectNo("Here are the details");
+            Expect("Here are the details");
             await Task.CompletedTask;
 
         }
