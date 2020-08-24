@@ -1,6 +1,6 @@
 ﻿@inject SharedOptions sharedOptions
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Confirm your organisation - Modern Slavery reporting service";
     var emailAdd = sharedOptions.MsuReportingEmail;
     var emailSubject = WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));
@@ -10,45 +10,27 @@
 }
 @using ModernSlavery.Core.Models
 @model ScopingViewModel
-<div class="grid-row">
-    <div class="column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new {@class = "form", autocomplete = "off"}))
+<a class="govuk-back-link" href="@Model.StartUrl">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off" }))
         {
             @Html.AntiForgeryToken()
 
-            <a class="link-back" href="@Model.StartUrl">Back <span class="visuallyhidden"> to the previous question</span></a>
-
-            <h1 class="heading-large">
-                <span>Confirm your organisation is not required to report</span>
+            <h1 class="govuk-heading-l">
+                Confirm your organisation’s details
             </h1>
 
-            @await Html.PartialAsync("Parts/SnapshotDatePart", Model)
             @await Html.PartialAsync("Parts/EmployerDetailsPart", Model)
 
-            <br/>
-            <p class="notice">
-                <i class="icon icon-important">
-                    <span class="visually-hidden">Warning</span>
-                </i>
-                <strong class="bold-small">
-                    If your organisation is in scope of the reporting regulations for one or more of these snapshot dates, or you wish to report voluntarily proceed to <a href="@Url.Action("RegisterOrManage")">@(Model.UserIsRegistered ? "" : "register and ")manage this organisation</a>.
-                </strong>
-            </p>
-            <p class="text">
-                <span>
-                    If these details are correct and your organisation is out of scope for both these snapshot dates, please continue.
-                </span>
-            </p>
-
-
-            <div class="form-group">
-                <a href="@Url.Action("EnterOutOfScopeAnswers")" class="button">Continue</a>
+            <div class="govuk-inset-text">
+                If this information is not correct, please email <a href="@mailto" target="_blank">@sharedOptions.MsuReportingEmail</a>
             </div>
 
-            <p class="text">
-                If your organisation name or address is incorrect,
-                please email us at <a href="@mailto" target="_blank">@sharedOptions.MsuReportingEmail</a> and let us know the correct information.
-            </p>
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" value="Confirm and continue">
+                Confirm and continue
+            </button>
+
         }
     </div>
 </div>

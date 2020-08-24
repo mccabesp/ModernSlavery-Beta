@@ -1,41 +1,36 @@
 ﻿@model ScopingViewModel
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Scope already known - Modern Slavery reporting service";
+    var controller = ViewData["Controller"] as BaseController;
 }
-<div class="grid-row">
-    <div class="column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new {@class = "form", autocomplete = "off", novalidate = ""}))
+<a class="govuk-back-link" href="@Url.Action("OutOfScope")">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate = "" }))
         {
             @Html.AntiForgeryToken()
             @Html.HiddenFor(m => Model.OrganisationId)
 
-            <a id="BackLink" class="link-back" href="@Url.Action("OutOfScope")">Back <span class="visuallyhidden"> to the previous question</span></a>
 
-            <h1 class="heading-large">
-                Scope already declared
+            <h1 class="govuk-heading-l">
+                Your organisation has already declared it is not required to publish a modern slavery statement
             </h1>
-            <p>
-                Your organisation is showing as @(Model.LastScope.ScopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.PresumedInScope) ? "in" : "out of") scope of the Modern Slavery reporting regulations for snapshot date <span class="nowrap">@(Model.LastScope.SnapshotDate.ToString("d MMMM yyyy"))</span>
-                and @(Model.ThisScope.ScopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.PresumedInScope) ? "in" : "out of") scope for snapshot date <span class="nowrap">@(Model.ThisScope.SnapshotDate.ToString("d MMMM yyyy"))</span>.
+
+            <h2 class="govuk-heading-m">
+                Publishing a statement voluntarily
+            </h2>
+
+            <p class="govuk-body">
+                If you are not legally required to publish a modern slavery statement, you can still create a statement voluntarily and submit it to our service.
             </p>
-            @await Html.PartialAsync("Parts/EmployerDetailsPart", Model)
 
-            <br/>
-
-            if (User.Identity.IsAuthenticated)
+            @if (controller.CurrentUser == null)
             {
-                <span>
-                    <a class="button" href="@Url.Action("RegisterOrManage")">Continue</a>.
-                </span>
+                <div class="govuk-inset-text">
+                    To submit a modern slavery statement to our service, <a href="/sign-up">create an account</a> and register your organisation.
+                </div>
             }
-            else
-            {
-                <p class="text">
-                    To change your scope for either of these snapshot dates you must
-                    <a href="@Url.Action("RegisterOrManage")">@(Model.UserIsRegistered ? "" : "register and ")manage this organisation</a>.
-                </p>
             }
-        }
-    </div>
+        </div>
 </div>

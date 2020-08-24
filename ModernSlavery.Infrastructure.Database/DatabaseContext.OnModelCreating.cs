@@ -329,7 +329,11 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.Property(e => e.ContactLastname).HasMaxLength(50);
 
+                    entity.Property(e => e.ContactJobTitle).HasMaxLength(50);
+
                     entity.Property(e => e.Reason).HasMaxLength(1000);
+
+                    entity.Property(e => e.TurnOver).HasMaxLength(128);
 
                     entity.Property(e => e.SubmissionDeadline)
                         .HasColumnType("date");

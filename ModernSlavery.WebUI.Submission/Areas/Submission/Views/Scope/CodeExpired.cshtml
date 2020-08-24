@@ -17,7 +17,7 @@
             </p>
             <p class="text">
                 Go <a href="@Url.Action("OutOfScope")">back</a> to enter more codes or
-                <a href="@Url.Action("RegisterOrManage")">@(Model.UserIsRegistered ? "" : "register or ")manage this organisation</a>.
+                   <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" )">@(Model.UserIsRegistered ? "" : "register or ")manage this organisation</a>.
             </p>
         }
     </div>
