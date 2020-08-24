@@ -39,7 +39,16 @@ namespace ModernSlavery.Hosts.Web.Tests
             BelowField("How can we improve the service?").Expect("You have 1982 characters remaining");
             await Task.CompletedTask;
         }
+        [Test, Order(47)]
+        public async Task Email_Phone()
+        {
+            BelowLabel("Your email address (optional)").Set(The.Top).To("roger@uat.co");
+            BelowLabel("Your phone number (optional)").Set(The.Top).To("1234");
+            
 
+
+            await Task.CompletedTask;
+        }
         [Test, Order(48)]
         public async Task Submit_Feedback()
         {
@@ -51,7 +60,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             await Task.CompletedTask;
         }
-
+        
         [Test, Order(50)]
         public async Task Return_To_Manage_Orgs()
         {
