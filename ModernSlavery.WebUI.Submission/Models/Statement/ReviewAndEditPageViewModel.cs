@@ -118,7 +118,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (!IsComplete())
                 yield return new ValidationResult("You must first complete all sections before you can submit");
 
-            else if (!HasChanged())
+            else if (Submitted && !HasChanged())
                 yield return new ValidationResult("You must edit the statement before you can submit");
         }
 
@@ -130,7 +130,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public bool CanSubmit()
         {
-            return IsComplete() && HasChanged();
+            return IsComplete() && (!Submitted || HasSubmissionChanged());
         }
 
         public bool HasChanged()
