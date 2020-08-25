@@ -34,8 +34,14 @@
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
   </ItemGroup>
 
+
   <ItemGroup>
-    <Content Update="wwwroot\**\*.*">
+    <Content Remove="wwwroot\**" />
+    <None Remove="wwwroot\**" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="wwwroot\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
