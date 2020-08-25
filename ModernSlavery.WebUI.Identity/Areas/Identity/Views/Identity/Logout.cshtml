@@ -3,7 +3,15 @@
     Layout = "~/Views/DfeTemplate.cshtml";
     ViewData["PageTitle"] = "Sign out - Modern Slavery reporting service - GOV.UK";
 }
-
+@section Head {
+    <script type="text/javascript">
+        var uri = window.location.toString();
+        if (uri.indexOf("?") > 0) {
+            var clean_uri = uri.substring(0, uri.indexOf("?"));
+            window.history.replaceState({}, document.title, clean_uri);
+        }
+    </script>
+}
 <div class="logout-page">
     <div class="page-header">
         <h1>Logout</h1>
@@ -11,9 +19,28 @@
 
     <div class="row">
         <div class="col-sm-6">
-            <p>Would you like to logout of IdentityServer?</p>
+            <p>Would you like to sign out?</p>
             <form asp-action="Logout">
-                <input type="hidden" name="logoutId" value="@Model.LogoutId"/>
+                <input type="hidden" name="logoutId" value="@Model.LogoutId" />
+                <fieldset>
+                    <div class="form-group">
+                        <button class="btn btn-primary">Yes</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="grid-row">
+    <div class="column-two-thirds">
+        <div class="govuk-box-highlight">
+            <h1 class="bold-large">Sign Out</h1>
+        </div>
+        <p>Would you like to sign out of the @(Model.ClientName ?? "Modern Slavery reporting service")?</p>
+
+        <div>
+            <form asp-action="Logout">
+                <input type="hidden" name="logoutId" value="@Model.LogoutId" />
                 <fieldset>
                     <div class="form-group">
                         <button class="btn btn-primary">Yes</button>

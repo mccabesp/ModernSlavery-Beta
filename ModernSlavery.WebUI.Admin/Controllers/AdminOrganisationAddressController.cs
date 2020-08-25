@@ -25,12 +25,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
         private readonly ICompaniesHouseAPI CompaniesHouseApi;
-        private readonly IUpdateFromCompaniesHouseService UpdateFromCompaniesHouseService;
+        private readonly ICompaniesHouseService UpdateFromCompaniesHouseService;
 
         public AdminOrganisationAddressController(
             IAdminService adminService,
             ICompaniesHouseAPI companiesHouseApi,
-            IUpdateFromCompaniesHouseService updateFromCompaniesHouseService,
+            ICompaniesHouseService updateFromCompaniesHouseService,
             AuditLogger auditLogger,
             ILogger<AdminOrganisationAddressController> logger, IWebService webService,
             ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)

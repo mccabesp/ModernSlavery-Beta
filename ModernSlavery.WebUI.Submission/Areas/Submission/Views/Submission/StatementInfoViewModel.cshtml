@@ -10,24 +10,25 @@
         @(reportingDeadline.Year-1) to @((reportingDeadline.Year))
     </div>
 
-    @*<div class="gpg-manage-reports__cell">
+    <div class="gpg-manage-reports__cell">
         <div>
             @if (!Model.StatementInfo.RequiredToReport)
             {
-                <span>Not required to submit</span>
+                <span>No</span>
             }
             else
             {
-                <span>Required to submit<br /> by @(reportDateFormatter.FullStartDate)</span>
+                <span>Yes</span>
             }
         </div>
-        @if (Model.CanChangeScope)
-        {
+        @*TODO: get CanChangeScope flag working*@
+        @*@if (Model.CanChangeScope)
+        {*@
             <div>
-                <a id="ChangeScope@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@(Url.Action("ChangeOrganisationScope", new {organisationIdentifier = Model.OrganisationIdentifier, reportingDeadlineYear=reportDateFormatter.StartYear}))">Change</a>
+                <a id="ChangeScope@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@(Url.ActionArea("ChangeOrganisationScope", "Scope", "Submission", new {organisationIdentifier = Model.OrganisationIdentifier, reportingDeadlineYear=reportDateFormatter.StartYear}))">Change</a>
             </div>
-        }
-    </div>*@
+        @*}*@
+    </div>
 
     <div class="gpg-manage-reports__cell">
         <div>

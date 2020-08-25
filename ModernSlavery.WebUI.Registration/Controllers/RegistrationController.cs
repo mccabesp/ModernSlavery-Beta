@@ -7,6 +7,7 @@ using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Registration.Presenters;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
@@ -23,16 +24,19 @@ namespace ModernSlavery.WebUI.Registration.Controllers
     {
         private readonly IRegistrationService _registrationService;
         private readonly IRegistrationPresenter _registrationPresenter;
+        private readonly IPostcodeChecker _postcodeChecker;
 
         #region Constructors
 
         public RegistrationController(
             IRegistrationService registrationService,
             IRegistrationPresenter registrationPresenter,
+            IPostcodeChecker postcodeChecker,
             ILogger<RegistrationController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) :base(logger, webService, sharedBusinessLogic)
         {
             _registrationService = registrationService;
             _registrationPresenter = registrationPresenter;
+            _postcodeChecker = postcodeChecker;
         }
 
         #endregion

@@ -3,131 +3,103 @@
 @using ModernSlavery.Core.Models
 @model ScopingViewModel
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Tell us why your organisation is not in scope - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
-    var backLink = Model.IsChangeJourney && Model.IsOutOfScopeJourney ? Model.StartUrl : Url.Action("ConfirmOutOfScopeDetails");
-
-    // handles the reason error css class
-    HtmlString reasonErrorClass = null;
-    if (string.IsNullOrEmpty(Model.EnterAnswers.Reason))
-    {
-        reasonErrorClass = Html.SetErrorClass(nameof(EnterAnswersViewModel.Reason), "error");
-    }
-    else if (Model.EnterAnswers.Reason == "Other")
-    {
-        reasonErrorClass = Html.SetErrorClass(nameof(EnterAnswersViewModel.OtherReason), "error");
-    }
-
-    var under250Reason = "My organisation had fewer than 250 employees";
+    var backLink = Model.IsChangeJourney && Model.IsOutOfScopeJourney ? Model.StartUrl : Url.ActionArea("ConfirmOutOfScopeDetails", "Scope", "Submission");
+    var reasonIndex = 0;
 }
-<div class="grid-row">
-    <div class="column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new {@class = "form", autocomplete = "off", novalidate = ""}))
+<a class="govuk-back-link" href="@backLink">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate = "" }))
         {
             @Html.AntiForgeryToken()
+            @await Html.GovUkValidationSummaryAsync(false);
 
-            <a id="BackLink" class="link-back" href="@backLink">Back <span class="visuallyhidden"> to the previous question</span></a>
-
-            @await Html.CustomValidationSummaryAsync(false)
-
-            <h1 class="heading-large">
-                Tell us why your organisation doesn't need to report
+            <h1 class="govuk-heading-l">
+                Tell us why your organisation is not required to publish a modern slavery statement
             </h1>
 
-            <div id="ReasonGroup" class="form-group @reasonErrorClass">
-                <fieldset>
-                    <legend>
-                        <h1 class="heading-medium" style="margin-top: 15px">
-                            Why is your organisation not required to report their Modern Slavery statement for
-                            @if (Model.IsChangeJourney)
-                            {
-                                <span>the snapshot date @(new GDSDateFormatter(Model.AccountingDate).FullStartDate)?</span>
-                            }
-                            else
-                            {
-                                <span> both snapshot dates @(Model.AccountingDate.AddYears(-1).ToFriendlyDate()) and @(Model.AccountingDate.Year)?</span>
-                            }
-                        </h1>
-                        @Html.ValidationMessage(nameof(EnterAnswersViewModel.Reason), "", new {id = "ReasonError", @class = "error-message"})
-                        @if (Model.EnterAnswers.Reason == "Other")
+            <div id="ReasonGroup" class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <div class="govuk-checkboxes @Html.SetErrorClass(model => model.EnterAnswers.SelectedReasonOptions, "govuk-form-group--error")" data-module="govuk-checkboxes">
+                        <span asp-validation-for="EnterAnswers.SelectedReasonOptions" class="govuk-error-message"></span>
+                        @foreach (var reason in Model.EnterAnswers.ReasonOptions)
                         {
-                            @Html.ValidationMessage(nameof(EnterAnswersViewModel.OtherReason), "", new {id = "OtherReasonError", @class = "error-message"})
+                            <div class="govuk-checkboxes__item">
+                                <input name="SelectedReasonOptions" checked=@(Model.EnterAnswers.SelectedReasonOptions.Contains(reason)) value="@reason" class="govuk-checkboxes__input" type="checkbox" data-aria-controls="reason-conditional@(reasonIndex)">
+                                <label class="govuk-label govuk-checkboxes__label" for="reason-conditional">
+                                    @reason
+                                </label>
+                            </div>
+                            @if (reason.Equals("Its turnover or budget is less than £36 million per year"))
+                            {
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.EnterAnswers.TurnOver, "govuk-form-group--error")" id="reason-conditional@(reasonIndex)">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="other">
+                                            What is your organistion’s annual turnover or budget?
+                                        </label>
+                                        <input name="@nameof(EnterAnswersViewModel.TurnOver)" class="govuk-input" value="@(Model.EnterAnswers.TurnOver)" maxlength="128" />
+                                        <span asp-validation-for="EnterAnswers.TurnOver" class="govuk-error-message"></span>
+                                    </div>
+                                </div>
+                            }
+                            @if (reason.Equals("Other"))
+                            {
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.EnterAnswers.OtherReason, "govuk-form-group--error")" id="reason-conditional@(reasonIndex)">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="other">
+                                            Please specify
+                                        </label>
+                                        <textarea id="@nameof(EnterAnswersViewModel.OtherReason)" name="@nameof(EnterAnswersViewModel.OtherReason)" class="govuk-textarea" rows="5" type="text" maxlength="256">@Model.EnterAnswers.OtherReason</textarea>
+                                        <span asp-validation-for="EnterAnswers.OtherReason" class="govuk-error-message"></span>
+                                    </div>
+                                </div>
+                            }
+                            { reasonIndex++; }
                         }
-                    </legend>
-                    <div class="multiple-choice">
-                        <input id="Under250" type="radio" name="Reason" value="Under250" @(Model.EnterAnswers.Reason == "Under250" ? "checked" : "")>
-                        <label for="Under250">@under250Reason</label>
-                    </div>
-                    <div class="multiple-choice" data-target="ShowOtherReason">
-                        <input id="OtherReasonSelected" type="radio" name="Reason" value="Other" @(Model.EnterAnswers.Reason == "Other" ? "checked" : "")>
-                        <label for="OtherReasonSelected">Other reason</label>
-                    </div>
-                    <div class="panel panel-border-narrow js-hidden" id="ShowOtherReason">
-                        @Html.LabelFor(model => model.EnterAnswers.OtherReason, new {@class = "form-label"})
-                        <textarea id="@nameof(EnterAnswersViewModel.OtherReason)" name="@nameof(EnterAnswersViewModel.OtherReason)" class="form-control"></textarea>
                     </div>
                 </fieldset>
             </div>
 
-            <div id="ReadGuidanceGroup" class="form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.ReadGuidance), "error")">
-                <fieldset class="inline">
-                    <legend>
-                        <h1 class="heading-medium" style="margin-top: 15px">
-                            Have you read our guidance, which explains who needs to report?
-                        </h1>
-                        <p class="form-hint">If you would like to read the guidance then you can find it <a href="@sharedOptions.WhoNeedsToReportGuidanceLink" target="_blank" rel="noopener noreferrer">here</a></p>
-                        @Html.ValidationMessage(nameof(EnterAnswersViewModel.ReadGuidance), "", new {id = "ReadGuidanceError", @class = "error-message"})
-                    </legend>
-                    <div class="multiple-choice">
-                        <input id="ReadGuidanceYes" type="radio" name="ReadGuidance" value="true" @(Model.EnterAnswers.ReadGuidance == "true" ? "checked" : "")>
-                        <label for="ReadGuidanceYes">Yes</label>
-                    </div>
-                    <div class="multiple-choice">
-                        <input id="ReadGuidanceNo" type="radio" name="ReadGuidance" value="false" @(Model.EnterAnswers.ReadGuidance == "false" ? "checked" : "")>
-                        <label for="ReadGuidanceNo">No</label>
-                    </div>
-                </fieldset>
+            <div class="govuk-inset-text">
+                <a href="https://www.gov.uk/guidance/publish-an-annual-modern-slavery-statement" target="_blank">Guidance</a> is available to help you work out whether your organisation is required to publish a modern slavery statement.
             </div>
+
 
             if (controller.CurrentUser == null)
             {
-                <p class="text">
-                    Please provide your name and contact email
-                </p>
-
-                <fieldset>
-                    <legend class="visuallyhidden">Contact Details</legend>
-                    <div id="FirstNameGroup" class="form-group @(Html.SetErrorClass(nameof(EnterAnswersViewModel.FirstName), "error")) ">
-                        @Html.LabelFor(model => model.EnterAnswers.FirstName, "First name", new {@class = "form-label"})
-                        @Html.ValidationMessage(nameof(EnterAnswersViewModel.FirstName), "", new {id = "FirstNameError", @class = "error-message"})
-                        <input name="@nameof(EnterAnswersViewModel.FirstName)" class="form-control" value="@(Model.EnterAnswers.FirstName)"/>
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        Your contact details
+                    </legend>
+                    <div id="FirstNameGroup" class="govuk-form-group @(Html.SetErrorClass(nameof(EnterAnswersViewModel.FirstName), "govuk-form-group--error")) ">
+                        <label asp-for="EnterAnswers.FirstName" class="govuk-label">First name</label>
+                        <input name="@nameof(EnterAnswersViewModel.FirstName)" class="govuk-input govuk-input--width-20" value="@(Model.EnterAnswers.FirstName)" />
+                        <span asp-validation-for="EnterAnswers.FirstName" class="govuk-error-message"></span>
                     </div>
-                    <div id="LastNameGroup" class="form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.LastName), "error") ">
-                        @Html.LabelFor(model => model.EnterAnswers.LastName, "Last name", new {@class = "form-label"})
-                        @Html.ValidationMessage(nameof(EnterAnswersViewModel.LastName), "", new {id = "LastNameError", @class = "error-message"})
-                        <input name="@nameof(EnterAnswersViewModel.LastName)" class="form-control" value="@(Model.EnterAnswers.LastName)"/>
+                    <div id="LastNameGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.LastName), "govuk-form-group--error") ">
+                        <label asp-for="EnterAnswers.LastName" class="govuk-label">Last name</label>
+                        <input name="@nameof(EnterAnswersViewModel.LastName)" class="govuk-input govuk-input--width-20" value="@(Model.EnterAnswers.LastName)" />
+                        <span asp-validation-for="EnterAnswers.LastName" class="govuk-error-message"></span>
                     </div>
-                </fieldset>
-
-                <fieldset>
-                    <legend class="visuallyhidden">Email</legend>
-                    <div id="EmailAddressGroup" class="form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.EmailAddress), "error") ">
-                        @Html.LabelFor(model => model.EnterAnswers.EmailAddress, "Enter your email address", new {@class = "form-label"})
-                        @Html.ValidationMessage(nameof(EnterAnswersViewModel.EmailAddress), null, new {id = "EmailAddressError", @class = "error-message"})
-                        <input type="email" name="@nameof(EnterAnswersViewModel.EmailAddress)" class="form-control" value="@(Model.EnterAnswers.EmailAddress)"/>
+                    <div id="TitleGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.JobTitle), "govuk-form-group--error") ">
+                        <label asp-for="EnterAnswers.JobTitle" class="govuk-label">Job title</label>
+                        <input name="@nameof(EnterAnswersViewModel.JobTitle)" class="govuk-input govuk-input--width-20" value="@(Model.EnterAnswers.JobTitle)" />
+                        <span asp-validation-for="EnterAnswers.JobTitle" class="govuk-error-message"></span>
                     </div>
-                    <div id="ConfirmEmailAddressGroup" class="form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.ConfirmEmailAddress), "error") ">
-                        @Html.LabelFor(model => model.EnterAnswers.ConfirmEmailAddress, "Confirm your email address", new {@class = "form-label"})
-                        @Html.ValidationMessage(nameof(EnterAnswersViewModel.ConfirmEmailAddress), "", new {id = "ConfirmEmailAddressError", @class = "error-message"})
-                        <input type="email" name="@nameof(EnterAnswersViewModel.ConfirmEmailAddress)" class="form-control" value="@(Model.EnterAnswers.ConfirmEmailAddress)"/>
+                    <div id="EmailAddressGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.EmailAddress), "govuk-form-group--error") ">
+                        <label asp-for="EnterAnswers.EmailAddress" class="govuk-label">Email address</label>
+                        <input name="@nameof(EnterAnswersViewModel.EmailAddress)" class="govuk-input govuk-input--width-20" value="@(Model.EnterAnswers.EmailAddress)" type="email" />
+                        <span asp-validation-for="EnterAnswers.EmailAddress" class="govuk-error-message"></span>
                     </div>
                 </fieldset>
             }
 
-            <div class="form-group">
-                <input id="NextStep" type="submit" class="button" value="Continue"/>
-            </div>
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" value="Continue">
+                Continue
+            </button>
         }
     </div>
 </div>

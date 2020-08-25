@@ -17,9 +17,9 @@ namespace ModernSlavery.Infrastructure.Hosts
 {
     public static class WebHost
     {
-        public static IHostBuilder ConfigureWebHostBuilder<TStartupModule>(string applicationName = null, Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
+        public static IHostBuilder ConfigureWebHostBuilder<TStartupModule>(Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
-            var genericHost = Extensions.CreateGenericHost<TStartupModule>(applicationName, additionalSettings, commandlineArgs);
+            var genericHost = Extensions.CreateGenericHost<TStartupModule>(additionalSettings, commandlineArgs);
 
             //Configure the host defaults
             genericHost.HostBuilder.ConfigureWebHostDefaults(webHostBuilder =>

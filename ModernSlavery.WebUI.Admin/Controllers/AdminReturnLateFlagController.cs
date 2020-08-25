@@ -31,10 +31,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("return/{id}/change-late-flag")]
         public IActionResult ChangeLateFlag(long id)
         {
-            var specifiedReturn = _adminService.SharedBusinessLogic.DataRepository.Get<Return>(id);
+            var specifiedStatement = _adminService.SharedBusinessLogic.DataRepository.Get<Statement>(id);
 
-            var viewModel = new AdminReturnLateFlagViewModel
-                {Return = specifiedReturn, NewLateFlag = !specifiedReturn.IsLateSubmission};
+            var viewModel = new AdminStatementLateFlagViewModel
+                {Statement = specifiedStatement, NewLateFlag = !specifiedStatement.IsLateSubmission};
 
             return View("ChangeLateFlag", viewModel);
         }
@@ -42,15 +42,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpPost("return/{id}/change-late-flag")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public IActionResult ChangeLateFlag(long id, AdminReturnLateFlagViewModel viewModel)
+        public IActionResult ChangeLateFlag(long id, AdminStatementLateFlagViewModel viewModel)
         {
-            var specifiedReturn = _adminService.SharedBusinessLogic.DataRepository.Get<Return>(id);
+            var specifiedStatement = _adminService.SharedBusinessLogic.DataRepository.Get<Statement>(id);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
 
             if (viewModel.HasAnyErrors())
             {
-                viewModel.Return = specifiedReturn;
+                viewModel.Statement = specifiedStatement;
 
                 // If there are any errors, return the user back to the same page to correct the mistakes
                 return View("ChangeLateFlag", viewModel);
@@ -58,14 +58,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (viewModel.NewLateFlag is null) throw new ArgumentNullException(nameof(viewModel.NewLateFlag));
 
-            specifiedReturn.IsLateSubmission = viewModel.NewLateFlag.Value;
+            specifiedStatement.IsLateSubmission = viewModel.NewLateFlag.Value;
 
             _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
 
             auditLogger.AuditChangeToOrganisation(
                 this,
                 AuditedAction.AdminChangeLateFlag,
-                specifiedReturn.Organisation,
+                specifiedStatement.Organisation,
                 new
                 {
                     ReturnId = id,
@@ -74,7 +74,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 });
 
             return RedirectToAction("ViewOrganisation", "AdminViewOrganisation",
-                new {id = specifiedReturn.OrganisationId});
+                new {id = specifiedStatement.OrganisationId});
         }
     }
 }

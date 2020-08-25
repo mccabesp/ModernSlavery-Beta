@@ -1,42 +1,50 @@
 ﻿@model ScopingViewModel
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Review your information - Modern Slavery reporting service";
+    var controller = ViewData["Controller"] as BaseController;
 }
-<div class="grid-row">
-    <div class="column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new {@class = "form", autocomplete = "off", novalidate = ""}))
+<a class="govuk-back-link" href="@Url.Action("EnterOutOfScopeAnswers")">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate = "" }))
         {
             @Html.AntiForgeryToken()
 
             var reportDateFormatter = new GDSDateFormatter(Model.AccountingDate);
 
-            <a class="link-back" href="@Url.Action("EnterOutOfScopeAnswers")">Back <span class="visuallyhidden"> to the previous question</span></a>
-
-            <h1 class="heading-xlarge">
-                Review your information
+            <h1 class="govuk-heading-l">
+                Check your answers before sending
             </h1>
 
-            @await Html.PartialAsync("Parts/SnapshotDatePart", Model)
+            <h2 class="govuk-heading-m">Organisation details</h2>
             @await Html.PartialAsync("Parts/EmployerDetailsPart", Model)
+    <div class="change-header">
+        <h2 class="govuk-heading-m">Declaration</h2>
+        <a class="govuk-link" href="@Url.Action("EnterOutOfScopeAnswers")">
+            Change
+        </a>
+    </div>
             @await Html.PartialAsync("Parts/AnswersPart", Model)
 
-            <br/>
-
-            <p class="text">
-                You are reminded that it is a legal obligation for relevant employers with 250 or more employees to report.
-                Please ensure that you have considered the appropriate guidance carefully before proceeding.
-                By submitting this notification, you are telling us that your organisation is not subject to the gender
-                pay gap regulations for this reporting year.
-            </p>
-
-            <p class="text">
-                The information you provide may be shared with the Equality and Human Rights Commission for the purposes of enforcing compliance with the Modern Slavery reporting requirements.
-            </p>
-
-            <div class="form-group">
-                <input id="NextStep" name="command" type="submit" class="button" value="Confirm and submit"/>
+            @if (controller.CurrentUser == null)
+            {
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <div class="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            @Html.CheckBoxFor(model => model.EnterAnswers.RequiresEmailConfirmation, new { @class = "govuk-checkboxes__input" })
+                            @Html.LabelFor(model => model.EnterAnswers.RequiresEmailConfirmation," I would like to recieve a confirmation email", new { @class = "govuk-label govuk-checkboxes__label" })                          
+                        </div>
+        </div>
+                   
+                </fieldset>
             </div>
+            }
+
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" value="Confirm and send">
+                Confirm and send
+            </button>
         }
     </div>
-</div>
+        </div>

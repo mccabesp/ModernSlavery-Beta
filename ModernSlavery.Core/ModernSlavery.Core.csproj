@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="5.0.0" />
+    <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="Kent.Cryptography.Obfuscation" Version="2.0.0" />
     <PackageReference Include="Lindhart.Analyser.MissingAwaitWarning" Version="1.2.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">

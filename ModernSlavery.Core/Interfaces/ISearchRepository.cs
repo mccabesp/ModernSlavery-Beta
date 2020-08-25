@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Core.Interfaces
 {
@@ -9,11 +10,10 @@ namespace ModernSlavery.Core.Interfaces
         public bool Disabled { get; set; }
         public string IndexName { get; }
 
-        Task RefreshIndexDataAsync(IEnumerable<T> allRecords);
         Task AddOrUpdateIndexDataAsync(IEnumerable<T> records);
         Task<int> RemoveFromIndexAsync(IEnumerable<T> records);
         Task<T> GetAsync(string key, string selectFields = null);
-        Task<IList<T>> ListAsync(string selectFields = null);
+        Task<IList<T>> ListAsync(string selectFields = null, string filter=null);
         Task CreateIndexIfNotExistsAsync(string indexName);
         Task<long> GetDocumentCountAsync();
 
@@ -25,7 +25,6 @@ namespace ModernSlavery.Core.Interfaces
 
         Task<PagedResult<T>> SearchAsync(string searchText,
             int currentPage,
-            SearchTypes searchType,
             int pageSize = 20,
             string searchFields = null,
             string selectFields = null,

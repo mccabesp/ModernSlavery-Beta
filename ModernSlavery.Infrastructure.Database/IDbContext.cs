@@ -15,5 +15,7 @@ namespace ModernSlavery.Infrastructure.Database
         DatabaseFacade GetDatabase();
 
         bool MigrationsApplied { get; }
+
+        Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity = false) where TEntity : class;
     }
 }

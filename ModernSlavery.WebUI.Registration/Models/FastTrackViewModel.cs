@@ -7,8 +7,8 @@ namespace ModernSlavery.WebUI.Registration.Models
     public class FastTrackViewModel
     {
         [Required(AllowEmptyStrings = false, ErrorMessage = "You must enter an employer reference")]
-        [Display(Name = "Employer reference")]
-        public string EmployerReference { get; set; }
+        [Display(Name = "Organisation reference")]
+        public string OrganisationReference { get; set; }
 
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "You must enter a security code")]

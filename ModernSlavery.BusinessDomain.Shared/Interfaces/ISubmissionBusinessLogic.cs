@@ -11,17 +11,16 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
     {
         // Submission
         IAuditLogger SubmissionLog { get; }
-        Task<Return> GetSubmissionByReturnIdAsync(long returnId);
-
+        
         /// <summary>
         ///     Gets the latest submitted return for the specified organisation id and snapshot year
         /// </summary>
         /// <param name="organisationId"></param>
         /// <param name="snapshotYear"></param>
         /// <returns></returns>
-        Task<Return> GetLatestSubmissionBySnapshotYearAsync(long organisationId, int snapshotYear);
+        Task<Statement> GetLatestStatementBySnapshotYearAsync(long organisationId, int snapshotYear);
 
-        IEnumerable<Return> GetAllSubmissionsByOrganisationIdAndSnapshotYear(long organisationId,
+        IEnumerable<Statement> GetAllStatementsByOrganisationIdAndReportingDeadlineYear(long organisationId,
             int snapshotYear);
 
         /// <summary>
@@ -29,7 +28,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// </summary>
         /// <param name="year"></param>
         /// <returns></returns>
-        IEnumerable<SubmissionsFileModel> GetSubmissionsFileModelByYear(int year);
+        IEnumerable<StatementsFileModel> GetStatementsFileModelByYear(int year);
 
         /// <summary>
         ///     Gets a list of late submissions that were in scope
@@ -37,7 +36,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <returns></returns>
         IEnumerable<LateSubmissionsFileModel> GetLateSubmissions();
 
-        ReturnViewModel ConvertSubmissionReportToReturnViewModel(Return reportToConvert);
-        CustomResult<Return> GetSubmissionByOrganisationAndYear(Organisation organisation, int year);
+        CustomResult<Statement> GetSubmissionByOrganisationAndYear(Organisation organisation, int year);
     }
 }

@@ -14,7 +14,7 @@ namespace ModernSlavery.Core.Interfaces
         void SendSuccessfulSubmissionEmail(string emailAddress, string organisationName, string submittedOrUpdated,
             string reportingPeriod, string reportLink);
 
-        void SendSuccessfulSubmissionEmailToRegisteredUsers(Return postedReturn, string reportLink,
+        void SendSuccessfulSubmissionEmailToRegisteredUsers(Statement postedStatement, string reportLink,
             string submittedOrUpdated);
 
         void SendUserAddedEmailToExistingUsers(Organisation organisation, User addedUser);

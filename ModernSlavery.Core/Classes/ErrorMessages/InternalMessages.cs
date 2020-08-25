@@ -1,16 +1,16 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Core.Classes.ErrorMessages
 {
     public class InternalMessages
     {
-        public static CustomError SameScopesCannotBeUpdated(ScopeStatuses newScopeStatus, ScopeStatuses oldScopeStatus,
-            int snapshotYear)
+        public static CustomError SameScopesCannotBeUpdated(ScopeStatuses newScopeStatus, ScopeStatuses oldScopeStatus,DateTime reportingDeadline)
         {
             return new CustomError(
                 4006,
-                $"Unable to update to {newScopeStatus} as the record for {snapshotYear} is already showing as {oldScopeStatus}");
+                $"Unable to update to {newScopeStatus} as the record for {reportingDeadline} is already showing as {oldScopeStatus}");
         }
 
         public static CustomError OrganisationRevertOnlyRetiredErrorMessage(string organisationName,
@@ -42,15 +42,15 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
                 $"Generation of security codes cannot be performed for retired organisations. Organisation '{organisationName}' employerReference '{employerReference}' has status '{status}'.");
         }
 
-        public static CustomError HttpBadRequestCausedByInvalidEmployerIdentifier(string employerIdentifier)
+        public static CustomError HttpBadRequestCausedByInvalidEmployerIdentifier(string organisationIdentifier)
         {
-            return new CustomError(HttpStatusCode.BadRequest, $"Bad employer identifier {employerIdentifier}");
+            return new CustomError(HttpStatusCode.BadRequest, $"Bad employer identifier {organisationIdentifier}");
         }
 
-        public static CustomError HttpNotFoundCausedByOrganisationIdNotInDatabase(string employerIdentifier)
+        public static CustomError HttpNotFoundCausedByOrganisationIdNotInDatabase(string organisationIdentifier)
         {
             return new CustomError(HttpStatusCode.NotFound,
-                $"Employer: Could not find organisation '{employerIdentifier}'");
+                $"Employer: Could not find organisation '{organisationIdentifier}'");
         }
 
         public static CustomError HttpGoneCausedByOrganisationBeingInactive(OrganisationStatuses organisationStatus)

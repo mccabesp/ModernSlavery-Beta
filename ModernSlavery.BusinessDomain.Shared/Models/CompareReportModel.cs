@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 
 namespace ModernSlavery.BusinessDomain.Shared.Models
 {
@@ -36,16 +37,16 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public decimal? FemaleUpperQuartilePayBand { get; set; }
 
-        public OrganisationSizes? OrganisationSize { get; set; }
+        public TurnoverRanges? TurnoverRange { get; set; }
 
         public bool? HasBonusesPaid { get; set; }
 
         public bool RequiredToReport =>
             ScopeStatus == ScopeStatuses.InScope || ScopeStatus == ScopeStatuses.PresumedInScope;
 
-        public string OrganisationSizeName =>
+        public string TurnoverName =>
             HasReported
-                ? OrganisationSize.GetAttribute<DisplayAttribute>().Name
-                : OrganisationSizes.NotProvided.GetAttribute<DisplayAttribute>().Name;
+                ? TurnoverRange.GetAttribute<DisplayAttribute>().Name
+                : TurnoverRanges.NotProvided.GetAttribute<DisplayAttribute>().Name;
     }
 }

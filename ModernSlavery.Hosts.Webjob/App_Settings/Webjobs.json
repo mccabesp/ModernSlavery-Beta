@@ -1,0 +1,84 @@
+{
+  "AzureWebJobsStorage": "$(Storage:AzureConnectionString)",
+  "Webjobs": {
+    "CheckSiteCertAsync": {
+      "Action": "Disable",
+      "Trigger": "01:00:00:00"
+    },
+    "ExecuteWebjob": { "Action": "Enable" },
+    "FixLatestAsync": {
+      "Action": "Enable",
+      "Trigger": "00:01:00:00"
+    },
+    "FixOrganisationAddresses": { "Action": "Enable" },
+    "LogEvent": { "Action": "Enable" },
+    "LogRecord": { "Action": "Enable" },
+    "MergeLogs": {
+      "Action": "Disable",
+      "Trigger": "01:00:00:00"
+    },
+    "PurgeStatementData": {
+      "Action": "Disable",
+      "Trigger": "01:00:00:00"
+    },
+    "PurgeOrganisations": {
+      "Action": "Disable",
+      "Trigger": "01:00:00:00"
+    },
+    "PurgeRegistrations": {
+      "Action": "Disable",
+      "Trigger": "01:00:00:00"
+    },
+    "PurgeTestDataAsync": {
+      "Action": "Enable",
+      "Trigger": "00:12:00:00"
+    },
+    "PurgeUsers": {
+      "Action": "Disable",
+      "Trigger": "01:00:00:00"
+    },
+    "ReferenceEmployers": {
+      "Action": "Enable",
+      "Trigger": "01:00:00:00"
+    },
+    "SendEmail": { "Action": "Enable" },
+    "SendNotifyEmail": { "Action": "Enable" },
+    "SendReminderEmails": {
+      "Action": "Enable",
+      "Trigger": "00:01:00:00"
+    },
+    "SetIsUkAddressesAsync": {
+      "Action": "Enable",
+      "Trigger": "01:00:00:00"
+    },
+    "SetPresumedScopes": {
+      "Action": "Enable",
+      "Trigger": "01:00:00:00"
+    },
+    "StorageHealthCheck": { "Action": "Disable" },
+    "TakeSnapshotAsync": { "Action": "Disable" },
+    "UpdateDownloadFiles": {
+      "Action": "Disable",
+      "Trigger": "00:01:00:00"
+    },
+    "UpdateFromCompaniesHouseAsync": {
+      "Action": "Enable",
+      "Trigger": "00:03:00:00"
+    },
+    "UpdateOrganisationLateSubmissions": { "Action": "Disable" },
+    "UpdateOrganisationsAsync": { "Action": "Disable" },
+    "UpdateOrphanOrganisationsAsync": { "Action": "Disable" },
+    "UpdateRegistrationAddressesAsync": { "Action": "Disable" },
+    "UpdateRegistrations": { "Action": "Disable" },
+    "UpdateScopes": { "Action": "Disable" },
+    "UpdateOrganisationSearchIndexesAsync": {
+      "Action": "Enable",
+      "Trigger": "00:03:00:00"
+    },
+    "UpdateSubmissions": { "Action": "Disable" },
+    "UpdateUnverifiedRegistrations": { "Action": "Disable" },
+    "UpdateUsers": { "Action": "Disable" },
+    "UpdateUsersToContactForFeedback": { "Action": "Disable" },
+    "UpdateUsersToSendInfo": false
+  }
+}

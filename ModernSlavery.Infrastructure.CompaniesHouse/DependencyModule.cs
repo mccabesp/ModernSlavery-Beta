@@ -5,6 +5,7 @@ using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.CompaniesHouse
 {

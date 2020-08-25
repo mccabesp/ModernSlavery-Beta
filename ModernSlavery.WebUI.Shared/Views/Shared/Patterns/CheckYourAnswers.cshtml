@@ -1,13 +1,13 @@
 ﻿@model CheckYourAnswers
 
-<dl class="govuk-check-your-answers cya-questions-short">
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
     @foreach (var item in Model.Items)
     {
-        <div>
-            <dt class="cya-question">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
                 @item.Name
             </dt>
-            <dd id="@item.ValueId" class="cya-answer">
+            <dd id="@item.ValueId" class="govuk-summary-list__value">
                 @Html.Raw(item.Value)
             </dd>
         </div>

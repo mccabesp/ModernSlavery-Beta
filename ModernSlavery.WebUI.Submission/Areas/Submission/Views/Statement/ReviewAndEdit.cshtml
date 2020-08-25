@@ -19,7 +19,7 @@
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm())
         {
-            @await Html.CustomValidationSummaryAsync();
+            @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ReturnToReviewPage);
             @Html.HiddenFor(m => m.Submitted);
@@ -113,11 +113,11 @@
                 </li>
             </ol>
 
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.CanSubmit())" name="command" value="@BaseViewModel.CommandType.Submit">
+                Confirm and Submit
+            </button>
             @if (Model.HasChanged())
             {
-                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.IsComplete())" name="command" value="@BaseViewModel.CommandType.Submit">
-                    Confirm and Submit
-                </button>
                 <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" name="command" value="@BaseViewModel.CommandType.SaveAndExit">
                     Exit and save changes
                 </button>

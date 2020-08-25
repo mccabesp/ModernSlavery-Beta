@@ -38,7 +38,7 @@
             <div class="column-full">
                 @if (!string.IsNullOrWhiteSpace(Model.SearchText))
                 {
-                    if (Model.Employers == null || Model.Employers.Results.Count < 1)
+                    if (Model.Organisations == null || Model.Organisations.Results.Count < 1)
                     {
                         <div class="zero-results">
                             <h2 class="heading-medium">0 employers found that match your search</h2>
@@ -59,10 +59,10 @@
                                     <div class="bold-small"><span class="error-message" style="display: inline">There was a problem searching the Companies&nbsp;House service. </span><br/>If you cant find your organisation below, please use the search button to try again.</div>
                                 </div>
                             }
-                            else if (Model.Employers.VirtualRecordTotal != Model.Employers.ActualRecordTotal)
+                            else if (Model.Organisations.VirtualRecordTotal != Model.Organisations.ActualRecordTotal)
                             {
                                 <div class="subsection panel-indent">
-                                    <div class="bold-small">Showing @Model.Employers.VirtualRecordTotal.ToString("N0") of @Model.Employers.ActualRecordTotal.ToString("N0") results. Refine your search or enter your company number.</div>
+                                    <div class="bold-small">Showing @Model.Organisations.VirtualRecordTotal.ToString("N0") of @Model.Organisations.ActualRecordTotal.ToString("N0") results. Refine your search or enter your company number.</div>
                                 </div>
                             }
                             <p style="width: 66%">Choose your organisation and we'll send an activation PIN to its registered address. Only organisations registered at Companies House are listed here.</p>
@@ -82,16 +82,16 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @for (var i = 0; i < Model.Employers.Results.Count; i++)
+                            @for (var i = 0; i < Model.Organisations.Results.Count; i++)
                             {
-                                <tr style="background-color: @(Model.Employers.Results[i].OrganisationId > 0 ? "inherit" : "#d2e5f5")">
+                                <tr style="background-color: @(Model.Organisations.Results[i].OrganisationId > 0 ? "inherit" : "#d2e5f5")">
                                     <td>
-                                        @Model.Employers.Results[i].OrganisationName <span>@Model.Employers.Results[i].GetFullAddress()</span>
+                                        @Model.Organisations.Results[i].OrganisationName <span>@Model.Organisations.Results[i].GetFullAddress()</span>
                                     </td>
                                     @if (Model.SectorType == SectorTypes.Private)
                                     {
                                         <td>
-                                            @Model.Employers.Results[i].CompanyNumber
+                                            @Model.Organisations.Results[i].CompanyNumber
                                         </td>
                                     }
                                     <td>
@@ -102,20 +102,20 @@
                             </tbody>
                         </table>
 
-                        if (Model.Employers.Results.Count > 1)
+                        if (Model.Organisations.Results.Count > 1)
                         {
                             <div class="pager">
                                 <div class="pager-controls">
-                                    @if (Model.Employers.CurrentPage > 1)
+                                    @if (Model.Organisations.CurrentPage > 1)
                                     {
                                         <button type="submit" class="link-button" name="command" value="pagePrev">Previous</button>
                                     }
-                                    @if (Model.Employers.PageCount > 1)
+                                    @if (Model.Organisations.PageCount > 1)
                                     {
                                         <ul class="pager-items">
                                             @for (var i = Model.PagerStartIndex; i <= Model.PagerEndIndex; i++)
                                             {
-                                                if (i == Model.Employers.CurrentPage)
+                                                if (i == Model.Organisations.CurrentPage)
                                                 {
                                                     <li>
                                                         <b>@i</b>
@@ -130,12 +130,12 @@
                                             }
                                         </ul>
                                     }
-                                    @if (Model.Employers.CurrentPage < Model.Employers.PageCount)
+                                    @if (Model.Organisations.CurrentPage < Model.Organisations.PageCount)
                                     {
                                         <button type="submit" class="link-button" name="command" value="pageNext">Next</button>
                                     }
                                 </div>
-                                <div class="pager-summary">Showing @Model.EmployerStartIndex – @Model.EmployerEndIndex of @Model.Employers.VirtualRecordTotal employers</div>
+                                <div class="pager-summary">Showing @Model.OrganisationStartIndex – @Model.OrganisationEndIndex of @Model.Organisations.VirtualRecordTotal employers</div>
                             </div>
                         }
                     }

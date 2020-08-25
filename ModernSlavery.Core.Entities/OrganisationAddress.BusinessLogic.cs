@@ -78,24 +78,26 @@ namespace ModernSlavery.Core.Entities
             return firstRegistration?.PINConfirmedDate ?? Created;
         }
 
-        public void SetStatus(AddressStatuses status, long byUserId, string details = null, DateTime? statusDate = null)
+        public AddressStatus SetStatus(AddressStatuses status, long byUserId, string details = null, DateTime? statusDate = null)
         {
-            if (status == Status && details == StatusDetails && statusDate == null) return;
+            if (status == Status && details == StatusDetails && statusDate == null) return null;
 
             if (statusDate == null || statusDate == DateTime.MinValue) statusDate = VirtualDateTime.Now;
 
-            AddressStatuses.Add(
-                new AddressStatus
+            var addressStatus = new AddressStatus
                 {
                     AddressId = AddressId,
                     Status = status,
                     StatusDate = statusDate.Value,
                     StatusDetails = details,
                     ByUserId = byUserId
-                });
+                };
+
+            AddressStatuses.Add(addressStatus);
             Status = status;
             StatusDate = statusDate.Value;
             StatusDetails = details;
+            return addressStatus;
         }
 
         #endregion

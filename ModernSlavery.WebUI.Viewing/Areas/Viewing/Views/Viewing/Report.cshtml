@@ -1,0 +1,118 @@
+﻿@using System.ComponentModel.DataAnnotations
+@model ModernSlavery.WebUI.Viewing.Models.StatementViewModel
+@{
+    //Required for variables in Sitemap taghelpers
+    var reportingPeriod = (Model.StatementDeadline.Year - 1) + "-" + (Model.StatementDeadline.Year).ToTwoDigitYear();
+
+    Layout = "~/Views/DfeTemplate.cshtml";
+    ViewBag.Title = Model.OrganisationName + " Modern Slavery statement" + " / " + reportingPeriod;
+    ViewBag.pageDescription = $"View {reportingPeriod} Modern Slavery statement for {Model.OrganisationName}";
+    ViewBag.ogTitle = ViewBag.Title;
+    ViewBag.ogType = "business.gender_pay_gap";
+    ViewBag.pageClass = "organisation-report-page";
+
+}
+
+<div class="grid-row">
+    <div class="column-full">
+        <a class="link-back" href="@(Url.Action("Organisation", new {Model.EncryptedOrganisationId}))">View all reports for this organisation</a>
+        <h1 class="heading-large">
+            <div id="OrganisationName" class="heading-secondary">
+                @Model.OrganisationName
+            </div>
+            <div>
+                Modern Slavery report
+            </div>
+        </h1>
+
+        <div style="margin-bottom: 20px;">
+            <span>
+                <partial name="Parts/_ReportStatusBadge" model="new ReportStatusBadgeViewModel {IsLateSubmission = Model.IsLateSubmission, IsVoluntarySubmission = Model.IsVoluntarySubmission}"/>
+            </span>
+        </div>
+
+    </div>
+</div>
+
+<div class="grid-row">
+    <div class="column-full">
+        <dl class="metadata organisation-report-metadata">
+            <div>
+                <dt class="metadata-text-label">Reporting Period</dt>
+                <dd class="metadata-text-value">@reportingPeriod</dd>
+            </div>
+            <div>
+                <dt class="metadata-text-label">Turnover</dt>
+                <dd class="metadata-text-value">
+                    @(Model.Turnover.GetAttribute<DisplayAttribute>().Name)
+                </dd>
+            </div>
+            @if (Model.SectorType == SectorTypes.Private)
+            {
+                <div>
+                    <dt class="metadata-text-label">Approved By</dt>
+                    <dd class="metadata-text-value">
+                        <span>@Model.Approver</span>
+                    </dd>
+                </div>
+            }
+            <div>
+                <dt class="visually-hidden">More options</dt>
+                <dd>
+                    <div style="margin: 10px auto;">
+                        <a rel="track" data-track-category="Related Link Clicked" target="_blank" href="/assets/public/assets/pdf/understand-your-gender-pay-gap.pdf">Potential causes of Modern Slavery</a>
+                    </div>
+                    <div style="margin: 10px auto;">
+                        <a rel="track" data-track-category="Related Link Clicked" href="/actions-to-close-the-gap">How can organisations close the gap</a>
+                    </div>
+                    @if (UriSanitiser.IsValidHttpOrHttpsLink(Model.StatementUrl))
+                    {
+                        try // This try-catch is here because of a bug in AnchorTagHelper
+                        {
+                            <div style="margin: 10px auto;">
+                                <a href="@Model.StatementUrl" rel="external noopener" target="_blank">
+                                    What this organisation says about their Modern Slavery <span class="visually-hidden">, opens in new window</span>
+                                </a>
+                            </div>
+                        }
+                        catch (ArgumentException)
+                        {
+                            <div style="margin: 10px auto;">
+                                What this organisation says about their Modern Slavery is available at this website:<br/>
+                                @(Model.StatementUrl)
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span>This organisation has not provided extra information on their Modern Slavery</span>
+                    }
+                </dd>
+            </div>
+        </dl>
+
+        <hr>
+    </div>
+</div>
+
+<hr style="background: black; border: 1px solid black;"/>
+<partial name="~/Views/Shared/ServiceSurveyIntroAndLink.cshtml"/>
+
+@section Scripts {
+    <script>
+
+        (function() {
+            "use strict";
+
+            GOVUK.details.addDetailsPolyfill();
+
+            new GOVUK.Ajaxify({
+                onError: function(errorCode, error, errorThrown) {
+                    window.location.href = '/error/1146';
+                }
+            });
+
+        }());
+
+    </script>
+}

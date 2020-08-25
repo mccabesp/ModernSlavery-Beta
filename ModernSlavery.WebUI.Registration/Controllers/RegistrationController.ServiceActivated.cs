@@ -224,8 +224,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     });
 
             //Add this organisation to the search index
-            if (updateSearchIndex)
-                await _registrationService.SearchBusinessLogic.UpdateSearchIndexAsync(userOrg.Organisation);
+            if (updateSearchIndex && !_registrationService.SearchBusinessLogic.SearchOptions.Disabled)
+                await _registrationService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(userOrg.Organisation);
 
             //Prompt the user with confirmation
             return result1;

@@ -4,7 +4,8 @@ namespace ModernSlavery.Core.Interfaces
 {
     public interface IDataImporter
     {
-        Task ImportOrganisationsAsync(bool force = false);
+        Task ImportPrivateOrganisationsAsync(long userId, bool force = false);
+        Task ImportPublicOrganisationsAsync(long userId, bool force = false);
         Task ImportSICCodesAsync(bool force = false);
         Task ImportSICSectionsAsync(bool force = false);
         Task ImportStatementDiligenceTypesAsync(bool force = false);

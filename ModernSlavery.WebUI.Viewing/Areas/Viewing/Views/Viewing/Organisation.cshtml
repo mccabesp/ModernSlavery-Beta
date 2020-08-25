@@ -1,0 +1,175 @@
+﻿@inject ViewingOptions ViewingOptions
+@inject IReportingDeadlineHelper SnapshotDateHelper
+@inject IObfuscator Obfuscator;
+@inject IOrganisationBusinessLogic OrganisationBusinessLogic
+@using ModernSlavery.BusinessDomain.Shared.Interfaces
+@using ModernSlavery.Core.Interfaces
+@model OrganisationDetailsViewModel
+@{
+    //Required for variables in Sitemap taghelpers
+    ViewBag.OrganisationName = Model.Organisation.OrganisationName;
+
+    var organisation = Model.Organisation;
+    Layout = "~/Views/DfeTemplate.cshtml";
+    ViewBag.Title = organisation.OrganisationName + " Details";
+    ViewBag.pageDescription = "View Modern Slavery details for " + organisation.OrganisationName;
+    ViewBag.ogTitle = ViewBag.Title;
+    ViewBag.ogType = "business.gender_pay_gap";
+    ViewBag.pageClass = "organisation-report-page";
+
+    var organisationIdentifier = Obfuscator.Obfuscate(organisation.OrganisationId);
+
+    var backUrl = !string.IsNullOrWhiteSpace(Model.OrganisationBackUrl) ? Model.OrganisationBackUrl : !string.IsNullOrWhiteSpace(Model.LastSearchUrl) ? Model.LastSearchUrl : "/";
+    if (string.IsNullOrWhiteSpace(ViewBag.ReturnUrl))
+    {
+        ViewBag.ReturnUrl = Context.GetUri().PathAndQuery;
+    }
+    var viewModel = new AddRemoveButtonViewModel {OrganisationIdEncrypted = organisationIdentifier, OrganisationName = organisation.OrganisationName};
+}
+
+<div class="grid-row">
+    <div class="column-full">
+        <div class="grid-row">
+            <div class="column-full">
+                <h1 class="heading-large">
+                    <span id="OrganisationName">
+                        @organisation.OrganisationName
+                    </span>
+                </h1>
+                @if (organisation.OrganisationNames.Count > 1)
+                {
+                    <div class="panel">
+                        <div>Previously known as</div>
+                        <strong>@organisation.OrganisationNames.ElementAt(organisation.OrganisationNames.Count - 2).Name</strong>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="grid-row">
+            <div class="column-full">
+                <dl class="metadata organisation-report-metadata">
+                    <div>
+                        <dt class="metadata-text-label">Address</dt>
+                        <dd class="metadata-text-value">@(organisation.LatestAddress?.GetAddressString())</dd>
+                    </div>
+                    <div>
+                        <dt class="metadata-text-label">Nature of business (SIC)</dt>
+                        <dd class="metadata-text-value">@organisation.GetLatestSicSectorsString()</dd>
+                    </div>
+                </dl>
+                <hr>
+            </div>
+        </div>
+
+        <div class="grid-row">
+            <div class="column-full">
+                <h2 class="heading-small">Modern Slavery reports</h2>
+                <div class="body" style="font-size: 16px;">
+                    <p>
+                        This page shows all reports submitted or expected from the organisation. Organisations with less than 250 staff may report voluntarily and these reports are marked as &quot;Voluntary&quot;. Reports submitted after the deadline are marked as &quot;Late&quot;.
+                    </p>
+                </div>
+
+                @await Html.PartialModelAsync(new Details
+                {
+                    Id = "WhoNeedsToReport",
+                    LinkText = "Who needs to report and what are the deadlines?",
+                    SummaryPartial = "Parts/_WhoNeedsToReport"
+                })
+
+            </div>
+        </div>
+
+        @foreach (var report in OrganisationBusinessLogic.GetOrganisationRecentStatements(organisation,ViewingOptions.ShowReportYearCount))
+        {
+            <div class="grid-row">
+                <div class="column-full">
+                    <table>
+                        <thead></thead>
+                        <tbody>
+                        <tr>
+                            <td style="border-bottom: none; width: 300px;">
+                                <span class="heading-small">@report.GetReportingPeriod()</span>
+                            </td>
+                            <td style="border-bottom: none;">
+                                <partial name="Parts/_ReportStatusBadge.cshtml" model="new ReportStatusBadgeViewModel {IsLateSubmission = report.IsLateSubmission, IsVoluntarySubmission = report.IsVoluntarySubmission()}"/>
+                            </td>
+                        </tr>
+                        @if (report.StatementId == 0)
+                        {
+                            <tr>
+                                <td colspan="2" style="border-bottom: none;">
+                                    @if (organisation.GetIsInscope(report.SubmissionDeadline))
+                                    {
+                                        <span>
+                                            This organisation
+                                            @(report.SubmissionDeadline.Year == SnapshotDateHelper.CurrentSnapshotYear ? "is" : "was")
+                                            required to report by @(report.SubmissionDeadline.AddYears(1).AddDays(-1).ToString("d MMMM yyyy"))
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>Not required to report</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="2" style="border-bottom: none;">
+                                    @Html.ActionLink("View Report", "Report", new {organisationIdentifier, year = report.SubmissionDeadline.Year}, new {style = "font-size: 19px!important;"})
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="border-bottom: none;">
+                                    This data has been taken from @(report.SubmissionDeadline.ToString("d MMMM yyyy"))
+                                </td>
+                            </tr>
+                        }
+                        @if (report.StatementId > 0 && organisation.SectorType == SectorTypes.Private)
+                        {
+                            <tr>
+                                <td colspan="2" style="border-bottom: none;">
+
+                                    <div class="heading-xsmall" style="font-weight: bold">Person responsible</div>
+                                    <div>
+                                        <span>@report.ApproverFirstName @report.ApproverLastName</span>
+                                    </div>
+                                    <div>
+                                        <span>(@report.ApproverJobTitle)</span>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        }
+                        <hr/>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        <hr style="background: black; border: 1px solid black;"/>
+        <partial name="~/Views/Shared/ServiceSurveyIntroAndLink.cshtml"/>
+        <hr/>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+        (function() {
+            "use strict";
+
+            GOVUK.details.addDetailsPolyfill();
+
+            new GOVUK.Ajaxify({
+                onError: function(errorCode, error, errorThrown) {
+                    window.location.href = '/error/1146';
+                }
+            });
+        }());
+
+    </script>
+}

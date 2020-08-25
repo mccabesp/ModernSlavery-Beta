@@ -16,12 +16,6 @@ namespace ModernSlavery.Core.Extensions
 {
     public static class Lists
     {
-        public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IQueryable<T> query)
-        {
-            foreach (var entity in query)
-                yield return entity;
-        }
-
         public static string[] SplitI(this string list,
             string separators = ";,",
             int maxItems = 0,
@@ -254,6 +248,26 @@ namespace ModernSlavery.Core.Extensions
         public static void AddRange<T>(this SortedSet<T> targetCollection, IEnumerable<T> collection)
         {
             foreach (var item in collection) targetCollection.Add(item);
+        }
+
+        public static void RemoveRange<T>(this HashSet<T> targetCollection, params T[] pars)
+        {
+            RemoveRange(targetCollection, pars.AsEnumerable());
+        }
+
+        public static void RemoveRange<T>(this HashSet<T> targetCollection, IEnumerable<T> collection)
+        {
+            foreach (var item in collection) targetCollection.Remove(item);
+        }
+
+        public static void RemoveRange<T>(this SortedSet<T> targetCollection, params T[] pars)
+        {
+            RemoveRange(targetCollection, pars.AsEnumerable());
+        }
+
+        public static void RemoveRange<T>(this SortedSet<T> targetCollection, IEnumerable<T> collection)
+        {
+            foreach (var item in collection) targetCollection.Remove(item);
         }
 
         public static List<string> RemoveI(this List<string> source, params string[] collection)

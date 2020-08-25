@@ -2,13 +2,32 @@
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ModernSlavery.BusinessDomain.Registration
 {
     public class RegistrationService : IRegistrationService
     {
+        public IAuditLogger BadSicLog { get; }
+        public IAuditLogger RegistrationLog { get; }
+        public IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
+        public IScopeBusinessLogic ScopeBusinessLogic { get; }
+        public IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
+        public ISharedBusinessLogic SharedBusinessLogic { get; }
+        public ISearchBusinessLogic SearchBusinessLogic { get; }
+        public IPagedRepository<OrganisationRecord> PrivateSectorRepository { get; }
+        public IPagedRepository<OrganisationRecord> PublicSectorRepository { get; }
+        public IUserRepository UserRepository { get; }
+        public IPinInThePostService PinInThePostService { get; }
+        public IPostcodeChecker PostcodeChecker { get; }
+
+
         public RegistrationService(
             [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog,
             [KeyFilter(Filenames.RegistrationLog)] IAuditLogger registrationLog,
@@ -20,8 +39,8 @@ namespace ModernSlavery.BusinessDomain.Registration
             IUserRepository userRepository,
             IPinInThePostService pinInThePostService,
             IPostcodeChecker postcodeChecker,
-            [KeyFilter("Private")] IPagedRepository<EmployerRecord> privateSectorRepository,
-            [KeyFilter("Public")] IPagedRepository<EmployerRecord> publicSectorRepository
+            [KeyFilter("Private")] IPagedRepository<OrganisationRecord> privateSectorRepository,
+            [KeyFilter("Public")] IPagedRepository<OrganisationRecord> publicSectorRepository
         )
         {
             RegistrationBusinessLogic = registrationBusinessLogic;
@@ -36,23 +55,6 @@ namespace ModernSlavery.BusinessDomain.Registration
             PublicSectorRepository = publicSectorRepository;
             UserRepository = userRepository;
             PinInThePostService = pinInThePostService;
-            PostcodeChecker = postcodeChecker;
         }
-
-        public IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
-
-        public IAuditLogger BadSicLog { get; }
-        public IAuditLogger RegistrationLog { get; }
-
-        public IPinInThePostService PinInThePostService { get; }
-        public IPostcodeChecker PostcodeChecker { get; }
-
-        public ISharedBusinessLogic SharedBusinessLogic { get; }
-        public IOrganisationBusinessLogic OrganisationBusinessLogic { get; }
-        public IScopeBusinessLogic ScopeBusinessLogic { get; }
-        public ISearchBusinessLogic SearchBusinessLogic { get; }
-        public IUserRepository UserRepository { get; }
-        public IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
-        public IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
     }
 }

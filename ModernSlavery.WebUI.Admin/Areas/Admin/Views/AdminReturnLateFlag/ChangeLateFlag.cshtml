@@ -1,4 +1,4 @@
-@model AdminReturnLateFlagViewModel
+@model AdminStatementLateFlagViewModel
 @{Layout = "~/Views/GdsLayout.cshtml";}
 @{
     ViewBag.Title = "Change late flag - Administration - Modern Slavery Reporting service";
@@ -15,8 +15,8 @@
             },
             new CrumbViewModel
             {
-                Text = Model.Return.Organisation.OrganisationName,
-                Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Return.Organisation.OrganisationId})
+                Text = Model.Statement.Organisation.OrganisationName,
+                Href = Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Statement.Organisation.OrganisationId})
             },
             new CrumbViewModel
             {
@@ -39,7 +39,7 @@
             Change late flag
             <br/>
             <span class="govuk-!-font-size-27">
-                for @(Model.Return.Organisation.OrganisationName)
+                for @(Model.Statement.Organisation.OrganisationName)
             </span>
         </h1>
 
@@ -49,11 +49,11 @@
             <tbody class="govuk-table__body">
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Reporting year</th>
-                <td class="govuk-table__cell">@(Model.Return.GetReportingPeriod())</td>
+                <td class="govuk-table__cell">@(Model.Statement.GetReportingPeriod())</td>
             </tr>
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Current late flag</th>
-                <td class="govuk-table__cell">@(Model.Return.IsLateSubmission ? "Late" : "Not late")</td>
+                <td class="govuk-table__cell">@(Model.Statement.IsLateSubmission ? "Late" : "Not late")</td>
             </tr>
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">New late flag</th>
@@ -62,7 +62,7 @@
             </tbody>
         </table>
 
-        <form method="POST" action="@Url.Action("ChangeLateFlag", "AdminReturnLateFlag", new {id = Model.Return.ReturnId})">
+        <form method="POST" action="@Url.Action("ChangeLateFlag", "AdminReturnLateFlag", new {id = Model.Statement.StatementId})">
             @(Html.AntiForgeryToken())
             @(Html.HiddenFor(m => m.NewLateFlag))
             <div class="govuk-form-group">
@@ -86,7 +86,7 @@
                 }))
 
                 <p class="govuk-body">
-                    <a href="@Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Return.Organisation.OrganisationId})"
+                    <a href="@Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = Model.Statement.Organisation.OrganisationId})"
                        class="govuk-link">
                         Cancel and return to organisation page
                     </a>

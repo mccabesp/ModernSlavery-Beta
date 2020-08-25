@@ -1,3 +1,4 @@
+using ModernSlavery.Core.Extensions;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -23,7 +24,7 @@ namespace ModernSlavery.Core.Entities
         public string EmailAddress { get; set; }
         public string PhoneNumber { get; set; }
 
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = VirtualDateTime.Now;
 
     }
     public enum WhyVisitMSUSite : byte

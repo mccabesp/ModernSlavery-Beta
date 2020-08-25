@@ -117,6 +117,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             if (!IsComplete())
                 yield return new ValidationResult("You must first complete all sections before you can submit");
+
+            else if (!HasChanged())
+                yield return new ValidationResult("You must edit the statement before you can submit");
         }
 
         public override bool IsComplete()
@@ -125,10 +128,24 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 && Compliance.IsComplete();
         }
 
+        public bool CanSubmit()
+        {
+            return IsComplete() && HasChanged();
+        }
+
         public bool HasChanged()
         {
-            return (!Submitted && DraftModifications!=null && DraftModifications.Any()) 
-                || (Submitted && SubmittedModifications != null && SubmittedModifications.Any());
+            return (!Submitted && HasDraftChanged()) || (Submitted && HasSubmissionChanged());
+        }
+
+        public bool HasDraftChanged()
+        {
+            return DraftModifications != null && DraftModifications.Any();
+        }
+
+        public bool HasSubmissionChanged()
+        {
+            return  SubmittedModifications != null && SubmittedModifications.Any();
         }
     }
 }

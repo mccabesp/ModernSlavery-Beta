@@ -4,12 +4,14 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.BusinessDomain.Submission;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Submission.Models;
 using ModernSlavery.WebUI.Submission.Models.Statement;
 using ModernSlavery.WebUI.Submission.Presenters;
 using Newtonsoft.Json;
@@ -33,7 +35,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             : base(logger, webService, sharedBusinessLogic)
         {
             SubmissionPresenter = submissionPresenter;
-
         }
 
         #region General notes
@@ -133,7 +134,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             switch (viewModel)
             {
                 case YourStatementPageViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : null;
+                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetReturnUrl();
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetComplianceUrl();
                     break;
@@ -320,7 +321,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             //Show the correct view
-            return View("BeforeYouStart",GetYourStatementUrl());
+            return View("BeforeYouStart", new BeforeYouStartViewModel { BackUrl = GetReturnUrl(), ContinueUrl = GetYourStatementUrl() });
         }
         #endregion
 
@@ -479,8 +480,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Create the view model
             var viewModel = await CreateReviewPageViewModelAsync(statementModel);
 
-            //Set the flag so we now always return to the review page
-            if (!viewModel.ReturnToReviewPage)
+            //Set the flag so we now always return to the review page when we have some content
+            if (!viewModel.ReturnToReviewPage && !statementModel.IsEmpty())
             {
                 statementModel.ReturnToReviewPage = true;
                 await SubmissionPresenter.SaveStatementModelAsync(statementModel);

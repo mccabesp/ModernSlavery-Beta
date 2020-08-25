@@ -32,7 +32,7 @@ namespace ModernSlavery.WebUI.Registration.Presenters
             FastTrackViewModel enterCodes, User currentUser)
         {
             var org = await _organisationBusinessLogic.GetOrganisationByEmployerReferenceAndSecurityCodeAsync(
-                enterCodes.EmployerReference,
+                enterCodes.OrganisationReference,
                 enterCodes.SecurityCode);
             if (org == null) return null;
 
@@ -45,9 +45,9 @@ namespace ModernSlavery.WebUI.Registration.Presenters
 
             model.IsRegistered = org.UserOrganisations.Any(uo => uo.User == currentUser && uo.PINConfirmedDate != null);
 
-            model.Employers = new PagedResult<EmployerRecord>();
-            model.Employers.Results = new List<EmployerRecord> { _organisationBusinessLogic.CreateEmployerRecord(org) };
-            model.SelectedEmployerIndex = 0;
+            model.Organisations = new PagedResult<OrganisationRecord>();
+            model.Organisations.Results = new List<OrganisationRecord> { _organisationBusinessLogic.CreateOrganisationRecord(org) };
+            model.SelectedOrganisationIndex = 0;
 
             //Mark the organisation as authorised
             model.SelectedAuthorised = true;

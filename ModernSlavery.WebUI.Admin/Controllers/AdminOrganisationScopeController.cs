@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private readonly AuditLogger auditLogger;
 
         public AdminOrganisationScopeController(
-            IAdminService adminService, 
+            IAdminService adminService,
             AuditLogger auditLogger)
         {
             _adminService = adminService;
@@ -43,7 +43,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public IActionResult ChangeScopeGet(long id, int year)
         {
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
-            var currentScopeStatus = organisation.GetScope(year).ScopeStatus;
+            var currentScopeStatus = organisation.GetActiveScope(year).ScopeStatus;
 
             var viewModel = new AdminChangeScopeViewModel
             {
@@ -63,7 +63,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         public async Task<IActionResult> ChangeScopePost(long id, int year, AdminChangeScopeViewModel viewModel)
         {
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
-            var currentOrganisationScope = organisation.GetScope(year);
+            var currentOrganisationScope = organisation.GetActiveScope(year);
 
             if (currentOrganisationScope.ScopeStatus != ScopeStatuses.InScope
                 && currentOrganisationScope.ScopeStatus != ScopeStatuses.OutOfScope)
@@ -74,7 +74,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (viewModel.HasAnyErrors())
             {
                 // If there are any errors, return the user back to the same page to correct the mistakes
-                var currentScopeStatus = organisation.GetScope(year).ScopeStatus;
+                var currentScopeStatus = organisation.GetActiveScope(year).ScopeStatus;
 
                 viewModel.OrganisationName = organisation.OrganisationName;
                 viewModel.OrganisationId = organisation.OrganisationId;
@@ -96,6 +96,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 ContactFirstname = currentOrganisationScope.ContactFirstname,
                 ContactLastname = currentOrganisationScope.ContactLastname,
                 ContactEmailAddress = currentOrganisationScope.ContactEmailAddress,
+                ContactJobTitle = currentOrganisationScope.ContactJobTitle,
                 Reason = viewModel.Reason,
                 SubmissionDeadline = currentOrganisationScope.SubmissionDeadline,
                 StatusDetails = "Changed by Admin",
@@ -120,7 +121,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 });
 
             return RedirectToAction("ViewScopeHistory", "AdminOrganisationScope",
-                new {id = organisation.OrganisationId});
+                new { id = organisation.OrganisationId });
         }
 
         private void RetireOldScopesForCurrentSnapshotDate(Organisation organisation, int year)

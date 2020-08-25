@@ -13,7 +13,7 @@
     @using (Html.BeginForm())
     {
         @Html.AntiForgeryToken()
-        @Html.HiddenFor(model => model.SelectedEmployerIndex)
+        @Html.HiddenFor(model => model.SelectedOrganisationIndex)
         @Html.HiddenFor(model => model.CompanyNumber)
         @Html.HiddenFor(model => model.CharityNumber)
         @Html.HiddenFor(model => model.MutualNumber)
@@ -41,7 +41,7 @@
         @Html.HiddenFor(model => model.PoBox)
 
         @Html.HiddenFor(model => model.ManualAddress)
-        @Html.HiddenFor(model => model.ManualEmployerIndex)
+        @Html.HiddenFor(model => model.ManualOrganisationIndex)
         @Html.HiddenFor(model => model.MatchedReferenceCount)
 
         @Html.HiddenFor(model => model.ManualRegistration)

@@ -187,54 +187,40 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var logRecords = new List<SubmissionLogModel>();
 
                 //Create the first log file
-                foreach (var @return in SharedBusinessLogic.DataRepository.GetAll<Return>().OrderBy(r => r.StatusDate))
+                foreach (var statement in SharedBusinessLogic.DataRepository.GetAll<Statement>().OrderBy(r => r.StatusDate))
                 {
                     //Dont log return for test organisations
-                    if (@return.Organisation.OrganisationName.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+                    if (statement.Organisation.OrganisationName.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
                         continue;
 
-                    var status = await SharedBusinessLogic.DataRepository.GetAll<ReturnStatus>()
+                    var status = await SharedBusinessLogic.DataRepository.GetAll<StatementStatus>()
                         .FirstOrDefaultAsync(
-                            rs => rs.ReturnId == @return.ReturnId && rs.Status == @return.Status &&
-                                  rs.StatusDate == @return.StatusDate);
+                            rs => rs.StatementId == statement.StatementId && rs.Status == statement.Status &&
+                                  rs.StatusDate == statement.StatusDate);
 
                     //Log the submission
                     if (status == null)
                         Logger.LogError(
-                            $"Could not find status '{@return.Status}' for return '{@return.ReturnId}' at '{@return.StatusDate}' while creating return history");
+                            $"Could not find status '{statement.Status}' for return '{statement.StatementId}' at '{statement.StatusDate}' while creating return history");
                     else
                         logRecords.Add(
                             new SubmissionLogModel
                             {
-                                StatusDate = @return.Created,
+                                StatusDate = statement.Created,
                                 Status = StatementStatuses.Submitted,
                                 Details = "",
-                                Sector = @return.Organisation.SectorType,
-                                ReturnId = @return.ReturnId,
-                                AccountingDate = @return.AccountingDate.ToShortDateString(),
-                                OrganisationId = @return.OrganisationId,
-                                EmployerName = @return.Organisation.OrganisationName,
-                                Address = @return.Organisation.LatestAddress?.GetAddressString(
+                                Sector = statement.Organisation.SectorType,
+                                StatementId = statement.StatementId,
+                                AccountingDate = statement.SubmissionDeadline.ToShortDateString(),
+                                OrganisationId = statement.OrganisationId,
+                                EmployerName = statement.Organisation.OrganisationName,
+                                Address = statement.Organisation.LatestAddress?.GetAddressString(
                                     "," + Environment.NewLine),
-                                CompanyNumber = @return.Organisation.CompanyNumber,
-                                SicCodes = @return.Organisation.GetSicCodeIdsString(@return.StatusDate,
+                                CompanyNumber = statement.Organisation.CompanyNumber,
+                                SicCodes = statement.Organisation.GetSicCodeIdsString(statement.StatusDate,
                                     "," + Environment.NewLine),
-                                DiffMeanHourlyPayPercent = @return.DiffMeanHourlyPayPercent,
-                                DiffMedianHourlyPercent = @return.DiffMedianHourlyPercent,
-                                DiffMeanBonusPercent = @return.DiffMeanBonusPercent,
-                                DiffMedianBonusPercent = @return.DiffMedianBonusPercent,
-                                MaleMedianBonusPayPercent = @return.MaleMedianBonusPayPercent,
-                                FemaleMedianBonusPayPercent = @return.FemaleMedianBonusPayPercent,
-                                MaleLowerPayBand = @return.MaleLowerPayBand,
-                                FemaleLowerPayBand = @return.FemaleLowerPayBand,
-                                MaleMiddlePayBand = @return.MaleMiddlePayBand,
-                                FemaleMiddlePayBand = @return.FemaleMiddlePayBand,
-                                MaleUpperPayBand = @return.MaleUpperPayBand,
-                                FemaleUpperPayBand = @return.FemaleUpperPayBand,
-                                MaleUpperQuartilePayBand = @return.MaleUpperQuartilePayBand,
-                                FemaleUpperQuartilePayBand = @return.FemaleUpperQuartilePayBand,
-                                CompanyLinkToGPGInfo = @return.CompanyLinkToGPGInfo,
-                                ResponsiblePerson = @return.ResponsiblePerson,
+                                StatementUrl = statement.StatementUrl,
+                                ApprovingPerson = statement.ApprovingPerson,
                                 UserFirstname = status.ByUser.Firstname,
                                 UserLastname = status.ByUser.Lastname,
                                 UserJobtitle = status.ByUser.JobTitle,
@@ -668,7 +654,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Type = Filenames.SicSections,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.SicSections),
                 Title = "SIC Sections",
-                Description = "Standard Industrial Classification (SIC) sector titles.",
+                Description = "Standard Industrial Classification (SIC) sector titles. Import performs Add/Update/Delete.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<SicSection>().CountAsync()
             };
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
@@ -685,7 +671,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Type = Filenames.SicCodes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.SicCodes),
                 Title = "SIC Codes",
-                Description = "Standard Industrial Classification (SIC) codes and titles.",
+                Description = "Standard Industrial Classification (SIC) codes and titles. Import performs Add/Update/Delete.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<SicCode>().CountAsync()
             };
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
@@ -702,7 +688,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Type = Filenames.StatementDiligenceTypes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementDiligenceTypes),
                 Title = "Statement Due Diligence Types",
-                Description = "Due-diligence types used for Modern Slavery Statements",
+                Description = "Due-diligence types used for Modern Slavery Statements. Import performs Add/Update/Delete.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementDiligenceType>().CountAsync()
             };
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
@@ -720,7 +706,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Type = Filenames.StatementPolicyTypes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementPolicyTypes),
                 Title = "Statement Policy Types",
-                Description = "Policy types used for Modern Slavery Statements",
+                Description = "Policy types used for Modern Slavery Statements. Import performs Add/Update/Delete.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementPolicyType>().CountAsync()
             };
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
@@ -737,7 +723,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Type = Filenames.StatementRiskTypes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementRiskTypes),
                 Title = "Statement Risk Types",
-                Description = "Risk types used for Modern Slavery Statements",
+                Description = "Risk types used for Modern Slavery Statements. Import performs Add/Update/Delete.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementRiskType>().CountAsync()
             };
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
@@ -754,7 +740,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Type = Filenames.StatementSectorTypes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementSectorTypes),
                 Title = "Statement Sector Types",
-                Description = "Sector types used for Modern Slavery Statements",
+                Description = "Sector types used for Modern Slavery Statements. Import performs Add/Update/Delete.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementSectorType>().CountAsync()
             };
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
@@ -771,7 +757,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Type = Filenames.StatementTrainingTypes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementTrainingTypes),
                 Title = "Statement Due Training Types",
-                Description = "Due-Training types used for Modern Slavery Statements",
+                Description = "Due-Training types used for Modern Slavery Statements. Import performs Add/Update/Delete.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementTrainingType>().CountAsync()
             };
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
@@ -783,14 +769,32 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             model.Uploads.Add(upload);
             #endregion
 
-            #region Show ImportOrganisations Upload
+            #region Show ImportPrivateOrganisations Upload
             upload = new UploadViewModel.Upload
             {
-                Type = Filenames.ImportOrganisations,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ImportOrganisations),
-                Title = "Organisations Import",
-                Description = "Organisations from external data source",
-                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<Organisation>().CountAsync()
+                Type = Filenames.ImportPrivateOrganisations,
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ImportPrivateOrganisations),
+                Title = "Private Organisations Import",
+                Description = "Add only new Private Organisations from external data source.  Import performs Add only.",
+                DatabaseCount = await SharedBusinessLogic.DataRepository.CountAsync<Organisation>(r=>r.SectorType== SectorTypes.Private)
+            };
+            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+            {
+                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
+                upload.FileExists = true;
+            }
+
+            model.Uploads.Add(upload);
+            #endregion
+
+            #region Show ImportPublicOrganisations Upload
+            upload = new UploadViewModel.Upload
+            {
+                Type = Filenames.ImportPublicOrganisations,
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ImportPublicOrganisations),
+                Title = "Public Organisations Import",
+                Description = "Public Organisations from external data source.  Import performs Add only.",
+                DatabaseCount = await SharedBusinessLogic.DataRepository.CountAsync<Organisation>(r => r.SectorType == SectorTypes.Public)
             };
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
             {
@@ -808,7 +812,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Type = Filenames.ShortCodes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ShortCodes),
                 Title = "Short Codes",
-                Description = "Short codes for tracking and routing users to specific web pages.",
+                Description = "Short codes for tracking and routing users to specific web pages. Import performs Add/Update/Delete.",
                 DatabaseCount = allShortCodes == null ? 0 : allShortCodes.Count
             };
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
@@ -918,7 +922,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         List<object> records;
                         switch (fileName)
                         {
-                            case var f when f.EqualsI(Filenames.ImportOrganisations):
+                            case var f when f.EqualsI(Filenames.ImportPrivateOrganisations):
+                                records = csvReader.GetRecords<ImportOrganisationModel>().Cast<object>().ToList();
+                                break;
+                            case var f when f.EqualsI(Filenames.ImportPublicOrganisations):
                                 records = csvReader.GetRecords<ImportOrganisationModel>().Cast<object>().ToList();
                                 break;
                             case var f when f.EqualsI(Filenames.SicSections):
@@ -961,8 +968,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         var updateTime = VirtualDateTime.Now.AddMinutes(-2);
                         switch (fileName)
                         {
-                            case var f when f.EqualsI(Filenames.ImportOrganisations):
-                                await _adminService.DataImporter.ImportOrganisationsAsync(true);
+                            case var f when f.EqualsI(Filenames.ImportPrivateOrganisations):
+                                await _adminService.DataImporter.ImportPrivateOrganisationsAsync(VirtualUser.UserId,true);
+                                break;
+                            case var f when f.EqualsI(Filenames.ImportPublicOrganisations):
+                                await _adminService.DataImporter.ImportPublicOrganisationsAsync(VirtualUser.UserId,true);
                                 break;
                             case var f when f.EqualsI(Filenames.SicSections):
                                 await _adminService.DataImporter.ImportSICSectionsAsync(true);
@@ -990,6 +1000,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 break;
                         }
                     }
+                }
+                catch (AggregateException aex)
+                {
+                    ModelState.AddModelError("", $@"Error reading file '{fileName}'");
+                    foreach (var ex in aex.InnerExceptions)
+                        ModelState.AddModelError("", ex.Message);
                 }
                 catch (Exception ex)
                 {

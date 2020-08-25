@@ -266,7 +266,7 @@ namespace ModernSlavery.Core.Classes
         /// <param name="fileName"></param>
         /// <param name="remotePath">The path to the remote file</param>
         /// <param name="localPath">The path to the local file (default=</param>
-        public static async Task PushRemoteFileAsync(this IFileRepository fileRepository,
+        public static async Task<bool> PushRemoteFileAsync(this IFileRepository fileRepository,
             string fileName,
             string remotePath,
             string localPath = null, bool OverwriteIfNewer = false)
@@ -289,21 +289,19 @@ namespace ModernSlavery.Core.Classes
             remotePath = Path.Combine(remotePath, fileName);
             var remoteExists = await fileRepository.GetFileExistsAsync(remotePath);
 
+            //Dont overwrite if remote is newer than local unless explicit override set
             if (remoteExists)
             {
-                //Dont overwite remote file if it exists (unless local is newer)
-                if (!OverwriteIfNewer) return;
-
-                //Dont overwrite remote file unless local file is newer
-                var remoteLastWriteTime = await fileRepository.GetLastWriteTimeAsync(localPath);
-                var localLastWriteTime = File.GetLastWriteTime(remotePath);
-
-                if (remoteLastWriteTime >= localLastWriteTime) return;
+                var remoteLastWriteTime = await fileRepository.GetLastWriteTimeAsync(remotePath);
+                var localLastWriteTime = File.GetLastWriteTime(localPath); 
+                if (remoteLastWriteTime >= localLastWriteTime && !OverwriteIfNewer) return false;
             }
 
             //Overwrite remote 
             var localContent = File.ReadAllBytes(localPath);
-            if (localContent.Length > 0) await fileRepository.WriteAsync(remotePath, localContent);
+            if (localContent.Length == 0) return false;            
+            await fileRepository.WriteAsync(remotePath, localContent);
+            return true;
         }
 
         #endregion

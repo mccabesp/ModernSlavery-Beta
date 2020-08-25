@@ -10,7 +10,7 @@
     -->
     <StaticWebAssetBasePath Condition="$(StaticWebAssetBasePath) == ''">/</StaticWebAssetBasePath>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="5.0.0" />
+    <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
     <PackageReference Include="BuildWebCompiler" Version="1.12.405" />
     <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" />
@@ -35,10 +35,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\**\*.*">
+    <None Update="wwwroot\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

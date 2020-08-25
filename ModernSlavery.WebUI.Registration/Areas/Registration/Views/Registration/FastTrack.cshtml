@@ -26,10 +26,10 @@
                     Enter the employer reference and security code provided in the letter we sent you.                   
                 </p>
 
-                <div class="form-group @Html.SetErrorClass(model => model.EmployerReference, "error")">
-                    @Html.LabelFor(model => model.EmployerReference, new { @class = "form-label" })
-                    @Html.ValidationMessageFor(model => model.EmployerReference, "", new { @class = "error-message" })
-                    @Html.CustomEditorFor(model => model.EmployerReference, new { @class = "form-control" })
+                <div class="form-group @Html.SetErrorClass(model => model.OrganisationReference, "error")">
+                    @Html.LabelFor(model => model.OrganisationReference, new { @class = "form-label" })
+                    @Html.ValidationMessageFor(model => model.OrganisationReference, "", new { @class = "error-message" })
+                    @Html.CustomEditorFor(model => model.OrganisationReference, new { @class = "form-control" })
                 </div>
 
                 <div class="form-group @Html.SetErrorClass(model => model.SecurityCode, "error")">

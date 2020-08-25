@@ -17,11 +17,10 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         ISearchBusinessLogic SearchBusinessLogic { get; set; }
         ISubmissionBusinessLogic SubmissionBusinessLogic { get; }
         IUserRepository UserRepository { get; }
-        IPagedRepository<EmployerRecord> PrivateSectorRepository { get; }
-        IPagedRepository<EmployerRecord> PublicSectorRepository { get; }
+        IPagedRepository<OrganisationRecord> PrivateSectorRepository { get; }
+        IPagedRepository<OrganisationRecord> PublicSectorRepository { get; }
         IQueue ExecuteWebjobQueue { get; }
-        ISearchRepository<EmployerSearchModel> EmployerSearchRepository { get; }
-        ISearchRepository<SicCodeSearchModel> SicCodeSearchRepository { get; }
+        ISearchRepository<OrganisationSearchModel> OrganisationSearchRepository { get; }
         ISharedBusinessLogic SharedBusinessLogic { get; }
         Task LogSubmission(IOrderedEnumerable<SubmissionLogModel> logRecords);
     }

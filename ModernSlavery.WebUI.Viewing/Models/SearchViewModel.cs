@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
+using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 
 namespace ModernSlavery.WebUI.Viewing.Models
 {
     [Serializable]
     public class SearchViewModel
     {
-        private List<string> _reportingStatusFilterInfo;
-
         private List<string> _reportingYearFilterInfo;
 
         private List<string> _sectorFilterInfo;
@@ -22,42 +21,38 @@ namespace ModernSlavery.WebUI.Viewing.Models
             _sectorFilterInfo = new List<string>();
             _sizeFilterInfo = new List<string>();
             _reportingYearFilterInfo = new List<string>();
-            _reportingStatusFilterInfo = new List<string>();
         }
 
         public List<OptionSelect> SectorOptions { get; set; }
         public List<OptionSelect> ReportingYearOptions { get; set; }
-        public List<OptionSelect> ReportingStatusOptions { get; internal set; }
-        public List<OptionSelect> SizeOptions { get; internal set; }
+        public List<OptionSelect> TurnoverOptions { get; internal set; }
 
         public string search { get; set; }
 
-        public IEnumerable<char> s { get; set; }
-        public IEnumerable<int> es { get; set; }
+        public IEnumerable<short> s { get; set; }
+        public IEnumerable<byte> tr { get; set; }
         public IEnumerable<int> y { get; set; }
-        public IEnumerable<int> st { get; set; }
         public int p { get; set; }
-        public string t { get; set; }
 
-        public PagedResult<EmployerSearchModel> Employers { get; set; }
+        public PagedResult<OrganisationSearchModel> Organisations { get; set; }
 
-        public int EmployerStartIndex
+        public int OrganisationStartIndex
         {
             get
             {
-                if (Employers == null || Employers.Results == null || Employers.Results.Count < 1) return 1;
+                if (Organisations == null || Organisations.Results == null || Organisations.Results.Count < 1) return 1;
 
-                return Employers.CurrentPage * Employers.PageSize - Employers.PageSize + 1;
+                return Organisations.CurrentPage * Organisations.PageSize - Organisations.PageSize + 1;
             }
         }
 
-        public int EmployerEndIndex
+        public int OrganisationEndIndex
         {
             get
             {
-                if (Employers == null || Employers.Results == null || Employers.Results.Count < 1) return 1;
+                if (Organisations == null || Organisations.Results == null || Organisations.Results.Count < 1) return 1;
 
-                return EmployerStartIndex + Employers.Results.Count - 1;
+                return OrganisationStartIndex + Organisations.Results.Count - 1;
             }
         }
 
@@ -65,13 +60,13 @@ namespace ModernSlavery.WebUI.Viewing.Models
         {
             get
             {
-                if (Employers == null || Employers.PageCount <= 5) return 1;
+                if (Organisations == null || Organisations.PageCount <= 5) return 1;
 
-                if (Employers.CurrentPage < 4) return 1;
+                if (Organisations.CurrentPage < 4) return 1;
 
-                if (Employers.CurrentPage + 2 > Employers.PageCount) return Employers.PageCount - 4;
+                if (Organisations.CurrentPage + 2 > Organisations.PageCount) return Organisations.PageCount - 4;
 
-                return Employers.CurrentPage - 2;
+                return Organisations.CurrentPage - 2;
             }
         }
 
@@ -85,11 +80,11 @@ namespace ModernSlavery.WebUI.Viewing.Models
             }
         }
 
-        public List<string> SizeFilterInfo
+        public List<string> TurnoverFilterInfo
         {
             get
             {
-                if (_sizeFilterInfo == null) _sizeFilterInfo = OptionSelect.GetCheckedString(SizeOptions);
+                if (_sizeFilterInfo == null) _sizeFilterInfo = OptionSelect.GetCheckedString(TurnoverOptions);
 
                 return _sizeFilterInfo;
             }
@@ -106,27 +101,17 @@ namespace ModernSlavery.WebUI.Viewing.Models
             }
         }
 
-        public List<string> ReportingStatusFilterInfo
-        {
-            get
-            {
-                if (_reportingStatusFilterInfo == null)
-                    _reportingStatusFilterInfo = OptionSelect.GetCheckedString(ReportingStatusOptions);
 
-                return _reportingStatusFilterInfo;
-            }
-        }
-
-        public EmployerSearchModel GetEmployer(string employerIdentifier)
-        {
-            //Get the employer from the last search results
-            return Employers?.Results?.FirstOrDefault(e => e.OrganisationIdEncrypted == employerIdentifier);
-        }
+        //public OrganisationSearchModel GetOrganisation(string organisationIdentifier)
+        //{
+        //    //Get the organisation from the last search results
+        //    return Organisations?.Results?.FirstOrDefault(e => e.OrganisationIdEncrypted == organisationIdentifier);
+        //}
 
         [Serializable]
-        public class SicSection
+        public class SectorTypeViewModel
         {
-            public string SicSectionCode { get; set; }
+            public short SectorTypeId { get; set; }
 
             public string Description { get; set; }
         }
