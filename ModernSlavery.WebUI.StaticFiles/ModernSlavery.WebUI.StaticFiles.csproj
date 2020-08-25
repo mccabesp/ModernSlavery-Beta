@@ -48,4 +48,8 @@
     </Content>
   </ItemGroup>
 
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="npm install&#xD;&#xA;npm rebuild" />
+  </Target>
+
 </Project>
