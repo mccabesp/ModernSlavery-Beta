@@ -480,8 +480,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Create the view model
             var viewModel = await CreateReviewPageViewModelAsync(statementModel);
 
-            //Set the flag so we now always return to the review page
-            if (!viewModel.ReturnToReviewPage)
+            //Set the flag so we now always return to the review page when we have some content
+            if (!viewModel.ReturnToReviewPage && !statementModel.IsEmpty())
             {
                 statementModel.ReturnToReviewPage = true;
                 await SubmissionPresenter.SaveStatementModelAsync(statementModel);

@@ -2,7 +2,7 @@
     Layout = "/Views/GdsLayout.cshtml";
     var relevantIndex = 0;
     var highIndex = 0;
-    var locationIndex = 0;   
+    var locationIndex = 0;
 }
 @model SupplyChainRisksPageViewModel
 <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
@@ -135,7 +135,7 @@
                                             </div>
                                             { highIndex++; }
                                         }
-                                    </div>                                    
+                                    </div>
                                 </div>
                                 <div class="total">
                                     <h3 class="govuk-body-m">
@@ -169,16 +169,16 @@
                     <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-location-risks">
                         @foreach (var parentType in Model.RiskTypes.Where(t => t.Category == "Location" && t.ParentId == null))
                         {
-                            <div class="govuk-accordion__section accordion-with-counts">                               
-                                    <div class="govuk-accordion__section-header">
-                                        <h3 class="govuk-accordion__section-heading">
-                                            <span class="govuk-accordion__section-button" id="accordion-location-risks-heading-@parentType.Id">
-                                                @parentType.Description
-                                            </span>
-                                        </h3>
-                                    </div>
+                            <div class="govuk-accordion__section accordion-with-counts">
+                                <div class="govuk-accordion__section-header">
+                                    <h3 class="govuk-accordion__section-heading">
+                                        <span class="govuk-accordion__section-button" id="accordion-location-risks-heading-@parentType.Id">
+                                            @parentType.Description
+                                        </span>
+                                    </h3>
+                                </div>
 
-                              
+
 
                                 <div id="accordion-location-risks-content-@parentType.Id" class="govuk-accordion__section-content" aria-labelledby="accordion-location-risks-heading-@parentType.Id">
 
@@ -208,7 +208,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>                                                                 
+                                    </div>
                                 </div>
                                 <div class="total">
                                     <h3 class="govuk-body-m">
@@ -238,3 +238,26 @@
     </div>
 
 </div>
+@section AfterLoadedCompiledScripts {
+    <script>
+        (function () {
+            "use strict";
+
+            LimitRisks();
+
+            $('input[id^=HighId]').on('change', function (evt) {
+                LimitRisks();
+            });
+
+            function LimitRisks() {
+                var checkedCount = $('input[id^=HighId]:checked').length;
+                if (checkedCount >= 3) {
+                    $('input[id^=HighId]:not(:checked)').attr("disabled", "disabled")
+                }
+                else {
+                    $('input[id^=HighId]').removeAttr("disabled")
+                }
+            }
+        }());
+    </script>
+}
