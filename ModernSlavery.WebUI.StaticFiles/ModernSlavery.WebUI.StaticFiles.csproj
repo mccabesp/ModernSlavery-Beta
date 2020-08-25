@@ -48,7 +48,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="npm install&#xD;&#xA;npm rebuild&#xD;&#xA;dotnet bundle&#xD;&#xA;" />
+    <Exec Command="npm install&#xD;&#xA;npm rebuild&#xD;&#xA;" />
   </Target>
 
 </Project>
