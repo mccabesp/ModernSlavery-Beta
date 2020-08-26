@@ -85,7 +85,8 @@ namespace ModernSlavery.Infrastructure.Hosts
                 hostBuilderContext.Configuration.SetupSerilogLogger();
 
                 loggingBuilder.AddAzureQueueLogger(); //Use the custom logger
-                loggingBuilder.AddApplicationInsights(); //log to app insights
+                var instrumentationKey = hostBuilderContext.Configuration["ApplicationInsights:InstrumentationKey"];
+                loggingBuilder.AddApplicationInsights(instrumentationKey); //log to app insights
                 loggingBuilder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
             });
 
