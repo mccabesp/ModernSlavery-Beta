@@ -139,7 +139,7 @@ namespace ModernSlavery.Hosts.Webjob
                     // Summary:
                     //     Triggered when the application host has fully started and is about to wait for
                     //     a graceful shutdown.
-                    _logger.LogInformation("Application Started");
+                    _logger.LogInformation("Webjobs Application Started");
                 });
             applicationLifetime.ApplicationStopping.Register(
                 () =>
@@ -147,7 +147,7 @@ namespace ModernSlavery.Hosts.Webjob
                     // Summary:
                     //     Triggered when the application host is performing a graceful shutdown. Requests
                     //     may still be in flight. Shutdown will block until this event completes.
-                    _logger.LogInformation("Application Stopping");
+                    _logger.LogInformation("Webjobs Application Stopping");
                 });
         }
 
