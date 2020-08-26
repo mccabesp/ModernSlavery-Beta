@@ -513,8 +513,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     //Handle any StatementErrors
                     if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
+                    var statementModel = openResult.Result;
+
                     //Create the view model
-                    viewModel = await CreateReviewPageViewModelAsync(openResult.Result);
+                    viewModel = await CreateReviewPageViewModelAsync(statementModel);
 
                     //set the navigation urls
                     SetNavigationUrl(viewModel);
@@ -530,6 +532,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                     //Handle any StatementErrors
                     if (viewModelSubmitResult.Fail) return HandleStatementErrors(openResult.Errors);
+
+                    //Stash the viewmodel for the complete page
+                    var submissionCompleteViewModel = SubmissionPresenter.GetViewModelFromStatementModel<SubmissionCompleteViewModel>(statementModel);
+                    StashModel(submissionCompleteViewModel);
 
                     //Redirect to the continue url
                     return Redirect(GetCompleteUrl());
@@ -730,7 +736,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/submission-complete")]
         public async Task<IActionResult> SubmissionComplete(string organisationIdentifier, int year)
         {
-            return await GetAsync<SubmissionCompleteViewModel>(organisationIdentifier, year);
+            var viewModel = UnstashModel<SubmissionCompleteViewModel>(true);
+            if (viewModel == null) throw new Exception("Could not unstash SubmissionCompleteViewModel");
+
+            SetNavigationUrl(viewModel);
+
+            //Otherwise return the view using the populated ViewModel
+            return View(viewModel);
         }
 
         #endregion
