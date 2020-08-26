@@ -82,7 +82,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             // the following fields are validatable at this stage
             ModelState.Include(
-                nameof(EnterCodesViewModel.EmployerReference),
+                nameof(EnterCodesViewModel.OrganisationReference),
                 nameof(EnterCodesViewModel.SecurityToken));
 
             // When ModelState is Not Valid Then Return the EnterCodes View
@@ -400,7 +400,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // when not auth then save codes and return ManageOrganisations redirect
             if (!stateModel.IsSecurityCodeExpired)
                 PendingFasttrackCodes =
-                    $"{stateModel.EnterCodes.EmployerReference}:{stateModel.EnterCodes.SecurityToken}:{stateModel.EnterAnswers?.FirstName}:{stateModel.EnterAnswers?.LastName}:{stateModel.EnterAnswers?.EmailAddress}";
+                    $"{stateModel.EnterCodes.OrganisationReference}:{stateModel.EnterCodes.SecurityToken}:{stateModel.EnterAnswers?.FirstName}:{stateModel.EnterAnswers?.LastName}:{stateModel.EnterAnswers?.EmailAddress}";
 
             return RedirectToAction(Url.Action(nameof(SubmissionController.ManageOrganisations)));
         }

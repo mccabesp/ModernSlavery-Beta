@@ -3,7 +3,7 @@
     Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Confirm your organisation - Modern Slavery reporting service";
     var emailAdd = sharedOptions.MsuReportingEmail;
-    var emailSubject = WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));
+    var emailSubject = WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.OrganisationReference));
 
     // c# 6 doesnt compile with razor in mvc5 so cant use string templates here :( need to update to MVC 6
     var mailto = string.Join("", "mailto:", emailAdd, "?subject=", emailSubject);
