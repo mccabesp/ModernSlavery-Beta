@@ -11,7 +11,7 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         public string OrganisationAddress { get; set; }
 
-        public DateTime AccountingDate { get; set; }
+        public DateTime DeadlineDate { get; set; }
 
         public string CampaignId { get; set; } = "-1";
 
