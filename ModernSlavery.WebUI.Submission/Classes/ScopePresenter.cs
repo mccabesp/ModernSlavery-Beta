@@ -116,7 +116,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
 
             if (!years.Any()) throw new ArgumentNullException(nameof(years));
 
-            //Get the organisation with this employer reference
+            //Get the organisation with this organisation reference
             var org = model.OrganisationId == 0
                 ? null
                 : await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(o =>
@@ -159,12 +159,12 @@ namespace ModernSlavery.WebUI.Submission.Classes
 
             if (model.IsSecurityCodeExpired) throw new ArgumentOutOfRangeException(nameof(model.IsSecurityCodeExpired));
 
-            // get the organisation by EmployerReference
-            var org = await GetOrgByEmployerReferenceAsync(model.EnterCodes.OrganisationReference);
+            // get the organisation by OrganisationReference
+            var org = await GetOrgByOrganisationReferenceAsync(model.EnterCodes.OrganisationReference);
             if (org == null)
                 throw new ArgumentOutOfRangeException(
                     nameof(model.EnterCodes.OrganisationReference),
-                    $"Cannot find organisation with EmployerReference: {model.EnterCodes.OrganisationReference} in the database");
+                    $"Cannot find organisation with OrganisationReference: {model.EnterCodes.OrganisationReference} in the database");
 
             // can only save a presumed scope in the prev or current year
             var currentReportingDeadline = _sharedBusinessLogic.GetReportingDeadline(org.SectorType);
@@ -200,10 +200,10 @@ namespace ModernSlavery.WebUI.Submission.Classes
             await ScopeBusinessLogic.SaveScopeAsync(org, true, newScope);
         }
 
-        public async Task<Organisation> GetOrgByEmployerReferenceAsync(string employerReference)
+        public async Task<Organisation> GetOrgByOrganisationReferenceAsync(string organisationReference)
         {
             var org = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(o =>
-                o.OrganisationReference == employerReference);
+                o.OrganisationReference == organisationReference);
             return org;
         }
     }

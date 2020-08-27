@@ -74,8 +74,8 @@
         <form method="GET" action="@(Url.Action("SearchGet", "AdminSearch"))">
             <div class="govuk-form-group @(Model.Error != null ? "govuk-form-group--error" : "")">
                 <label class="govuk-label" for="search-query">
-                    <b>Organisation:</b> current name, previous name, employer reference, company number
-                    <br/>
+                    <b>Organisation:</b> current name, previous name, organisation reference, company number
+                    <br />
                     <b>User:</b> name, email address
                 </label>
                 @if (Model.Error != null)
@@ -132,18 +132,18 @@
 
                                     @foreach (var previousName in organisation.OrganisationPreviousNames)
                                     {
-                                        <br/>
+                                        <br />
                                         @:previously @(HighlightMatches(previousName))
                                     }
 
-                                    @if (organisation.EmployerRef != null)
+                                    @if (organisation.OrganisationRef != null)
                                     {
-                                        <br/>
-                                        @:Employer ref: <b>@(organisation.EmployerRef)</b>
+                                        <br />
+                                        @:Organisation ref: <b>@(organisation.OrganisationRef)</b>
                                     }
                                     @if (organisation.CompanyNumber != null)
                                     {
-                                        <br/>
+                                        <br />
                                         @:Company number: <b>@(organisation.CompanyNumber)</b>
                                     }
                                 </td>

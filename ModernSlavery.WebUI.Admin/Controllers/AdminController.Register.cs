@@ -143,7 +143,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (string.IsNullOrWhiteSpace(code))
             {
-                //Load the employers from session
+                //Load the organisation from session
                 model = UnstashModel<OrganisationViewModel>();
                 if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1114));
             }
@@ -298,7 +298,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            //Make sure we can load employers from session
+            //Make sure we can load organisations from session
             var m = UnstashModel<OrganisationViewModel>();
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
@@ -551,7 +551,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             _adminService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation,
                 userOrg.User);
 
-            //Ensure the organisation has an employer reference
+            //Ensure the organisation has an organisation reference
             if (userOrg.PINConfirmedDate.HasValue && string.IsNullOrWhiteSpace(userOrg.Organisation.OrganisationReference))
                 await _adminService.OrganisationBusinessLogic.SetUniqueOrganisationReferenceAsync(userOrg.Organisation);
 
@@ -587,7 +587,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            //Make sure we can load employers from session
+            //Make sure we can load organisations from session
             var model = UnstashModel<OrganisationViewModel>();
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
@@ -607,7 +607,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            //Load the employers from session
+            //Load the organisations from session
             var m = UnstashModel<OrganisationViewModel>();
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
@@ -673,7 +673,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (!await SendRegistrationDeclinedAsync(
                 emailAddress,
                 string.IsNullOrWhiteSpace(model.CancellationReason)
-                    ? "We haven't been able to verify your employer's identity. So we have declined your application."
+                    ? "We haven't been able to verify your organisation's identity. So we have declined your application."
                     : model.CancellationReason))
             {
                 ModelState.AddModelError(1131);
