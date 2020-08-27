@@ -467,7 +467,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 var draftExpired = draftStatement.EditTimestamp.AddMinutes(_submissionOptions.DraftTimeoutMinutes) < VirtualDateTime.Now;
 
                 //If the draft has expired then remember to create a backup
-                createBackup = draftExpired;
+                createBackup = true;
 
                 //Check the existing draft is not still locked by another user
                 if (draftStatement.EditorUserId > 0 && draftStatement.EditorUserId != userId && !draftExpired)

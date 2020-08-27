@@ -21,7 +21,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         public bool CanChangeScope { get; set; }
 
         public bool SubmissionAvailable => StatementInfo.SubmittedStatementModifiedDate != null;
-        public bool DraftAvailable => StatementInfo.DraftStatementModifiedDate!=null;
+        public bool DraftAvailable => StatementInfo.DraftStatementModifiedDate!=null && !StatementInfo.DraftStatementIsEmpty;
 
         public string ButtonText
         {

@@ -169,12 +169,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             ApplyUserContactDetails(CurrentUser, stateModel);
 
             // Save user as in scope
-            var snapshotYears = new HashSet<int> { stateModel.AccountingDate.Year };
-            await ScopePresentation.SaveScopesAsync(stateModel, snapshotYears);
+            var years = new HashSet<int> { stateModel.DeadlineDate.Year };
+            await ScopePresentation.SaveScopesAsync(stateModel, years);
 
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            var currentSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType);
-            if (stateModel.AccountingDate == currentSnapshotDate)
+            var currentDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
+            if (stateModel.DeadlineDate == currentDeadlineDate)
             {
                 var emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
                 foreach (var emailAddress in emailAddressesForOrganisation)
@@ -335,16 +335,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             ApplyUserContactDetails(CurrentUser, stateModel);
 
             // Save user as out of scope
-            var snapshotYears = new HashSet<int> { stateModel.AccountingDate.Year };
-            if (!stateModel.IsChangeJourney) snapshotYears.Add(stateModel.AccountingDate.Year - 1);
+            // TODO James - review snapshot year, it will be submission deadlines how does this impact?
+            var years = new HashSet<int> { stateModel.DeadlineDate.Year };
+            if (!stateModel.IsChangeJourney) years.Add(stateModel.DeadlineDate.Year - 1);
 
-            await ScopePresentation.SaveScopesAsync(stateModel, snapshotYears);
+            await ScopePresentation.SaveScopesAsync(stateModel, years);
 
             StashModel(stateModel);
 
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            var currentSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType);
-            if (stateModel.AccountingDate == currentSnapshotDate)
+            var currentDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
+            if (stateModel.DeadlineDate == currentDeadlineDate)
             {
                 var emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
                 foreach (var emailAddress in emailAddressesForOrganisation)
@@ -538,7 +539,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var stateModel = ScopePresentation.CreateScopingViewModel(userOrg.Organisation, CurrentUser);
 
             // Get the latest scope for the reporting year
-            var latestScope = stateModel.ThisScope?.SnapshotDate.Year == reportingDeadlineYear ? stateModel.ThisScope :
+            var latestScope = stateModel.ThisScope?.DeadlineDate.Year == reportingDeadlineYear ? stateModel.ThisScope :
                 stateModel.LastScope;
             //TODO: check logic for this one
             // stateModel.LastScope.SnapshotDate.Year == reportingDeadlineYear ? stateModel.LastScope : null;
@@ -547,7 +548,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             stateModel.StartUrl = Url.Action("ManageOrganisation",
                 new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(organisationId.ToString()) });
             stateModel.IsChangeJourney = true;
-            stateModel.AccountingDate = latestScope.SnapshotDate;
+            stateModel.DeadlineDate = latestScope.DeadlineDate;
 
             //Set the in/out journey type
             stateModel.IsOutOfScopeJourney =

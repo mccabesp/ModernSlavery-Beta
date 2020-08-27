@@ -65,7 +65,7 @@ namespace ModernSlavery.Core.Classes
 
             var reportingStartDate = new DateTime(year, tempMonth, tempDay).Date.AddDays(1);
 
-            return reportingStartDate< now ? reportingStartDate.AddYears(-1) : reportingStartDate;
+            return reportingStartDate < now ? reportingStartDate.AddYears(-1) : reportingStartDate;
         }
         public DateTime GetReportingDeadline(SectorTypes sectorType, int reportingDeadlineYear = 0)
         {
