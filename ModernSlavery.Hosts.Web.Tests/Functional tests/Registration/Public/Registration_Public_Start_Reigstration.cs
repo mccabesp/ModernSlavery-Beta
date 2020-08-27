@@ -16,7 +16,7 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Bug raised in 3112, test case to be fixed once resolved")]
+    [TestFixture]
     public class Registration_Public_Start_Reigstration : CreateAccount
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
@@ -24,7 +24,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public Registration_Public_Start_Reigstration() : base(_firstname, _lastname, _title, _email, _password)
         {
         }
-        [Test, Order(20), Ignore("Bug raised in 3112, test case to be fixed once resolved")]
+        [Test, Order(20)]
         public async Task NavigateToOrgPage()
         {
             Click("Register an organisation");
@@ -41,7 +41,7 @@ namespace ModernSlavery.Hosts.Web.Tests
                 }
 
 
-        [Test, Order(22), Ignore("Bug raised in 3112, test case to be fixed once resolved")]
+        [Test, Order(22)]
         public async Task SearchForOrg()
         { 
             SetXPath("//input[@id='SearchText']").To(Registration.OrgName_Blackpool);
@@ -50,21 +50,21 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectRow("Organisation name and registered address");
             ExpectRow(That.Contains, Registration.OrgName_Blackpool);
-            ExpectRow(That.Contains, Registration.RegisteredAddress_Blackpool);
+            
 
             //message should not appear with single result 
             ExpectNo(What.Contains, "Showing 1-");
 
             await Task.CompletedTask;
         }
-        [Test, Order(24), Ignore("Bug raised in 3112, test case to be fixed once resolved")]
+        [Test, Order(24)]
 
         public async Task SelectOrg()
         {
             ClickButton(That.Contains, "Choose");
 
-            ExpectHeader("Address of the organisation you`re reporting for");
-            ExpectText("Enter the correspondence address for the organisation whose Modern Slavery statement you’re reporting.");
+            ExpectHeader("Your organisation's address");
+            ExpectText("Enter the correspondence address of the organisation you want to register.");
 
             await Task.CompletedTask;
 

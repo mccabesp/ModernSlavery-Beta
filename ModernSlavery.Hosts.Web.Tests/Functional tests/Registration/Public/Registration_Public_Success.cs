@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting fix for public registration in 3113")]
+    [TestFixture]
 
     public class Registration_Public_Success : Registration_Public_Start_Reigstration
     {

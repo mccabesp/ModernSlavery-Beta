@@ -16,7 +16,7 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Bug raised in 3112, test case to be fixed and broken down once resolved")]
+    [TestFixture]
     public class Registration_Public_Cant_Find_Your_Org_Success : CreateAccount
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
@@ -38,11 +38,11 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Find your organisation");
 
-            SetXPath("//input[@id='SearchText']").To(Registration.OrgName_Blackpool);
+            SetXPath("//input[@id='SearchText']").To("Not a real organisation name");
             Click(The.Bottom, "Search");
 
 
-            Expect("0 employers found that match your search");
+            Expect("0 organisations found that match your search");
 
             //message should not appear with single result 
             ExpectNo(What.Contains, "Showing 1-");
@@ -50,10 +50,10 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Can't find your organisation?");
             Click("Tell us about your organisation");
 
-            ExpectHeader(That.Contains, "Details of the organisation you're");
+            ExpectHeader(That.Contains, "Details of the organisation you want to register");
 
             //org name pre-filled by search
-            AtField("Organisation name").Expect(Registration.OrgName_Blackpool);
+            AtField("Organisation name").Expect("Not a real organisation name");
 
 
             Expect("Enter one or more unique references to help identify your organisation:");

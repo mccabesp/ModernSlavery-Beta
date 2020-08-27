@@ -16,7 +16,7 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore ("Awaiting Fixes to can't find your organisaiton paths, item 3113")]
+    [TestFixture]
     public class Private_Registration_Contact_Details_Mandatory_Fields : CreateAccount
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
