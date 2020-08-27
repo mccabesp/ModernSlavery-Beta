@@ -17,8 +17,6 @@
         {
             @Html.AntiForgeryToken()
 
-            var reportDateFormatter = new GDSDateFormatter(Model.AccountingDate);
-
             <a class="link-back" href="@Model.StartUrl">Back <span class="visuallyhidden"> to the previous question</span></a>
 
             <h1 class="heading-large">

@@ -1,0 +1,17 @@
+﻿@model ScopingViewModel
+@{
+    var deadlineName = "Deadline date";
+    var deadlineDateFmt = "";
+    if (!Model.IsChangeJourney && Model.IsOutOfScopeJourney)
+    {
+        deadlineName += "s";
+        deadlineDateFmt = $"{new GDSDateFormatter(Model.DeadlineDate.AddYears(-1)).FullStartDate} and {deadlineDateFmt = new GDSDateFormatter(Model.DeadlineDate).FullStartDate}";
+    }
+    else
+    {
+        deadlineDateFmt = new GDSDateFormatter(Model.DeadlineDate).FullStartDate;
+    }
+}
+@await Html.PartialModelAsync(new CheckYourAnswers(
+    new CheckYourAnswer(deadlineName, deadlineDateFmt, "DeadlineDate")
+    ))
