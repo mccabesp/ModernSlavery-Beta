@@ -188,7 +188,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
 
-        [HttpGet("out/confirm-employer")]
+        [HttpGet("out/confirm-organisation")]
         public async Task<IActionResult> ConfirmOutOfScopeDetails()
         {
             // When User is Admin then redirect to Admin\Home
@@ -205,7 +205,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        [HttpPost("out/confirm-employer")]
+        [HttpPost("out/confirm-organisation")]
         public async Task<IActionResult> ConfirmOutOfScopeDetails(string command)
         {
             // When User is Admin then redirect to Admin\Home

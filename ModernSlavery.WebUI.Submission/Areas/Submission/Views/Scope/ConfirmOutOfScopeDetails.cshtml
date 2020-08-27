@@ -3,7 +3,7 @@
     Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Confirm your organisation - Modern Slavery reporting service";
     var emailAdd = sharedOptions.MsuReportingEmail;
-    var emailSubject = WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.OrganisationReference));
+    var emailSubject = WebUtility.UrlEncode(string.Format("Wrong Organisation Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.OrganisationReference));
 
     // c# 6 doesnt compile with razor in mvc5 so cant use string templates here :( need to update to MVC 6
     var mailto = string.Join("", "mailto:", emailAdd, "?subject=", emailSubject);
@@ -21,7 +21,7 @@
                 Confirm your organisation’s details
             </h1>
 
-            @await Html.PartialAsync("Parts/EmployerDetailsPart", Model)
+            @await Html.PartialAsync("Parts/OrganisationDetailsPart", Model)
 
             <div class="govuk-inset-text">
                 If this information is not correct, please email <a href="@mailto" target="_blank">@sharedOptions.MsuReportingEmail</a>
