@@ -126,7 +126,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public static void NavigateToSubmission(UIContext ui, string Organistion, string YearFrom, string YearTo)
         {
-            ui.Click("Mange Organisations");
+            ui.Click("Manage Organisations");
             ui.ExpectHeader("Select an organisation");
 
             ui.Click("Organisation");

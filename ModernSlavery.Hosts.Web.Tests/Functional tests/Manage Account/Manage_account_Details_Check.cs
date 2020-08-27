@@ -51,6 +51,15 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //todo find out about phone number field
             //AtText("Phone number").Expect("");
+
+            ExpectHeader("Contact preferneces");
+            Expect("I would like to receive information about webinars, events and new guidance");
+            Expect("I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys");
+
+            ExpectHeader("Help us improve this service");
+            Expect("We want to understand what our users want so that we can create a better service. Take part in our survey and make your voice heard.");
+
+            Expect("Complete our Survey");
             await Task.CompletedTask;
 
         }
