@@ -467,7 +467,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 Action = ManualActions.Update,
                                 Source = CurrentUser.EmailAddress,
                                 Comment = comment,
-                                ReferenceName = nameof(Organisation.EmployerReference),
+                                ReferenceName = nameof(Organisation.OrganisationReference),
                                 ReferenceValue = employerRef,
                                 TargetName = nameof(Organisation.OrganisationScopes)
                             });
@@ -515,7 +515,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     org.LatestRegistration = latestReg;
                     subCount++;
                     writer.WriteLine(
-                        $"{subCount:000}: Organisation '{org.EmployerReference}:{org.OrganisationName}' missing a latest registration {(test ? "will be" : "was successfully")} fixed");
+                        $"{subCount:000}: Organisation '{org.OrganisationReference}:{org.OrganisationName}' missing a latest registration {(test ? "will be" : "was successfully")} fixed");
                 }
             }
 
@@ -542,7 +542,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     org.LatestStatement = latestStatement;
                     subCount++;
                     writer.WriteLine(
-                        $"{subCount:000}: Organisation '{org.EmployerReference}:{org.OrganisationName}' missing a latest statement {(test ? "will be" : "was successfully")} fixed");
+                        $"{subCount:000}: Organisation '{org.OrganisationReference}:{org.OrganisationName}' missing a latest statement {(test ? "will be" : "was successfully")} fixed");
                 }
             }
 
@@ -570,7 +570,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     org.LatestScope = latestScope;
                     subCount++;
                     writer.WriteLine(
-                        $"{subCount:000}: Organisation '{org.EmployerReference}:{org.OrganisationName}' missing a latest scope {(test ? "will be" : "was successfully")} fixed");
+                        $"{subCount:000}: Organisation '{org.OrganisationReference}:{org.OrganisationName}' missing a latest scope {(test ? "will be" : "was successfully")} fixed");
                 }
             }
 
@@ -646,7 +646,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == employerRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -683,7 +683,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 methodName,
                                 ManualActions.Update,
                                 CurrentUser.EmailAddress,
-                                nameof(Organisation.EmployerReference),
+                                nameof(Organisation.OrganisationReference),
                                 employerRef,
                                 nameof(Organisation.CompanyNumber),
                                 oldValue,
@@ -735,7 +735,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 // ensure the employer ref exists
                 var org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
+                    .FirstOrDefault(o => o.OrganisationReference.ToLower() == employerRef.ToLower());
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -827,7 +827,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             methodName,
                             ManualActions.Update,
                             CurrentUser.EmailAddress,
-                            nameof(Organisation.EmployerReference),
+                            nameof(Organisation.OrganisationReference),
                             employerRef,
                             nameof(Organisation.OrganisationSicCodes),
                             oldValue,
@@ -878,7 +878,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 // ensure the employer ref exists
                 var org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
+                    .FirstOrDefault(o => o.OrganisationReference.ToLower() == employerRef.ToLower());
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -1007,7 +1007,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             methodName,
                             ManualActions.Update,
                             CurrentUser.EmailAddress,
-                            nameof(Organisation.EmployerReference),
+                            nameof(Organisation.OrganisationReference),
                             employerRef,
                             nameof(Organisation.LatestAddress),
                             oldValue,
@@ -1057,7 +1057,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 // ensure the employer ref exists
                 var org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
+                    .FirstOrDefault(o => o.OrganisationReference.ToLower() == employerRef.ToLower());
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -1158,7 +1158,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             methodName,
                             ManualActions.Update,
                             CurrentUser.EmailAddress,
-                            nameof(Organisation.EmployerReference),
+                            nameof(Organisation.OrganisationReference),
                             employerRef,
                             nameof(Organisation.LatestPublicSectorType),
                             oldValue,
@@ -1230,7 +1230,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 processedNumbers.Add(newValue);
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == employerRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -1273,7 +1273,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 methodName,
                                 ManualActions.Update,
                                 CurrentUser.EmailAddress,
-                                nameof(Organisation.EmployerReference),
+                                nameof(Organisation.OrganisationReference),
                                 employerRef,
                                 nameof(Organisation.DUNSNumber),
                                 oldValue,
@@ -1322,7 +1322,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 processed.Add(employerRef);
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == employerRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -1428,12 +1428,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     Action = ManualActions.Update,
                     Source = CurrentUser.EmailAddress,
                     Comment = comment,
-                    ReferenceName = nameof(Organisation.EmployerReference),
+                    ReferenceName = nameof(Organisation.OrganisationReference),
                     ReferenceValue = employerRef
                 };
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == employerRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -1511,7 +1511,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 processed.Add(employerRef);
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == employerRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -1541,7 +1541,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 methodName,
                                 ManualActions.Update,
                                 CurrentUser.EmailAddress,
-                                nameof(Organisation.EmployerReference),
+                                nameof(Organisation.OrganisationReference),
                                 employerRef,
                                 nameof(Organisation.Status),
                                 oldValue.ToString(),
@@ -1596,7 +1596,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var newSector = SectorTypes.Public;
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == employerRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -1649,7 +1649,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     methodName,
                                     ManualActions.Update,
                                     CurrentUser.EmailAddress,
-                                    nameof(Organisation.EmployerReference),
+                                    nameof(Organisation.OrganisationReference),
                                     employerRef,
                                     nameof(Organisation.SectorType),
                                     oldSector.ToString(),
@@ -1674,7 +1674,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     methodName,
                                     ManualActions.Create,
                                     CurrentUser.EmailAddress,
-                                    nameof(Organisation.EmployerReference),
+                                    nameof(Organisation.OrganisationReference),
                                     employerRef,
                                     nameof(OrganisationSicCode),
                                     null,
@@ -1777,7 +1777,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var newSector = SectorTypes.Private;
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == employerRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -1829,7 +1829,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     methodName,
                                     ManualActions.Update,
                                     CurrentUser.EmailAddress,
-                                    nameof(Organisation.EmployerReference),
+                                    nameof(Organisation.OrganisationReference),
                                     employerRef,
                                     nameof(Organisation.SectorType),
                                     oldSector.ToString(),
@@ -1849,7 +1849,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         methodName,
                                         ManualActions.Delete,
                                         CurrentUser.EmailAddress,
-                                        nameof(Organisation.EmployerReference),
+                                        nameof(Organisation.OrganisationReference),
                                         employerRef,
                                         nameof(OrganisationSicCode),
                                         JsonConvert.SerializeObject(
@@ -1974,7 +1974,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == employerRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -2006,7 +2006,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 methodName,
                                 ManualActions.Update,
                                 CurrentUser.EmailAddress,
-                                nameof(Organisation.EmployerReference),
+                                nameof(Organisation.OrganisationReference),
                                 employerRef,
                                 nameof(Organisation.OrganisationName),
                                 oldValue,
@@ -2021,7 +2021,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 methodName,
                                 ManualActions.Create,
                                 CurrentUser.EmailAddress,
-                                nameof(Organisation.EmployerReference),
+                                nameof(Organisation.OrganisationReference),
                                 employerRef,
                                 nameof(Organisation.OrganisationName),
                                 oldValue,
@@ -2080,7 +2080,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == employerRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -2114,7 +2114,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     methodName,
                                     ManualActions.Update,
                                     CurrentUser.EmailAddress,
-                                    nameof(Organisation.EmployerReference),
+                                    nameof(Organisation.OrganisationReference),
                                     employerRef,
                                     nameof(Organisation.OrganisationName),
                                     oldValue,
@@ -2132,7 +2132,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         methodName,
                                         ManualActions.Delete,
                                         CurrentUser.EmailAddress,
-                                        nameof(Organisation.EmployerReference),
+                                        nameof(Organisation.OrganisationReference),
                                         employerRef,
                                         nameof(OrganisationName),
                                         JsonConvert.SerializeObject(
@@ -2159,7 +2159,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     methodName,
                                     ManualActions.Create,
                                     CurrentUser.EmailAddress,
-                                    nameof(Organisation.EmployerReference),
+                                    nameof(Organisation.OrganisationReference),
                                     employerRef,
                                     nameof(Organisation.OrganisationName),
                                     oldValue,
@@ -2274,7 +2274,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 Action = manualAction,
                                 Source = CurrentUser.EmailAddress,
                                 Comment = comment,
-                                ReferenceName = nameof(Organisation.EmployerReference),
+                                ReferenceName = nameof(Organisation.OrganisationReference),
                                 ReferenceValue = employerRef,
                                 TargetName = nameof(Organisation.SecurityCode),
                                 TargetNewValue = serialisedInfo
@@ -2382,7 +2382,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     Action = manualAction,
                                     Source = CurrentUser.EmailAddress,
                                     Comment = comment,
-                                    ReferenceName = nameof(Organisation.EmployerReference),
+                                    ReferenceName = nameof(Organisation.OrganisationReference),
                                     ReferenceValue = employerRef,
                                     TargetName = nameof(Organisation.SecurityCode),
                                     TargetNewValue = serialisedInfo

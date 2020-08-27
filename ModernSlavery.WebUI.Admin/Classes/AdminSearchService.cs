@@ -159,7 +159,7 @@ namespace ModernSlavery.WebUI.Admin.Classes
                     OrganisationId = o.OrganisationId,
                     OrganisationName = o.OrganisationName,
                     CompanyNumber = o.CompanyNumber,
-                    EmployerReference = o.EmployerReference,
+                    EmployerReference = o.OrganisationReference,
                     OrganisationNames = o.OrganisationNames.Select(on => on.Name).ToList()
                 })
                 .ToList();

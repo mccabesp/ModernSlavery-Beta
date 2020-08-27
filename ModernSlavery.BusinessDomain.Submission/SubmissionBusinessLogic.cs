@@ -97,7 +97,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                         OrganisationId = j.r.OrganisationId,
                         OrganisationName = j.r.Organisation.OrganisationName,
                         DUNSNumber = j.r.Organisation.DUNSNumber,
-                        EmployerReference = j.r.Organisation.EmployerReference,
+                        OrganisationReference = j.r.Organisation.OrganisationReference,
                         CompanyNumber = j.r.Organisation.CompanyNumber,
                         SectorType = j.r.Organisation.SectorType,
                         ScopeStatus = j.os?.ScopeStatus,

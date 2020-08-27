@@ -156,7 +156,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         {
                             OrganisationId = vo.OrganisationId,
                             DUNSNumber = vo.DUNSNumber,
-                            EmployerReference = vo.EmployerReference,
+                            OrganisationReference = vo.OrganisationReference,
                             Sector = vo.SectorType,
                             LatestUserJobTitle = latestRegistrationUser.JobTitle,
                             LatestUserFullName = latestRegistrationUser.Fullname,

@@ -27,7 +27,7 @@ namespace ModernSlavery.Core.Entities
 
         public override string ToString()
         {
-            return $"ref:{EmployerReference}, name:{OrganisationName}";
+            return $"ref:{OrganisationReference}, name:{OrganisationName}";
         }
         #endregion
 
@@ -327,7 +327,7 @@ namespace ModernSlavery.Core.Entities
         {
             var previousStatus = PreviousStatus
                                  ?? throw new InvalidOperationException(
-                                     $"The list of Statuses for Organisation '{OrganisationName}' employerReference '{EmployerReference}' isn't long enough to perform a '{nameof(RevertToLastStatus)}' command. It needs to have at least 2 statuses so these can reverted.");
+                                     $"The list of Statuses for Organisation '{OrganisationName}' organisationReference '{OrganisationReference}' isn't long enough to perform a '{nameof(RevertToLastStatus)}' command. It needs to have at least 2 statuses so these can reverted.");
 
             SetStatus(previousStatus.Status, byUserId, details);
         }

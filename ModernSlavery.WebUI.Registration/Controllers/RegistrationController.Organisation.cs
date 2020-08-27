@@ -443,9 +443,9 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                         .FirstOrDefault(o => o.CompanyNumber != null && o.CompanyNumber == organisation.CompanyNumber);
 
-                if (org == null && !string.IsNullOrWhiteSpace(organisation.EmployerReference))
+                if (org == null && !string.IsNullOrWhiteSpace(organisation.OrganisationReference))
                     org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                        .FirstOrDefault(o => o.EmployerReference == organisation.EmployerReference);
+                        .FirstOrDefault(o => o.OrganisationReference == organisation.OrganisationReference);
 
                 if (org != null)
                 {
@@ -454,7 +454,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     {
                         Logger.LogWarning(
                             $"Attempt to register a {org.Status} organisation",
-                            $"Organisation: '{org.OrganisationName}' Reference: '{org.EmployerReference}' User: '{VirtualUser.EmailAddress}'");
+                            $"Organisation: '{org.OrganisationName}' Reference: '{org.OrganisationReference}' User: '{VirtualUser.EmailAddress}'");
                         return View("CustomError", WebService.ErrorViewModelFactory.Create(1149));
                     }
 
@@ -872,7 +872,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             {
                 Logger.LogWarning(
                     $"Attempt to register a {org.Status} organisation",
-                    $"Organisation: '{org.OrganisationName}' Reference: '{org.EmployerReference}' User: '{VirtualUser.EmailAddress}'");
+                    $"Organisation: '{org.OrganisationName}' Reference: '{org.OrganisationReference}' User: '{VirtualUser.EmailAddress}'");
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1149));
             }
 
@@ -1647,8 +1647,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
                         //Ensure the organisation has an organisation reference
-                        if (string.IsNullOrWhiteSpace(tempUserOrg.Organisation.EmployerReference))
-                            await _registrationService.OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(
+                        if (string.IsNullOrWhiteSpace(tempUserOrg.Organisation.OrganisationReference))
+                            await _registrationService.OrganisationBusinessLogic.SetUniqueOrganisationReferenceAsync(
                                 tempUserOrg.Organisation);
 
                         SharedBusinessLogic.DataRepository.CommitTransaction();

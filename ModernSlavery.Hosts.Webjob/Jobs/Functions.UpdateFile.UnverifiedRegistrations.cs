@@ -74,7 +74,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         {
                             uo.Organisation.OrganisationId,
                             uo.Organisation.DUNSNumber,
-                            uo.Organisation.EmployerReference,
+                            uo.Organisation.OrganisationReference,
                             uo.Organisation.OrganisationName,
                             CompanyNo = uo.Organisation.CompanyNumber,
                             Sector = uo.Organisation.SectorType,

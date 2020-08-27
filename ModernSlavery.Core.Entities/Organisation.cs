@@ -28,7 +28,7 @@ namespace ModernSlavery.Core.Entities
         public DateTime Created { get; set; } = VirtualDateTime.Now;
         public DateTime Modified { get; set; } = VirtualDateTime.Now;
         public string DUNSNumber { get; set; }
-        public string EmployerReference { get; set; }
+        public string OrganisationReference { get; set; }
         public DateTime? DateOfCessation { get; set; }
         public long? LatestAddressId { get; set; }
         public long? LatestStatementId { get; set; }

@@ -120,7 +120,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             bool saveToDatabase)
         {
             var oldOrgScope = organisation.GetActiveScope(reportingDeadline);
-            if (oldOrgScope == null) throw new ArgumentOutOfRangeException($"Cannot find an scope with status 'Active' for reporting deadling '{reportingDeadline}' linked to organisation '{organisation.OrganisationName}', employerReference '{organisation.EmployerReference}'.");
+            if (oldOrgScope == null) throw new ArgumentOutOfRangeException($"Cannot find an scope with status 'Active' for reporting deadling '{reportingDeadline}' linked to organisation '{organisation.OrganisationName}', organisationReference '{organisation.OrganisationReference}'.");
 
             if (oldOrgScope.ScopeStatus == newStatus)
                 return new CustomResult<OrganisationScope>(InternalMessages.SameScopesCannotBeUpdated(newStatus, oldOrgScope.ScopeStatus, reportingDeadline));
@@ -204,7 +204,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     OrganisationId = o.OrganisationId,
                     OrganisationName = o.Organisation.OrganisationName,
                     DUNSNumber = o.Organisation.DUNSNumber,
-                    EmployerReference = o.Organisation.EmployerReference,
+                    OrganisationReference = o.Organisation.OrganisationReference,
                     OrganisationScopeId = o.OrganisationScopeId,
                     ScopeStatus = o.ScopeStatus,
                     ScopeStatusDate = o.ScopeStatusDate,
@@ -383,7 +383,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Check no previous scopes
             if (org.OrganisationScopes.Any(os => os.SubmissionDeadline == reportingDeadline))
-                throw new ArgumentException($"A scope already exists for reporting deadline year {reportingDeadline.Year} for organisation employer reference '{org.EmployerReference}'", nameof(scopeStatus));
+                throw new ArgumentException($"A scope already exists for reporting deadline year {reportingDeadline.Year} for organisation reference '{org.OrganisationReference}'", nameof(scopeStatus));
 
             //Check for conflict with previous years scope
             if (reportingDeadline.Year - 1 > _reportingDeadlineHelper.FirstReportingDeadlineYear)
@@ -392,7 +392,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 if (previousScope == ScopeStatuses.InScope && scopeStatus == ScopeStatuses.PresumedOutOfScope
                     || previousScope == ScopeStatuses.OutOfScope && scopeStatus == ScopeStatuses.PresumedInScope)
                     throw new ArgumentException(
-                        $"Cannot set {scopeStatus} for snapshot year {reportingDeadline.Year} when previos year was {previousScope} for organisation employer reference '{org.EmployerReference}'",
+                        $"Cannot set {scopeStatus} for snapshot year {reportingDeadline.Year} when previos year was {previousScope} for organisation reference '{org.OrganisationReference}'",
                         nameof(scopeStatus));
             }
 

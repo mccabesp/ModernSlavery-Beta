@@ -118,9 +118,9 @@ namespace ModernSlavery.Infrastructure.Database
                         .IsUnique()
                         .HasFilter("([DUNSNumber] IS NOT NULL)");
 
-                    entity.HasIndex(e => e.EmployerReference)
+                    entity.HasIndex(e => e.OrganisationReference)
                         .IsUnique()
-                        .HasFilter("([EmployerReference] IS NOT NULL)");
+                        .HasFilter("([OrganisationReference] IS NOT NULL)");
 
                     entity.HasIndex(e => e.LatestAddressId);
 
@@ -146,7 +146,7 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.Property(e => e.DUNSNumber)
                         .HasMaxLength(10);
 
-                    entity.Property(e => e.EmployerReference).HasMaxLength(10);
+                    entity.Property(e => e.OrganisationReference).HasMaxLength(10);
 
                     entity.Property(e => e.LatestRegistrationOrganisationId)
                         .HasColumnName("LatestRegistration_OrganisationId");

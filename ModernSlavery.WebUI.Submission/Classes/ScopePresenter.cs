@@ -49,7 +49,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             User currentUser)
         {
             // when NonStarterOrg doesn't exist then return null
-            var org = await _organisationBusinessLogic.GetOrganisationByEmployerReferenceAndSecurityCodeAsync(enterCodes.OrganisationReference, enterCodes.SecurityToken);
+            var org = await _organisationBusinessLogic.GetOrganisationByOrganisationReferenceAndSecurityCodeAsync(enterCodes.OrganisationReference, enterCodes.SecurityToken);
             if (org == null) return null;
 
             var scope = CreateScopingViewModel(org, currentUser);
@@ -74,7 +74,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
                 OrganisationAddress = org.LatestAddress?.GetAddressString(),
                 DeadlineDate = _sharedBusinessLogic.GetReportingDeadline(org.SectorType)
             };
-            model.EnterCodes.OrganisationReference = org.EmployerReference;
+            model.EnterCodes.OrganisationReference = org.OrganisationReference;
 
             // get the scope info for this year
             var scope = ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org, model.DeadlineDate);
@@ -203,7 +203,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
         public async Task<Organisation> GetOrgByEmployerReferenceAsync(string employerReference)
         {
             var org = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(o =>
-                o.EmployerReference == employerReference);
+                o.OrganisationReference == employerReference);
             return org;
         }
     }

@@ -427,7 +427,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // Ensure this user is registered fully for this organisation
             if (userOrg.PINConfirmedDate == null)
                 return new HttpForbiddenResult(
-                    $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.EmployerReference}");
+                    $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.OrganisationReference}");
 
             //Get the current snapshot date
             var reportingDeadline = SharedBusinessLogic.GetReportingDeadline(userOrg.Organisation.SectorType).AddYears(-2);
@@ -472,7 +472,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // Ensure this user is registered fully for this organisation
             if (userOrg.PINConfirmedDate == null)
                 return new HttpForbiddenResult(
-                    $"User {VirtualUser?.EmailAddress} has not completed registeration for organisation {userOrg.Organisation.EmployerReference}");
+                    $"User {VirtualUser?.EmailAddress} has not completed registeration for organisation {userOrg.Organisation.OrganisationReference}");
 
             //Check the year parameters
             if (model.ReportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear ||

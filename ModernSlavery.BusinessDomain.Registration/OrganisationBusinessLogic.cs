@@ -87,7 +87,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 {
                     OrganisationId = o.OrganisationId,
                     DUNSNumber = o.DUNSNumber,
-                    EmployerReference = o.EmployerReference,
+                    OrganisationReference = o.OrganisationReference,
                     OrganisationName = o.OrganisationName,
                     CompanyNo = o.CompanyNumber,
                     Sector = o.SectorType,
@@ -118,27 +118,27 @@ namespace ModernSlavery.BusinessDomain.Registration
             return records;
         }
 
-        public virtual async Task SetUniqueEmployerReferencesAsync()
+        public virtual async Task SetUniqueOrganisationReferencesAsync()
         {
-            var orgs = _dataRepository.GetAll<Organisation>().Where(o => o.EmployerReference == null);
-            foreach (var org in orgs) await SetUniqueEmployerReferenceAsync(org);
+            var orgs = _dataRepository.GetAll<Organisation>().Where(o => o.OrganisationReference == null);
+            foreach (var org in orgs) await SetUniqueOrganisationReferenceAsync(org);
         }
 
-        public virtual async Task SetUniqueEmployerReferenceAsync(Organisation organisation)
+        public virtual async Task SetUniqueOrganisationReferenceAsync(Organisation organisation)
         {
             //Get the unique reference
             do
             {
-                organisation.EmployerReference = GenerateEmployerReference();
+                organisation.OrganisationReference = GenerateOrganisationReference();
             } while (await _dataRepository.AnyAsync<Organisation>(o =>
                 o.OrganisationId != organisation.OrganisationId &&
-                o.EmployerReference == organisation.EmployerReference));
+                o.OrganisationReference == organisation.OrganisationReference));
 
             //Save the organisation
             await _dataRepository.SaveChangesAsync();
         }
 
-        public virtual string GenerateEmployerReference()
+        public virtual string GenerateOrganisationReference()
         {
             return Crypto.GeneratePasscode(_sharedOptions.OrganisationCodeChars.ToCharArray(),
                 _sharedOptions.OrganisationCodeLength);
@@ -150,14 +150,14 @@ namespace ModernSlavery.BusinessDomain.Registration
                 _sharedOptions.PinLength);
         }
 
-        public virtual async Task<CustomResult<OrganisationScope>> SetAsScopeAsync(string employerRef,
+        public virtual async Task<CustomResult<OrganisationScope>> SetAsScopeAsync(string organisationRef,
             int changeScopeToSnapshotYear,
             string changeScopeToComment,
             User currentUser,
             ScopeStatuses scopeStatus,
             bool saveToDatabase)
         {
-            var org = await GetOrganisationByEmployerReferenceOrThrowAsync(employerRef);
+            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef);
             var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(org.SectorType, changeScopeToSnapshotYear);
             return await _scopeLogic.AddScopeAsync(
                 org,
@@ -237,7 +237,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         {
             if (org.Status != OrganisationStatuses.Retired)
                 return InternalMessages.OrganisationRevertOnlyRetiredErrorMessage(org.OrganisationName,
-                    org.EmployerReference, org.Status.ToString());
+                    org.OrganisationReference, org.Status.ToString());
 
             org.RevertToLastStatus(byUserId, details);
             return null;
@@ -312,7 +312,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                     SectorType = org.SectorType,
                     OrganisationName = org.OrganisationName,
                     NameSource = GetOrganisationName(org)?.Source,
-                    EmployerReference = org.EmployerReference,
+                    OrganisationReference = org.OrganisationReference,
                     DateOfCessation = org.DateOfCessation,
                     DUNSNumber = org.DUNSNumber,
                     CompanyNumber = org.CompanyNumber,
@@ -332,7 +332,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 SectorType = org.SectorType,
                 OrganisationName = org.OrganisationName,
                 NameSource = GetOrganisationName(org)?.Source,
-                EmployerReference = org.EmployerReference,
+                OrganisationReference = org.OrganisationReference,
                 DateOfCessation = org.DateOfCessation,
                 DUNSNumber = org.DUNSNumber,
                 CompanyNumber = org.CompanyNumber,
@@ -448,18 +448,18 @@ namespace ModernSlavery.BusinessDomain.Registration
             return GetOrganisationSicCodes(organisation, maxDate).OrderBy(s => s.SicCodeId).Select(s => s.SicCodeId).ToDelimitedString(delimiter);
         }
 
-        public virtual async Task<Organisation> GetOrganisationByEmployerReferenceAsync(string employerReference)
+        public virtual async Task<Organisation> GetOrganisationByOrganisationReferenceAsync(string organisationReference)
         {
             return await _dataRepository.FirstOrDefaultAsync<Organisation>(o =>
-                o.EmployerReference.ToUpper() == employerReference.ToUpper());
+                o.OrganisationReference.ToUpper() == organisationReference.ToUpper());
         }
 
-        public virtual async Task<Organisation> GetOrganisationByEmployerReferenceAndSecurityCodeAsync(
-            string employerReference,
+        public virtual async Task<Organisation> GetOrganisationByOrganisationReferenceAndSecurityCodeAsync(
+            string organisationReference,
             string securityCode)
         {
             return await _dataRepository.FirstOrDefaultAsync<Organisation>(o =>
-                o.EmployerReference.ToUpper() == employerReference.ToUpper() && o.SecurityCode == securityCode);
+                o.OrganisationReference.ToUpper() == organisationReference.ToUpper() && o.SecurityCode == securityCode);
         }
 
 
@@ -477,14 +477,14 @@ namespace ModernSlavery.BusinessDomain.Registration
 
             return organisation.GetActiveScope(accountingStartDate);
         }
-        public virtual async Task<Organisation> GetOrganisationByEmployerReferenceOrThrowAsync(string employerReference)
+        public virtual async Task<Organisation> GetOrganisationByOrganisationReferenceOrThrowAsync(string organisationReference)
         {
-            var org = await GetOrganisationByEmployerReferenceAsync(employerReference);
+            var org = await GetOrganisationByOrganisationReferenceAsync(organisationReference);
 
             if (org == null)
                 throw new ArgumentException(
-                    $"Cannot find organisation with employerReference {employerReference}",
-                    nameof(employerReference));
+                    $"Cannot find organisation with organisationReference {organisationReference}",
+                    nameof(organisationReference));
 
             return org;
         }
@@ -522,10 +522,10 @@ namespace ModernSlavery.BusinessDomain.Registration
             };
         }
 
-        public async Task<CustomResult<Organisation>> CreateOrganisationSecurityCodeAsync(string employerRef,
+        public async Task<CustomResult<Organisation>> CreateOrganisationSecurityCodeAsync(string organisationRef,
             DateTime securityCodeExpiryDateTime)
         {
-            var org = await GetOrganisationByEmployerReferenceOrThrowAsync(employerRef);
+            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef);
             return _securityCodeLogic.CreateSecurityCode(org, securityCodeExpiryDateTime);
         }
 
@@ -536,10 +536,10 @@ namespace ModernSlavery.BusinessDomain.Registration
                 _securityCodeLogic.CreateSecurityCode);
         }
 
-        public async Task<CustomResult<Organisation>> ExtendOrganisationSecurityCodeAsync(string employerRef,
+        public async Task<CustomResult<Organisation>> ExtendOrganisationSecurityCodeAsync(string organisationRef,
             DateTime securityCodeExpiryDateTime)
         {
-            var org = await GetOrganisationByEmployerReferenceOrThrowAsync(employerRef);
+            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef);
             return _securityCodeLogic.ExtendSecurityCode(org, securityCodeExpiryDateTime);
         }
 
@@ -550,9 +550,9 @@ namespace ModernSlavery.BusinessDomain.Registration
                 _securityCodeLogic.ExtendSecurityCode);
         }
 
-        public async Task<CustomResult<Organisation>> ExpireOrganisationSecurityCodeAsync(string employerRef)
+        public async Task<CustomResult<Organisation>> ExpireOrganisationSecurityCodeAsync(string organisationRef)
         {
-            var org = await GetOrganisationByEmployerReferenceOrThrowAsync(employerRef);
+            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef);
             return _securityCodeLogic.ExpireSecurityCode(org);
         }
 

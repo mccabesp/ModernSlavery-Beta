@@ -552,8 +552,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 userOrg.User);
 
             //Ensure the organisation has an employer reference
-            if (userOrg.PINConfirmedDate.HasValue && string.IsNullOrWhiteSpace(userOrg.Organisation.EmployerReference))
-                await _adminService.OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(userOrg.Organisation);
+            if (userOrg.PINConfirmedDate.HasValue && string.IsNullOrWhiteSpace(userOrg.Organisation.OrganisationReference))
+                await _adminService.OrganisationBusinessLogic.SetUniqueOrganisationReferenceAsync(userOrg.Organisation);
 
             //Add or remove this organisation to/from the search index
             await _adminService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(userOrg.Organisation);
