@@ -10,15 +10,10 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                 name: "IX_Organisations_EmployerReference",
                 table: "Organisations");
 
-            migrationBuilder.DropColumn(
+            migrationBuilder.RenameColumn(
                 name: "EmployerReference",
+                newName: "OrganisationReference",
                 table: "Organisations");
-
-            migrationBuilder.AddColumn<string>(
-                name: "OrganisationReference",
-                table: "Organisations",
-                maxLength: 10,
-                nullable: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Organisations_OrganisationReference",
@@ -34,16 +29,10 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                 name: "IX_Organisations_OrganisationReference",
                 table: "Organisations");
 
-            migrationBuilder.DropColumn(
+            migrationBuilder.RenameColumn(
                 name: "OrganisationReference",
+                newName: "EmployerReference",
                 table: "Organisations");
-
-            migrationBuilder.AddColumn<string>(
-                name: "EmployerReference",
-                table: "Organisations",
-                type: "nvarchar(10)",
-                maxLength: 10,
-                nullable: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Organisations_EmployerReference",
