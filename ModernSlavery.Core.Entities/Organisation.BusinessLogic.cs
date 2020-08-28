@@ -230,18 +230,16 @@ namespace ModernSlavery.Core.Entities
         #endregion
 
         #region Scope
-        //Returns the scope for the specified accounting date
+        //Returns the scope for the specified submission dealine
         public OrganisationScope GetActiveScope(DateTime submissionDeadline)
         {
             return OrganisationScopes
-                //.OrderByDescending(s => s.ScopeStatusDate)
                 .FirstOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline == submissionDeadline);
         }
 
         public OrganisationScope GetActiveScope(int reportingDeadlineYear)
         {
             return OrganisationScopes
-                //.OrderByDescending(s => s.ScopeStatusDate)
                 .FirstOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline.Year == reportingDeadlineYear);
         }
 
