@@ -73,6 +73,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             return new EmptyResult();
         }
 
+        [HttpGet("Index")]
         public IActionResult Index()
         {
             //Clear the default back url of the organisation hub pages

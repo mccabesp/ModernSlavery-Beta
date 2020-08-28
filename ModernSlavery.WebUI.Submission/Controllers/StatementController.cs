@@ -57,13 +57,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         #endregion
 
         #region Properties
-        
+
         #endregion
 
         #region Url Methods
-        public string GetOrganisationIdentifier() => RouteData.Values["OrganisationIdentifier"].ToString();
+        private string GetOrganisationIdentifier() => RouteData.Values["OrganisationIdentifier"].ToString();
 
-        public string GetReportingDeadlineYear() => RouteData.Values["Year"].ToString();
+        private string GetReportingDeadlineYear() => RouteData.Values["Year"].ToString();
 
         private object GetOrgAndYearRouteData() => new { OrganisationIdentifier = GetOrganisationIdentifier(), year = GetReportingDeadlineYear() };
 

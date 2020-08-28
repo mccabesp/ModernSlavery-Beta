@@ -852,7 +852,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             return await SelectOrganisation(VirtualUser, model, employerIndex, nameof(SelectOrganisation));
         }
 
-        public async Task<IActionResult> SelectOrganisation(User VirtualUser,
+        [NonAction]
+        protected async Task<IActionResult> SelectOrganisation(User VirtualUser,
             OrganisationViewModel model,
             int employerIndex,
             string returnAction)

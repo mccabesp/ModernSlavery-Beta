@@ -23,6 +23,7 @@ using Extensions = ModernSlavery.WebUI.Shared.Classes.Extensions.Extensions;
 
 namespace ModernSlavery.WebUI.Shared.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class BaseController : Controller
     {
         #region Dependencies
@@ -190,7 +191,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             await Cache.RemoveAsync($"{UserHostAddress}:{retryLockKey}:Count");
         }
 
-        public async Task TrackPageViewAsync(string pageTitle = null, string pageUrl = null)
+        [NonAction]
+        protected async Task TrackPageViewAsync(string pageTitle = null, string pageUrl = null)
         {
             if (string.IsNullOrWhiteSpace(pageTitle)) pageTitle = ViewBag.Title;
 
@@ -397,7 +399,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         #endregion
 
-        #region Authorisation Methods
+        #region Authorisation Properties
 
         private User _OriginalUser;
 
@@ -668,7 +670,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         #region Exception handling methods
 
         [NonAction]
-        public void AddModelError(int errorCode, string propertyName = null, object parameters = null)
+        protected void AddModelError(int errorCode, string propertyName = null, object parameters = null)
         {
             ModelState.AddModelError(errorCode, propertyName, parameters);
         }
@@ -687,29 +689,34 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         #region Session Handling
 
-        public void StashModel<T>(T model)
+        [NonAction]
+        protected void StashModel<T>(T model)
         {
             Session[this + ":Model"] = Core.Extensions.Json.SerializeObjectDisposed(model);
         }
 
-        public void StashModel<KeyT, ModelT>(KeyT keyController, ModelT model)
+        [NonAction]
+        protected void StashModel<KeyT, ModelT>(KeyT keyController, ModelT model)
         {
             Session[keyController + ":Model"] = Core.Extensions.Json.SerializeObjectDisposed(model);
         }
 
-        public void ClearStash()
+        [NonAction]
+        protected void ClearStash()
         {
             Session.Remove(this + ":Model");
         }
 
-        public void ClearAllStashes()
+        [NonAction]
+        protected void ClearAllStashes()
         {
             foreach (var key in Session.Keys.ToList())
                 if (key.EndsWithI(":Model"))
                     Session.Remove(key);
         }
 
-        public T UnstashModel<T>(bool delete = false) where T : class
+        [NonAction]
+        protected T UnstashModel<T>(bool delete = false) where T : class
         {
             var json = Session[this + ":Model"].ToStringOrNull();
             var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json);
@@ -718,7 +725,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             return result;
         }
 
-        public T UnstashModel<T>(Type keyController, bool delete = false) where T : class
+        [NonAction]
+        protected T UnstashModel<T>(Type keyController, bool delete = false) where T : class
         {
             var json = Session[this + ":Model"].ToStringOrNull();
             var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json);
