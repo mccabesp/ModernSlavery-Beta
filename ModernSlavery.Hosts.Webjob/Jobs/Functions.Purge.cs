@@ -90,7 +90,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 registration.UserId,
                                 registration.User.EmailAddress,
                                 registration.OrganisationId,
-                                registration.Organisation.EmployerReference,
+                                registration.Organisation.OrganisationReference,
                                 registration.Organisation.OrganisationName,
                                 registration.Method,
                                 registration.PINSentDate,
@@ -155,7 +155,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 {
                                     org.OrganisationId,
                                     Address = org.GetLatestAddress()?.GetAddressString(),
-                                    org.EmployerReference,
+                                    org.OrganisationReference,
                                     org.DUNSNumber,
                                     org.CompanyNumber,
                                     org.OrganisationName,

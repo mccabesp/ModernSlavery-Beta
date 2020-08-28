@@ -7,7 +7,7 @@ namespace ModernSlavery.Core.Models
     {
         public long OrganisationId { get; set; }
         public string DUNSNumber { get; set; }
-        public string EmployerReference { get; set; }
+        public string OrganisationReference { get; set; }
         public string OrganisationName { get; set; }
         public string CompanyNo { get; set; }
         public SectorTypes Sector { get; set; }

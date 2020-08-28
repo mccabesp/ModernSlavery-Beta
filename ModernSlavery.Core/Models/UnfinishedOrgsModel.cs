@@ -7,7 +7,7 @@ namespace ModernSlavery.Core.Models
     public class UnfinishedOrgsModel
     {
         public string DUNSNumber { get; set; }
-        public string EmployerReference { get; set; }
+        public string OrganisationReference { get; set; }
         public string SecurityToken { get; set; }
         public DateTime? SecurityTokenCreated { get; set; }
 

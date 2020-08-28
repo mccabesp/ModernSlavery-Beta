@@ -5,7 +5,7 @@
     Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Confirm In Scope - Modern Slavery reporting service";
     var emailAdd = sharedOptions.MsuReportingEmail;
-    var emailSubject =  WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));
+    var emailSubject =  WebUtility.UrlEncode(string.Format("Wrong Organisation Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.OrganisationReference));
 
     // c# 6 doesnt compile with razor in mvc5 so cant use string templates here :( need to update to MVC 6
     var mailto = string.Join("", "mailto:", emailAdd, "?subject=", emailSubject);
@@ -24,7 +24,7 @@
             </h1>
 
 
-            @await Html.PartialAsync("Parts/EmployerDetailsPart", Model)
+            @await Html.PartialAsync("Parts/OrganisationDetailsPart", Model)
 
             <br/>
 

@@ -7,7 +7,7 @@ using ModernSlavery.Core.Models;
 namespace ModernSlavery.Infrastructure.Search
 {
     [Serializable]
-    public class AzureEmployerSearchModel : OrganisationSearchModel
+    public class AzureOrganisationSearchModel : OrganisationSearchModel
     {
         #region Organisation Properties
 

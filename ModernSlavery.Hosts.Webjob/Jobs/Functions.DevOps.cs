@@ -55,7 +55,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 //TODO: Check organisations with same DUNS number 
 
-                //TODO: Check organisations with same EmployerRef 
+                //TODO: Check organisations with same OrganisationRef 
 
                 //TODO: Check organisations with same OrganisationReferences
 

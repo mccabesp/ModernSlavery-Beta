@@ -121,10 +121,10 @@ namespace ModernSlavery.Infrastructure.Search
             newRecords = newRecords.OrderBy(o => o.Name);
 
             //Set the records to add or update
-            var actions = newRecords.Select(r => IndexAction.MergeOrUpload(_autoMapper.Map<AzureEmployerSearchModel>(r)))
+            var actions = newRecords.Select(r => IndexAction.MergeOrUpload(_autoMapper.Map<AzureOrganisationSearchModel>(r)))
                 .ToList();
 
-            var batches = new ConcurrentBag<IndexBatch<AzureEmployerSearchModel>>();
+            var batches = new ConcurrentBag<IndexBatch<AzureOrganisationSearchModel>>();
             while (actions.Any())
             {
                 var batchSize = actions.Count > 1000 ? 1000 : actions.Count;
@@ -171,9 +171,9 @@ namespace ModernSlavery.Infrastructure.Search
                 throw new ArgumentNullException(nameof(oldRecords), "You must supply at least one record to index");
 
             //Set the records to add or update
-            var actions = oldRecords.Select(r => IndexAction.Delete(_autoMapper.Map<AzureEmployerSearchModel>(r))).ToList();
+            var actions = oldRecords.Select(r => IndexAction.Delete(_autoMapper.Map<AzureOrganisationSearchModel>(r))).ToList();
 
-            var batches = new ConcurrentBag<IndexBatch<AzureEmployerSearchModel>>();
+            var batches = new ConcurrentBag<IndexBatch<AzureOrganisationSearchModel>>();
 
             while (actions.Any())
             {
@@ -451,7 +451,7 @@ namespace ModernSlavery.Infrastructure.Search
 
             if (await serviceClient.Indexes.ExistsAsync(indexName)) return;
 
-            var index = new Index {Name = indexName, Fields = FieldBuilder.BuildForType<AzureEmployerSearchModel>()};
+            var index = new Index {Name = indexName, Fields = FieldBuilder.BuildForType<AzureOrganisationSearchModel>()};
 
             index.Suggesters = new List<Suggester>
             {

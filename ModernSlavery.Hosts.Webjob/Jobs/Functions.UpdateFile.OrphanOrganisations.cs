@@ -158,7 +158,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         {
                             OrganisationId = org.OrganisationId,
                             DUNSNumber = org.DUNSNumber,
-                            EmployerReference = org.EmployerReference,
+                            OrganisationReference = org.OrganisationReference,
                             Sector = org.SectorType,
                             Company = org.OrganisationName,
                             Address1 = addressLines[0],

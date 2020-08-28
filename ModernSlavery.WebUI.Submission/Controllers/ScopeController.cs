@@ -82,7 +82,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             // the following fields are validatable at this stage
             ModelState.Include(
-                nameof(EnterCodesViewModel.EmployerReference),
+                nameof(EnterCodesViewModel.OrganisationReference),
                 nameof(EnterCodesViewModel.SecurityToken));
 
             // When ModelState is Not Valid Then Return the EnterCodes View
@@ -188,7 +188,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
 
-        [HttpGet("out/confirm-employer")]
+        [HttpGet("out/confirm-organisation")]
         public async Task<IActionResult> ConfirmOutOfScopeDetails()
         {
             // When User is Admin then redirect to Admin\Home
@@ -205,7 +205,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        [HttpPost("out/confirm-employer")]
+        [HttpPost("out/confirm-organisation")]
         public async Task<IActionResult> ConfirmOutOfScopeDetails(string command)
         {
             // When User is Admin then redirect to Admin\Home
@@ -400,7 +400,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // when not auth then save codes and return ManageOrganisations redirect
             if (!stateModel.IsSecurityCodeExpired)
                 PendingFasttrackCodes =
-                    $"{stateModel.EnterCodes.EmployerReference}:{stateModel.EnterCodes.SecurityToken}:{stateModel.EnterAnswers?.FirstName}:{stateModel.EnterAnswers?.LastName}:{stateModel.EnterAnswers?.EmailAddress}";
+                    $"{stateModel.EnterCodes.OrganisationReference}:{stateModel.EnterCodes.SecurityToken}:{stateModel.EnterAnswers?.FirstName}:{stateModel.EnterAnswers?.LastName}:{stateModel.EnterAnswers?.EmailAddress}";
 
             return RedirectToAction(Url.Action(nameof(SubmissionController.ManageOrganisations)));
         }
@@ -427,7 +427,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // Ensure this user is registered fully for this organisation
             if (userOrg.PINConfirmedDate == null)
                 return new HttpForbiddenResult(
-                    $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.EmployerReference}");
+                    $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.OrganisationReference}");
 
             //Get the current snapshot date
             var reportingDeadline = SharedBusinessLogic.GetReportingDeadline(userOrg.Organisation.SectorType).AddYears(-2);
@@ -472,7 +472,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // Ensure this user is registered fully for this organisation
             if (userOrg.PINConfirmedDate == null)
                 return new HttpForbiddenResult(
-                    $"User {VirtualUser?.EmailAddress} has not completed registeration for organisation {userOrg.Organisation.EmployerReference}");
+                    $"User {VirtualUser?.EmailAddress} has not completed registeration for organisation {userOrg.Organisation.OrganisationReference}");
 
             //Check the year parameters
             if (model.ReportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear ||

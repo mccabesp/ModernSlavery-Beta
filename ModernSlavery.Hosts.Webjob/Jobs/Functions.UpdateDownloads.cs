@@ -81,7 +81,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                     var downloadData = statements.ToList()
                         .Select(r => DownloadModel.Create(r))
-                        .OrderBy(d => d.EmployerName)
+                        .OrderBy(d => d.OrganisationName)
                         .ToList();
 
                     var newFilePath =
