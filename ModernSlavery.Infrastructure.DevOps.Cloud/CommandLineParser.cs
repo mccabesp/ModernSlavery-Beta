@@ -76,6 +76,7 @@ namespace ModernSlavery.Infrastructure.Azure
                             break;
                     }
                     break;
+                case SqlServerOptions sqlServerOptions:
                 case SqlDatabaseOptions sqlDatabaseOptions:
                     Authenticate(verbType as AzureOptions);
                     var sqlManager = new SqlManager(_azure);
@@ -84,6 +85,12 @@ namespace ModernSlavery.Infrastructure.Azure
                     {
                         case SqlDatabasetSetEditionOptions options:
                             sqlManager.SetDatabaseEdition(options.Database, options.DatabaseEdition);
+                            break;
+                        case SqlServerOpenFirewallOptions options:
+                            sqlManager.OpenFirewall(options.Server, options.RuleName,options.StartIP, options.EndIP);
+                            break;
+                        case SqlServerDeleteFirewallOptions options:
+                            sqlManager.DeleteFirewall(options.Server, options.RuleName);
                             break;
                     }
                     break;

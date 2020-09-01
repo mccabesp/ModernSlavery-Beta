@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 
 namespace ModernSlavery.Core.Extensions
 {
@@ -98,6 +99,66 @@ namespace ModernSlavery.Core.Extensions
                 }
 
             return false;
+        }
+
+        public static async Task<string> GetEgressIPAddressAsync()
+        {
+            string url;
+            string response;
+
+            try
+            {
+                url = "http://ipinfo.io/ip";
+                response = await Web.WebRequestAsync(Web.HttpMethods.Get, url);
+                if (!string.IsNullOrWhiteSpace(response) && !response.StartsWith("127.0.0.1"))
+                {
+                    return response.Trim();
+                }
+            }
+            catch { }
+
+            try
+            {
+                url = "https://myexternalip.com/raw";
+                response = await Web.WebRequestAsync(Web.HttpMethods.Get,url);
+                if (!string.IsNullOrWhiteSpace(response) && !response.StartsWith("127.0.0.1"))
+                {
+                    return response.Trim();
+                }
+            }
+            catch { }
+
+            try
+            {
+                url = "http://ipv4bot.whatismyipaddress.com/";
+                response = await Web.WebRequestAsync(Web.HttpMethods.Get, url);
+                if (!string.IsNullOrWhiteSpace(response) && !response.StartsWith("127.0.0.1"))
+                {
+                    return response.Trim();
+                }
+            }
+            catch { }
+
+            try
+            {
+                url = "http://checkip.dyndns.org";
+                response = await Web.WebRequestAsync(Web.HttpMethods.Get, url);
+                if (!string.IsNullOrWhiteSpace(response))
+                {
+                    string[] parts = response.Split(':');
+                    response = parts[1].Substring(1);
+                    parts = response.Split('<');
+                    response = parts[0];
+                }
+
+                if (!string.IsNullOrWhiteSpace(response) && !response.StartsWith("127.0.0.1"))
+                {
+                    return response.Trim();
+                }
+            }
+            catch { }
+
+            return null;
         }
     }
 }
