@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Testing.Helpers.Extensions
 {
@@ -19,8 +20,17 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         /// Deletes all tables in the database (except _EFMigrationsHistory) and reimports all seed data
         /// </summary>
         /// <param name="host"></param>
-        public static void ResetDatabase(this IHost host)
+        public static void ResetDatabase(this IHost host, bool force=false)
         {
+            if (!force) {
+                var lastFullDatabaseReset = Environment.GetEnvironmentVariable("LastFullDatabaseReset").ToDateTime();
+                if (lastFullDatabaseReset > DateTime.MinValue)
+                {
+                    host.ResetDatabase(lastFullDatabaseReset);
+                    return;
+                }
+            }
+
             var dataRepository = host.GetDataRepository();
             dataRepository.ExecuteTransactionAsync(async () =>
             {
@@ -61,8 +71,47 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             dataImporter.ImportStatementTrainingTypesAsync().Wait();
             dataImporter.ImportPrivateOrganisationsAsync(-1).Wait();
             dataImporter.ImportPublicOrganisationsAsync(-1).Wait();
+
+            //Set the last database reset
+            Environment.SetEnvironmentVariable("LastFullDatabaseReset", DateTime.Now.ToString());
         }
 
+        /// <summary>
+        /// Deletes all records in all tables created after a specified date
+        /// </summary>
+        /// <param name="host"></param>
+        public static void ResetDatabase(this IHost host, DateTime createdDate)
+        {
+            var dataRepository = host.GetDataRepository();
+            dataRepository.ExecuteTransactionAsync(async () =>
+            {
+                try
+                {
+                    dataRepository.BeginTransaction();
+                    dataRepository.GetAll<AuditLog>().Where(r=>r.CreatedDate>=createdDate).BatchDelete();
+                    dataRepository.GetAll<Feedback>().Where(r => r.CreatedDate >= createdDate).BatchDelete();
+                    dataRepository.GetAll<Organisation>().Where(r => r.Created >= createdDate).BatchUpdate(o => new Organisation { LatestAddressId = null, LatestStatementId = null, LatestPublicSectorTypeId = null, LatestRegistrationOrganisationId = null, LatestRegistrationUserId = null, LatestScopeId = null });
+                    dataRepository.GetAll<StatementOrganisation>().Where(r => r.Created >= createdDate).BatchUpdate(o => new StatementOrganisation { OrganisationId = null });
+                    dataRepository.GetAll<UserOrganisation>().Where(r => r.Created >= createdDate).BatchDelete();
+                    dataRepository.GetAll<Organisation>().Where(r => r.Created >= createdDate).BatchDelete();
+                    dataRepository.GetAll<ReminderEmail>().Where(r => r.Created >= createdDate).BatchDelete();
+                    dataRepository.GetAll<User>().Where(r => r.Created >= createdDate).BatchDelete();
+                    dataRepository.GetAll<PublicSectorType>().Where(r => r.Created >= createdDate).BatchDelete();
+                    dataRepository.GetAll<SicCode>().BatchDelete();
+                    dataRepository.GetAll<SicSection>().Where(r => r.Created >= createdDate).BatchDelete();
+                    dataRepository.GetAll<StatementDiligenceType>().Where(r => r.Created >= createdDate).BatchDelete();
+                    dataRepository.GetAll<StatementPolicyType>().Where(r => r.Created >= createdDate).BatchDelete();
+                    dataRepository.GetAll<StatementRiskType>().Where(r => r.Created >= createdDate).BatchDelete();
+                    dataRepository.GetAll<StatementTrainingType>().Where(r => r.Created >= createdDate).BatchDelete();
+                    dataRepository.CommitTransaction();
+                }
+                catch
+                {
+                    dataRepository.RollbackTransaction();
+                    throw;
+                }
+            }).Wait();
+        }
 
         /// <summary>
         /// Delete all the test records in the database created before the specified deadline 
