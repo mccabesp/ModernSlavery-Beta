@@ -22,10 +22,11 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         public static void ResetDatabase(this IHost host)
         {
             var dataRepository = host.GetDataRepository();
-            dataRepository.BeginTransactionAsync(async () =>
+            dataRepository.ExecuteTransactionAsync(async () =>
             {
                 try
                 {
+                    dataRepository.BeginTransaction();
                     dataRepository.GetAll<AuditLog>().BatchDelete();
                     dataRepository.GetAll<Feedback>().BatchDelete();
                     dataRepository.GetAll<Organisation>().BatchUpdate(o => new Organisation { LatestAddressId = null, LatestStatementId = null, LatestPublicSectorTypeId = null, LatestRegistrationOrganisationId = null, LatestRegistrationUserId = null, LatestScopeId = null });

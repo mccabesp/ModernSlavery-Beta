@@ -516,7 +516,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                  }
              });
 
-            await _dataRepository.BeginTransactionAsync(async () => 
+            await _dataRepository.ExecuteTransactionAsync(async () => 
             {
                 try
                 {

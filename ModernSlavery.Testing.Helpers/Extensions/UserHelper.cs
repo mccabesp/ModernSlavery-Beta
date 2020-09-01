@@ -33,7 +33,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             var user = dataRepository.GetAll<User>().SingleOrDefault(u => u.Firstname == firstName && u.Lastname == lastName);
             var userId = user.UserId;
             var email = user.EmailAddress.ToLower();
-            dataRepository.BeginTransactionAsync(async () =>
+            dataRepository.ExecuteTransactionAsync(async () =>
             {
                 try
                 {

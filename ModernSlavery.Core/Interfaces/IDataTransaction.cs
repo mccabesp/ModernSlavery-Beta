@@ -9,7 +9,9 @@ namespace ModernSlavery.Core.Interfaces
         ///     Creates a transaction for aggregating data update operations
         /// </summary>
         /// <param name="transactionFunc"></param>
-        Task BeginTransactionAsync(Func<Task> transactionFunc);
+        Task ExecuteTransactionAsync(Func<Task> transactionFunc);
+
+        void BeginTransaction();
 
         void CommitTransaction();
 

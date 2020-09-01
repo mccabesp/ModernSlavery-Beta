@@ -1627,7 +1627,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             var saved = false;
             var tempUserOrg = userOrg; // Need to use a temporary UserOrg inside a lambda expression for out parameters
-            await SharedBusinessLogic.DataRepository.BeginTransactionAsync(
+            await SharedBusinessLogic.DataRepository.ExecuteTransactionAsync(
                 async () =>
                 {
                     try

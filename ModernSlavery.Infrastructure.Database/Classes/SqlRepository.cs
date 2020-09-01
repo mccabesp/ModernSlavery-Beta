@@ -134,24 +134,29 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             DbContext.UpdateChangesInBulk(listOfOrganisations);
         }
 
-        public async Task BeginTransactionAsync(Func<Task> delegateAction)
+        public async Task ExecuteTransactionAsync(Func<Task> delegateAction)
         {
             if (Transaction != null) throw new Exception("Another transaction has already been started");
 
             var database = DbContext.GetDatabase();
             var strategy = database.CreateExecutionStrategy();
 
-            TransactionStarted = true;
             try
             {
-                await strategy.Execute(delegateAction);
-                if (Transaction != null)
-                    throw new TransactionException("An SQL transaction has started which you must commit or rollback");
+                TransactionStarted = true;
+                await strategy.ExecuteAsync(delegateAction);
+                if (Transaction != null)throw new TransactionException("An SQL transaction has started which you must commit or rollback");
             }
             finally
             {
                 TransactionStarted = false;
             }
+        }
+
+        public void BeginTransaction()
+        {
+            if (Transaction != null) throw new Exception("Another transaction has already been started");
+            Transaction = DbContext.GetDatabase().BeginTransaction();
         }
 
         public void CommitTransaction()

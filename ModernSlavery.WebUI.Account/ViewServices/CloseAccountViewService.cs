@@ -59,7 +59,7 @@ namespace ModernSlavery.WebUI.Account.ViewServices
             var userOrgs = userToRetire.UserOrganisations.Select(uo => uo.Organisation).Distinct().ToList();
 
             // aggregated save
-            await UserRepository.BeginTransactionAsync(
+            await UserRepository.ExecuteTransactionAsync(
                 async () =>
                 {
                     try

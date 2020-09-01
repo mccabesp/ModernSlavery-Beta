@@ -10,6 +10,7 @@ using NUnit.Framework.Interfaces;
 using System.Net;
 using System.IO;
 using System;
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -46,16 +47,19 @@ namespace ModernSlavery.Hosts.Web.Tests
             }
 
             //Create the test host usign the default dependency module and override with a test module
-            TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>(applicationName:"ModernSlavery.Host.Web");
+            TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>(applicationName:"ModernSlavery.Hosts.Web");
 
             //Start the test host
             await TestWebHost.StartAsync().ConfigureAwait(false);
 
+            //Reset the database - this must be after host start so seed data files are copied
+            TestWebHost.ResetDatabase();
+
+            //Start the Selenium client
             var baseUrl = TestWebHost.GetHostAddress();
             TestContext.Progress.WriteLine($"Test Host started on endpoint: {baseUrl}");
             WebDriverService = UITest.SetupWebDriverService(baseUrl: baseUrl);
 
-            //ModernSlavery.Testing.Helpers.Extensions.DatabaseHelper.ResetDatabase(TestWebHost);
         }
 
         [OneTimeTearDown]
