@@ -33,7 +33,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
              Org = Testing.Helpers.Extensions.OrganisationHelper.GetOrganisation(TestRunSetup.TestWebHost, Registration.OrgName_InterFloor);
             Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(Org, new DateTime(2021, 6, 10));
-            
+            Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(Org, new DateTime(2021, 6, 10));
             Click("Register an organisation");
 
 

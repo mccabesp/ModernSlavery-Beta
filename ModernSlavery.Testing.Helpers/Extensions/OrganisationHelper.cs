@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Registration;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 
 /// <summary>
 /// TODO: Use Business Logicfunctionality
@@ -76,9 +77,24 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             return userOrganisation;
         }
 
+        /// <summary>
+        /// Returns an instance of the ISecurityCodeBusinessLogic domain interface
+        /// </summary>
+        /// <param name="host">The webhost</param>
+        /// <returns></returns>
         public static ISecurityCodeBusinessLogic GetSecurityCodeBusinessLogic(this IHost host)
         {
             return host.Services.GetService<ISecurityCodeBusinessLogic>();
+        }
+
+        /// <summary>
+        /// Returns an instance of the IOrganisationBusinessLogic domain interface
+        /// </summary>
+        /// <param name="host">The webhost</param>
+        /// <returns></returns>
+        public static IOrganisationBusinessLogic GetOrganisationBusinessLogic(this IHost host)
+        {
+            return host.Services.GetService<IOrganisationBusinessLogic>();
         }
     }
 }
