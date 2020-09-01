@@ -323,21 +323,21 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         ///     //Seed the private organisations in the database
         /// </summary>
         /// <param name="force">When true always imports. When false only when no private organisation records in db</param>
-        public async Task ImportPrivateOrganisationsAsync(long userId, bool force = false)
+        public async Task ImportPrivateOrganisationsAsync(long userId, int maxRecords = 0, bool force = false)
         {
-            await ImportOrganisationsAsync(Filenames.ImportPrivateOrganisations, SectorTypes.Private, userId, force);
+            await ImportOrganisationsAsync(Filenames.ImportPrivateOrganisations, SectorTypes.Private, userId, maxRecords, force);
         }
 
         /// <summary>
         ///     //Seed the public organisations in the database
         /// </summary>
         /// <param name="force">When true always imports. When false only when no public organisation records in db</param>
-        public async Task ImportPublicOrganisationsAsync(long userId, bool force = false)
+        public async Task ImportPublicOrganisationsAsync(long userId, int maxRecords = 0, bool force = false)
         {
-            await ImportOrganisationsAsync(Filenames.ImportPublicOrganisations, SectorTypes.Public, userId, force);
+            await ImportOrganisationsAsync(Filenames.ImportPublicOrganisations, SectorTypes.Public, userId, maxRecords, force);
         }
 
-        private async Task ImportOrganisationsAsync(string fileName, SectorTypes sectorType, long userId, bool force = false)
+        private async Task ImportOrganisationsAsync(string fileName, SectorTypes sectorType, long userId, int maxRecords=0, bool force = false)
         {
             if (string.IsNullOrWhiteSpace(fileName)) throw new ArgumentNullException(nameof(fileName));
             if (sectorType == SectorTypes.Unknown) throw new ArgumentOutOfRangeException(nameof(sectorType));
@@ -361,6 +361,9 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             //Get the imported records
             var newRecords = await _fileRepository.ReadCSVAsync<ImportOrganisationModel>(filepath, false);
             if (!newRecords.Any()) throw new Exception($"No records found in {filepath}");
+
+            //Limit the number of records imported
+            if (maxRecords > 0) newRecords = newRecords.Take(maxRecords).ToList();
 
             var processedNames = new ConcurrentSet<string>();
             var processedNumbers = new ConcurrentSet<string>();

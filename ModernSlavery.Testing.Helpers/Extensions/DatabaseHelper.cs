@@ -77,8 +77,8 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             dataImporter.ImportStatementRiskTypesAsync().Wait();
             dataImporter.ImportStatementSectorTypesAsync().Wait();
             dataImporter.ImportStatementTrainingTypesAsync().Wait();
-            dataImporter.ImportPrivateOrganisationsAsync(-1).Wait();
-            dataImporter.ImportPublicOrganisationsAsync(-1).Wait();
+            dataImporter.ImportPrivateOrganisationsAsync(-1,100).Wait();
+            dataImporter.ImportPublicOrganisationsAsync(-1,100).Wait();
 
             //Set the last database reset
             Environment.SetEnvironmentVariable("LastFullDatabaseReset", DateTime.Now.ToString());
@@ -165,7 +165,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             var sqlManager = new SqlManager(_azure);
             _sqlServerName = sqlServerName;
             _sqlFirewallRuleName = buildAgentName;
-            _sqlManager.OpenFirewall(_sqlServerName, _sqlFirewallRuleName);
+            sqlManager.OpenFirewall(_sqlServerName, _sqlFirewallRuleName);
             _sqlManager = sqlManager;
         }
 

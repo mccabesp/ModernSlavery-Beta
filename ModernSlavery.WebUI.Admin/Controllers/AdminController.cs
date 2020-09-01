@@ -969,10 +969,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         switch (fileName)
                         {
                             case var f when f.EqualsI(Filenames.ImportPrivateOrganisations):
-                                await _adminService.DataImporter.ImportPrivateOrganisationsAsync(VirtualUser.UserId,true);
+                                await _adminService.DataImporter.ImportPrivateOrganisationsAsync(VirtualUser.UserId,0,true);
                                 break;
                             case var f when f.EqualsI(Filenames.ImportPublicOrganisations):
-                                await _adminService.DataImporter.ImportPublicOrganisationsAsync(VirtualUser.UserId,true);
+                                await _adminService.DataImporter.ImportPublicOrganisationsAsync(VirtualUser.UserId,0,true);
                                 break;
                             case var f when f.EqualsI(Filenames.SicSections):
                                 await _adminService.DataImporter.ImportSICSectionsAsync(true);
