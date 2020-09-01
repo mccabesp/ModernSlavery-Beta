@@ -4,15 +4,18 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting Submission merge")]
+    [TestFixture]
 
     public class Sumbission_Submit_Report_Mandatory_Fields_Only : Submission_Complete_Mandatory_Sections
     {
         [Test, Order(50)]
         public async Task NavigateToSubmissionPage()
         {
-
-            Submission_Helper.NavigateToSubmission(this, Submission.OrgName_Blackpool, "2020", "2021");
+            Click("Manage organisations");
+            Click("Interfloor limited");
+            Click("Continue");
+            ExpectHeader("Review before submitting");
+    
 
             await Task.CompletedTask;
         }
@@ -21,8 +24,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task EnsureSectionsAreCompleted()
         {
             //mandatory sections should be completed
-            AtRow("Your modern Slavery statement").Expect("Completed");
-            AtRow("Areas covered by your modern slavery statement").Expect("Completed");
+            RightOfText("Your modern slavery statement").ExpectText("Completed");
+            RightOfText("Areas covered by your modern statement").ExpectText("Completed");
             await Task.CompletedTask;
         }
 
@@ -30,13 +33,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task EnsureOptionalSectionsAreIncomplete()
         {
             //all other sections incomplete 
-
-            AtRow("Your organisation").Expect("Not Completed");
-            AtRow("Policies").Expect("Not Completed");
-            AtRow("Supply chain risks and due diligence (part 1)").Expect("Not Completed");
-            AtRow("Supply chain risks and due diligence (part 2)").Expect("Not Completed");
-            AtRow("Training").Expect("Not Completed");
-            AtRow("Monitoring progress").Expect("Not Completed");
+           
+            RightOfText("Your organisation").ExpectText("Not Completed");
+            RightOfText("Policies").ExpectText("Not Completed");
+            RightOfText("Supply chain risks and due diligence (part 1)").ExpectText("Not Completed");
+            RightOfText("Supply chain risks and due diligence (part 2)").ExpectText("Not Completed");
+            RightOfText("Training").ExpectText("Not Completed");
+            RightOfText("Monitoring progress").ExpectText("Not Completed");
             await Task.CompletedTask;
         }
 
