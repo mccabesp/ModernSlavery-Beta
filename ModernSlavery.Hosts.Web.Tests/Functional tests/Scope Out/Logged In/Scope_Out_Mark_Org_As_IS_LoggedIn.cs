@@ -87,7 +87,8 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ClickLabel("Other");
 
-            Expect("Please specify");
+            Expect(What.Contains, "Please specify");
+            ExpectField("OtherReason");
 
             await Task.CompletedTask;
         }
@@ -95,7 +96,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(34)]
         public async Task EnterOtherDetails()
         {
-            Set("Other").To("Here are the reasons why.");
+            Set("OtherReason").To("Here are the reasons why.");
 
             await Task.CompletedTask;
         }
