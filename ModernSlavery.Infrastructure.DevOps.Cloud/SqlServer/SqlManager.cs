@@ -71,7 +71,7 @@ namespace ModernSlavery.Infrastructure.Azure.DevOps
             return sqlServer.FirewallRules.List().FirstOrDefault(r => r.Name.EqualsI(ruleName));
         }
 
-        public ISqlFirewallRule OpenFirewall(string sqlServerName, string ruleName, string startIP, string endIP = null)
+        public ISqlFirewallRule OpenFirewall(string sqlServerName, string ruleName, string startIP=null, string endIP = null)
         {
             if (string.IsNullOrWhiteSpace(sqlServerName)) throw new ArgumentNullException(nameof(sqlServerName));
             if (string.IsNullOrWhiteSpace(ruleName)) throw new ArgumentNullException(nameof(ruleName));

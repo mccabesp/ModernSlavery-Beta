@@ -49,6 +49,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Create the test host usign the default dependency module and override with a test module
             TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>(applicationName:"ModernSlavery.Hosts.Web");
 
+            //Create SQL firewall rule for the build agent
+            TestWebHost.OpenSQLFirewall();
+
             //Start the test host
             await TestWebHost.StartAsync().ConfigureAwait(false);
 
@@ -66,6 +69,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task RunAfterAnyTestsAsync()
         {
             if (TestWebHost == null) return;
+
+            //Delete SQL firewall rules for the build agent
+            TestWebHost.CloseSQLFirewall();
 
             //Stop the webhost
             await TestWebHost?.StopAsync();
