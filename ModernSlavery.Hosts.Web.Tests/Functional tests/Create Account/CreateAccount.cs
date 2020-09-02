@@ -23,29 +23,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         private string URL;
         public CreateAccount(string firstname, string lastname, string title, string email, string password) : base()
         {
-            _firstname = firstname; _lastname = lastname; _title = title; _email = email; _password = password;
+            _firstname = firstname; _lastname = lastname; _title = title; _email = email + DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString() ; _password = password;
         }
 
-        //[OneTimeSetUp]
-        //public void RunBeforeAnyTests()
-        //{
-
-            
-        //    //Get the url from the test web host
-        //    _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
-        //    if (Debugger.IsAttached) Debug.WriteLine($"Kestrel authority: {_webAuthority}");
-        //    Console.WriteLine($"Kestrel authority: {_webAuthority}");
-
-        //    //Get the data repository from the test web host
-        //    _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
-
-        //    //Get the file repository from the test web host
-        //    _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
-        //    if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
-        //    Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
-
-        //    //Testing.Helpers.Extensions.DatabaseHelper.DeleteAllTestRecords(TestRunSetup.TestWebHost, DateTime.Now);
-        //}
         private bool TestRunFailed = false;
 
         [SetUp]
@@ -67,7 +47,6 @@ namespace ModernSlavery.Hosts.Web.Tests
             if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
 
         }
-
         
         [Test, Order(1)]
         public async Task GoToCreateAccountPage()

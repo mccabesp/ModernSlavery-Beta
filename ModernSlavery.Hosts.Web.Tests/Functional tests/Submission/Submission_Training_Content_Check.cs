@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Temporary Ignore")]
+
 
     public class Submission_Training_Content_Check : Private_Registration_Success
     {

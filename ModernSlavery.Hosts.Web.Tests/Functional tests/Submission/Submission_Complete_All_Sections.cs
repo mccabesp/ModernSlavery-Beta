@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
+    [TestFixture, Ignore("Temporary Ignore")]
     public class Submission_Complete_All_Sections : Private_Registration_Success
     {
         [Test, Order(40)]

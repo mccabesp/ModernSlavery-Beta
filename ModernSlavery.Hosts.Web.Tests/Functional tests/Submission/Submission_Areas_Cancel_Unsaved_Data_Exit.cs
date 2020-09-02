@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Temporary Ignore")]
+
 
     public class Submission_Areas_Cancel_Unsaved_Data_Exit : Private_Registration_Success
     {

@@ -16,16 +16,17 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Temporary igore")]
     public class Fastrack_Registration_Success : CreateAccount
     {
-
+        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
         string Pin;
         public Fastrack_Registration_Success() : base(_firstname, _lastname, _title, _email, _password)
         {
 
 
         }
+
         private Organisation Org;
         [Test, Order(20)]
         public async Task GoToRegistrationPage()
