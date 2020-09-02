@@ -26,7 +26,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         private static string LogsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LogFiles");
         private static string ScreenshotsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots");
-
+        
         [OneTimeSetUp]
         public async Task RunBeforeAnyTestsAsync()
         {
@@ -54,6 +54,8 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //Reset the database - this must be after host start so seed data files are copied
             TestWebHost.ResetDatabase();
+
+            await TestWebHost.DeleteDraftsAsync();
 
             //Start the Selenium client
             var baseUrl = TestWebHost.GetHostAddress();
