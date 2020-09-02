@@ -30,6 +30,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task RunBeforeAnyTestsAsync()
         {
+            DevOpsAgent.LogGroupStart("Logging test group");
+            DevOpsAgent.LogError("This is a test error");
+            DevOpsAgent.LogWarning("This is a test warning");
+            DevOpsAgent.LogInformation("This is test information");
+            DevOpsAgent.LogDebug("This is a test debug");
+            DevOpsAgent.LogGroupEnd();
+
             //Delete all previous log files
             if (Directory.Exists(LogsFilepath))
             {
