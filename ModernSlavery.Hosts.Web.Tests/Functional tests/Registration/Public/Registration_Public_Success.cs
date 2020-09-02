@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Temporary igore")]
+
 
     public class Registration_Public_Success : Registration_Public_Start_Reigstration
     {

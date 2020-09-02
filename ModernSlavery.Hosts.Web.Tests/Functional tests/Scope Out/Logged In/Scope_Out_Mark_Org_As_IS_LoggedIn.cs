@@ -16,7 +16,8 @@ using ModernSlavery.Core.Entities;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture]
+    [TestFixture, Ignore("Temporary Ignore")]
+
 
     public class Scope_Out_Mark_Org_As_IS_LoggedIn : Private_Registration_Success
     {

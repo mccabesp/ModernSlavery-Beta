@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Temporary Ignore")]
+
 
     public class Submission_Training_Validation_Check : Private_Registration_Success
     {
-        [Test, Order(40)]
+
         public async Task NavigateToTrainingPage()
         {
             Submission_Helper.NavigateToTraining(this, Submission.OrgName_InterFloor, "2019 to 2020");

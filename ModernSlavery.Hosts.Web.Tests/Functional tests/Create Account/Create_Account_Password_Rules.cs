@@ -12,53 +12,13 @@ namespace ModernSlavery.Hosts.Web.Tests
 {
     public class Create_Account_Password_Rules : UITest
     {
-        private IDataRepository _dataRepository;
-        private IFileRepository _fileRepository;
-        private string URL;
 
 
-        [OneTimeSetUp]
-        public void RunBeforeAnyTests()
-        {
-            //Get the url from the test web host
-            _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
-            if (Debugger.IsAttached) Debug.WriteLine($"Kestrel authority: {_webAuthority}");
-            Console.WriteLine($"Kestrel authority: {_webAuthority}");
-
-            //Get the data repository from the test web host
-            _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
-
-            //Get the file repository from the test web host
-            _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
-            if (Debugger.IsAttached) Debug.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
-            Console.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
-
-        }
-        private bool TestRunFailed = false;
-        private string _webAuthority;
-
-        [SetUp]
-        public void SetUp()
-        {
-            if (TestRunFailed)
-                Assert.Inconclusive("Previous test failed");
-            else
-                SetupTest(TestContext.CurrentContext.Test.Name);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            //if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
-            //TeardownTest();
-        }
+        
         [Test, Order(1)]
         public async Task GoToCreateAccountPage()
         {
             Goto("/");
-            Click("Sign in");
-            ExpectHeader("Sign in");
-            BelowHeader("No account yet?");
             Click("Create an account");
             ExpectHeader("Create an Account");
             await Task.CompletedTask;
@@ -66,7 +26,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
         [Test, Order(2)]
-        public async Task FillOutAccountCreationIngormation()
+        public async Task FillOutAccountCreationInformation()
         {
             Set("Email address").To("roger@test.co");
             Set("Confirm your email address").To("roger@test.co");
@@ -76,31 +36,53 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Set("Job title").To("Company Reporter");
 
-            Set("Password").To("Test1234!");
-            Set("Confirm Password").To("Test1234!");
             await Task.CompletedTask;
 
         }
 
         [Test, Order(3)]
-        public async Task TermsAndConditionsContinue()
+        public async Task ShortPassowrd()
         {
-            ClickLabel("I would like to receive information about webinars, events and new guidance");
-            ClickLabel("I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys");
+
+            Set("Password").To("test");
+            Set("Confirm password").To("test");
 
             Click("Continue");
+
+            Expect("The following errors were detected");
+
+            BelowLabel("Password").Expect("The Password must be at least 8 characters long.");
+
             await Task.CompletedTask;
 
         }
 
 
-        [Test, Order(3)]
-        public async Task ValidationForCorrectPassword()
+        [Test, Order(4)]
+        public async Task NoNumberOrCapital()
         {
-            ExpectHeader("Verify your email address");
-            Expect("We have sent a confirmation email to");
-            Expect("roger@test.co");
-            Expect("Follow the instructions in the email to continue your registration.");
+            Set("Password").To("testtest");
+            Set("Confirm password").To("testtest");
+
+            Click("Continue");
+
+            Expect("The following errors were detected");
+
+            BelowLabel("Password").Expect("Password must contain at least one upper case, 1 lower case character and 1 digit");
+            await Task.CompletedTask;
+        }
+
+        [Test, Order(5)]
+        public async Task NoMatch()
+        {
+            Set("Password").To("Testtest1");
+            Set("Confirm password").To("testtest");
+
+            Click("Continue");
+
+            Expect("The following errors were detected");
+
+            BelowLabel("Password").Expect("The password and confirmation password do not match.");
             await Task.CompletedTask;
         }
     }

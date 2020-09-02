@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
+    [TestFixture, Ignore("Temporary igore")]
+
     public class Manage_Account_Personal_Details_Validation : CreateAccount
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
@@ -35,7 +37,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
             //Act
-            Above(The.Top, "Change").Click(The.Top, "Change");
+            Above(The.Bottom, "Change").Click(The.Bottom, "Change");
 
             //Asert
             ExpectHeader("Change your personal details");

@@ -16,7 +16,9 @@ using ModernSlavery.Core.Entities;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture]
+    [TestFixture, Ignore("Temporary Ignore")]
+
+
 
     public class Scope_Out_Declaration_Complete_Content_Check : Scope_Out_Mark_Org_As_OOS_LoggedOut
     {
