@@ -41,23 +41,24 @@ namespace ModernSlavery.Hosts.Web.Tests
             //() => {AtRow("Phone number").Expect(""); });
 
 
-            AtText("Email address").Expect(Create_Account.roger_email);
-            AtText("Password").Expect("***********");
-
+            RightOfText("Email address").Expect(What.Contains, Create_Account.roger_email);
+            RightOfText("Password").Expect("***********");
             ExpectHeader("Personal details");
-            AtText("First name").Expect(Create_Account.roger_first);
-            AtText("Last name").Expect(Create_Account.roger_last);
-            AtText("Job title").Expect(Create_Account.roger_job_title);
+            RightOfText("First name").Expect(Create_Account.roger_first);
+            RightOfText("Last name").Expect(Create_Account.roger_last);
+            RightOfText("Job title").Expect(Create_Account.roger_job_title);
 
             //todo find out about phone number field
             //AtText("Phone number").Expect("");
 
-            ExpectHeader("Contact preferneces");
-            Expect("I would like to receive information about webinars, events and new guidance");
-            Expect("I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys");
+            ExpectHeader("Contact preferences");
+            RightOf("I would like to receive information about webinars, events and new guidance").Expect("Yes") ;
+            RightOf("I'm happy to be contacted for feedback on this service and take part in surveys about modern slavery").Expect("Yes");
 
-            ExpectHeader("Help us improve this service");
-            Expect("We want to understand what our users want so that we can create a better service. Take part in our survey and make your voice heard.");
+            Expect("Help us improve this service");
+            Expect(What.Contains, "We want to understand what our users want so that we can");
+            Expect(What.Contains, "create a better service.");
+            Expect(What.Contains, "Take part in our survey and make your voice heard.");
 
             Expect("Complete our Survey");
             await Task.CompletedTask;
