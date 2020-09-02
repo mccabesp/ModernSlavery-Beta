@@ -31,9 +31,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task GoToRegistrationPage()
         {
-             Org = Testing.Helpers.Extensions.OrganisationHelper.GetOrganisation(TestRunSetup.TestWebHost, Registration.OrgName_InterFloor);
+            Org = Testing.Helpers.Extensions.OrganisationHelper.GetOrganisation(TestRunSetup.TestWebHost, Registration.OrgName_InterFloor);
             Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(Org, new DateTime(2021, 6, 10));
-            Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(Org, new DateTime(2021, 6, 10));
+
             Click("Register an organisation");
 
 
@@ -82,8 +82,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectRow(Registration.OrgName_Millbrook);
             AtRow(Registration.OrgName_Millbrook).Column("Organisation Status").Expect("Registration Complete");
         }
-        }
-
-        
-
     }
+
+
+
+}

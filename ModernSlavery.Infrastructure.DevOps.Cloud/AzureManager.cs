@@ -15,7 +15,7 @@ namespace ModernSlavery.Infrastructure.Azure
         public const string ConfigTenantId = "TenantId";
         public const string ConfigClientId = "ClientId";
         public const string ConfigClientSecret = "ClientSecret";
-
+        public static IAzure Azure = null;
 
         private AzureCredentials GetCredentials(string clientId = null, string clientSecret = null, string tenantId = null)
         {
@@ -27,46 +27,58 @@ namespace ModernSlavery.Infrastructure.Azure
 
             if (string.IsNullOrWhiteSpace(tenantId)) tenantId = Environment.GetEnvironmentVariable(ConfigTenantId);
             if (string.IsNullOrWhiteSpace(tenantId)) throw new ArgumentNullException(nameof(tenantId), $"You must provide a '{nameof(tenantId)}' or specify '{ConfigTenantId}' as an environment variable");
-            
+
             return SdkContext.AzureCredentialsFactory.FromServicePrincipal(clientId, clientSecret, tenantId, AzureEnvironment.AzureGlobalCloud);
         }
 
         public IAzure Authenticate(AzureOptions azureOptions)
         {
-            //=================================================================
-            // Authenticate
-            var credentials = GetCredentials(azureOptions.ClientId, azureOptions.ClientSecret, azureOptions.TenantId);
+            if (Azure == null)
+            {
+                //=================================================================
+                // Authenticate
+                var credentials = GetCredentials(azureOptions.ClientId, azureOptions.ClientSecret, azureOptions.TenantId);
 
-            return Authenticate(credentials, azureOptions.SubscriptionId);
+                Azure = Authenticate(credentials, azureOptions.SubscriptionId);
+            }
+            return Azure;
         }
 
         public IAzure Authenticate(string clientId, string clientSecret, string tenantId = null, string subscriptionId = null)
         {
-            //=================================================================
-            // Authenticate
-            var credentials = GetCredentials(clientId, clientSecret, tenantId);
+            if (Azure == null)
+            {
+                //=================================================================
+                // Authenticate
+                var credentials = GetCredentials(clientId, clientSecret, tenantId);
 
-            return Authenticate(credentials, subscriptionId);
+                Azure = Authenticate(credentials, subscriptionId);
+            }
+            return Azure;
         }
 
         public IAzure Authenticate(AzureCredentials credentials, string subscriptionId = null)
         {
-            if (string.IsNullOrWhiteSpace(subscriptionId)) subscriptionId = Environment.GetEnvironmentVariable(ConfigSubscriptionId);
-            if (!string.IsNullOrWhiteSpace(subscriptionId))
-                return Microsoft.Azure.Management.Fluent.Azure
-                    .Configure()
-                    .WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic)
-                    .Authenticate(credentials)
-                    .WithSubscription(subscriptionId);
-
-            return Microsoft.Azure.Management.Fluent.Azure
-                .Configure()
-                .WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic)
-                .Authenticate(credentials)
-                .WithDefaultSubscription();
+            if (Azure == null)
+            {
+                if (string.IsNullOrWhiteSpace(subscriptionId)) subscriptionId = Environment.GetEnvironmentVariable(ConfigSubscriptionId);
+                if (!string.IsNullOrWhiteSpace(subscriptionId))
+                    Azure = Microsoft.Azure.Management.Fluent.Azure
+                        .Configure()
+                        .WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic)
+                        .Authenticate(credentials)
+                        .WithSubscription(subscriptionId);
+                else
+                    Azure = Microsoft.Azure.Management.Fluent.Azure
+                        .Configure()
+                        .WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic)
+                        .Authenticate(credentials)
+                        .WithDefaultSubscription();
+            }
+            return Azure;
         }
 
-        private static AuthenticationContext GetAuthenticationContext(string tenantId=null)
+        private static AuthenticationContext GetAuthenticationContext(string tenantId = null)
         {
             if (string.IsNullOrWhiteSpace(tenantId)) tenantId = Environment.GetEnvironmentVariable(ConfigTenantId);
 

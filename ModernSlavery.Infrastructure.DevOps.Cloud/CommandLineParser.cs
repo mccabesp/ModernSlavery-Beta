@@ -15,7 +15,6 @@ namespace ModernSlavery.Infrastructure.Azure
     public class CommandLineParser
     {
         private static AzureManager AzureManager = new AzureManager();
-        private static IAzure _azure = null;
         private static AzureOptions _azureOptions;
 
         private static Type[] LoadCommandLineVerbTypes()
@@ -42,12 +41,13 @@ namespace ModernSlavery.Infrastructure.Azure
 
         private static void ExecuteVerbs(object verbType)
         {
+            IAzure _Azure = null;
             switch (verbType)
             {
                 case KeyVaultOptions keyVaultOptions:
                     Authenticate(verbType as AzureOptions);
 
-                    var keyVaultManager = new KeyVaultManager(_azure, keyVaultOptions.VaultName);
+                    var keyVaultManager = new KeyVaultManager(_Azure, keyVaultOptions.VaultName);
 
                     switch (verbType)
                     {
@@ -67,7 +67,7 @@ namespace ModernSlavery.Infrastructure.Azure
                     break;
                 case AppServiceOptions appServiceOptions:
                     Authenticate(verbType as AzureOptions);
-                    var appServiceManager = new AppServiceManager(_azure);
+                    var appServiceManager = new AppServiceManager(_Azure);
 
                     switch (verbType)
                     {
@@ -79,7 +79,7 @@ namespace ModernSlavery.Infrastructure.Azure
                 case SqlServerOptions sqlServerOptions:
                 case SqlDatabaseOptions sqlDatabaseOptions:
                     Authenticate(verbType as AzureOptions);
-                    var sqlManager = new SqlManager(_azure);
+                    var sqlManager = new SqlManager(_Azure);
 
                     switch (verbType)
                     {
@@ -113,8 +113,7 @@ namespace ModernSlavery.Infrastructure.Azure
         private static void Authenticate(AzureOptions azureOptions)
         {
             if (azureOptions == null) throw new ArgumentNullException(nameof(azureOptions));
-            if (_azure != null && _azureOptions.ClientId == azureOptions.ClientId && _azureOptions.ClientSecret == azureOptions.ClientSecret && _azureOptions.TenantId == azureOptions.TenantId && _azureOptions.SubscriptionId == azureOptions.SubscriptionId) return;
-            _azure = AzureManager.Authenticate(azureOptions);
+            AzureManager.Authenticate(azureOptions);
             _azureOptions = azureOptions;
         }
     }

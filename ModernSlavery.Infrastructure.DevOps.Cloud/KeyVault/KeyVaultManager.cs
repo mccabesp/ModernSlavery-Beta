@@ -53,7 +53,7 @@ namespace ModernSlavery.Infrastructure.Azure.KeyVault
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
             var secret = GetSecret(name, secrets);
-            var latestValue = secret.ListVersions().LastOrDefault();
+            var latestValue = secret?.ListVersions().LastOrDefault();
             return latestValue?.Value;
         }
 

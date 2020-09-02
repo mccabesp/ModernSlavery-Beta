@@ -1,20 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.WebUI.Shared.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace ModernSlavery.Testing.Helpers
 {
@@ -46,14 +37,19 @@ namespace ModernSlavery.Testing.Helpers
             return host.Services.GetRequiredService<T>();
         }
 
+        public static IConfiguration GetConfiguration(this IHost host)
+        {
+            return host.Services.GetRequiredService<IConfiguration>();
+        }
+
         public static IDataRepository GetDataRepository(this IHost host)
         {
             return host.Services.GetRequiredService<IDataRepository>();
         }
 
-        public static DatabaseContext GetDatabaseContext(this IHost host)
+        public static IDbContext GetDbContext(this IHost host)
         {
-            return host.Services.GetRequiredService<DatabaseContext>();
+            return host.Services.GetRequiredService<IDbContext>();
         }
 
         public static IFileRepository GetFileRepository(this IHost host)

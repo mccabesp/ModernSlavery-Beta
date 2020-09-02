@@ -22,6 +22,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         private readonly IFileRepository _fileRepository;
         private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
         private readonly IPostcodeChecker _postcodeChecker;
+        private static readonly int? CommandTimeout = 500;
 
         public DataImporter(SharedOptions sharedOptions, IDataRepository dataRepository, IFileRepository fileRepository, IReportingDeadlineHelper reportingDeadlineHelper, IPostcodeChecker postcodeChecker)
         {
@@ -30,7 +31,6 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             _fileRepository = fileRepository ?? throw new ArgumentNullException(nameof(fileRepository));
             _reportingDeadlineHelper = reportingDeadlineHelper ?? throw new ArgumentNullException(nameof(reportingDeadlineHelper));
             _postcodeChecker = postcodeChecker ?? throw new ArgumentNullException(nameof(postcodeChecker));
-
         }
 
         #region Seed the SIC Codes and Categories
@@ -525,10 +525,11 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                 {
                     if (bulkOrganisations.Any())
                     {
+                        _dataRepository.BeginTransaction();
                         //We need to set a dummy id to preserver insert order so we can retrieve ids 
                         long i = -10 - bulkOrganisations.Count;
                         bulkOrganisations.ForEach(org => org.OrganisationId = i++);
-                        await _dataRepository.BulkInsertAsync(bulkOrganisations,true);
+                        await _dataRepository.BulkInsertAsync(bulkOrganisations,true, timeout: CommandTimeout);
                         Parallel.ForEach(bulkOrganisations, org =>
                         {
                             org.OrganisationStatuses.ForEach(s => s.OrganisationId = org.OrganisationId);
@@ -536,17 +537,17 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                             org.OrganisationNames.ForEach(s => s.OrganisationId = org.OrganisationId);
                             org.OrganisationAddresses.ForEach(s => s.OrganisationId = org.OrganisationId);
                         });
-                        if (bulkOrganisationStatuses.Any()) await _dataRepository.BulkInsertAsync(bulkOrganisationStatuses);
-                        if (bulkOrganisationSicCodes.Any()) await _dataRepository.BulkInsertAsync(bulkOrganisationSicCodes);
-                        if (bulkOrganisationNames.Any()) await _dataRepository.BulkInsertAsync(bulkOrganisationNames);
+                        if (bulkOrganisationStatuses.Any()) await _dataRepository.BulkInsertAsync(bulkOrganisationStatuses, timeout: CommandTimeout);
+                        if (bulkOrganisationSicCodes.Any()) await _dataRepository.BulkInsertAsync(bulkOrganisationSicCodes, timeout: CommandTimeout);
+                        if (bulkOrganisationNames.Any()) await _dataRepository.BulkInsertAsync(bulkOrganisationNames, timeout: CommandTimeout);
 
                         //We need to set a dummy id to preserver insert order so we can retrieve ids 
                         i = -10 - bulkAddresses.Count;
                         bulkAddresses.ForEach(address => address.AddressId = i++);
-                        if (bulkAddresses.Any()) await _dataRepository.BulkInsertAsync(bulkAddresses,true);
+                        if (bulkAddresses.Any()) await _dataRepository.BulkInsertAsync(bulkAddresses,true,timeout:CommandTimeout);
                         Parallel.ForEach(bulkAddresses, address => address.AddressStatuses.ForEach(s => s.AddressId = address.AddressId));
 
-                        if (bulkAddressStatuses.Any()) await _dataRepository.BulkInsertAsync(bulkAddressStatuses);
+                        if (bulkAddressStatuses.Any()) await _dataRepository.BulkInsertAsync(bulkAddressStatuses, timeout: CommandTimeout);
                         _dataRepository.CommitTransaction();
                     }
                 }
