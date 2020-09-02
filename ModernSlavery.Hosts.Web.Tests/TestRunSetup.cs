@@ -80,7 +80,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             if (TestWebHost == null) return;
 
             //Delete SQL firewall rules for the build agent
-            TestWebHost.CloseSQLFirewall();
+            AzureHelpers.CloseSQLFirewall();
 
             //Stop the webhost
             await TestWebHost?.StopAsync();

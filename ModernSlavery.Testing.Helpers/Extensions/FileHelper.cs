@@ -20,6 +20,8 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             var fileRepository = host.GetFileRepository();
             var submissionOptions = host.Services.GetService<SubmissionOptions>();
 
+            if (!await fileRepository.GetDirectoryExistsAsync(submissionOptions.DraftsPath)) return;
+
             var files = await fileRepository.GetFilesAsync(submissionOptions.DraftsPath);
             foreach (var file in files)
             {

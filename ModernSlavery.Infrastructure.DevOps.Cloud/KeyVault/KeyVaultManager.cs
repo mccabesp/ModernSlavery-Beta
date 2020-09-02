@@ -14,6 +14,8 @@ namespace ModernSlavery.Infrastructure.Azure.KeyVault
         IAzure _azure;
         IVault _vault;
 
+        public readonly string VaultName;
+
         public KeyVaultManager(IAzure azure, string vaultName, string resourceGroup = null)
         {
             _azure = azure ?? throw new ArgumentNullException(nameof(azure));
@@ -37,6 +39,7 @@ namespace ModernSlavery.Infrastructure.Azure.KeyVault
                 _vault = _azure.Vaults.GetByResourceGroup(resourceGroup, vaultName);
             }
             if (_vault == null) throw new ArgumentException($"Cannot find vault '{vaultName}'", nameof(vaultName));
+            VaultName = vaultName;
         }
 
         private ISecret GetSecret(string name, IList<ISecret> secrets = null)

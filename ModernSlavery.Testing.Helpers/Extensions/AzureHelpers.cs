@@ -8,21 +8,25 @@ using ModernSlavery.Core.Extensions;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using ModernSlavery.Infrastructure.Azure.KeyVault;
+using Microsoft.Azure.Management.Sql.Fluent.Models;
+using Microsoft.Azure.Management.Sql.Fluent;
+using SqlManager = ModernSlavery.Infrastructure.Azure.DevOps.SqlManager;
 
 namespace ModernSlavery.Testing.Helpers.Extensions
 {
     public static class AzureHelpers
     {
         private static AzureManager _azureManager = null;
-        private static IConfiguration _config=null;
+        private static IConfiguration _config = null;
         private static SqlManager _sqlManager = null;
         private static string _sqlServerName = null;
+        private static string _sqlDatabaseName = null;
         private static string _sqlFirewallRuleName = null;
         private static KeyVaultManager _keyVaultManager = null;
 
         private static IAzure Initialise(this IHost host)
         {
-            if (_azureManager != null && AzureManager.Azure!=null) return AzureManager.Azure;
+            if (_azureManager != null && AzureManager.Azure != null) return AzureManager.Azure;
             _azureManager = new AzureManager();
 
             _config = host.Services.GetRequiredService<IConfiguration>();
@@ -35,15 +39,8 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             return _azure;
         }
 
-        #region SQL Firewall
-        /// <summary>
-        /// Opens the firewall to the current SQL server for the current build agent
-        /// </summary>
-        /// <param name="host">The webhost</param>
-        public static void OpenSQLFirewall(this IHost host)
+        private static bool InitialiseSql(this IAzure azure)
         {
-            var azure = host.Initialise();
-
             SqlManager sqlManager = _sqlManager;
             if (sqlManager == null)
             {
@@ -53,26 +50,59 @@ namespace ModernSlavery.Testing.Helpers.Extensions
                 var connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
 
                 var sqlServerName = connectionStringBuilder.DataSource.BeforeFirst(".database.windows.net", StringComparison.OrdinalIgnoreCase, false, true).AfterFirst("tcp:", StringComparison.OrdinalIgnoreCase, false, true);
-                if (sqlServerName.ContainsI("localdb")) return;
+                if (sqlServerName.ContainsI("localdb")) return false;
 
+                _sqlManager = sqlManager;
                 _sqlServerName = sqlServerName;
-                _sqlFirewallRuleName = $"TESTAGENT_{_config.GetValue("AGENT_NAME", Environment.MachineName)}";
+                _sqlDatabaseName = connectionStringBuilder.InitialCatalog;
             }
-            sqlManager.OpenFirewall(_sqlServerName, _sqlFirewallRuleName);
-            _sqlManager = sqlManager;
+            return true;
+        }
+
+        #region SQL Firewall
+        /// <summary>
+        /// Opens the firewall to the current SQL server for the current build agent
+        /// </summary>
+        /// <param name="host">The webhost</param>
+        public static void OpenSQLFirewall(this IHost host)
+        {
+            var azure = host.Initialise();
+
+            if (!azure.InitialiseSql()) return;
+
+            var sqlFirewallRuleName = $"TESTAGENT_{_config.GetValue("AGENT_NAME", Environment.MachineName)}";
+            _sqlManager.OpenFirewall(_sqlServerName, sqlFirewallRuleName);
+            _sqlFirewallRuleName = sqlFirewallRuleName;
         }
 
         /// <summary>
         /// Deletes the firewall to the current SQL server for the current build agent
         /// </summary>
         /// <param name="host">The webhost</param>
-        public static void CloseSQLFirewall(this IHost host)
+        public static void CloseSQLFirewall()
         {
-            _sqlManager?.DeleteFirewall(_sqlServerName, _sqlFirewallRuleName);
+            if (!string.IsNullOrWhiteSpace(_sqlServerName) && !string.IsNullOrWhiteSpace(_sqlFirewallRuleName))_sqlManager?.DeleteFirewall(_sqlServerName, _sqlFirewallRuleName);
         }
         #endregion
 
+        public static void SetSqlDatabaseEdition(this IHost host, DatabaseEdition newDatabaseEdition)
+        {
+            var azure = host.Initialise();
+
+            if (!azure.InitialiseSql()) return;
+
+            _sqlManager.SetDatabaseEdition(_sqlDatabaseName, newDatabaseEdition);
+        }
+
         #region KeyVault
+        private static bool InitialiseKeyVault(this IAzure azure)
+        {
+            var vaultName = _config["Vault"];
+            if (string.IsNullOrWhiteSpace(vaultName)) return false;
+            if (_keyVaultManager == null || !_keyVaultManager.VaultName.EqualsI(vaultName)) _keyVaultManager = new KeyVaultManager(azure, vaultName);
+            return true;
+        }
+
         /// <summary>
         /// Gets a secret value from the keyVault
         /// </summary>
@@ -84,10 +114,9 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
 
             var azure = host.Initialise();
+            if (!azure.InitialiseKeyVault()) throw new Exception($"Could not create KeyVaultManager for vault '{vaultName}'");
 
-            var keyVaultManager = _keyVaultManager;
-            if (keyVaultManager == null) keyVaultManager = new KeyVaultManager(azure, vaultName); var value=keyVaultManager.GetValue(key);
-            _keyVaultManager = keyVaultManager;
+            var value = _keyVaultManager.GetValue(key);
             return value;
         }
 
@@ -103,11 +132,9 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
 
             var azure = host.Initialise();
+            if (!azure.InitialiseKeyVault()) throw new Exception($"Could not create KeyVaultManager for vault '{vaultName}'");
 
-            var keyVaultManager = _keyVaultManager;
-            if (keyVaultManager == null)keyVaultManager = new KeyVaultManager(azure,vaultName);
-            keyVaultManager.SetValue(key,value);
-            _keyVaultManager = keyVaultManager;
+            _keyVaultManager.SetValue(key, value);
         }
         #endregion
     }
