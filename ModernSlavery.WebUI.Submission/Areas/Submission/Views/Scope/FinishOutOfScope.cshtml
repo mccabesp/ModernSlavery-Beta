@@ -54,13 +54,13 @@
                 if (Model.UserIsRegistered)
                 {
                     <p>
-                        <a href="@Url.Action("ManageOrganisation", "Organisation", new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId.ToString())})" class="govuk-button govuk-!-margin-right-1">Continue</a>
+                        <a href="@Url.Action("ManageOrganisation", "submission", new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId.ToString())})" class="govuk-button govuk-!-margin-right-1">Continue</a>
                     </p>
                 }
                 else
                 {
                     <p>
-                        <a href="@Url.Action(nameof(SubmissionController.ManageOrganisations))" class="govuk-button govuk-!-margin-right-1">Continue</a>
+                        <a href="@Url.Action("ManageOrganisation", "submission", new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId.ToString())})" class="govuk-button govuk-!-margin-right-1">Continue</a>
                     </p>
                 }
             }

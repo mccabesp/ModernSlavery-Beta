@@ -544,6 +544,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //TODO: check logic for this one
             // stateModel.LastScope.SnapshotDate.Year == reportingDeadlineYear ? stateModel.LastScope : null;
 
+            if (latestScope == null)
+                throw new Exception($"Missing scope for organisation {organisationId} and year {reportingDeadlineYear}");
+
             // Set the return url
             stateModel.StartUrl = Url.Action("ManageOrganisation", "Submission",
                 new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(organisationId.ToString()) });
