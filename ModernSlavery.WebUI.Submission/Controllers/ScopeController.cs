@@ -545,7 +545,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // stateModel.LastScope.SnapshotDate.Year == reportingDeadlineYear ? stateModel.LastScope : null;
 
             // Set the return url
-            stateModel.StartUrl = Url.Action("ManageOrganisation",
+            stateModel.StartUrl = Url.Action("ManageOrganisation", "Submission",
                 new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(organisationId.ToString()) });
             stateModel.IsChangeJourney = true;
             stateModel.DeadlineDate = latestScope.DeadlineDate;
