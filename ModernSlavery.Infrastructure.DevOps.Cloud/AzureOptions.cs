@@ -1,11 +1,8 @@
 ﻿using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ModernSlavery.Infrastructure.DevOps.Cloud.AzureManagerOptions
+namespace ModernSlavery.Infrastructure.Azure
 {
-    public interface IAzureOptions
+    public class AzureOptions
     {
         [Option("client", Required = false, HelpText = "The ClientId of the Azure App Registration")]
         public string ClientId { get; set; }

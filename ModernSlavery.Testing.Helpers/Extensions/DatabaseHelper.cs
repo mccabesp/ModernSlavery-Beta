@@ -2,19 +2,27 @@
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Infrastructure.Database;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Infrastructure.Azure;
+using System.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using ModernSlavery.Infrastructure.Azure.DevOps;
+using Microsoft.Azure.Management.Fluent;
 
 namespace ModernSlavery.Testing.Helpers.Extensions
 {
     public static class DatabaseHelper
     {
+        private static AzureManager AzureManager = new AzureManager();
+        private static IAzure _azure = null;
+        private static SqlManager _sqlManager = null;
+        private static string _sqlServerName = null;
+        private static string _sqlFirewallRuleName = null;
+        private static AzureOptions _azureOptions;
 
         /// <summary>
         /// Deletes all tables in the database (except _EFMigrationsHistory) and reimports all seed data
@@ -69,8 +77,8 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             dataImporter.ImportStatementRiskTypesAsync().Wait();
             dataImporter.ImportStatementSectorTypesAsync().Wait();
             dataImporter.ImportStatementTrainingTypesAsync().Wait();
-            dataImporter.ImportPrivateOrganisationsAsync(-1).Wait();
-            dataImporter.ImportPublicOrganisationsAsync(-1).Wait();
+            dataImporter.ImportPrivateOrganisationsAsync(-1,100).Wait();
+            dataImporter.ImportPublicOrganisationsAsync(-1,100).Wait();
 
             //Set the last database reset
             Environment.SetEnvironmentVariable("LastFullDatabaseReset", DateTime.Now.ToString());
@@ -130,5 +138,44 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             await dataRepository.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Opens the firewall to the current SQL server for the current build agent
+        /// </summary>
+        /// <param name="host">The webhost</param>
+        public static void OpenSQLFirewall(this IHost host)
+        {
+            var config=host.Services.GetRequiredService<IConfiguration>();
+            var connectionString = config["Database:ConnectionString"];
+            var connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
+
+            var sqlServerName = connectionStringBuilder.DataSource.BeforeFirst(".database.windows.net", StringComparison.OrdinalIgnoreCase, false, true).AfterFirst("tcp:", StringComparison.OrdinalIgnoreCase,false,true);
+            if (sqlServerName.ContainsI("localdb")) return;
+
+            var clientId = config["ClientId"];
+            var clientSecret= config["ClientSecret"];
+            var buildAgentName= $"TESTAGENT_{config.GetValue("AGENT_NAME",Environment.MachineName)}";
+
+            if (string.IsNullOrWhiteSpace(clientId))
+                throw new ArgumentNullException(nameof(clientId), "Missing ClientId setting");
+            if (string.IsNullOrWhiteSpace(clientSecret))
+                throw new ArgumentNullException(nameof(clientSecret), "Missing ClientSecret setting");
+
+            string tenantId = config["TenantId"];
+            _azure = AzureManager.Authenticate(clientId,clientSecret,tenantId);
+            var sqlManager = new SqlManager(_azure);
+            _sqlServerName = sqlServerName;
+            _sqlFirewallRuleName = buildAgentName;
+            sqlManager.OpenFirewall(_sqlServerName, _sqlFirewallRuleName);
+            _sqlManager = sqlManager;
+        }
+
+        /// <summary>
+        /// Deletes the firewall to the current SQL server for the current build agent
+        /// </summary>
+        /// <param name="host">The webhost</param>
+        public static void CloseSQLFirewall(this IHost host)
+        {
+            _sqlManager?.DeleteFirewall(_sqlServerName, _sqlFirewallRuleName);
+        }
     }
 }

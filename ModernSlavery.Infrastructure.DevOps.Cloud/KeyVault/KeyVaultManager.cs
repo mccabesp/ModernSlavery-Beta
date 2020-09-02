@@ -1,26 +1,19 @@
-﻿using Microsoft.Azure.Management.BatchAI.Fluent.Models;
-using Microsoft.Azure.Management.Fluent;
+﻿using Microsoft.Azure.Management.Fluent;
 using Microsoft.Azure.Management.KeyVault.Fluent;
-using Microsoft.Azure.Management.Sql.Fluent;
-using Microsoft.Extensions.Configuration;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Infrastructure.Configuration;
-using ModernSlavery.Infrastructure.DevOps.Cloud.AzureManagerOptions;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ModernSlavery.Infrastructure.DevOps.Cloud.AzureResourceManagers
+namespace ModernSlavery.Infrastructure.Azure.KeyVault
 {
     public class KeyVaultManager
     {
         IAzure _azure;
         IVault _vault;
+
         public KeyVaultManager(IAzure azure, string vaultName, string resourceGroup = null)
         {
             _azure = azure ?? throw new ArgumentNullException(nameof(azure));
@@ -46,61 +39,88 @@ namespace ModernSlavery.Infrastructure.DevOps.Cloud.AzureResourceManagers
             if (_vault == null) throw new ArgumentException($"Cannot find vault '{vaultName}'", nameof(vaultName));
         }
 
-        public string GetValue(string name)
+        private ISecret GetSecret(string name, IList<ISecret> secrets = null)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
-            var secret = _vault.Secrets.GetByName(name);
-            return secret?.Value;
+            name = name.Replace(":", "--");
+            secrets = secrets ?? _vault.Secrets.List().ToList();
+            return secrets.FirstOrDefault(s => s.Name == name);
         }
 
-        public void SetValue(string name, string value)
+        public string GetValue(string name, IList<ISecret> secrets = null)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+
+            var secret = GetSecret(name, secrets);
+            var latestValue = secret.ListVersions().LastOrDefault();
+            return latestValue?.Value;
+        }
+
+        public ISecret SetValue(string name, string value, IList<ISecret> secrets = null)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(value)) throw new ArgumentNullException(nameof(value));
 
-            name = name.Replace(":", "--");
 
-            var secret = _vault.Secrets.List().FirstOrDefault(s => s.Name.EqualsI(name));
+            name = name.Replace(":", "--");
+            secrets = secrets ?? _vault.Secrets.List().ToList();
+            var secret = GetSecret(name, secrets);
+
             if (secret == null)
-                _vault.Secrets.Define(name).WithValue(value).Create();
-            else
-                secret.Update().WithValue(value).Apply();
+                return _vault.Secrets.Define(name).WithValue(value).Create();
+            else if (GetValue(name) != value)
+                return secret.Update().WithValue(value).Apply();
+
+            return null;
         }
 
-        public Dictionary<string, string> GetValues(string sectionName = null)
+        public Dictionary<string, string> GetValues(string sectionName = null, IList<ISecret> secrets = null)
         {
             var settings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            secrets = secrets ?? _vault.Secrets.List().ToList();
 
             sectionName = sectionName?.Replace("--", ":");
-            _vault.Secrets.List().ForEach(secret =>
+            secrets.ForEach(secret =>
             {
                 var newKey = secret.Name.Replace("--", ":");
-                var versions = secret.ListVersions().ToList();
                 if (string.IsNullOrWhiteSpace(sectionName) || newKey.StartsWithI(sectionName))
-                    settings[newKey] = secret.ListVersions().FirstOrDefault()?.Value;
+                    settings[newKey] = GetValue(secret.Name);
             });
 
             return settings;
         }
 
-        public string ImportValues(string filepath, string sectionName=null)
+        public string ImportValues(string filepath, string sectionName = null)
         {
-            var settings = Configuration.Extensions.LoadSettings(filepath,sectionName);
+            if (string.IsNullOrWhiteSpace(filepath)) throw new ArgumentNullException(nameof(filepath));
 
-            settings.Keys.ForEach(key =>
+            filepath = FileSystem.ExpandLocalPath(filepath);
+            if (!System.IO.File.Exists(filepath)) throw new FileNotFoundException("Cannot find file", filepath);
+
+            var settings = Configuration.Extensions.LoadSettings(filepath, sectionName);
+
+            var secrets = _vault.Secrets.List().ToList();
+
+            settings.Keys.ForEach(name =>
             {
-                SetValue(key, settings[key]);
+                var secret = SetValue(name, settings[name], secrets);
+                if (secret != null) Console.WriteLine($"Imported secret '{name}'");
             });
+
             return null;
         }
         public void ExportValues(string vaultName, string filepath, string sectionName = null)
         {
             if (string.IsNullOrWhiteSpace(filepath)) throw new ArgumentNullException(nameof(filepath));
 
+            filepath = FileSystem.ExpandLocalPath(filepath);
+
             var settings = GetValues(sectionName);
 
             settings.SaveSettings(filepath);
         }
+
+
     }
 }

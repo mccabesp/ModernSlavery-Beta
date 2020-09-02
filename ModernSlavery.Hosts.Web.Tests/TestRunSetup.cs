@@ -30,6 +30,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task RunBeforeAnyTestsAsync()
         {
+            DevOpsAgent.LogGroupStart("Logging test group");
+            DevOpsAgent.LogError("This is a test error");
+            DevOpsAgent.LogWarning("This is a test warning");
+            DevOpsAgent.LogInformation("This is test information");
+            DevOpsAgent.LogDebug("This is a test debug");
+            DevOpsAgent.LogGroupEnd();
+
             //Delete all previous log files
             if (Directory.Exists(LogsFilepath))
             {
@@ -48,6 +55,9 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //Create the test host usign the default dependency module and override with a test module
             TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>(applicationName:"ModernSlavery.Hosts.Web");
+
+            //Create SQL firewall rule for the build agent
+            TestWebHost.OpenSQLFirewall();
 
             //Start the test host
             await TestWebHost.StartAsync().ConfigureAwait(false);
@@ -68,6 +78,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task RunAfterAnyTestsAsync()
         {
             if (TestWebHost == null) return;
+
+            //Delete SQL firewall rules for the build agent
+            TestWebHost.CloseSQLFirewall();
 
             //Stop the webhost
             await TestWebHost?.StopAsync();
