@@ -8,7 +8,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     public class Feedback_Submit_Feedback : Private_Registration_Success
     {
-        [Test, Order(40)]
+           [Test, Order(40)]
         public async Task NavigateToFeedbackPage()
         {
             Click("feedback");
@@ -64,7 +64,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(50)]
         public async Task Return_To_Manage_Orgs()
         {
-            Click("Return to manage organisations");
+            ClickText("Return to manage organistions");
             ExpectHeader(That.Contains, "Select an organisation");
             await Task.CompletedTask;
         }
