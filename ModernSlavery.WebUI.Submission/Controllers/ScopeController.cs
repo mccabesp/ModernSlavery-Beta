@@ -250,7 +250,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // when model is null then return session expired view
             if (stateModel == null) return SessionExpiredView();
 
-            return View("EnterOutOfScopeAnswers", stateModel);
+            var model = stateModel.EnterAnswers ?? new EnterAnswersViewModel();
+
+            model.BackUrl = stateModel.IsChangeJourney && stateModel.IsOutOfScopeJourney
+                ? stateModel.StartUrl
+                : Url.ActionArea("ConfirmOutOfScopeDetails", "Scope", "Submission");
+
+            return View("EnterOutOfScopeAnswers", model);
         }
 
         [PreventDuplicatePost]
@@ -269,12 +275,33 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // update the state
             stateModel.EnterAnswers = enterAnswersModel;
             StashModel(stateModel);
+            var fields = new List<string> { "", nameof(EnterAnswersViewModel.SelectedReasonOptions) };
+
+            if (enterAnswersModel.SelectedReasonOptions.Contains("Its turnover or budget is less than £36 million per year"))
+                fields.Add(nameof(EnterAnswersViewModel.TurnOver));
+
+            if (enterAnswersModel.SelectedReasonOptions.Contains("Other"))
+                fields.Add(nameof(EnterAnswersViewModel.OtherReason));
+
+            // when the user is not logged in then validate the contact details
+            if (CurrentUser == null)
+            {
+                fields.Add(nameof(EnterAnswersViewModel.FirstName));
+                fields.Add(nameof(EnterAnswersViewModel.LastName));
+                fields.Add(nameof(EnterAnswersViewModel.JobTitle));
+                fields.Add(nameof(EnterAnswersViewModel.EmailAddress));
+            }
+
+            ModelState.Include(fields.ToArray());
 
             // validate the details
             if (!ModelState.IsValid)
             {
-                this.SetModelCustomErrors<ScopingViewModel>();
-                return View("EnterOutOfScopeAnswers", stateModel);
+                enterAnswersModel.BackUrl = stateModel.IsChangeJourney && stateModel.IsOutOfScopeJourney
+                ? stateModel.StartUrl
+                : Url.ActionArea("ConfirmOutOfScopeDetails", "Scope", "Submission");
+                this.SetModelCustomErrors<EnterAnswersViewModel>();
+                return View("EnterOutOfScopeAnswers", enterAnswersModel);
             }
 
             //Ensure email is always lower case
