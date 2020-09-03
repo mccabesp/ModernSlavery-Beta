@@ -118,7 +118,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Organisation details");
 
             RightOfText("Name").Expect(Submission.OrgName_InterFloor);
-            RightOfText("Reference").Expect(Submission.EmployerReference_InterFloor);
+            RightOfText("Reference").Expect(Submission.EmployerReference_Success);
             //todo await helper implementation for address logic
             RightOfText("Registered address").Expect("");
 

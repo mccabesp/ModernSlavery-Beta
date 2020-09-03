@@ -86,9 +86,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Expect(What.Contains, Create_Account.roger_first + " " + Create_Account.roger_last + " (" + Create_Account.roger_job_title + ")");
-            Expect(What.Contains, Registration.Address1_InterFloor);
-            Expect(What.Contains, Registration.Address3_InterFloor);
-            Expect(What.Contains, Registration.PostCode_InterFloor);
+            Expect(What.Contains, Registration.RegisteredAddress_InterFloor);
 
             await Task.CompletedTask;
 

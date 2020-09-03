@@ -1,12 +1,14 @@
-﻿using System;
+﻿using ModernSlavery.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    class Registration
+    public static class Registration
     {
         //todo clarify dummy data
         public const string InvalidEmployerReference = "invalid";
@@ -33,15 +35,20 @@ namespace ModernSlavery.Hosts.Web.Tests
         //codes 1, 84110
         public const string SicCodes_Blackpool = "Public Sector, General public administration activities";
 
-        public const string EmployerReference_InterFloor = "B72GL8R2";
-        public const string OrgName_InterFloor = "INTERFLOOR LIMITED";
-        public const string RegisteredAddress_InterFloor = "Broadway, Haslingden, Rossendale, Lancashire, BB4 4LS";
-        public const string Address1_InterFloor = "Broadway, Haslingden";
-        public const string Address2_InterFloor = "";
-        public const string Address3_InterFloor = "Rossendale";
-        public const string PostCode_InterFloor = "BB4 4LS";
-        //codes 1, 84110
-        public const string SicCodes_InterFloor = "Public Sector, General public administration activities";
+        //private static string _EmployerReference_Success;
+        private static string _OrgName_InterFloor;
+        ////private static string RegisteredAddress_InterFloor = "Broadway, Haslingden, Rossendale, Lancashire, BB4 4LS";
+        //private static string Address1_InterFloor;
+        //private static string Address2_InterFloor;
+        //private static string Address3_InterFloor;
+        //private static string PostCode_InterFloor;
+        //private static string SicCodes_InterFloor;
+        public static Organisation Organisation { get; } = OrganisationHelper.ListOrganisations(TestRunSetup.TestWebHost).FirstOrDefault();
+
+        public static string EmployerReference_Success => Organisation.EmployerReference;
+        public static string OrgName_InterFloor => Organisation.OrganisationName;
+        public static string RegisteredAddress_InterFloor => Organisation.GetAddressString(DateTime.Now);
+        public static string SicCodes_InterFloor => Organisation.GetSicCodeIdsString(DateTime.Now);
 
 
         public const string OrgName_CantFind = "QWERTYUIOPQWERTYUIOP";
