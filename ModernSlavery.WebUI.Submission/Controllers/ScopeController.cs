@@ -269,24 +269,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // update the state
             stateModel.EnterAnswers = enterAnswersModel;
             StashModel(stateModel);
-            var fields = new List<string>();
-
-            // when the user is not logged in then validate the contact details
-            if (CurrentUser == null)
-            {
-                fields.Add(nameof(EnterAnswersViewModel.FirstName));
-                fields.Add(nameof(EnterAnswersViewModel.LastName));
-                fields.Add(nameof(EnterAnswersViewModel.EmailAddress));
-            }
-
-            // the following fields are validatable at this stage
-            fields.Add(nameof(EnterAnswersViewModel.Reason));
-            if (enterAnswersModel.Reason == "Other") fields.Add(nameof(EnterAnswersViewModel.OtherReason));
-
-            fields.Add(nameof(EnterAnswersViewModel.TurnOver));
-            //fields.Add(nameof(EnterAnswersViewModel.ReadGuidance));
-
-            ModelState.Include(fields.ToArray());
 
             // validate the details
             if (!ModelState.IsValid)

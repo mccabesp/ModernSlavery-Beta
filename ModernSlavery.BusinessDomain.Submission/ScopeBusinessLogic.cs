@@ -97,7 +97,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                 ContactFirstname = oldScope.ContactFirstname,
                 ContactLastname = oldScope.ContactLastname,
                 ContactJobTitle = oldScope.ContactJobTitle,
-                ReadGuidance = oldScope.ReadGuidance,
                 Reason = oldScope.Reason,
                 TurnOver = oldScope.TurnOver,
                 ScopeStatus = newStatus,
@@ -135,7 +134,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                 ContactFirstname = currentUser.Firstname,
                 ContactLastname = currentUser.Lastname,
                 ContactJobTitle = currentUser.JobTitle,
-                ReadGuidance = oldOrgScope.ReadGuidance,
                 Reason = !string.IsNullOrEmpty(comment)
                     ? comment
                     : oldOrgScope.Reason,
@@ -214,7 +212,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                     ContactFirstname = o.ContactFirstname,
                     ContactLastname = o.ContactLastname,
                     ContactJobTitle = o.ContactJobTitle,
-                    ReadGuidance = o.ReadGuidance,
                     Reason = o.Reason,
                     TurnOver = o.TurnOver,
                     CampaignId = o.CampaignId

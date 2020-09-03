@@ -28,8 +28,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public string ContactJobTitle { get; set; }
 
-        public bool? ReadGuidance { get; set; }
-
         public string Reason { get; set; }
 
         public string TurnOver { get; set; }

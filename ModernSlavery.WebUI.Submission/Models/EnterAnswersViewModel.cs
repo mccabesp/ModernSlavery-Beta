@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Azure.Management.WebSites.Models;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
@@ -61,32 +64,23 @@ namespace ModernSlavery.WebUI.Submission.Models
             }
         }
 
-        public string ReadGuidance { get; set; }
-
-        [Required]
         public string FirstName { get; set; }
 
-        [Required]
         public string LastName { get; set; }
 
         public string JobTitle { get; set; }
 
         [EmailAddress]
-        [Required]
         public string EmailAddress { get; set; }
 
         public bool HasName => !string.IsNullOrEmpty(FirstName + LastName);
 
         public string FullName => $"{FirstName} {LastName}";
 
-        public bool? HasReadGuidance()
-        {
-            if (!string.IsNullOrWhiteSpace(ReadGuidance)) return ReadGuidance.ToBoolean();
-
-            return null;
-        }
-
         public bool RequiresEmailConfirmation { get; set; }
+
+        [BindNever]
+        public bool IsLoggedIn { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -98,9 +92,22 @@ namespace ModernSlavery.WebUI.Submission.Models
             if (SelectedReasonOptions.Contains("Other") && string.IsNullOrWhiteSpace(OtherReason))
                 validationResults.AddValidationError(2117, nameof(OtherReason));
 
+            if (SelectedReasonOptions.Contains("Its turnover or budget is less than £36 million per year") && string.IsNullOrWhiteSpace(TurnOver))
+                validationResults.AddValidationError(2116, nameof(TurnOver));
+
+            if (IsLoggedIn)
+            {
+                if (string.IsNullOrWhiteSpace(FirstName))
+                    validationResults.AddValidationError(2111, nameof(FirstName));
+                if (string.IsNullOrWhiteSpace(LastName))
+                    validationResults.AddValidationError(2112, nameof(LastName));
+                if (string.IsNullOrWhiteSpace(JobTitle))
+                    validationResults.AddValidationError(2118, nameof(JobTitle));
+                if (string.IsNullOrWhiteSpace(EmailAddress))
+                    validationResults.AddValidationError(2107, nameof(EmailAddress));
+            }
+
             return validationResults;
         }
     }
-
-
 }
