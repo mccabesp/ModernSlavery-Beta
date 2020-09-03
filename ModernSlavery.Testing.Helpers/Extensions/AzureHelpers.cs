@@ -27,13 +27,16 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         private static IAzure Initialise(this IHost host)
         {
             if (_azureManager != null && AzureManager.Azure != null) return AzureManager.Azure;
-            _azureManager = new AzureManager();
 
             _config = host.Services.GetRequiredService<IConfiguration>();
 
             var clientId = _config["ClientId"];
+            if (string.IsNullOrWhiteSpace(clientId)) return null;
+
             var clientSecret = _config["ClientSecret"];
             var tenantId = _config["TenantId"];
+
+            _azureManager = new AzureManager();
             var _azure = _azureManager.Authenticate(clientId, clientSecret, tenantId);
 
             return _azure;
@@ -68,7 +71,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         {
             var azure = host.Initialise();
 
-            if (!azure.InitialiseSql()) return;
+            if (azure==null || !azure.InitialiseSql()) return;
 
             var sqlFirewallRuleName = $"TESTAGENT_{_config.GetValue("AGENT_NAME", Environment.MachineName)}";
             _sqlManager.OpenFirewall(_sqlServerName, sqlFirewallRuleName);
