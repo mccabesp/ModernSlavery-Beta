@@ -21,6 +21,8 @@ using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
 using System.Net.Http;
+using ModernSlavery.Infrastructure.Database.Classes;
+using ModernSlavery.Infrastructure.Database;
 
 namespace ModernSlavery.Hosts.Webjob
 {
@@ -61,6 +63,9 @@ namespace ModernSlavery.Hosts.Webjob
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
+            builder.RegisterType<DatabaseContext>().As<IDbContext>();
+            builder.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerDependency();
+
             //Register the messaging dependencies
             builder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
             builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();

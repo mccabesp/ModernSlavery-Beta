@@ -22,7 +22,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 //Load all the organisation in the database
-                var orgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync().ConfigureAwait(false);
+                var orgs = await _dataRepository.GetAll<Organisation>().ToListAsync().ConfigureAwait(false);
                 var count = 0;
 
                 //Loop through each organisation in the list
@@ -78,7 +78,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     }
 
                     //If there were database changes then save them
-                    if (changed) await _SharedBusinessLogic.DataRepository.SaveChangesAsync().ConfigureAwait(false);
+                    if (changed) await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
 
                     count++;
                 }
@@ -89,7 +89,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 log.LogError(ex, $"Failed webjob ({nameof(FixOrganisationAddresses)})");
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }

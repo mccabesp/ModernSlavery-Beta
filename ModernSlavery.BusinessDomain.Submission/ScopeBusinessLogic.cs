@@ -259,19 +259,22 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             return changedOrgs;
         }
-
         public async Task<HashSet<Organisation>> SetPresumedScopesAsync()
         {
-            var missingOrgs = await FindOrgsWhereScopeNotSetAsync();
-            var changedOrgs = new HashSet<Organisation>();
+            var allOrgs = await _dataRepository.ToListAsync<Organisation>();
+            allOrgs.SelectMany(o => o.OrganisationScopes).ToList();
 
-            foreach (var org in missingOrgs)
-                if (await SetPresumedScopesAsync(org.Organisation))
-                    changedOrgs.Add(org.Organisation);
+            var changedOrgs = new ConcurrentBag<Organisation>();
 
-            if (changedOrgs.Count > 0) await _dataRepository.SaveChangesAsync();
+            Parallel.ForEach(allOrgs, async org =>
+            {
+                if (await SetPresumedScopesAsync(org))
+                    changedOrgs.Add(org);
+            });
 
-            return changedOrgs;
+            if (changedOrgs.Count>0) await _dataRepository.SaveChangesAsync();
+
+            return changedOrgs.ToHashSet();
         }
 
         public async Task<bool> SetPresumedScopesAsync(Organisation org)
@@ -280,14 +283,15 @@ namespace ModernSlavery.BusinessDomain.Submission
             var neverDeclaredScope = true;
             var changed = false;
 
+            OrganisationScope currentScope = null;
             foreach (var reportingDeadline in _reportingDeadlineHelper.GetReportingDeadlines(org.SectorType))
             {
-                var scope = org.GetActiveScope(reportingDeadline);
+                currentScope = org.GetActiveScope(reportingDeadline);
 
                 // if we already have a scope then flag (prevYearScope, neverDeclaredScope) and skip this year
-                if (scope != null && scope.ScopeStatus != ScopeStatuses.Unknown)
+                if (currentScope != null && currentScope.ScopeStatus != ScopeStatuses.Unknown)
                 {
-                    prevYearScope = scope.ScopeStatus;
+                    prevYearScope = currentScope.ScopeStatus;
                     neverDeclaredScope = false;
                     continue;
                 }
@@ -318,51 +322,22 @@ namespace ModernSlavery.BusinessDomain.Submission
                 }
 
                 // update the scope status
-                SetPresumedScopeStatus(org, prevYearScope, reportingDeadline);
+                currentScope=SetPresumedScopeStatus(org, prevYearScope, reportingDeadline);
 
                 changed = true;
             }
 
+            if (currentScope == null) throw new Exception($"Scope cannot be null after {nameof(SetPresumedScopesAsync)}");
+            if (currentScope.Status!= ScopeRowStatuses.Active) throw new Exception($"Scope status cannot be {currentScope.Status} after {nameof(SetPresumedScopesAsync)}");
+
             // set the latest scope if not set
-            if (org.LatestScope == null)
+            if (org.LatestScopeId == null)
             {
-                org.LatestScope = org.GetLatestActiveScope();
+                org.LatestScope = currentScope;
                 changed = true;
             }
 
             return changed;
-        }
-
-        public async Task<IList<OrganisationMissingScope>> FindOrgsWhereScopeNotSetAsync()
-        {
-            // get all orgs of any status
-            var allOrgs = await _dataRepository.ToListAsync<Organisation>();
-            allOrgs.SelectMany(o => o.OrganisationScopes).ToList();
-
-            // find all orgs who have no scope or unknown scope statuses
-            var orgsWithMissingScope = new ConcurrentBag<OrganisationMissingScope>();
-            var privateDeadlines = _reportingDeadlineHelper.GetReportingDeadlines(SectorTypes.Private);
-            var publicDeadlines = _reportingDeadlineHelper.GetReportingDeadlines(SectorTypes.Public);
-
-            Parallel.ForEach(allOrgs, org =>
-             {
-                 var missingDeadlines = new List<DateTime>();
-
-                 // for all snapshot years check if scope exists
-                 var deadlines = org.SectorType == SectorTypes.Private ? privateDeadlines : publicDeadlines;
-                 foreach (var reportingDeadline in deadlines)
-                 {
-                     var scope = org.GetActiveScope(reportingDeadline);
-                     if (scope == null || scope.ScopeStatus == ScopeStatuses.Unknown) missingDeadlines.Add(reportingDeadline);
-                 }
-
-                 // collect
-                 if (missingDeadlines.Count > 0)
-                     orgsWithMissingScope.Add(
-                         new OrganisationMissingScope { Organisation = org, MissingDeadlines = missingDeadlines });
-             });
-
-            return orgsWithMissingScope.ToList();
         }
 
         /// <summary>
@@ -412,15 +387,6 @@ namespace ModernSlavery.BusinessDomain.Submission
             org.OrganisationScopes.Add(newScope);
 
             return newScope;
-        }
-
-
-        public virtual async Task<OrganisationScope> GetPendingScopeRegistrationAsync(string emailAddress)
-        {
-            var result = await _dataRepository.FirstOrDefaultByDescendingAsync<OrganisationScope, DateTime>(
-                s => s.RegisterStatusDate,
-                o => o.RegisterStatus == RegisterStatuses.RegisterPending && o.ContactEmailAddress == emailAddress);
-            return result;
         }
     }
 }

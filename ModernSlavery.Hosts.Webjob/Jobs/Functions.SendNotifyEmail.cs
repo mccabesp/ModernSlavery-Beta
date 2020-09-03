@@ -29,12 +29,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             catch (Exception ex)
             {
-                _CustomLogger.Error("EMAIL FAILURE: Failed to deserialise Notify email from queue", ex);
+                log.LogError("EMAIL FAILURE: Failed to deserialise Notify email from queue", ex);
                 throw;
             }
 
-            govNotifyApi.SendEmail(notifyEmail);
-            _CustomLogger.Information("Successfully received message from queue and passed to GovNotifyAPI",
+            _govNotifyApi.SendEmail(notifyEmail);
+            log.LogInformation("Successfully received message from queue and passed to GovNotifyAPI",
                 new {notifyEmail});
         }
 
@@ -45,9 +45,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         /// <param name="log"></param>
         [Singleton] //Ensures execution on only one instance
         public async Task SendNotifyEmailPoisonAsync([QueueTrigger(QueueNames.SendNotifyEmail + "-poison")]
-            string queueMessage)
+            string queueMessage,
+            ILogger log)
         {
-            _CustomLogger.Error("EMAIL FAILURE: Notify email in poison queue", new {queueMessage});
+            log.LogError("EMAIL FAILURE: Notify email in poison queue", new {queueMessage});
         }
     }
 }

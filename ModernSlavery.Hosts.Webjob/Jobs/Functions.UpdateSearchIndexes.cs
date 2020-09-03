@@ -22,7 +22,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             catch (Exception ex)
             {
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", ex.Message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", ex.Message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -45,7 +45,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 if (force && !string.IsNullOrWhiteSpace(userEmail))
                     try
                     {
-                        await _Messenger.SendMessageAsync("UpdateOrganisationSearchIndexes complete", userEmail, "The update of the search indexes completed successfully.").ConfigureAwait(false);
+                        await _messenger.SendMessageAsync("UpdateOrganisationSearchIndexes complete", userEmail, "The update of the search indexes completed successfully.").ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {

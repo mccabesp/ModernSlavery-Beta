@@ -24,7 +24,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(SetIsUkAddressesAsync)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -38,7 +38,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                var addresses = _SharedBusinessLogic.DataRepository.GetAll<OrganisationAddress>().Where(a => a.IsUkAddress == null);
+                var addresses = _dataRepository.GetAll<OrganisationAddress>().Where(a => a.IsUkAddress == null);
                 foreach (var org in addresses) await SetIsUkAddressAsync(org);
             }
             finally
@@ -53,10 +53,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             if (string.IsNullOrWhiteSpace(address.PostCode)) throw new ArgumentNullException(nameof(address.PostCode));
 
             //Check if the address is a valid UK postcode
-            address.IsUkAddress = await _PostCodeChecker.IsValidPostcode(address.PostCode);
+            address.IsUkAddress = await _postCodeChecker.IsValidPostcode(address.PostCode);
 
             //Save the address
-            await _SharedBusinessLogic.DataRepository.SaveChangesAsync();
+            await _dataRepository.SaveChangesAsync();
         }
     }
 }

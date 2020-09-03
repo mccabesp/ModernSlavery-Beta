@@ -37,7 +37,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             //RunningJobs.Add(nameof(CompaniesHouseCheck));
 
-            //IEnumerable<string> filePaths = await _FileRepository.GetFilesAsync(_SharedBusinessLogic.SharedOptions.DataPath, "MSU-DnBOrgs_*.csv");
+            //IEnumerable<string> filePaths = await _FileRepository.GetFilesAsync(_sharedOptions.DataPath, "MSU-DnBOrgs_*.csv");
             //string filePath = filePaths.OrderByDescending(f => f).FirstOrDefault();
             //var updates = 0;
             //try
