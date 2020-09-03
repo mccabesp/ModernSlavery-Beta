@@ -30,19 +30,19 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var model = UnstashModel<OrganisationViewModel>();
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            //Pre-populate address from selected employer
-            var employer = model.ManualRegistration ? null : model.GetManualOrganisation() ?? model.GetSelectedOrganisation();
+            //Pre-populate address from selected organisation
+            var organisation = model.ManualRegistration ? null : model.GetManualOrganisation() ?? model.GetSelectedOrganisation();
 
-            if (employer != null)
+            if (organisation != null)
             {
-                var list = employer.GetAddressList();
+                var list = organisation.GetAddressList();
                 model.Address1 = list.Count > 0 ? list[0] : null;
                 model.Address2 = list.Count > 1 ? list[1] : null;
                 model.Address3 = list.Count > 2 ? list[2] : null;
                 model.City = null;
                 model.County = null;
                 model.Country = null;
-                model.Postcode = employer.PostCode;
+                model.Postcode = organisation.PostCode;
             }
 
             return View(nameof(AddAddress), model);
@@ -58,7 +58,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            //Make sure we can load employers from session
+            //Make sure we can load organisations from session
             var m = UnstashModel<OrganisationViewModel>();
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
@@ -102,32 +102,32 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             var sector = model.SectorType;
             var authorised = false;
-            OrganisationRecord employer = null;
+            OrganisationRecord organisation = null;
             if (!model.ManualRegistration)
             {
-                employer = model.GetManualOrganisation();
+                organisation = model.GetManualOrganisation();
 
-                if (employer != null)
+                if (organisation != null)
                 {
                     authorised = model.ManualAuthorised;
                 }
                 else
                 {
-                    employer = model.GetSelectedOrganisation();
+                    organisation = model.GetSelectedOrganisation();
                     authorised = model.SelectedAuthorised;
                 }
             }
 
             //Set the address source to the user or original source if unchanged
-            if (employer != null && model.GetAddressModel().Equals(employer.GetAddressModel()))
-                model.AddressSource = employer.AddressSource;
+            if (organisation != null && model.GetAddressModel().Equals(organisation.GetAddressModel()))
+                model.AddressSource = organisation.AddressSource;
             else
                 model.AddressSource = VirtualUser.EmailAddress;
 
             if (model.WrongAddress) model.ManualAddress = true;
 
             //When doing manual address only and user is already authorised redirect to confirm page
-            if (model.ManualAddress && sector == SectorTypes.Public && authorised && !employer.HasAnyAddress())
+            if (model.ManualAddress && sector == SectorTypes.Public && authorised && !organisation.HasAnyAddress())
             {
                 //We don't need contact info if there is no address only when there is an address
                 model.ConfirmReturnAction = nameof(AddAddress);
@@ -193,7 +193,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            //Make sure we can load employers from session
+            //Make sure we can load organisation from session
             var m = UnstashModel<OrganisationViewModel>();
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 

@@ -6,11 +6,11 @@ namespace ModernSlavery.WebUI.Submission.Models
     [Serializable]
     public class EnterCodesViewModel
     {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "You must enter an employer reference")]
-        [Display(Name = "Enter your employer reference")]
-        public string EmployerReference { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        [Display(Name = "Enter your organisation reference")]
+        public string OrganisationReference { get; set; }
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "You must enter a security code")]
+        [Required(AllowEmptyStrings = false)]
         [Display(Name = "Enter your security code")]
         public string SecurityToken { get; set; }
     }

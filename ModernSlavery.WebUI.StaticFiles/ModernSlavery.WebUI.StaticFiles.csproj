@@ -34,15 +34,21 @@
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
   </ItemGroup>
 
+
   <ItemGroup>
-    <Content Update="wwwroot\**">
+    <Content Remove="wwwroot\**" />
+    <None Remove="wwwroot\**" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="wwwroot\**\*.*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="npm install&#xD;&#xA;npm rebuild" />
+    <Exec Command="npm install&#xD;&#xA;npm rebuild&#xD;&#xA;" />
   </Target>
 
 </Project>

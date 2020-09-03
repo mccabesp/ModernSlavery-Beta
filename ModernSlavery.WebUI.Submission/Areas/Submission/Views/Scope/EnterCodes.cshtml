@@ -24,10 +24,10 @@
             </p>
 
             <fieldset class="govuk-fieldset">
-                <div id="EmployerReferenceGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterCodesViewModel.EmployerReference), "govuk-form-group--error")">
-                    <label asp-for="EmployerReference" class="govuk-label">Organisation reference</label>
-                    <input asp-for="EmployerReference" class="govuk-input govuk-!-width-two-thirds" style="text-transform:uppercase" />
-                    <span asp-validation-for="EmployerReference" class="govuk-error-message"></span>
+                <div id="OrganisationReferenceGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterCodesViewModel.OrganisationReference), "govuk-form-group--error")">
+                    <label asp-for="OrganisationReference" class="govuk-label">Organisation reference</label>
+                    <input asp-for="OrganisationReference" class="govuk-input govuk-!-width-two-thirds" style="text-transform:uppercase" />
+                    <span asp-validation-for="OrganisationReference" class="govuk-error-message"></span>
                 </div>
                 
                 <div id="SecurityTokenGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterCodesViewModel.SecurityToken), "govuk-form-group--error")">

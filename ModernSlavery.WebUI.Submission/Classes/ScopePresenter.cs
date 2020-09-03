@@ -18,7 +18,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
         // inteface
         ScopingViewModel CreateScopingViewModel(Organisation org, User currentUser);
         Task<ScopingViewModel> CreateScopingViewModelAsync(EnterCodesViewModel enterCodes, User currentUser);
-        Task SaveScopesAsync(ScopingViewModel model, IEnumerable<int> snapshotYears);
+        Task SaveScopesAsync(ScopingViewModel model, IEnumerable<int> years);
         Task SavePresumedScopeAsync(ScopingViewModel model, int reportingStartYear);
     }
 
@@ -49,7 +49,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             User currentUser)
         {
             // when NonStarterOrg doesn't exist then return null
-            var org = await _organisationBusinessLogic.GetOrganisationByEmployerReferenceAndSecurityCodeAsync(enterCodes.EmployerReference, enterCodes.SecurityToken);
+            var org = await _organisationBusinessLogic.GetOrganisationByOrganisationReferenceAndSecurityCodeAsync(enterCodes.OrganisationReference, enterCodes.SecurityToken);
             if (org == null) return null;
 
             var scope = CreateScopingViewModel(org, currentUser);
@@ -72,12 +72,12 @@ namespace ModernSlavery.WebUI.Submission.Classes
                 DUNSNumber = org.DUNSNumber,
                 OrganisationName = org.OrganisationName,
                 OrganisationAddress = org.LatestAddress?.GetAddressString(),
-                AccountingDate = _sharedBusinessLogic.GetReportingStartDate(org.SectorType)
+                DeadlineDate = _sharedBusinessLogic.GetReportingDeadline(org.SectorType)
             };
-            model.EnterCodes.EmployerReference = org.EmployerReference;
+            model.EnterCodes.OrganisationReference = org.OrganisationReference;
 
             // get the scope info for this year
-            var scope = ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org, model.AccountingDate.AddYears(1));
+            var scope = ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org, model.DeadlineDate);
             if (scope != null)
                 model.ThisScope = new ScopeViewModel
                 {
@@ -85,11 +85,11 @@ namespace ModernSlavery.WebUI.Submission.Classes
                     ScopeStatus = scope.ScopeStatus,
                     StatusDate = scope.ScopeStatusDate,
                     RegisterStatus = scope.RegisterStatus,
-                    SnapshotDate = scope.SubmissionDeadline
+                    DeadlineDate = scope.SubmissionDeadline
                 };
 
             // get the scope info for last year
-            scope = ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org, model.AccountingDate);
+            scope = ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org, model.DeadlineDate);
             if (scope != null)
                 model.LastScope = new ScopeViewModel
                 {
@@ -97,7 +97,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
                     ScopeStatus = scope.ScopeStatus,
                     StatusDate = scope.ScopeStatusDate,
                     RegisterStatus = scope.RegisterStatus,
-                    SnapshotDate = scope.SubmissionDeadline
+                    DeadlineDate = scope.SubmissionDeadline
                 };
 
             //Check if the user is registered for this organisation
@@ -107,16 +107,16 @@ namespace ModernSlavery.WebUI.Submission.Classes
             return model;
         }
 
-        public virtual async Task SaveScopesAsync(ScopingViewModel model, IEnumerable<int> snapshotYears)
+        public virtual async Task SaveScopesAsync(ScopingViewModel model, IEnumerable<int> years)
         {
-            if (string.IsNullOrWhiteSpace(model.EnterCodes.EmployerReference))
-                throw new ArgumentNullException(nameof(model.EnterCodes.EmployerReference));
+            if (string.IsNullOrWhiteSpace(model.EnterCodes.OrganisationReference))
+                throw new ArgumentNullException(nameof(model.EnterCodes.OrganisationReference));
 
             if (model.IsSecurityCodeExpired) throw new ArgumentOutOfRangeException(nameof(model.IsSecurityCodeExpired));
 
-            if (!snapshotYears.Any()) throw new ArgumentNullException(nameof(snapshotYears));
+            if (!years.Any()) throw new ArgumentNullException(nameof(years));
 
-            //Get the organisation with this employer reference
+            //Get the organisation with this organisation reference
             var org = model.OrganisationId == 0
                 ? null
                 : await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(o =>
@@ -128,7 +128,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
 
             var newScopes = new List<OrganisationScope>();
 
-            foreach (var snapshotYear in snapshotYears.OrderByDescending(y => y))
+            foreach (var year in years.OrderByDescending(y => y))
             {
                 var scope = new OrganisationScope
                 {
@@ -142,8 +142,8 @@ namespace ModernSlavery.WebUI.Submission.Classes
                     TurnOver = model.EnterAnswers.TurnOver,
                     ScopeStatus = model.IsOutOfScopeJourney ? ScopeStatuses.OutOfScope : ScopeStatuses.InScope,
                     CampaignId = model.CampaignId,
-                    // set the snapshot date according to sector
-                    SubmissionDeadline = _sharedBusinessLogic.GetReportingStartDate(org.SectorType, snapshotYear)
+                    // set the deadline date according to sector
+                    SubmissionDeadline = _sharedBusinessLogic.GetReportingDeadline(org.SectorType, year)
                 };
                 newScopes.Add(scope);
             }
@@ -154,26 +154,26 @@ namespace ModernSlavery.WebUI.Submission.Classes
 
         public virtual async Task SavePresumedScopeAsync(ScopingViewModel model, int reportingDeadlineYear)
         {
-            if (string.IsNullOrWhiteSpace(model.EnterCodes.EmployerReference))
-                throw new ArgumentNullException(nameof(model.EnterCodes.EmployerReference));
+            if (string.IsNullOrWhiteSpace(model.EnterCodes.OrganisationReference))
+                throw new ArgumentNullException(nameof(model.EnterCodes.OrganisationReference));
 
             if (model.IsSecurityCodeExpired) throw new ArgumentOutOfRangeException(nameof(model.IsSecurityCodeExpired));
 
-            // get the organisation by EmployerReference
-            var org = await GetOrgByEmployerReferenceAsync(model.EnterCodes.EmployerReference);
+            // get the organisation by OrganisationReference
+            var org = await GetOrgByOrganisationReferenceAsync(model.EnterCodes.OrganisationReference);
             if (org == null)
                 throw new ArgumentOutOfRangeException(
-                    nameof(model.EnterCodes.EmployerReference),
-                    $"Cannot find organisation with EmployerReference: {model.EnterCodes.EmployerReference} in the database");
+                    nameof(model.EnterCodes.OrganisationReference),
+                    $"Cannot find organisation with OrganisationReference: {model.EnterCodes.OrganisationReference} in the database");
 
-            // can only save a presumed scope in the prev or current snapshot year
+            // can only save a presumed scope in the prev or current year
             var currentReportingDeadline = _sharedBusinessLogic.GetReportingDeadline(org.SectorType);
             var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(org.SectorType, reportingDeadlineYear);
 
             if (reportingDeadline.Year > currentReportingDeadline.Year || reportingDeadline.Year < currentReportingDeadline.Year - 1)
                 throw new ArgumentOutOfRangeException(nameof(reportingDeadline));
 
-            // skip saving a presumed scope when an active scope already exists for the snapshot year
+            // skip saving a presumed scope when an active scope already exists for the year
             if (await ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org.OrganisationId, reportingDeadline) !=
                 null) return;
 
@@ -191,7 +191,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
                     ? ScopeStatuses.PresumedOutOfScope
                     : ScopeStatuses.PresumedInScope,
                 CampaignId = model.CampaignId,
-                // set the snapshot date according to sector
+                // set the deadline date according to sector
                 SubmissionDeadline = _sharedBusinessLogic.GetReportingStartDate(org.SectorType, reportingDeadlineYear),
                 StatusDetails = "Generated by the system"
             };
@@ -200,10 +200,10 @@ namespace ModernSlavery.WebUI.Submission.Classes
             await ScopeBusinessLogic.SaveScopeAsync(org, true, newScope);
         }
 
-        public async Task<Organisation> GetOrgByEmployerReferenceAsync(string employerReference)
+        public async Task<Organisation> GetOrgByOrganisationReferenceAsync(string organisationReference)
         {
             var org = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Organisation>(o =>
-                o.EmployerReference == employerReference);
+                o.OrganisationReference == organisationReference);
             return org;
         }
     }

@@ -121,7 +121,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
                     if (localResults.Count > 0)
                     {
-                        if (test) //Make sure test employer is first
+                        if (test) //Make sure test organisation is first
                             searchResults.Results.AddRange(localResults.Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)));
                         else
                             searchResults.Results.InsertRange(0, localResults.Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)));

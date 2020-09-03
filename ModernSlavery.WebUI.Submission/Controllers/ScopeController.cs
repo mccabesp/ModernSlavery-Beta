@@ -82,7 +82,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             // the following fields are validatable at this stage
             ModelState.Include(
-                nameof(EnterCodesViewModel.EmployerReference),
+                nameof(EnterCodesViewModel.OrganisationReference),
                 nameof(EnterCodesViewModel.SecurityToken));
 
             // When ModelState is Not Valid Then Return the EnterCodes View
@@ -169,12 +169,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             ApplyUserContactDetails(CurrentUser, stateModel);
 
             // Save user as in scope
-            var snapshotYears = new HashSet<int> { stateModel.AccountingDate.Year };
-            await ScopePresentation.SaveScopesAsync(stateModel, snapshotYears);
+            var years = new HashSet<int> { stateModel.DeadlineDate.Year };
+            await ScopePresentation.SaveScopesAsync(stateModel, years);
 
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            var currentSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType);
-            if (stateModel.AccountingDate == currentSnapshotDate)
+            var currentDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
+            if (stateModel.DeadlineDate == currentDeadlineDate)
             {
                 var emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
                 foreach (var emailAddress in emailAddressesForOrganisation)
@@ -188,7 +188,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
 
-        [HttpGet("out/confirm-employer")]
+        [HttpGet("out/confirm-organisation")]
         public async Task<IActionResult> ConfirmOutOfScopeDetails()
         {
             // When User is Admin then redirect to Admin\Home
@@ -205,7 +205,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        [HttpPost("out/confirm-employer")]
+        [HttpPost("out/confirm-organisation")]
         public async Task<IActionResult> ConfirmOutOfScopeDetails(string command)
         {
             // When User is Admin then redirect to Admin\Home
@@ -335,16 +335,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             ApplyUserContactDetails(CurrentUser, stateModel);
 
             // Save user as out of scope
-            var snapshotYears = new HashSet<int> { stateModel.AccountingDate.Year };
-            if (!stateModel.IsChangeJourney) snapshotYears.Add(stateModel.AccountingDate.Year - 1);
+            // TODO James - review snapshot year, it will be submission deadlines how does this impact?
+            var years = new HashSet<int> { stateModel.DeadlineDate.Year };
+            if (!stateModel.IsChangeJourney) years.Add(stateModel.DeadlineDate.Year - 1);
 
-            await ScopePresentation.SaveScopesAsync(stateModel, snapshotYears);
+            await ScopePresentation.SaveScopesAsync(stateModel, years);
 
             StashModel(stateModel);
 
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            var currentSnapshotDate = _sharedBusinessLogic.GetReportingStartDate(organisation.SectorType);
-            if (stateModel.AccountingDate == currentSnapshotDate)
+            var currentDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
+            if (stateModel.DeadlineDate == currentDeadlineDate)
             {
                 var emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
                 foreach (var emailAddress in emailAddressesForOrganisation)
@@ -399,7 +400,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // when not auth then save codes and return ManageOrganisations redirect
             if (!stateModel.IsSecurityCodeExpired)
                 PendingFasttrackCodes =
-                    $"{stateModel.EnterCodes.EmployerReference}:{stateModel.EnterCodes.SecurityToken}:{stateModel.EnterAnswers?.FirstName}:{stateModel.EnterAnswers?.LastName}:{stateModel.EnterAnswers?.EmailAddress}";
+                    $"{stateModel.EnterCodes.OrganisationReference}:{stateModel.EnterCodes.SecurityToken}:{stateModel.EnterAnswers?.FirstName}:{stateModel.EnterAnswers?.LastName}:{stateModel.EnterAnswers?.EmailAddress}";
 
             return RedirectToAction(Url.Action(nameof(SubmissionController.ManageOrganisations)));
         }
@@ -426,7 +427,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // Ensure this user is registered fully for this organisation
             if (userOrg.PINConfirmedDate == null)
                 return new HttpForbiddenResult(
-                    $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.EmployerReference}");
+                    $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.OrganisationReference}");
 
             //Get the current snapshot date
             var reportingDeadline = SharedBusinessLogic.GetReportingDeadline(userOrg.Organisation.SectorType).AddYears(-2);
@@ -471,7 +472,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // Ensure this user is registered fully for this organisation
             if (userOrg.PINConfirmedDate == null)
                 return new HttpForbiddenResult(
-                    $"User {VirtualUser?.EmailAddress} has not completed registeration for organisation {userOrg.Organisation.EmployerReference}");
+                    $"User {VirtualUser?.EmailAddress} has not completed registeration for organisation {userOrg.Organisation.OrganisationReference}");
 
             //Check the year parameters
             if (model.ReportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear ||
@@ -538,16 +539,19 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var stateModel = ScopePresentation.CreateScopingViewModel(userOrg.Organisation, CurrentUser);
 
             // Get the latest scope for the reporting year
-            var latestScope = stateModel.ThisScope?.SnapshotDate.Year == reportingDeadlineYear ? stateModel.ThisScope :
+            var latestScope = stateModel.ThisScope?.DeadlineDate.Year == reportingDeadlineYear ? stateModel.ThisScope :
                 stateModel.LastScope;
             //TODO: check logic for this one
             // stateModel.LastScope.SnapshotDate.Year == reportingDeadlineYear ? stateModel.LastScope : null;
 
+            if (latestScope == null)
+                throw new Exception($"Missing scope for organisation {organisationId} and year {reportingDeadlineYear}");
+
             // Set the return url
-            stateModel.StartUrl = Url.Action("ManageOrganisation",
+            stateModel.StartUrl = Url.Action("ManageOrganisation", "Submission",
                 new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(organisationId.ToString()) });
             stateModel.IsChangeJourney = true;
-            stateModel.AccountingDate = latestScope.SnapshotDate;
+            stateModel.DeadlineDate = latestScope.DeadlineDate;
 
             //Set the in/out journey type
             stateModel.IsOutOfScopeJourney =

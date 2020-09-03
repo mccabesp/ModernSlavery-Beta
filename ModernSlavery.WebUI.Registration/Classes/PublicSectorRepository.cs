@@ -34,12 +34,12 @@ namespace ModernSlavery.WebUI.Registration.Classes
             var result = new PagedResult<OrganisationRecord>();
             if (test)
             {
-                var employers = new List<OrganisationRecord>();
+                var organisations = new List<OrganisationRecord>();
 
                 var min = await _DataRepository.CountAsync<Organisation>();
 
                 var id = Numeric.Rand(min, int.MaxValue - 1);
-                var employer = new OrganisationRecord
+                var organisation = new OrganisationRecord
                 {
                     OrganisationName = _sharedOptions.TestPrefix + "_GovDept_" + id,
                     CompanyNumber = ("_" + id).Left(10),
@@ -52,13 +52,13 @@ namespace ModernSlavery.WebUI.Registration.Classes
                     PoBox = null,
                     SicCodeIds = "1"
                 };
-                employers.Add(employer);
+                organisations.Add(organisation);
 
-                result.ActualRecordTotal = employers.Count;
-                result.VirtualRecordTotal = employers.Count;
+                result.ActualRecordTotal = organisations.Count;
+                result.VirtualRecordTotal = organisations.Count;
                 result.CurrentPage = page;
                 result.PageSize = pageSize;
-                result.Results = employers;
+                result.Results = organisations;
                 return result;
             }
 

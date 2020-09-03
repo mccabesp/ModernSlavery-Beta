@@ -13,7 +13,7 @@ namespace ModernSlavery.Core.Models.LogModels
         public long StatementId { get; set; }
         public string AccountingDate { get; set; }
         public long OrganisationId { get; set; }
-        public string EmployerName { get; set; }
+        public string OrganisationName { get; set; }
         public string Address { get; set; }
         public string CompanyNumber { get; set; }
         public string SicCodes { get; set; }

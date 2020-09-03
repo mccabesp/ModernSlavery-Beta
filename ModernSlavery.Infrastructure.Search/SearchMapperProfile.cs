@@ -7,7 +7,7 @@ namespace ModernSlavery.Infrastructure.Search
     {
         public SearchMapperProfile()
         {
-            CreateMap<OrganisationSearchModel,AzureEmployerSearchModel>();
+            CreateMap<OrganisationSearchModel,AzureOrganisationSearchModel>();
         }
     }
 }

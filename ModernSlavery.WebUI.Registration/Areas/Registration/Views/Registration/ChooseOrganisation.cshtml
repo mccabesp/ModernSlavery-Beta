@@ -41,10 +41,10 @@
                     if (Model.Organisations == null || Model.Organisations.Results.Count < 1)
                     {
                         <div class="zero-results">
-                            <h2 class="heading-medium">0 employers found that match your search</h2>
+                            <h2 class="heading-medium">0 organisations found that match your search</h2>
                             <h2>Please try:</h2>
                             <ul class="list list-bullet">
-                                <li>searching again using different employer name</li>
+                                <li>searching again using different organisation name</li>
                             </ul>
                         </div>
                     }
@@ -95,7 +95,7 @@
                                         </td>
                                     }
                                     <td>
-                                        <button type="submit" class="link-button" name="command" value="employer_@i">Choose&nbsp;organisation</button>
+                                        <button type="submit" class="link-button" name="command" value="organisation_@i">Choose&nbsp;organisation</button>
                                     </td>
                                 </tr>
                             }
@@ -135,7 +135,7 @@
                                         <button type="submit" class="link-button" name="command" value="pageNext">Next</button>
                                     }
                                 </div>
-                                <div class="pager-summary">Showing @Model.OrganisationStartIndex – @Model.OrganisationEndIndex of @Model.Organisations.VirtualRecordTotal employers</div>
+                                <div class="pager-summary">Showing @Model.OrganisationStartIndex – @Model.OrganisationEndIndex of @Model.Organisations.VirtualRecordTotal organisations</div>
                             </div>
                         }
                     }

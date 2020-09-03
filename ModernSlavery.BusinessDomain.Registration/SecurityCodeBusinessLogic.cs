@@ -38,7 +38,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 return new CustomResult<Organisation>(
                     InternalMessages.SecurityCodeCreateIsOnlyAllowedToNonRetiredOrgsErrorMessage(
                         organisation.OrganisationName,
-                        organisation.EmployerReference,
+                        organisation.OrganisationReference,
                         organisation.Status.ToString()),
                     organisation);
 

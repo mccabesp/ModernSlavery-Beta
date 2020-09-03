@@ -33,6 +33,8 @@ namespace ModernSlavery.WebUI.Admin
             //Register dependencies here
             builder.RegisterType<AdminSearchService>().As<AdminSearchService>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<AuditLogger>().As<AuditLogger>()
+                .InstancePerLifetimeScope();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

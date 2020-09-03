@@ -31,7 +31,7 @@ namespace ModernSlavery.WebUI.Registration.Presenters
         public virtual async Task<OrganisationViewModel> CreateOrganisationViewModelAsync(
             FastTrackViewModel enterCodes, User currentUser)
         {
-            var org = await _organisationBusinessLogic.GetOrganisationByEmployerReferenceAndSecurityCodeAsync(
+            var org = await _organisationBusinessLogic.GetOrganisationByOrganisationReferenceAndSecurityCodeAsync(
                 enterCodes.OrganisationReference,
                 enterCodes.SecurityCode);
             if (org == null) return null;

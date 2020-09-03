@@ -1,0 +1,8 @@
+﻿@model ScopingViewModel
+
+
+@await Html.PartialModelAsync(new CheckYourAnswers(
+    new CheckYourAnswer("Organisation Reference", Model.EnterCodes.OrganisationReference.ToUpper(), "OrganisationReferenceAnswer"),
+    new CheckYourAnswer("Organisation Name", Model.OrganisationName, "OrganisationNameAnswer"),
+    new CheckYourAnswer("Registered Address", Model.OrgAddressHtml, "OrgAddressAnswer")
+    ))

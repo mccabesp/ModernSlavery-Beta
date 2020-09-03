@@ -28,14 +28,14 @@
                         @foreach (var reason in Model.EnterAnswers.ReasonOptions)
                         {
                             <div class="govuk-checkboxes__item">
-                                <input name="SelectedReasonOptions" checked=@(Model.EnterAnswers.SelectedReasonOptions.Contains(reason)) value="@reason" class="govuk-checkboxes__input" type="checkbox" data-aria-controls="reason-conditional@(reasonIndex)">
-                                <label class="govuk-label govuk-checkboxes__label" for="reason-conditional">
+                                <input id="selected-reason-@reasonIndex" name="SelectedReasonOptions" checked=@(Model.EnterAnswers.SelectedReasonOptions.Contains(reason)) value="@reason" class="govuk-checkboxes__input" type="checkbox" data-aria-controls="reason-conditional-@(reasonIndex)">
+                                <label class="govuk-label govuk-checkboxes__label" for="selected-reason-@reasonIndex">
                                     @reason
                                 </label>
                             </div>
                             @if (reason.Equals("Its turnover or budget is less than £36 million per year"))
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.EnterAnswers.TurnOver, "govuk-form-group--error")" id="reason-conditional@(reasonIndex)">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.EnterAnswers.TurnOver, "govuk-form-group--error")" id="reason-conditional-@(reasonIndex)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
                                             What is your organistion’s annual turnover or budget?
@@ -47,7 +47,7 @@
                             }
                             @if (reason.Equals("Other"))
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.EnterAnswers.OtherReason, "govuk-form-group--error")" id="reason-conditional@(reasonIndex)">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.EnterAnswers.OtherReason, "govuk-form-group--error")" id="reason-conditional-@(reasonIndex)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
                                             Please specify

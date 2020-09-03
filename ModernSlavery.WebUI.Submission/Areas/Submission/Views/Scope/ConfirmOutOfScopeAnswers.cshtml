@@ -11,14 +11,12 @@
         {
             @Html.AntiForgeryToken()
 
-            var reportDateFormatter = new GDSDateFormatter(Model.AccountingDate);
-
             <h1 class="govuk-heading-l">
                 Check your answers before sending
             </h1>
 
             <h2 class="govuk-heading-m">Organisation details</h2>
-            @await Html.PartialAsync("Parts/EmployerDetailsPart", Model)
+            @await Html.PartialAsync("Parts/OrganisationDetailsPart", Model)
     <div class="change-header">
         <h2 class="govuk-heading-m">Declaration</h2>
         <a class="govuk-link" href="@Url.Action("EnterOutOfScopeAnswers")">
