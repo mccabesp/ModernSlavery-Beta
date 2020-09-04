@@ -121,7 +121,7 @@ namespace ModernSlavery.Hosts.Webjob
             RegisterEmailTemplate<OrganisationRegistrationApprovedTemplate>(emailTemplatesConfigPath);
             RegisterEmailTemplate<OrganisationRegistrationDeclinedTemplate>(emailTemplatesConfigPath);
             RegisterEmailTemplate<OrganisationRegistrationRemovedTemplate>(emailTemplatesConfigPath);
-            RegisterEmailTemplate<GeoOrganisationRegistrationRequestTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<MsuOrganisationRegistrationRequestTemplate>(emailTemplatesConfigPath);
 
             // system templates
             RegisterEmailTemplate<SendEmailTemplate>(emailTemplatesConfigPath);

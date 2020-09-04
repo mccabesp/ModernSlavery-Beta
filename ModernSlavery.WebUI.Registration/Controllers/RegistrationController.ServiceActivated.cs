@@ -181,10 +181,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 StashModel(model);
 
                 result1 = RedirectToAction("ServiceActivated");
-
-                //Send notification email to existing users 
-                _registrationService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(
-                    userOrg.Organisation, userOrg.User);
             }
             else
             {

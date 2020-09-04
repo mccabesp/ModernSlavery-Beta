@@ -24,6 +24,7 @@ using ModernSlavery.Infrastructure.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Configuration.Json;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
@@ -66,7 +67,8 @@ namespace ModernSlavery.Infrastructure.Hosts
 
             hostBuilder.ConfigureAppConfiguration((hostBuilderContext, appConfigBuilder) =>
             {
-                appConfigBuilder.Sources.Clear();
+                //Remove the extra json appsettings added by system
+                appConfigBuilder.RemoveConfigSources<JsonConfigurationSource>();
                 appConfigBuilder.AddConfiguration(appConfig);
             });
 

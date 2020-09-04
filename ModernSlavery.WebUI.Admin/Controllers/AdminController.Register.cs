@@ -547,10 +547,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //Save the changes and redirect
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            //Send notification email to existing users 
-            _adminService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation,
-                userOrg.User);
-
             //Ensure the organisation has an employer reference
             if (userOrg.PINConfirmedDate.HasValue && string.IsNullOrWhiteSpace(userOrg.Organisation.EmployerReference))
                 await _adminService.OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(userOrg.Organisation);
