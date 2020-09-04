@@ -370,7 +370,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(stateModel.EnterAnswers.EmailAddress,
                         organisation.OrganisationName,
                         stateModel.EnterAnswers.FullName,
-                        $"{stateModel.DeadlineDate.Year} to {stateModel.DeadlineDate.Year + 1}",
+                        $"{stateModel.DeadlineDate.Year - 1} to {stateModel.DeadlineDate.Year}",
                         organisation.LatestAddress.GetAddressString(),
                         stateModel.EnterAnswers.Reason);
             }
