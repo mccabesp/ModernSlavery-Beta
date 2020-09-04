@@ -10,7 +10,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     {
         //Ensure all organisations have a unique organisation reference
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task ReferenceOrganisations([TimerTrigger("%ReferenceOrganisations%")] TimerInfo timer, ILogger log)
+        public async Task ReferenceOrganisations([TimerTrigger("%ReferenceOrganisations%", RunOnStartup = true)] TimerInfo timer, ILogger log)
         {
             try
             {
