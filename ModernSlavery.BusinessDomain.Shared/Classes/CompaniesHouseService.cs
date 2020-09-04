@@ -71,7 +71,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
 
             var organisations = _dataRepository.GetAll<Organisation>()
                 .Where(org => !org.OptedOutFromCompaniesHouseUpdate && org.CompanyNumber != null && org.CompanyNumber != "" && (org.LastCheckedAgainstCompaniesHouse == null || org.LastCheckedAgainstCompaniesHouse < lastCheck))
-                .OrderByDescending(org => org.LastCheckedAgainstCompaniesHouse);
+                .OrderByDescending(org => org.LastCheckedAgainstCompaniesHouse).Take(_companiesHouseOptions.MaxApiCallsPerFiveMins);
 
             foreach (var organisation in organisations)
                 await UpdateOrganisationAsync(organisation);
@@ -85,6 +85,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             {
                 var organisationFromCompaniesHouse = _CompaniesHouseAPI.GetCompanyAsync(organisation.CompanyNumber).Result;
 
+                if (organisation.OrganisationId == 1041) System.Diagnostics.Debugger.Break();
                 try
                 {
                     await UpdateSicCodeAsync(organisation, organisationFromCompaniesHouse);
@@ -98,13 +99,13 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
                 }
                 catch (Exception ex)
                 {
-                    var message = $"Update from Companies House: Failed to update database, organisation id = {organisation.OrganisationId}";
+                    var message = $"Update from Companies House: Failed to update database, organisation id :{organisation.OrganisationId}, Company number:{organisation.CompanyNumber}";
                     _CustomLogger.Error(message, ex);
                 }
             }
             catch (Exception ex)
             {
-                var message = $"Update from Companies House: Failed to get company data from companies house, organisation id = {organisation.OrganisationId}";
+                var message = $"Update from Companies House: Failed to get company data from companies house, organisation id:{organisation.OrganisationId}, Company number:{organisation.CompanyNumber}";
                 _CustomLogger.Error(message, ex);
                 return;
             }

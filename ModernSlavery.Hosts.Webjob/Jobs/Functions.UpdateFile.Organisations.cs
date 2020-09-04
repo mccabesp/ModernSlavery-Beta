@@ -17,13 +17,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.Organisations);
+                var filePath = Path.Combine(_sharedOptions.DownloadsPath, Filenames.Organisations);
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateOrganisationsAsync)))
                 {
-                    var files = await _SharedBusinessLogic.FileRepository.GetFilesAsync(
-                        _SharedBusinessLogic.SharedOptions.DownloadsPath,
+                    var files = await _fileRepository.GetFilesAsync(
+                        _sharedOptions.DownloadsPath,
                         $"{Path.GetFileNameWithoutExtension(Filenames.Organisations)}*{Path.GetExtension(Filenames.Organisations)}").ConfigureAwait(false);
                     if (files.Any()) return;
                 }
@@ -37,7 +37,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed {nameof(UpdateOrganisationsAsync)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -56,7 +56,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             {
                 await WriteRecordsPerYearAsync(
                     filePath,
-                    _OrganisationBusinessLogic.GetOrganisationFileModelByYearAsync).ConfigureAwait(false);
+                    _organisationBusinessLogic.GetOrganisationFileModelByYearAsync).ConfigureAwait(false);
             }
             finally
             {

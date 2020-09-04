@@ -1,6 +1,6 @@
 ﻿namespace ModernSlavery.Core.EmailTemplates
 {
-    public class GeoOrganisationRegistrationRequestTemplate : EmailTemplate
+    public class MsuOrganisationRegistrationRequestTemplate : EmailTemplate
     {
         public string Name { get; set; }
 

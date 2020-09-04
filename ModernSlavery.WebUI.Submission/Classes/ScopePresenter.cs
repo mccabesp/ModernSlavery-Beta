@@ -137,7 +137,6 @@ namespace ModernSlavery.WebUI.Submission.Classes
                     ContactFirstname = model.EnterAnswers.FirstName,
                     ContactLastname = model.EnterAnswers.LastName,
                     ContactJobTitle = model.EnterAnswers.JobTitle,
-                    ReadGuidance = model.EnterAnswers.HasReadGuidance(),
                     Reason = model.EnterAnswers.Reason,
                     TurnOver = model.EnterAnswers.TurnOver,
                     ScopeStatus = model.IsOutOfScopeJourney ? ScopeStatuses.OutOfScope : ScopeStatuses.InScope,
@@ -185,7 +184,6 @@ namespace ModernSlavery.WebUI.Submission.Classes
                 ContactFirstname = model.EnterAnswers.FirstName,
                 ContactLastname = model.EnterAnswers.LastName,
                 ContactJobTitle = model.EnterAnswers.JobTitle,
-                ReadGuidance = model.EnterAnswers.HasReadGuidance(),
                 Reason = "",
                 ScopeStatus = model.IsOutOfScopeJourney
                     ? ScopeStatuses.PresumedOutOfScope

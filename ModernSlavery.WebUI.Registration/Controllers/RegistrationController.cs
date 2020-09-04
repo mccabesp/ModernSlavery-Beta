@@ -137,9 +137,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         }
                     }
 
-                    Logger.LogInformation(
-                        "Send Pin-in-post",
-                        $"Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}, Address:{userOrg?.Address.GetAddressString()}");
+                    Logger.LogInformation($"Send Pin-in-post. Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}, Address:{userOrg?.Address.GetAddressString()}");
                 }
                 catch (Exception ex)
                 {

@@ -20,16 +20,18 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         [Disable(typeof(DisableWebjobProvider))]
         public async Task PurgeUsers([TimerTrigger("%PurgeUsers%")] TimerInfo timer, ILogger log)
         {
+            if (RunningJobs.Contains(nameof(PurgeUsers))) return;
+            RunningJobs.Add(nameof(PurgeUsers));
             try
             {
                 var deadline =
-                    VirtualDateTime.Now.AddDays(0 - _SharedBusinessLogic.SharedOptions.PurgeUnverifiedUserDays);
-                var users = await _SharedBusinessLogic.DataRepository.GetAll<User>()
+                    VirtualDateTime.Now.AddDays(0 - _sharedOptions.PurgeUnverifiedUserDays);
+                var users = await _dataRepository.GetAll<User>()
                     .Where(u => u.EmailVerifiedDate == null &&
                                 (u.EmailVerifySendDate == null || u.EmailVerifySendDate.Value < deadline))
                     .ToListAsync().ConfigureAwait(false);
                 var pinExpireyDate =
-                    VirtualDateTime.Now.AddDays(0 - _SharedBusinessLogic.SharedOptions.PinInPostExpiryDays);
+                    VirtualDateTime.Now.AddDays(0 - _sharedOptions.PinInPostExpiryDays);
                 foreach (var user in users)
                 {
                     //Ignore if they have verified PIN
@@ -44,11 +46,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         nameof(user.UserId),
                         user.UserId.ToString(),
                         null,
-                        JsonConvert.SerializeObject(new {user.UserId, user.EmailAddress, user.JobTitle, user.Fullname}),
+                        JsonConvert.SerializeObject(new { user.UserId, user.EmailAddress, user.JobTitle, user.Fullname }),
                         null);
-                    _SharedBusinessLogic.DataRepository.Delete(user);
-                    await _SharedBusinessLogic.DataRepository.SaveChangesAsync().ConfigureAwait(false);
-                    await _ManualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
+                    _dataRepository.Delete(user);
+                    await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
+                    await _manualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
                 }
 
                 log.LogDebug($"Executed {nameof(PurgeUsers)} successfully");
@@ -58,21 +60,28 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(PurgeUsers)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(PurgeUsers));
+            }
+            
         }
 
         //Remove any incomplete registrations
         [Disable(typeof(DisableWebjobProvider))]
         public async Task PurgeRegistrations([TimerTrigger("%PurgeRegistrations%")] TimerInfo timer, ILogger log)
         {
+            if (RunningJobs.Contains(nameof(PurgeRegistrations))) return;
+            RunningJobs.Add(nameof(PurgeRegistrations));
             try
             {
                 var deadline =
-                    VirtualDateTime.Now.AddDays(0 - _SharedBusinessLogic.SharedOptions.PurgeUnconfirmedPinDays);
-                var registrations = await _SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
+                    VirtualDateTime.Now.AddDays(0 - _sharedOptions.PurgeUnconfirmedPinDays);
+                var registrations = await _dataRepository.GetAll<UserOrganisation>()
                     .Where(u => u.PINConfirmedDate == null && u.PINSentDate != null && u.PINSentDate.Value < deadline)
                     .ToListAsync().ConfigureAwait(false);
                 foreach (var registration in registrations)
@@ -97,9 +106,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 registration.PINConfirmedDate
                             }),
                         null);
-                    _SharedBusinessLogic.DataRepository.Delete(registration);
-                    await _SharedBusinessLogic.DataRepository.SaveChangesAsync().ConfigureAwait(false);
-                    await _ManualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
+                    _dataRepository.Delete(registration);
+                    await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
+                    await _manualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
                 }
 
                 log.LogDebug($"Executed {nameof(PurgeRegistrations)} successfully");
@@ -109,10 +118,15 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(PurgeRegistrations)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(PurgeRegistrations));
+            }
+            
         }
 
         //Remove any unverified users their addresses, UserOrgs, Org and addresses and archive to zip
@@ -121,11 +135,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
+            if (RunningJobs.Contains(nameof(PurgeOrganisations))) return;
+            RunningJobs.Add(nameof(PurgeOrganisations));
             try
             {
                 var deadline =
-                    VirtualDateTime.Now.AddDays(0 - _SharedBusinessLogic.SharedOptions.PurgeUnusedOrganisationDays);
-                var orgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+                    VirtualDateTime.Now.AddDays(0 - _sharedOptions.PurgeUnusedOrganisationDays);
+                var orgs = await _dataRepository.GetAll<Organisation>()
                     .Where(
                         o => o.Created < deadline
                              && !o.Statements.Any()
@@ -169,7 +185,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                         var searchRecords = await _searchBusinessLogic.GetOrganisationSearchIndexesAsync(org);
 
-                        await _SharedBusinessLogic.DataRepository.BeginTransactionAsync(
+                        await _dataRepository.BeginTransactionAsync(
                             async () =>
                             {
                                 try
@@ -178,26 +194,26 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                     org.LatestRegistration = null;
                                     org.LatestStatement = null;
                                     org.LatestScope = null;
-                                    org.UserOrganisations.ForEach(uo => _SharedBusinessLogic.DataRepository.Delete(uo));
-                                    await _SharedBusinessLogic.DataRepository.SaveChangesAsync().ConfigureAwait(false);
+                                    org.UserOrganisations.ForEach(uo => _dataRepository.Delete(uo));
+                                    await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
 
-                                    _SharedBusinessLogic.DataRepository.Delete(org);
-                                    await _SharedBusinessLogic.DataRepository.SaveChangesAsync().ConfigureAwait(false);
+                                    _dataRepository.Delete(org);
+                                    await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
 
-                                    _SharedBusinessLogic.DataRepository.CommitTransaction();
+                                    _dataRepository.CommitTransaction();
                                 }
                                 catch (Exception ex)
                                 {
-                                    _SharedBusinessLogic.DataRepository.RollbackTransaction();
+                                    _dataRepository.RollbackTransaction();
                                     log.LogError(
                                         ex,
                                         $"{nameof(PurgeOrganisations)}: Failed to purge organisation {org.OrganisationId} '{org.OrganisationName}' ERROR: {ex.Message}:{ex.GetDetailsText()}");
                                 }
                             }).ConfigureAwait(false);
                         //Remove this organisation from the search index
-                        await _OrganisationSearchRepository.RemoveFromIndexAsync(searchRecords).ConfigureAwait(false);
+                        await _organisationSearchRepository.RemoveFromIndexAsync(searchRecords).ConfigureAwait(false);
 
-                        await _ManualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
+                        await _manualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
                         count++;
                     }
 
@@ -209,21 +225,28 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(PurgeOrganisations)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(PurgeOrganisations));
+            }
+            
         }
 
         //Remove retired copies of GPG data
         [Disable(typeof(DisableWebjobProvider))]
         public async Task PurgeStatementData([TimerTrigger("%PurgeStatementData%")] TimerInfo timer, ILogger log)
         {
+            if (RunningJobs.Contains(nameof(PurgeStatementData))) return;
+            RunningJobs.Add(nameof(PurgeStatementData));
             try
             {
                 var deadline =
-                    VirtualDateTime.Now.AddDays(0 - _SharedBusinessLogic.SharedOptions.PurgeRetiredReturnDays);
-                var statements = await _SharedBusinessLogic.DataRepository.GetAll<Statement>()
+                    VirtualDateTime.Now.AddDays(0 - _sharedOptions.PurgeRetiredReturnDays);
+                var statements = await _dataRepository.GetAll<Statement>()
                     .Where(r => r.StatusDate < deadline &&
                                 (r.Status == StatementStatuses.Retired || r.Status == StatementStatuses.Deleted))
                     .ToListAsync().ConfigureAwait(false);
@@ -239,9 +262,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         null,
                         JsonConvert.SerializeObject(DownloadModel.Create(statement)),
                         null);
-                    _SharedBusinessLogic.DataRepository.Delete(statement);
-                    await _SharedBusinessLogic.DataRepository.SaveChangesAsync().ConfigureAwait(false);
-                    await _ManualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
+                    _dataRepository.Delete(statement);
+                    await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
+                    await _manualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
                 }
 
                 log.LogDebug($"Executed {nameof(PurgeStatementData)} successfully");
@@ -251,10 +274,15 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(PurgeStatementData)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(PurgeStatementData));
+            }
+            
         }
 
         //Remove test users and organisations
@@ -263,8 +291,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
-            if (_SharedBusinessLogic.SharedOptions.IsProduction()) return;
-
+            if (RunningJobs.Contains(nameof(PurgeTestDataAsync))) return;
+            RunningJobs.Add(nameof(PurgeTestDataAsync));
             try
             {
                 var databaseContext = new DatabaseContext(default);
@@ -276,11 +304,18 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             {
                 //Send Email to GEO reporting errors
                 var message = $"Failed webjob ({nameof(PurgeTestDataAsync)}):{ex.Message}:{ex.GetDetailsText()}";
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
 
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(PurgeTestDataAsync));
+            }
+            if (_sharedOptions.IsProduction()) return;
+
+            
         }
     }
 }

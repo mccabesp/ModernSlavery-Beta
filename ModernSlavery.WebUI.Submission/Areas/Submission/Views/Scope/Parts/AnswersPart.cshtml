@@ -1,11 +1,18 @@
 ﻿@model ScopingViewModel
 @{
-    var reason = Model.EnterAnswers.Reason.Replace("\r", ",").Replace("Other", Model.EnterAnswers.OtherReason);
-   
+    var reason = "<ul><li>" + Model.EnterAnswers.Reason
+        .Replace("\r", "</li><br><li>")
+        .Replace("Other", Model.EnterAnswers.OtherReason)
+        + "</li></ul>";
+    var answers = Model.UserIsRegistered
+        ? new CheckYourAnswers(
+            new CheckYourAnswer("Reason your organisation is not required to publish a modern slavery statement on your website", reason, "ReasonAnswer"),
+            new CheckYourAnswer("Contact name", Model.EnterAnswers.FullName, "FullNameAnswer"),
+            new CheckYourAnswer("Job title", Model.EnterAnswers.JobTitle, "JobTitleAnswer"),
+            new CheckYourAnswer("Contact email", Model.EnterAnswers.EmailAddress, "EmailAddressAnswer")
+            )
+        : new CheckYourAnswers(
+            new CheckYourAnswer("Reason your organisation is not required to publish a modern slavery statement on your website", reason, "ReasonAnswer"));
 }
-@await Html.PartialModelAsync(new CheckYourAnswers(
-    new CheckYourAnswer("Reason your organisation is not required to publish a modern slavery statement on your website", reason, "ReasonAnswer"),   
-    new CheckYourAnswer("Contact name", Model.EnterAnswers.FullName, "FullNameAnswer"),
-    new CheckYourAnswer("Job title", Model.EnterAnswers.JobTitle, "JobTitleAnswer"),
-    new CheckYourAnswer("Contact email", Model.EnterAnswers.EmailAddress, "EmailAddressAnswer") 
-    ))
+
+@await Html.PartialModelAsync(answers)

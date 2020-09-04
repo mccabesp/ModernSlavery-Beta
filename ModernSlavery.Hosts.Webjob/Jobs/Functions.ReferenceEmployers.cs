@@ -10,8 +10,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     {
         //Ensure all organisations have a unique organisation reference
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task ReferenceOrganisations([TimerTrigger("%ReferenceOrganisations%")] TimerInfo timer, ILogger log)
+        public async Task ReferenceOrganisations([TimerTrigger("%ReferenceOrganisations%", RunOnStartup = true)] TimerInfo timer, ILogger log)
         {
+            if (RunningJobs.Contains(nameof(ReferenceOrganisations))) return;
+            RunningJobs.Add(nameof(ReferenceOrganisations));
             try
             {
                 await ReferenceOrganisationsAsync().ConfigureAwait(false);
@@ -22,10 +24,15 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(ReferenceOrganisations)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(ReferenceOrganisations));
+            }
+            
         }
 
         private async Task ReferenceOrganisationsAsync()
@@ -36,7 +43,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                await _OrganisationBusinessLogic.SetUniqueOrganisationReferencesAsync().ConfigureAwait(false);
+                await _organisationBusinessLogic.SetUniqueOrganisationReferencesAsync().ConfigureAwait(false);
             }
             finally
             {

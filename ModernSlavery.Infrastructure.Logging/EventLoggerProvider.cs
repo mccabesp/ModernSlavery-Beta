@@ -21,8 +21,9 @@ namespace ModernSlavery.Infrastructure.Logging
         public string Alias =
             typeof(EventLoggerProvider).GetAttributeValue((ProviderAliasAttribute attrib) => attrib.Alias);
 
-        public EventLoggerProvider(IQueue queue, string applicationName, LoggerFilterOptions filterOptions)
+        public EventLoggerProvider(IQueue queue, LoggerFilterOptions filterOptions, string applicationName = null)
         {
+            if (string.IsNullOrWhiteSpace(applicationName)) applicationName = AppDomain.CurrentDomain.FriendlyName;
             if (string.IsNullOrWhiteSpace(applicationName)) throw new ArgumentNullException(nameof(applicationName));
 
             ApplicationName = applicationName;

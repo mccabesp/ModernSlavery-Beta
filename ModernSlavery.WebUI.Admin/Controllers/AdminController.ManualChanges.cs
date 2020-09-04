@@ -2602,5 +2602,36 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         #endregion
+
+        #region Trigger Webjobs
+        [HttpGet("trigger-webjobs")]
+        public IActionResult TriggerWebjobs()
+        {
+            //Throw error if the user is not a super administrator
+            if (!IsDatabaseAdministrator)
+                return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a database administrator");
+
+            return View();
+        }
+
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        [HttpPost("trigger-webjobs")]
+        public async Task<IActionResult> TriggerWebjobs(string webjobname)
+        {
+            //Throw error if the user is not a super administrator
+            if (!IsDatabaseAdministrator)
+                return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a database administrator");
+
+            if (!string.IsNullOrWhiteSpace(webjobname))
+            {
+                await _adminService.ExecuteWebjobQueue.AddMessageAsync(
+                    new QueueWrapper($"command={webjobname}"));
+            }
+
+            return RedirectToAction("Home");
+        }
+
+        #endregion
     }
 }

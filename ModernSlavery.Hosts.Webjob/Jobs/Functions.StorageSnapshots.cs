@@ -21,6 +21,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
+            if (RunningJobs.Contains(nameof(TakeSnapshotAsync))) return;
+            RunningJobs.Add(nameof(TakeSnapshotAsync));
             try
             {
                 var azureStorageConnectionString = _storageOptions.AzureConnectionString;
@@ -45,7 +47,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         xml.Descendants().Where(e => e.Name.LocalName.EqualsI("Snapshot")).Select(e => e.Value)
                             .ToList();
                     //var snapshots = snapshots.Where(e => e.EqualsI("Snapshot")).Select(e=>e.Value).ToList();
-                    var deadline = VirtualDateTime.Now.AddDays(0 - _SharedBusinessLogic.SharedOptions.MaxSnapshotDays);
+                    var deadline = VirtualDateTime.Now.AddDays(0 - _sharedOptions.MaxSnapshotDays);
                     foreach (var snapshot in snapshots)
                     {
                         var date = DateTime.Parse(snapshot);
@@ -64,10 +66,15 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob:{nameof(TakeSnapshotAsync)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(TakeSnapshotAsync));
+            }
+            
         }
 
         public async Task TakeSnapshotAsync(ILogger log)
@@ -230,27 +237,27 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             const string logZipDir = @"\Archive\";
 
             //Ensure the archive directory exists
-            if (!await _SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(logZipDir).ConfigureAwait(false))
-                await _SharedBusinessLogic.FileRepository.CreateDirectoryAsync(logZipDir).ConfigureAwait(false);
+            if (!await _fileRepository.GetDirectoryExistsAsync(logZipDir).ConfigureAwait(false))
+                await _fileRepository.CreateDirectoryAsync(logZipDir).ConfigureAwait(false);
 
             //Create the zip file path using todays date
             var logZipFilePath = Path.Combine(logZipDir, $"{VirtualDateTime.Now.ToString("yyyyMMdd")}.zip");
 
             //Dont zip if we have one for today
-            if (await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(logZipFilePath).ConfigureAwait(false)) return;
+            if (await _fileRepository.GetFileExistsAsync(logZipFilePath).ConfigureAwait(false)) return;
 
-            var zipDir = Url.UrlToDirSeparator(Path.Combine(_SharedBusinessLogic.FileRepository.RootDir, logZipDir));
+            var zipDir = Url.UrlToDirSeparator(Path.Combine(_fileRepository.RootDir, logZipDir));
 
             using (var fileStream = new MemoryStream())
             {
                 var files = 0;
                 using (var zipStream = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
                 {
-                    foreach (var dir in await _SharedBusinessLogic.FileRepository.GetDirectoriesAsync("\\", null, true).ConfigureAwait(false))
+                    foreach (var dir in await _fileRepository.GetDirectoriesAsync("\\", null, true).ConfigureAwait(false))
                     {
                         if (Url.UrlToDirSeparator($"{dir}\\").StartsWithI(zipDir)) continue;
 
-                        foreach (var file in await _SharedBusinessLogic.FileRepository.GetFilesAsync(dir, "*.*").ConfigureAwait(false))
+                        foreach (var file in await _fileRepository.GetFilesAsync(dir, "*.*").ConfigureAwait(false))
                         {
                             var dirFile = Url.UrlToDirSeparator(file);
 
@@ -260,7 +267,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             var entry = zipStream.CreateEntry(dirFile);
                             using (var entryStream = entry.Open())
                             {
-                                await _SharedBusinessLogic.FileRepository.ReadAsync(dirFile, entryStream).ConfigureAwait(false);
+                                await _fileRepository.ReadAsync(dirFile, entryStream).ConfigureAwait(false);
                                 files++;
                             }
                         }
@@ -270,7 +277,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 if (files == 0) return;
 
                 fileStream.Position = 0;
-                await _SharedBusinessLogic.FileRepository.WriteAsync(logZipFilePath, fileStream).ConfigureAwait(false);
+                await _fileRepository.WriteAsync(logZipFilePath, fileStream).ConfigureAwait(false);
             }
         }
     }

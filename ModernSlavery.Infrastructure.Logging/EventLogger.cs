@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
@@ -43,7 +45,7 @@ namespace ModernSlavery.Infrastructure.Logging
         {
             //Check logging for this level is enabled
             if (!IsEnabled(logLevel)) return;
-
+            
             var entry = new LogEntryModel {Message = formatter(state, exception)};
 
             if (exception != null)

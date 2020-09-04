@@ -172,21 +172,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var years = new HashSet<int> { stateModel.DeadlineDate.Year };
             await ScopePresentation.SaveScopesAsync(stateModel, years);
 
-            var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            var currentDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
-            if (stateModel.DeadlineDate == currentDeadlineDate)
-            {
-                var emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
-                foreach (var emailAddress in emailAddressesForOrganisation)
-                    _sharedBusinessLogic.NotificationService.SendScopeChangeInEmail(emailAddress,
-                        organisation.OrganisationName);
-            }
-
             //Start new user registration
             return RedirectToAction("ManageOrganisation", "Submission",
                 new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(stateModel.OrganisationId.ToString()) });
         }
-
 
         [HttpGet("out/confirm-organisation")]
         public async Task<IActionResult> ConfirmOutOfScopeDetails()
@@ -228,10 +217,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return View("ScopeKnown", stateModel);
 
             //when organisation is already registered then tell user 
+            var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
             if (!stateModel.IsChangeJourney
-                && (
-                    stateModel.ThisScope != null || stateModel.LastScope != null
-                    ))
+                // considered registered if any user associated has confirmed via pin
+                && organisation.UserOrganisations.Any(uo => uo.PINConfirmedDate != null))
                 return View("AlreadyRegistered", stateModel);
 
 
@@ -250,7 +239,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // when model is null then return session expired view
             if (stateModel == null) return SessionExpiredView();
 
-            return View("EnterOutOfScopeAnswers", stateModel);
+            var model = stateModel.EnterAnswers ?? new EnterAnswersViewModel();
+
+            model.UserIsRegistered = stateModel.UserIsRegistered;
+            model.BackUrl = stateModel.IsChangeJourney && stateModel.IsOutOfScopeJourney
+                ? stateModel.StartUrl
+                : Url.ActionArea("ConfirmOutOfScopeDetails", "Scope", "Submission");
+
+            return View("EnterOutOfScopeAnswers", model);
         }
 
         [PreventDuplicatePost]
@@ -269,30 +265,33 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // update the state
             stateModel.EnterAnswers = enterAnswersModel;
             StashModel(stateModel);
-            var fields = new List<string>();
+            var fields = new List<string> { "", nameof(EnterAnswersViewModel.SelectedReasonOptions) };
+
+            if (enterAnswersModel.SelectedReasonOptions.Contains("Its turnover or budget is less than £36 million per year"))
+                fields.Add(nameof(EnterAnswersViewModel.TurnOver));
+
+            if (enterAnswersModel.SelectedReasonOptions.Contains("Other"))
+                fields.Add(nameof(EnterAnswersViewModel.OtherReason));
 
             // when the user is not logged in then validate the contact details
-            if (CurrentUser == null)
+            if (!stateModel.UserIsRegistered)
             {
                 fields.Add(nameof(EnterAnswersViewModel.FirstName));
                 fields.Add(nameof(EnterAnswersViewModel.LastName));
+                fields.Add(nameof(EnterAnswersViewModel.JobTitle));
                 fields.Add(nameof(EnterAnswersViewModel.EmailAddress));
             }
-
-            // the following fields are validatable at this stage
-            fields.Add(nameof(EnterAnswersViewModel.Reason));
-            if (enterAnswersModel.Reason == "Other") fields.Add(nameof(EnterAnswersViewModel.OtherReason));
-
-            fields.Add(nameof(EnterAnswersViewModel.TurnOver));
-            //fields.Add(nameof(EnterAnswersViewModel.ReadGuidance));
 
             ModelState.Include(fields.ToArray());
 
             // validate the details
             if (!ModelState.IsValid)
             {
-                this.SetModelCustomErrors<ScopingViewModel>();
-                return View("EnterOutOfScopeAnswers", stateModel);
+                enterAnswersModel.BackUrl = stateModel.IsChangeJourney && stateModel.IsOutOfScopeJourney
+                ? stateModel.StartUrl
+                : Url.ActionArea("ConfirmOutOfScopeDetails", "Scope", "Submission");
+                this.SetModelCustomErrors<EnterAnswersViewModel>();
+                return View("EnterOutOfScopeAnswers", enterAnswersModel);
             }
 
             //Ensure email is always lower case
@@ -322,20 +321,25 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [HttpPost("out/confirm-answers")]
-        public async Task<IActionResult> ConfirmOutOfScopeAnswers(string command)
+        public async Task<IActionResult> ConfirmOutOfScopeAnswers(bool RequiresEmailConfirmation)
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
                 return RedirectToActionArea("Home", "Admin", "Admin");
 
             var stateModel = UnstashModel<ScopingViewModel>();
+
+            // Hacky fix becuase requires email confirm field will not be bound to the statemodel
+            // this is because it is stored in session and is not posted to the server, therefore not being bound
+            if (!stateModel.UserIsRegistered)
+                stateModel.EnterAnswers.RequiresEmailConfirmation = RequiresEmailConfirmation;
+
             // when model is null then return session expired view
             if (stateModel == null) return SessionExpiredView();
 
             ApplyUserContactDetails(CurrentUser, stateModel);
 
             // Save user as out of scope
-            // TODO James - review snapshot year, it will be submission deadlines how does this impact?
             var years = new HashSet<int> { stateModel.DeadlineDate.Year };
             if (!stateModel.IsChangeJourney) years.Add(stateModel.DeadlineDate.Year - 1);
 
@@ -347,15 +351,28 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var currentDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
             if (stateModel.DeadlineDate == currentDeadlineDate)
             {
-                var emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
-                foreach (var emailAddress in emailAddressesForOrganisation)
-                    _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(emailAddress,
-                        organisation.OrganisationName);
+                var emailAddressesForOrganisation = organisation.UserOrganisations
+                    .Where(uo => uo.PINConfirmedDate != null)
+                    .Select(uo => uo.User);
+                foreach (var user in emailAddressesForOrganisation)
+                {
+                    _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(user.EmailAddress,
+                            organisation.OrganisationName,
+                            user.ContactFullname,
+                            $"{stateModel.DeadlineDate.Year} to {stateModel.DeadlineDate.Year + 1}",
+                            organisation.LatestAddress.GetAddressString(),
+                            stateModel.EnterAnswers.Reason);
+                }
             }
             if (stateModel.EnterAnswers.RequiresEmailConfirmation)
             {
                 //TODO: confirm this email logic - should it be a new template or same as one above?
-                _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(stateModel.EnterAnswers.EmailAddress, organisation.OrganisationName);
+                _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(stateModel.EnterAnswers.EmailAddress,
+                        organisation.OrganisationName,
+                        stateModel.EnterAnswers.FullName,
+                        $"{stateModel.DeadlineDate.Year - 1} to {stateModel.DeadlineDate.Year}",
+                        organisation.LatestAddress.GetAddressString(),
+                        stateModel.EnterAnswers.Reason);
             }
 
             //Start new user registration
