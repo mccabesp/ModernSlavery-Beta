@@ -11,7 +11,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     {
         //Set presumed scope of previous years and current years
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task SetPresumedScopes([TimerTrigger("%SetPresumedScopes%")]
+        public async Task SetPresumedScopes([TimerTrigger("%SetPresumedScopes%",RunOnStartup = true)]
             TimerInfo timer,
             ILogger log)
         {

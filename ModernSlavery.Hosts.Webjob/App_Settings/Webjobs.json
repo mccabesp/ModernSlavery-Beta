@@ -53,7 +53,7 @@
     },
     "SetPresumedScopes": {
       "Action": "Enable",
-      "Trigger": "01:00:00:00"
+      "Trigger": "00:01:00:00"
     },
     "StorageHealthCheck": { "Action": "Disable" },
     "TakeSnapshotAsync": { "Action": "Disable" },
