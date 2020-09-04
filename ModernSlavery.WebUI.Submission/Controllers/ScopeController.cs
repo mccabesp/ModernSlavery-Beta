@@ -331,7 +331,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             // Hacky fix becuase requires email confirm field will not be bound to the statemodel
             // this is because it is stored in session and is not posted to the server, therefore not being bound
-            stateModel.EnterAnswers.RequiresEmailConfirmation = RequiresEmailConfirmation;
+            if (!stateModel.UserIsRegistered)
+                stateModel.EnterAnswers.RequiresEmailConfirmation = RequiresEmailConfirmation;
 
             // when model is null then return session expired view
             if (stateModel == null) return SessionExpiredView();
@@ -350,15 +351,28 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var currentDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
             if (stateModel.DeadlineDate == currentDeadlineDate)
             {
-                var emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
-                foreach (var emailAddress in emailAddressesForOrganisation)
-                    _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(emailAddress,
-                        organisation.OrganisationName);
+                var emailAddressesForOrganisation = organisation.UserOrganisations
+                    .Where(uo => uo.PINConfirmedDate != null)
+                    .Select(uo => uo.User);
+                foreach (var user in emailAddressesForOrganisation)
+                {
+                    _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(user.EmailAddress,
+                            organisation.OrganisationName,
+                            user.ContactFullname,
+                            $"{stateModel.DeadlineDate.Year} to {stateModel.DeadlineDate.Year + 1}",
+                            organisation.LatestAddress.GetAddressString(),
+                            stateModel.EnterAnswers.Reason);
+                }
             }
             if (stateModel.EnterAnswers.RequiresEmailConfirmation)
             {
                 //TODO: confirm this email logic - should it be a new template or same as one above?
-                _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(stateModel.EnterAnswers.EmailAddress, organisation.OrganisationName);
+                _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(stateModel.EnterAnswers.EmailAddress,
+                        organisation.OrganisationName,
+                        stateModel.EnterAnswers.FullName,
+                        $"{stateModel.DeadlineDate.Year} to {stateModel.DeadlineDate.Year + 1}",
+                        organisation.LatestAddress.GetAddressString(),
+                        stateModel.EnterAnswers.Reason);
             }
 
             //Start new user registration
