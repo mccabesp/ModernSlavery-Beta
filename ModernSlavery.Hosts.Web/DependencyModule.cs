@@ -238,7 +238,7 @@ namespace ModernSlavery.Hosts.Web
                     // Summary:
                     //     Triggered when the application host has fully started and is about to wait for
                     //     a graceful shutdown.
-                    _logger.LogInformation("Application Started");
+                    _logger.LogInformation("Web Application Started");
                     app.ServerFeatures.LogHostAddresses(_logger);
                 });
             hostApplicationLifetime.ApplicationStopping.Register(
@@ -247,7 +247,7 @@ namespace ModernSlavery.Hosts.Web
                     // Summary:
                     //     Triggered when the application host is performing a graceful shutdown. Requests
                     //     may still be in flight. Shutdown will block until this event completes.
-                    _logger.LogInformation("Application Stopping");
+                    _logger.LogInformation("Web Application Stopping");
 
                 });
         }

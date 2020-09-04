@@ -26,12 +26,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath,
+                var filePath = Path.Combine(_sharedOptions.DownloadsPath,
                     Filenames.RegistrationAddresses);
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(funcName) &&
-                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
+                    await _fileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
                 {
                     log.LogDebug($"Skipped {funcName} at start up.");
                     return;
@@ -49,7 +49,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed {funcName}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -83,7 +83,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         {
                             // get organisation scope and submission per year
                             var returnByYear =
-                                await _SubmissionBusinessLogic.GetLatestStatementBySnapshotYearAsync(
+                                await _submissionBusinessLogic.GetLatestStatementBySnapshotYearAsync(
                                     model.OrganisationId, year).ConfigureAwait(false);
                             var scopeByYear =
                                 await _scopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(model.OrganisationId, returnByYear.SubmissionDeadline).ConfigureAwait(false);
@@ -105,7 +105,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         public async Task<List<RegistrationAddressesFileModel>> GetLatestRegistrationAddressesAsync()
         {
             // Get all the latest verified organisation registrations
-            var verifiedOrgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>()
+            var verifiedOrgs = await _dataRepository.GetAll<Organisation>()
                 .Where(uo => uo.LatestRegistration != null)
                 .Include(uo => uo.LatestRegistration)
                 .Include(uo => uo.LatestAddress)

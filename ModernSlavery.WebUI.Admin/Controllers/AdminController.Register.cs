@@ -547,13 +547,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //Save the changes and redirect
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            //Send notification email to existing users 
-            _adminService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(userOrg.Organisation,
-                userOrg.User);
-
-            //Ensure the organisation has an organisation reference
-            if (userOrg.PINConfirmedDate.HasValue && string.IsNullOrWhiteSpace(userOrg.Organisation.OrganisationReference))
-                await _adminService.OrganisationBusinessLogic.SetUniqueOrganisationReferenceAsync(userOrg.Organisation);
+            //Ensure the organisation has an employer reference
+            if (userOrg.PINConfirmedDate.HasValue && string.IsNullOrWhiteSpace(userOrg.Organisation.EmployerReference))
+                await _adminService.OrganisationBusinessLogic.SetUniqueEmployerReferenceAsync(userOrg.Organisation);
 
             //Add or remove this organisation to/from the search index
             await _adminService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(userOrg.Organisation);

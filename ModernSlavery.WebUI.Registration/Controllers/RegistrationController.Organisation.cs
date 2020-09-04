@@ -1227,11 +1227,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             ContactPhoneNumber = userOrg.User.ContactPhoneNumber
                         });
 
-                if (model.IsFastTrackAuthorised)
-                    //Send notification email to existing users
-                    _registrationService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(
-                        userOrg.Organisation, userOrg.User);
-
                 StashModel(
                     new CompleteViewModel
                     {

@@ -172,16 +172,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var years = new HashSet<int> { stateModel.DeadlineDate.Year };
             await ScopePresentation.SaveScopesAsync(stateModel, years);
 
-            var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            var currentDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
-            if (stateModel.DeadlineDate == currentDeadlineDate)
-            {
-                var emailAddressesForOrganisation = organisation.UserOrganisations.Select(uo => uo.User.EmailAddress);
-                foreach (var emailAddress in emailAddressesForOrganisation)
-                    _sharedBusinessLogic.NotificationService.SendScopeChangeInEmail(emailAddress,
-                        organisation.OrganisationName);
-            }
-
             //Start new user registration
             return RedirectToAction("ManageOrganisation", "Submission",
                 new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(stateModel.OrganisationId.ToString()) });

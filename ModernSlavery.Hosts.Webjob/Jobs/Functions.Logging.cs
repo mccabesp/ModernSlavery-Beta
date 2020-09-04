@@ -25,12 +25,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             //Retrieve long messages from file storage
             var filepath = GetLargeQueueFilepath(queueMessage);
             if (!string.IsNullOrWhiteSpace(filepath))
-                queueMessage = await _SharedBusinessLogic.FileRepository.ReadAsync(filepath).ConfigureAwait(false);
+                queueMessage = await _fileRepository.ReadAsync(filepath).ConfigureAwait(false);
 
             var wrapper = JsonConvert.DeserializeObject<LogEventWrapperModel>(queueMessage);
 
             //Calculate the daily log file path
-            var LogRoot = _SharedBusinessLogic.SharedOptions.LogPath;
+            var LogRoot = _sharedOptions.LogPath;
             string FilePath;
             switch (wrapper.LogLevel)
             {
@@ -69,7 +69,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 //Write to the log entry
-                await _SharedBusinessLogic.FileRepository.AppendCsvRecordAsync(DailyPath, wrapper.LogEntry).ConfigureAwait(false);
+                await _fileRepository.AppendCsvRecordAsync(DailyPath, wrapper.LogEntry).ConfigureAwait(false);
             }
             finally
             {
@@ -81,7 +81,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             //Delete the large file
             if (!string.IsNullOrWhiteSpace(filepath))
-                await _SharedBusinessLogic.FileRepository.DeleteFileAsync(filepath).ConfigureAwait(false);
+                await _fileRepository.DeleteFileAsync(filepath).ConfigureAwait(false);
 
             log.LogDebug($"Executed {nameof(LogEvent)}:{queueMessage} successfully");
         }
@@ -95,15 +95,15 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             if (!string.IsNullOrWhiteSpace(filepath))
             {
                 //Get the large file
-                queueMessage = await _SharedBusinessLogic.FileRepository.ReadAsync(filepath).ConfigureAwait(false);
+                queueMessage = await _fileRepository.ReadAsync(filepath).ConfigureAwait(false);
                 //Delete the large file
-                await _SharedBusinessLogic.FileRepository.DeleteFileAsync(filepath).ConfigureAwait(false);
+                await _fileRepository.DeleteFileAsync(filepath).ConfigureAwait(false);
             }
 
             log.LogError($"Could not log event, Details: {queueMessage}");
 
             //Send Email to GEO reporting errors
-            await _Messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not log event:" + queueMessage).ConfigureAwait(false);
+            await _messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not log event:" + queueMessage).ConfigureAwait(false);
         }
 
         [Singleton(Mode = SingletonMode.Listener)] //Ensures execution on only one instance with one listener
@@ -113,13 +113,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             //Retrieve long messages from file storage
             var filepath = GetLargeQueueFilepath(queueMessage);
             if (!string.IsNullOrWhiteSpace(filepath))
-                queueMessage = await _SharedBusinessLogic.FileRepository.ReadAsync(filepath).ConfigureAwait(false);
+                queueMessage = await _fileRepository.ReadAsync(filepath).ConfigureAwait(false);
 
             //Get the log event details
             var wrapper = JsonConvert.DeserializeObject<LogRecordWrapperModel>(queueMessage);
 
             //Calculate the daily log file path
-            var LogRoot = _SharedBusinessLogic.SharedOptions.LogPath;
+            var LogRoot = _sharedOptions.LogPath;
             var FilePath = Path.Combine(LogRoot, wrapper.ApplicationName, wrapper.FileName);
             var DailyPath = Path.Combine(
                 Path.GetPathRoot(FilePath),
@@ -138,7 +138,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 FileLocks[DailyPath] = fileLock;
 
                 //Write to the log entry
-                await _SharedBusinessLogic.FileRepository.AppendCsvRecordAsync(DailyPath, wrapper.Record).ConfigureAwait(false);
+                await _fileRepository.AppendCsvRecordAsync(DailyPath, wrapper.Record).ConfigureAwait(false);
             }
             finally
             {
@@ -149,7 +149,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             //Delete the large file
             if (!string.IsNullOrWhiteSpace(filepath))
-                await _SharedBusinessLogic.FileRepository.DeleteFileAsync(filepath).ConfigureAwait(false);
+                await _fileRepository.DeleteFileAsync(filepath).ConfigureAwait(false);
 
             log.LogDebug($"Executed {nameof(LogRecord)}:{queueMessage} successfully");
         }
@@ -163,15 +163,15 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             if (!string.IsNullOrWhiteSpace(filepath))
             {
                 //Get the large file
-                queueMessage = await _SharedBusinessLogic.FileRepository.ReadAsync(filepath).ConfigureAwait(false);
+                queueMessage = await _fileRepository.ReadAsync(filepath).ConfigureAwait(false);
                 //Delete the large file
-                await _SharedBusinessLogic.FileRepository.DeleteFileAsync(filepath).ConfigureAwait(false);
+                await _fileRepository.DeleteFileAsync(filepath).ConfigureAwait(false);
             }
 
             log.LogError($"Could not log record: Details:{queueMessage}");
 
             //Send Email to GEO reporting errors
-            await _Messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not log record:" + queueMessage).ConfigureAwait(false);
+            await _messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not log record:" + queueMessage).ConfigureAwait(false);
         }
 
         private static string GetLargeQueueFilepath(string queueMessage)
