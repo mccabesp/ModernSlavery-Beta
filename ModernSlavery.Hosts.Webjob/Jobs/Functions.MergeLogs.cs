@@ -19,6 +19,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
+            if (RunningJobs.Contains(nameof(MergeLogs))) return;
+            RunningJobs.Add(nameof(MergeLogs));
             try
             {
                 //Backup the log files first
@@ -78,6 +80,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(MergeLogs));
+            }
+
+           
         }
 
         private async Task MergeCsvLogsAsync<T>(ILogger log, string logPath, string prefix, string extension = ".csv")

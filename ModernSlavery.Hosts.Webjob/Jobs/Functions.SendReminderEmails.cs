@@ -16,47 +16,57 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         [Disable(typeof(DisableWebjobProvider))]
         public void SendReminderEmails([TimerTrigger("%SendReminderEmails%")] TimerInfo timer, ILogger log)
         {
-            var start = VirtualDateTime.Now;
-            log.LogInformation($"SendReminderEmails Function started {start}");
-
-            if (_sharedOptions.ReminderEmailDays == null ||
-                _sharedOptions.ReminderEmailDays.Length == 0)
+            if (RunningJobs.Contains(nameof(SendReminderEmails))) return;
+            RunningJobs.Add(nameof(SendReminderEmails));
+            try
             {
-                log.LogInformation("SendReminderEmails Function finished. No ReminderEmailDays set.");
-                return;
-            }
+                var start = VirtualDateTime.Now;
+                log.LogInformation($"SendReminderEmails Function started {start}");
 
-            IEnumerable<User> users = _dataRepository.GetAll<User>();
-
-            foreach (var user in users)
-            {
-                if (VirtualDateTime.Now > start.AddMinutes(59))
+                if (_sharedOptions.ReminderEmailDays == null ||
+                    _sharedOptions.ReminderEmailDays.Length == 0)
                 {
-                    log.LogInformation("Hit timeout break");
-                    break;
+                    log.LogInformation("SendReminderEmails Function finished. No ReminderEmailDays set.");
+                    return;
                 }
 
-                var inScopeOrganisationsThatStillNeedToReport = user.UserOrganisations
-                    .Select(uo => uo.Organisation)
-                    .Where(
-                        o =>
-                            o.LatestScope.ScopeStatus == ScopeStatuses.InScope
-                            || o.LatestScope.ScopeStatus == ScopeStatuses.PresumedInScope)
-                    .Where(
-                        o =>
-                            o.LatestStatement == null
-                            || o.LatestStatement.SubmissionDeadline != _snapshotDateHelper.GetReportingDeadline(o.SectorType)
-                            || o.LatestStatement.Status != StatementStatuses.Submitted)
-                    .ToList();
+                IEnumerable<User> users = _dataRepository.GetAll<User>();
 
-                if (inScopeOrganisationsThatStillNeedToReport.Count > 0)
+                foreach (var user in users)
                 {
-                    SendReminderEmailsForSectorType(user, inScopeOrganisationsThatStillNeedToReport,SectorTypes.Public,log);
-                    SendReminderEmailsForSectorType(user, inScopeOrganisationsThatStillNeedToReport,SectorTypes.Private,log);
-                }
-            }
+                    if (VirtualDateTime.Now > start.AddMinutes(59))
+                    {
+                        log.LogInformation("Hit timeout break");
+                        break;
+                    }
 
-            log.LogInformation("SendReminderEmails Function finished");
+                    var inScopeOrganisationsThatStillNeedToReport = user.UserOrganisations
+                        .Select(uo => uo.Organisation)
+                        .Where(
+                            o =>
+                                o.LatestScope.ScopeStatus == ScopeStatuses.InScope
+                                || o.LatestScope.ScopeStatus == ScopeStatuses.PresumedInScope)
+                        .Where(
+                            o =>
+                                o.LatestStatement == null
+                                || o.LatestStatement.SubmissionDeadline != _reportingDeadlineHelper.GetReportingDeadline(o.SectorType)
+                                || o.LatestStatement.Status != StatementStatuses.Submitted)
+                        .ToList();
+
+                    if (inScopeOrganisationsThatStillNeedToReport.Count > 0)
+                    {
+                        SendReminderEmailsForSectorType(user, inScopeOrganisationsThatStillNeedToReport, SectorTypes.Public, log);
+                        SendReminderEmailsForSectorType(user, inScopeOrganisationsThatStillNeedToReport, SectorTypes.Private, log);
+                    }
+                }
+
+                log.LogInformation("SendReminderEmails Function finished");
+            }
+            finally
+            {
+                RunningJobs.Remove(nameof(SendReminderEmails));
+            }
+            
         }
 
         private void SendReminderEmailsForSectorType(
@@ -98,11 +108,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             {
                 {
                     "DeadlineDate",
-                    _snapshotDateHelper.GetReportingStartDate(sectorType).AddYears(1).AddDays(-1).ToString("d MMMM yyyy")
+                    _reportingDeadlineHelper.GetReportingStartDate(sectorType).AddYears(1).AddDays(-1).ToString("d MMMM yyyy")
                 },
                 {
                     "DaysUntilDeadline",
-                    _snapshotDateHelper.GetReportingStartDate(sectorType).AddYears(1).AddDays(-1)
+                    _reportingDeadlineHelper.GetReportingStartDate(sectorType).AddYears(1).AddDays(-1)
                         .Subtract(VirtualDateTime.Now).Days
                 },
                 {"OrganisationNames", GetOrganisationNameString(organisations)},
@@ -192,7 +202,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         private DateTime GetDeadlineDate(SectorTypes sectorType)
         {
-            return _snapshotDateHelper.GetReportingStartDate(sectorType).AddYears(1);
+            return _reportingDeadlineHelper.GetReportingStartDate(sectorType).AddYears(1);
         }
     }
 }

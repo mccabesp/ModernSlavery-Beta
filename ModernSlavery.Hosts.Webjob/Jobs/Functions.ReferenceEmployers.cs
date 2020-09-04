@@ -12,6 +12,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         [Disable(typeof(DisableWebjobProvider))]
         public async Task ReferenceOrganisations([TimerTrigger("%ReferenceOrganisations%", RunOnStartup = true)] TimerInfo timer, ILogger log)
         {
+            if (RunningJobs.Contains(nameof(ReferenceOrganisations))) return;
+            RunningJobs.Add(nameof(ReferenceOrganisations));
             try
             {
                 await ReferenceOrganisationsAsync().ConfigureAwait(false);
@@ -26,6 +28,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(ReferenceOrganisations));
+            }
+            
         }
 
         private async Task ReferenceOrganisationsAsync()

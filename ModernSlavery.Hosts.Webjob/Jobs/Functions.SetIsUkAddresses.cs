@@ -14,6 +14,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         [Disable(typeof(DisableWebjobProvider))]
         public async Task SetIsUkAddressesAsync([TimerTrigger("%SetIsUkAddressesAsync%")] TimerInfo timer, ILogger log)
         {
+            if (RunningJobs.Contains(nameof(SetIsUkAddressesAsync))) return;
+            RunningJobs.Add(nameof(SetIsUkAddressesAsync));
             try
             {
                 await SetIsUkAddressesAsync().ConfigureAwait(false);
@@ -28,6 +30,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(SetIsUkAddressesAsync));
+            }
+           
         }
 
         private async Task SetIsUkAddressesAsync()

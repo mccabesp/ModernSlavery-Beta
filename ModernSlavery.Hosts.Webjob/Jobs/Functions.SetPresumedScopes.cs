@@ -15,6 +15,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
+            if (RunningJobs.Contains(nameof(SetPresumedScopes))) return;
+            RunningJobs.Add(nameof(SetPresumedScopes));
             try
             {
                 //Initialise any unknown scope statuses
@@ -37,6 +39,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(SetPresumedScopes));
+            }
+            
         }
     }
 }

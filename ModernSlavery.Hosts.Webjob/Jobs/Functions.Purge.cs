@@ -20,6 +20,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         [Disable(typeof(DisableWebjobProvider))]
         public async Task PurgeUsers([TimerTrigger("%PurgeUsers%")] TimerInfo timer, ILogger log)
         {
+            if (RunningJobs.Contains(nameof(PurgeUsers))) return;
+            RunningJobs.Add(nameof(PurgeUsers));
             try
             {
                 var deadline =
@@ -44,7 +46,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         nameof(user.UserId),
                         user.UserId.ToString(),
                         null,
-                        JsonConvert.SerializeObject(new {user.UserId, user.EmailAddress, user.JobTitle, user.Fullname}),
+                        JsonConvert.SerializeObject(new { user.UserId, user.EmailAddress, user.JobTitle, user.Fullname }),
                         null);
                     _dataRepository.Delete(user);
                     await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
@@ -62,12 +64,19 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(PurgeUsers));
+            }
+            
         }
 
         //Remove any incomplete registrations
         [Disable(typeof(DisableWebjobProvider))]
         public async Task PurgeRegistrations([TimerTrigger("%PurgeRegistrations%")] TimerInfo timer, ILogger log)
         {
+            if (RunningJobs.Contains(nameof(PurgeRegistrations))) return;
+            RunningJobs.Add(nameof(PurgeRegistrations));
             try
             {
                 var deadline =
@@ -113,6 +122,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(PurgeRegistrations));
+            }
+            
         }
 
         //Remove any unverified users their addresses, UserOrgs, Org and addresses and archive to zip
@@ -121,6 +135,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
+            if (RunningJobs.Contains(nameof(PurgeOrganisations))) return;
+            RunningJobs.Add(nameof(PurgeOrganisations));
             try
             {
                 var deadline =
@@ -213,12 +229,19 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(PurgeOrganisations));
+            }
+            
         }
 
         //Remove retired copies of GPG data
         [Disable(typeof(DisableWebjobProvider))]
         public async Task PurgeStatementData([TimerTrigger("%PurgeStatementData%")] TimerInfo timer, ILogger log)
         {
+            if (RunningJobs.Contains(nameof(PurgeStatementData))) return;
+            RunningJobs.Add(nameof(PurgeStatementData));
             try
             {
                 var deadline =
@@ -255,6 +278,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(PurgeStatementData));
+            }
+            
         }
 
         //Remove test users and organisations
@@ -263,8 +291,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
-            if (_sharedOptions.IsProduction()) return;
-
+            if (RunningJobs.Contains(nameof(PurgeTestDataAsync))) return;
+            RunningJobs.Add(nameof(PurgeTestDataAsync));
             try
             {
                 var databaseContext = new DatabaseContext(default);
@@ -281,6 +309,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(PurgeTestDataAsync));
+            }
+            if (_sharedOptions.IsProduction()) return;
+
+            
         }
     }
 }
