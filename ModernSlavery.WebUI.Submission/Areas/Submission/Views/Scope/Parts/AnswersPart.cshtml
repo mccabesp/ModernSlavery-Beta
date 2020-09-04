@@ -4,8 +4,7 @@
         .Replace("\r", "</li><br><li>")
         .Replace("Other", Model.EnterAnswers.OtherReason)
         + "</li></ul>";
-    var controller = ViewData["Controller"] as BaseController;
-    var answers = controller.CurrentUser == null
+    var answers = Model.UserIsRegistered
         ? new CheckYourAnswers(
             new CheckYourAnswer("Reason your organisation is not required to publish a modern slavery statement on your website", reason, "ReasonAnswer"),
             new CheckYourAnswer("Contact name", Model.EnterAnswers.FullName, "FullNameAnswer"),

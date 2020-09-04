@@ -1,18 +1,16 @@
 ﻿@inject SharedOptions sharedOptions
 @using Microsoft.AspNetCore.Html
 @using ModernSlavery.Core.Models
-@model ScopingViewModel
+@model EnterAnswersViewModel
 @{
     Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Tell us why your organisation is not in scope - Modern Slavery reporting service";
-    var controller = ViewData["Controller"] as BaseController;
-    var backLink = Model.IsChangeJourney && Model.IsOutOfScopeJourney ? Model.StartUrl : Url.ActionArea("ConfirmOutOfScopeDetails", "Scope", "Submission");
     var reasonIndex = 0;
 }
-<a class="govuk-back-link" href="@backLink">Back</a>
+<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate = "" }))
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off" }))
         {
             @Html.AntiForgeryToken()
             @await Html.GovUkValidationSummaryAsync(false);
@@ -23,37 +21,37 @@
 
             <div id="ReasonGroup" class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                    <div class="govuk-checkboxes @Html.SetErrorClass(model => model.EnterAnswers.SelectedReasonOptions, "govuk-form-group--error")" data-module="govuk-checkboxes">
-                        <span asp-validation-for="EnterAnswers.SelectedReasonOptions" class="govuk-error-message"></span>
-                        @foreach (var reason in Model.EnterAnswers.ReasonOptions)
+                    <div class="govuk-checkboxes @Html.SetErrorClass(model => model.SelectedReasonOptions, "govuk-form-group--error")" data-module="govuk-checkboxes">
+                        <span asp-validation-for="SelectedReasonOptions" class="govuk-error-message"></span>
+                        @foreach (var reason in Model.ReasonOptions)
                         {
                             <div class="govuk-checkboxes__item">
-                                <input id="selected-reason-@reasonIndex" name="SelectedReasonOptions" checked=@(Model.EnterAnswers.SelectedReasonOptions.Contains(reason)) value="@reason" class="govuk-checkboxes__input" type="checkbox" data-aria-controls="reason-conditional-@(reasonIndex)">
+                                <input id="selected-reason-@reasonIndex" name="SelectedReasonOptions" checked=@(Model.SelectedReasonOptions.Contains(reason)) value="@reason" class="govuk-checkboxes__input" type="checkbox" data-aria-controls="reason-conditional-@(reasonIndex)">
                                 <label class="govuk-label govuk-checkboxes__label" for="selected-reason-@reasonIndex">
                                     @reason
                                 </label>
                             </div>
                             @if (reason.Equals("Its turnover or budget is less than £36 million per year"))
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.EnterAnswers.TurnOver, "govuk-form-group--error")" id="reason-conditional-@(reasonIndex)">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.TurnOver, "govuk-form-group--error")" id="reason-conditional-@(reasonIndex)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
                                             What is your organistion’s annual turnover or budget?
                                         </label>
-                                        <input name="@nameof(EnterAnswersViewModel.TurnOver)" class="govuk-input" value="@(Model.EnterAnswers.TurnOver)" maxlength="128" />
-                                        <span asp-validation-for="EnterAnswers.TurnOver" class="govuk-error-message"></span>
+                                        <input class="govuk-input" asp-for="TurnOver" />
+                                        <span asp-validation-for="TurnOver" class="govuk-error-message"></span>
                                     </div>
                                 </div>
                             }
                             @if (reason.Equals("Other"))
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.EnterAnswers.OtherReason, "govuk-form-group--error")" id="reason-conditional-@(reasonIndex)">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherReason, "govuk-form-group--error")" id="reason-conditional-@(reasonIndex)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
                                             Please specify
                                         </label>
-                                        <textarea id="@nameof(EnterAnswersViewModel.OtherReason)" name="@nameof(EnterAnswersViewModel.OtherReason)" class="govuk-textarea" rows="5" type="text" maxlength="256">@Model.EnterAnswers.OtherReason</textarea>
-                                        <span asp-validation-for="EnterAnswers.OtherReason" class="govuk-error-message"></span>
+                                        <textarea asp-for="OtherReason" id="@nameof(EnterAnswersViewModel.OtherReason)" class="govuk-textarea" rows="5"></textarea>
+                                        <span asp-validation-for="OtherReason" class="govuk-error-message"></span>
                                     </div>
                                 </div>
                             }
@@ -68,31 +66,31 @@
             </div>
 
 
-            if (controller.CurrentUser == null)
+            if (!Model.UserIsRegistered)
             {
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                         Your contact details
                     </legend>
                     <div id="FirstNameGroup" class="govuk-form-group @(Html.SetErrorClass(nameof(EnterAnswersViewModel.FirstName), "govuk-form-group--error")) ">
-                        <label asp-for="EnterAnswers.FirstName" class="govuk-label">First name</label>
-                        <input name="@nameof(EnterAnswersViewModel.FirstName)" class="govuk-input govuk-input--width-20" value="@(Model.EnterAnswers.FirstName)" />
-                        <span asp-validation-for="EnterAnswers.FirstName" class="govuk-error-message"></span>
+                        <label asp-for="FirstName" class="govuk-label">First name</label>
+                        <input name="@nameof(EnterAnswersViewModel.FirstName)" class="govuk-input govuk-input--width-20" value="@(Model.FirstName)" />
+                        <span asp-validation-for="FirstName" class="govuk-error-message"></span>
                     </div>
                     <div id="LastNameGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.LastName), "govuk-form-group--error") ">
-                        <label asp-for="EnterAnswers.LastName" class="govuk-label">Last name</label>
-                        <input name="@nameof(EnterAnswersViewModel.LastName)" class="govuk-input govuk-input--width-20" value="@(Model.EnterAnswers.LastName)" />
-                        <span asp-validation-for="EnterAnswers.LastName" class="govuk-error-message"></span>
+                        <label asp-for="LastName" class="govuk-label">Last name</label>
+                        <input name="@nameof(EnterAnswersViewModel.LastName)" class="govuk-input govuk-input--width-20" value="@(Model.LastName)" />
+                        <span asp-validation-for="LastName" class="govuk-error-message"></span>
                     </div>
                     <div id="TitleGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.JobTitle), "govuk-form-group--error") ">
-                        <label asp-for="EnterAnswers.JobTitle" class="govuk-label">Job title</label>
-                        <input name="@nameof(EnterAnswersViewModel.JobTitle)" class="govuk-input govuk-input--width-20" value="@(Model.EnterAnswers.JobTitle)" />
-                        <span asp-validation-for="EnterAnswers.JobTitle" class="govuk-error-message"></span>
+                        <label asp-for="JobTitle" class="govuk-label">Job title</label>
+                        <input name="@nameof(EnterAnswersViewModel.JobTitle)" class="govuk-input govuk-input--width-20" value="@(Model.JobTitle)" />
+                        <span asp-validation-for="JobTitle" class="govuk-error-message"></span>
                     </div>
                     <div id="EmailAddressGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.EmailAddress), "govuk-form-group--error") ">
-                        <label asp-for="EnterAnswers.EmailAddress" class="govuk-label">Email address</label>
-                        <input name="@nameof(EnterAnswersViewModel.EmailAddress)" class="govuk-input govuk-input--width-20" value="@(Model.EnterAnswers.EmailAddress)" type="email" />
-                        <span asp-validation-for="EnterAnswers.EmailAddress" class="govuk-error-message"></span>
+                        <label asp-for="EmailAddress" class="govuk-label">Email address</label>
+                        <input name="@nameof(EnterAnswersViewModel.EmailAddress)" class="govuk-input govuk-input--width-20" value="@(Model.EmailAddress)" type="email" />
+                        <span asp-validation-for="EmailAddress" class="govuk-error-message"></span>
                     </div>
                 </fieldset>
             }

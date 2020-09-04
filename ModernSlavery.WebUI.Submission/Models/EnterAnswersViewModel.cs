@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Azure.Management.WebSites.Models;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
-using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
     [Serializable]
-    public class EnterAnswersViewModel : IValidatableObject
+    public class EnterAnswersViewModel
     {
         public string[] ReasonOptions = new[]
         {
@@ -21,11 +23,14 @@ namespace ModernSlavery.WebUI.Submission.Models
          "Other"
         };
 
+        [MinLength(1)]
         public List<string> SelectedReasonOptions { get; set; } = new List<string>();
 
+        [Required]
         [MaxLength(256)]
         public string OtherReason { get; set; }
 
+        [Required]
         public string TurnOver { get; set; }
 
         public string Reason
@@ -61,46 +66,29 @@ namespace ModernSlavery.WebUI.Submission.Models
             }
         }
 
-        public string ReadGuidance { get; set; }
-
         [Required]
         public string FirstName { get; set; }
 
         [Required]
         public string LastName { get; set; }
 
+        [Required]
         public string JobTitle { get; set; }
 
-        [EmailAddress]
         [Required]
+        [EmailAddress]
         public string EmailAddress { get; set; }
 
         public bool HasName => !string.IsNullOrEmpty(FirstName + LastName);
 
         public string FullName => $"{FirstName} {LastName}";
 
-        public bool? HasReadGuidance()
-        {
-            if (!string.IsNullOrWhiteSpace(ReadGuidance)) return ReadGuidance.ToBoolean();
-
-            return null;
-        }
-
         public bool RequiresEmailConfirmation { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            var validationResults = new List<ValidationResult>();
+        [BindNever]
+        public string BackUrl { get; set; }
 
-            if (!SelectedReasonOptions.Any())
-                validationResults.AddValidationError(2115, nameof(SelectedReasonOptions));
-
-            if (SelectedReasonOptions.Contains("Other") && string.IsNullOrWhiteSpace(OtherReason))
-                validationResults.AddValidationError(2117, nameof(OtherReason));
-
-            return validationResults;
-        }
+        [BindNever]
+        public bool UserIsRegistered { get; set; }
     }
-
-
 }
