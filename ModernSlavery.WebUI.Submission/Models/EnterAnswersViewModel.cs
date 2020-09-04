@@ -76,6 +76,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         [Required]
         public string JobTitle { get; set; }
 
+        [Required]
         [EmailAddress]
         public string EmailAddress { get; set; }
 
