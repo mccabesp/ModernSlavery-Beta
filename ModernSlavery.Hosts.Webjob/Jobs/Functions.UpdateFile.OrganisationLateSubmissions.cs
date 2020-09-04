@@ -18,12 +18,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath,
+                var filePath = Path.Combine(_sharedOptions.DownloadsPath,
                     Filenames.OrganisationLateSubmissions);
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateOrganisationLateSubmissions))
-                    && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
+                    && await _fileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
                     return;
 
                 await UpdateOrganisationLateSubmissionsAsync(filePath, log).ConfigureAwait(false);
@@ -35,7 +35,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed {nameof(UpdateOrganisationLateSubmissions)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -53,8 +53,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(callingMethodName);
             try
             {
-                var records = _SubmissionBusinessLogic.GetLateSubmissions();
-                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath).ConfigureAwait(false);
+                var records = _submissionBusinessLogic.GetLateSubmissions();
+                await Extensions.SaveCSVAsync(_fileRepository, records, filePath).ConfigureAwait(false);
             }
             finally
             {

@@ -1,12 +1,9 @@
-﻿using Autofac;
-using Autofac.Core.Lifetime;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Infrastructure.Configuration;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
+using ModernSlavery.Infrastructure.Logging;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
@@ -15,6 +12,13 @@ namespace ModernSlavery.Infrastructure.Hosts
         public static IHostBuilder ConfigureWebjobHostBuilder<TStartupModule>(Dictionary<string, string> additionalSettings = null, params string[] commandlineArgs) where TStartupModule : class, IDependencyModule
         {
             var genericHost = Extensions.CreateGenericHost<TStartupModule>(additionalSettings, commandlineArgs);
+
+            genericHost.HostBuilder.ConfigureLogging((hostBuilderContext, loggingBuilder) =>
+            {
+                var instrumentationKey = genericHost.AppConfig["ApplicationInsights:InstrumentationKey"];
+                loggingBuilder.AddApplicationInsightsWebJobs(o => { o.InstrumentationKey = instrumentationKey; });
+            });
+
             //Register the callback to configure the web jobs
             genericHost.HostBuilder.ConfigureWebJobs(webJobsBuilder =>
             {
@@ -28,11 +32,10 @@ namespace ModernSlavery.Infrastructure.Hosts
                     {
                     //Configure blobs here
                 });
-
                 webJobsBuilder.AddServiceBus();
                 webJobsBuilder.AddEventHubs();
                 webJobsBuilder.AddTimers();
-
+                
                 genericHost.DependencyBuilder.Container_OnBuild += (lifetimeScope) => genericHost.DependencyBuilder.ConfigureHost(lifetimeScope);
             });
             return genericHost.HostBuilder;

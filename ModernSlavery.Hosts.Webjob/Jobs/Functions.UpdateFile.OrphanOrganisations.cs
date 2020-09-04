@@ -25,12 +25,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath,
+                var filePath = Path.Combine(_sharedOptions.DownloadsPath,
                     Filenames.OrphanOrganisations);
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(funcName) &&
-                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
+                    await _fileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
                 {
                     log.LogDebug($"Skipped {funcName} at start up.");
                     return;
@@ -48,7 +48,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed {funcName}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -85,7 +85,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         {
                             // get organisation scope and submission per year
                             var returnByYear =
-                                await _SubmissionBusinessLogic.GetLatestStatementBySnapshotYearAsync(
+                                await _submissionBusinessLogic.GetLatestStatementBySnapshotYearAsync(
                                     model.OrganisationId, year).ConfigureAwait(false);
                             var scopeByYear =
                                 await _scopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(model.OrganisationId, returnByYear.SubmissionDeadline).ConfigureAwait(false);
@@ -107,8 +107,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private async Task<List<UnregisteredOrganisationsFileModel>> GetOrphanOrganisationsAsync()
         {
             // Get all the latest organisations with no registrations
-            var pinExpiresDate = _SharedBusinessLogic.SharedOptions.PinExpiresDate;
-            var unregisteredOrgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>().Where(o =>
+            var pinExpiresDate = _sharedOptions.PinExpiresDate;
+            var unregisteredOrgs = await _dataRepository.GetAll<Organisation>().Where(o =>
                     o.Status == OrganisationStatuses.Active
                     && (o.LatestScope.ScopeStatus == ScopeStatuses.InScope
                         || o.LatestScope.ScopeStatus == ScopeStatuses.PresumedInScope)

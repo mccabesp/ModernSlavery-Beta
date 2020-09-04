@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
@@ -13,25 +14,25 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     {
         // This trigger is set to run every hour, on the hour
         [Disable(typeof(DisableWebjobProvider))]
-        public void SendReminderEmails([TimerTrigger("%SendReminderEmails%")] TimerInfo timer)
+        public void SendReminderEmails([TimerTrigger("%SendReminderEmails%")] TimerInfo timer, ILogger log)
         {
             var start = VirtualDateTime.Now;
-            _CustomLogger.Information("SendReminderEmails Function started", start);
+            log.LogInformation($"SendReminderEmails Function started {start}");
 
-            if (_SharedBusinessLogic.SharedOptions.ReminderEmailDays == null ||
-                _SharedBusinessLogic.SharedOptions.ReminderEmailDays.Length == 0)
+            if (_sharedOptions.ReminderEmailDays == null ||
+                _sharedOptions.ReminderEmailDays.Length == 0)
             {
-                _CustomLogger.Information("SendReminderEmails Function finished. No ReminderEmailDays set.");
+                log.LogInformation("SendReminderEmails Function finished. No ReminderEmailDays set.");
                 return;
             }
 
-            IEnumerable<User> users = _SharedBusinessLogic.DataRepository.GetAll<User>();
+            IEnumerable<User> users = _dataRepository.GetAll<User>();
 
             foreach (var user in users)
             {
                 if (VirtualDateTime.Now > start.AddMinutes(59))
                 {
-                    _CustomLogger.Information("Hit timeout break");
+                    log.LogInformation("Hit timeout break");
                     break;
                 }
 
@@ -50,20 +51,18 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 if (inScopeOrganisationsThatStillNeedToReport.Count > 0)
                 {
-                    SendReminderEmailsForSectorType(user, inScopeOrganisationsThatStillNeedToReport,
-                        SectorTypes.Public);
-                    SendReminderEmailsForSectorType(user, inScopeOrganisationsThatStillNeedToReport,
-                        SectorTypes.Private);
+                    SendReminderEmailsForSectorType(user, inScopeOrganisationsThatStillNeedToReport,SectorTypes.Public,log);
+                    SendReminderEmailsForSectorType(user, inScopeOrganisationsThatStillNeedToReport,SectorTypes.Private,log);
                 }
             }
 
-            _CustomLogger.Information("SendReminderEmails Function finished");
+            log.LogInformation("SendReminderEmails Function finished");
         }
 
         private void SendReminderEmailsForSectorType(
             User user,
             List<Organisation> inScopeOrganisationsThatStillNeedToReport,
-            SectorTypes sectorType)
+            SectorTypes sectorType, ILogger log)
         {
             var organisationsOfSectorType = inScopeOrganisationsThatStillNeedToReport
                 .Where(o => o.SectorType == sectorType)
@@ -78,8 +77,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     }
                     catch (Exception ex)
                     {
-                        _CustomLogger.Error(
-                            "Failed whilst sending or saving reminder email",
+                        log.LogError(
+                            "Failed whilst sending or saving reminder email. Details: {details}",
                             new
                             {
                                 user.UserId,
@@ -112,9 +111,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 {"SectorType", sectorType.ToString().ToLower()},
                 {
                     "Environment",
-                    _SharedBusinessLogic.SharedOptions.IsProduction()
+                    _sharedOptions.IsProduction()
                         ? ""
-                        : $"[{_SharedBusinessLogic.SharedOptions.Environment}] "
+                        : $"[{_sharedOptions.Environment}] "
                 }
             };
 
@@ -124,7 +123,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 Personalisation = personalisation
             };
 
-            govNotifyApi.SendEmail(notifyEmail);
+            _govNotifyApi.SendEmail(notifyEmail);
             SaveReminderEmailRecord(user, sectorType);
         }
 
@@ -132,8 +131,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             var reminderEmailRecord = new ReminderEmail
                 {UserId = user.UserId, SectorType = sectorType, DateSent = VirtualDateTime.Now};
-            _SharedBusinessLogic.DataRepository.Insert(reminderEmailRecord);
-            _SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            _dataRepository.Insert(reminderEmailRecord);
+            _dataRepository.SaveChangesAsync().Wait();
         }
 
         private string GetOrganisationNameString(List<Organisation> organisations)
@@ -153,7 +152,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         private bool ReminderEmailWasNotSentAfterLatestReminderDate(User user, SectorTypes sectorType)
         {
-            var latestReminderEmail = _SharedBusinessLogic.DataRepository.GetAll<ReminderEmail>()
+            var latestReminderEmail = _dataRepository.GetAll<ReminderEmail>()
                 .Where(re => re.UserId == user.UserId)
                 .Where(re => re.SectorType == sectorType)
                 .OrderByDescending(re => re.DateSent)
@@ -168,8 +167,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private DateTime GetEarliestReminderDate(SectorTypes sectorType)
         {
             var earliestReminderDay =
-                _SharedBusinessLogic.SharedOptions.ReminderEmailDays[
-                    _SharedBusinessLogic.SharedOptions.ReminderEmailDays.Length - 1];
+                _sharedOptions.ReminderEmailDays[
+                    _sharedOptions.ReminderEmailDays.Length - 1];
 
             var deadlineDate = GetDeadlineDate(sectorType);
             return deadlineDate.AddDays(-earliestReminderDay);
@@ -187,7 +186,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             var deadlineDate = GetDeadlineDate(sectorType);
 
-            return _SharedBusinessLogic.SharedOptions.ReminderEmailDays
+            return _sharedOptions.ReminderEmailDays
                 .Select(reminderDay => deadlineDate.AddDays(-reminderDay)).ToList();
         }
 

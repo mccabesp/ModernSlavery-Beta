@@ -21,12 +21,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             try
             {
-                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath,
+                var filePath = Path.Combine(_sharedOptions.DownloadsPath,
                     Filenames.UnverifiedRegistrations);
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateUnverifiedRegistrations))
-                    && await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
+                    && await _fileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
                     return;
 
                 await UpdateUnverifiedRegistrationsAsync(log, filePath).ConfigureAwait(false);
@@ -37,7 +37,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed {nameof(UpdateUnverifiedRegistrations)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -63,7 +63,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(UpdateUnverifiedRegistrations));
             try
             {
-                var userOrgs = _SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
+                var userOrgs = _dataRepository.GetAll<UserOrganisation>()
                     .Where(uo => uo.PINConfirmedDate == null)
                     .OrderBy(uo => uo.Organisation.OrganisationName)
                     .Include(uo => uo.Organisation.LatestScope)
@@ -97,7 +97,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             Address = uo.Address?.GetAddressString()
                         })
                     .ToList();
-                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath).ConfigureAwait(false);
+                await Extensions.SaveCSVAsync(_fileRepository, records, filePath).ConfigureAwait(false);
             }
             finally
             {

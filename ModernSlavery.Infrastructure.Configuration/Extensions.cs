@@ -276,6 +276,17 @@ namespace ModernSlavery.Infrastructure.Configuration
             }
         }
 
+
+        //Promotes previous configuration sources to top of stack
+        public static void RemoveConfigSources<T>(this IConfigurationBuilder configBuilder, Predicate<IConfigurationSource> match=null) where T : IConfigurationSource
+        {
+            var sources = configBuilder.Sources.OfType<T>().ToList();
+            if (match==null)
+                sources.ForEach(s => configBuilder.Sources.Remove(s));
+            else
+                sources.ForEach(s => configBuilder.Sources.ToList().RemoveAll(match));
+        }
+
         //Promotes previous configuration sources to top of stack
         public static void PromoteConfigSources<T>(this IConfigurationBuilder configBuilder) where T : IConfigurationSource
         {

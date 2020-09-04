@@ -1,6 +1,7 @@
 ﻿using System;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Classes;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
@@ -10,6 +11,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
 using ModernSlavery.Hosts.Webjob.Classes;
+using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Storage;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
@@ -19,18 +21,19 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         #region Dependencies
         private readonly StorageOptions _storageOptions;
         private readonly SearchOptions _searchOptions;
-        private readonly IEventLogger _CustomLogger;
-        private readonly IAuditLogger _BadSicLog;
-        private readonly IAuditLogger _ManualChangeLog;
-        private readonly IMessenger _Messenger;
-        private readonly ISharedBusinessLogic _SharedBusinessLogic;
-        private readonly ISearchRepository<OrganisationSearchModel> _OrganisationSearchRepository;
+        private readonly IAuditLogger _badSicLog;
+        private readonly IAuditLogger _manualChangeLog;
+        private readonly IMessenger _messenger;
+        private readonly SharedOptions _sharedOptions;
+        private readonly IFileRepository _fileRepository;
+        private readonly IDataRepository _dataRepository;
+        private readonly ISearchRepository<OrganisationSearchModel> _organisationSearchRepository;
         private readonly IScopeBusinessLogic _scopeBusinessLogic;
-        private readonly ISubmissionBusinessLogic _SubmissionBusinessLogic;
-        private readonly IOrganisationBusinessLogic _OrganisationBusinessLogic;
-        private readonly IPostcodeChecker _PostCodeChecker;
+        private readonly ISubmissionBusinessLogic _submissionBusinessLogic;
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
+        private readonly IPostcodeChecker _postCodeChecker;
         public readonly ISearchBusinessLogic _searchBusinessLogic;
-        private readonly IGovNotifyAPI govNotifyApi;
+        private readonly IGovNotifyAPI _govNotifyApi;
         private readonly CompaniesHouseService _companiesHouseService;
         private readonly IReportingDeadlineHelper _snapshotDateHelper;
         private readonly IAuthorisationBusinessLogic _authorisationBusinessLogic;
@@ -38,11 +41,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         public Functions(
             StorageOptions storageOptions,
             SearchOptions searchOptions,
-            IEventLogger customLogger,
             [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog,
             [KeyFilter(Filenames.ManualChangeLog)] IAuditLogger manualChangeLog,
             IMessenger messenger,
-            ISharedBusinessLogic sharedBusinessLogic,
+            SharedOptions sharedOptions,
+            IFileRepository fileRepository,
+            IDataRepository dataRepository,
             ISearchRepository<OrganisationSearchModel> organisationSearchRepository,
             IScopeBusinessLogic scopeBusinessLogic,
             ISubmissionBusinessLogic submissionBusinessLogic,
@@ -55,21 +59,24 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             _storageOptions = storageOptions;
             _searchOptions = searchOptions;
-            _CustomLogger = customLogger;
-            _BadSicLog = badSicLog;
-            _ManualChangeLog = manualChangeLog;
-            _Messenger = messenger;
-            _SharedBusinessLogic = sharedBusinessLogic;
-            _OrganisationSearchRepository = organisationSearchRepository;
+            _badSicLog = badSicLog;
+            _manualChangeLog = manualChangeLog;
+            _messenger = messenger;
+            _sharedOptions = sharedOptions;
+            _fileRepository = fileRepository;
+            _dataRepository = dataRepository;
+            _organisationSearchRepository = organisationSearchRepository;
             _scopeBusinessLogic = scopeBusinessLogic;
-            _SubmissionBusinessLogic = submissionBusinessLogic;
-            _OrganisationBusinessLogic = organisationBusinessLogic;
-            _PostCodeChecker = postCodeChecker;
+            _submissionBusinessLogic = submissionBusinessLogic;
+            _organisationBusinessLogic = organisationBusinessLogic;
+            _postCodeChecker = postCodeChecker;
             _searchBusinessLogic = searchBusinessLogic;
             _companiesHouseService = companiesHouseService;
             _authorisationBusinessLogic = authorisationBusinessLogic;
-            this.govNotifyApi = govNotifyApi;
+            _govNotifyApi = govNotifyApi;
         }
+
+        public IServiceScope LifetimeScope { get; set; }
 
         #region Properties
 

@@ -21,6 +21,9 @@ using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
 using System.Net.Http;
+using ModernSlavery.Infrastructure.Database.Classes;
+using ModernSlavery.Infrastructure.Database;
+using ModernSlavery.Infrastructure.Logging;
 
 namespace ModernSlavery.Hosts.Webjob
 {
@@ -61,6 +64,9 @@ namespace ModernSlavery.Hosts.Webjob
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
+            builder.RegisterType<DatabaseContext>().As<IDbContext>();
+            builder.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerDependency();
+
             //Register the messaging dependencies
             builder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
             builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
@@ -90,10 +96,12 @@ namespace ModernSlavery.Hosts.Webjob
 
         }
 
-
         public void Configure(ILifetimeScope lifetimeScope)
         {  
-            var applicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>(); 
+            var applicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>();
+
+            lifetimeScope.UseLogEventQueueLogger();
+
             var config = lifetimeScope.Resolve<IConfiguration>();
             var fileRepository = lifetimeScope.Resolve<IFileRepository>();
             var sharedOptions = lifetimeScope.Resolve<SharedOptions>();
@@ -113,7 +121,7 @@ namespace ModernSlavery.Hosts.Webjob
             RegisterEmailTemplate<OrganisationRegistrationApprovedTemplate>(emailTemplatesConfigPath);
             RegisterEmailTemplate<OrganisationRegistrationDeclinedTemplate>(emailTemplatesConfigPath);
             RegisterEmailTemplate<OrganisationRegistrationRemovedTemplate>(emailTemplatesConfigPath);
-            RegisterEmailTemplate<GeoOrganisationRegistrationRequestTemplate>(emailTemplatesConfigPath);
+            RegisterEmailTemplate<MsuOrganisationRegistrationRequestTemplate>(emailTemplatesConfigPath);
 
             // system templates
             RegisterEmailTemplate<SendEmailTemplate>(emailTemplatesConfigPath);
@@ -139,7 +147,7 @@ namespace ModernSlavery.Hosts.Webjob
                     // Summary:
                     //     Triggered when the application host has fully started and is about to wait for
                     //     a graceful shutdown.
-                    _logger.LogInformation("Application Started");
+                    _logger.LogInformation("Webjobs Application Started");
                 });
             applicationLifetime.ApplicationStopping.Register(
                 () =>
@@ -147,7 +155,7 @@ namespace ModernSlavery.Hosts.Webjob
                     // Summary:
                     //     Triggered when the application host is performing a graceful shutdown. Requests
                     //     may still be in flight. Shutdown will block until this event completes.
-                    _logger.LogInformation("Application Stopping");
+                    _logger.LogInformation("Webjobs Application Stopping");
                 });
         }
 

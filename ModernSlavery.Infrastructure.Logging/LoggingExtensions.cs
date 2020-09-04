@@ -39,29 +39,9 @@ namespace ModernSlavery.Infrastructure.Logging
             var logEventQueue = lifetimeScope.Resolve<LogEventQueue>();
 
             // Create the logging provider
-            loggerFactory.AddProvider(new EventLoggerProvider(logEventQueue, AppDomain.CurrentDomain.FriendlyName,filterOptions.Value));
+            loggerFactory.AddProvider(new EventLoggerProvider(logEventQueue, filterOptions.Value));
 
             return loggerFactory;
-        }
-
-        /// <summary>
-        ///     Adds an azure queue logger to a LoggingBuilder
-        /// </summary>
-        /// <param name="builder"></param>
-        public static ILoggingBuilder AddAzureQueueLogger(this ILoggingBuilder builder)
-        {
-            builder.Services.AddSingleton(ctx =>
-                {
-                    // Resolve filter options
-                    var filterOptions = ctx.GetRequiredService<LoggerFilterOptions>();
-
-                    // Resolve the keyed queue from autofac
-                    var logEventQueue = ctx.GetRequiredService<LogEventQueue>();
-
-                    return new EventLoggerProvider(logEventQueue, AppDomain.CurrentDomain.FriendlyName, filterOptions);
-                });
-
-            return builder;
         }
     }
 }
