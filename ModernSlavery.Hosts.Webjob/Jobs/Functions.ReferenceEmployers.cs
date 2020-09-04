@@ -36,7 +36,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                await _organisationBusinessLogic.SetUniqueEmployerReferencesAsync().ConfigureAwait(false);
+                await _organisationBusinessLogic.SetUniqueOrganisationReferencesAsync().ConfigureAwait(false);
             }
             finally
             {
