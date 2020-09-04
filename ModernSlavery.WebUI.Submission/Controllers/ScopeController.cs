@@ -331,20 +331,24 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [HttpPost("out/confirm-answers")]
-        public async Task<IActionResult> ConfirmOutOfScopeAnswers(string command)
+        public async Task<IActionResult> ConfirmOutOfScopeAnswers(bool RequiresEmailConfirmation)
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
                 return RedirectToActionArea("Home", "Admin", "Admin");
 
             var stateModel = UnstashModel<ScopingViewModel>();
+
+            // Hacky fix becuase requires email confirm field will not be bound to the statemodel
+            // this is because it is stored in session and is not posted to the server, therefore not being bound
+            stateModel.EnterAnswers.RequiresEmailConfirmation = RequiresEmailConfirmation;
+
             // when model is null then return session expired view
             if (stateModel == null) return SessionExpiredView();
 
             ApplyUserContactDetails(CurrentUser, stateModel);
 
             // Save user as out of scope
-            // TODO James - review snapshot year, it will be submission deadlines how does this impact?
             var years = new HashSet<int> { stateModel.DeadlineDate.Year };
             if (!stateModel.IsChangeJourney) years.Add(stateModel.DeadlineDate.Year - 1);
 
