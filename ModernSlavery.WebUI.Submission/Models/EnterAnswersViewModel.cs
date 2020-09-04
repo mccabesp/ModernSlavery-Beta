@@ -87,5 +87,8 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         [BindNever]
         public string BackUrl { get; set; }
+
+        [BindNever]
+        public bool UserIsRegistered { get; set; }
     }
 }

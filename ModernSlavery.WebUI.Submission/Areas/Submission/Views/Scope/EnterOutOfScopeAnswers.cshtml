@@ -5,7 +5,6 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Tell us why your organisation is not in scope - Modern Slavery reporting service";
-    var controller = ViewData["Controller"] as BaseController;
     var reasonIndex = 0;
 }
 <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
@@ -67,7 +66,7 @@
             </div>
 
 
-            if (controller.CurrentUser == null)
+            if (!Model.UserIsRegistered)
             {
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">

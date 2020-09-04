@@ -187,7 +187,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(stateModel.OrganisationId.ToString()) });
         }
 
-
         [HttpGet("out/confirm-organisation")]
         public async Task<IActionResult> ConfirmOutOfScopeDetails()
         {
@@ -252,6 +251,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             var model = stateModel.EnterAnswers ?? new EnterAnswersViewModel();
 
+            model.UserIsRegistered = stateModel.UserIsRegistered;
             model.BackUrl = stateModel.IsChangeJourney && stateModel.IsOutOfScopeJourney
                 ? stateModel.StartUrl
                 : Url.ActionArea("ConfirmOutOfScopeDetails", "Scope", "Submission");
@@ -284,7 +284,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 fields.Add(nameof(EnterAnswersViewModel.OtherReason));
 
             // when the user is not logged in then validate the contact details
-            if (CurrentUser == null)
+            if (!stateModel.UserIsRegistered)
             {
                 fields.Add(nameof(EnterAnswersViewModel.FirstName));
                 fields.Add(nameof(EnterAnswersViewModel.LastName));
