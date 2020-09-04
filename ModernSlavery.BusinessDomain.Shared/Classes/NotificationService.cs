@@ -72,12 +72,21 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             await AddEmailToQueue(notifyEmail);
         }
 
-        public async void SendScopeChangeOutEmail(string emailAddress, string organisationName)
+        public async void SendScopeChangeOutEmail(string emailAddress,
+            string organisationName,
+            string contactName,
+            string period,
+            string address,
+            string reason)
         {
             var personalisation = new Dictionary<string, dynamic>
             {
-                {"OrganisationName", organisationName},
-                {"Environment", _sharedOptions.IsProduction() ? "" : $"[{_sharedOptions.Environment}] "}
+                { "Environment", _sharedOptions.IsProduction() ? "" : $"[{_sharedOptions.Environment}] " },
+                { "ORGANISATION NAME", organisationName },
+                { "CONTACT NAME", contactName },
+                { "PERIOD", period },
+                { "REGISTERED ADDRESS", address },
+                { "REASON GIVEN", reason },
             };
 
             var notifyEmail = new SendEmailRequest

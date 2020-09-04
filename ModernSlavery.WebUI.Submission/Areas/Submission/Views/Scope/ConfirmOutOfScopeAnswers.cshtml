@@ -2,7 +2,6 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Review your information - Modern Slavery reporting service";
-    var controller = ViewData["Controller"] as BaseController;
 }
 <a class="govuk-back-link" href="@Url.Action("EnterOutOfScopeAnswers")">Back</a>
 <div class="govuk-grid-row">
@@ -28,7 +27,7 @@
 
             @await Html.PartialAsync("Parts/AnswersPart", Model)
 
-            @if (controller.CurrentUser == null)
+            @if (!Model.UserIsRegistered)
             {
                 <div class="govuk-form-group">
                     <fieldset class="govuk-fieldset">
