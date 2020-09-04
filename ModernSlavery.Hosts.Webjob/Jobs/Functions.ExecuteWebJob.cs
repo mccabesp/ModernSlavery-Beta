@@ -46,19 +46,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     await FixOrganisationsNamesAsync(log, parameters["userEmail"], parameters["comment"]).ConfigureAwait(false);
                     break;
                 default:
-                    if (RunningJobs.Contains(command)) return;
-                    RunningJobs.Add(command);
-                    try
-                    {
-                        var inputs = new Dictionary<string, object> { { "timer", null }, { "log", log } };
-                        foreach (string key in parameters.Keys)
-                            inputs[key] = parameters[key];
-                        await _jobHost.CallAsync(command, inputs).ConfigureAwait(false);
-                    }
-                    finally
-                    {
-                        RunningJobs.Remove(command);
-                    }
+                    var inputs = new Dictionary<string, object> { { "timer", null }, { "log", log } };
+                    foreach (string key in parameters.Keys)
+                        inputs[key] = parameters[key];
+                    await _jobHost.CallAsync(command, inputs).ConfigureAwait(false);
                     break;
             }
 
