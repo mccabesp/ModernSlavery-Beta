@@ -34,8 +34,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
 
             _govNotifyApi.SendEmail(notifyEmail);
-            log.LogInformation("Successfully received message from queue and passed to GovNotifyAPI",
-                new {notifyEmail});
+            log.LogInformation("Successfully received message from queue and passed to GovNotifyAPI. Details: {notifyEmail}", notifyEmail);
         }
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             string queueMessage,
             ILogger log)
         {
-            log.LogError("EMAIL FAILURE: Notify email in poison queue", new {queueMessage});
+            log.LogError($"EMAIL FAILURE: Notify email in poison queue. Details: {queueMessage}");
         }
     }
 }

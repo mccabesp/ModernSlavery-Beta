@@ -40,6 +40,12 @@ namespace ModernSlavery.Infrastructure.Hosts
             var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
             var appConfig = configBuilder.Build();
 
+            hostBuilder.ConfigureHostConfiguration(hostConfigBuilder =>
+            {
+                hostConfigBuilder.Sources.Clear();
+                hostConfigBuilder.AddConfiguration(appConfig);
+            });
+
             //Set the virtual date and time
             if (!appConfig.IsProduction() && !string.IsNullOrWhiteSpace(appConfig["DateTimeOffset"]))
                 VirtualDateTime.Initialise(appConfig["DateTimeOffset"]);
@@ -60,35 +66,38 @@ namespace ModernSlavery.Infrastructure.Hosts
 
             hostBuilder.ConfigureAppConfiguration((hostBuilderContext, appConfigBuilder) =>
             {
+                appConfigBuilder.Sources.Clear();
                 appConfigBuilder.AddConfiguration(appConfig);
+            });
+
+            hostBuilder.ConfigureLogging((hostBuilderContext, loggingBuilder) =>
+            {
+                loggingBuilder.ClearProviders();
+                //Setup the seri logger
+                hostBuilderContext.Configuration.SetupSerilogLogger();
+                //loggingBuilder.AddAzureQueueLogger(); //Use the custom logger
+                var instrumentationKey = appConfig["ApplicationInsights:InstrumentationKey"];
+                loggingBuilder.AddApplicationInsights(instrumentationKey); //log to app insights
+                loggingBuilder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
+                loggingBuilder.AddConsole();
+                loggingBuilder.AddConfiguration(appConfig);
             });
 
             //Load the configuration options
             var optionsBinder = new OptionsBinder(appConfig);
-            var configOptions = optionsBinder.BindAssemblies();
+            var optionServices = optionsBinder.BindAssemblies();
 
             hostBuilder.ConfigureServices(optionsBinder.RegisterOptions);
 
             //Load all the dependency actions
             var dependencyBuilder = new DependencyBuilder();
-            dependencyBuilder.Build<TStartupModule>(configOptions,appConfig);
+            dependencyBuilder.Build<TStartupModule>(optionServices, appConfig);
 
             //Register the callback to add dependent services - this is required here so IWebHostEnvironment is available to services
             hostBuilder.ConfigureServices(dependencyBuilder.RegisterDependencyServices);
 
             //Create the callback to register autofac dependencies only
             hostBuilder.ConfigureContainer<ContainerBuilder>(dependencyBuilder.RegisterDependencyServices);
-
-            hostBuilder.ConfigureLogging((hostBuilderContext, loggingBuilder) =>
-            {
-                //Setup the seri logger
-                hostBuilderContext.Configuration.SetupSerilogLogger();
-
-                loggingBuilder.AddAzureQueueLogger(); //Use the custom logger
-                var instrumentationKey = hostBuilderContext.Configuration["ApplicationInsights:InstrumentationKey"];
-                loggingBuilder.AddApplicationInsights(instrumentationKey); //log to app insights
-                loggingBuilder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
-            });
 
             //Register Autofac as the service provider
             hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());

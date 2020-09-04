@@ -23,6 +23,7 @@ using ModernSlavery.Infrastructure.Storage;
 using System.Net.Http;
 using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Database;
+using ModernSlavery.Infrastructure.Logging;
 
 namespace ModernSlavery.Hosts.Webjob
 {
@@ -95,10 +96,12 @@ namespace ModernSlavery.Hosts.Webjob
 
         }
 
-
         public void Configure(ILifetimeScope lifetimeScope)
         {  
-            var applicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>(); 
+            var applicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>();
+
+            lifetimeScope.UseLogEventQueueLogger();
+
             var config = lifetimeScope.Resolve<IConfiguration>();
             var fileRepository = lifetimeScope.Resolve<IFileRepository>();
             var sharedOptions = lifetimeScope.Resolve<SharedOptions>();

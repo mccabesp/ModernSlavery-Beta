@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Hosts.Webjob.Jobs;
 using ModernSlavery.Infrastructure.Hosts;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace ModernSlavery.Hosts.Webjob
 {
@@ -18,8 +19,6 @@ namespace ModernSlavery.Hosts.Webjob
             //NOTE: Leave this here to ensure function dependencies resolve on startup rather than when each function method is invoked
             //      It is also also useful when debugging individual jobs locally
             var functions = host.Services.GetService<Functions>();
-            //var logger = host.Services.GetService<ILogger<Functions>>();
-
             //functions.UpdateOrganisationSearchIndexesAsync(null, logger).Wait();
             //return;
 

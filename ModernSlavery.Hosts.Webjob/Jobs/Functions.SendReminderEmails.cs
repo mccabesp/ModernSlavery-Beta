@@ -17,7 +17,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         public void SendReminderEmails([TimerTrigger("%SendReminderEmails%")] TimerInfo timer, ILogger log)
         {
             var start = VirtualDateTime.Now;
-            log.LogInformation("SendReminderEmails Function started", start);
+            log.LogInformation($"SendReminderEmails Function started {start}");
 
             if (_sharedOptions.ReminderEmailDays == null ||
                 _sharedOptions.ReminderEmailDays.Length == 0)
@@ -78,7 +78,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     catch (Exception ex)
                     {
                         log.LogError(
-                            "Failed whilst sending or saving reminder email",
+                            "Failed whilst sending or saving reminder email. Details: {details}",
                             new
                             {
                                 user.UserId,
