@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
@@ -24,13 +25,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             var parameters = wrapper.Message.FromQueryString();
             var command = parameters["command"];
+            parameters.Remove("command");
             if (string.IsNullOrWhiteSpace(command)) command = wrapper.Message;
 
             switch (command)
             {
-                case "CompaniesHouseCheck":
-                    await CompaniesHouseCheckAsync(log, true).ConfigureAwait(false);
-                    break;
                 case "UpdateFile":
                     await UpdateFileAsync(log, parameters["filePath"], parameters["action"]).ConfigureAwait(false);
                     break;
@@ -47,7 +46,20 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     await FixOrganisationsNamesAsync(log, parameters["userEmail"], parameters["comment"]).ConfigureAwait(false);
                     break;
                 default:
-                    throw new Exception("Could not execute webjob:" + queueMessage);
+                    if (RunningJobs.Contains(command)) return;
+                    RunningJobs.Add(command);
+                    try
+                    {
+                        var inputs = new Dictionary<string, object> { { "timer", null }, { "log", log } };
+                        foreach (string key in parameters.Keys)
+                            inputs[key] = parameters[key];
+                        await _jobHost.CallAsync(command, inputs).ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        RunningJobs.Remove(command);
+                    }
+                    break;
             }
 
             log.LogDebug($"Executed {nameof(ExecuteWebjob)}:{command} successfully");

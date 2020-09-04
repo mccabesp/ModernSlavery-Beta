@@ -19,6 +19,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
+            if (RunningJobs.Contains(nameof(FixOrganisationAddresses))) return;
+            RunningJobs.Add(nameof(FixOrganisationAddresses));
             try
             {
                 //Load all the organisation in the database
@@ -93,6 +95,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(FixOrganisationAddresses));
+            }
+            
         }
     }
 }

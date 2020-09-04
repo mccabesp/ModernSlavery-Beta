@@ -21,6 +21,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
+            if (RunningJobs.Contains(nameof(TakeSnapshotAsync))) return;
+            RunningJobs.Add(nameof(TakeSnapshotAsync));
             try
             {
                 var azureStorageConnectionString = _storageOptions.AzureConnectionString;
@@ -68,6 +70,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(TakeSnapshotAsync));
+            }
+            
         }
 
         public async Task TakeSnapshotAsync(ILogger log)

@@ -12,6 +12,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         [Disable(typeof(DisableWebjobProvider))]
         public async Task CheckSiteCertAsync([TimerTrigger("%CheckSiteCertAsync%")] TimerInfo timer, ILogger log)
         {
+            if (RunningJobs.Contains(nameof(CheckSiteCertAsync))) return;
+            RunningJobs.Add(nameof(CheckSiteCertAsync));
             try
             {
                 if (_sharedOptions.CertExpiresWarningDays > 0)
@@ -56,6 +58,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(CheckSiteCertAsync));
+            }
+
         }
     }
 }

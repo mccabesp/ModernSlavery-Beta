@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac.Features.AttributeFilters;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Timers;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared;
@@ -19,6 +20,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         #region Dependencies
+        private readonly IJobHost _jobHost;
         private readonly StorageOptions _storageOptions;
         private readonly SearchOptions _searchOptions;
         private readonly IAuditLogger _badSicLog;
@@ -32,13 +34,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private readonly ISubmissionBusinessLogic _submissionBusinessLogic;
         private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
         private readonly IPostcodeChecker _postCodeChecker;
-        public readonly ISearchBusinessLogic _searchBusinessLogic;
+        private readonly ISearchBusinessLogic _searchBusinessLogic;
         private readonly IGovNotifyAPI _govNotifyApi;
         private readonly CompaniesHouseService _companiesHouseService;
-        private readonly IReportingDeadlineHelper _snapshotDateHelper;
+        private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
         private readonly IAuthorisationBusinessLogic _authorisationBusinessLogic;
         #endregion
         public Functions(
+            IJobHost jobHost,
             StorageOptions storageOptions,
             SearchOptions searchOptions,
             [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog,
@@ -47,6 +50,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             SharedOptions sharedOptions,
             IFileRepository fileRepository,
             IDataRepository dataRepository,
+            IReportingDeadlineHelper reportingDeadlineHelper,
             ISearchRepository<OrganisationSearchModel> organisationSearchRepository,
             IScopeBusinessLogic scopeBusinessLogic,
             ISubmissionBusinessLogic submissionBusinessLogic,
@@ -57,6 +61,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             CompaniesHouseService companiesHouseService,
             IAuthorisationBusinessLogic authorisationBusinessLogic)
         {
+            _jobHost = jobHost;
             _storageOptions = storageOptions;
             _searchOptions = searchOptions;
             _badSicLog = badSicLog;
@@ -65,6 +70,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             _sharedOptions = sharedOptions;
             _fileRepository = fileRepository;
             _dataRepository = dataRepository;
+            _reportingDeadlineHelper = reportingDeadlineHelper;
             _organisationSearchRepository = organisationSearchRepository;
             _scopeBusinessLogic = scopeBusinessLogic;
             _submissionBusinessLogic = submissionBusinessLogic;
