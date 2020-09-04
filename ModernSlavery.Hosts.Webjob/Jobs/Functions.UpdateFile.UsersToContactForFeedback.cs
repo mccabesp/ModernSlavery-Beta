@@ -15,7 +15,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     {
         [Disable(typeof(DisableWebjobProvider))]
         public async Task UpdateUsersToContactForFeedback(
-            [TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
+            [TimerTrigger(typeof(EveryWorkingHourSchedule))]
             TimerInfo timer,
             ILogger log)
         {
