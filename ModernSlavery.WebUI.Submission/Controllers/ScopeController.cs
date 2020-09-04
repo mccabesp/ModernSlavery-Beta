@@ -228,10 +228,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return View("ScopeKnown", stateModel);
 
             //when organisation is already registered then tell user 
+            var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
             if (!stateModel.IsChangeJourney
-                && (
-                    stateModel.ThisScope != null || stateModel.LastScope != null
-                    ))
+                // considered registered if any user associated has confirmed via pin
+                && organisation.UserOrganisations.Any(uo => uo.PINConfirmedDate != null))
                 return View("AlreadyRegistered", stateModel);
 
 
