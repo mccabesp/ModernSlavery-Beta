@@ -14,17 +14,17 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     public partial class Functions
     {
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task UpdateUsers([TimerTrigger(typeof(EveryWorkingHourSchedule), RunOnStartup = true)]
+        public async Task UpdateUsers([TimerTrigger(typeof(EveryWorkingHourSchedule))]
             TimerInfo timer,
             ILogger log)
         {
             try
             {
-                var filePath = Path.Combine(_SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.Users);
+                var filePath = Path.Combine(_sharedOptions.DownloadsPath, Filenames.Users);
 
                 //Dont execute on startup if file already exists
                 if (!StartedJobs.Contains(nameof(UpdateUsers)) &&
-                    await _SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false)) return;
+                    await _fileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false)) return;
 
                 await UpdateUsersAsync(filePath).ConfigureAwait(false);
                 log.LogDebug($"Executed {nameof(UpdateUsers)}:successfully");
@@ -34,7 +34,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed {nameof(UpdateUsers)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -51,7 +51,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(UpdateUsers));
             try
             {
-                var users = await _SharedBusinessLogic.DataRepository.GetAll<User>().ToListAsync().ConfigureAwait(false);
+                var users = await _dataRepository.GetAll<User>().ToListAsync().ConfigureAwait(false);
                 var records = users.Where(u => !_authorisationBusinessLogic.IsAdministrator(u))
                     .OrderBy(u => u.Lastname)
                     .Select(
@@ -77,7 +77,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             u.Created
                         })
                     .ToList();
-                await Extensions.SaveCSVAsync(_SharedBusinessLogic.FileRepository, records, filePath).ConfigureAwait(false);
+                await Extensions.SaveCSVAsync(_fileRepository, records, filePath).ConfigureAwait(false);
             }
             finally
             {

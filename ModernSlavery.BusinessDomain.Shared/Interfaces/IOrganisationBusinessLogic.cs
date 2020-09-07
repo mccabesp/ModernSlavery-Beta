@@ -22,12 +22,12 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <returns></returns>
         Task<List<OrganisationsFileModel>> GetOrganisationFileModelByYearAsync(int year);
 
-        Task SetUniqueEmployerReferencesAsync();
-        Task SetUniqueEmployerReferenceAsync(Organisation organisation);
-        string GenerateEmployerReference();
+        Task SetUniqueOrganisationReferencesAsync();
+        Task SetUniqueOrganisationReferenceAsync(Organisation organisation);
+        string GenerateOrganisationReference();
         string GeneratePINCode();
 
-        Task<CustomResult<OrganisationScope>> SetAsScopeAsync(string employerRef,
+        Task<CustomResult<OrganisationScope>> SetAsScopeAsync(string organisationRef,
             int changeScopeToSnapshotYear,
             string changeScopeToComment,
             User currentUser,
@@ -93,27 +93,27 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 
         SortedSet<int> GetOrganisationSicCodeIds(Organisation organisation, DateTime? maxDate = null);
         string GetOrganisationSicCodeIdsString(Organisation organisation, DateTime? maxDate = null, string delimiter = ", ");
-        Task<Organisation> GetOrganisationByEmployerReferenceAsync(string employerReference);
+        Task<Organisation> GetOrganisationByOrganisationReferenceAsync(string organisationReference);
 
-        Task<Organisation> GetOrganisationByEmployerReferenceAndSecurityCodeAsync(
-            string employerReference,
+        Task<Organisation> GetOrganisationByOrganisationReferenceAndSecurityCodeAsync(
+            string organisationReference,
             string securityCode);
 
         Statement GetOrganisationStatement(Organisation organisation, int year = 0);
 
-        Task<CustomResult<Organisation>> CreateOrganisationSecurityCodeAsync(string employerRef,
+        Task<CustomResult<Organisation>> CreateOrganisationSecurityCodeAsync(string organisationRef,
             DateTime securityCodeExpiryDateTime);
 
         Task<CustomBulkResult<Organisation>> CreateOrganisationSecurityCodesInBulkAsync(
             DateTime securityCodeExpiryDateTime);
 
-        Task<CustomResult<Organisation>> ExtendOrganisationSecurityCodeAsync(string employerRef,
+        Task<CustomResult<Organisation>> ExtendOrganisationSecurityCodeAsync(string organisationRef,
             DateTime securityCodeExpiryDateTime);
 
         Task<CustomBulkResult<Organisation>> ExtendOrganisationSecurityCodesInBulkAsync(
             DateTime securityCodeExpiryDateTime);
 
-        Task<CustomResult<Organisation>> ExpireOrganisationSecurityCodeAsync(string employerRef);
+        Task<CustomResult<Organisation>> ExpireOrganisationSecurityCodeAsync(string organisationRef);
         Task<CustomBulkResult<Organisation>> ExpireOrganisationSecurityCodesInBulkAsync();
         IQueryable<Organisation> SearchOrganisations(string searchText,int records);
         Task FixLatestAddressesAsync();

@@ -47,7 +47,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         {
             if (reportingDeadline == null) reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(organisation.SectorType);
 
-            var orgScope = organisation.OrganisationScopes.SingleOrDefault(s => s.SubmissionDeadline == reportingDeadline && s.Status == ScopeRowStatuses.Active);
+            var orgScope = organisation.GetActiveScope(reportingDeadline.Value);
 
             return orgScope;
         }
@@ -97,7 +97,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                 ContactFirstname = oldScope.ContactFirstname,
                 ContactLastname = oldScope.ContactLastname,
                 ContactJobTitle = oldScope.ContactJobTitle,
-                ReadGuidance = oldScope.ReadGuidance,
                 Reason = oldScope.Reason,
                 TurnOver = oldScope.TurnOver,
                 ScopeStatus = newStatus,
@@ -120,7 +119,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             bool saveToDatabase)
         {
             var oldOrgScope = organisation.GetActiveScope(reportingDeadline);
-            if (oldOrgScope == null) throw new ArgumentOutOfRangeException($"Cannot find an scope with status 'Active' for reporting deadling '{reportingDeadline}' linked to organisation '{organisation.OrganisationName}', employerReference '{organisation.EmployerReference}'.");
+            if (oldOrgScope == null) throw new ArgumentOutOfRangeException($"Cannot find an scope with status 'Active' for reporting deadling '{reportingDeadline}' linked to organisation '{organisation.OrganisationName}', organisationReference '{organisation.OrganisationReference}'.");
 
             if (oldOrgScope.ScopeStatus == newStatus)
                 return new CustomResult<OrganisationScope>(InternalMessages.SameScopesCannotBeUpdated(newStatus, oldOrgScope.ScopeStatus, reportingDeadline));
@@ -135,7 +134,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                 ContactFirstname = currentUser.Firstname,
                 ContactLastname = currentUser.Lastname,
                 ContactJobTitle = currentUser.JobTitle,
-                ReadGuidance = oldOrgScope.ReadGuidance,
                 Reason = !string.IsNullOrEmpty(comment)
                     ? comment
                     : oldOrgScope.Reason,
@@ -204,7 +202,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     OrganisationId = o.OrganisationId,
                     OrganisationName = o.Organisation.OrganisationName,
                     DUNSNumber = o.Organisation.DUNSNumber,
-                    EmployerReference = o.Organisation.EmployerReference,
+                    OrganisationReference = o.Organisation.OrganisationReference,
                     OrganisationScopeId = o.OrganisationScopeId,
                     ScopeStatus = o.ScopeStatus,
                     ScopeStatusDate = o.ScopeStatusDate,
@@ -214,7 +212,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                     ContactFirstname = o.ContactFirstname,
                     ContactLastname = o.ContactLastname,
                     ContactJobTitle = o.ContactJobTitle,
-                    ReadGuidance = o.ReadGuidance,
                     Reason = o.Reason,
                     TurnOver = o.TurnOver,
                     CampaignId = o.CampaignId
@@ -259,168 +256,24 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             return changedOrgs;
         }
-
         public async Task<HashSet<Organisation>> SetPresumedScopesAsync()
         {
-            var missingOrgs = await FindOrgsWhereScopeNotSetAsync();
-            var changedOrgs = new HashSet<Organisation>();
-
-            foreach (var org in missingOrgs)
-                if (await SetPresumedScopesAsync(org.Organisation))
-                    changedOrgs.Add(org.Organisation);
-
-            if (changedOrgs.Count > 0) await _dataRepository.SaveChangesAsync();
-
-            return changedOrgs;
-        }
-
-        public async Task<bool> SetPresumedScopesAsync(Organisation org)
-        {
-            var prevYearScope = ScopeStatuses.Unknown;
-            var neverDeclaredScope = true;
-            var changed = false;
-
-            foreach (var reportingDeadline in _reportingDeadlineHelper.GetReportingDeadlines(org.SectorType))
-            {
-                var scope = org.GetActiveScope(reportingDeadline);
-
-                // if we already have a scope then flag (prevYearScope, neverDeclaredScope) and skip this year
-                if (scope != null && scope.ScopeStatus != ScopeStatuses.Unknown)
-                {
-                    prevYearScope = scope.ScopeStatus;
-                    neverDeclaredScope = false;
-                    continue;
-                }
-
-                // determine if need to presume scope
-                var shouldPresumeScope = neverDeclaredScope
-                                         && (prevYearScope == ScopeStatuses.PresumedOutOfScope
-                                             || prevYearScope == ScopeStatuses.PresumedInScope
-                                             || prevYearScope == ScopeStatuses.Unknown);
-
-                // presumed scope from created date
-                if (shouldPresumeScope)
-                {
-                    var createdAfterDeadlineYear = org.Created >= reportingDeadline;
-                    if (createdAfterDeadlineYear)
-                        prevYearScope = ScopeStatuses.PresumedOutOfScope;
-                    else
-                        prevYearScope = ScopeStatuses.PresumedInScope;
-                }
-                // otherwise presume scope from declared scope
-                else if (prevYearScope == ScopeStatuses.InScope)
-                {
-                    prevYearScope = ScopeStatuses.PresumedInScope;
-                }
-                else if (prevYearScope == ScopeStatuses.OutOfScope)
-                {
-                    prevYearScope = ScopeStatuses.PresumedOutOfScope;
-                }
-
-                // update the scope status
-                SetPresumedScopeStatus(org, prevYearScope, reportingDeadline);
-
-                changed = true;
-            }
-
-            // set the latest scope if not set
-            if (org.LatestScope == null)
-            {
-                org.LatestScope = org.GetLatestActiveScope();
-                changed = true;
-            }
-
-            return changed;
-        }
-
-        public async Task<IList<OrganisationMissingScope>> FindOrgsWhereScopeNotSetAsync()
-        {
-            // get all orgs of any status
             var allOrgs = await _dataRepository.ToListAsync<Organisation>();
             allOrgs.SelectMany(o => o.OrganisationScopes).ToList();
 
-            // find all orgs who have no scope or unknown scope statuses
-            var orgsWithMissingScope = new ConcurrentBag<OrganisationMissingScope>();
+            var changedOrgs = new ConcurrentBag<Organisation>();
             var privateDeadlines = _reportingDeadlineHelper.GetReportingDeadlines(SectorTypes.Private);
             var publicDeadlines = _reportingDeadlineHelper.GetReportingDeadlines(SectorTypes.Public);
 
-            Parallel.ForEach(allOrgs, org =>
-             {
-                 var missingDeadlines = new List<DateTime>();
-
-                 // for all snapshot years check if scope exists
-                 var deadlines = org.SectorType == SectorTypes.Private ? privateDeadlines : publicDeadlines;
-                 foreach (var reportingDeadline in deadlines)
-                 {
-                     var scope = org.GetActiveScope(reportingDeadline);
-                     if (scope == null || scope.ScopeStatus == ScopeStatuses.Unknown) missingDeadlines.Add(reportingDeadline);
-                 }
-
-                 // collect
-                 if (missingDeadlines.Count > 0)
-                     orgsWithMissingScope.Add(
-                         new OrganisationMissingScope { Organisation = org, MissingDeadlines = missingDeadlines });
-             });
-
-            return orgsWithMissingScope.ToList();
-        }
-
-        /// <summary>
-        ///     Adds a new scope and updates the latest scope (if required)
-        /// </summary>
-        /// <param name="org"></param>
-        /// <param name="scopeStatus"></param>
-        /// <param name="reportingDeadline"></param>
-        /// <param name="currentUser"></param>
-        public virtual OrganisationScope SetPresumedScopeStatus(Organisation org,
-            ScopeStatuses scopeStatus,
-            DateTime reportingDeadline,
-            User currentUser = null)
-        {
-            //Ensure scopestatus is presumed
-            if (scopeStatus != ScopeStatuses.PresumedInScope && scopeStatus != ScopeStatuses.PresumedOutOfScope)
-                throw new ArgumentOutOfRangeException(nameof(scopeStatus));
-
-            //Check no previous scopes
-            if (org.OrganisationScopes.Any(os => os.SubmissionDeadline == reportingDeadline))
-                throw new ArgumentException($"A scope already exists for reporting deadline year {reportingDeadline.Year} for organisation employer reference '{org.EmployerReference}'", nameof(scopeStatus));
-
-            //Check for conflict with previous years scope
-            if (reportingDeadline.Year - 1 > _reportingDeadlineHelper.FirstReportingDeadlineYear)
+            Parallel.ForEach(allOrgs, async org =>
             {
-                var previousScope = GetScopeStatusByReportingDeadlineOrLatestAsync(org, reportingDeadline.AddYears(-1));
-                if (previousScope == ScopeStatuses.InScope && scopeStatus == ScopeStatuses.PresumedOutOfScope
-                    || previousScope == ScopeStatuses.OutOfScope && scopeStatus == ScopeStatuses.PresumedInScope)
-                    throw new ArgumentException(
-                        $"Cannot set {scopeStatus} for snapshot year {reportingDeadline.Year} when previos year was {previousScope} for organisation employer reference '{org.EmployerReference}'",
-                        nameof(scopeStatus));
-            }
+                if (await org.SetPresumedScopesAsync(org.SectorType== SectorTypes.Public ? publicDeadlines : privateDeadlines))
+                    changedOrgs.Add(org);
+            });
 
-            var newScope = new OrganisationScope
-            {
-                OrganisationId = org.OrganisationId,
-                ContactEmailAddress = currentUser?.EmailAddress,
-                ContactFirstname = currentUser?.Firstname,
-                ContactLastname = currentUser?.Lastname,
-                ContactJobTitle = currentUser?.JobTitle,
-                ScopeStatus = scopeStatus,
-                Status = ScopeRowStatuses.Active,
-                StatusDetails = "Generated by the system",
-                SubmissionDeadline = reportingDeadline
-            };
+            if (changedOrgs.Count>0) await _dataRepository.SaveChangesAsync();
 
-            org.OrganisationScopes.Add(newScope);
-
-            return newScope;
-        }
-
-
-        public virtual async Task<OrganisationScope> GetPendingScopeRegistrationAsync(string emailAddress)
-        {
-            var result = await _dataRepository.FirstOrDefaultByDescendingAsync<OrganisationScope, DateTime>(
-                s => s.RegisterStatusDate,
-                o => o.RegisterStatus == RegisterStatuses.RegisterPending && o.ContactEmailAddress == emailAddress);
-            return result;
+            return changedOrgs.ToHashSet();
         }
     }
 }

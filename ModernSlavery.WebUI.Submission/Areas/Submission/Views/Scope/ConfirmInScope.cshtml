@@ -2,41 +2,39 @@
 @using System.Net;
 @using ModernSlavery.Core.Models
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Confirm In Scope - Modern Slavery reporting service";
     var emailAdd = sharedOptions.MsuReportingEmail;
-    var emailSubject =  WebUtility.UrlEncode(string.Format("Wrong Employer Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.EmployerReference));
+    var emailSubject = WebUtility.UrlEncode(string.Format("Wrong Organisation Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.OrganisationReference));
 
     // c# 6 doesnt compile with razor in mvc5 so cant use string templates here :( need to update to MVC 6
     var mailto = string.Join("", "mailto:", emailAdd, "?subject=", emailSubject);
 }
 @model ScopingViewModel
-<div class="grid-row">
-    <div class="column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new {@class = "form", autocomplete = "off"}))
+<a class="govuk-back-link" href="@Model.StartUrl">Back</a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off" }))
         {
             @Html.AntiForgeryToken()
 
-            <a class="link-back" href="@Model.StartUrl">Back <span class="visuallyhidden"> to the previous question</span></a>
-
-            <h1 class="heading-large">
+            <h1 class="govuk-heading-l">
                 <span>Confirm your organisation is required to publish a modern slavery statement</span>
             </h1>
 
+            @await Html.PartialAsync("Parts/OrganisationDetailsPart", Model)
 
-            @await Html.PartialAsync("Parts/EmployerDetailsPart", Model)
+            <br />
 
-            <br/>
-
-            <p class="text">
+            <p class="govuk-body">
                 <span>Please confirm your organisation is required to publish a modern slavery statement.</span>
             </p>
 
             <div class="form-group">
-                <input id="NextStep" type="submit" class="button" name="command" value="Confirm"/>
+                <input id="NextStep" type="submit" class="govuk-button govuk-!-margin-right-1" name="command" value="Confirm" />
             </div>
 
-            <p class="text">
+            <p class="govuk-body">
                 If your organisation name or address is incorrect, email us at <a href="@mailto" target="_blank">@sharedOptions.MsuReportingEmail</a> and let us know the correct information.
             </p>
         }

@@ -39,18 +39,18 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
         {
             if (searchText.IsNumber()) searchText = searchText.PadLeft(8, '0');
 
-            var employersPage = new PagedResult<OrganisationRecord>
+            var organisationsPage = new PagedResult<OrganisationRecord>
             {
                 PageSize = pageSize, CurrentPage = page, Results = new List<OrganisationRecord>()
             };
 
             if (test)
             {
-                employersPage.ActualRecordTotal = 1;
-                employersPage.VirtualRecordTotal = 1;
+                organisationsPage.ActualRecordTotal = 1;
+                organisationsPage.VirtualRecordTotal = 1;
 
                 var id = Numeric.Rand(100000, int.MaxValue - 1);
-                var employer = new OrganisationRecord
+                var organisation = new OrganisationRecord
                 {
                     OrganisationName = _sharedOptions.TestPrefix + "_Ltd_" + id,
                     CompanyNumber = ("_" + id).Left(10),
@@ -61,13 +61,13 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                     PostCode = "Test Post Code",
                     PoBox = null
                 };
-                employersPage.Results.Add(employer);
-                return employersPage;
+                organisationsPage.Results.Add(organisation);
+                return organisationsPage;
             }
 
             //Get the first page of results and the total records, number of pages, and page size
             var tasks = new List<Task<PagedResult<OrganisationRecord>>>();
-            var page1task = SearchEmployersAsync(searchText, 1, pageSize);
+            var page1task = SearchOrganisationsAsync(searchText, 1, pageSize);
             await page1task;
 
             //Calculate the maximum page size
@@ -76,7 +76,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
 
             //Add a task for ll pages from 2 upwards to maxpages
             for (var subPage = 2; subPage <= maxPages; subPage++)
-                tasks.Add(SearchEmployersAsync(searchText, subPage, page1task.Result.PageSize));
+                tasks.Add(SearchOrganisationsAsync(searchText, subPage, page1task.Result.PageSize));
 
             //Wait for all the tasks to complete
             await Task.WhenAll(tasks);
@@ -85,13 +85,13 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             tasks.Insert(0, page1task);
 
             //Merge the results from each page into a single page of results
-            foreach (var task in tasks) employersPage.Results.AddRange(task.Result.Results);
+            foreach (var task in tasks) organisationsPage.Results.AddRange(task.Result.Results);
 
             //Get the toal number of records
-            employersPage.ActualRecordTotal = page1task.Result.ActualRecordTotal;
-            employersPage.VirtualRecordTotal = page1task.Result.VirtualRecordTotal;
+            organisationsPage.ActualRecordTotal = page1task.Result.ActualRecordTotal;
+            organisationsPage.VirtualRecordTotal = page1task.Result.VirtualRecordTotal;
 
-            return employersPage;
+            return organisationsPage;
         }
 
         public async Task<string> GetSicCodesAsync(string companyNumber)
@@ -133,33 +133,33 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             }
         }
 
-        private async Task<PagedResult<OrganisationRecord>> SearchEmployersAsync(string searchText, int page, int pageSize)
+        private async Task<PagedResult<OrganisationRecord>> SearchOrganisationsAsync(string searchText, int page, int pageSize)
         {
-            var employersPage = new PagedResult<OrganisationRecord>
+            var organisationsPage = new PagedResult<OrganisationRecord>
             {
                 PageSize = pageSize, CurrentPage = page, Results = new List<OrganisationRecord>()
             };
 
-            var json = await GetCompaniesAsync(searchText, page, employersPage.PageSize);
+            var json = await GetCompaniesAsync(searchText, page, organisationsPage.PageSize);
 
             dynamic companies = JsonConvert.DeserializeObject(json);
             if (companies != null)
             {
-                employersPage.ActualRecordTotal = companies.total_results;
-                employersPage.VirtualRecordTotal = companies.total_results;
-                employersPage.PageSize = companies.items_per_page;
-                if (employersPage.ActualRecordTotal > 0)
+                organisationsPage.ActualRecordTotal = companies.total_results;
+                organisationsPage.VirtualRecordTotal = companies.total_results;
+                organisationsPage.PageSize = companies.items_per_page;
+                if (organisationsPage.ActualRecordTotal > 0)
                     foreach (var company in companies.items)
                     {
-                        var employer = new OrganisationRecord();
-                        employer.OrganisationName = company.title;
-                        employer.NameSource = "CoHo";
-                        employer.CompanyNumber = company.company_number;
-                        if (employer.CompanyNumber.IsNumber())
-                            employer.CompanyNumber = employer.CompanyNumber.PadLeft(8, '0');
+                        var organisation = new OrganisationRecord();
+                        organisation.OrganisationName = company.title;
+                        organisation.NameSource = "CoHo";
+                        organisation.CompanyNumber = company.company_number;
+                        if (organisation.CompanyNumber.IsNumber())
+                            organisation.CompanyNumber = organisation.CompanyNumber.PadLeft(8, '0');
 
                         var dateOfCessation = ((string) company?.date_of_cessation).ToDateTime();
-                        if (dateOfCessation > DateTime.MinValue) employer.DateOfCessation = dateOfCessation;
+                        if (dateOfCessation > DateTime.MinValue) organisation.DateOfCessation = dateOfCessation;
 
                         var company_type = (string) company?.company_type;
                         if (company.address != null)
@@ -211,23 +211,23 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                             if (!string.IsNullOrWhiteSpace(addressLine3) && !addresses.ContainsI(addressLine3))
                                 addresses.Add(addressLine3);
 
-                            employer.Address1 = addresses.Count > 0 ? addresses[0] : null;
-                            employer.Address2 = addresses.Count > 1 ? addresses[1] : null;
-                            employer.Address3 = addresses.Count > 2 ? addresses[2] : null;
+                            organisation.Address1 = addresses.Count > 0 ? addresses[0] : null;
+                            organisation.Address2 = addresses.Count > 1 ? addresses[1] : null;
+                            organisation.Address3 = addresses.Count > 2 ? addresses[2] : null;
 
-                            employer.City = city;
-                            employer.County = county;
-                            employer.Country = country;
-                            employer.PostCode = postalCode;
-                            employer.PoBox = poBox;
-                            employer.AddressSource = "CoHo";
+                            organisation.City = city;
+                            organisation.County = county;
+                            organisation.Country = country;
+                            organisation.PostCode = postalCode;
+                            organisation.PoBox = poBox;
+                            organisation.AddressSource = "CoHo";
                         }
 
-                        employersPage.Results.Add(employer);
+                        organisationsPage.Results.Add(organisation);
                     }
             }
 
-            return employersPage;
+            return organisationsPage;
         }
 
         private async Task<string> GetCompaniesAsync(string companyName, int page, int pageSize = 10,

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModernSlavery.Infrastructure.Database;
 
 namespace ModernSlavery.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20200827155917_UpdateEmployerReferenceToOrganisationReference")]
+    partial class UpdateEmployerReferenceToOrganisationReference
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -461,6 +463,9 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
 
                     b.Property<long>("OrganisationId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool?>("ReadGuidance")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Reason")
                         .HasColumnType("nvarchar(1000)")

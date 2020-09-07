@@ -8,39 +8,46 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 {
     public partial class Functions
     {
-        //Ensure all organisations have a unique employer reference
+        //Ensure all organisations have a unique organisation reference
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task ReferenceEmployers([TimerTrigger("%ReferenceEmployers%")] TimerInfo timer, ILogger log)
+        public async Task ReferenceOrganisations([TimerTrigger("%ReferenceOrganisations%")] TimerInfo timer, ILogger log)
         {
+            if (RunningJobs.Contains(nameof(ReferenceOrganisations))) return;
+            RunningJobs.Add(nameof(ReferenceOrganisations));
             try
             {
-                await ReferenceEmployersAsync().ConfigureAwait(false);
-                log.LogDebug($"Executed {nameof(ReferenceEmployers)} successfully");
+                await ReferenceOrganisationsAsync().ConfigureAwait(false);
+                log.LogDebug($"Executed {nameof(ReferenceOrganisations)} successfully");
             }
             catch (Exception ex)
             {
-                var message = $"Failed webjob ({nameof(ReferenceEmployers)}):{ex.Message}:{ex.GetDetailsText()}";
+                var message = $"Failed webjob ({nameof(ReferenceOrganisations)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(ReferenceOrganisations));
+            }
+            
         }
 
-        private async Task ReferenceEmployersAsync()
+        private async Task ReferenceOrganisationsAsync()
         {
-            if (RunningJobs.Contains(nameof(ReferenceEmployers))) return;
+            if (RunningJobs.Contains(nameof(ReferenceOrganisations))) return;
 
-            RunningJobs.Add(nameof(ReferenceEmployers));
+            RunningJobs.Add(nameof(ReferenceOrganisations));
 
             try
             {
-                await _OrganisationBusinessLogic.SetUniqueEmployerReferencesAsync().ConfigureAwait(false);
+                await _organisationBusinessLogic.SetUniqueOrganisationReferencesAsync().ConfigureAwait(false);
             }
             finally
             {
-                RunningJobs.Remove(nameof(ReferenceEmployers));
+                RunningJobs.Remove(nameof(ReferenceOrganisations));
             }
         }
     }

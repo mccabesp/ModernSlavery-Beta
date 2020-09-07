@@ -300,19 +300,19 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         /// <summary>
-        ///     Contains the logic to extract an employer reference from a manual changes parameter line.
+        ///     Contains the logic to extract an organisation reference from a manual changes parameter line.
         /// </summary>
-        /// <param name="lineToReview">line containing the employer reference</param>
-        /// <param name="employerReference">the found employer reference or null if unable to extract</param>
-        /// <returns>true if the employer reference was found, false otherwise</returns>
-        private static bool HasEmployerReference(ref string lineToReview, out string employerReference)
+        /// <param name="lineToReview">line containing the organisation reference</param>
+        /// <param name="organisationReference">the found organisation reference or null if unable to extract</param>
+        /// <returns>true if the organisation reference was found, false otherwise</returns>
+        private static bool HasOrganisationReference(ref string lineToReview, out string organisationReference)
         {
-            employerReference = lineToReview.BeforeFirst("=")?.ToUpper();
+            organisationReference = lineToReview.BeforeFirst("=")?.ToUpper();
 
             // if found, remove from line to review
-            if (!string.IsNullOrEmpty(employerReference)) lineToReview = lineToReview.Replace(employerReference, "");
+            if (!string.IsNullOrEmpty(organisationReference)) lineToReview = lineToReview.Replace(organisationReference, "");
 
-            return !string.IsNullOrEmpty(employerReference);
+            return !string.IsNullOrEmpty(organisationReference);
         }
 
         private static bool HasDateTimeInfo(ref string lineToReview, out DateTime extractedDateTime)
@@ -396,11 +396,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 i++;
 
-                if (!HasEmployerReference(ref outcome, out var employerRef))
+                if (!HasOrganisationReference(ref outcome, out var organisationRef))
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{line}' expected an employer reference before the '=' character (i.e. EmployerReference=SnapshotYear,Comment to add to the scope change for this particular employer)");
+                        $"{i}: ERROR: '{line}' expected an organisation reference before the '=' character (i.e. OrganisationReference=SnapshotYear,Comment to add to the scope change for this particular organisation)");
                     continue;
                 }
 
@@ -412,7 +412,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}' the in-line comment appears to begin with a number, if having a number as part of the comment is intended please reenter this line with the format '{employerRef}=SnapshotYear,{changeScopeToComment}', alternatively add a comma after the number.");
+                        $"{i}: ERROR: '{organisationRef}' the in-line comment appears to begin with a number, if having a number as part of the comment is intended please reenter this line with the format '{organisationRef}=SnapshotYear,{changeScopeToComment}', alternatively add a comma after the number.");
                     continue;
                 }
 
@@ -422,7 +422,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     {
                         writer.WriteLine(
                             Color.Red,
-                            $"{i}: ERROR: '{employerRef}' please enter a comment in the comments section of this page");
+                            $"{i}: ERROR: '{organisationRef}' please enter a comment in the comments section of this page");
                         continue;
                     }
 
@@ -431,16 +431,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 try
                 {
-                    if (processed.Contains(employerRef))
+                    if (processed.Contains(organisationRef))
                     {
-                        writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                        writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                         continue;
                     }
 
-                    processed.Add(employerRef);
+                    processed.Add(organisationRef);
 
                     var outOfScopeOutcome = await _adminService.OrganisationBusinessLogic.SetAsScopeAsync(
-                        employerRef,
+                        organisationRef,
                         changeScopeToSnapshotYear,
                         changeScopeToComment,
                         CurrentUser,
@@ -449,7 +449,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     if (outOfScopeOutcome.Failed)
                     {
-                        writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' {outOfScopeOutcome.ErrorMessage}");
+                        writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' {outOfScopeOutcome.ErrorMessage}");
                         continue;
                     }
 
@@ -458,7 +458,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     var hasBeenWillBe = test ? "will be" : "has been";
                     writer.WriteLine(
-                        $"{i}: {employerRef}: {hasBeenWillBe} set as '{outOfScopeOutcome.Result.ScopeStatus}' for snapshotYear '{outOfScopeOutcome.Result.SubmissionDeadline.Year}' with comment '{outOfScopeOutcome.Result.Reason}'");
+                        $"{i}: {organisationRef}: {hasBeenWillBe} set as '{outOfScopeOutcome.Result.ScopeStatus}' for snapshotYear '{outOfScopeOutcome.Result.SubmissionDeadline.Year}' with comment '{outOfScopeOutcome.Result.Reason}'");
                     if (!test)
                         await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel
@@ -467,14 +467,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 Action = ManualActions.Update,
                                 Source = CurrentUser.EmailAddress,
                                 Comment = comment,
-                                ReferenceName = nameof(Organisation.EmployerReference),
-                                ReferenceValue = employerRef,
+                                ReferenceName = nameof(Organisation.OrganisationReference),
+                                ReferenceValue = organisationRef,
                                 TargetName = nameof(Organisation.OrganisationScopes)
                             });
                 }
                 catch (Exception ex)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' {ex.Message}");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' {ex.Message}");
                     continue;
                 }
 
@@ -515,7 +515,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     org.LatestRegistration = latestReg;
                     subCount++;
                     writer.WriteLine(
-                        $"{subCount:000}: Organisation '{org.EmployerReference}:{org.OrganisationName}' missing a latest registration {(test ? "will be" : "was successfully")} fixed");
+                        $"{subCount:000}: Organisation '{org.OrganisationReference}:{org.OrganisationName}' missing a latest registration {(test ? "will be" : "was successfully")} fixed");
                 }
             }
 
@@ -542,7 +542,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     org.LatestStatement = latestStatement;
                     subCount++;
                     writer.WriteLine(
-                        $"{subCount:000}: Organisation '{org.EmployerReference}:{org.OrganisationName}' missing a latest statement {(test ? "will be" : "was successfully")} fixed");
+                        $"{subCount:000}: Organisation '{org.OrganisationReference}:{org.OrganisationName}' missing a latest statement {(test ? "will be" : "was successfully")} fixed");
                 }
             }
 
@@ -570,7 +570,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     org.LatestScope = latestScope;
                     subCount++;
                     writer.WriteLine(
-                        $"{subCount:000}: Organisation '{org.EmployerReference}:{org.OrganisationName}' missing a latest scope {(test ? "will be" : "was successfully")} fixed");
+                        $"{subCount:000}: Organisation '{org.OrganisationReference}:{org.OrganisationName}' missing a latest scope {(test ? "will be" : "was successfully")} fixed");
                 }
             }
 
@@ -608,16 +608,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
                 var newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI()?.ToUpper();
 
@@ -631,14 +631,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     if (!newValue.IsCompanyNumber())
                     {
-                        writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Invalid company number '{newValue}'");
+                        writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' Invalid company number '{newValue}'");
                         continue;
                     }
 
                     if (processedCoNos.Contains(newValue))
                     {
                         writer.WriteLine(Color.Red,
-                            $"{i}: ERROR: '{employerRef}' duplicate company number '{newValue}'");
+                            $"{i}: ERROR: '{organisationRef}' duplicate company number '{newValue}'");
                         continue;
                     }
 
@@ -646,11 +646,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == organisationRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
@@ -660,14 +660,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Orange,
-                        $"{i}: WARNING '{employerRef}' '{org.OrganisationName}' Company Number='{org.CompanyNumber}' already set to '{oldValue}'");
+                        $"{i}: WARNING '{organisationRef}' '{org.OrganisationName}' Company Number='{org.CompanyNumber}' already set to '{oldValue}'");
                 }
                 else if (!string.IsNullOrWhiteSpace(newValue)
                          && await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                              .AnyAsync(o => o.CompanyNumber == newValue && o.OrganisationId != org.OrganisationId))
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR '{employerRef}' Another organisation exists with this company number");
+                        $"{i}: ERROR '{organisationRef}' Another organisation exists with this company number");
                     continue;
                 }
                 else
@@ -675,7 +675,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     //Output the actual execution result
                     org.CompanyNumber = newValue;
                     writer.WriteLine(
-                        $"{i}: {employerRef}: {org.OrganisationName} Company Number='{org.CompanyNumber}' set to '{newValue}'");
+                        $"{i}: {organisationRef}: {org.OrganisationName} Company Number='{org.CompanyNumber}' set to '{newValue}'");
                     if (!test)
                     {
                         await _adminService.ManualChangeLog.WriteAsync(
@@ -683,8 +683,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 methodName,
                                 ManualActions.Update,
                                 CurrentUser.EmailAddress,
-                                nameof(Organisation.EmployerReference),
-                                employerRef,
+                                nameof(Organisation.OrganisationReference),
+                                organisationRef,
                                 nameof(Organisation.CompanyNumber),
                                 oldValue,
                                 newValue,
@@ -722,24 +722,24 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure we have value BEFORE the = sign
-                var employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
-                // ensure the employer ref exists
+                // ensure the organisation ref exists
                 var org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
+                    .FirstOrDefault(o => o.OrganisationReference.ToLower() == organisationRef.ToLower());
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
@@ -748,7 +748,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' is not an active organisation so you cannot change its SIC codes");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' is not an active organisation so you cannot change its SIC codes");
                     continue;
                 }
 
@@ -757,7 +757,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' has a company number so you cannot change this organisation");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' has a company number so you cannot change this organisation");
                     continue;
                 }
 
@@ -766,7 +766,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (string.IsNullOrWhiteSpace(newSicCodes))
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' must contain at least one SIC code");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' must contain at least one SIC code");
                     continue;
                 }
 
@@ -775,7 +775,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (sicCodes.Any(x => int.TryParse(x, out var o) == false))
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' you can only input numeric SIC codes");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' you can only input numeric SIC codes");
                     continue;
                 }
 
@@ -795,7 +795,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' the following SIC codes do not exist in the database: {string.Join(",", invalidSicCodes)}'");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' the following SIC codes do not exist in the database: {string.Join(",", invalidSicCodes)}'");
                     continue;
                 }
 
@@ -819,7 +819,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var newValue = string.Join(",", parsedSicCodes);
                 var hasBeenWillBe = test ? "will be" : "has been";
                 writer.WriteLine(
-                    $"{i}: {employerRef}:{org.OrganisationName} SIC codes={oldValue} {hasBeenWillBe} set to {newValue}");
+                    $"{i}: {organisationRef}:{org.OrganisationName} SIC codes={oldValue} {hasBeenWillBe} set to {newValue}");
                 if (!test)
                 {
                     await _adminService.ManualChangeLog.WriteAsync(
@@ -827,8 +827,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             methodName,
                             ManualActions.Update,
                             CurrentUser.EmailAddress,
-                            nameof(Organisation.EmployerReference),
-                            employerRef,
+                            nameof(Organisation.OrganisationReference),
+                            organisationRef,
                             nameof(Organisation.OrganisationSicCodes),
                             oldValue,
                             newValue,
@@ -865,24 +865,24 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure we have value BEFORE the = sign
-                var employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
-                // ensure the employer ref exists
+                // ensure the organisation ref exists
                 var org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
+                    .FirstOrDefault(o => o.OrganisationReference.ToLower() == organisationRef.ToLower());
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
@@ -891,7 +891,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' is not an active organisation so you cannot change its address");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' is not an active organisation so you cannot change its address");
                     continue;
                 }
 
@@ -900,7 +900,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' has a company number so you cannot change this organisation");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' has a company number so you cannot change this organisation");
                     continue;
                 }
 
@@ -909,7 +909,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (string.IsNullOrWhiteSpace(addressEntries))
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' must contain an address entry");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' must contain an address entry");
                     continue;
                 }
 
@@ -920,7 +920,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' doesnt have the correct number of address fields. Expected 7 fields but saw {addressFields.Length} fields");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' doesnt have the correct number of address fields. Expected 7 fields but saw {addressFields.Length} fields");
                     continue;
                 }
 
@@ -965,7 +965,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (requiredState.Count > 0)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' {string.Join(",", requiredState)}");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' {string.Join(",", requiredState)}");
                     continue;
                 }
 
@@ -999,7 +999,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var newValue = string.Join(",", addressFields);
                 var hasBeenWillBe = test ? "will be" : "has been";
                 writer.WriteLine(
-                    $"{i}: {employerRef}:{org.OrganisationName} Address={oldValue} {hasBeenWillBe} set to {newValue}");
+                    $"{i}: {organisationRef}:{org.OrganisationName} Address={oldValue} {hasBeenWillBe} set to {newValue}");
                 if (!test)
                 {
                     await _adminService.ManualChangeLog.WriteAsync(
@@ -1007,8 +1007,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             methodName,
                             ManualActions.Update,
                             CurrentUser.EmailAddress,
-                            nameof(Organisation.EmployerReference),
-                            employerRef,
+                            nameof(Organisation.OrganisationReference),
+                            organisationRef,
                             nameof(Organisation.LatestAddress),
                             oldValue,
                             newValue,
@@ -1044,24 +1044,24 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure we have value BEFORE the = sign
-                var employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
-                // ensure the employer ref exists
+                // ensure the organisation ref exists
                 var org = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefault(o => o.EmployerReference.ToLower() == employerRef.ToLower());
+                    .FirstOrDefault(o => o.OrganisationReference.ToLower() == organisationRef.ToLower());
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
@@ -1070,7 +1070,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' is not an active organisation so you cannot change its public sector type");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' is not an active organisation so you cannot change its public sector type");
                     continue;
                 }
 
@@ -1078,7 +1078,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (org.SectorType != SectorTypes.Public)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' is not a public sector organisation");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' is not a public sector organisation");
                     continue;
                 }
 
@@ -1087,7 +1087,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (string.IsNullOrWhiteSpace(enteredClassification))
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' must contain a public sector type");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' must contain a public sector type");
                     continue;
                 }
 
@@ -1096,7 +1096,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' you can only assign one public sector type per organisation'");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' you can only assign one public sector type per organisation'");
                     continue;
                 }
 
@@ -1105,7 +1105,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' you can only input a numeric public sector type");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' you can only input a numeric public sector type");
                     continue;
                 }
 
@@ -1115,7 +1115,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' public sector type {parsedPublicSectorTypeId} does not exist");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' public sector type {parsedPublicSectorTypeId} does not exist");
                     continue;
                 }
 
@@ -1124,7 +1124,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{employerRef}:{org.OrganisationName}' is already set to {parsedPublicSectorTypeId}:{newSectorType.Description}");
+                        $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' is already set to {parsedPublicSectorTypeId}:{newSectorType.Description}");
                     continue;
                 }
 
@@ -1150,7 +1150,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 var newValue = newSectorType.Description;
                 var hasBeenWillBe = test ? "will be" : "has been";
                 writer.WriteLine(
-                    $"{i}: {employerRef}:{org.OrganisationName} public sector type={oldValue} {hasBeenWillBe} set to {newValue}");
+                    $"{i}: {organisationRef}:{org.OrganisationName} public sector type={oldValue} {hasBeenWillBe} set to {newValue}");
                 if (!test)
                 {
                     await _adminService.ManualChangeLog.WriteAsync(
@@ -1158,8 +1158,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             methodName,
                             ManualActions.Update,
                             CurrentUser.EmailAddress,
-                            nameof(Organisation.EmployerReference),
-                            employerRef,
+                            nameof(Organisation.OrganisationReference),
+                            organisationRef,
                             nameof(Organisation.LatestPublicSectorType),
                             oldValue,
                             newValue,
@@ -1196,45 +1196,45 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
                 var newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI()?.ToUpper();
 
                 if (string.IsNullOrWhiteSpace(newValue))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' must contain a DUNS number");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' must contain a DUNS number");
                     continue;
                 }
 
                 if (!newValue.IsDUNSNumber())
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' Invalid DUNS number '{newValue}'");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' Invalid DUNS number '{newValue}'");
                     continue;
                 }
 
                 if (processedNumbers.Contains(newValue))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate DUNS number '{newValue}'");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate DUNS number '{newValue}'");
                     continue;
                 }
 
                 processedNumbers.Add(newValue);
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == organisationRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
@@ -1244,20 +1244,20 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Orange,
-                        $"{i}: WARNING '{employerRef}' '{org.OrganisationName}' DUNS Number='{org.DUNSNumber}' already set to '{newValue}'");
+                        $"{i}: WARNING '{organisationRef}' '{org.OrganisationName}' DUNS Number='{org.DUNSNumber}' already set to '{newValue}'");
                 }
                 else if (!string.IsNullOrWhiteSpace(oldValue))
                 {
                     writer.WriteLine(
                         Color.Orange,
-                        $"{i}: ERROR '{employerRef}' '{org.OrganisationName}' already holds a different DUNS Number='{org.DUNSNumber}'");
+                        $"{i}: ERROR '{organisationRef}' '{org.OrganisationName}' already holds a different DUNS Number='{org.DUNSNumber}'");
                     continue;
                 }
                 else if (await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .AnyAsync(o => o.DUNSNumber == newValue && o.OrganisationId != org.OrganisationId))
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR '{employerRef}' Another organisation exists with this DUNS number");
+                        $"{i}: ERROR '{organisationRef}' Another organisation exists with this DUNS number");
                     continue;
                 }
                 else
@@ -1265,7 +1265,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     //Output the actual execution result
                     org.DUNSNumber = newValue;
                     writer.WriteLine(
-                        $"{i}: {employerRef}: {org.OrganisationName} DUNS Number='{org.DUNSNumber}' set to '{newValue}'");
+                        $"{i}: {organisationRef}: {org.OrganisationName} DUNS Number='{org.DUNSNumber}' set to '{newValue}'");
                     if (!test)
                     {
                         await _adminService.ManualChangeLog.WriteAsync(
@@ -1273,8 +1273,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 methodName,
                                 ManualActions.Update,
                                 CurrentUser.EmailAddress,
-                                nameof(Organisation.EmployerReference),
-                                employerRef,
+                                nameof(Organisation.OrganisationReference),
+                                organisationRef,
                                 nameof(Organisation.DUNSNumber),
                                 oldValue,
                                 newValue,
@@ -1310,30 +1310,30 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == organisationRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
                 var number = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
                 if (number == null || !string.IsNullOrWhiteSpace(number) && !number.IsNumber())
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' invalid year '{number}'");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' invalid year '{number}'");
                     continue;
                 }
 
@@ -1343,7 +1343,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (statement == null)
                 {
                     writer.WriteLine(Color.Orange,
-                        $"{i}: WARNING: '{employerRef}' Cannot find submitted data for year {year}");
+                        $"{i}: WARNING: '{organisationRef}' Cannot find submitted data for year {year}");
                     continue;
                 }
 
@@ -1368,7 +1368,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 writer.WriteLine(
-                    $"{i}: {employerRef}: {org.OrganisationName} Year='{year}' Status='{oldValue}' set to '{newValue}'");
+                    $"{i}: {organisationRef}: {org.OrganisationName} Year='{year}' Status='{oldValue}' set to '{newValue}'");
                 if (!test)
                 {
                     await _adminService.ManualChangeLog.WriteAsync(
@@ -1382,7 +1382,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             oldValue.ToString(),
                             newValue.ToString(),
                             comment,
-                            $"Year={year} Employer='{employerRef}'"));
+                            $"Year={year} Organisation='{organisationRef}'"));
                     await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
@@ -1411,16 +1411,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
                 var manualChangeLogModel = new ManualChangeLogModel
                 {
@@ -1428,16 +1428,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     Action = ManualActions.Update,
                     Source = CurrentUser.EmailAddress,
                     Comment = comment,
-                    ReferenceName = nameof(Organisation.EmployerReference),
-                    ReferenceValue = employerRef
+                    ReferenceName = nameof(Organisation.OrganisationReference),
+                    ReferenceValue = organisationRef
                 };
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == organisationRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
@@ -1457,14 +1457,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
                 catch (Exception ex)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' {ex.Message}");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' {ex.Message}");
                     continue;
                 }
 
                 manualChangeLogModel.TargetNewValue = org.Status.ToString();
 
                 writer.WriteLine(
-                    $"{i}: {employerRef}: {org.OrganisationName} reverted from status '{manualChangeLogModel.TargetOldValue}' to '{manualChangeLogModel.TargetNewValue}'");
+                    $"{i}: {organisationRef}: {org.OrganisationName} reverted from status '{manualChangeLogModel.TargetOldValue}' to '{manualChangeLogModel.TargetNewValue}'");
                 if (!test)
                 {
                     await _adminService.ManualChangeLog.WriteAsync(manualChangeLogModel);
@@ -1499,23 +1499,23 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == organisationRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
@@ -1526,14 +1526,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Orange,
-                        $"{i}: WARNING: '{employerRef}' '{org.OrganisationName}' Status='{oldValue}' already set to '{newValue}'");
+                        $"{i}: WARNING: '{organisationRef}' '{org.OrganisationName}' Status='{oldValue}' already set to '{newValue}'");
                 }
                 else
                 {
                     //Output the actual execution result
                     org.SetStatus(newValue, CurrentUser.UserId, comment);
                     writer.WriteLine(
-                        $"{i}: {employerRef}: {org.OrganisationName} Status='{oldValue}' set to '{newValue}'");
+                        $"{i}: {organisationRef}: {org.OrganisationName} Status='{oldValue}' set to '{newValue}'");
                     if (!test)
                     {
                         await _adminService.ManualChangeLog.WriteAsync(
@@ -1541,8 +1541,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 methodName,
                                 ManualActions.Update,
                                 CurrentUser.EmailAddress,
-                                nameof(Organisation.EmployerReference),
-                                employerRef,
+                                nameof(Organisation.OrganisationReference),
+                                organisationRef,
                                 nameof(Organisation.Status),
                                 oldValue.ToString(),
                                 newValue.ToString(),
@@ -1582,25 +1582,25 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var employerRef = line?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
                 var newSector = SectorTypes.Public;
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == organisationRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
@@ -1635,7 +1635,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Orange,
-                        $"{i}: WARNING: '{employerRef}' '{org.OrganisationName}' sector already set to '{oldSector}'");
+                        $"{i}: WARNING: '{organisationRef}' '{org.OrganisationName}' sector already set to '{oldSector}'");
                 }
                 else
                 {
@@ -1649,8 +1649,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     methodName,
                                     ManualActions.Update,
                                     CurrentUser.EmailAddress,
-                                    nameof(Organisation.EmployerReference),
-                                    employerRef,
+                                    nameof(Organisation.OrganisationReference),
+                                    organisationRef,
                                     nameof(Organisation.SectorType),
                                     oldSector.ToString(),
                                     newSector.ToString(),
@@ -1674,8 +1674,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     methodName,
                                     ManualActions.Create,
                                     CurrentUser.EmailAddress,
-                                    nameof(Organisation.EmployerReference),
-                                    employerRef,
+                                    nameof(Organisation.OrganisationReference),
+                                    organisationRef,
                                     nameof(OrganisationSicCode),
                                     null,
                                     "1",
@@ -1731,7 +1731,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         }
 
                     writer.WriteLine(
-                        $"{i}: {employerRef}: {org.OrganisationName} sector {oldSector} set to '{newSector}'");
+                        $"{i}: {organisationRef}: {org.OrganisationName} sector {oldSector} set to '{newSector}'");
                     if (!test) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
@@ -1763,25 +1763,25 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var employerRef = line?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
                 var newSector = SectorTypes.Private;
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == organisationRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
@@ -1815,7 +1815,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Orange,
-                        $"{i}: WARNING: '{employerRef}' '{org.OrganisationName}' sector already set to '{oldSector}'");
+                        $"{i}: WARNING: '{organisationRef}' '{org.OrganisationName}' sector already set to '{oldSector}'");
                 }
                 else
                 {
@@ -1829,8 +1829,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     methodName,
                                     ManualActions.Update,
                                     CurrentUser.EmailAddress,
-                                    nameof(Organisation.EmployerReference),
-                                    employerRef,
+                                    nameof(Organisation.OrganisationReference),
+                                    organisationRef,
                                     nameof(Organisation.SectorType),
                                     oldSector.ToString(),
                                     newSector.ToString(),
@@ -1849,8 +1849,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         methodName,
                                         ManualActions.Delete,
                                         CurrentUser.EmailAddress,
-                                        nameof(Organisation.EmployerReference),
-                                        employerRef,
+                                        nameof(Organisation.OrganisationReference),
+                                        organisationRef,
                                         nameof(OrganisationSicCode),
                                         JsonConvert.SerializeObject(
                                             new
@@ -1894,7 +1894,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             if (string.IsNullOrWhiteSpace(statement.ApprovingPerson))
                                 writer.WriteLine(
                                     Color.Orange,
-                                    $"    WARNING: No personal responsible for '{employerRef}' for data submited for year '{oldDate.Year}'");
+                                    $"    WARNING: No personal responsible for '{organisationRef}' for data submited for year '{oldDate.Year}'");
                         }
 
                     //Set snapshot Date
@@ -1922,7 +1922,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         }
 
                     writer.WriteLine(
-                        $"{i}: {employerRef}: {org.OrganisationName} sector {oldSector} set to '{newSector}'");
+                        $"{i}: {organisationRef}: {org.OrganisationName} sector {oldSector} set to '{newSector}'");
                     if (!test) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
@@ -1956,29 +1956,29 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
                 var newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
                 if (string.IsNullOrWhiteSpace(newValue))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' No organisation name specified");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' No organisation name specified");
                     continue;
                 }
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == organisationRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
@@ -1986,14 +1986,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (oldValue == newValue)
                 {
                     writer.WriteLine(Color.Orange,
-                        $"{i}: WARNING: '{employerRef}' '{org.OrganisationName}' already set to '{newValue}'");
+                        $"{i}: WARNING: '{organisationRef}' '{org.OrganisationName}' already set to '{newValue}'");
                 }
                 else if (await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .AnyAsync(o =>
                         o.OrganisationName.ToLower() == newValue.ToLower() && o.OrganisationId != org.OrganisationId))
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Another organisation exists with this company name");
+                        $"{i}: ERROR: '{organisationRef}' Another organisation exists with this company name");
                     continue;
                 }
                 else
@@ -2006,8 +2006,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 methodName,
                                 ManualActions.Update,
                                 CurrentUser.EmailAddress,
-                                nameof(Organisation.EmployerReference),
-                                employerRef,
+                                nameof(Organisation.OrganisationReference),
+                                organisationRef,
                                 nameof(Organisation.OrganisationName),
                                 oldValue,
                                 newValue,
@@ -2021,14 +2021,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 methodName,
                                 ManualActions.Create,
                                 CurrentUser.EmailAddress,
-                                nameof(Organisation.EmployerReference),
-                                employerRef,
+                                nameof(Organisation.OrganisationReference),
+                                organisationRef,
                                 nameof(Organisation.OrganisationName),
                                 oldValue,
                                 newValue,
                                 comment));
 
-                    writer.WriteLine($"{i}: {employerRef}: '{oldValue}' set to '{newValue}'");
+                    writer.WriteLine($"{i}: {organisationRef}: '{oldValue}' set to '{newValue}'");
                     if (!test) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
@@ -2062,29 +2062,29 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var employerRef = line.BeforeFirst("=")?.ToUpper();
-                if (string.IsNullOrWhiteSpace(employerRef)) continue;
+                var organisationRef = line.BeforeFirst("=")?.ToUpper();
+                if (string.IsNullOrWhiteSpace(organisationRef)) continue;
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
                 var newValue = line.AfterFirst("=", includeWhenNoSeparator: false).TrimI();
                 if (string.IsNullOrWhiteSpace(newValue))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' No organisation name specified");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' No organisation name specified");
                     continue;
                 }
 
                 var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.EmployerReference.ToUpper() == employerRef);
+                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == organisationRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Cannot find organisation with this employer reference");
+                        $"{i}: ERROR: '{organisationRef}' Cannot find organisation with this organisation reference");
                     continue;
                 }
 
@@ -2092,14 +2092,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (oldValue == newValue && org.OrganisationNames.Count() == 1)
                 {
                     writer.WriteLine(Color.Orange,
-                        $"{i}: WARNING: '{employerRef}' '{org.OrganisationName}' already set to '{newValue}'");
+                        $"{i}: WARNING: '{organisationRef}' '{org.OrganisationName}' already set to '{newValue}'");
                 }
                 else if (await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .AnyAsync(o =>
                         o.OrganisationName.ToLower() == newValue.ToLower() && o.OrganisationId != org.OrganisationId))
                 {
                     writer.WriteLine(Color.Red,
-                        $"{i}: ERROR: '{employerRef}' Another organisation exists with this company name");
+                        $"{i}: ERROR: '{organisationRef}' Another organisation exists with this company name");
                     continue;
                 }
                 else
@@ -2114,8 +2114,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     methodName,
                                     ManualActions.Update,
                                     CurrentUser.EmailAddress,
-                                    nameof(Organisation.EmployerReference),
-                                    employerRef,
+                                    nameof(Organisation.OrganisationReference),
+                                    organisationRef,
                                     nameof(Organisation.OrganisationName),
                                     oldValue,
                                     newValue,
@@ -2132,8 +2132,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         methodName,
                                         ManualActions.Delete,
                                         CurrentUser.EmailAddress,
-                                        nameof(Organisation.EmployerReference),
-                                        employerRef,
+                                        nameof(Organisation.OrganisationReference),
+                                        organisationRef,
                                         nameof(OrganisationName),
                                         JsonConvert.SerializeObject(
                                             new
@@ -2159,15 +2159,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     methodName,
                                     ManualActions.Create,
                                     CurrentUser.EmailAddress,
-                                    nameof(Organisation.EmployerReference),
-                                    employerRef,
+                                    nameof(Organisation.OrganisationReference),
+                                    organisationRef,
                                     nameof(Organisation.OrganisationName),
                                     oldValue,
                                     newValue,
                                     comment));
                     }
 
-                    writer.WriteLine($"{i}: {employerRef}: '{oldValue}' set to '{newValue}'");
+                    writer.WriteLine($"{i}: {organisationRef}: '{oldValue}' set to '{newValue}'");
                     if (!test) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
@@ -2177,7 +2177,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        public delegate Task<CustomResult<Organisation>> SecurityCodeDelegate(string employerRef,
+        public delegate Task<CustomResult<Organisation>> SecurityCodeDelegate(string organisationRef,
             DateTime securityCodeExpiryDateTime);
 
         private async Task<int> SecurityCodeWorkAsync(string input,
@@ -2208,11 +2208,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                if (!HasEmployerReference(ref outcome, out var employerRef))
+                if (!HasOrganisationReference(ref outcome, out var organisationRef))
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{line}' expected an employer reference before the '=' character (i.e. EmployerReference=dd/mm/yyyy to know which employer to modify)");
+                        $"{i}: ERROR: '{line}' expected an organisation reference before the '=' character (i.e. OrganisationReference=dd/mm/yyyy to know which organisation to modify)");
                     continue;
                 }
 
@@ -2220,21 +2220,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{line}' expected a valid (dd/mm/yyyy) date value after the '=' character (i.e. EmployerReference=dd/mm/yyyy to know when to expire the security codes created for this employer)");
+                        $"{i}: ERROR: '{line}' expected a valid (dd/mm/yyyy) date value after the '=' character (i.e. OrganisationReference=dd/mm/yyyy to know when to expire the security codes created for this organisation)");
                     continue;
                 }
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
                 try
                 {
-                    var securityCodeWorksOutcome = await callBackDelegatedMethod(employerRef, extractedDateTime);
+                    var securityCodeWorksOutcome = await callBackDelegatedMethod(organisationRef, extractedDateTime);
 
                     if (securityCodeWorksOutcome.Failed)
                     {
@@ -2274,8 +2274,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 Action = manualAction,
                                 Source = CurrentUser.EmailAddress,
                                 Comment = comment,
-                                ReferenceName = nameof(Organisation.EmployerReference),
-                                ReferenceValue = employerRef,
+                                ReferenceName = nameof(Organisation.OrganisationReference),
+                                ReferenceValue = organisationRef,
                                 TargetName = nameof(Organisation.SecurityCode),
                                 TargetNewValue = serialisedInfo
                             });
@@ -2283,7 +2283,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
                 catch (Exception ex)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' {ex.Message}");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' {ex.Message}");
                     continue;
                 }
 
@@ -2328,26 +2328,26 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                if (!HasEmployerReference(ref outcome, out var employerRef))
+                if (!HasOrganisationReference(ref outcome, out var organisationRef))
                 {
                     writer.WriteLine(
                         Color.Red,
-                        $"{i}: ERROR: '{line}' expected a valid employer reference to know which employer to modify");
+                        $"{i}: ERROR: '{line}' expected a valid organisation reference to know which organisation to modify");
                     continue;
                 }
 
-                if (processed.Contains(employerRef))
+                if (processed.Contains(organisationRef))
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' duplicate organisation");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' duplicate organisation");
                     continue;
                 }
 
-                processed.Add(employerRef);
+                processed.Add(organisationRef);
 
                 try
                 {
                     var securityCodeWorksOutcome =
-                        await _adminService.OrganisationBusinessLogic.ExpireOrganisationSecurityCodeAsync(employerRef);
+                        await _adminService.OrganisationBusinessLogic.ExpireOrganisationSecurityCodeAsync(organisationRef);
 
                     if (securityCodeWorksOutcome.Failed)
                     {
@@ -2382,8 +2382,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     Action = manualAction,
                                     Source = CurrentUser.EmailAddress,
                                     Comment = comment,
-                                    ReferenceName = nameof(Organisation.EmployerReference),
-                                    ReferenceValue = employerRef,
+                                    ReferenceName = nameof(Organisation.OrganisationReference),
+                                    ReferenceValue = organisationRef,
                                     TargetName = nameof(Organisation.SecurityCode),
                                     TargetNewValue = serialisedInfo
                                 });
@@ -2391,7 +2391,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
                 catch (Exception ex)
                 {
-                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{employerRef}' {ex.Message}");
+                    writer.WriteLine(Color.Red, $"{i}: ERROR: '{organisationRef}' {ex.Message}");
                     continue;
                 }
 
@@ -2599,6 +2599,37 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             return result;
+        }
+
+        #endregion
+
+        #region Trigger Webjobs
+        [HttpGet("trigger-webjobs")]
+        public IActionResult TriggerWebjobs()
+        {
+            //Throw error if the user is not a super administrator
+            if (!IsDatabaseAdministrator)
+                return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a database administrator");
+
+            return View();
+        }
+
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        [HttpPost("trigger-webjobs")]
+        public async Task<IActionResult> TriggerWebjobs(string webjobname)
+        {
+            //Throw error if the user is not a super administrator
+            if (!IsDatabaseAdministrator)
+                return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a database administrator");
+
+            if (!string.IsNullOrWhiteSpace(webjobname))
+            {
+                await _adminService.ExecuteWebjobQueue.AddMessageAsync(
+                    new QueueWrapper($"command={webjobname}"));
+            }
+
+            return RedirectToAction("Home");
         }
 
         #endregion

@@ -36,6 +36,9 @@ namespace ModernSlavery.Infrastructure.Database
             if (databaseOptions.GetIsMigrationApp())
                 MigrationsApplied=EnsureMigrated();
         }
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
+        {
+        }
 
         private bool EnsureMigrated()
         {
@@ -52,9 +55,7 @@ namespace ModernSlavery.Infrastructure.Database
             return migrationsPending && !migrationsApplied;
         }
 
-        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
-        {
-        }
+ 
 
         public async Task<int> SaveChangesAsync()
         {

@@ -15,6 +15,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             TimerInfo timer,
             ILogger log)
         {
+            if (RunningJobs.Contains(nameof(SetPresumedScopes))) return;
+            RunningJobs.Add(nameof(SetPresumedScopes));
             try
             {
                 //Initialise any unknown scope statuses
@@ -33,10 +35,15 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(SetPresumedScopes)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
+            finally
+            {
+                RunningJobs.Remove(nameof(SetPresumedScopes));
+            }
+            
         }
     }
 }

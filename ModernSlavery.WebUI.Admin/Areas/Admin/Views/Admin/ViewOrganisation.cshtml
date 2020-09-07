@@ -63,161 +63,165 @@
 
 <table class="govuk-table">
     <tbody class="govuk-table__body">
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">Name</th>
-        <td class="govuk-table__cell">
-            @(Model.OrganisationName)
-        </td>
-        <td class="govuk-table__cell">
-            <a href="@Url.Action("ViewNameHistory", "AdminOrganisationName", new {id = Model.OrganisationId})"
-               class="govuk-link">
-                History <span class="govuk-visually-hidden"> of names</span> / change<span class="govuk-visually-hidden"> name</span>
-            </a>
-        </td>
-    </tr>
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">Address</th>
-        <td class="govuk-table__cell">
-            @(Model.OrganisationAddresses.OrderByDescending(a => a.Created).FirstOrDefault()?.GetAddressString() ?? "(No 'latest address')")
-        </td>
-        <td class="govuk-table__cell">
-            <a href="@(Url.Action("ViewAddressHistory", "AdminOrganisationAddress", new {id = Model.OrganisationId}))"
-               class="govuk-link">
-                History <span class="govuk-visually-hidden"> of addresses</span> / change<span class="govuk-visually-hidden"> address</span>
-            </a>
-        </td>
-    </tr>
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">Employer Reference</th>
-        <td class="govuk-table__cell" colspan="2">@(Model.EmployerReference)</td>
-    </tr>
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">Organisation ID</th>
-        <td class="govuk-table__cell" colspan="2">@(Model.OrganisationId)</td>
-    </tr>
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">Company Number</th>
-        <td class="govuk-table__cell" colspan="2">@(Model.CompanyNumber)</td>
-    </tr>
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">
-            Synchronise data<br/>
-            <span class="govuk-!-font-weight-regular">with Companies House</span>
-        </th>
-        @if (!string.IsNullOrWhiteSpace(Model.CompanyNumber))
-        {
-            <td class="govuk-table__cell">
-                @(Model.OptedOutFromCompaniesHouseUpdate ? "Opted out" : "Opted in")
-            </td>
-            <td class="govuk-table__cell">
-                @if (Model.OptedOutFromCompaniesHouseUpdate)
-                {
-                    <a href="@Url.Action("OptIn", "AdminOrganisationCompaniesHouseOptInOut", new {id = Model.OrganisationId})"
-                       class="govuk-link">
-                        Change <span class="govuk-visually-hidden"> Companies House sync to opted in</span>
-                    </a>
-                }
-                else
-                {
-                    <a href="@Url.Action("OptOut", "AdminOrganisationCompaniesHouseOptInOut", new {id = Model.OrganisationId})"
-                       class="govuk-link">
-                        Change <span class="govuk-visually-hidden"> Companies House sync to opted out</span>
-                    </a>
-                }
-            </td>
-        }
-        else
-        {
-            <td class="govuk-table__cell" colspan="2">
-                Not applicable
-                <br/>
-                <span class="govuk-body-s">
-                    (organisation needs a company number to be eligible to synchronise with Companies House)
-                </span>
-            </td>
-        }
-    </tr>
-
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">Status</th>
-        <td class="govuk-table__cell" colspan="2">@(Model.Status)</td>
-    </tr>
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">Sector</th>
-        <td class="govuk-table__cell">
-            @(Model.SectorType)
-        </td>
-        <td class="govuk-table__cell"></td>
-    </tr>
-    @if (Model.SectorType == SectorTypes.Public)
-    {
         <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">Public sector classification</th>
+            <th scope="row" class="govuk-table__header">Name</th>
             <td class="govuk-table__cell">
-                @(Model.LatestPublicSectorType?.PublicSectorType?.Description ?? "(none)")
+                @(Model.OrganisationName)
             </td>
             <td class="govuk-table__cell">
-                <a href="@Url.Action("ChangePublicSectorClassificationGet", "AdminOrganisationSector", new {id = Model.OrganisationId})"
+                <a href="@Url.Action("ViewNameHistory", "AdminOrganisationName", new {id = Model.OrganisationId})"
                    class="govuk-link">
-                    Change <span class="govuk-visually-hidden">public sector classification</span>
+                    History <span class="govuk-visually-hidden"> of names</span> / change<span class="govuk-visually-hidden"> name</span>
                 </a>
             </td>
         </tr>
-    }
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">SIC codes</th>
-        <td class="govuk-table__cell">
-            @foreach (var organisationSicCode in Model.OrganisationSicCodes.Where(osc => !osc.Retired.HasValue))
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Address</th>
+            <td class="govuk-table__cell">
+                @(Model.OrganisationAddresses.OrderByDescending(a => a.Created).FirstOrDefault()?.GetAddressString() ?? "(No 'latest address')")
+            </td>
+            <td class="govuk-table__cell">
+                <a href="@(Url.Action("ViewAddressHistory", "AdminOrganisationAddress", new {id = Model.OrganisationId}))"
+                   class="govuk-link">
+                    History <span class="govuk-visually-hidden"> of addresses</span> / change<span class="govuk-visually-hidden"> address</span>
+                </a>
+            </td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Organisation Reference</th>
+            <td class="govuk-table__cell" colspan="2">@(Model.OrganisationReference)</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Organisation ID</th>
+            <td class="govuk-table__cell" colspan="2">@(Model.OrganisationId)</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Company Number</th>
+            <td class="govuk-table__cell" colspan="2">@(Model.CompanyNumber)</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Security Code</th>
+            <td class="govuk-table__cell" colspan="2">@(Model.SecurityCode) (expires:@(Model.SecurityCodeExpiryDateTime))</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">
+                Synchronise data<br />
+                <span class="govuk-!-font-weight-regular">with Companies House</span>
+            </th>
+            @if (!string.IsNullOrWhiteSpace(Model.CompanyNumber))
             {
-                <b>@(organisationSicCode.SicCode.SicCodeId)</b>
-                @(organisationSicCode.SicCode.Description)
-                <br/>
-                <span class="govuk-body-s">
-                    part of: @(organisationSicCode.SicCode.SicSection.Description)
-                </span>
-                <br/>
+                <td class="govuk-table__cell">
+                    @(Model.OptedOutFromCompaniesHouseUpdate ? "Opted out" : "Opted in")
+                </td>
+                <td class="govuk-table__cell">
+                    @if (Model.OptedOutFromCompaniesHouseUpdate)
+                    {
+                        <a href="@Url.Action("OptIn", "AdminOrganisationCompaniesHouseOptInOut", new {id = Model.OrganisationId})"
+                           class="govuk-link">
+                            Change <span class="govuk-visually-hidden"> Companies House sync to opted in</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("OptOut", "AdminOrganisationCompaniesHouseOptInOut", new {id = Model.OrganisationId})"
+                           class="govuk-link">
+                            Change <span class="govuk-visually-hidden"> Companies House sync to opted out</span>
+                        </a>
+                    }
+                </td>
             }
-        </td>
-        <td class="govuk-table__cell">
-            <a href="@Url.Action("ViewSicCodesHistory", "AdminOrganisationSicCodes", new {id = Model.OrganisationId})"
-               class="govuk-link">
-                History <span class="govuk-visually-hidden"> of SIC codes</span> / change<span class="govuk-visually-hidden"> SIC codes</span>
-            </a>
-        </td>
-    </tr>
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">Scope</th>
-        <td class="govuk-table__cell">
-            @{
-                var scopes = Model.OrganisationScopes
-                    .Where(s => s.Status == ScopeRowStatuses.Active)
-                    .OrderByDescending(s => s.SubmissionDeadline);
-            }
-            @foreach (var scope in scopes)
+            else
             {
-                <b>
-                    @(ReportingPeriodHelper.FormatReportingPeriod(scope.SubmissionDeadline.Year)):
-                </b>
-                @(scope.ScopeStatus)
-                <br/>
+                <td class="govuk-table__cell" colspan="2">
+                    Not applicable
+                    <br />
+                    <span class="govuk-body-s">
+                        (organisation needs a company number to be eligible to synchronise with Companies House)
+                    </span>
+                </td>
             }
-        </td>
-        <td class="govuk-table__cell">
-            <a href="@Url.Action("ViewScopeHistory", "AdminOrganisationScope", new {id = Model.OrganisationId})"
-               class="govuk-link">
-                History <span class="govuk-visually-hidden"> of scopes</span> / change<span class="govuk-visually-hidden"> scope</span>
-            </a>
-        </td>
-    </tr>
-    <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header" colspan="2">Audit logs</th>
-        <td class="govuk-table__cell">
-            <a href="@Url.Action("ViewOrganisationAuditLogs", "AdminViewAuditLogs", new {id = Model.OrganisationId})"
-               class="govuk-link">
-                View audit logs
-            </a>
-        </td>
-    </tr>
+        </tr>
+
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Status</th>
+            <td class="govuk-table__cell" colspan="2">@(Model.Status)</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Sector</th>
+            <td class="govuk-table__cell">
+                @(Model.SectorType)
+            </td>
+            <td class="govuk-table__cell"></td>
+        </tr>
+        @if (Model.SectorType == SectorTypes.Public)
+        {
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Public sector classification</th>
+                <td class="govuk-table__cell">
+                    @(Model.LatestPublicSectorType?.PublicSectorType?.Description ?? "(none)")
+                </td>
+                <td class="govuk-table__cell">
+                    <a href="@Url.Action("ChangePublicSectorClassificationGet", "AdminOrganisationSector", new {id = Model.OrganisationId})"
+                       class="govuk-link">
+                        Change <span class="govuk-visually-hidden">public sector classification</span>
+                    </a>
+                </td>
+            </tr>
+        }
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">SIC codes</th>
+            <td class="govuk-table__cell">
+                @foreach (var organisationSicCode in Model.OrganisationSicCodes.Where(osc => !osc.Retired.HasValue))
+                {
+                    <b>@(organisationSicCode.SicCode.SicCodeId)</b>
+                    @(organisationSicCode.SicCode.Description)
+                    <br />
+                    <span class="govuk-body-s">
+                        part of: @(organisationSicCode.SicCode.SicSection.Description)
+                    </span>
+                    <br />
+                }
+            </td>
+            <td class="govuk-table__cell">
+                <a href="@Url.Action("ViewSicCodesHistory", "AdminOrganisationSicCodes", new {id = Model.OrganisationId})"
+                   class="govuk-link">
+                    History <span class="govuk-visually-hidden"> of SIC codes</span> / change<span class="govuk-visually-hidden"> SIC codes</span>
+                </a>
+            </td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Scope</th>
+            <td class="govuk-table__cell">
+                @{
+                    var scopes = Model.OrganisationScopes
+                        .Where(s => s.Status == ScopeRowStatuses.Active)
+                        .OrderByDescending(s => s.SubmissionDeadline);
+                }
+                @foreach (var scope in scopes)
+                {
+                    <b>
+                        @(ReportingPeriodHelper.FormatReportingPeriod(scope.SubmissionDeadline.Year)):
+                    </b>
+                    @(scope.ScopeStatus)
+                    <br />
+                }
+            </td>
+            <td class="govuk-table__cell">
+                <a href="@Url.Action("ViewScopeHistory", "AdminOrganisationScope", new {id = Model.OrganisationId})"
+                   class="govuk-link">
+                    History <span class="govuk-visually-hidden"> of scopes</span> / change<span class="govuk-visually-hidden"> scope</span>
+                </a>
+            </td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header" colspan="2">Audit logs</th>
+            <td class="govuk-table__cell">
+                <a href="@Url.Action("ViewOrganisationAuditLogs", "AdminViewAuditLogs", new {id = Model.OrganisationId})"
+                   class="govuk-link">
+                    View audit logs
+                </a>
+            </td>
+        </tr>
     </tbody>
 </table>
 

@@ -66,21 +66,10 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <returns></returns>
         Task<HashSet<Organisation>> FixScopeRowStatusesAsync();
 
-        Task<HashSet<Organisation>> SetPresumedScopesAsync();
-        Task<bool> SetPresumedScopesAsync(Organisation organisation);
-
         /// <summary>
-        ///     Adds a new scope and updates the latest scope (if required)
+        /// Ensure all organisations have an active scope for every year
         /// </summary>
-        /// <param name="org"></param>
-        /// <param name="scopeStatus"></param>
-        /// <param name="reportingDeadline"></param>
-        /// <param name="currentUser"></param>
-        OrganisationScope SetPresumedScopeStatus(Organisation organisation, ScopeStatuses scopeStatus, DateTime reportingDeadline, User currentUser = null);
-
-        Task<IList<OrganisationMissingScope>> FindOrgsWhereScopeNotSetAsync();
-
-
-        Task<OrganisationScope> GetPendingScopeRegistrationAsync(string emailAddress);
+        /// <returns>List of organisations whose scoped were changed</returns>
+        Task<HashSet<Organisation>> SetPresumedScopesAsync();
     }
 }

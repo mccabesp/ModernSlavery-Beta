@@ -149,7 +149,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 {
                     Logger.LogWarning(
                         $"Attempt to PIN activate a {userOrg.Organisation.Status} organisation",
-                        $"Organisation: '{userOrg.Organisation.OrganisationName}' Reference: '{userOrg.Organisation.EmployerReference}' User: '{VirtualUser.EmailAddress}'");
+                        $"Organisation: '{userOrg.Organisation.OrganisationName}' Reference: '{userOrg.Organisation.OrganisationReference}' User: '{VirtualUser.EmailAddress}'");
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1149));
                 }
 
@@ -181,10 +181,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 StashModel(model);
 
                 result1 = RedirectToAction("ServiceActivated");
-
-                //Send notification email to existing users 
-                _registrationService.SharedBusinessLogic.NotificationService.SendUserAddedEmailToExistingUsers(
-                    userOrg.Organisation, userOrg.User);
             }
             else
             {

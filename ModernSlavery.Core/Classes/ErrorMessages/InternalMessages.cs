@@ -14,12 +14,12 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         }
 
         public static CustomError OrganisationRevertOnlyRetiredErrorMessage(string organisationName,
-            string employerReference,
+            string organisationReference,
             string status)
         {
             return new CustomError(
                 4005,
-                $"Only organisations with current status 'Retired' are allowed to be reverted, Organisation '{organisationName}' employerReference '{employerReference}' has status '{status}'.");
+                $"Only organisations with current status 'Retired' are allowed to be reverted, Organisation '{organisationName}' organisationReference '{organisationReference}' has status '{status}'.");
         }
 
         public static CustomError SecurityCodeMustExpireInFutureErrorMessage()
@@ -34,29 +34,29 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         }
 
         public static CustomError SecurityCodeCreateIsOnlyAllowedToNonRetiredOrgsErrorMessage(string organisationName,
-            string employerReference,
+            string organisationReference,
             string status)
         {
             return new CustomError(
                 4003,
-                $"Generation of security codes cannot be performed for retired organisations. Organisation '{organisationName}' employerReference '{employerReference}' has status '{status}'.");
+                $"Generation of security codes cannot be performed for retired organisations. Organisation '{organisationName}' organisationReference '{organisationReference}' has status '{status}'.");
         }
 
-        public static CustomError HttpBadRequestCausedByInvalidEmployerIdentifier(string organisationIdentifier)
+        public static CustomError HttpBadRequestCausedByInvalidOrganisationIdentifier(string organisationIdentifier)
         {
-            return new CustomError(HttpStatusCode.BadRequest, $"Bad employer identifier {organisationIdentifier}");
+            return new CustomError(HttpStatusCode.BadRequest, $"Bad organisation identifier {organisationIdentifier}");
         }
 
         public static CustomError HttpNotFoundCausedByOrganisationIdNotInDatabase(string organisationIdentifier)
         {
             return new CustomError(HttpStatusCode.NotFound,
-                $"Employer: Could not find organisation '{organisationIdentifier}'");
+                $"Organisation: Could not find organisation '{organisationIdentifier}'");
         }
 
         public static CustomError HttpGoneCausedByOrganisationBeingInactive(OrganisationStatuses organisationStatus)
         {
             return new CustomError(HttpStatusCode.Gone,
-                $"Employer: The status of this organisation is '{organisationStatus}'");
+                $"Organisation: The status of this organisation is '{organisationStatus}'");
         }
 
         public static CustomError HttpNotFoundCausedByOrganisationReturnNotInDatabase(string organisationIdEncrypted,
@@ -64,19 +64,19 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         {
             return new CustomError(
                 HttpStatusCode.NotFound,
-                $"Employer: Could not find GPG Data for organisation:{organisationIdEncrypted} and year:{year}");
+                $"Organisation: Could not find GPG Data for organisation:{organisationIdEncrypted} and year:{year}");
         }
 
         public static CustomError HttpGoneCausedByReportNotHavingBeenSubmitted(int reportYear, string reportStatus)
         {
             return new CustomError(HttpStatusCode.Gone,
-                $"Employer report '{reportYear}' is showing with status '{reportStatus}'");
+                $"Organisation report '{reportYear}' is showing with status '{reportStatus}'");
         }
 
         public static CustomError HttpNotFoundCausedByReturnIdNotInDatabase(string returnIdEncrypted)
         {
             return new CustomError(HttpStatusCode.NotFound,
-                $"Employer: Could not find GPG Data for returnId:'{returnIdEncrypted}'");
+                $"Organisation: Could not find GPG Data for returnId:'{returnIdEncrypted}'");
         }
     }
 }

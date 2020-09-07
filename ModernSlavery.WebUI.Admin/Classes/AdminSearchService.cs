@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Admin.Classes
         public string OrganisationName { get; set; }
         public List<string> OrganisationNames { get; set; } // All names (current and previous)
         public string CompanyNumber { get; set; }
-        public string EmployerReference { get; set; }
+        public string OrganisationReference { get; set; }
     }
 
     internal class AdminSearchServiceUser
@@ -159,7 +159,7 @@ namespace ModernSlavery.WebUI.Admin.Classes
                     OrganisationId = o.OrganisationId,
                     OrganisationName = o.OrganisationName,
                     CompanyNumber = o.CompanyNumber,
-                    EmployerReference = o.EmployerReference,
+                    OrganisationReference = o.OrganisationReference,
                     OrganisationNames = o.OrganisationNames.Select(on => on.Name).ToList()
                 })
                 .ToList();
@@ -189,9 +189,9 @@ namespace ModernSlavery.WebUI.Admin.Classes
                     {
                         var nameMatches =
                             CurrentOrPreviousOrganisationNameMatchesSearchTerms(organisation, searchTerms);
-                        var employerRefMatches = organisation.EmployerReference?.Trim() == query.Trim();
+                        var organisationRefMatches = organisation.OrganisationReference?.Trim() == query.Trim();
                         var companyNumberMatches = organisation.CompanyNumber?.Trim() == query.Trim();
-                        return nameMatches || employerRefMatches || companyNumberMatches;
+                        return nameMatches || organisationRefMatches || companyNumberMatches;
                     })
                 .ToList();
         }
@@ -236,8 +236,8 @@ namespace ModernSlavery.WebUI.Admin.Classes
                             .Select(on => GetMatchGroups(on, searchTerms))
                             .ToList();
 
-                        var employerRefMatch = organisation.EmployerReference?.Trim() == query.Trim()
-                            ? organisation.EmployerReference
+                        var organisationRefMatch = organisation.OrganisationReference?.Trim() == query.Trim()
+                            ? organisation.OrganisationReference
                             : null;
 
                         var companyNumberMatch = organisation.CompanyNumber?.Trim() == query.Trim()
@@ -248,7 +248,7 @@ namespace ModernSlavery.WebUI.Admin.Classes
                         {
                             OrganisationName = matchGroupsForCurrentName,
                             OrganisationPreviousNames = matchGroupsForPreviousNames,
-                            EmployerRef = employerRefMatch,
+                            OrganisationRef = organisationRefMatch,
                             CompanyNumber = companyNumberMatch,
                             OrganisationId = organisation.OrganisationId
                         };

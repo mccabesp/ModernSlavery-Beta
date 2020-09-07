@@ -37,7 +37,7 @@
       "Action": "Disable",
       "Trigger": "01:00:00:00"
     },
-    "ReferenceEmployers": {
+    "ReferenceOrganisations": {
       "Action": "Enable",
       "Trigger": "01:00:00:00"
     },
@@ -63,7 +63,7 @@
     },
     "UpdateFromCompaniesHouseAsync": {
       "Action": "Enable",
-      "Trigger": "00:03:00:00"
+      "Trigger": "00:01:00:00"
     },
     "UpdateOrganisationLateSubmissions": { "Action": "Disable" },
     "UpdateOrganisationsAsync": { "Action": "Disable" },

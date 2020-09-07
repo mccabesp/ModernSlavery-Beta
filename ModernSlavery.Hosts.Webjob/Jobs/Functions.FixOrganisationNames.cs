@@ -19,7 +19,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(FixOrganisationsNamesAsync));
             try
             {
-                var orgs = await _SharedBusinessLogic.DataRepository.GetAll<Organisation>().ToListAsync().ConfigureAwait(false);
+                var orgs = await _dataRepository.GetAll<Organisation>().ToListAsync().ConfigureAwait(false);
 
                 var count = 0;
                 var i = 0;
@@ -33,13 +33,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     while (names.Count > 1 && names[1].Name
                         .EqualsI(names[0].Name.Replace(" LTD.", " LIMITED").Replace(" Ltd", " Limited")))
                     {
-                        await _ManualChangeLog.WriteAsync(
+                        await _manualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
                                 nameof(FixOrganisationsNamesAsync),
                                 ManualActions.Delete,
                                 userEmail,
-                                nameof(Organisation.EmployerReference),
-                                org.EmployerReference,
+                                nameof(Organisation.OrganisationReference),
+                                org.OrganisationReference,
                                 null,
                                 JsonConvert.SerializeObject(
                                     new {names[0].Name, names[0].Source, names[0].Created, names[0].OrganisationId}),
@@ -47,7 +47,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 comment)).ConfigureAwait(false);
 
                         names[1].Created = names[0].Created;
-                        _SharedBusinessLogic.DataRepository.Delete(names[0]);
+                        _dataRepository.Delete(names[0]);
                         names.RemoveAt(0);
                         changed = true;
                     }
@@ -59,13 +59,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         if (org.OrganisationName != newValue)
                         {
                             org.OrganisationName = newValue;
-                            await _ManualChangeLog.WriteAsync(
+                            await _manualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     nameof(FixOrganisationsNamesAsync),
                                     ManualActions.Update,
                                     userEmail,
-                                    nameof(Organisation.EmployerReference),
-                                    org.EmployerReference,
+                                    nameof(Organisation.OrganisationReference),
+                                    org.OrganisationReference,
                                     nameof(org.OrganisationName),
                                     org.OrganisationName,
                                     newValue,
@@ -77,7 +77,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     if (changed)
                     {
                         count++;
-                        await _SharedBusinessLogic.DataRepository.SaveChangesAsync().ConfigureAwait(false);
+                        await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
                     }
                 }
 

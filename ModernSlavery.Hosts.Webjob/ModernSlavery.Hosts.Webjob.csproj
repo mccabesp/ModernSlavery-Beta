@@ -37,7 +37,6 @@
     <PackageReference Include="Microsoft.Azure.Webjobs.Extensions.EventHubs" Version="4.1.1" />
     <PackageReference Include="Microsoft.Azure.Webjobs.Extensions.ServiceBus" Version="4.1.0" />
     <PackageReference Include="Microsoft.Azure.Webjobs.Extensions.Storage" Version="3.0.10" />
-    <PackageReference Include="Microsoft.Azure.Webjobs.Logging.ApplicationInsights" Version="3.0.14" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

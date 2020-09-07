@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
@@ -27,6 +28,8 @@ namespace ModernSlavery.BusinessDomain.Shared
         /// <returns></returns>
         DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0);
         DateTime GetReportingDeadline(SectorTypes sectorType, int year = 0);
+        IList<DateTime> GetReportingDeadlines(SectorTypes sectorType, int recentYears = 0);
+
         DateTime GetReportingDeadline(long organisationId, int year);
         DateTime GetReportingDeadline(string organisationIdentifier, int year);
     }
@@ -80,6 +83,11 @@ namespace ModernSlavery.BusinessDomain.Shared
             return _snapshotDateHelper.GetReportingDeadline(sectorType, year);
         }
 
+        public IList<DateTime> GetReportingDeadlines(SectorTypes sectorType, int recentYears = 0)
+        {
+            return _snapshotDateHelper.GetReportingDeadlines(sectorType, recentYears);
+        }
+
         public DateTime GetReportingDeadline(long organisationId, int year)
         {
             var organisation = DataRepository.Get<Organisation>(organisationId);
@@ -94,5 +102,6 @@ namespace ModernSlavery.BusinessDomain.Shared
             return GetReportingDeadline(organisation.SectorType, year);
         }
 
+    
     }
 }

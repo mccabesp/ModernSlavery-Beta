@@ -23,7 +23,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(UpdateFromCompaniesHouseAsync)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _Messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }

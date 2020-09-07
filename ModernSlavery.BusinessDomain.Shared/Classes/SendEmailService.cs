@@ -148,7 +148,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             string reportingAddress,
             bool test = false)
         {
-            var geoOrganisationRegistrationRequest = new GeoOrganisationRegistrationRequestTemplate
+            var geoOrganisationRegistrationRequest = new MsuOrganisationRegistrationRequestTemplate
             {
                 RecipientEmailAddress = EmailOptions.AdminDistributionList,
                 Test = test,

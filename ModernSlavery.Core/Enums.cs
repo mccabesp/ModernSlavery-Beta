@@ -40,7 +40,7 @@ namespace ModernSlavery.Core
         [Display(Name = "Reported late")] ReportedLate,
 
         [Display(Name = "Reported with extra information")]
-        ExplanationProvidedByEmployer
+        ExplanationProvidedByOrganisation
     }
 
     public enum StatementErrors : byte

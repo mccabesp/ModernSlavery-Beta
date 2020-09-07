@@ -7,7 +7,7 @@ namespace ModernSlavery.Core.Models
 {
     public class DownloadModel
     {
-        public string EmployerName { get; set; }
+        public string OrganisationName { get; set; }
         public string Address { get; set; }
         public string CompanyNumber { get; set; }
         public string SicCodes { get; set; }
@@ -23,7 +23,7 @@ namespace ModernSlavery.Core.Models
         {
             return new DownloadModel
             {
-                EmployerName = statement.Organisation.GetName(statement.StatusDate)?.Name ??
+                OrganisationName = statement.Organisation.GetName(statement.StatusDate)?.Name ??
                                statement.Organisation.OrganisationName,
                 Address = statement.Organisation.GetAddressString(statement.StatusDate,
                     delimiter: "," + Environment.NewLine),

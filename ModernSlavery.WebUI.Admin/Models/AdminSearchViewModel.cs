@@ -28,7 +28,7 @@ namespace ModernSlavery.WebUI.Admin.Models
         public AdminSearchMatchViewModel OrganisationName { get; set; }
         public List<AdminSearchMatchViewModel> OrganisationPreviousNames { get; set; }
         public long OrganisationId { get; set; }
-        public string EmployerRef { get; set; }
+        public string OrganisationRef { get; set; }
         public string CompanyNumber { get; set; }
     }
 

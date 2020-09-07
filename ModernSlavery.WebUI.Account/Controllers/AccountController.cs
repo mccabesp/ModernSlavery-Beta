@@ -217,8 +217,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
                     return false;
 
                 Logger.LogInformation(
-                    "Password reset sent",
-                    $"Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}");
+                    $"Password reset sent. Name:{VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}");
             }
             catch (Exception ex)
             {

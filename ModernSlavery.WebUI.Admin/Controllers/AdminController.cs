@@ -213,7 +213,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 StatementId = statement.StatementId,
                                 AccountingDate = statement.SubmissionDeadline.ToShortDateString(),
                                 OrganisationId = statement.OrganisationId,
-                                EmployerName = statement.Organisation.OrganisationName,
+                                OrganisationName = statement.Organisation.OrganisationName,
                                 Address = statement.Organisation.LatestAddress?.GetAddressString(
                                     "," + Environment.NewLine),
                                 CompanyNumber = statement.Organisation.CompanyNumber,
