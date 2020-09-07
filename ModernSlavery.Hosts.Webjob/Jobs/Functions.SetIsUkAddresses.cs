@@ -18,7 +18,9 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(SetIsUkAddressesAsync));
             try
             {
-                await SetIsUkAddressesAsync().ConfigureAwait(false);
+                var addresses = _dataRepository.GetAll<OrganisationAddress>().Where(a => a.IsUkAddress == null);
+                foreach (var org in addresses) await SetIsUkAddressAsync(org);
+
                 log.LogDebug($"Executed {nameof(SetIsUkAddressesAsync)} successfully");
             }
             catch (Exception ex)
@@ -35,23 +37,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 RunningJobs.Remove(nameof(SetIsUkAddressesAsync));
             }
            
-        }
-
-        private async Task SetIsUkAddressesAsync()
-        {
-            if (RunningJobs.Contains(nameof(SetIsUkAddressesAsync))) return;
-
-            RunningJobs.Add(nameof(SetIsUkAddressesAsync));
-
-            try
-            {
-                var addresses = _dataRepository.GetAll<OrganisationAddress>().Where(a => a.IsUkAddress == null);
-                foreach (var org in addresses) await SetIsUkAddressAsync(org);
-            }
-            finally
-            {
-                RunningJobs.Remove(nameof(SetIsUkAddressesAsync));
-            }
         }
 
         public async Task SetIsUkAddressAsync(OrganisationAddress address)

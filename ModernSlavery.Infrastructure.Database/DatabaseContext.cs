@@ -98,78 +98,39 @@ namespace ModernSlavery.Infrastructure.Database
             return base.Set<TEntity>();
         }
 
-        public async Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity=false) where TEntity : class
+        public async Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity=false, int batchSize = 2000, int? timeout = null) where TEntity : class
         {
-            await DbContextBulkExtensions.BulkInsertAsync(this,entities.ToList(), b=> { b.SetOutputIdentity = setOutputIdentity; b.PreserveInsertOrder = setOutputIdentity; });
+            int? previousTimout = null;
+            if (timeout != null)
+            {
+                previousTimout = Database.GetCommandTimeout();
+                Database.SetCommandTimeout(timeout);
+            }
+            await DbContextBulkExtensions.BulkInsertAsync(this,entities.ToList(), b=> { b.SetOutputIdentity = setOutputIdentity; b.PreserveInsertOrder = setOutputIdentity; b.BatchSize = batchSize; });
+            if (timeout != null) Database.SetCommandTimeout(previousTimout);
+        }
+        public async Task BulkUpdateAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
+        {
+            int? previousTimout=null;
+            if (timeout != null)
+            {
+                previousTimout = Database.GetCommandTimeout();
+                Database.SetCommandTimeout(timeout);
+            }
+            await DbContextBulkExtensions.BulkUpdateAsync(this, entities.ToList(), b => { b.BatchSize=batchSize; });
+            if (timeout!=null)Database.SetCommandTimeout(previousTimout);
         }
 
-        /// <summary>
-        ///     https://social.msdn.microsoft.com/Forums/en-US/c369c1f9-828c-480a-b1e3-14677b64a3c0/how-to-update-large-quantity-of-data-in-database-using-c
-        /// </summary>
-        public void UpdateChangesInBulk<TEntity>(IEnumerable<TEntity> listOfOrganisations) where TEntity : class
+        public async Task BulkDeleteAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
         {
-            var dataTableOfOrganisations = new DataTable("MyDataTableOfOrganisations");
-            dataTableOfOrganisations = ConvertToDataTable(listOfOrganisations);
-            var connectionString = Database.GetDbConnection().ConnectionString;
-            using (var conn = new SqlConnection(connectionString))
+            int? previousTimout = null;
+            if (timeout != null)
             {
-                using (var command = new SqlCommand(string.Empty, conn))
-                {
-                    try
-                    {
-                        conn.Open();
-
-                        var tempTableName = "#TempBulkUpdateTable";
-
-                        // Make sure the temp table doesn't exist
-                        command.CommandText =
-                            $" IF OBJECT_ID('tempdb..{tempTableName}') IS NOT NULL DROP Table {tempTableName}; ";
-                        command.ExecuteNonQuery();
-
-                        // Create the temp table on database
-                        command.CommandText = $" CREATE TABLE {tempTableName} (                     "
-                                              + "     OrganisationId bigint not null,                 "
-                                              + "     SecurityCode nvarchar(max) null,                "
-                                              + "     SecurityCodeExpiryDateTime datetime2(7) null,   "
-                                              + "     SecurityCodeCreatedDateTime datetime2(7) null   "
-                                              + " ); ";
-                        command.ExecuteNonQuery();
-
-                        // Bulk insert into temp table
-                        using (var bulkcopy = new SqlBulkCopy(conn))
-                        {
-                            bulkcopy.BulkCopyTimeout = 660;
-                            bulkcopy.DestinationTableName = tempTableName;
-                            bulkcopy.WriteToServer(dataTableOfOrganisations);
-                            bulkcopy.Close();
-                        }
-
-                        // Updating destination table
-                        command.CommandTimeout = 300;
-                        command.CommandText = " Update Organisations                                                "
-                                              + " set SecurityCode = tmp.SecurityCode,                                 "
-                                              + "     SecurityCodeExpiryDateTime = tmp.SecurityCodeExpiryDateTime,     "
-                                              + "     SecurityCodeCreatedDateTime = tmp.SecurityCodeCreatedDateTime    "
-                                              + " from Organisations orgs                                              "
-                                              + $" inner join {tempTableName} tmp on tmp.OrganisationId = orgs.OrganisationId ";
-                        command.ExecuteNonQuery();
-
-                        // Dropping the temp table
-                        command.CommandText =
-                            $" IF OBJECT_ID('tempdb..{tempTableName}') IS NOT NULL DROP Table {tempTableName}; ";
-                        command.ExecuteNonQuery();
-                    }
-                    catch (Exception ex)
-                    {
-                        var mesage = ex.Message;
-                        // Handle exception properly
-                    }
-                    finally
-                    {
-                        conn.Close();
-                    }
-                }
+                previousTimout = Database.GetCommandTimeout();
+                Database.SetCommandTimeout(timeout);
             }
+            await DbContextBulkExtensions.BulkDeleteAsync(this, entities.ToList(), b => { b.BatchSize = batchSize; });
+            if (timeout != null) Database.SetCommandTimeout(previousTimout);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
