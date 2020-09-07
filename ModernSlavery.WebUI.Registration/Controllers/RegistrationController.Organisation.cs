@@ -1193,7 +1193,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     userOrg.UserId + ":" + userOrg.OrganisationId + ":" + VirtualDateTime.Now.ToSmallDateTime());
 
                 if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
-                    TempData["TestUrl"] = Url.ActionArea("ReviewRequest", "Admin","Admin",new {code = reviewCode});
+                    TempData["TestUrl"] = Url.ActionArea("ReviewRequest", "Admin", "Admin", new { code = reviewCode });
 
                 return RedirectToAction("RequestReceived");
             }
@@ -1617,8 +1617,12 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
                         //Ensure the organisation has an organisation reference
                         if (string.IsNullOrWhiteSpace(tempUserOrg.Organisation.OrganisationReference))
+                        {
                             await _registrationService.OrganisationBusinessLogic.SetUniqueOrganisationReferenceAsync(
                                 tempUserOrg.Organisation);
+
+                            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+                        }
 
                         SharedBusinessLogic.DataRepository.CommitTransaction();
                         saved = true;
@@ -1648,13 +1652,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 badSicCodes.ForEach(
                     code => badSicLoggingtasks.Add(
                         _registrationService.BadSicLog.WriteAsync(
-                            new BadSicLogModel
-                            {
-                                OrganisationId = org.OrganisationId,
-                                OrganisationName = org.OrganisationName,
-                                SicCode = code,
-                                Source = "CoHo"
-                            })));
+                                    new BadSicLogModel
+                                    {
+                                        OrganisationId = org.OrganisationId,
+                                        OrganisationName = org.OrganisationName,
+                                        SicCode = code,
+                                        Source = "CoHo"
+                                    })));
 
                 //Wait for all the logging tasks to complete
                 await Task.WhenAll(badSicLoggingtasks);
@@ -1691,7 +1695,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Send a verification link to the email address
             var reviewCode = userOrg.GetReviewCode();
-            var reviewUrl = Url.ActionArea("ReviewRequest", "Admin", "Admin", new {code = reviewCode});
+            var reviewUrl = Url.ActionArea("ReviewRequest", "Admin", "Admin", new { code = reviewCode });
 
             //If the email address is a test email then simulate sending
             if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)) return;
