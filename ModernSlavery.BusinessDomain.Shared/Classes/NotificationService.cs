@@ -6,6 +6,7 @@ using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
@@ -77,7 +78,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             string contactName,
             string period,
             string address,
-            string reason)
+            string[] reasons)
         {
             var personalisation = new Dictionary<string, dynamic>
             {
@@ -86,8 +87,14 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
                 { "CONTACT NAME", contactName },
                 { "PERIOD", period },
                 { "REGISTERED ADDRESS", address },
-                { "REASON GIVEN", reason },
             };
+
+            for (var i = 0; i < 5; i++)
+            {
+                var hasreason = reasons.Length > i;
+                personalisation.Add($"HASREASON{i + 1}", hasreason ? "yes" : "no");
+                personalisation.Add($"REASON{i + 1}", hasreason ? reasons[i] : "");
+            }
 
             var notifyEmail = new SendEmailRequest
             {
