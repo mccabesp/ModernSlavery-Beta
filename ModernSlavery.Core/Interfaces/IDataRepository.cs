@@ -45,7 +45,8 @@ namespace ModernSlavery.Core.Interfaces
 
         Task SaveChangesAsync();
 
-        void UpdateChangesInBulk<TEntity>(IEnumerable<TEntity> listOfOrganisations) where TEntity : class;
-        Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity = false) where TEntity : class;
-    }
+        Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity = false, int batchSize = 2000, int? timeout = null) where TEntity : class;
+        Task BulkUpdateAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class;
+        Task BulkDeleteAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class;
+    } 
 }

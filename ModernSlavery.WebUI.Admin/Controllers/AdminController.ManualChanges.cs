@@ -2497,8 +2497,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (!test && securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses.Count > 0)
                 {
-                    SharedBusinessLogic.DataRepository.UpdateChangesInBulk(securityCodeBulkWorkOutcome
-                        .ConcurrentBagOfSuccesses);
+                    await SharedBusinessLogic.DataRepository.BulkUpdateAsync(securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses);
                     writer.WriteLine(Color.Green, "INFO: Changes saved to database");
                 }
 
@@ -2585,8 +2584,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (!test && securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses.Count > 0)
                 {
-                    SharedBusinessLogic.DataRepository.UpdateChangesInBulk(securityCodeBulkWorkOutcome
-                        .ConcurrentBagOfSuccesses);
+                    await SharedBusinessLogic.DataRepository.BulkUpdateAsync(securityCodeBulkWorkOutcome.ConcurrentBagOfSuccesses);
                     writer.WriteLine(Color.Green, "INFO: Changes saved to database");
                 }
 

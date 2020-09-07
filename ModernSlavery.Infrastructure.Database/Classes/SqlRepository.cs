@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Transactions;
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using ModernSlavery.Core.Interfaces;
@@ -122,16 +123,24 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             await DbContext.SaveChangesAsync();
         }
 
-        public async Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity = false) where TEntity : class
+        public async Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity = false, int batchSize = 2000, int? timeout = null) where TEntity : class
         {
             if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
 
-            await DbContext.BulkInsertAsync(entities,setOutputIdentity);
+            await DbContext.BulkInsertAsync(entities,setOutputIdentity, batchSize,timeout);
         }
 
-        public void UpdateChangesInBulk<TEntity>(IEnumerable<TEntity> listOfOrganisations) where TEntity : class
+        public async Task BulkUpdateAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
         {
-            DbContext.UpdateChangesInBulk(listOfOrganisations);
+            if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
+
+            await DbContext.BulkUpdateAsync(entities, batchSize, timeout);
+        }
+
+        public async Task BulkDeleteAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
+        {
+            if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
+            await DbContext.BulkDeleteAsync(entities, batchSize, timeout);
         }
 
         public async Task BeginTransactionAsync(Func<Task> delegateAction)
