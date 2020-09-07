@@ -8,6 +8,6 @@ namespace ModernSlavery.Core.Interfaces
 
         void SendPinEmail(string emailAddress, string pin, string organisationName);
         void SendRemovedUserFromOrganisationEmail(string emailAddress, string organisationName, string removedUserName);
-        void SendScopeChangeOutEmail(string emailAddress, string organisationName, string contactName,string period, string address, string reason);
+        void SendScopeChangeOutEmail(string emailAddress, string organisationName, string contactName, string period, string address, string[] reasons);
     }
 }
