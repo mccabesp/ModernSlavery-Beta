@@ -19,8 +19,9 @@ namespace ModernSlavery.Hosts.Webjob
             //NOTE: Leave this here to ensure function dependencies resolve on startup rather than when each function method is invoked
             //      It is also also useful when debugging individual jobs locally
             var functions = host.Services.GetService<Functions>();
-            //var logger = host.Services.GetService<ILogger>();
-            //functions.UpdateFromCompaniesHouseAsync(null, logger).Wait();
+            //var loggerFactory = host.Services.GetService<ILoggerFactory>();
+            //var logger = loggerFactory.CreateLogger<ILogger<Program>>();
+            //functions.ReferenceOrganisations(null, logger).Wait();
             //return;
 
             //Run the host

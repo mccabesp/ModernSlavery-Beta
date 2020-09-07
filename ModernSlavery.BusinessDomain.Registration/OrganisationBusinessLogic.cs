@@ -120,8 +120,9 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public virtual async Task SetUniqueOrganisationReferencesAsync()
         {
-            var orgs = _dataRepository.GetAll<Organisation>().Where(o => o.OrganisationReference == null);
+            var orgs = await _dataRepository.ToListAsync<Organisation>(o => o.OrganisationReference == null);
             foreach (var org in orgs) await SetUniqueOrganisationReferenceAsync(org);
+            await _dataRepository.BulkUpdateAsync(orgs);
         }
 
         public virtual async Task SetUniqueOrganisationReferenceAsync(Organisation organisation)
@@ -133,9 +134,6 @@ namespace ModernSlavery.BusinessDomain.Registration
             } while (await _dataRepository.AnyAsync<Organisation>(o =>
                 o.OrganisationId != organisation.OrganisationId &&
                 o.OrganisationReference == organisation.OrganisationReference));
-
-            //Save the organisation
-            await _dataRepository.SaveChangesAsync();
         }
 
         public virtual string GenerateOrganisationReference()
