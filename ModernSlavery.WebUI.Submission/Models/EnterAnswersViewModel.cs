@@ -26,6 +26,21 @@ namespace ModernSlavery.WebUI.Submission.Models
         [MinLength(1)]
         public List<string> SelectedReasonOptions { get; set; } = new List<string>();
 
+        internal IEnumerable<string> FriendlyReasonOptions
+        {
+            get
+            {
+                if (SelectedReasonOptions.Contains("Other"))
+                {
+                    return SelectedReasonOptions
+                        .Where(i => i != "Other")
+                        .Append(OtherReason);
+                }
+                else
+                    return SelectedReasonOptions;
+            }
+        }
+
         [Required]
         [MaxLength(256)]
         public string OtherReason { get; set; }
