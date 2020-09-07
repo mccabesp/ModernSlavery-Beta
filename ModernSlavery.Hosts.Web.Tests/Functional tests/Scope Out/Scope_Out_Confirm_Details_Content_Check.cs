@@ -43,7 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Employer Reference").To(Org.EmployerReference);
+            Set("Employer Reference").To(Org.OrganisationReference);
             Set("Security Code").To(Org.SecurityCode);
             await Task.CompletedTask;
         }
@@ -63,7 +63,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Try(() => {
                 RightOfText("Name").Expect(Org.OrganisationName); ;
             },
-                    () => { RightOfText("Reference").Expect(Org.EmployerReference); }, 
+                    () => { RightOfText("Reference").Expect(Org.OrganisationReference); }, 
                     () => { RightOfText("Registered address").Expect(Org.LatestAddress.Address1 + ", " + Org.LatestAddress.Address2 + ", " + Org.LatestAddress.Address3 + ", " + Org.LatestAddress.TownCity + ", " + Org.LatestAddress.PostCode); },
                     () => { Expect(What.Contains, "If this information is not correct, please email"); },
                     () => { ExpectLink("modernslaverystatements@homeoffice.gov.uk"); },

@@ -51,7 +51,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task ContentCheck()
         {
-            Set("Organisation reference").To(Org.EmployerReference);
+            Set("Organisation reference").To(Org.OrganisationReference);
             Set("Security code").To(Org.SecurityCode);
 
             Click("Continue");

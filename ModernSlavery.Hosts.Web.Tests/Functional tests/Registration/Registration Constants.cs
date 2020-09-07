@@ -45,7 +45,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         //private static string SicCodes_InterFloor;
         public static Organisation Organisation { get; } = OrganisationHelper.ListOrganisations(TestRunSetup.TestWebHost).FirstOrDefault();
 
-        public static string EmployerReference_Success => Organisation.EmployerReference;
+        public static string EmployerReference_Success => Organisation.OrganisationReference;
         public static string OrgName_InterFloor => Organisation.OrganisationName;
         public static string RegisteredAddress_InterFloor => Organisation.GetAddressString(DateTime.Now);
         public static string SicCodes_InterFloor => Organisation.GetSicCodeIdsString(DateTime.Now);
