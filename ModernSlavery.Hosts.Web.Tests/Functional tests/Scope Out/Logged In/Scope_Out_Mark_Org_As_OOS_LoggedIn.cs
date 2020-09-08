@@ -16,78 +16,99 @@ using ModernSlavery.Core.Entities;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("Temporary Ignore")]
+    [TestFixture]
 
 
     public class Scope_Out_Mark_Org_As_OOS_LoggedIn : CreateAccount
     {
-        private string EmployerReference;
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
+        string Pin;
         public Scope_Out_Mark_Org_As_OOS_LoggedIn() : base(_firstname, _lastname, _title, _email, _password)
         {
-        }
-        [Test, Order(20)]
-        public async Task AddOrgToDb()
-        {
-            //EmployerReference = ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(Submission.OrgName_InterFloor, "ABCD1234");
 
-            await Task.CompletedTask;
+
         }
 
-        [Test, Order(22)]
-        public async Task EnterScopeURLLeadsToOrgIdentityPage()
+        [Test, Order(29)]
+        public async Task RegisterOrg()
         {
-            Goto(ScopeConstants.ScopeUrl);
-            ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
-            await Task.CompletedTask;
-        }
 
-        [Test, Order(24)]
-        public async Task EnterEmployerReferenceAndSecurityCode()
-        {
-            Set("Employer Reference").To(EmployerReference);
-            Set("Security Code").To("ABCD1234");
-            await Task.CompletedTask;
-        }
+            await ModernSlavery.Testing.Helpers.Extensions.OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, Registration.OrgName_InterFloor, _firstname, _lastname);
 
-        [Test, Order(26)]
-        public async Task SubmittingIndentityFormLeadsToConfirmOrgDetails()
-        {
-            Click("Continue");
-            ExpectHeader("Confirm your organisation’s details");
-            await Task.CompletedTask;
-        }
 
-        [Test, Order(28)]
-        public async Task VerifyOrgDetails()
-        {
-            RightOfText("Name").Expect(Submission.OrgName_InterFloor);
-            RightOfText("Reference").Expect(EmployerReference);
-            //todo await helper implementation for address logic
-            RightOfText("Registered address").Expect("");
+
             await Task.CompletedTask;
         }
 
         [Test, Order(30)]
-        public async Task ContinueonVerifyDetailsLeadsToTelUsWhy()
+        public async Task GoToManageOrgPage()
         {
-            Click("Confirm and Continue");
+            Goto("/");
 
-            ExpectHeader("Tell us why your organisation is not required to publish a modern slavery statement");
-
+            Click("Manage organisations");
+            ExpectHeader(That.Contains, "Select an organisation");
 
             await Task.CompletedTask;
         }
 
+        [Test, Order(31)]
+        public async Task SelectOrg()
+        {
+
+            Click(Registration.OrgName_InterFloor);
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+
+            RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "Yes");
+            await Task.CompletedTask;
+        }
+
         [Test, Order(32)]
+        public async Task ChangeOrgStatus()
+        {
+            Click("Change");
+            ExpectHeader("Tell us why your organisation is not required to publish a modern slavery statement");
+            await Task.CompletedTask;
+        }
+
+        //[Test, Order(36)]
+        //public async Task SubmittingIndentityFormLeadsToConfirmOrgDetails()
+        //{
+        //    Click("Continue");
+        //    ExpectHeader("Confirm your organisation’s details");
+        //    await Task.CompletedTask;
+        //}
+
+        //[Test, Order(38)]
+        //public async Task VerifyOrgDetails()
+        //{
+        //    RightOfText("Name").Expect(Submission.OrgName_InterFloor);
+        //    RightOfText("Reference").Expect(EmployerReference);
+        //    //todo await helper implementation for address logic
+        //    RightOfText("Registered address").Expect("");
+        //    await Task.CompletedTask;
+        //}
+
+        //[Test, Order(30)]
+        //public async Task ContinueonVerifyDetailsLeadsToTelUsWhy()
+        //{
+        //    Click("Confirm and Continue");
+
+        //    ExpectHeader("Tell us why your organisation is not required to publish a modern slavery statement");
+
+
+        //    await Task.CompletedTask;
+        //}
+
+        [Test, Order(33)]
         public async Task SelectingOtherOptionMakesPleaseSpecifyFieldAppear()
         {
             ExpectNo("Please specify");
 
             ClickLabel("Other");
 
-            Expect("Please specify");
+            //Expect(What.Contains, "Please specify");
+            ExpectField("OtherReason");
 
             await Task.CompletedTask;
         }
@@ -95,12 +116,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(34)]
         public async Task EnterOtherDetails()
         {
-            Set("Other").To("Here are the reasons why.");
+            Set("OtherReason").To("Here are the reasons why.");
 
             await Task.CompletedTask;
         }
 
-       
+
 
         [Test, Order(38)]
         public async Task ContinueOnTellUsWhyFormLeadsToCheckYourAnswers()
@@ -115,17 +136,14 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader("Organisation details");
 
-            RightOfText("Name").Expect(Submission.OrgName_InterFloor);
-            RightOfText("Reference").Expect(EmployerReference);
+            RightOfText("Organisation Reference").Expect(Registration.Organisation.OrganisationReference);
+            RightOfText("Organisation Name").Expect(Registration.OrgName_InterFloor);
             //todo await helper implementation for address logic
-            RightOfText("Registered address").Expect("");
+            //RightOfText("Registered address").Expect("");
 
             ExpectHeader("Declaration");
-            RightOfText("Reason your organisation is not required to publish a modern slavery statement on your website").Expect("Other");
-            RightOfText("Contact name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last);
-            //todo await helper implementation for address logic
-            RightOfText("Job title").Expect("Create_Account.roger_job_title");
-            RightOfText("Contact email").Expect(Create_Account.roger_email);
+            RightOfText("Reason your organisation is not required to publish a modern slavery statement on your website").Expect("Here are the reasons why.");
+
 
             await Task.CompletedTask;
         }
@@ -139,20 +157,19 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
         [Test, Order(42)]
-        public async Task CompletePageContentCheck ()
+        public async Task CompletePageContentCheck()
         {
-            Click("Confirm and send");
-            ExpectHeader("Declaration complete");
 
-            Expect("You have declared your organisation is not required to publish a modern slavery statement");
+            Expect("You have declared your organisation is not required to publish a modern slavery statement on your website");
 
-            Expect("We have sent you a confirmation email. We will contact you if we need more information.");
+            Expect("We've sent a confirmation email to you and any other user associated with this organisation on our system. We will contact you if we need more information.");
 
-            ExpectHeader("Produced a statement voluntarily?");
-            Expect("If you are not legally required to publish a modern slavery statement, but have produced one voluntarily, you can still submit it to our service.");
-            Expect(What.Contains, "To submit a modern slavery statement to our service, ");
-            ExpectLink(That.Contains,"create an account");
-            Expect(What.Contains, " and register your organisation.");
+            ExpectHeader("Publishing a statement voluntarily");
+            Expect("If you are not legally required to publish a modern slavery statement on your website, you can still create a statement voluntarily and submit it to our service.");
+
+            ClickText("Continue");
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+
             await Task.CompletedTask;
         }
     }
