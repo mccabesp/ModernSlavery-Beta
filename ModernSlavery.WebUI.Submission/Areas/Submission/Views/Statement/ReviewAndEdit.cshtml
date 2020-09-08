@@ -28,6 +28,34 @@
                 @Model.PageTitle
             </h1>
 
+            <h2>
+                (@(Model.ReportingDeadlineYear-1) to @(Model.ReportingDeadlineYear)) modern slavery statement for @(Model.OrganisationName)
+            </h2>
+
+            @if (Model.GroupOrganisations.GroupSubmission == true)
+            {
+                <p>
+                    You can <a class="govuk-link" href="@Model.GroupReviewUrl">review and edit the organisations</a> included in this group statement,
+                    or <a class="govuk-link" href="@Model.GroupStatusUrl">tell us it's a single organisation</a> instead.
+                </p>
+            }
+            else if (Model.GroupOrganisations.GroupSubmission == false)
+            {
+                <p>
+                    If your statement is for a group of organisations, you need to <a class="govuk-link" href="@Model.GroupStatusUrl">specify it’s for a group</a> and tell us which organisations are in the group.
+                </p>
+            }
+            else
+            {
+                <p>
+                    You need to <a class="govuk-link" href="@Model.GroupStatusUrl">tell us if your statement is for a group of organisations or for a single organisation</a>.
+                </p>
+            }
+
+            <p>
+                If you want to check your answers, click on the relevant link below.
+            </p>
+
             @*//TODO: get the correct text based on sections completed*@
             <h2 class="govuk-heading-s govuk-!-margin-bottom-7">@Model.SubTitle</h2>
 

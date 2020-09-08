@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
@@ -33,6 +34,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.StatementEndDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.StatementEndDate); })
                 .ForMember(d => d.ApprovedDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.ApprovedDate); })
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
+                .ForMember(d => d.GroupSubmission, opt => opt.Ignore())
                 .ForSourceMember(s => s.StatementStartYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.StatementStartMonth, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.StatementStartDay, opt => opt.DoNotValidate())
@@ -89,6 +91,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public readonly int MaxApprovedYear;
 
         public override string PageTitle => "Your modern slavery statement";
+
+        [BindNever]
+        public bool? GroupSubmission { get; set; }
 
         [Url]
         [MaxLength(256)]

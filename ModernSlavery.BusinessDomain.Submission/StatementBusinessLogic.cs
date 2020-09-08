@@ -19,8 +19,6 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.BusinessDomain.Submission
 {
-
-
     partial class StatementBusinessLogic : IStatementBusinessLogic
     {
         private readonly SubmissionOptions _submissionOptions;
@@ -151,6 +149,19 @@ namespace ModernSlavery.BusinessDomain.Submission
         private void MapFromModel(StatementModel statementModel, Statement statement)
         {
             _mapper.Map(statementModel, statement);
+
+            //Map the group organisations
+            statementModel.StatementOrganisations.ForEach(groupOrganisation =>
+            {
+                var statementOrganisation=new StatementOrganisation() 
+                    { 
+                        Statement=statement,
+                        OrganisationName=groupOrganisation.OrganisationName,
+                        OrganisationId= groupOrganisation.OrganisationId,
+                        Included= groupOrganisation.Included
+                    };
+                statement.StatementOrganisations.Add(statementOrganisation);
+            });
 
             //Map the sectors
             statement.Sectors.Where(s => !statementModel.Sectors.Contains(s.StatementSectorTypeId)).ForEach(s => { statement.Sectors.Remove(s); _sharedBusinessLogic.DataRepository.Delete(s); });
