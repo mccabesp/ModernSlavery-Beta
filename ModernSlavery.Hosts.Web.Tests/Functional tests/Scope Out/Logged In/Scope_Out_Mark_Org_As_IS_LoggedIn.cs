@@ -39,7 +39,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             await OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, Registration.OrgName_InterFloor, _firstname, _lastname);
             await OrganisationHelper.GetOrganisationBusinessLogic(TestRunSetup.TestWebHost).CreateOrganisationSecurityCodeAsync(Registration.Organisation.OrganisationReference, new DateTime(2030, 1, 10));
 
-            User CurrentUser = TestRunSetup.TestWebHost.GetDataRepository().GetAll<User>().Where(o => o.EmailAddress == UniqueEmail).FirstOrDefault();
+            User CurrentUser = await TestRunSetup.TestWebHost.GetDataRepository().SingleOrDefaultAsync<User>(o => o.EmailAddress == UniqueEmail);
             await OrganisationHelper.GetOrganisationBusinessLogic(TestRunSetup.TestWebHost).SetAsScopeAsync(Registration.Organisation.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.OutOfScope, true);
 
 
