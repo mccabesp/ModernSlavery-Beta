@@ -65,6 +65,11 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Reset the database - this must be after host start so seed data files are copied
             TestWebHost.ResetDatabase();
 
+            await OrganisationHelper.GetOrganisationBusinessLogic(TestWebHost).FixLatestAddressesAsync();
+            await OrganisationHelper.GetOrganisationBusinessLogic(TestWebHost).SetUniqueOrganisationReferencesAsync();
+            await OrganisationHelper.GetOrganisationBusinessLogic(TestWebHost).FixLatestAddressesAsync();
+            await OrganisationHelper.GetScopeBusinessLogic(TestWebHost).SetPresumedScopesAsync();
+            await OrganisationHelper.GetOrganisationBusinessLogic(TestWebHost).FixLatestScopesAsync();
             await TestWebHost.DeleteDraftsAsync();
 
             //Start the Selenium client
