@@ -96,5 +96,8 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         {
             return host.Services.GetService<IOrganisationBusinessLogic>();
         }
+
+        public static IScopeBusinessLogic GetScopeBusinessLogic(this IHost host)
+            => host.Services.GetService<IScopeBusinessLogic>();
     }
 }
