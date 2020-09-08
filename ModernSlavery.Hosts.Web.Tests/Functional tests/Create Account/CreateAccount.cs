@@ -21,9 +21,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         private IDataRepository _dataRepository;
         private IFileRepository _fileRepository;
         private string URL;
+        public string UniqueEmail;
         public CreateAccount(string firstname, string lastname, string title, string email, string password) : base()
         {
-            _firstname = firstname; _lastname = lastname; _title = title; _email = email + DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString() ; _password = password;
+            UniqueEmail = email + DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            _firstname = firstname; _lastname = lastname; _title = title; _email = UniqueEmail; _password = password;
+
+
         }
 
         private bool TestRunFailed = false;
