@@ -1,8 +1,7 @@
 ﻿@model ScopingViewModel
 @{
-    var reason = "<ul><li>" + Model.EnterAnswers.Reason
-        .Replace("\r", "</li><br><li>")
-        .Replace("Other", Model.EnterAnswers.OtherReason)
+    var reason = "<ul><li>"
+        + string.Join("</li><br><li>", Model.EnterAnswers.FriendlyReasonOptions)
         + "</li></ul>";
     var answers = !Model.UserIsRegistered
         ? new CheckYourAnswers(
