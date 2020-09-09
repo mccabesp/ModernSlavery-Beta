@@ -7,7 +7,10 @@
     ViewBag.Title = "Tell us why your organisation is not in scope - Modern Slavery reporting service";
     var reasonIndex = 0;
 }
-<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+
+@section BeforeMain {
+    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off" }))
