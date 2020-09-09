@@ -36,6 +36,18 @@
                 </fieldset>
             </div>
 
+            @for (var organisationIndex = 0; organisationIndex < Model.StatementOrganisations.Count; organisationIndex++)
+            {
+                <div>
+                    @(Model.StatementOrganisations[organisationIndex].OrganisationName)
+                </div>
+
+                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="removeIndex" value="@organisationIndex.">
+                    Remove
+                </button>
+
+            }
+
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Confirm and Continue
             </button>

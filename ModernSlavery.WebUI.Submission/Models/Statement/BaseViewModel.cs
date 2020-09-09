@@ -19,7 +19,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             SaveAndExit=3,
             DiscardAndExit=4,
             ExitNoChanges = 5,
-            Submit = 6
+            Submit = 6,
+            AddOrganisation=7,
+            RemoveOrganisation = 8
         }
 
         [BindRequired]

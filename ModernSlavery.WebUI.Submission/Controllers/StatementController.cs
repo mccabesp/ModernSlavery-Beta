@@ -314,6 +314,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                     //Redirect to the cancel page
                     return Redirect(viewModel.CancelUrl);
+                case BaseViewModel.CommandType.AddOrganisation:
+                case BaseViewModel.CommandType.RemoveOrganisation:
                 case BaseViewModel.CommandType.Continue:
                     //Validate the submitted ViewModel data
                     if (!ModelState.IsValid)
@@ -327,6 +329,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                     //Handle any StatementErrors
                     if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
+
+                    //Return to the same view if adding or removing group organisations
+                    if (command.IsAny(BaseViewModel.CommandType.AddOrganisation,BaseViewModel.CommandType.RemoveOrganisation))return View(viewModelResult.Result);
 
                     //Redirect to the continue url
                     return Redirect(viewModel.ContinueUrl);
@@ -374,8 +379,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/group-search")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GroupSearch(GroupSearchViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> GroupSearch(GroupSearchViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command,int addIndex=-1)
         {
+            if (addIndex > -1)
+            {
+                var newStatementOrganisationViewModel = new GroupOrganisationsViewModel.StatementOrganisationViewModel();
+                
+                //TODO: Add group organisation
+                
+                viewModel.StatementOrganisations.Add(newStatementOrganisationViewModel);
+                command = BaseViewModel.CommandType.AddOrganisation;
+            }
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
 
@@ -388,8 +402,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/group-review")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GroupReview(GroupReviewViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> GroupReview(GroupReviewViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, int removeIndex = -1)
         {
+            if (removeIndex > -1)
+            {
+                viewModel.StatementOrganisations.RemoveAt(removeIndex);
+                command = BaseViewModel.CommandType.RemoveOrganisation;
+            }
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
 
