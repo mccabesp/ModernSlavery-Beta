@@ -187,22 +187,23 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
         [Test, Order(48)]
-        public async Task ExpectButtons()
+        public async Task GroupReviewPage()
         {
-            ExpectButton("Confirm and submit");
-            ExpectButton("Exit and save Changes");
-            ExpectButton("Exit and lose Changes");
+            Expect("2019 to 2020 modern slavery statement for "+ TestData.Organisations[0].OrganisationName + " (group)");
+
+            Expect(What.Contains, "You can ");
+            ExpectLink(That.Contains, "review and edit the organisations");
+            Expect(What.Contains, " included in this group statement, or ");
+            ExpectLink(That.Contains, "tell us it’s for a single organisation");
+            Expect(What.Contains, " instead.");
             await Task.CompletedTask;
         }
-        [Test, Order(49)]
+        [Test, Order(50)]
         public async Task ExitAndSaveChanges()
         {
+            Expect("Submit");
             Expect("You've submitted your Modern Slavery statement for 2019 to 2020");
 
-            Click("Finish and Sign out");
-
-
-            WaitForNewPage();
 
             await Task.CompletedTask;
 
