@@ -25,7 +25,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task AddOrgToDb()
         {
-            //EmployerReference =  ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(Submission.OrgName_InterFloor, "ABCD1234");
+            //EmployerReference =  ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(TestData.OrgName, "ABCD1234");
 
             await Task.CompletedTask;
         }
@@ -57,7 +57,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(28)]
         public async Task VerifyOrgDetails()
         {
-            RightOfText("Name").Expect(Submission.OrgName_InterFloor);
+            RightOfText("Name").Expect(TestData.OrgName);
             RightOfText("Reference").Expect(EmployerReference);
             //todo await helper implementation for address logic
             RightOfText("Registered address").Expect("");
@@ -117,7 +117,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(38)]
         public async Task CheckDetails()
         {
-            RightOfText("Name").Expect(Submission.OrgName_InterFloor);
+            RightOfText("Name").Expect(TestData.OrgName);
             RightOfText("Reference").Expect(EmployerReference);
             //todo await helper implementation for address logic
             RightOfText("Registered address").Expect("");

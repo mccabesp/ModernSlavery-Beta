@@ -25,9 +25,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task AddOrgToDb()
         {
-            //EmployerReference =  ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(Submission.OrgName_InterFloor, "ABCD1234");
+            //EmployerReference =  ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(TestData.OrgName, "ABCD1234");
 
-            Org = Testing.Helpers.Extensions.OrganisationHelper.GetOrganisation(TestRunSetup.TestWebHost, Submission.OrgName_InterFloor);
+            Org = Testing.Helpers.Extensions.OrganisationHelper.GetOrganisation(TestRunSetup.TestWebHost, TestData.OrgName);
 
             await Task.CompletedTask;
         }

@@ -13,7 +13,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(41)]
         public async Task NavigateToAreasPage()
         {
-            Submission_Helper.NavigateToAreasCovered(this, Submission.OrgName_InterFloor, "2019 to 2020");
+            Submission_Helper.NavigateToAreasCovered(this, TestData.OrgName, "2019 to 2020");
             
 
             await Task.CompletedTask;

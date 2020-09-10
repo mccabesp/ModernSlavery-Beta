@@ -36,7 +36,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task RegisterOrgAndSetScope()
         {
            
-            await OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, Registration.OrgName_InterFloor, _firstname, _lastname);
+            await OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, TestData.OrgName, _firstname, _lastname);
             await OrganisationHelper.GetOrganisationBusinessLogic(TestRunSetup.TestWebHost).CreateOrganisationSecurityCodeAsync(Registration.Organisation.OrganisationReference, new DateTime(2030, 1, 10));
 
              User CurrentUser = await TestRunSetup.TestWebHost.GetDataRepository().SingleOrDefaultAsync<User>(o => o.EmailAddress == UniqueEmail);
@@ -55,7 +55,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Manage organisations");
             ExpectHeader(That.Contains, "Select an organisation");
 
-            Click(Registration.OrgName_InterFloor);
+            Click(TestData.OrgName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             await Task.CompletedTask;

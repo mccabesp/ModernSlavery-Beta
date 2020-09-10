@@ -34,7 +34,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
         public const string EmployerReference_Success = "B72GL8R2";
-        public const string OrgName_InterFloor = "InterFloor Limited";
+        public const string OrgName_Interfloor = "InterFloor Limited";
         public const string RegisteredAddress_InterFloor = "Broadway, Haslingden, Rossendale, BB4 4LS";
         public const string Address1_InterFloor = "Broadway, Haslingden";
         public const string Address2_InterFloor = "";

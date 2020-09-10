@@ -13,7 +13,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader("Select an organisation");
 
-            Click(Registration.OrgName_InterFloor);
+            Click(TestData.OrgName);
 
 
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");

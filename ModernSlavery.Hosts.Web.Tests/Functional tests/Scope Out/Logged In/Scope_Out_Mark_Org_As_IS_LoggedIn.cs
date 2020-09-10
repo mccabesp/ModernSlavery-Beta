@@ -36,7 +36,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task RegisterOrgAndSetScope()
         {
            
-            await OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, Registration.OrgName_InterFloor, _firstname, _lastname);
+            await OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, TestData.OrgName, _firstname, _lastname);
             await OrganisationHelper.GetOrganisationBusinessLogic(TestRunSetup.TestWebHost).CreateOrganisationSecurityCodeAsync(Registration.Organisation.OrganisationReference, new DateTime(2030, 1, 10));
 
             User CurrentUser = await TestRunSetup.TestWebHost.GetDataRepository().SingleOrDefaultAsync<User>(o => o.EmailAddress == UniqueEmail);
@@ -62,7 +62,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SelectOrg()
         {
 
-            Click(Registration.OrgName_InterFloor);
+            Click(TestData.OrgName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
@@ -82,7 +82,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task VerifyOrgDetails()
         {
             RightOfText("Organisation Reference").Expect(Registration.Organisation.OrganisationReference);
-            RightOfText("Organisation Name").Expect(Registration.OrgName_InterFloor);
+            RightOfText("Organisation Name").Expect(TestData.OrgName);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
 

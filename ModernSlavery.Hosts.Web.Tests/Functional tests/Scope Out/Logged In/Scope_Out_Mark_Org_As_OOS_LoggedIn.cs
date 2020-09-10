@@ -34,7 +34,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task RegisterOrg()
         {
 
-            await ModernSlavery.Testing.Helpers.Extensions.OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, Registration.OrgName_InterFloor, _firstname, _lastname);
+            await ModernSlavery.Testing.Helpers.Extensions.OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, TestData.OrgName, _firstname, _lastname);
 
 
 
@@ -56,7 +56,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SelectOrg()
         {
 
-            Click(Registration.OrgName_InterFloor);
+            Click(TestData.OrgName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "Yes");
@@ -82,7 +82,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         //[Test, Order(38)]
         //public async Task VerifyOrgDetails()
         //{
-        //    RightOfText("Name").Expect(Submission.OrgName_InterFloor);
+        //    RightOfText("Name").Expect(TestData.OrgName);
         //    RightOfText("Reference").Expect(EmployerReference);
         //    //todo await helper implementation for address logic
         //    RightOfText("Registered address").Expect("");
@@ -137,7 +137,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Organisation details");
 
             RightOfText("Organisation Reference").Expect(Registration.Organisation.OrganisationReference);
-            RightOfText("Organisation Name").Expect(Registration.OrgName_InterFloor);
+            RightOfText("Organisation Name").Expect(TestData.OrgName);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
 

@@ -12,7 +12,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task NavigateToTrainingPage()
         {
-            Submission_Helper.NavigateToTraining(this, Submission.OrgName_InterFloor, "2019 to 2020");
+            Submission_Helper.NavigateToTraining(this, TestData.OrgName, "2019 to 2020");
 
             ExpectHeader("Training");
             await Task.CompletedTask;

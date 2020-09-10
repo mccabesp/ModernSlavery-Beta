@@ -112,7 +112,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(62)]
         public async Task ConfrimOrgDetails()
         {
-            RightOfText("Name").Expect(Submission.OrgName_InterFloor);
+            RightOfText("Name").Expect(TestData.OrgName);
             RightOfText("Company number").Expect("1");
             //todo await helper implementation for address logic
             RightOfText("Registered address").Expect("");
@@ -127,7 +127,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Continue");
 
-            Expect(Submission.OrgName_InterFloor);
+            Expect(TestData.OrgName);
             await Task.CompletedTask;
         }
     }

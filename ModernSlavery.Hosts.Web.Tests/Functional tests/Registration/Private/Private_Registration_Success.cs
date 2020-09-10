@@ -49,10 +49,10 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task SearchForOrganisation()
         { 
-            SetXPath("//*[@id='SearchText']").To(Registration.OrgName_InterFloor);
+            SetXPath("//*[@id='SearchText']").To(TestData.OrgName);
             Click("Search");
 
-            ExpectRow(That.Contains, Registration.OrgName_InterFloor);
+            ExpectRow(That.Contains, TestData.OrgName);
 
             await Task.CompletedTask;
 
@@ -61,14 +61,14 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task ChooseOrganisation()
         { 
-        AtRow(That.Contains, Registration.OrgName_InterFloor).Click(What.Contains, "Choose");
+        AtRow(That.Contains, TestData.OrgName).Click(What.Contains, "Choose");
 
             ExpectHeader("Confirm your organisation’s details");
 
-            AtRow("Organisation name").Expect(Registration.OrgName_InterFloor);
+            AtRow("Organisation name").Expect(TestData.OrgName);
             
             //todo investigate address issue
-            //AtRow("Registered address").Expect(Registration.RegisteredAddress_InterFloor);
+            //AtRow("Registered address").Expect(TestData.RegisteredAddress;
             Click("Confirm");
 
             ExpectHeader("We're sending a PIN by post to the following name and address:");
@@ -88,7 +88,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Expect(What.Contains, Create_Account.roger_first + " " + Create_Account.roger_last + " (" + Create_Account.roger_job_title + ")");
-            //Expect(What.Contains, Registration.RegisteredAddress_InterFloor);
+            //Expect(What.Contains, TestData.RegisteredAddress;
 
             await Task.CompletedTask;
 
@@ -103,7 +103,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Select an organisation");
 
 
-            ClickText(Registration.OrgName_InterFloor);
+            ClickText(TestData.OrgName);
 
             ExpectHeader("Enter your registration PIN");
 
@@ -114,7 +114,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ClickText("Activate and continue");
 
-            AtRow(Registration.OrgName_InterFloor).Expect("Registration complete");
+            AtRow(TestData.OrgName).Expect("Registration complete");
 
             await Task.CompletedTask;
 

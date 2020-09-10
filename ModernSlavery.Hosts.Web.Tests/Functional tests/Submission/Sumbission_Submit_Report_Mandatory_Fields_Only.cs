@@ -12,7 +12,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToSubmissionPage()
         {
             Click("Manage organisations");
-            Click("Interfloor limited");
+            Click(TestData.OrgName);
             Click("Continue");
             ExpectHeader("Review before submitting");
     
