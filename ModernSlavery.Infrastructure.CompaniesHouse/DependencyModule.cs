@@ -29,7 +29,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             services.AddHttpClient<ICompaniesHouseAPI, CompaniesHouseAPI>(nameof(ICompaniesHouseAPI),
                     httpClient =>
                     {
-                        CompaniesHouseAPI.SetupHttpClient(httpClient, _companiesHouseOptions.ApiServer, _companiesHouseOptions.ApiKey);
+                        CompaniesHouseAPI.SetupHttpClient(httpClient, _companiesHouseOptions.ApiServer);
                     })
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10))
                 .AddPolicyHandler(CompaniesHouseAPI.GetRetryPolicy());

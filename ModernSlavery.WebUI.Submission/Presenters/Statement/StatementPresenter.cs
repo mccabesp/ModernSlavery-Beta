@@ -1,19 +1,23 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.SignalR;
+﻿using Autofac.Features.AttributeFilters;
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.BusinessDomain.Submission;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
+using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Submission.Models.Statement;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.WebUI.Submission.Presenters
@@ -61,7 +65,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="organisationIdentifier">The unique obfuscated identifier of the organisation who owns the statement data</param>
         /// <param name="reportingDeadlineYear">The year of the reporting deadlien to which the statement data relates</param>
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
-        /// <returns>OutCome.Success with the populated ViewModel or Outcome.Fail with a list of StatementErrors</returns>
+        /// <returns>Outcome.Success with the populated ViewModel or Outcome.Fail with a list of StatementErrors</returns>
         Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId) where TViewModel : BaseViewModel;
 
         /// <summary>
@@ -73,7 +77,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="organisationIdentifier">The unique obfuscated identifier of the organisation who owns the statement data</param>
         /// <param name="reportingDeadlineYear">The year of the reporting deadlien to which the statement data relates</param>
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
-        /// <returns>OutCome.Success or Outcome.Fail with a list of StatementErrors</returns>
+        /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
         Task<Outcome<StatementErrors, TViewModel>> SaveViewModelAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int reportingDeadlineYear, long userId) where TViewModel : BaseViewModel;
 
         /// <summary>
@@ -83,7 +87,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="organisationIdentifier">The unique obfuscated identifier of the organisation who owns the statement data</param>
         /// <param name="reportingDeadlineYear">The year of the reporting deadlien to which the statement data relates</param>
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
-        /// <returns>OutCome.Success with the populated StatementModel or Outcome.Fail with a list of StatementErrors</returns>
+        /// <returns>Outcome.Success with the populated StatementModel or Outcome.Fail with a list of StatementErrors</returns>
         Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId);
 
         /// <summary>
@@ -92,7 +96,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="organisationIdentifier">The unique obfuscated identifier of the organisation who owns the statement data</param>
         /// <param name="reportingDeadlineYear">The year of the reporting deadlien to which the statement data relates</param>
         /// <param name="userId">The unique Id of the user who currently editting the Statement data</param>
-        /// <returns>OutCome.Success or Outcome.Fail with a list of StatementErrors</returns>
+        /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
         Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId);
 
         /// <summary>
@@ -101,7 +105,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="organisationIdentifier">The unique obfuscated identifier of the organisation who owns the statement data</param>
         /// <param name="reportingDeadlineYear">The year of the reporting deadlien to which the statement data relates</param>
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
-        /// <returns>OutCome.Success or Outcome.Fail with a list of StatementErrors</returns>
+        /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
         Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId);
 
         /// <summary>
@@ -111,31 +115,54 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="organisationIdentifier">The unique obfuscated identifier of the organisation who owns the statement data</param>
         /// <param name="reportingDeadlineYear">The year of the reporting deadlien to which the statement data relates</param>
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
-        /// <returns>OutCome.Success or Outcome.Fail with a list of StatementErrors</returns>
+        /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
         Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId);
-        
+
         /// <summary>
         /// Save any changes to the statement model
         /// </summary>
         /// <param name="statementModel">The statement model to save</param>
-        /// <returns></returns>
+        /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
         Task SaveStatementModelAsync(StatementModel statementModel);
+
+        /// <summary>
+        /// Search companies house and database for organisations
+        /// </summary>
+        /// <param name="groupSearchViewModel">The GroupSearchViewModel containing the search paramaters and search results</param>
+        /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
+        Task<Outcome<StatementErrors>> SearchGroupOrganisationsAsync(GroupSearchViewModel groupSearchViewModel, User user);
+
+        /// <summary>
+        /// Include a manual or selected group organisation 
+        /// </summary>
+        /// <param name="groupResults"></param>
+        /// <param name="addIndex"></param>
+        /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
+        Outcome<StatementErrors> IncludeGroupOrganisation(GroupSearchViewModel groupSearchViewModel, int addIndex=0);
     }
 
     public class StatementPresenter : IStatementPresenter
     {
+        private readonly ILogger<StatementPresenter> _logger;
+        private readonly IHttpSession _session;
         private readonly IStatementBusinessLogic _statementBusinessLogic;
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
         private readonly IMapper _mapper;
         public JsonSerializerSettings JsonSettings { get; }
         private readonly IServiceProvider _serviceProvider;
+        private readonly IPagedRepository<OrganisationRecord> _organisationRepository;
         public StatementPresenter(
+            ILogger<StatementPresenter> logger,
+            IHttpSession session,
             IMapper mapper,
             DependencyContractResolver dependencyContractResolver,
             ISharedBusinessLogic sharedBusinessLogic,
             IStatementBusinessLogic statementBusinessLogic,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            [KeyFilter("PrivateAndPublic")] IPagedRepository<OrganisationRecord> organisationRepository)
         {
+            _logger = logger;
+            _session = session;
             _mapper = mapper;
             JsonSettings = new JsonSerializerSettings
             {
@@ -145,9 +172,18 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             _sharedBusinessLogic = sharedBusinessLogic;
             _statementBusinessLogic = statementBusinessLogic;
             _serviceProvider = serviceProvider;
+            _organisationRepository = organisationRepository;
         }
-
-
+        private int CompaniesHouseFailures
+        {
+            get => _session["CompaniesHouseFailures"].ToInt32();
+            set
+            {
+                _session.Remove("CompaniesHouseFailures");
+                if (value > 0) _session["CompaniesHouseFailures"] = value;
+            }
+        }
+        private int LastOrganisationSearchRemoteTotal => _session["LastOrganisationSearchRemoteTotal"].ToInt32();
 
         public TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel) where TViewModel : BaseViewModel
         {
@@ -239,5 +275,83 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await _statementBusinessLogic.CompareToSubmittedStatement(newStatementModel);
         }
 
+        public async Task<Outcome<StatementErrors>> SearchGroupOrganisationsAsync(GroupSearchViewModel groupSearchViewModel, User user)
+        {
+            if (groupSearchViewModel == null) throw new ArgumentNullException(nameof(GroupSearchViewModel));
+            if (groupSearchViewModel.GroupResults == null) throw new ArgumentNullException(nameof(groupSearchViewModel.GroupResults));
+
+            try
+            {
+                groupSearchViewModel.GroupResults.ResultsPage = await _organisationRepository.SearchAsync(
+                    groupSearchViewModel.GroupResults.SearchKeywords,
+                    groupSearchViewModel.GroupResults.ResultsPage.CurrentPage,
+                    _sharedBusinessLogic.SharedOptions.OrganisationPageSize,
+                    user.EmailAddress.StartsWithI(_sharedBusinessLogic.SharedOptions.TestPrefix));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+
+                CompaniesHouseFailures++;
+                if (CompaniesHouseFailures < 3)
+                {
+                    groupSearchViewModel.GroupResults.ResultsPage?.Results?.Clear();
+                    return new Outcome<StatementErrors>(StatementErrors.CoHoTransientError);
+                }
+
+                await _sharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
+                    "GPG - COMPANIES HOUSE ERROR",
+                    $"Cant search using Companies House API for query '{groupSearchViewModel.GroupResults.SearchKeywords}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
+                    user.EmailAddress.StartsWithI(_sharedBusinessLogic.SharedOptions.TestPrefix));
+                
+                return new Outcome<StatementErrors>(StatementErrors.CoHoPermanentError);
+            }
+
+            if (LastOrganisationSearchRemoteTotal == -1)
+            {
+                CompaniesHouseFailures++;
+                if (CompaniesHouseFailures >= 3)
+                    return new Outcome<StatementErrors>(StatementErrors.CoHoPermanentError);
+            }
+            else
+            {
+                CompaniesHouseFailures = 0;
+            }
+            return new Outcome<StatementErrors>();
+        }
+
+        public Outcome<StatementErrors> IncludeGroupOrganisation(GroupSearchViewModel groupSearchViewModel, int addIndex=0)
+        {
+            if (groupSearchViewModel == null) throw new ArgumentNullException(nameof(GroupSearchViewModel));
+            if (groupSearchViewModel.GroupResults == null) throw new ArgumentNullException(nameof(groupSearchViewModel.GroupResults));
+
+            var newStatementOrganisationViewModel = new GroupOrganisationsViewModel.StatementOrganisationViewModel() { Included = true };
+
+            if (groupSearchViewModel.GroupResults.ShowResults)
+            {
+                if (groupSearchViewModel.GroupResults.ResultsPage == null) throw new ArgumentNullException(nameof(groupSearchViewModel.GroupResults.ResultsPage));
+                if (addIndex<0 || addIndex > groupSearchViewModel.GroupResults.ResultsPage.Results.Count-1) throw new ArgumentOutOfRangeException(nameof(addIndex), $"Index is outside bounds of search results");
+                var groupOrganisation = groupSearchViewModel.GroupResults.ResultsPage.Results[addIndex];
+                newStatementOrganisationViewModel.Address = groupOrganisation;
+                newStatementOrganisationViewModel.OrganisationId = groupOrganisation.OrganisationId>0 ? groupOrganisation.OrganisationId : default;
+                newStatementOrganisationViewModel.OrganisationName = groupOrganisation.OrganisationName;
+                newStatementOrganisationViewModel.CompanyNumber = groupOrganisation.CompanyNumber;
+                newStatementOrganisationViewModel.DateOfCessation = groupOrganisation.DateOfCessation;
+            }
+            else
+            {
+                //Add the new organisation manually
+                if (addIndex!=0) throw new ArgumentOutOfRangeException(nameof(addIndex),$"Index must be 0 when manually adding a group organisation");
+                newStatementOrganisationViewModel.OrganisationName = groupSearchViewModel.GroupResults.OrganisationName;
+            }
+
+            //Check the organisation is not already included
+            if (groupSearchViewModel.StatementOrganisations.Any(o => o.OrganisationName.EqualsI(newStatementOrganisationViewModel.OrganisationName))) 
+                return new Outcome<StatementErrors>(StatementErrors.DuplicateName,newStatementOrganisationViewModel.OrganisationName);
+
+            //Include the new organisation
+            groupSearchViewModel.StatementOrganisations.Add(newStatementOrganisationViewModel);
+            return new Outcome<StatementErrors>();
+        }
     }
 }

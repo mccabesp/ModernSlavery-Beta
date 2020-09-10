@@ -12,9 +12,9 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
-namespace ModernSlavery.WebUI.Registration.Classes
+namespace ModernSlavery.WebUI.Submission.Classes
 {
-    public class PrivateSectorRepository : IPagedRepository<OrganisationRecord>
+    public class OrganisationRepository : IPagedRepository<OrganisationRecord>
     {
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
         private readonly CompaniesHouseOptions _companiesHouseOptions;
@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
         private readonly IHttpSession _Session;
         private readonly SharedOptions SharedOptions;
         private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
-        public PrivateSectorRepository(
+        public OrganisationRepository(
             SharedOptions sharedOptions,
             IHttpContextAccessor httpContextAccessor,
             IHttpSession session,
@@ -51,10 +51,9 @@ namespace ModernSlavery.WebUI.Registration.Classes
             throw new NotImplementedException();
         }
 
-        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize,bool test = false)
+        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize, bool test = false)
         {
             if (searchText.IsNumber()) searchText = searchText.PadLeft(8, '0');
-
 
             var remoteTotal = 0;
             var searchResults = test ? null : LoadSearch(searchText);
@@ -66,11 +65,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
                 if (!test)
                 {
-                    orgs = _DataRepository.GetAll<Organisation>()
-                        .Where(
-                            o => o.SectorType == SectorTypes.Private && o.Status == OrganisationStatuses.Active &&
-                                 o.LatestAddress != null)
-                        .ToList();
+                    orgs = _DataRepository.GetAll<Organisation>().Where(o => o.Status == OrganisationStatuses.Active && o.LatestAddress != null).ToList();
 
                     if (searchText.IsCompanyNumber())
                         localResults = orgs.Where(o => o.CompanyNumber.EqualsI(searchText))
@@ -82,9 +77,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
                 try
                 {
-                    searchResults =
-                        await _CompaniesHouseAPI.SearchOrganisationsAsync(searchText, 1, _companiesHouseOptions.MaxResponseCompanies,
-                            test);
+                    searchResults = await _CompaniesHouseAPI.SearchOrganisationsAsync(searchText, 1, _companiesHouseOptions.MaxResponseCompanies,test);
                     remoteTotal = searchResults.Results.Count;
                 }
                 catch (Exception ex)
@@ -103,9 +96,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
                 if (!searchText.IsCompanyNumber() && remoteTotal > 0)
                 {
                     //Replace CoHo orgs with db orgs with same company number
-                    var companyNumbers = new SortedSet<string>(
-                        searchResults.Results.Select(s => s.CompanyNumber),
-                        StringComparer.OrdinalIgnoreCase);
+                    var companyNumbers = new SortedSet<string>(searchResults.Results.Select(s => s.CompanyNumber),StringComparer.OrdinalIgnoreCase);
                     var existingResults = orgs.Where(o => companyNumbers.Contains(o.CompanyNumber)).ToList();
                     localResults = localResults.Union(existingResults).ToList();
                 }
@@ -115,8 +106,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
                 //Remove any coho results found in DB
                 if (localTotal > 0)
                 {
-                    localTotal -=
-                        searchResults.Results.RemoveAll(r => localResults.Any(l => l.CompanyNumber == r.CompanyNumber));
+                    localTotal -=searchResults.Results.RemoveAll(r => localResults.Any(l => l.CompanyNumber == r.CompanyNumber));
 
                     if (localResults.Count > 0)
                     {
@@ -150,22 +140,22 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
         public void ClearSearch()
         {
-            _Session.Remove("LastPrivateSearchText");
-            _Session.Remove("LastPrivateSearchResults");
-            _Session.Remove("LastPrivateSearchRemoteTotal");
+            _Session.Remove("LastOrganisationSearchText");
+            _Session.Remove("LastOrganisationSearchResults");
+            _Session.Remove("LastOrganisationSearchRemoteTotal");
         }
 
         public void SaveSearch(string searchText, PagedResult<OrganisationRecord> results, int remoteTotal)
         {
-            _Session["LastPrivateSearchText"] = searchText;
-            _Session["LastPrivateSearchResults"] = results;
-            _Session["LastPrivateSearchRemoteTotal"] = remoteTotal;
+            _Session["LastOrganisationSearchText"] = searchText;
+            _Session["LastOrganisationSearchResults"] = results;
+            _Session["LastOrganisationSearchRemoteTotal"] = remoteTotal;
         }
 
         public PagedResult<OrganisationRecord> LoadSearch(string searchText)
         {
-            var lastSearchText = _Session["LastPrivateSearchText"] as string;
-            var remoteTotal = _Session["LastPrivateSearchRemoteTotal"].ToInt32();
+            var lastSearchText = _Session["LastOrganisationSearchText"] as string;
+            var remoteTotal = _Session["LastOrganisationSearchRemoteTotal"].ToInt32();
 
             PagedResult<OrganisationRecord> result = null;
 
@@ -181,7 +171,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
             }
             else
             {
-                result = _Session.Get<PagedResult<OrganisationRecord>>("LastPrivateSearchResults");
+                result = _Session.Get<PagedResult<OrganisationRecord>>("LastOrganisationSearchResults");
                 if (result == null) result = new PagedResult<OrganisationRecord>();
             }
 

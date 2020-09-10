@@ -42,7 +42,7 @@
                     @(Model.StatementOrganisations[organisationIndex].OrganisationName)
                 </div>
 
-                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="removeIndex" value="@organisationIndex.">
+                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="removeIndex" value="@organisationIndex">
                     Remove
                 </button>
 
@@ -52,7 +52,7 @@
                 Confirm and Continue
             </button>
 
-            <a href="@Model.BackUrl" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+            <a href="@Model.GroupSearchUrl" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                 Select more organisations
             </a>
 

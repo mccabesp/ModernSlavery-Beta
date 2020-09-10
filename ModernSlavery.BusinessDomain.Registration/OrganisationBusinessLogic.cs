@@ -4,16 +4,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Azure.Management.WebSites.Models;
-using ModernSlavery.BusinessDomain.Shared;
+using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.Core.Classes;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Models.LogModels;
 using User = ModernSlavery.Core.Entities.User;
 
 namespace ModernSlavery.BusinessDomain.Registration
@@ -24,34 +23,29 @@ namespace ModernSlavery.BusinessDomain.Registration
         private readonly IDataRepository _dataRepository;
         private readonly IScopeBusinessLogic _scopeLogic;
         private readonly ISecurityCodeBusinessLogic _securityCodeLogic;
-        private readonly IObfuscator _obfuscator;
         private readonly ISubmissionBusinessLogic _submissionLogic;
-        private readonly IStatementBusinessLogic _statementBusinessLogic;
         private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
-
+        private readonly IAuditLogger _badSicLog;
         public OrganisationBusinessLogic(SharedOptions sharedOptions,
             IDataRepository dataRepository, IReportingDeadlineHelper reportingDeadlineHelper,
-            IObfuscator obfuscator,
             ISubmissionBusinessLogic submissionLogic,
-            IStatementBusinessLogic statementBusinessLogic,
             IScopeBusinessLogic scopeLogic,
-            ISecurityCodeBusinessLogic securityCodeLogic)
+            ISecurityCodeBusinessLogic securityCodeLogic,
+            [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog)
         {
             _sharedOptions = sharedOptions;
             _dataRepository = dataRepository;
             _reportingDeadlineHelper = reportingDeadlineHelper;
-
-            _obfuscator = obfuscator;
             _submissionLogic = submissionLogic;
-            _statementBusinessLogic = statementBusinessLogic;
             _scopeLogic = scopeLogic;
             _securityCodeLogic = securityCodeLogic;
+            _badSicLog = badSicLog;
         }
 
-        public IQueryable<Organisation> SearchOrganisations(string searchText,int records)
+        public IQueryable<Organisation> SearchOrganisations(string searchText, int records)
         {
             var searchData = _dataRepository.GetAll<Organisation>();
-            var levenshteinRecords =searchData.ToList().Select(o => new{ distance = o.OrganisationName.LevenshteinCompute(searchText), org = o });
+            var levenshteinRecords = searchData.ToList().Select(o => new { distance = o.OrganisationName.LevenshteinCompute(searchText), org = o });
             var pattern = searchText?.ToLower();
 
             var searchResults = levenshteinRecords.AsQueryable()
@@ -104,7 +98,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                     SecurityCodeCreatedDateTime = o.SecurityCodeCreatedDateTime
                 };
 
-                var latestReturn =await _submissionLogic.GetLatestStatementBySnapshotYearAsync(o.OrganisationId, year);
+                var latestReturn = await _submissionLogic.GetLatestStatementBySnapshotYearAsync(o.OrganisationId, year);
                 var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(o.SectorType, year);
                 var latestScope = await _scopeLogic.GetScopeByReportingDeadlineOrLatestAsync(o.OrganisationId, reportingDeadline);
 
@@ -170,7 +164,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         {
             var organisation = GetOrganisationById(organisationId);
 
-            if (organisation == null)return new CustomResult<Organisation>(InternalMessages.HttpNotFoundCausedByOrganisationIdNotInDatabase(organisationId.ToString()));
+            if (organisation == null) return new CustomResult<Organisation>(InternalMessages.HttpNotFoundCausedByOrganisationIdNotInDatabase(organisationId.ToString()));
 
             return new CustomResult<Organisation>(organisation);
         }
@@ -198,8 +192,139 @@ namespace ModernSlavery.BusinessDomain.Registration
             return orgList;
         }
 
+        public Organisation CreateOrganisation(string organisationName, string source, SectorTypes sectorType, OrganisationStatuses status, AddressModel addressModel, AddressStatuses addressStatus= AddressStatuses.Pending, string companyNumber = null, DateTime? dateOfCessation = null, Dictionary<string, string> references = null, SortedSet<int> sicCodes = null, long userId = -1)
+        {
+            #region Check the parameters
+            if (string.IsNullOrWhiteSpace(organisationName)) throw new ArgumentNullException(nameof(organisationName));
+            if (sectorType == SectorTypes.Unknown) throw new ArgumentOutOfRangeException(nameof(sectorType));
+            if (!status.IsAny(OrganisationStatuses.Active, OrganisationStatuses.Pending)) throw new ArgumentOutOfRangeException(nameof(status),$"Organisation status must be active or pending but was {status}");
+            if (addressModel == null || addressModel.IsEmpty()) throw new ArgumentNullException(nameof(addressModel), "Cannot save an organisation with no address");
+            #endregion
 
-        #region Entity
+            #region Create the basic organisation
+            var organisation = new Organisation
+            {
+                SectorType = sectorType,
+                CompanyNumber = companyNumber,
+                DateOfCessation = dateOfCessation,
+            };
+            _dataRepository.Insert(organisation);
+
+            //Set the organisation status
+            organisation.SetStatus(status, userId);
+            #endregion
+
+            #region Add the references
+            if (references != null)
+            {
+                foreach (var key in references.Keys)
+                {
+                    var value = references[key];
+                    if (string.IsNullOrWhiteSpace(value)) continue;
+                    var reference = new OrganisationReference
+                    {
+                        ReferenceName = key,
+                        ReferenceValue = value,
+                        Organisation = organisation
+                    };
+
+                    _dataRepository.Insert(reference);
+                    organisation.OrganisationReferences.Add(reference);
+                }
+            }
+            #endregion
+
+            #region Add the SIC codes
+            if (organisation.SectorType == SectorTypes.Public) sicCodes.Add(1);
+
+            //Remove invalid SicCodes
+            var badSicCodes = new SortedSet<int>();
+            if (sicCodes.Count > 0)
+            {
+                //TODO we should cache these SIC codes
+                var allSicCodes = _dataRepository.GetAll<SicCode>().Select(s => s.SicCodeId)
+                    .ToSortedSet();
+                badSicCodes = sicCodes.Except(allSicCodes).ToSortedSet();
+                sicCodes = sicCodes.Except(badSicCodes).ToSortedSet();
+
+                //Update the new and retire the old SIC codes
+                if (sicCodes.Count > 0)
+                {
+                    foreach (var newSicCodeId in sicCodes)
+                    {
+                        var sicCode = new OrganisationSicCode
+                        { Organisation = organisation, SicCodeId = newSicCodeId, Source = source };
+                        _dataRepository.Insert(sicCode);
+                        organisation.OrganisationSicCodes.Add(sicCode);
+                    }
+                }
+            }
+
+            #endregion
+
+            #region Add the organisation address
+            //Use the old address for this registration
+            //Create address received from user
+            var address = new OrganisationAddress();
+            address.Organisation = organisation;
+            address.CreatedByUserId = userId;
+            address.Address1 = addressModel.Address1;
+            address.Address2 = addressModel.Address2;
+            address.Address3 = addressModel.Address3;
+            address.TownCity = addressModel.City;
+            address.County = addressModel.County;
+            address.Country = addressModel.Country;
+            address.PostCode = addressModel.PostCode;
+            address.PoBox = addressModel.PoBox;
+            address.IsUkAddress = addressModel.IsUkAddress;
+            address.Source = source;
+            address.SetStatus(addressStatus, userId);
+            _dataRepository.Insert(address);
+            #endregion
+            
+            return organisation;
+        }
+
+        public async Task SaveOrganisationAsync(IDataRepository dataRepository, Organisation organisation)
+        {
+            #region Check the parameters
+            if (dataRepository==null) throw new ArgumentNullException(nameof(dataRepository));
+            if (organisation == null) throw new ArgumentNullException(nameof(organisation));
+            #endregion
+
+            //Check if we are creating a new organisation
+            var isnew = organisation.OrganisationId == 0;
+
+            //Save the organisation to ensure it has an OrganisationId
+            await dataRepository.SaveChangesAsync();
+
+            //Ensure the organisation has an organisation reference
+            if (string.IsNullOrWhiteSpace(organisation.OrganisationReference))
+                await SetUniqueOrganisationReferenceAsync(organisation);
+
+            //Create a presumed in-scope for current and previous years
+            if (isnew)
+            {
+                await organisation.SetPresumedScopesAsync(_reportingDeadlineHelper.GetReportingDeadlines(organisation.SectorType));
+                await dataRepository.SaveChangesAsync();
+            }
+
+            //Set the latest scope
+            organisation.FixLatestScope();
+
+            //Set the latest address
+            organisation.FixLatestAddress();
+
+            //Set the latest statement
+            organisation.FixLatestStatement();
+
+            //Set the latest registration
+            organisation.FixLatestRegistration();
+
+            await dataRepository.SaveChangesAsync();
+        }
+
+        #region Organisation
 
         public string GetOrganisationSicSectorsString(Organisation organisation, DateTime? maxDate = null, string delimiter = ", ")
         {
@@ -275,6 +400,35 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         #endregion
 
+        #region Sic Codes
+
+        public async Task LogBadSicCodesAsync(Organisation organisation, SortedSet<int> badSicCodes)
+        {
+            if (organisation == null) throw new ArgumentNullException(nameof(organisation));
+            if (organisation.OrganisationId == 0) throw new ArgumentException("Organisation must be saved first before logging bad SIC codes",nameof(organisation));
+            if (badSicCodes == null) throw new ArgumentNullException(nameof(badSicCodes));
+
+            //Log the bad sic codes here to ensure organisation identifiers have been created when saved
+            if (badSicCodes.Count == 0) return;
+
+            //Create the logging tasks
+            var badSicLoggingtasks = new List<Task>();
+            badSicCodes.ForEach(
+                code => badSicLoggingtasks.Add(
+                    _badSicLog.WriteAsync(
+                                new BadSicLogModel
+                                {
+                                    OrganisationId = organisation.OrganisationId,
+                                    OrganisationName = organisation.OrganisationName,
+                                    SicCode = code,
+                                    Source = "CoHo"
+                                })));
+
+            //Wait for all the logging tasks to complete
+            await Task.WhenAll(badSicLoggingtasks);
+        }
+        #endregion
+
         #region Repo
 
         public virtual Organisation GetOrganisationById(long organisationId)
@@ -282,9 +436,9 @@ namespace ModernSlavery.BusinessDomain.Registration
             return _dataRepository.Get<Organisation>(organisationId);
         }
 
-        public IEnumerable<Statement> GetOrganisationRecentStatements(Organisation organisation,int recentCount)
+        public IEnumerable<Statement> GetOrganisationRecentStatements(Organisation organisation, int recentCount)
         {
-            foreach (var reportingDeadline in _reportingDeadlineHelper.GetReportingDeadlines(organisation.SectorType,recentCount))
+            foreach (var reportingDeadline in _reportingDeadlineHelper.GetReportingDeadlines(organisation.SectorType, recentCount))
             {
                 var defaultStatement = new Statement
                 {
@@ -293,7 +447,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                     Modified = VirtualDateTime.Now
                 };
 
-                yield return  organisation.GetStatement(reportingDeadline) ?? defaultStatement;
+                yield return organisation.GetStatement(reportingDeadline) ?? defaultStatement;
             }
         }
         public OrganisationRecord CreateOrganisationRecord(Organisation org, long userId = 0)
@@ -314,7 +468,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                     DateOfCessation = org.DateOfCessation,
                     DUNSNumber = org.DUNSNumber,
                     CompanyNumber = org.CompanyNumber,
-                    SicSectors = GetOrganisationSicSectorsString(org,null, ",<br/>"),
+                    SicSectors = GetOrganisationSicSectorsString(org, null, ",<br/>"),
                     SicCodeIds = GetOrganisationSicCodeIdsString(org),
                     SicSource = GetOrganisationSicSource(org),
                     RegistrationStatus = org.GetRegistrationStatus(),
@@ -334,7 +488,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 DateOfCessation = org.DateOfCessation,
                 DUNSNumber = org.DUNSNumber,
                 CompanyNumber = org.CompanyNumber,
-                SicSectors = GetOrganisationSicSectorsString(org,null, ",<br/>"),
+                SicSectors = GetOrganisationSicSectorsString(org, null, ",<br/>"),
                 SicCodeIds = GetOrganisationSicCodeIdsString(org),
                 SicSource = GetOrganisationSicSource(org),
                 ActiveAddressId = address.AddressId,
@@ -355,7 +509,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                     StringComparer.OrdinalIgnoreCase)
             };
         }
-       
+
         public bool GetOrganisationIsOrphan(Organisation organisation)
         {
             return organisation.Status == OrganisationStatuses.Active
@@ -374,7 +528,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public bool GetOrganisationWasDissolvedBeforeCurrentAccountingYear(Organisation organisation)
         {
-            
+
             var accountingStartDate = _reportingDeadlineHelper.GetReportingDeadline(organisation.SectorType);
             return organisation.GetWasDissolvedBefore(accountingStartDate);
         }
@@ -386,7 +540,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         /// <returns>The name of the organisation</returns>
         public OrganisationName GetOrganisationName(Organisation organisation, DateTime? maxDate = null)
         {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate =_reportingDeadlineHelper.GetReportingDeadline(organisation.SectorType).AddYears(1);
+            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _reportingDeadlineHelper.GetReportingDeadline(organisation.SectorType).AddYears(1);
 
             return organisation.GetName(maxDate.Value);
         }
@@ -424,7 +578,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         /// </summary>
         /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
         /// <returns>The name of the organisation</returns>
-        public IEnumerable<OrganisationSicCode> GetOrganisationSicCodes(Organisation organisation,DateTime? maxDate = null)
+        public IEnumerable<OrganisationSicCode> GetOrganisationSicCodes(Organisation organisation, DateTime? maxDate = null)
         {
             if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _reportingDeadlineHelper.GetReportingDeadline(organisation.SectorType).AddYears(1);
 
@@ -434,7 +588,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public SortedSet<int> GetOrganisationSicCodeIds(Organisation organisation, DateTime? maxDate = null)
         {
-            var organisationSicCodes = GetOrganisationSicCodes(organisation,maxDate);
+            var organisationSicCodes = GetOrganisationSicCodes(organisation, maxDate);
 
             var codes = new SortedSet<int>();
             foreach (var sicCode in organisationSicCodes) codes.Add(sicCode.SicCodeId);

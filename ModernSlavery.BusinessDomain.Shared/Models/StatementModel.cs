@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 
 namespace ModernSlavery.BusinessDomain.Shared.Models
 {
@@ -176,16 +175,18 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 Included = statementOrganisation.Included;
                 OrganisationName = statementOrganisation.OrganisationName;
                 OrganisationId = statementOrganisation.OrganisationId;
-                Address = statementOrganisation.Organisation?.LatestAddress?.GetAddressString();
+                Address = statementOrganisation.Organisation?.LatestAddress == null ? null : AddressModel.Create(statementOrganisation.Organisation.LatestAddress);
                 CompanyNumber = statementOrganisation.Organisation?.CompanyNumber;
+                DateOfCessation = statementOrganisation.Organisation.DateOfCessation;
             }
 
-            public long StatementOrganisationId { get; set; }
+            public long? StatementOrganisationId { get; set; }
             public bool Included { get; set; }
             public long? OrganisationId { get; set; }
             public string OrganisationName { get; set; }
-            public string Address { get; set; }
+            public AddressModel Address { get; set; }
             public string CompanyNumber { get; set; }
+            public DateTime? DateOfCessation { get; set; }
         }
         public List<StatementOrganisationModel> StatementOrganisations { get; set; } = new List<StatementOrganisationModel>();
 

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,21 +15,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
     public class GroupOrganisationsViewModelMapperProfile : Profile
     {
-        private readonly IObfuscator _obfuscator;
-        public GroupOrganisationsViewModelMapperProfile(IObfuscator obfuscator)
-        {
-            _obfuscator = obfuscator;
-        }
-
         public GroupOrganisationsViewModelMapperProfile()
         {
-            CreateMap<StatementModel.StatementOrganisationModel, GroupOrganisationsViewModel.StatementOrganisationViewModel>()
-                .ForMember(d => d.StatementOrganisationIdentifier, opt => opt.MapFrom(s => _obfuscator.Obfuscate(s.StatementOrganisationId)))
-                .ForMember(d => d.OrganisationIdentifier, opt => opt.MapFrom(s => s.OrganisationId==null ? null : _obfuscator.Obfuscate(s.OrganisationId.Value)));
+            CreateMap<StatementModel.StatementOrganisationModel, GroupOrganisationsViewModel.StatementOrganisationViewModel>();
 
-            CreateMap<GroupOrganisationsViewModel.StatementOrganisationViewModel, StatementModel.StatementOrganisationModel>()
-                .ForMember(d => d.StatementOrganisationId, opt => opt.MapFrom(s => _obfuscator.DeObfuscate(s.StatementOrganisationIdentifier)))
-                .ForMember(d => d.OrganisationId, opt => opt.MapFrom(s => s.OrganisationIdentifier == null ? default : _obfuscator.DeObfuscate(s.OrganisationIdentifier)));
+            CreateMap<GroupOrganisationsViewModel.StatementOrganisationViewModel, StatementModel.StatementOrganisationModel>();
 
             CreateMap<GroupOrganisationsViewModel, StatementModel>(MemberList.Source)
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
@@ -50,16 +42,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         #region Types
         public class StatementOrganisationViewModel
         {
-            public string StatementOrganisationIdentifier { get; set; }
-            public string OrganisationIdentifier { get; set; }
+            public long? StatementOrganisationId { get; set; }
+            public long? OrganisationId { get; set; }
             public bool Included { get; set; }
-
-            [MaxLength(100)]
             public string OrganisationName { get; set; }
-            [BindNever] 
-            public string Address { get; set; }
-            [BindNever]
+            public AddressModel Address { get; set; }
             public string CompanyNumber { get; set; }
+            public DateTime? DateOfCessation { get; set; }
         }
         #endregion
 

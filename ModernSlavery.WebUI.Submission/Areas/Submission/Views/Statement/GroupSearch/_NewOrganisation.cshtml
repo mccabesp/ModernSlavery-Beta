@@ -1,0 +1,21 @@
+﻿@model GroupSearchViewModel
+<div class="grid-row finder">
+    <div class="column-two-thirds">
+        <div style="display:table-row">
+            <div style="display:table-cell">
+                @Html.LabelFor(m => m.GroupResults.OrganisationName)<br />
+                @Html.TextBoxFor(m => m.GroupResults.OrganisationName)<br />
+                <span asp-validation-for="GroupResults.OrganisationName" class="govuk-error-message"></span>
+            </div>
+
+            <div style="display:table-cell">
+                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="addIndex" value="0">
+                    Include
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.ToggleResults">
+    Cancel and return to search results
+</button>

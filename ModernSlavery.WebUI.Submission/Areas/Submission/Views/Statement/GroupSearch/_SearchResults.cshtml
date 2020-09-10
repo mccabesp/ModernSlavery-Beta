@@ -1,0 +1,77 @@
+﻿@model GroupSearchViewModel
+<button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.ToggleResults">
+    Can't find the organisation you're looking for?
+</button>
+
+<div class="grid-row">
+    <div class="column-full">
+        <div class="grid-row finder">
+            <div class="column-two-thirds js-live-search-results-block" aria-live="assertive">
+                <div id="loading"></div>
+                <div id="main">
+                    @if (Model.GroupResults.ResultsPage.Results.Count < 1)
+                    {
+                        <div class="zero-results">
+                            <h2 class="heading-medium">0 organisations found that match your search</h2>
+                            <h2>Please try:</h2>
+                            <ul class="list list-bullet">
+                                <li>searching again using different organisation name or company number</li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        @for (var addIndex = 0; addIndex < Model.GroupResults.ResultsPage.Results.Count; addIndex++)
+                        {
+                            <div style="display:table-row">
+                                <div style="display:table-cell">
+                                    Name: @(Model.GroupResults.ResultsPage.Results[addIndex].OrganisationName)<br />
+                                    Address: @(Model.GroupResults.ResultsPage.Results[addIndex].GetFullAddress())<br />
+                                    Number: @(Model.GroupResults.ResultsPage.Results[addIndex].CompanyNumber)
+                                </div>
+
+                                <div style="display:table-cell">
+                                    @if (Model.ContainsGroupOrganisation(Model.GroupResults.ResultsPage.Results[addIndex]))
+                                    {
+                                        <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="removeIndex" value="@(addIndex)">
+                                            Remove
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="addIndex" value="@(addIndex)">
+                                            Include
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        <partial name="_SearchPagination.cshtml" model="Model.GroupResults.ResultsPage" />
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            "use strict";
+
+            //Keep comparison basket within viewport
+            GOVUK.stickAtTopWhenScrolling.init();
+
+            new GOVUK.Ajaxify({
+                onRefresh: function () {
+                    GOVUK.stickAtTopWhenScrolling.init();
+                },
+                onError: function (errorCode, error, errorThrown) {
+                    window.location.href = '/error/1146';
+                }
+            });
+
+        }());
+
+    </script>
+}

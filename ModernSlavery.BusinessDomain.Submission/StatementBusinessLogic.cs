@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
@@ -8,7 +9,6 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -21,14 +21,18 @@ namespace ModernSlavery.BusinessDomain.Submission
 {
     partial class StatementBusinessLogic : IStatementBusinessLogic
     {
+        private readonly ILogger<StatementBusinessLogic> _logger;
         private readonly SubmissionOptions _submissionOptions;
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
+        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
         private readonly IMapper _mapper;
 
-        public StatementBusinessLogic(SubmissionOptions submissionOptions, ISharedBusinessLogic sharedBusinessLogic, IMapper mapper)
+        public StatementBusinessLogic(ILogger<StatementBusinessLogic> logger, SubmissionOptions submissionOptions, ISharedBusinessLogic sharedBusinessLogic, IOrganisationBusinessLogic organisationBusinessLogic, IMapper mapper)
         {
+            _logger = logger;
             _submissionOptions = submissionOptions;
             _sharedBusinessLogic = sharedBusinessLogic;
+            _organisationBusinessLogic = organisationBusinessLogic;
             _mapper = mapper;
         }
 
@@ -107,7 +111,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         public async Task<Statement> FindLatestSubmittedStatementAsync(Organisation organisation, DateTime reportingDeadline)
         {
             //Validate method parameters
-            if (organisation==null) throw new ArgumentNullException(nameof(organisation));
+            if (organisation == null) throw new ArgumentNullException(nameof(organisation));
 
             //Check the reporting deadlin
             CheckReportingDeadline(organisation, reportingDeadline);
@@ -153,13 +157,13 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Map the group organisations
             statementModel.StatementOrganisations.ForEach(groupOrganisation =>
             {
-                var statementOrganisation=new StatementOrganisation() 
-                    { 
-                        Statement=statement,
-                        OrganisationName=groupOrganisation.OrganisationName,
-                        OrganisationId= groupOrganisation.OrganisationId,
-                        Included= groupOrganisation.Included
-                    };
+                var statementOrganisation = new StatementOrganisation()
+                {
+                    Statement = statement,
+                    OrganisationName = groupOrganisation.OrganisationName,
+                    OrganisationId = groupOrganisation.OrganisationId,
+                    Included = groupOrganisation.Included
+                };
                 statement.StatementOrganisations.Add(statementOrganisation);
             });
 
@@ -605,7 +609,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             await SaveStatementModelToFileAsync(statementModel, draftFilePath);
         }
 
-        public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId)
+        public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId = -1)
         {
             //Validate the parameters
             if (organisationId <= 0) throw new ArgumentOutOfRangeException(nameof(organisationId));
@@ -624,30 +628,57 @@ namespace ModernSlavery.BusinessDomain.Submission
             newStatement.Organisation = previousStatement == null ? await _sharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId) : previousStatement.Organisation;
             newStatement.SetStatus(StatementStatuses.Submitted, userId);
             newStatement.Organisation.Statements.Add(newStatement);
+            await _sharedBusinessLogic.DataRepository.BeginTransactionAsync(
+                async () =>
+                {
+                    try
+                    {
+                        //Save new group organisations from companies house
+                        statementModel.StatementOrganisations.Where(o => o.OrganisationId == null && !string.IsNullOrWhiteSpace(o.CompanyNumber)).ForEach(async groupOrganisation =>
+                            {
+                                var organisation = _sharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.CompanyNumber == groupOrganisation.CompanyNumber);
+                                if (organisation == null)
+                                {
+                                    //Save the new organisation from companies house
+                                    organisation = _organisationBusinessLogic.CreateOrganisation(groupOrganisation.OrganisationName, "CoHo", SectorTypes.Private, OrganisationStatuses.Active, groupOrganisation.Address, AddressStatuses.Active, groupOrganisation.CompanyNumber, groupOrganisation.DateOfCessation, userId: userId);
+                                    await _organisationBusinessLogic.SaveOrganisationAsync(_sharedBusinessLogic.DataRepository, organisation);
+                                }
+                                groupOrganisation.OrganisationId = organisation.OrganisationId;
+                            });
 
-            //Copy all the other model propertiesto the entity
-            MapFromModel(statementModel, newStatement);
-            newStatement.Modifications = null;
+                        //Copy all the other model propertiesto the entity
+                        MapFromModel(statementModel, newStatement);
+                        newStatement.Modifications = null;
 
-            if (previousStatement != null)
-            {
-                //Create the previous StatementModel
-                var previousStatementModel = new StatementModel();
-                _mapper.Map(previousStatement, previousStatementModel);
+                        if (previousStatement != null)
+                        {
+                            //Create the previous StatementModel
+                            var previousStatementModel = new StatementModel();
+                            _mapper.Map(previousStatement, previousStatementModel);
 
-                //Compare the latest with the previous statementModel
-                var modifications = GetModifications(previousStatementModel, statementModel);
-                newStatement.Modifications = modifications.Any() ? JsonConvert.SerializeObject(modifications, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore }) : null;
-            }
+                            //Compare the latest with the previous statementModel
+                            var modifications = GetModifications(previousStatementModel, statementModel);
+                            newStatement.Modifications = modifications.Any() ? JsonConvert.SerializeObject(modifications, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore }) : null;
+                        }
 
-            //Set whether thestatement is late
-            newStatement.IsLateSubmission = newStatement.GetIsLateSubmission();
+                        //Set whether thestatement is late
+                        newStatement.IsLateSubmission = newStatement.GetIsLateSubmission();
 
-            //Save the changes to the database
-            await _sharedBusinessLogic.DataRepository.SaveChangesAsync();
+                        //Save the changes to the database
+                        await _sharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            //Delete the draft file and its backup
-            await DeleteDraftStatementModelAsync(organisationId, reportingDeadline);
+                        //Delete the draft file and its backup
+                        await DeleteDraftStatementModelAsync(organisationId, reportingDeadline);
+
+                        _sharedBusinessLogic.DataRepository.CommitTransaction();
+                    }
+                    catch (Exception ex)
+                    {
+                        _sharedBusinessLogic.DataRepository.RollbackTransaction();
+                        _logger.LogError(ex, JsonConvert.SerializeObject(statementModel));
+                        throw;
+                    }
+                });
 
             return new Outcome<StatementErrors>();
         }
