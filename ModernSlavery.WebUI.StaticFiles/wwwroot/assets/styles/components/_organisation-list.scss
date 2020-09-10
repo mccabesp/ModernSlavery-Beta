@@ -1,0 +1,29 @@
+﻿.organisation-list {
+
+    div {
+        line-height: 0px;
+    }
+
+    .govuk-inset-text {
+        border-left: 10px solid $govuk-brand-colour;
+        margin-top: 0px;
+        margin-bottom:0px;
+    }
+
+    .govuk-blue {
+        color: $govuk-brand-colour;
+    }
+
+    button.link-button {
+        border: none;
+        background: none;
+        text-decoration: underline;
+        cursor: pointer;
+        color: $govuk-brand-colour;
+        font-size:19px;
+    }
+
+    .buttons{
+        vertical-align:middle;
+    }
+}

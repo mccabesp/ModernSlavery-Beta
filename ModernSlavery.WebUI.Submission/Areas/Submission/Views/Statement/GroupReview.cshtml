@@ -27,38 +27,75 @@
                             for @(Model.OrganisationName) (@(Model.ReportingDeadlineYear-1) to @(Model.ReportingDeadlineYear))
                         </h2>
                     </legend>
-                    <div class="govuk-hint">
+
+
+                    <p class="govuk-body">
                         You’ve told us your statement is for the following group of organisations. You can add more organisations to the group, or remove organisations, before confirming and continuing.
-                    </div>
-                    <div class="govuk-hint">
+
+                    </p>
+
+                    <p class="govuk-body">
                         If your statement is for a single organisation, and not a group, you can return to the ‘Who is your statement for?’ page and <a class="govuk-link" href="@Model.GroupStatusUrl">specify a single organisation</a>.
-                    </div>
+                    </p>
                 </fieldset>
-            </div>
 
-            @for (var organisationIndex = 0; organisationIndex < Model.StatementOrganisations.Count; organisationIndex++)
-            {
-                <div>
-                    @(Model.StatementOrganisations[organisationIndex].OrganisationName)
-                </div>
 
-                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="removeIndex" value="@organisationIndex.">
-                    Remove
+                <table class="govuk-table organisation-list">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header">Organisation</th>
+                            <th class="govuk-table__header"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+
+                        @*The order of the list to be handled by controller*@
+                        @for (var organisationIndex = 0; organisationIndex < Model.StatementOrganisations.Count; organisationIndex++)
+                        {
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">
+                                    @*TODO: Blue items are actually from database and will be orgs that already have a statement of some sort*@
+                                    @if (Model.StatementOrganisations[organisationIndex].OrganisationIdentifier != null)
+                                    {
+                                        <div class="govuk-inset-text">
+                                            <p class="govuk-!-font-weight-bold govuk-blue">TODO: text to be added </p><br />
+                                            <p class="govuk-!-font-weight-bold"> @(Model.StatementOrganisations[organisationIndex].OrganisationName)</p> <br />
+                                            <p>@Model.StatementOrganisations[organisationIndex].Address</p><br />
+                                            <p> Company number: @Model.StatementOrganisations[organisationIndex].CompanyNumber</p>
+                                        </div>
+
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            <p class="govuk-!-font-weight-bold"> @(Model.StatementOrganisations[organisationIndex].OrganisationName)</p> <br />
+                                            <p class="">@Model.StatementOrganisations[organisationIndex].Address</p><br />
+                                            <p>Company number: @Model.StatementOrganisations[organisationIndex].CompanyNumber</p>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="govuk-table__cell buttons">
+                                    <button type="submit" class="link-button" name="removeIndex" value="@organisationIndex">Remove</button>
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                    Confirm and continue
                 </button>
 
-            }
+                <a href="@Model.BackUrl" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    Select more organisations
+                </a>
 
-            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
-                Confirm and Continue
-            </button>
+                <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+                    Cancel
+                </button>
 
-            <a href="@Model.BackUrl" class="govuk-button govuk-button--secondary" data-module="govuk-button">
-                Select more organisations
-            </a>
-
-            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
-                Cancel
-            </button>
+            </div>
         }
     </div>
 </div>
