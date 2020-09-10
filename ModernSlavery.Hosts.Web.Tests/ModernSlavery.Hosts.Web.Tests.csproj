@@ -46,4 +46,8 @@
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
     <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Functional tests\Submission\Group\" />
+  </ItemGroup>
 </Project>
