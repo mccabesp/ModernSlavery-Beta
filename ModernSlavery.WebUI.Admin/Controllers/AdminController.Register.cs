@@ -499,6 +499,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 //Send the approved email to the applicant
                 if (!await SendRegistrationAcceptedAsync(
+                    userOrg.Organisation.OrganisationName,
                     userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress),
                     userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)))
                 {
@@ -564,14 +565,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         //Send the registration request
-        protected async Task<bool> SendRegistrationAcceptedAsync(string emailAddress, bool test = false)
+        protected async Task<bool> SendRegistrationAcceptedAsync(string organisationName, string emailAddress, bool test = false)
         {
-            //Always use the administrators email when not on production
-            if (!SharedBusinessLogic.SharedOptions.IsProduction()) emailAddress = CurrentUser.EmailAddress;
-
             //Send an acceptance link to the email address
             var returnUrl = Url.ActionArea("ManageOrganisations", "Submission", "Submission", null, "https");
-            return await _adminService.SharedBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(returnUrl,
+            return await _adminService.SharedBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(organisationName, returnUrl,
                 emailAddress, test);
         }
 
@@ -670,6 +668,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             //Send the declined email to the applicant
             if (!await SendRegistrationDeclinedAsync(
+                userOrg.Organisation.OrganisationName,
                 emailAddress,
                 string.IsNullOrWhiteSpace(model.CancellationReason)
                     ? "We haven't been able to verify your organisation's identity. So we have declined your application."
@@ -695,13 +694,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
 
         //Send the registration request
-        protected async Task<bool> SendRegistrationDeclinedAsync(string emailAddress, string reason)
+        protected async Task<bool> SendRegistrationDeclinedAsync(string organisationName, string emailAddress, string reason)
         {
-            //Always use the administrators email when not on production
-            if (!SharedBusinessLogic.SharedOptions.IsProduction()) emailAddress = CurrentUser.EmailAddress;
-
             //Send a verification link to the email address
-            return await _adminService.SharedBusinessLogic.SendEmailService.SendRegistrationDeclinedAsync(emailAddress,
+            return await _adminService.SharedBusinessLogic.SendEmailService.SendRegistrationDeclinedAsync(organisationName, emailAddress,
                 reason);
         }
 
