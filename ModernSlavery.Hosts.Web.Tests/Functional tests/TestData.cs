@@ -10,13 +10,16 @@ namespace ModernSlavery.Hosts.Web.Tests
     public static class TestData
     {
         //org details
-        private static string _OrgName_InterFloor;
         public static Organisation Organisation { get; } = OrganisationHelper.ListOrganisations(TestRunSetup.TestWebHost).OrderBy(o => o.OrganisationName).FirstOrDefault();
 
         public static string EmployerReference => Organisation.OrganisationReference;
         public static string OrgName => Organisation.OrganisationName;
         public static string RegisteredAddress => Organisation.GetAddressString(DateTime.Now);
         public static string SicCodes => Organisation.GetSicCodeIdsString(DateTime.Now);
+
+
+        //multiple org details for Group Submission
+        public static Organisation[] Organisations { get; } = OrganisationHelper.ListOrganisations(TestRunSetup.TestWebHost).OrderBy(o => o.OrganisationName).Take(10).ToArray();
 
 
         //todo clarify dummy data
