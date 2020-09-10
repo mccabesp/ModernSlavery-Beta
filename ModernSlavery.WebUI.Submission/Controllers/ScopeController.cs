@@ -263,6 +263,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var stateModel = UnstashModel<ScopingViewModel>();
             if (stateModel == null) return SessionExpiredView();
 
+            enterAnswersModel.UserIsRegistered = stateModel.UserIsRegistered;
             // update the state
             stateModel.EnterAnswers = enterAnswersModel;
             StashModel(stateModel);
