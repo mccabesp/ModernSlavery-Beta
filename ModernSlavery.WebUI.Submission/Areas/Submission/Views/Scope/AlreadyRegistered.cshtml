@@ -3,7 +3,9 @@
     Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Organisation already resgistered - Modern Slavery reporting service";
 }
-<a class="govuk-back-link" href="@Url.Action("OutOfScope")">Back</a>
+@section BeforeMain {
+    <a class="govuk-back-link" href="@Url.Action("OutOfScope")">Back</a>
+}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate = "" }))
@@ -11,9 +13,9 @@
             @Html.AntiForgeryToken()
             @Html.HiddenFor(m => Model.OrganisationId)
 
-        <h1 class="govuk-heading-l">
-            Your organisation has already been registered on our service
-        </h1>
+            <h1 class="govuk-heading-l">
+                Your organisation has already been registered on our service
+            </h1>
 
             <p class="govuk-body">
                 Someone has already registered this organisation on our service. You’ll need to <a href="/sign-up">sign in or create an account</a> if you want to:
