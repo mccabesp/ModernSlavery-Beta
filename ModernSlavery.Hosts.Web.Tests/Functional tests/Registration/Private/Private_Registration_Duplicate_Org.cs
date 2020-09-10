@@ -33,7 +33,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(31)]
 
         public async Task SelectDuplicateOrg() { 
-            AtRow(That.Contains, Data.OrgName_InterFloor).Click(What.Contains, "Choose");
+            AtRow(That.Contains, TestData.OrgName).Click(What.Contains, "Choose");
             await Task.CompletedTask;
 
         }
