@@ -8,7 +8,7 @@ using Geeks.Pangolin.Helper.UIContext;
 
 namespace ModernSlavery.Testing.Helpers.Extensions
 {
-    class SubmissionHelper
+    public static class SubmissionHelper
     {
         public static void GroupOrSingleScreenComplete(UIContext ui, bool IsGroup = false, string OrgName = null, string Year = null)
         {
