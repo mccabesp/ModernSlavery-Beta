@@ -7,4 +7,15 @@
     }
 }
 
+.govuk-body.currency-symbol {
+    position: relative;
+
+    &:before {
+        content: "£";
+        top: 0;
+        position: absolute;
+        left: -20px;
+    }
+}
+
 

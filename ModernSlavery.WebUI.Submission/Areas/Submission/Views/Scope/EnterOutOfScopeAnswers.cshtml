@@ -36,9 +36,11 @@
                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.TurnOver, "govuk-form-group--error")" id="reason-conditional-@(reasonIndex)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
-                                            What is your organistion’s annual turnover or budget?
+                                            What is your organisation’s annual turnover or budget?
                                         </label>
-                                        <input class="govuk-input" asp-for="TurnOver" />
+                                        <span class="govuk-body currency-symbol">
+                                            <input class="govuk-input" asp-for="TurnOver" />
+                                        </span>
                                         <span asp-validation-for="TurnOver" class="govuk-error-message"></span>
                                     </div>
                                 </div>
