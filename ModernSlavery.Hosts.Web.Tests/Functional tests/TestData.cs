@@ -21,6 +21,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         //multiple org details for Group Submission
         public static Organisation[] Organisations { get; } = OrganisationHelper.ListOrganisations(TestRunSetup.TestWebHost).OrderBy(o => o.OrganisationName).Take(10).ToArray();
 
+        //scope url
+        public const string ScopeUrl = "/scope/out";
+
 
         //todo clarify dummy data
         public const string InvalidEmployerReference = "invalid";
