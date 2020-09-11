@@ -177,7 +177,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 OrganisationId = statementOrganisation.OrganisationId;
                 Address = statementOrganisation.Organisation?.LatestAddress == null ? null : AddressModel.Create(statementOrganisation.Organisation.LatestAddress);
                 CompanyNumber = statementOrganisation.Organisation?.CompanyNumber;
-                DateOfCessation = statementOrganisation.Organisation.DateOfCessation;
+                DateOfCessation = statementOrganisation.Organisation?.DateOfCessation;
             }
 
             public long? StatementOrganisationId { get; set; }

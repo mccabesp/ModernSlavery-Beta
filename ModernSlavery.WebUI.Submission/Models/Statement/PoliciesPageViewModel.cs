@@ -17,6 +17,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, PoliciesPageViewModel>();
 
             CreateMap<PoliciesPageViewModel, StatementModel>(MemberList.Source)
+                .ForMember(s => s.OrganisationId, opt => opt.Ignore())
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForSourceMember(s => s.PolicyTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())

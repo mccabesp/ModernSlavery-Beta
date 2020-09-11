@@ -37,7 +37,7 @@
                                             Remove
                                         </button>
                                     }
-                                    else
+                                    else if (Model.OrganisationId != Model.GroupResults.ResultsPage.Results[addIndex].OrganisationId)
                                     {
                                         <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="addIndex" value="@(addIndex)">
                                             Include

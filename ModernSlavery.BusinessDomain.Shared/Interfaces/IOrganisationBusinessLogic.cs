@@ -11,6 +11,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
     public interface IOrganisationBusinessLogic
     {
+        IDataRepository DataRepository { get; }
+
         public delegate CustomResult<Organisation> ActionSecurityCodeDelegate(Organisation organisation,
             DateTime securityCodeExpiryDateTime);
 
@@ -129,7 +131,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         Task LogBadSicCodesAsync(Organisation organisation, SortedSet<int> badSicCodes);
 
         /// <summary>
-        /// Create a new (unsaved) organisation with address, SicCodes and statuses
+        /// Create a new (detached) organisation with address, SicCodes and statuses
         /// </summary>
         /// <param name="organisationName">The name of the organisation</param>
         /// <param name="source">The source of the organisation (eg., CoHo, External, (user email) etc)</param>
@@ -142,15 +144,14 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="references">A list of unique organisation references (eg., Charity number) </param>
         /// <param name="sicCodes">A list of SIC code ids</param>
         /// <param name="user">The user who created the organisation. If empty a userId of 0 (system) will be assumed</param>
-        /// <returns>The new attached organisation entity ready for saving</returns>
+        /// <returns>The new detached organisation entity ready for saving</returns>
         Organisation CreateOrganisation(string organisationName, string source, SectorTypes sectorType, OrganisationStatuses status, AddressModel addressModel, AddressStatuses addressStatus=AddressStatuses.Pending, string companyNumber = null, DateTime? dateOfCessation = null, Dictionary<string, string> references = null, SortedSet<int> sicCodes = null, long userId = -1);
-        
+
         /// <summary>
         /// Save a new or existing organisation with OrganisationReference, presumed scopes, LatestScope, LatestAddress, LatestStatement, LatestRegistration
         /// </summary>
-        /// <param name="dataRepository">The data repository to save the organisation to</param>
         /// <param name="organisation">The organisation to save</param>
         /// <returns></returns>
-        Task SaveOrganisationAsync(IDataRepository dataRepository, Organisation organisation);
+        Task SaveOrganisationAsync(Organisation organisation);
     }
 }

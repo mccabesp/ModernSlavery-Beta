@@ -20,7 +20,7 @@ namespace ModernSlavery.BusinessDomain.Registration
     public class OrganisationBusinessLogic : IOrganisationBusinessLogic
     {
         private readonly SharedOptions _sharedOptions;
-        private readonly IDataRepository _dataRepository;
+        public IDataRepository DataRepository { get; }
         private readonly IScopeBusinessLogic _scopeLogic;
         private readonly ISecurityCodeBusinessLogic _securityCodeLogic;
         private readonly ISubmissionBusinessLogic _submissionLogic;
@@ -34,7 +34,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog)
         {
             _sharedOptions = sharedOptions;
-            _dataRepository = dataRepository;
+            DataRepository = dataRepository;
             _reportingDeadlineHelper = reportingDeadlineHelper;
             _submissionLogic = submissionLogic;
             _scopeLogic = scopeLogic;
@@ -44,7 +44,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public IQueryable<Organisation> SearchOrganisations(string searchText, int records)
         {
-            var searchData = _dataRepository.GetAll<Organisation>();
+            var searchData = DataRepository.GetAll<Organisation>();
             var levenshteinRecords = searchData.ToList().Select(o => new { distance = o.OrganisationName.LevenshteinCompute(searchText), org = o });
             var pattern = searchText?.ToLower();
 
@@ -68,8 +68,8 @@ namespace ModernSlavery.BusinessDomain.Registration
         {
 #if DEBUG
             var orgs = Debugger.IsAttached
-                ? _dataRepository.GetAll<Organisation>().Take(100)
-                : _dataRepository.GetAll<Organisation>();
+                ? DataRepository.GetAll<Organisation>().Take(100)
+                : DataRepository.GetAll<Organisation>();
 #else
             var orgs = _dataRepository.GetAll<Organisation>();
 #endif
@@ -114,9 +114,9 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public virtual async Task SetUniqueOrganisationReferencesAsync()
         {
-            var orgs = await _dataRepository.ToListAsync<Organisation>(o => o.OrganisationReference == null);
+            var orgs = await DataRepository.ToListAsync<Organisation>(o => o.OrganisationReference == null);
             foreach (var org in orgs) await SetUniqueOrganisationReferenceAsync(org);
-            await _dataRepository.BulkUpdateAsync(orgs);
+            await DataRepository.BulkUpdateAsync(orgs);
         }
 
         public virtual async Task SetUniqueOrganisationReferenceAsync(Organisation organisation)
@@ -125,7 +125,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             do
             {
                 organisation.OrganisationReference = GenerateOrganisationReference();
-            } while (await _dataRepository.AnyAsync<Organisation>(o =>
+            } while (await DataRepository.AnyAsync<Organisation>(o =>
                 o.OrganisationId != organisation.OrganisationId &&
                 o.OrganisationReference == organisation.OrganisationReference));
         }
@@ -183,7 +183,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         private async Task<IEnumerable<Organisation>> GetAllActiveOrPendingOrganisationsOrThrowAsync()
         {
-            var orgList = _dataRepository.GetAll<Organisation>()
+            var orgList = DataRepository.GetAll<Organisation>()
                 .Where(o => o.Status == OrganisationStatuses.Active || o.Status == OrganisationStatuses.Pending);
 
             if (!orgList.Any())
@@ -204,11 +204,12 @@ namespace ModernSlavery.BusinessDomain.Registration
             #region Create the basic organisation
             var organisation = new Organisation
             {
+                OrganisationName=organisationName,
                 SectorType = sectorType,
                 CompanyNumber = companyNumber,
                 DateOfCessation = dateOfCessation,
             };
-            _dataRepository.Insert(organisation);
+            DataRepository.Insert(organisation);
 
             //Set the organisation status
             organisation.SetStatus(status, userId);
@@ -227,14 +228,14 @@ namespace ModernSlavery.BusinessDomain.Registration
                         ReferenceValue = value,
                         Organisation = organisation
                     };
-
-                    _dataRepository.Insert(reference);
+                    DataRepository.Insert(reference);
                     organisation.OrganisationReferences.Add(reference);
                 }
             }
             #endregion
 
             #region Add the SIC codes
+            if (sicCodes == null) sicCodes = new SortedSet<int>();
             if (organisation.SectorType == SectorTypes.Public) sicCodes.Add(1);
 
             //Remove invalid SicCodes
@@ -242,7 +243,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             if (sicCodes.Count > 0)
             {
                 //TODO we should cache these SIC codes
-                var allSicCodes = _dataRepository.GetAll<SicCode>().Select(s => s.SicCodeId)
+                var allSicCodes = DataRepository.GetAll<SicCode>().Select(s => s.SicCodeId)
                     .ToSortedSet();
                 badSicCodes = sicCodes.Except(allSicCodes).ToSortedSet();
                 sicCodes = sicCodes.Except(badSicCodes).ToSortedSet();
@@ -254,7 +255,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                     {
                         var sicCode = new OrganisationSicCode
                         { Organisation = organisation, SicCodeId = newSicCodeId, Source = source };
-                        _dataRepository.Insert(sicCode);
+                        DataRepository.Insert(sicCode);
                         organisation.OrganisationSicCodes.Add(sicCode);
                     }
                 }
@@ -279,16 +280,15 @@ namespace ModernSlavery.BusinessDomain.Registration
             address.IsUkAddress = addressModel.IsUkAddress;
             address.Source = source;
             address.SetStatus(addressStatus, userId);
-            _dataRepository.Insert(address);
+            DataRepository.Insert(address);
             #endregion
-            
+
             return organisation;
         }
 
-        public async Task SaveOrganisationAsync(IDataRepository dataRepository, Organisation organisation)
+        public async Task SaveOrganisationAsync(Organisation organisation)
         {
             #region Check the parameters
-            if (dataRepository==null) throw new ArgumentNullException(nameof(dataRepository));
             if (organisation == null) throw new ArgumentNullException(nameof(organisation));
             #endregion
 
@@ -296,7 +296,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             var isnew = organisation.OrganisationId == 0;
 
             //Save the organisation to ensure it has an OrganisationId
-            await dataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync();
 
             //Ensure the organisation has an organisation reference
             if (string.IsNullOrWhiteSpace(organisation.OrganisationReference))
@@ -306,7 +306,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             if (isnew)
             {
                 await organisation.SetPresumedScopesAsync(_reportingDeadlineHelper.GetReportingDeadlines(organisation.SectorType));
-                await dataRepository.SaveChangesAsync();
+                await DataRepository.SaveChangesAsync();
             }
 
             //Set the latest scope
@@ -321,7 +321,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             //Set the latest registration
             organisation.FixLatestRegistration();
 
-            await dataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync();
         }
 
         #region Organisation
@@ -383,7 +383,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 var code = sicCode.ToInt64();
                 if (code < 1) continue;
 
-                var sic = _dataRepository.GetAll<SicCode>().FirstOrDefault(s => s.SicCodeId == code);
+                var sic = DataRepository.GetAll<SicCode>().FirstOrDefault(s => s.SicCodeId == code);
                 var sector = sic == null ? "Other" : sic.SicSection.Description;
                 var sics = results.ContainsKey(sector) ? results[sector] : new HashSet<long>();
                 sics.Add(code);
@@ -433,7 +433,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public virtual Organisation GetOrganisationById(long organisationId)
         {
-            return _dataRepository.Get<Organisation>(organisationId);
+            return DataRepository.Get<Organisation>(organisationId);
         }
 
         public IEnumerable<Statement> GetOrganisationRecentStatements(Organisation organisation, int recentCount)
@@ -602,7 +602,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public virtual async Task<Organisation> GetOrganisationByOrganisationReferenceAsync(string organisationReference)
         {
-            return await _dataRepository.FirstOrDefaultAsync<Organisation>(o =>
+            return await DataRepository.FirstOrDefaultAsync<Organisation>(o =>
                 o.OrganisationReference.ToUpper() == organisationReference.ToUpper());
         }
 
@@ -610,7 +610,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             string organisationReference,
             string securityCode)
         {
-            return await _dataRepository.FirstOrDefaultAsync<Organisation>(o =>
+            return await DataRepository.FirstOrDefaultAsync<Organisation>(o =>
                 o.OrganisationReference.ToUpper() == organisationReference.ToUpper() && o.SecurityCode == securityCode);
         }
 
@@ -736,50 +736,50 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public async Task FixLatestAddressesAsync()
         {
-            var organisations = _dataRepository.GetAll<Organisation>().Where(o => o.LatestAddress == null && o.OrganisationAddresses.Any(a => a.Status == AddressStatuses.Active)).ToList();
+            var organisations = DataRepository.GetAll<Organisation>().Where(o => o.LatestAddress == null && o.OrganisationAddresses.Any(a => a.Status == AddressStatuses.Active)).ToList();
             organisations.SelectMany(o => o.OrganisationAddresses).ToList();
 
             Parallel.ForEach(organisations, organisation =>
             {
                 organisation.FixLatestAddress();
             });
-            await _dataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync();
         }
 
         public async Task FixLatestScopesAsync()
         {
-            var organisations = _dataRepository.GetAll<Organisation>().Where(o => o.LatestScope == null && o.OrganisationScopes.Any(a => a.Status == ScopeRowStatuses.Active)).ToList();
+            var organisations = DataRepository.GetAll<Organisation>().Where(o => o.LatestScope == null && o.OrganisationScopes.Any(a => a.Status == ScopeRowStatuses.Active)).ToList();
             organisations.SelectMany(o => o.OrganisationScopes).ToList();
 
             Parallel.ForEach(organisations, organisation =>
             {
                 organisation.FixLatestScope();
             });
-            await _dataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync();
         }
 
         public async Task FixLatestStatementsAsync()
         {
-            var organisations = _dataRepository.GetAll<Organisation>().Where(o => o.LatestStatement == null && o.Statements.Any(a => a.Status == StatementStatuses.Submitted)).ToList();
+            var organisations = DataRepository.GetAll<Organisation>().Where(o => o.LatestStatement == null && o.Statements.Any(a => a.Status == StatementStatuses.Submitted)).ToList();
             organisations.SelectMany(o => o.Statements).ToList();
 
             Parallel.ForEach(organisations, organisation =>
             {
                 organisation.FixLatestStatement();
             });
-            await _dataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync();
         }
 
         public async Task FixLatestRegistrationsAsync()
         {
-            var organisations = _dataRepository.GetAll<Organisation>().Where(o => o.LatestRegistration == null && o.UserOrganisations.Any(a => a.PINConfirmedDate != null)).ToList();
+            var organisations = DataRepository.GetAll<Organisation>().Where(o => o.LatestRegistration == null && o.UserOrganisations.Any(a => a.PINConfirmedDate != null)).ToList();
             organisations.SelectMany(o => o.UserOrganisations).ToList();
 
             Parallel.ForEach(organisations, organisation =>
             {
                 organisation.FixLatestRegistration();
             });
-            await _dataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync();
         }
         #endregion
 

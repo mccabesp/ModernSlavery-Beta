@@ -12,10 +12,6 @@
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ReturnToReviewPage);
-            @Html.HiddenFor(m => m.Submitted);
-            @Html.HiddenFor(m => m.OrganisationName);
-            @Html.HiddenFor(m => m.SubmissionDeadline);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle

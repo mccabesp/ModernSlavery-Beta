@@ -30,11 +30,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.ApprovedYear, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Year));
 
             CreateMap<YourStatementPageViewModel, StatementModel>(MemberList.Source)
+                .ForMember(s => s.OrganisationId, opt => opt.Ignore())
                 .ForMember(d => d.StatementStartDate, opt => { opt.MapFrom(s => s.StatementStartDate); })
                 .ForMember(d => d.StatementEndDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.StatementEndDate); })
                 .ForMember(d => d.ApprovedDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.ApprovedDate); })
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
-                .ForMember(d => d.GroupSubmission, opt => opt.Ignore())
                 .ForSourceMember(s => s.StatementStartYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.StatementStartMonth, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.StatementStartDay, opt => opt.DoNotValidate())

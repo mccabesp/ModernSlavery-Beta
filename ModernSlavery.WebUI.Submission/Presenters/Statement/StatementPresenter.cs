@@ -332,8 +332,8 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 if (groupSearchViewModel.GroupResults.ResultsPage == null) throw new ArgumentNullException(nameof(groupSearchViewModel.GroupResults.ResultsPage));
                 if (addIndex<0 || addIndex > groupSearchViewModel.GroupResults.ResultsPage.Results.Count-1) throw new ArgumentOutOfRangeException(nameof(addIndex), $"Index is outside bounds of search results");
                 var groupOrganisation = groupSearchViewModel.GroupResults.ResultsPage.Results[addIndex];
-                newStatementOrganisationViewModel.Address = groupOrganisation;
-                newStatementOrganisationViewModel.OrganisationId = groupOrganisation.OrganisationId>0 ? groupOrganisation.OrganisationId : default;
+                newStatementOrganisationViewModel.Address = groupOrganisation.ToAddressModel();
+                newStatementOrganisationViewModel.OrganisationId = groupOrganisation.OrganisationId>0 ? (int?)groupOrganisation.OrganisationId : default;
                 newStatementOrganisationViewModel.OrganisationName = groupOrganisation.OrganisationName;
                 newStatementOrganisationViewModel.CompanyNumber = groupOrganisation.CompanyNumber;
                 newStatementOrganisationViewModel.DateOfCessation = groupOrganisation.DateOfCessation;

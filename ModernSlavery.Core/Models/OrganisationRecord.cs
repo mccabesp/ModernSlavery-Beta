@@ -53,6 +53,21 @@ namespace ModernSlavery.Core.Models
             return emailDomains.Count > 0 && emailAddress.LikeAny(emailDomains);
         }
 
+        public AddressModel ToAddressModel()
+        {
+            return new AddressModel
+            {
+                Address1 = Address1,
+                Address2 = Address2,
+                Address3 = Address3,
+                City = City,
+                County = County,
+                Country = County,
+                PostCode = PostCode,
+                PoBox = PoBox,
+                IsUkAddress = IsUkAddress
+            };
+        }
 
     }
 }

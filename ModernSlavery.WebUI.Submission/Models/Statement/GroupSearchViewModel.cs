@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -19,13 +20,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<GroupSearchViewModel, StatementModel>(MemberList.Source)
                 .IncludeBase<GroupOrganisationsViewModel, StatementModel>()
-                .ForMember(d => d.GroupSubmission, opt => opt.Ignore())
                 .ForSourceMember(d => d.GroupResults, opt => opt.DoNotValidate())
                 .ForSourceMember(d => d.GroupReviewUrl, opt => opt.DoNotValidate());
 
             CreateMap<StatementModel, GroupSearchViewModel>()
-                .IncludeBase<StatementModel, GroupOrganisationsViewModel>()
-                .ForMember(d => d.GroupSubmission, opt => opt.Ignore());
+                .IncludeBase<StatementModel, GroupOrganisationsViewModel>();
         }
     }
 
