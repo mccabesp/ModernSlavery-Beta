@@ -4,7 +4,10 @@
     ViewBag.Title = "Scope already known - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
 }
-<a class="govuk-back-link" href="@Url.Action("OutOfScope")">Back</a>
+
+@section BeforeMain {
+    <a class="govuk-back-link" href="@Url.Action("OutOfScope")">Back</a>
+}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate = "" }))
@@ -31,6 +34,6 @@
                     To submit a modern slavery statement to our service, <a href="/sign-up">create an account</a> and register your organisation.
                 </div>
             }
-            }
-        </div>
+        }
+    </div>
 </div>

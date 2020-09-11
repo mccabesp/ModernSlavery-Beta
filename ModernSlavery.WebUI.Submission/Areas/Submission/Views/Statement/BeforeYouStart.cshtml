@@ -2,7 +2,10 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model BeforeYouStartViewModel
-<a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+
+@section BeforeMain {
+    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">

@@ -161,26 +161,28 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             return await QueueEmailAsync(geoOrganisationRegistrationRequest);
         }
 
-        public async Task<bool> SendRegistrationApprovedAsync(string returnUrl, string emailAddress, bool test = false)
+        public async Task<bool> SendRegistrationApprovedAsync(string organisationName, string returnUrl, string emailAddress, bool test = false)
         {
             var organisationRegistrationApproved = new OrganisationRegistrationApprovedTemplate
             {
                 RecipientEmailAddress = emailAddress,
                 Test = emailAddress.StartsWithI(SharedOptions.TestPrefix),
                 Simulate = emailAddress.StartsWithI(SharedOptions.TestPrefix),
+                OrganisationName = organisationName,
                 Url = returnUrl
             };
 
             return await QueueEmailAsync(organisationRegistrationApproved);
         }
 
-        public async Task<bool> SendRegistrationDeclinedAsync(string emailAddress, string reason)
+        public async Task<bool> SendRegistrationDeclinedAsync(string organisationName, string emailAddress, string reason)
         {
             var organisationRegistrationDeclined = new OrganisationRegistrationDeclinedTemplate
             {
                 RecipientEmailAddress = emailAddress,
                 Test = emailAddress.StartsWithI(SharedOptions.TestPrefix),
                 Simulate = emailAddress.StartsWithI(SharedOptions.TestPrefix),
+                OrganisationName = organisationName,
                 Reason = reason
             };
 
