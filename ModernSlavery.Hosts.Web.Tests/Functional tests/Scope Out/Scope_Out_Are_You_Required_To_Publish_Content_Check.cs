@@ -16,28 +16,33 @@ using ModernSlavery.Core.Entities;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("Awaiting Scope Merge")]
+    [TestFixture]
 
     public class Scope_Out_Are_You_Required_To_Publish_Content_Check : UITest
     {
         private string EmployerReference;
 
+        
+
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
-            Goto(ScopeConstants.ScopeUrl);
+            Goto(TestData.ScopeUrl);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
             await Task.CompletedTask;
         }
 
-        [Test, Order(24)]
+        
+
+
+        [Test, Order(28)]
         public async Task CheckPageContent()
         {
             Expect("We sent you a letter telling you we think your organisation is legally required to publish an annual modern slavery statement on your website. If this is not correct please let us know so we can update our records.");
 
-            Expect("Enter the employer reference and security code provided in the letter we sent you. We will then ask you to confirm your organisation is not required to publish a modern slavery statement and give a reason.");
+            Expect("Enter the organisation reference and security code provided in the letter we sent you. We will then ask you to confirm your organisation is not required to publish a modern slavery statement and give a reason.");
 
-            ExpectField("Employer reference");
+            ExpectField("Organisation reference");
 
             ExpectField("Security code");
 
