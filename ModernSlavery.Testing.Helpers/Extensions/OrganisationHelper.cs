@@ -77,6 +77,17 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             return userOrganisation;
         }
 
+
+        /// <summary>
+        /// Shim for saving when needed, should prob refactor this out.
+        /// </summary>
+        /// <returns></returns>
+        public static async Task SaveAsync(this IHost host)
+        {
+            await host.Services.GetService<Core.Interfaces.IDataRepository>().SaveChangesAsync();
+        }
+
+
         /// <summary>
         /// Returns an instance of the ISecurityCodeBusinessLogic domain interface
         /// </summary>
