@@ -1,13 +1,32 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
-
-    public class Sumbission_Submit_Report_Mandatory_Fields_Only : Submission_Complete_Mandatory_Sections
+    public class Sumbission_Submit_Report_Mandatory_Fields_Only : CreateAccount
     {
+        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
+
+        string Pin;
+        public Sumbission_Submit_Report_Mandatory_Fields_Only() : base(_firstname, _lastname, _title, _email, _password)
+        {
+
+
+        }
+
+        [Test, Order(29)]
+        public async Task RegisterOrgAndSetScope()
+        {
+
+            await OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, TestData.OrgName, _firstname, _lastname);
+
+
+
+            await Task.CompletedTask;
+        }
         [Test, Order(50)]
         public async Task NavigateToSubmissionPage()
         {
