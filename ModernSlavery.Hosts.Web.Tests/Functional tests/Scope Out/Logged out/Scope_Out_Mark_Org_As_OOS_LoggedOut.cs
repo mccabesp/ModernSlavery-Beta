@@ -125,7 +125,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task CheckDetails()
         {
             RightOfText("Organisation Name").Expect(TestData.OrgName);
-            RightOfText("Organisatin Reference").Expect(TestData.Organisation.OrganisationReference);
+            RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
 

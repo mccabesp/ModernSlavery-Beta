@@ -16,16 +16,23 @@ using ModernSlavery.Core.Entities;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("Awaiting Scope Merge")]
+    [TestFixture]
 
     public class Scope_Out_Confirm_Details_Back_Button_Check : UITest
     {
         protected string EmployerReference;
 
         [Test, Order(20)]
-        public async Task AddOrgToDb()
+        public async Task SetSecurityCode()
         {
-            //EmployerReference =  ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(TestData.OrgName, "ABCD1234");
+            var result = Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+
+            if (result.Failed)
+            {
+                throw new Exception("Unable to set security code");
+            }
+
+            await Testing.Helpers.Extensions.OrganisationHelper.SaveAsync(TestRunSetup.TestWebHost);
 
             await Task.CompletedTask;
         }
@@ -33,7 +40,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
-            Goto(ScopeConstants.ScopeUrl);
+            Goto(TestData.ScopeUrl);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
             await Task.CompletedTask;
         }
@@ -41,8 +48,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Employer Reference").To(EmployerReference);
-            Set("Security Code").To("ABCD1234");
+            Set("Organisation Reference").To(TestData.Organisation.OrganisationReference);
+            Set("Security Code").To(TestData.Organisation.SecurityCode);
             await Task.CompletedTask;
         }
 

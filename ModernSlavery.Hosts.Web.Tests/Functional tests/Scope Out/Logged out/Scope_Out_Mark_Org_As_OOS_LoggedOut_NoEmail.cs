@@ -16,7 +16,7 @@ using ModernSlavery.Core.Entities;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("Awaiting Scope Merge")]
+    [TestFixture]
 
     public class Scope_Out_Mark_Org_As_OOS_LoggedOut_NoEmail : UITest
     {
@@ -121,25 +121,23 @@ namespace ModernSlavery.Hosts.Web.Tests
             await Task.CompletedTask;
         }
 
-        [Test, Order(38)]
+        [Test, Order(40)]
         public async Task CheckDetails()
         {
             RightOfText("Organisation Name").Expect(TestData.OrgName);
-            RightOfText("Organisatin Reference").Expect(TestData.Organisation.OrganisationReference);
+            RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
 
             RightOfText("Reason your organisation is not required to publish a modern slavery statement on your website").Expect("Here are the reasons why.");
-            RightOfText("Contact name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last);
-            //todo await helper implementation for address logic
-            RightOfText("Job title").Expect("Create_Account.roger_job_title");
-            RightOfText("Contact email").Expect(Create_Account.roger_email);
+            
+
 
 
             await Task.CompletedTask;
         }
 
-        [Test, Order(38)]
+        [Test, Order(42)]
         public async Task ConfirmAndSendLeadsToConfirmationPage()
         {
             Click("Confirm and send");
@@ -148,19 +146,15 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
 
-        [Test, Order(42)]
+        [Test, Order(44)]
         public async Task CompletePageContentCheck()
         {
-            Click("Confirm and send");
-            ExpectHeader("Declaration complete");
 
-            Expect("You have declared your organisation is not required to publish a modern slavery statement");
+            Expect("You have declared your organisation is not required to publish a modern slavery statement on your website");
 
-            //shouldn't see we have sent an email text, only we will contact
-            Expect("We will contact you if we need more information.");
 
-            ExpectHeader("Produced a statement voluntarily?");
-            Expect("If you are not legally required to publish a modern slavery statement, but have produced one voluntarily, you can still submit it to our service.");
+            ExpectHeader("Publishing a statement voluntarily");
+            Expect("If you are not legally required to publish a modern slavery statement on your website, you can still create a statement voluntarily and submit it to our service.");
             Expect(What.Contains, "To submit a modern slavery statement to our service, ");
             ExpectLink(That.Contains, "create an account");
             Expect(What.Contains, " and register your organisation.");
