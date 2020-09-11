@@ -23,9 +23,16 @@ namespace ModernSlavery.Hosts.Web.Tests
        protected string EmployerReference;
 
         [Test, Order(20)]
-        public async Task AddOrgToDb()
+        public async Task SetSecurityCode()
         {
-            //EmployerReference =  ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(TestData.OrgName, "ABCD1234");
+            var result = Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+
+            if (result.Failed)
+            {
+                throw new Exception("Unable to set security code");
+            }
+
+            await Testing.Helpers.Extensions.OrganisationHelper.SaveAsync(TestRunSetup.TestWebHost);
 
             await Task.CompletedTask;
         }
@@ -33,7 +40,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
-            Goto(ScopeConstants.ScopeUrl);
+            Goto(TestData.ScopeUrl);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
             await Task.CompletedTask;
         }
@@ -41,8 +48,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Employer Reference").To(EmployerReference);
-            Set("Security Code").To("ABCD1234");
+            Set("Organisation Reference").To(TestData.Organisation.OrganisationReference);
+            Set("Security Code").To(TestData.Organisation.SecurityCode);
             await Task.CompletedTask;
         }
 
@@ -57,10 +64,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(28)]
         public async Task VerifyOrgDetails()
         {
-            RightOfText("Name").Expect(TestData.OrgName);
-            RightOfText("Reference").Expect(EmployerReference);
+            RightOfText("Organisation Name").Expect(TestData.OrgName);
+            RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference);
             //todo await helper implementation for address logic
-            RightOfText("Registered address").Expect("");
+            //RightOfText("Registered address").Expect("");
             await Task.CompletedTask;
         }
 
@@ -90,7 +97,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(34)]
         public async Task EnterOtherDetails()
         {
-            Set("Other").To("Here are the reasons why.");
+            Set("OtherReason").To("Here are the reasons why.");
 
             await Task.CompletedTask;
         }
@@ -98,10 +105,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(36)]
         public async Task EnterContactDetails()
         {
-            Set("First name").To(Create_Account.roger_first);
-            Set("Last name").To(Create_Account.roger_last);
-            Set("Job title").To(Create_Account.roger_job_title);
-            Set("Email address").To(Create_Account.roger_email);
+            BelowLabel("First name").Set(The.Top).To(Create_Account.roger_first);
+            BelowLabel("Last name").Set(The.Top).To(Create_Account.roger_last);
+            BelowLabel("Job title").Set(The.Top).To(Create_Account.roger_job_title);
+            BelowLabel("Email address").Set(The.Top).To(Create_Account.roger_email);
 
             await Task.CompletedTask;
         }
@@ -115,17 +122,15 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
         [Test, Order(38)]
-        public async Task CheckDetails_DontAskForEmail()
+        public async Task CheckDetails()
         {
-            ExpectHeader("Organisation details");
-            RightOfText("Name").Expect(TestData.OrgName);
-            RightOfText("Reference").Expect(EmployerReference);
+            RightOfText("Organisation Name").Expect(TestData.OrgName);
+            RightOfText("Organisatin Reference").Expect(TestData.Organisation.OrganisationReference);
             //todo await helper implementation for address logic
-            RightOfText("Registered address").Expect("");
+            //RightOfText("Registered address").Expect("");
 
-            ExpectHeader("Declaration");
-            RightOfText("Reason your organisation is not required to publish a modern slavery statement on your website").Expect("Other");
-            RightOfText("Contact name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last) ;
+            RightOfText("Reason your organisation is not required to publish a modern slavery statement on your website").Expect("Here are the reasons why.");
+            RightOfText("Contact name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last);
             //todo await helper implementation for address logic
             RightOfText("Job title").Expect("Create_Account.roger_job_title");
             RightOfText("Contact email").Expect(Create_Account.roger_email);
@@ -141,6 +146,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Declaration complete");
             await Task.CompletedTask;
         }
+
 
         [Test, Order(42)]
         public async Task CompletePageContentCheck()

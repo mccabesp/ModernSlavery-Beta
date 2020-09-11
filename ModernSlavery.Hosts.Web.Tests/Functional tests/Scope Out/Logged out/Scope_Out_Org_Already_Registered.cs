@@ -16,23 +16,41 @@ using ModernSlavery.Core.Entities;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("Awaiting Scope Merge")]
+    [TestFixture]
 
-    public class Scope_Out_Org_Already_Registered : UITest
+    public class Scope_Out_Org_Already_Registered : CreateAccount
     {
-        private string EmployerReference;
+        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
+
+        string Pin;
+        public Scope_Out_Org_Already_Registered() : base(_firstname, _lastname, _title, _email, _password)
+        {
+
+
+        }
 
         [Test, Order(20)]
-        public async Task AddOrgToDb()
+        public async Task AddSecurityCode()
         {
-            //EmployerReference = ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(TestData.OrgName, "ABCD1234");
-            //ModernSlavery.Testing.Helpers.Testing_Helpers.RegisterOrganisation("", TestData.OrgName);
+           await ModernSlavery.Testing.Helpers.Extensions.OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, TestData.OrgName, _firstname, _lastname);
+
+            var result = Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+
+            if (result.Failed)
+            {
+                throw new Exception("Unable to set security code");
+            }
+
+            await Testing.Helpers.Extensions.OrganisationHelper.SaveAsync(TestRunSetup.TestWebHost);
+
             await Task.CompletedTask;
         }
 
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
+            Click("Sign out");
+            ExpectHeader("Signed out");
             Goto(ScopeConstants.ScopeUrl);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
             await Task.CompletedTask;
@@ -41,15 +59,25 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Employer Reference").To(EmployerReference);
-            Set("Security Code").To("ABCD1234");
+            Set("Organisation Reference").To(TestData.Organisation.OrganisationReference);
+            Set("Security Code").To(TestData.Organisation.SecurityCode);
+            await Task.CompletedTask;
+        }
+
+        [Test, Order(25)]
+        public async Task ConfirmDetails()
+        {
+            Click("Continue");
+            ExpectHeader("Confirm your organisation’s details");
+            RightOfText("Organisation Name").Expect(TestData.OrgName);
+            RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference);
             await Task.CompletedTask;
         }
 
         [Test, Order(26)]
         public async Task EnteringAlreadyRegisteredOrgDetailsLeadsToAlreadyRegisteredPage()
         {
-            Click("Continue");
+            Click("Confirm and continue");
             ExpectHeader("Your organisation has already been registered on our service");
 
             await Task.CompletedTask;
@@ -59,7 +87,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task CheckContentOfAlreadyReigsteredPage()
         {
             Try(
-                 () => Expect(What.Contains, "Someone has already registered this organisation on our service.You’ll need to"),
+                 () => Expect(What.Contains, "Someone has already registered this organisation on our service. You’ll need to "),
             () => { ExpectLink(That.Contains, "sign in or create an account"); },
             () => { Expect(What.Contains, "if you want to:"); },
             () => { Expect("check the organisation’s status, and see whether our records show it’s required or not required to publish a modern slavery statement"); },
@@ -68,13 +96,6 @@ namespace ModernSlavery.Hosts.Web.Tests
             await Task.CompletedTask;
         }
 
-        [Test, Order(26)]
-        public async Task SignInOrCreateAccoutnLinkLeadsToSignInPage()
-        {
-            Click("Sign in or create an account");
-            ExpectHeader("Sign in or create an account");
-
-            await Task.CompletedTask;
-        }
+        
     }
 }

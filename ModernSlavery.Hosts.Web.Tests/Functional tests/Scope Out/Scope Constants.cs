@@ -9,7 +9,7 @@ namespace ModernSlavery.Hosts.Web.Tests
     class ScopeConstants
     {
         //todo enter scope url
-        public const string ScopeUrl = "";
+        public const string ScopeUrl = "/scope/out";
        
     }
 }
