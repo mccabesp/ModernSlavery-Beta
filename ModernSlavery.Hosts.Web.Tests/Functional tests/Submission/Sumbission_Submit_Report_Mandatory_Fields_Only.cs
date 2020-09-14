@@ -20,13 +20,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(29)]
         public async Task RegisterOrgAndSetScope()
         {
-
-            await OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, TestData.OrgName, _firstname, _lastname);
-
-
-
-            await Task.CompletedTask;
+            await OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, TestData.OrgName, UniqueEmail);
         }
+
         [Test, Order(50)]
         public async Task NavigateToSubmissionPage()
         {

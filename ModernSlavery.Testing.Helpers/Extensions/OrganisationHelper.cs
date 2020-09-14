@@ -36,20 +36,30 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         /// </summary>
         /// <param name="host">The webhost</param>
         /// <param name="organisationName">The name of the organisation</param>
-        /// <param name="firstName">The first name of the user</param>
-        /// <param name="lastName">The last name of the user</param>
+        /// <param name="email">The email of the user</param>
         /// <param name="pin">If empty the registration is activated. Otherwise unactivated and pin set to this value</param>
         /// <param name="pinSendDate">When pin not null this value marks when the pin was sent - set it to an old value to expire the pin</param>
         /// <returns></returns>
-        public static async Task<UserOrganisation> RegisterUserOrganisationAsync(this IHost host, string organisationName, string firstName, string lastName, string pin=null, DateTime? pinSendDate=null)
+        public static async Task<UserOrganisation> RegisterUserOrganisationAsync(this IHost host, string organisationName, string email, string pin = null, DateTime? pinSendDate = null)
         {
+            // guards against misuse
+            if (host == null)
+                throw new ArgumentNullException(nameof(host));
+            if (string.IsNullOrEmpty(organisationName))
+                throw new ArgumentNullException(nameof(organisationName), "Organisation name can not be null or empty");
+            if (string.IsNullOrEmpty(email))
+                throw new ArgumentNullException(nameof(email), "Email can not be null or empty");
+
             var dataRepository = host.GetDataRepository();
-            var organisation = dataRepository.GetAll<Organisation>().SingleOrDefault(o => o.OrganisationName == organisationName);
+            Organisation organisation = dataRepository.GetAll<Organisation>().SingleOrDefault(o => o.OrganisationName == organisationName);
+            if (organisation == null)
+                throw new ArgumentException(nameof(organisationName), "No corresponding organisation matches the supplied organisation name");
             var organisationId = organisation.OrganisationId;
 
-            var user = dataRepository.GetAll<User>().SingleOrDefault(u => u.Firstname == firstName && u.Lastname == lastName);
+            var user = dataRepository.GetAll<User>().SingleOrDefault(u => u.EmailAddress == email);
+            if (user == null)
+                throw new ArgumentException(nameof(email), "No corresponding user matches the supplied email");
             var userId = user.UserId;
-            var email = user.EmailAddress.ToLower();
 
             var userOrganisation = dataRepository.Get<UserOrganisation>(userId, organisationId);
             if (userOrganisation == null)
@@ -76,7 +86,6 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
             return userOrganisation;
         }
-
 
         /// <summary>
         /// Shim for saving when needed, should prob refactor this out.
