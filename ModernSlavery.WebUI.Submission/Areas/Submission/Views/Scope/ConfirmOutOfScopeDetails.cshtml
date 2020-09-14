@@ -26,8 +26,8 @@
 
             @await Html.PartialAsync("Parts/OrganisationDetailsPart", Model)
 
-            <div class="govuk-inset-text">
-                If this information is not correct, please email <a href="@mailto" target="_blank">@sharedOptions.MsuReportingEmail</a>
+            <div class="govuk-inset-text govuk-!-margin-bottom-9">
+                If this information is not correct, please email <a class="govuk-link" href="@mailto" target="_blank">@sharedOptions.MsuReportingEmail</a>
             </div>
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" value="Confirm and continue">
