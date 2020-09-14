@@ -22,9 +22,11 @@
 
             <div class="change-header">
                 <h2 class="govuk-heading-m">Declaration</h2>
-                <a class="govuk-link" href="@Url.Action("EnterOutOfScopeAnswers")">
-                    Change
-                </a>
+                <span class="govuk-body">
+                    <a class="govuk-link" href="@Url.Action("EnterOutOfScopeAnswers")">
+                        Change
+                    </a>
+                </span>
             </div>
 
             @await Html.PartialAsync("Parts/AnswersPart", Model)
