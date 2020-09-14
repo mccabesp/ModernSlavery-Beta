@@ -12,10 +12,6 @@
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ReturnToReviewPage);
-            @Html.HiddenFor(m => m.Submitted);
-            @Html.HiddenFor(m => m.OrganisationName);
-            @Html.HiddenFor(m => m.SubmissionDeadline);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
@@ -87,9 +83,9 @@
                     Confirm and continue
                 </button>
 
-                <a href="@Model.BackUrl" class="govuk-button govuk-button--secondary" data-module="govuk-button">
-                    Select more organisations
-                </a>
+            <a href="@Model.GroupSearchUrl" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                Select more organisations
+            </a>
 
                 <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
                     Cancel

@@ -12,25 +12,23 @@
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ReturnToReviewPage);
-            @Html.HiddenFor(m => m.Submitted);
-            @Html.HiddenFor(m => m.OrganisationName);
-            @Html.HiddenFor(m => m.SubmissionDeadline);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
             </h1>
 
-            <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
-                            @(Model.OrganisationName) <a class="govuk-link" href="@Model.GroupReviewUrl">group statement</a> (@(Model.ReportingDeadlineYear-1) to @(Model.ReportingDeadlineYear))
-                        </h2>
-                    </legend>
-                </fieldset>
-            </div>
+            <partial name="GroupSearch/_SearchHeader" model="Model" />
 
+            <partial name="GroupSearch/_SearchKeywords" model="Model" />
+
+            if (!Model.GroupResults.ShowResults)
+            {
+                <partial name="GroupSearch/_NewOrganisation" model="Model" />
+            }
+            else if (Model.GroupResults?.ResultsPage != null && !string.IsNullOrWhiteSpace(Model.GroupResults.SearchKeywords))
+            {
+                <partial name="GroupSearch/_SearchResults" model="Model" />
+            }
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Continue

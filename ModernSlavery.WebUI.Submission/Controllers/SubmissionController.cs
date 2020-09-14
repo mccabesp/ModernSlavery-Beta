@@ -84,6 +84,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("~/manage-organisation/{organisationIdentifier}")]
         public async Task<IActionResult> ManageOrganisation(string organisationIdentifier)
         {
+            //Clear all the stashes
+            ClearAllStashes();
+
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
@@ -97,9 +100,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (userOrg == null)
                 return new HttpForbiddenResult(
                     $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
-
-            // clear the stash
-            ClearStash();
 
             //Get the current snapshot date
             var currentReportingDeadline = SharedBusinessLogic.GetReportingDeadline(userOrg.Organisation.SectorType);

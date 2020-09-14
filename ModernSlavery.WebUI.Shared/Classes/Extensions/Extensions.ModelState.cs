@@ -56,7 +56,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                     propertyInfo?.GetCustomAttributes(typeof(DisplayAttribute), false).FirstOrDefault() as
                         DisplayAttribute;
                 var displayName = displayNameAttribute != null ? displayNameAttribute.DisplayName :
-                    displayAttribute != null ? displayAttribute.Name : propertyName;
+                    displayAttribute != null ? displayAttribute.Name : propertyName.AfterLast(".");
 
                 foreach (var error in modelState.Value.Errors)
                 {

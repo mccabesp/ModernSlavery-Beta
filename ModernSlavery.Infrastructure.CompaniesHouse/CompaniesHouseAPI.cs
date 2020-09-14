@@ -19,19 +19,18 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
 {
     public class CompaniesHouseAPI : ICompaniesHouseAPI
     {
-        private readonly string _apiKey;
-
         private readonly CompaniesHouseOptions _companiesHouseOptions;
         private readonly SharedOptions _sharedOptions;
         private readonly HttpClient _httpClient;
-
+        private readonly string[] _apiKeys;
 
         public CompaniesHouseAPI(CompaniesHouseOptions companiesHouseOptions, SharedOptions sharedOptions, HttpClient httpClient)
         {
             _companiesHouseOptions = companiesHouseOptions ?? throw new ArgumentNullException("You must provide the companies house options",nameof(CompaniesHouseOptions));
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(sharedOptions));
-            _apiKey = _companiesHouseOptions.ApiKey;
+            _apiKeys = _companiesHouseOptions.GetApiKeys();
+            if (_apiKeys.Length==0)throw new ArgumentNullException(nameof(companiesHouseOptions.ApiKey));
         }
 
         public async Task<PagedResult<OrganisationRecord>> SearchOrganisationsAsync(string searchText, int page, int pageSize,
@@ -64,6 +63,8 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                 organisationsPage.Results.Add(organisation);
                 return organisationsPage;
             }
+
+            SetApiKey();
 
             //Get the first page of results and the total records, number of pages, and page size
             var tasks = new List<Task<PagedResult<OrganisationRecord>>>();
@@ -110,6 +111,13 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             return codes.ToDelimitedString();
         }
 
+        //Sets the api key to the next random value
+        private void SetApiKey()
+        {
+            var apiKey = _apiKeys[Numeric.Rand(0, _apiKeys.Length - 1)];
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",Convert.ToBase64String(Encoding.ASCII.GetBytes($"{apiKey}:")));
+        }
+
         public async Task<CompaniesHouseCompany> GetCompanyAsync(string companyNumber)
         {
             if (companyNumber.IsNumber()) companyNumber = companyNumber.PadLeft(8, '0');
@@ -118,6 +126,8 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             string json = null;
             try
             {
+                SetApiKey();
+
                 var response = await _httpClient.GetAsync($"/company/{companyNumber}");
                 // Migration to dotnet core work around return status codes until over haul of this API client
                 if (response.StatusCode != HttpStatusCode.OK) throw new HttpException(response.StatusCode);
@@ -242,13 +252,11 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             return json;
         }
 
-        public static void SetupHttpClient(HttpClient httpClient, string apiServer, string apiKey)
+        public static void SetupHttpClient(HttpClient httpClient, string apiServer)
         {
             httpClient.BaseAddress = new Uri(apiServer);
 
             httpClient.DefaultRequestHeaders.Clear();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                Convert.ToBase64String(Encoding.ASCII.GetBytes($"{apiKey}:")));
             httpClient.DefaultRequestHeaders.ConnectionClose = false;
             ServicePointManager.FindServicePoint(httpClient.BaseAddress).ConnectionLeaseTimeout = 60 * 1000;
         }
