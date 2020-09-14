@@ -11,6 +11,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
     public interface IOrganisationBusinessLogic
     {
+        IDataRepository DataRepository { get; }
+
         public delegate CustomResult<Organisation> ActionSecurityCodeDelegate(Organisation organisation,
             DateTime securityCodeExpiryDateTime);
 
@@ -120,5 +122,36 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         Task FixLatestScopesAsync();
         Task FixLatestStatementsAsync();
         Task FixLatestRegistrationsAsync();
+        /// <summary>
+        /// Save bad sic codes for an organisation to log file
+        /// </summary>
+        /// <param name="organisation">The organisation with the bad sic codes</param>
+        /// <param name="badSicCodes">The list of bad sic code ids</param>
+        /// <returns></returns>
+        Task LogBadSicCodesAsync(Organisation organisation, SortedSet<int> badSicCodes);
+
+        /// <summary>
+        /// Create a new (detached) organisation with address, SicCodes and statuses
+        /// </summary>
+        /// <param name="organisationName">The name of the organisation</param>
+        /// <param name="source">The source of the organisation (eg., CoHo, External, (user email) etc)</param>
+        /// <param name="sectorType">The sector type of the organisation (ie., Private or Public)</param>
+        /// <param name="addressModel">The address of the organisation</param>
+        /// <param name="addressStatus">The status of the address (ie., Active or Pending (default))</param>
+        /// <param name="status">The status of the organisation (ie., Active (default) or Pending)</param>
+        /// <param name="companyNumber">The company number of the organisation</param>
+        /// <param name="dateOfCessation">The date the company ceased trading</param>
+        /// <param name="references">A list of unique organisation references (eg., Charity number) </param>
+        /// <param name="sicCodes">A list of SIC code ids</param>
+        /// <param name="user">The user who created the organisation. If empty a userId of 0 (system) will be assumed</param>
+        /// <returns>The new detached organisation entity ready for saving</returns>
+        Organisation CreateOrganisation(string organisationName, string source, SectorTypes sectorType, OrganisationStatuses status, AddressModel addressModel, AddressStatuses addressStatus=AddressStatuses.Pending, string companyNumber = null, DateTime? dateOfCessation = null, Dictionary<string, string> references = null, SortedSet<int> sicCodes = null, long userId = -1);
+
+        /// <summary>
+        /// Save a new or existing organisation with OrganisationReference, presumed scopes, LatestScope, LatestAddress, LatestStatement, LatestRegistration
+        /// </summary>
+        /// <param name="organisation">The organisation to save</param>
+        /// <returns></returns>
+        Task SaveOrganisationAsync(Organisation organisation);
     }
 }

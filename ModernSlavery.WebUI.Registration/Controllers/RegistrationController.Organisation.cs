@@ -16,6 +16,7 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Models;
+using Newtonsoft.Json;
 
 namespace ModernSlavery.WebUI.Registration.Controllers
 {
@@ -1256,28 +1257,28 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             UserOrganisation userOrg = null;
             var authorised = false;
             var hasAddress = false;
-            OrganisationRecord organisation = null;
+            OrganisationRecord organisationRecord = null;
             var now = VirtualDateTime.Now;
             if (!model.ManualRegistration)
             {
-                organisation = model.GetManualOrganisation();
+                organisationRecord = model.GetManualOrganisation();
 
-                if (organisation != null)
+                if (organisationRecord != null)
                 {
                     authorised = model.ManualAuthorised;
-                    hasAddress = organisation.HasAnyAddress();
+                    hasAddress = organisationRecord.HasAnyAddress();
                 }
                 else
                 {
-                    organisation = model.GetSelectedOrganisation();
+                    organisationRecord = model.GetSelectedOrganisation();
                     authorised = model.SelectedAuthorised;
-                    if (organisation != null) hasAddress = organisation.HasAnyAddress();
+                    if (organisationRecord != null) hasAddress = organisationRecord.HasAnyAddress();
                 }
             }
 
-            var org = organisation == null || organisation.OrganisationId == 0
+            var org = organisationRecord == null || organisationRecord.OrganisationId == 0
                 ? null
-                : SharedBusinessLogic.DataRepository.Get<Organisation>(organisation.OrganisationId);
+                : _registrationService.OrganisationBusinessLogic.DataRepository.Get<Organisation>(organisationRecord.OrganisationId);
 
             #region Create a new organisation
 
@@ -1285,14 +1286,14 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (org == null)
             {
                 org = new Organisation();
-                org.SectorType = organisation == null ? model.SectorType.Value : organisation.SectorType;
-                org.CompanyNumber = organisation == null ? model.CompanyNumber : organisation.CompanyNumber;
-                org.DateOfCessation = organisation == null ? model.DateOfCessation : organisation.DateOfCessation;
+                org.SectorType = organisationRecord == null ? model.SectorType.Value : organisationRecord.SectorType;
+                org.CompanyNumber = organisationRecord == null ? model.CompanyNumber : organisationRecord.CompanyNumber;
+                org.DateOfCessation = organisationRecord == null ? model.DateOfCessation : organisationRecord.DateOfCessation;
                 org.Created = now;
                 org.Modified = now;
                 org.Status = OrganisationStatuses.New;
 
-                if (organisation == null)
+                if (organisationRecord == null)
                 {
                     OrganisationReference reference;
                     //Add the charity number
@@ -1304,7 +1305,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             ReferenceValue = model.CharityNumber,
                             Organisation = org
                         };
-                        SharedBusinessLogic.DataRepository.Insert(reference);
+                        _registrationService.OrganisationBusinessLogic.DataRepository.Insert(reference);
                         org.OrganisationReferences.Add(reference);
                     }
 
@@ -1317,7 +1318,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             ReferenceValue = model.MutualNumber,
                             Organisation = org
                         };
-                        SharedBusinessLogic.DataRepository.Insert(reference);
+                        _registrationService.OrganisationBusinessLogic.DataRepository.Insert(reference);
                         org.OrganisationReferences.Add(reference);
                     }
 
@@ -1330,7 +1331,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             ReferenceValue = model.OtherValue,
                             Organisation = org
                         };
-                        SharedBusinessLogic.DataRepository.Insert(reference);
+                        _registrationService.OrganisationBusinessLogic.DataRepository.Insert(reference);
                         org.OrganisationReferences.Add(reference);
                     }
                 }
@@ -1340,7 +1341,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         ? OrganisationStatuses.Active
                         : OrganisationStatuses.Pending,
                     OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId);
-                SharedBusinessLogic.DataRepository.Insert(org);
+
+                _registrationService.OrganisationBusinessLogic.DataRepository.Insert(org);
             }
 
             #endregion
@@ -1355,10 +1357,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 newName = model.OrganisationName;
                 newNameSource = model.NameSource;
             }
-            else if (organisation != null)
+            else if (organisationRecord != null)
             {
-                newName = organisation.OrganisationName;
-                newNameSource = organisation.NameSource;
+                newName = organisationRecord.OrganisationName;
+                newNameSource = organisationRecord.NameSource;
             }
 
             if (string.IsNullOrWhiteSpace(newName))
@@ -1379,7 +1381,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     org.OrganisationName = newName;
 
                     var orgName = new OrganisationName { Name = newName, Source = newNameSource };
-                    SharedBusinessLogic.DataRepository.Insert(orgName);
+                    _registrationService.OrganisationBusinessLogic.DataRepository.Insert(orgName);
                     org.OrganisationNames.Add(orgName);
                 }
             }
@@ -1396,10 +1398,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 newSicCodeIds = model.GetSicCodeIds();
                 newSicSource = model.SicSource;
             }
-            else if (organisation != null)
+            else if (organisationRecord != null)
             {
-                newSicCodeIds = organisation.GetSicCodes();
-                newSicSource = organisation.SicSource;
+                newSicCodeIds = organisationRecord.GetSicCodes();
+                newSicSource = organisationRecord.SicSource;
             }
 
             if (org.SectorType == SectorTypes.Public) newSicCodeIds.Add(1);
@@ -1408,7 +1410,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (newSicCodeIds.Any())
             {
                 //TODO we should cache these SIC codes
-                var allSicCodes = SharedBusinessLogic.DataRepository.GetAll<SicCode>().Select(s => s.SicCodeId)
+                var allSicCodes = _registrationService.OrganisationBusinessLogic.DataRepository.GetAll<SicCode>().Select(s => s.SicCodeId)
                     .ToSortedSet();
                 badSicCodes = newSicCodeIds.Except(allSicCodes).ToSortedSet();
                 newSicCodeIds = newSicCodeIds.Except(badSicCodes).ToSortedSet();
@@ -1432,7 +1434,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         {
                             var sicCode = new OrganisationSicCode
                             { Organisation = org, SicCodeId = newSicCodeId, Source = newSicSource };
-                            SharedBusinessLogic.DataRepository.Insert(sicCode);
+                            _registrationService.OrganisationBusinessLogic.DataRepository.Insert(sicCode);
                             org.OrganisationSicCodes.Add(sicCode);
                         }
                     }
@@ -1455,11 +1457,11 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 newAddressModel = model.GetAddressModel();
                 newAddressSource = model.AddressSource;
             }
-            else if (organisation != null)
+            else if (organisationRecord != null)
             {
-                newAddressModel = organisation.GetAddressModel();
+                newAddressModel = organisationRecord;
                 newAddressModel.IsUkAddress = model.IsUkAddress;
-                newAddressSource = organisation.AddressSource;
+                newAddressSource = organisationRecord.AddressSource;
             }
 
             if (newAddressModel == null || newAddressModel.IsEmpty())
@@ -1503,7 +1505,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 address.Source = newAddressSource;
                 address.SetStatus(AddressStatuses.Pending,
                     OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId);
-                SharedBusinessLogic.DataRepository.Insert(address);
+                _registrationService.OrganisationBusinessLogic.DataRepository.Insert(address);
             }
 
             //This line is to help diagnose object reference not found exception raised at this point 
@@ -1516,13 +1518,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             userOrg = org.OrganisationId == 0
                 ? null
-                : await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo =>
+                : await _registrationService.OrganisationBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo =>
                     uo.OrganisationId == org.OrganisationId && uo.UserId == VirtualUser.UserId);
 
             if (userOrg == null)
             {
                 userOrg = new UserOrganisation { User = VirtualUser, Organisation = org, Created = now };
-                SharedBusinessLogic.DataRepository.Insert(userOrg);
+                _registrationService.OrganisationBusinessLogic.DataRepository.Insert(userOrg);
             }
 
             //This line is to help diagnose object reference not found exception raised at this point 
@@ -1594,48 +1596,24 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             #region Save the changes to the database
 
             var saved = false;
-            var tempUserOrg = userOrg; // Need to use a temporary UserOrg inside a lambda expression for out parameters
-            await SharedBusinessLogic.DataRepository.BeginTransactionAsync(
+            await _registrationService.OrganisationBusinessLogic.DataRepository.BeginTransactionAsync(
                 async () =>
                 {
                     try
                     {
-                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+                        await _registrationService.OrganisationBusinessLogic.SaveOrganisationAsync(org);
 
-                        if (tempUserOrg.PINConfirmedDate != null)
-                            tempUserOrg.Organisation.LatestRegistration = tempUserOrg;
-
-                        //Create a presumed in-scope for current and previous years
-                        await org.SetPresumedScopesAsync(_registrationService.SharedBusinessLogic.GetReportingDeadlines(org.SectorType));
-
-                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-
-                        if (tempUserOrg.Address.Status == AddressStatuses.Active)
-                            tempUserOrg.Organisation.LatestAddress = tempUserOrg.Address;
-
-                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-
-                        //Ensure the organisation has an organisation reference
-                        if (string.IsNullOrWhiteSpace(tempUserOrg.Organisation.OrganisationReference))
-                        {
-                            await _registrationService.OrganisationBusinessLogic.SetUniqueOrganisationReferenceAsync(
-                                tempUserOrg.Organisation);
-
-                            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-                        }
-
-                        SharedBusinessLogic.DataRepository.CommitTransaction();
+                        _registrationService.OrganisationBusinessLogic.DataRepository.CommitTransaction();
                         saved = true;
                     }
                     catch (Exception ex)
                     {
-                        SharedBusinessLogic.DataRepository.RollbackTransaction();
+                        _registrationService.OrganisationBusinessLogic.DataRepository.RollbackTransaction();
                         sendRequest = false;
-                        Logger.LogWarning(ex, Core.Extensions.Json.SerializeObjectDisposed(model));
+                        Logger.LogError(ex, JsonConvert.SerializeObject(model));
                         throw;
                     }
                 });
-            userOrg = tempUserOrg; // Need to return temporary UserOrg inside a lambda expression back to out parameters
 
             #endregion
 
@@ -1645,24 +1623,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (saved && !_registrationService.SearchBusinessLogic.SearchOptions.Disabled) await _registrationService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(userOrg.Organisation);
 
             //Log the bad sic codes here to ensure organisation identifiers have been created when saved
-            if (badSicCodes.Count > 0)
-            {
-                //Create the logging tasks
-                var badSicLoggingtasks = new List<Task>();
-                badSicCodes.ForEach(
-                    code => badSicLoggingtasks.Add(
-                        _registrationService.BadSicLog.WriteAsync(
-                                    new BadSicLogModel
-                                    {
-                                        OrganisationId = org.OrganisationId,
-                                        OrganisationName = org.OrganisationName,
-                                        SicCode = code,
-                                        Source = "CoHo"
-                                    })));
-
-                //Wait for all the logging tasks to complete
-                await Task.WhenAll(badSicLoggingtasks);
-            }
+            if (badSicCodes.Count > 0) await _registrationService.OrganisationBusinessLogic.LogBadSicCodesAsync(org, badSicCodes);
 
             //Send request to GEO
             if (sendRequest)

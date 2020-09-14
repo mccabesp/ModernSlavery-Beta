@@ -7,7 +7,7 @@ namespace ModernSlavery.Core.Classes
     public class PagedResult<T>
     {
         public List<T> Results { get; set; } = new List<T>();
-        public int CurrentPage { get; set; }
+        public int CurrentPage { get; set; } = 1;
 
         public int PageCount => ActualRecordTotal <= 0 || PageSize <= 0
             ? 0

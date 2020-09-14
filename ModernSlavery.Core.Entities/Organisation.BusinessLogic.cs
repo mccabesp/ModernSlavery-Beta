@@ -113,7 +113,6 @@ namespace ModernSlavery.Core.Entities
 
         public string GetLatestSicSectorsString(string delimiter = ", ")
         {
-            var organisationSicCodes = GetLatestSicCodes();
             return GetSicSectorsString(GetLatestSicSections(), delimiter);
         }
         #endregion
@@ -265,7 +264,7 @@ namespace ModernSlavery.Core.Entities
         {
             if (newScope != null && newScope.Status != ScopeRowStatuses.Active) throw new ArgumentException($"Cannot set latest scope with status={newScope.Status}");
 
-            LatestScope = newScope ?? OrganisationScopes.OrderBy(a => a.SubmissionDeadline).ThenBy(s => s.ScopeStatusDate).LastOrDefault(a => a.Status == ScopeRowStatuses.Active);
+             LatestScope = newScope ?? OrganisationScopes.OrderBy(a => a.SubmissionDeadline).ThenBy(s => s.ScopeStatusDate).LastOrDefault(a => a.Status == ScopeRowStatuses.Active);
         }
 
         /// <summary>

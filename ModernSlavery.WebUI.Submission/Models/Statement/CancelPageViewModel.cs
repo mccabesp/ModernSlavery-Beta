@@ -15,6 +15,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, CancelPageViewModel>();
 
             CreateMap<CancelPageViewModel, StatementModel>(MemberList.Source)
+                .ForMember(s => s.OrganisationId, opt => opt.Ignore())
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForSourceMember(s => s.Modifications, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.ErrorCount, opt => opt.DoNotValidate())

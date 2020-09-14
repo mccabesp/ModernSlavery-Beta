@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,8 +19,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(d => d.MaxStatementYears, opt => opt.MapFrom(s => s.StatementYears.GetAttribute<RangeAttribute>().Maximum))
                 .ForMember(d => d.MinTurnover, opt => opt.MapFrom(s => s.Turnover.GetAttribute<RangeAttribute>().Minimum))
                 .ForMember(d => d.MaxTurnover, opt => opt.MapFrom(s => s.Turnover.GetAttribute<RangeAttribute>().Maximum))
-                .ForMember(dest => dest.IncludedOrganisationCount, opt => opt.Ignore())
-                .ForMember(dest => dest.ExcludedOrganisationCount, opt => opt.Ignore())
+                .ForMember(dest => dest.IncludedOrganisationCount, opt => opt.MapFrom(s=>s.StatementOrganisations.Count(o=>o.Included)))
+                .ForMember(dest => dest.ExcludedOrganisationCount, opt => opt.MapFrom(s => s.StatementOrganisations.Count(o => !o.Included)))
                 .ForMember(dest => dest.StatementOrganisations, opt => opt.Ignore())
                 .ForMember(dest => dest.Sectors, opt => opt.Ignore())
                 .ForMember(dest => dest.Policies, opt => opt.Ignore())
@@ -41,14 +41,16 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.Statuses, opt => opt.Ignore());
 
             CreateMap<Statement, StatementModel>()
-                .ForMember(d => d.Submitted, opt => opt.MapFrom(s => s.StatementId>0))
+                .ForMember(d => d.Submitted, opt => opt.MapFrom(s => s.StatementId > 0))
+                .ForMember(dest => dest.StatementOrganisations, opt => opt.MapFrom(st => st.StatementOrganisations.Select(s => new StatementModel.StatementOrganisationModel(s))))
                 .ForMember(d => d.StatementStartDate, opt => opt.MapFrom(s => s.StatementStartDate == DateTime.MinValue ? (DateTime?)null : s.StatementStartDate))
                 .ForMember(d => d.StatementEndDate, opt => opt.MapFrom(s => s.StatementEndDate == DateTime.MinValue ? (DateTime?)null : s.StatementEndDate))
                 .ForMember(d => d.ApprovedDate, opt => opt.MapFrom(s => s.ApprovedDate == DateTime.MinValue ? (DateTime?)null : s.ApprovedDate))
                 .ForMember(d => d.OrganisationName, opt => opt.MapFrom(s => s.Organisation.OrganisationName))
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => StatementModel.GetStatementYears(s)))
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => StatementModel.GetTurnover(s)))
-                .ForMember(dest => dest.Modifications, opt => opt.MapFrom(s=>string.IsNullOrWhiteSpace(s.Modifications) ? null : JsonConvert.DeserializeObject<List<AutoMap.Diff>>(s.Modifications)))
+                .ForMember(dest => dest.Modifications, opt => opt.MapFrom(s => string.IsNullOrWhiteSpace(s.Modifications) ? null : JsonConvert.DeserializeObject<List<AutoMap.Diff>>(s.Modifications)))
+                .ForMember(dest => dest.GroupSubmission, opt => opt.MapFrom(s=>s.StatementId==0 ? default : s.StatementOrganisations.Any()))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.Sectors, opt => opt.MapFrom(st => st.Sectors.Select(s => s.StatementSectorTypeId)))
                 .ForMember(dest => dest.Policies, opt => opt.MapFrom(st => st.Policies.Select(s => s.StatementPolicyTypeId)))
@@ -60,7 +62,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.EditorUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.EditTimestamp, opt => opt.Ignore())
                 .ForMember(dest => dest.DraftBackupDate, opt => opt.Ignore())
-                .ForMember(dest => dest.ReturnToReviewPage, opt => opt.MapFrom(st=>st.StatementId>0))
+                .ForMember(dest => dest.ReturnToReviewPage, opt => opt.MapFrom(st => st.StatementId > 0))
                 // for nullable to non-nullable properties, dont overwrite the null with the default values when new
                 .ForMember(dest => dest.IncludesStructure, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesStructure))
                 .ForMember(dest => dest.IncludesPolicies, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesPolicies))
@@ -78,7 +80,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
     [Serializable]
     public class StatementModel
     {
-        #region Types
+        #region Enum Types
         public enum TurnoverRanges : byte
         {
             //Not Provided
@@ -126,6 +128,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         }
         #endregion
 
+        public bool? GroupSubmission { get; set; }
+
         public bool Submitted { get; set; }
         public bool ReturnToReviewPage { get; set; }
         public DateTime? DraftBackupDate { get; set; }
@@ -157,6 +161,36 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         public short ExcludedOrganisationCount { get; set; }
         public DateTime Modified { get; set; }
         public DateTime Created { get; set; }
+
+        #region Step 0 - Group submission
+        public class StatementOrganisationModel
+        {
+            public StatementOrganisationModel()
+            {
+
+            }
+            public StatementOrganisationModel(StatementOrganisation statementOrganisation)
+            {
+                StatementOrganisationId = statementOrganisation.StatementOrganisationId;
+                Included = statementOrganisation.Included;
+                OrganisationName = statementOrganisation.OrganisationName;
+                OrganisationId = statementOrganisation.OrganisationId;
+                Address = statementOrganisation.Organisation?.LatestAddress == null ? null : AddressModel.Create(statementOrganisation.Organisation.LatestAddress);
+                CompanyNumber = statementOrganisation.Organisation?.CompanyNumber;
+                DateOfCessation = statementOrganisation.Organisation?.DateOfCessation;
+            }
+
+            public long? StatementOrganisationId { get; set; }
+            public bool Included { get; set; }
+            public long? OrganisationId { get; set; }
+            public string OrganisationName { get; set; }
+            public AddressModel Address { get; set; }
+            public string CompanyNumber { get; set; }
+            public DateTime? DateOfCessation { get; set; }
+        }
+        public List<StatementOrganisationModel> StatementOrganisations { get; set; } = new List<StatementOrganisationModel>();
+
+        #endregion
 
         #region Step 1 - your statement
 
