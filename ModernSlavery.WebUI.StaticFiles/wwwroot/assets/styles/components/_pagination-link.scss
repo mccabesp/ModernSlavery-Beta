@@ -22,3 +22,32 @@
     text-decoration: underline;
   }
 }
+.pagination-next {
+    .next-arrow {
+        display: inline-block;
+        background: url("/assets/images/arrow-next.svg") no-repeat ;
+        height:15px;
+        width:20px;
+    }
+}
+.pagination-prev {
+    .prev-arrow {
+        display: inline-block;
+        background: url("/assets/images/arrow-previous.svg") no-repeat;
+        height: 15px;
+        width: 20px;
+    }
+}
+
+
+.pagination {
+    margin-bottom: 20px;
+
+    span {
+        color: $govuk-brand-colour;
+        &.pagination-numbers
+            {
+            margin-left:20px;
+        }
+    }
+}

@@ -30,7 +30,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class GroupSearchViewModel : GroupOrganisationsViewModel
     {
-        public override string PageTitle => "Who is your statement for?";
+        public override string PageTitle => "Which organisations are included in your group statement?";
         [IgnoreMap]
         [BindNever]
         public string GroupReviewUrl { get; set; }

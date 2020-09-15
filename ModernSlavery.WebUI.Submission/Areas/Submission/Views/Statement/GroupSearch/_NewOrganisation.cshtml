@@ -3,8 +3,8 @@
     <div class="column-two-thirds">
         <div style="display:table-row">
             <div style="display:table-cell">
-                @Html.LabelFor(m => m.GroupResults.OrganisationName)<br />
-                @Html.TextBoxFor(m => m.GroupResults.OrganisationName)<br />
+                @Html.LabelFor(m => m.GroupResults.OrganisationName, "Tell us the name of the organisation", new { @class = "govuk-label" })<br />
+                @Html.TextBoxFor(m => m.GroupResults.OrganisationName, new { @class = "govuk-input" })<br />
                 <span asp-validation-for="GroupResults.OrganisationName" class="govuk-error-message"></span>
             </div>
 

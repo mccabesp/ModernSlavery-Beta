@@ -1,58 +1,71 @@
 ﻿@model GroupSearchViewModel
-<button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.ToggleResults">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+<button class="link-button find-organisation" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.ToggleResults">
     Can't find the organisation you're looking for?
 </button>
 
-<div class="grid-row">
-    <div class="column-full">
-        <div class="grid-row finder">
-            <div class="column-two-thirds js-live-search-results-block" aria-live="assertive">
-                <div id="loading"></div>
-                <div id="main">
-                    @if (Model.GroupResults.ResultsPage.Results.Count < 1)
-                    {
-                        <div class="zero-results">
-                            <h2 class="heading-medium">0 organisations found that match your search</h2>
-                            <h2>Please try:</h2>
-                            <ul class="list list-bullet">
-                                <li>searching again using different organisation name or company number</li>
-                            </ul>
-                        </div>
-                    }
-                    else
-                    {
+</div>
+    </div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds" js-live-search-results-block" aria-live="assertive">
+        <div id="loading"></div>
+        <div id="main">
+            @if (Model.GroupResults.ResultsPage.Results.Count < 1)
+            {
+                <div class="govuk-form-group govuk-!-margin-top-5 zero-results">
+                    <h2 class="govuk-heading-m">0 organisations found that match your search</h2>
+                    <h2 class="govuk-heading-m">Please try:</h2>
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>searching again using different organisation name or company number</li>
+                    </ul>
+                </div>
+            }
+            else
+            {
+
+                <table class="govuk-table organisation-list">
+                    <tbody class="govuk-table__body">
+
                         @for (var addIndex = 0; addIndex < Model.GroupResults.ResultsPage.Results.Count; addIndex++)
                         {
-                            <div style="display:table-row">
-                                <div style="display:table-cell">
-                                    Name: @(Model.GroupResults.ResultsPage.Results[addIndex].OrganisationName)<br />
-                                    Address: @(Model.GroupResults.ResultsPage.Results[addIndex].GetFullAddress())<br />
-                                    Number: @(Model.GroupResults.ResultsPage.Results[addIndex].CompanyNumber)
-                                </div>
 
-                                <div style="display:table-cell">
-                                    @if (Model.ContainsGroupOrganisation(Model.GroupResults.ResultsPage.Results[addIndex]))
-                                    {
-                                        <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="removeIndex" value="@(addIndex)">
-                                            Remove
-                                        </button>
-                                    }
-                                    else if (Model.OrganisationId != Model.GroupResults.ResultsPage.Results[addIndex].OrganisationId)
-                                    {
-                                        <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="addIndex" value="@(addIndex)">
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">
+                                    <div>
+                                        <p class="govuk-!-font-weight-bold"> @(Model.GroupResults.ResultsPage.Results[addIndex].OrganisationName)</p> <br />
+                                        <p class="">@(Model.GroupResults.ResultsPage.Results[addIndex].GetFullAddress())</p><br />
+                                        <p>Company number: @(Model.GroupResults.ResultsPage.Results[addIndex].CompanyNumber)</p>
+                                    </div>
+                                </td>
+                                @if (Model.ContainsGroupOrganisation(Model.GroupResults.ResultsPage.Results[addIndex]))
+                                {
+                                    <td class="govuk-table__cell buttons">
+                                        <button type="submit" class="link-button" data-module="govuk-button" name="removeIndex" value="@(addIndex)">Remove</button>
+
+                                    </td>
+                                }
+                                else if (Model.OrganisationId != Model.GroupResults.ResultsPage.Results[addIndex].OrganisationId)
+                                {
+                                    <td class="govuk-table__cell buttons">
+                                        <button class="govuk-button govuk-button--secondary govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="addIndex" value="@(addIndex)">
                                             Include
                                         </button>
-                                    }
-                                </div>
-                            </div>
+                                    </td>
+                                }
+
+                            </tr>
                         }
-                        <partial name="_SearchPagination.cshtml" model="Model.GroupResults.ResultsPage" />
-                    }
-                </div>
-            </div>
+                    </tbody>
+                </table>
+
+            }
+
         </div>
     </div>
 </div>
+<partial name="_SearchPagination.cshtml" model="Model.GroupResults.ResultsPage" />
 
 @section Scripts {
     <script>
