@@ -28,8 +28,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// Retrieves all the search index documents from Azure Congitic Search for a specific organisation
         /// </summary>
         /// <param name="organisation">The organisation whos search index documents to retrieve</param>
+        /// <param name="statementDeadlineYear">The reporting year whos search index documents to retrieve or 0 if all years</param>
         /// <returns>The list of search index documents from Azure</returns>
-        Task<IEnumerable<OrganisationSearchModel>> GetOrganisationSearchIndexesAsync(Organisation organisation, bool keyOnly=true);
+        Task<IEnumerable<OrganisationSearchModel>> GetOrganisationSearchIndexesAsync(Organisation organisation, int statementDeadlineYear = 0, bool keyOnly=true);
 
         /// <summary>
         /// Delete old search index documents for a specific organisation entity
@@ -58,6 +59,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// Adds new search index documents, update existing and delete old documents for a specific organisation entity
         /// </summary>
         /// <param name="organisation">The organisation whos search index documents to update</param>
-        Task UpdateOrganisationSearchIndexAsync(Organisation organisation);
+        /// <param name="statementDeadlineYear">The reporting year whos search index documents to update or 0 if all years</param>
+        Task UpdateOrganisationSearchIndexAsync(Organisation organisation, int statementDeadlineYear = 0);
     }
 }

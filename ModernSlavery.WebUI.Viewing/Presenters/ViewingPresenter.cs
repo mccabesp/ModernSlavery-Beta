@@ -14,6 +14,7 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.Viewing.Models;
 using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 
@@ -55,9 +56,9 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         public async Task<SearchViewModel> SearchAsync(OrganisationSearchParameters searchParams)
         {
             var facets = new Dictionary<string, Dictionary<object, long>>();
-            facets.Add("Turnover", null);
-            facets.Add("SectorTypeIds", null);
-            facets.Add("StatementYears", null);
+            facets.Add(nameof(OrganisationSearchModel.Turnover), null);
+            facets.Add(nameof(OrganisationSearchModel.SectorTypeIds), null);
+            facets.Add(nameof(OrganisationSearchModel.StatementDeadlineYear), null);
 
             var searchTermEnteredOnScreen = searchParams.Keywords;
 
@@ -89,7 +90,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
                 searchParams.PageSize,
                 filter: searchParams.ToFilterQuery(),
                 facets: facets,
-                orderBy: string.IsNullOrWhiteSpace(searchParams.Keywords) ? nameof(OrganisationSearchModel.Name) : null,
+                orderBy: string.IsNullOrWhiteSpace(searchParams.Keywords) ? nameof(OrganisationSearchModel.OrganisationName) : null,
                 searchFields: searchParams.SearchFields,
                 searchMode: searchParams.SearchMode);
         }
@@ -107,30 +108,6 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             result.PageSize = pageSize;
 
             return result;
-        }
-
-        public async Task<List<SuggestOrganisationResult>> SuggestOrganisationNameAsync(string searchText)
-        {
-            var results = await _viewingService.SearchBusinessLogic.OrganisationSearchRepository.SuggestAsync(
-                searchText,
-                $"{nameof(OrganisationSearchModel.Name)};{nameof(OrganisationSearchModel.PreviousName)};{nameof(OrganisationSearchModel.Abbreviations)}");
-
-            var matches = new List<SuggestOrganisationResult>();
-            foreach (var result in results)
-            {
-                //Ensure all names in suggestions are unique
-                if (matches.Any(m => m.Text == result.Value.Name)) continue;
-
-                matches.Add(
-                    new SuggestOrganisationResult
-                    {
-                        Id = Obfuscator.Obfuscate(result.Value.OrganisationId),
-                        Text = result.Value.Name,
-                        PreviousName = result.Value.PreviousName
-                    });
-            }
-
-            return matches;
         }
         #endregion
 
@@ -155,14 +132,15 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
 
         public List<OptionSelect> GetTurnoverOptions(IEnumerable<byte> filterTurnoverRanges, Dictionary<object, long> facetResults)
         {
-            var allRanges = Enum.GetValues(typeof(TurnoverRanges));
+            var allRanges = Enum.GetValues(typeof(SearchViewModel.TurnoverRanges));
 
             // setup the filters
             var results = new List<OptionSelect>();
-            foreach (TurnoverRanges range in allRanges)
+            foreach (SearchViewModel.TurnoverRanges range in allRanges)
             {
+                if (range == SearchViewModel.TurnoverRanges.NotProvided) continue;
                 var id = (byte)range;
-                var label = range.GetAttribute<DisplayAttribute>().Name;
+                var label = range.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text;
                 var isChecked = filterTurnoverRanges != null && filterTurnoverRanges.Contains(id);
                 results.Add(
                     new OptionSelect

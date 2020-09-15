@@ -10,38 +10,33 @@ namespace ModernSlavery.Infrastructure.Search
     public class AzureOrganisationSearchModel : OrganisationSearchModel
     {
         #region Organisation Properties
+        [Key] 
+        public override string SearchDocumentKey { get; set; }
 
-        [Key] public override string SearchDocumentKey { get; set; }
-
-        [IsSearchable]
-        [Analyzer(AnalyzerName.AsString.EnLucene)]
+        [IsSearchable, Analyzer(AnalyzerName.AsString.EnLucene)]
         [IsFilterable]
         [IsSortable]
-        public override string Name { get; set; }
+        public override string OrganisationName { get; set; }
 
         [IsSearchable]
         public override string CompanyNumber { get; set; }
 
         [IsFilterable]
-        public override long OrganisationId { get; set; }
+        public override long ParentOrganisationId { get; set; }
 
         [IsFilterable]
         public override long? StatementId { get; set; }
 
-        [IsSearchable]
-        [Analyzer(AnalyzerName.AsString.EnLucene)]
-        public override string PreviousName { get; set; }
+        [IsSearchable] 
+        public override string PartialNameForSuffixSearches { get; set; }
 
-        [IsSearchable] public override string PartialNameForSuffixSearches { get; set; }
+        [IsSearchable] 
+        public override string PartialNameForCompleteTokenSearches { get; set; }
 
-        [IsSearchable] public override string PartialNameForCompleteTokenSearches { get; set; }
-
-        [IsSearchable]
-        [Analyzer(AnalyzerName.AsString.EnLucene)]
+        [IsSearchable, Analyzer(AnalyzerName.AsString.EnLucene)]
         public override string[] Abbreviations { get; set; }
 
         [IsFilterable]
-        [IsSortable]
         [IsFacetable]
         public override int? Turnover { get; set; }
 

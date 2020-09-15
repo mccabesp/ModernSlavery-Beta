@@ -32,31 +32,24 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
     [Route("viewing")]
     public class ViewingController : BaseController
     {
-        #region Constructors
+        #region Dependencies
+        public IViewingService ViewingService { get; }
+        public IViewingPresenter ViewingPresenter { get; }
+        public ISearchPresenter SearchPresenter { get; }
+        #endregion
 
+        #region Constructors
         public ViewingController(
             IViewingService viewingService,
             IViewingPresenter viewingPresenter,
             ISearchPresenter searchPresenter,
-            IComparePresenter comparePresenter,
             ILogger<ViewingController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(
             logger, webService, sharedBusinessLogic)
         {
             ViewingService = viewingService;
             ViewingPresenter = viewingPresenter;
             SearchPresenter = searchPresenter;
-            ComparePresenter = comparePresenter;
         }
-
-        #endregion
-
-        #region Dependencies
-
-        public IViewingService ViewingService { get; }
-        public IViewingPresenter ViewingPresenter { get; }
-        public ISearchPresenter SearchPresenter { get; }
-        public IComparePresenter ComparePresenter { get; }
-
         #endregion
 
         #region Initialisation
@@ -135,11 +128,6 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
                 return View("CustomError",
                     WebService.ErrorViewModelFactory.Create(1151, new {featureName = "Search Service"}));
 
-            //When never searched in this session
-            if (string.IsNullOrWhiteSpace(SearchPresenter.LastSearchParameters))
-                //If no compare organisations in session then load organisations from the cookie
-                if (ComparePresenter.BasketItemCount == 0)
-                    ComparePresenter.LoadComparedOrganisationsFromCookie();
 
             //Clear the default back url of the organisation hub pages
             OrganisationBackUrl = null;
@@ -154,12 +142,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
             ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
 
-            ViewBag.BasketViewModel = new CompareBasketViewModel
-            {
-                CanAddOrganisations = false, CanViewCompare = ComparePresenter.BasketItemCount > 1, CanClearCompare = true
-            };
-
-            return View("Finder/SearchResults", model);
+            return View("SearchResults", model);
         }
 
         [NoCache]
@@ -291,61 +274,29 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             //Clear the default back url of the report page
             ReportBackUrl = null;
 
-            ViewBag.BasketViewModel = new CompareBasketViewModel {CanAddOrganisations = true, CanViewCompare = true};
-
             return View(
                 "OrganisationDetails/Organisation",
                 new OrganisationDetailsViewModel
                 {
                     Organisation = organisationLoadingOutcome.Result,
                     LastSearchUrl = SearchPresenter.GetLastSearchUrl(),
-                    OrganisationBackUrl = OrganisationBackUrl,
-                    ComparedOrganisations = ComparePresenter.ComparedOrganisations.Value
+                    OrganisationBackUrl = OrganisationBackUrl
                 });
         }
 
         #endregion
 
         #region Reports
-        [HttpGet("~/Organisation/{organisationIdentifier}/{year}")]
-        public async Task<IActionResult> Report(string organisationIdentifier, int year)
+        [HttpGet("~/Statement/{organisationIdentifier}/{statementDeadlineYear}")]
+        public async Task<IActionResult> Statement(string organisationIdentifier, int statementDeadlineYear)
         {
             //Get the latest statement data for this organisation, reporting year
-            var openResult = await ViewingPresenter.GetStatementViewModelAsync(organisationIdentifier, year);
+            var openResult = await ViewingPresenter.GetStatementViewModelAsync(organisationIdentifier, statementDeadlineYear);
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             var viewModel = openResult.Result;
             return View("OrganisationDetails/Report", viewModel);
         }
-
-        [HttpGet("add-search-results-to-compare")]
-        public async Task<IActionResult> AddSearchResultsToCompare([FromQuery] SearchResultsQuery searchQuery)
-        {
-            if (!searchQuery.TryValidateSearchParams(out var result)) return result;
-
-            // generate compare list
-            var searchParams = AutoMapper.Map<OrganisationSearchParameters>(searchQuery);
-
-            // set maximum search size
-            searchParams.Page = 1;
-            searchParams.PageSize = ComparePresenter.MaxCompareBasketCount;
-            var searchResultsModel = await ViewingPresenter.SearchAsync(searchParams);
-
-            // add any new items to the compare list
-            var resultIds = searchResultsModel.Organisations.Results
-                .Where(organisation => ComparePresenter.BasketContains(ViewingPresenter.Obfuscator.Obfuscate(organisation.OrganisationId)) == false)
-                .Take(ComparePresenter.MaxCompareBasketCount - ComparePresenter.BasketItemCount)
-                .Select(organisation => ViewingPresenter.Obfuscator.Obfuscate(organisation.OrganisationId))
-                .ToArray();
-
-            ComparePresenter.AddRangeToBasket(resultIds);
-
-            // save the results to the cookie
-            ComparePresenter.SaveComparedOrganisationsToCookie(Request);
-
-            return RedirectToAction(nameof(SearchResults), searchQuery);
-        }
-
         #endregion
     }
 }

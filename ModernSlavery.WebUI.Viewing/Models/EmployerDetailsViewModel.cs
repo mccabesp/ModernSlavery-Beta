@@ -10,7 +10,5 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public string LastSearchUrl { get; set; }
 
         public string OrganisationBackUrl { get; set; }
-
-        public SessionList<string> ComparedOrganisations { get; set; }
     }
 }

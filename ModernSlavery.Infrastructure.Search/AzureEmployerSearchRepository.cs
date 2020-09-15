@@ -55,6 +55,15 @@ namespace ModernSlavery.Infrastructure.Search
 
             if (string.IsNullOrWhiteSpace(searchOptions.ServiceName)) throw new ArgumentNullException(nameof(searchOptions.ServiceName));
 
+#if DEBUG
+            /* Since we cant emulate Search Index we share the same search search on Azure DEV environment.
+             * Therefore we must use a different index name to the default when running locally in development mode
+             * So as not to interfer with the default indexes.
+             * Add your initials after the index name in your appsettings.secret.json file. eg.,
+             *   "SearchService": {"OrganisationIndexName": "OrganisationSearchModel-SMc"} */
+            if (searchOptions.OrganisationIndexName.EqualsI(nameof(OrganisationSearchModel)) && _sharedOptions.IsDevelopment()) throw new ArgumentException($"Config setting 'SearchService:OrganisationIndexName' cannot be '{nameof(OrganisationSearchModel)}' when running locally in Development mode");
+#endif
+
             if (string.IsNullOrWhiteSpace(searchOptions.AdminApiKey) && string.IsNullOrWhiteSpace(searchOptions.QueryApiKey))
                 throw new ArgumentNullException($"You must provide '{nameof(searchOptions.AdminApiKey)}' or '{nameof(searchOptions.QueryApiKey)}'");
 
@@ -115,10 +124,10 @@ namespace ModernSlavery.Infrastructure.Search
 
             //Remove all test organisations
             if (!string.IsNullOrWhiteSpace(_sharedOptions.TestPrefix))
-                newRecords = newRecords.Where(e => !e.Name.StartsWithI(_sharedOptions.TestPrefix));
+                newRecords = newRecords.Where(e => !e.OrganisationName.StartsWithI(_sharedOptions.TestPrefix));
 
             //Ensure the records are ordered by name
-            newRecords = newRecords.OrderBy(o => o.Name);
+            newRecords = newRecords.OrderBy(o => o.OrganisationName);
 
             //Set the records to add or update
             var actions = newRecords.Select(r => IndexAction.MergeOrUpload(_autoMapper.Map<AzureOrganisationSearchModel>(r)))
@@ -457,8 +466,7 @@ namespace ModernSlavery.Infrastructure.Search
             {
                 new Suggester(
                     suggestorName,
-                    nameof(OrganisationSearchModel.Name),
-                    nameof(OrganisationSearchModel.PreviousName),
+                    nameof(OrganisationSearchModel.OrganisationName),
                     nameof(OrganisationSearchModel.Abbreviations))
             };
 
@@ -522,9 +530,7 @@ namespace ModernSlavery.Infrastructure.Search
                     .SynonymMaps =
                 new[] {synonymMapName};
 
-            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.Name)).SynonymMaps = new[] {synonymMapName};
-            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PreviousName)).SynonymMaps =
-                new[] {synonymMapName};
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.OrganisationName)).SynonymMaps = new[] {synonymMapName};
 
             //Add the synonyms if they dont already exist
             if (!await serviceClient.SynonymMaps.ExistsAsync(synonymMapName))

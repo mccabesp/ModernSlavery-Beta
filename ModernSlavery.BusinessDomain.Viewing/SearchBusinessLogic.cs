@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
@@ -22,24 +20,24 @@ namespace ModernSlavery.BusinessDomain.Viewing
         public SearchOptions SearchOptions { get; }
         public readonly SharedOptions _sharedOptions;
         private readonly IDataRepository _dataRepository;
+        private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
         public ISearchRepository<OrganisationSearchModel> OrganisationSearchRepository { get; set; }
-        private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
         public IAuditLogger SearchLog { get; }
 
         public SearchBusinessLogic(
             SearchOptions searchOptions,
             SharedOptions sharedOptions,
             IDataRepository dataRepository,
+            IReportingDeadlineHelper reportingDeadlineHelper,
             ISearchRepository<OrganisationSearchModel> organisationSearchRepository,
-            IOrganisationBusinessLogic organisationBusinessLogic,
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog
         )
         {
             SearchOptions = searchOptions;
             _sharedOptions = sharedOptions;
             _dataRepository = dataRepository;
+            _reportingDeadlineHelper = reportingDeadlineHelper;
             OrganisationSearchRepository = organisationSearchRepository;
-            _organisationBusinessLogic = organisationBusinessLogic;
             SearchLog = searchLog;
         }
 
@@ -47,10 +45,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
         {
             //Remove the test organisations
             if (!string.IsNullOrWhiteSpace(_sharedOptions.TestPrefix))
-                organisations=organisations.Where(o => !o.OrganisationName.StartsWithI(_sharedOptions.TestPrefix));
-
-            //When debugging just update 100 
-            if (Debugger.IsAttached) organisations = organisations.Take(100).ToList();
+                organisations = organisations.Where(o => !o.OrganisationName.StartsWithI(_sharedOptions.TestPrefix));
 
             //Remove those which are not to be searched
             organisations = LookupSearchableOrganisations(organisations.ToArray()).ToList();
@@ -71,7 +66,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
             if (retiredModels.Any()) await OrganisationSearchRepository.RemoveFromIndexAsync(retiredModels).ConfigureAwait(false);
         }
 
-        public IEnumerable<Organisation> LookupSearchableOrganisations(params Organisation[] organisations)
+        private IEnumerable<Organisation> LookupSearchableOrganisations(params Organisation[] organisations)
         {
             return organisations.Where(
                 o => o.Status == OrganisationStatuses.Active
@@ -88,19 +83,22 @@ namespace ModernSlavery.BusinessDomain.Viewing
             await UpdateOrganisationSearchIndexAsync(organisations);
         }
 
-        public async Task UpdateOrganisationSearchIndexAsync(Organisation organisation)
+        public async Task UpdateOrganisationSearchIndexAsync(Organisation organisation, int statementDeadlineYear = 0)
         {
             //Ensure we have an organisation
             if (organisation == null) throw new ArgumentNullException(nameof(organisation));
 
             //Get the organisations to include or exclude from search
-            var newSearchModels = LookupSearchableOrganisations(organisation).SelectMany(o => CreateOrganisationSearchModelKeys(o));
+            var newSearchModels = LookupSearchableOrganisations(organisation).SelectMany(o => CreateOrganisationSearchModels(o));
 
-            //Get the old indexes for statements
-            var retiredModels = await GetOrganisationSearchIndexesAsync(organisation);
+            //Remove those models not for the selected statementDeadlineYear
+            if (statementDeadlineYear > 0) newSearchModels = newSearchModels.Where(m => m.StatementDeadlineYear == statementDeadlineYear);
+
+             //Get the old indexes for statements
+            var retiredModels = await GetOrganisationSearchIndexesAsync(organisation, statementDeadlineYear);
 
             //Batch update the included organisations
-            if (newSearchModels.Any())await OrganisationSearchRepository.AddOrUpdateIndexDataAsync(newSearchModels);
+            if (newSearchModels.Any()) await OrganisationSearchRepository.AddOrUpdateIndexDataAsync(newSearchModels);
 
             //Remove the retired models
             retiredModels = retiredModels.Except(newSearchModels).ToList();
@@ -123,18 +121,19 @@ namespace ModernSlavery.BusinessDomain.Viewing
             if (searchIndexes.Any()) await OrganisationSearchRepository.RemoveFromIndexAsync(searchIndexes).ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<OrganisationSearchModel>> GetOrganisationSearchIndexesAsync(Organisation organisation, bool keyOnly=true)
+        public async Task<IEnumerable<OrganisationSearchModel>> GetOrganisationSearchIndexesAsync(Organisation organisation, int statementDeadlineYear = 0, bool keyOnly = true)
         {
             //Ensure we have an organisation
             if (organisation == null) throw new ArgumentNullException(nameof(organisation));
 
             //Get the old indexes for statements
-            var filter = $"{nameof(organisation.OrganisationId)} eq {organisation.OrganisationId}";
- 
-            return await OrganisationSearchRepository.ListAsync(selectFields:keyOnly ? nameof(OrganisationSearchModel.SearchDocumentKey) : null, filter: filter);
+            var filter = $"{nameof(OrganisationSearchModel.ParentOrganisationId)} eq {organisation.OrganisationId}";
+            if (statementDeadlineYear>0)filter += $" and {nameof(OrganisationSearchModel.StatementDeadlineYear)} eq {statementDeadlineYear}";
+
+            return await OrganisationSearchRepository.ListAsync(selectFields: keyOnly ? nameof(OrganisationSearchModel.SearchDocumentKey) : null, filter: filter);
         }
 
-        #region Create SearchModels
+        #region Create OrganisationSearchModel and Index Keys
         /// <summary>
         /// Returns a list of fully populated search index documents for specific organisations
         /// </summary>
@@ -147,22 +146,23 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             //Get statement models for all organisations
             foreach (var organisation in organisations)
-                foreach (var searchModel in CreateOrganisationSearchModel(organisation))
+                foreach (var searchModel in CreateOrganisationSearchModels(organisation))
                 {
                     if (searchModel.StatementDeadlineYear == null && searchModel.ChildStatementOrganisationId == null)
-                        unreportedSearchModels[searchModel.OrganisationId] = searchModel;
+                        unreportedSearchModels[searchModel.ParentOrganisationId] = searchModel;
                     else
                     {
-                        reportedOrganisationIds.Add(searchModel.OrganisationId);
+                        reportedOrganisationIds.Add(searchModel.ParentOrganisationId);
                         if (searchModel.ChildStatementOrganisationId.HasValue)
-                            reportedOrganisationIds.Add(searchModel.ChildStatementOrganisationId.Value);                         
+                            reportedOrganisationIds.Add(searchModel.ChildStatementOrganisationId.Value);
 
                         yield return searchModel;
                     }
                 }
 
             //Remove any reported organisations from the unreported
-            reportedOrganisationIds.ForEach(id => {
+            reportedOrganisationIds.ForEach(id =>
+            {
                 if (unreportedSearchModels.ContainsKey(id)) unreportedSearchModels.Remove(id);
             });
 
@@ -176,73 +176,78 @@ namespace ModernSlavery.BusinessDomain.Viewing
         /// </summary>
         /// <param name="organisation">The organisation whos index documents we want to return</param>
         /// <returns>The list of fully populated search index documents</returns>
-        private IEnumerable<OrganisationSearchModel> CreateOrganisationSearchModel(Organisation organisation)
+        private IEnumerable<OrganisationSearchModel> CreateOrganisationSearchModels(Organisation organisation)
         {
-            var submittedStatements = organisation.Statements.Where(s => s.Status == StatementStatuses.Submitted);
+            foreach (var reportingDeadline in _reportingDeadlineHelper.GetReportingDeadlines(organisation.SectorType))
+                foreach (var organisationSearchModel in CreateOrganisationSearchModels(organisation, reportingDeadline.Year))
+                    yield return organisationSearchModel;
+        }
+
+        /// <summary>
+        /// Returns a list of fully populated search index documents for a specific organisation for a specific reporting year
+        /// </summary>
+        /// <param name="organisation">The organisation whos index documents we want to return</param>
+        /// <param name="reportingDeadlineYear">The reporting year</param>
+        /// <returns>The list of fully populated search index documents for the specified year</returns>
+        private IEnumerable<OrganisationSearchModel> CreateOrganisationSearchModels(Organisation organisation, int reportingDeadlineYear)
+        {
+            var submittedStatement = organisation.Statements.FirstOrDefault(s => s.Status == StatementStatuses.Submitted && s.SubmissionDeadline.Year == reportingDeadlineYear);
 
             // Get the abbreviations for the organisation name
-            var abbreviations = CreateOrganisationNameAbbreviations(organisation);
+            var abbreviations = CreateOrganisationNameAbbreviations(organisation.OrganisationName);
 
-            // extract the prev org name (if exists)
-            var prevOrganisationName = organisation.GetPreviousName();
-
-            var searchModel = new OrganisationSearchModel
+            var parentStatementModel = new OrganisationSearchModel
             {
-                OrganisationId = organisation.OrganisationId,
-                Name = organisation.OrganisationName,
-                PreviousName = prevOrganisationName,
-                PartialNameForSuffixSearches = organisation.OrganisationName,
+                StatementId = submittedStatement?.StatementId,
+                ParentOrganisationId = organisation.OrganisationId,
+                StatementDeadlineYear = reportingDeadlineYear,
+                OrganisationName = organisation.OrganisationName,
+                CompanyNumber = organisation.CompanyNumber,
+                Address = organisation.LatestAddress.GetAddressString(),
+                SectorTypeIds = submittedStatement?.Sectors.Select(s => (int)s.StatementSectorTypeId).ToArray(),
+                Turnover = submittedStatement == null ? (int?)null : (int)StatementModel.GetTurnover(submittedStatement),
+                Modified = submittedStatement == null ? organisation.Modified : submittedStatement.Modified,
+                IsParent = submittedStatement == null ? false : submittedStatement.StatementOrganisations.Any(),
+                Abbreviations = CreateOrganisationNameAbbreviations(organisation.OrganisationName),
                 PartialNameForCompleteTokenSearches = organisation.OrganisationName,
-                Abbreviations = abbreviations.ToArray(),
-                Address = organisation.LatestAddress?.GetAddressString(),
+                PartialNameForSuffixSearches = organisation.OrganisationName
             };
+            yield return parentStatementModel.SetSearchDocumentKey();
 
-            //Return the search document for any organisation who has never reported
-            if (!submittedStatements.Any())
-                yield return searchModel.SetSearchDocumentKey();
-
-            foreach (var submittedStatement in submittedStatements)
-            {
-                //Return the search document for each submitted statement for organisation
-                var parentStatementModel = searchModel.GetClone();
-                parentStatementModel.StatementDeadlineYear = submittedStatement.SubmissionDeadline.Year;
-                parentStatementModel.Turnover = (byte)StatementModel.GetTurnover(submittedStatement);
-                parentStatementModel.StatementId = submittedStatement.StatementId;
-                parentStatementModel.SectorTypeIds = submittedStatement.Sectors.Select(s => (int)s.StatementSectorTypeId).ToArray();
-                parentStatementModel.IsParent = submittedStatement.StatementOrganisations.Any();
-
-                //Mark this organisation as reported
-                yield return parentStatementModel.SetSearchDocumentKey();
-
+            if (submittedStatement!=null)
                 foreach (var childOrganisation in submittedStatement.StatementOrganisations.Where(go => go.Included))
                 {
-                    //Return the search document for each child organisation in a group submitted statement
-                    var childStatementModel = parentStatementModel.GetClone();
-                    childStatementModel.ChildStatementOrganisationId = childOrganisation.StatementOrganisationId;
-                    childStatementModel.IsParent = false;
+                    var childStatementModel = new OrganisationSearchModel
+                    {
+                        StatementId = parentStatementModel.StatementId,
+                        ParentOrganisationId = parentStatementModel.ParentOrganisationId,
+                        StatementDeadlineYear = parentStatementModel.StatementDeadlineYear,
+                        ParentName = parentStatementModel.OrganisationName,
+                        SectorTypeIds = parentStatementModel.SectorTypeIds,
+                        Turnover = parentStatementModel.Turnover,
+                        Modified = parentStatementModel.Modified,
+                        ChildStatementOrganisationId = childOrganisation.StatementOrganisationId,
+                        ChildOrganisationId = childOrganisation.OrganisationId
+                    };
 
                     if (childOrganisation.Organisation == null)
                     {
-                        childStatementModel.ChildOrganisationId = 0;
-                        childStatementModel.Name = childOrganisation.OrganisationName;
-                        childStatementModel.PartialNameForSuffixSearches = childOrganisation.OrganisationName;
-                        childStatementModel.PartialNameForCompleteTokenSearches = childOrganisation.OrganisationName;
+                        childStatementModel.OrganisationName = childOrganisation.OrganisationName;
+                        childStatementModel.CompanyNumber = organisation.CompanyNumber;
+                        childStatementModel.Address = organisation.LatestAddress.GetAddressString();
                     }
                     else
                     {
-                        childStatementModel.ChildOrganisationId = childOrganisation.OrganisationId.Value;
-                        childStatementModel.Name = childOrganisation.Organisation.OrganisationName;
-                        childStatementModel.PartialNameForSuffixSearches = childStatementModel.Name;
-                        childStatementModel.PartialNameForCompleteTokenSearches = childStatementModel.Name;
-                        childStatementModel.Address = childOrganisation.Organisation.LatestAddress?.GetAddressString();
-                        abbreviations = CreateOrganisationNameAbbreviations(childOrganisation.Organisation);
-                        abbreviations.AddRange(childStatementModel.Abbreviations);
-                        childStatementModel.Abbreviations = abbreviations.ToArray();
+                        childStatementModel.OrganisationName = childOrganisation.Organisation.OrganisationName;
+                        childStatementModel.CompanyNumber = childOrganisation.Organisation.CompanyNumber;
+                        childStatementModel.Address = childOrganisation.Organisation.LatestAddress.GetAddressString();
                     }
+                    childStatementModel.Abbreviations = CreateOrganisationNameAbbreviations(childStatementModel.OrganisationName);
+                    childStatementModel.PartialNameForCompleteTokenSearches = childStatementModel.OrganisationName;
+                    childStatementModel.PartialNameForSuffixSearches = childStatementModel.OrganisationName;
 
                     yield return childStatementModel.SetSearchDocumentKey();
                 }
-            }
         }
 
         /// <summary>
@@ -252,69 +257,39 @@ namespace ModernSlavery.BusinessDomain.Viewing
         /// <returns>The list of search index documents with only SearchDocumentKey populated</returns>
         private IEnumerable<OrganisationSearchModel> CreateOrganisationSearchModelKeys(Organisation organisation)
         {
-            var submittedStatements = organisation.Statements.Where(s => s.Status == StatementStatuses.Submitted);
-
-            var unreportedSearchModels = new Dictionary<long, OrganisationSearchModel>();
-            var reportedOrganisationIds = new HashSet<long>();
-
-            var searchModel = new OrganisationSearchModel
-            {
-                OrganisationId = organisation.OrganisationId,
-            };
-            unreportedSearchModels[searchModel.OrganisationId] = searchModel;
-
-            foreach (var submittedStatement in submittedStatements)
-            {
-                //Return the search document for each submitted statement for organisation
-                var parentStatementModel = searchModel.GetClone();
-                parentStatementModel.StatementDeadlineYear = submittedStatement.SubmissionDeadline.Year;
-
-                //Mark this organisation as reported
-                reportedOrganisationIds.Add(parentStatementModel.OrganisationId);
-                yield return parentStatementModel.SetSearchDocumentKey();
-
-                foreach (var childOrganisation in submittedStatement.StatementOrganisations.Where(go => go.Included))
-                {
-                    //Return the search document for each child organisation in a group submitted statement
-                    var childStatementModel = parentStatementModel.GetClone();
-                    childStatementModel.ChildStatementOrganisationId = childOrganisation.StatementOrganisationId;
-
-                    if (childOrganisation.Organisation == null)
-                    {
-                        childStatementModel.OrganisationId = 0;
-                    }
-                    else
-                    {
-                        childStatementModel.OrganisationId = childOrganisation.OrganisationId.Value;
-
-                        //Mark this organisation as reported
-                        reportedOrganisationIds.Add(childStatementModel.OrganisationId);
-                    }
-
-                    yield return childStatementModel.SetSearchDocumentKey();
-                }
-            }
-
-            //Remove any reported organisations from the unreported
-            reportedOrganisationIds.ForEach(id => {
-                if (unreportedSearchModels.ContainsKey(id)) unreportedSearchModels.Remove(id);
-            });
-
-            //Return the search document for any organisation who has never reported
-            foreach (var organisationId in unreportedSearchModels.Keys)
-                yield return unreportedSearchModels[organisationId].SetSearchDocumentKey();
+            foreach (var reportingDeadline in _reportingDeadlineHelper.GetReportingDeadlines(organisation.SectorType))
+                foreach (var organisationSearchModel in CreateOrganisationSearchModelKeys(organisation, reportingDeadline.Year))
+                    yield return organisationSearchModel;
         }
 
         /// <summary>
-        /// Returns a list of abbreviations from the names of a specific organisation
+        /// Returns a list of search index document keys for a specific organisation for a specific reporting year
         /// </summary>
-        /// <param name="organisation">The organisation whos names we want to parse</param>
-        /// <returns>The list of abbreviations</returns>
-        private SortedSet<string> CreateOrganisationNameAbbreviations(Organisation organisation)
+        /// <param name="organisation">The organisation whos index document keys we want to return</param>
+        /// <param name="reportingDeadlineYear">The reporting year</param>
+        /// <returns>The list of search index document keys for the specified year</returns>
+        private IEnumerable<OrganisationSearchModel> CreateOrganisationSearchModelKeys(Organisation organisation, int reportingDeadlineYear)
         {
-            // Get the last two names for the org. Most recent name first
-            var names = organisation.OrganisationNames.OrderByDescending(n => n.Created).Select(n => n.Name).Take(2).ToArray();
-            return CreateOrganisationNameAbbreviations(names);
+            var submittedStatement = organisation.Statements.FirstOrDefault(s => s.Status == StatementStatuses.Submitted && s.SubmissionDeadline.Year == reportingDeadlineYear);
+
+            var parentStatementModel = new OrganisationSearchModel
+            {
+                ParentOrganisationId = organisation.OrganisationId,
+                StatementDeadlineYear = reportingDeadlineYear,
+            };
+            yield return parentStatementModel.SetSearchDocumentKey();
+
+            foreach (var childOrganisation in submittedStatement.StatementOrganisations.Where(go => go.Included))
+            {
+                var childStatementModel = new OrganisationSearchModel
+                {
+                    ParentOrganisationId = parentStatementModel.ParentOrganisationId,
+                    StatementDeadlineYear = parentStatementModel.StatementDeadlineYear,
+                    ChildStatementOrganisationId = childOrganisation.StatementOrganisationId,
+                };
+
+                yield return childStatementModel.SetSearchDocumentKey();
+            }
         }
 
         /// <summary>
@@ -322,7 +297,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
         /// </summary>
         /// <param name="names">The organisation names to parse</param>
         /// <returns>The list of abbreviations</returns>
-        private SortedSet<string> CreateOrganisationNameAbbreviations(params string[] names)
+        private string[] CreateOrganisationNameAbbreviations(params string[] names)
         {
             // Get the last two names for the org. Most recent name first
             var abbreviations = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -345,7 +320,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
                 if (!string.IsNullOrWhiteSpace(prevOrganisationName))
                     abbreviations.Remove(prevOrganisationName);
             }
-            return abbreviations;
+            return abbreviations.ToArray();
         }
         #endregion
     }

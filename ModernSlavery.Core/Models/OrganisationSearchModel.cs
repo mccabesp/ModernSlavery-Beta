@@ -9,11 +9,6 @@ namespace ModernSlavery.Core.Models
     [Serializable]
     public class OrganisationSearchModel
     {
-        public bool Equals(OrganisationSearchModel model)
-        {
-            return model != null && model.OrganisationId == OrganisationId;
-        }
-
         public override bool Equals(object obj)
         {
             var target = obj as OrganisationSearchModel;
@@ -22,18 +17,18 @@ namespace ModernSlavery.Core.Models
 
         public override int GetHashCode()
         {
-            return OrganisationId.GetHashCode();
+            return SearchDocumentKey.GetHashCode();
         }
 
         public virtual string SearchDocumentKey { get; set; }
 
         #region Organisation Properties
-        public virtual long OrganisationId { get; set; }
-        public virtual long ChildOrganisationId { get; set; }
+        public virtual long ParentOrganisationId { get; set; }
+        public virtual long? ChildOrganisationId { get; set; }
         public virtual string CompanyNumber { get; set; }
         public virtual long? StatementId { get; set; }
-        public virtual string Name { get; set; }
-        public virtual string PreviousName { get; set; }
+        public virtual string OrganisationName { get; set; }
+        public virtual string ParentName { get; set; }
         public virtual string PartialNameForSuffixSearches { get; set; }
         public virtual string PartialNameForCompleteTokenSearches { get; set; }
         public virtual string[] Abbreviations { get; set; }
@@ -50,10 +45,16 @@ namespace ModernSlavery.Core.Models
 
         public OrganisationSearchModel SetSearchDocumentKey()
         {
-            var key = OrganisationId.ToString();
+            var key = ParentOrganisationId.ToString();
             if (StatementDeadlineYear.HasValue) key += $"-{StatementDeadlineYear}";
-            if (ChildStatementOrganisationId.HasValue) key += $"-{ChildStatementOrganisationId}";
-            SearchDocumentKey=key;
+            if (!string.IsNullOrWhiteSpace(ParentName))
+            {
+                if (ChildOrganisationId.HasValue)
+                    key += $"-{ChildOrganisationId}";
+                else
+                    key += $"-{OrganisationName.ToLower()}";
+            }
+            SearchDocumentKey = key;
             return this;
         }
     }

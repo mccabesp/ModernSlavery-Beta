@@ -1,4 +1,5 @@
 ﻿using ModernSlavery.Core.Attributes;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Core.Options
