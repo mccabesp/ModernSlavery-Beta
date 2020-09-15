@@ -50,7 +50,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => StatementModel.GetStatementYears(s)))
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => StatementModel.GetTurnover(s)))
                 .ForMember(dest => dest.Modifications, opt => opt.MapFrom(s => string.IsNullOrWhiteSpace(s.Modifications) ? null : JsonConvert.DeserializeObject<List<AutoMap.Diff>>(s.Modifications)))
-                .ForMember(dest => dest.GroupSubmission, opt => opt.MapFrom(s=>s.StatementId==0 ? default : s.StatementOrganisations.Any()))
+                .ForMember(dest => dest.GroupSubmission, opt => opt.MapFrom(s=>s.StatementId==0 ? (bool?)null : s.StatementOrganisations.Any()))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.Sectors, opt => opt.MapFrom(st => st.Sectors.Select(s => s.StatementSectorTypeId)))
                 .ForMember(dest => dest.Policies, opt => opt.MapFrom(st => st.Policies.Select(s => s.StatementPolicyTypeId)))

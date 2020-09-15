@@ -18,8 +18,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForSourceMember(d => d.GroupStatusUrl, opt => opt.DoNotValidate());
 
             CreateMap<StatementModel, GroupReviewViewModel>()
-                .IncludeBase<StatementModel, GroupOrganisationsViewModel>()
-                .ForMember(d => d.GroupSubmission, opt => opt.Ignore());
+                .IncludeBase<StatementModel, GroupOrganisationsViewModel>();
         }
     }
 
