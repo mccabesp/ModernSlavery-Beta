@@ -60,7 +60,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         #endregion
 
         #region Properties
-        
+
         #endregion
 
         #region Url Methods
@@ -77,7 +77,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         private string GetGroupStatusUrl() => Url.Action(nameof(GroupStatus), GetOrgAndYearRouteData());
         private string GetGroupSearchUrl() => Url.Action(nameof(GroupSearch), GetOrgAndYearRouteData());
         private string GetGroupReviewUrl() => Url.Action(nameof(GroupReview), GetOrgAndYearRouteData());
-        
+
         private string GetYourStatementUrl() => Url.Action(nameof(YourStatement), GetOrgAndYearRouteData());
 
         private string GetComplianceUrl() => Url.Action(nameof(Compliance), GetOrgAndYearRouteData());
@@ -143,7 +143,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 case GroupStatusViewModel vm:
                     vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetReturnUrl();
                     vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : vm.GroupSubmission==true ? GetGroupSearchUrl() : GetYourStatementUrl();
+                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : vm.GroupSubmission == true ? GetGroupSearchUrl() : GetYourStatementUrl();
                     break;
                 case GroupSearchViewModel vm:
                     vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetGroupStatusUrl();
@@ -159,7 +159,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.GroupSearchUrl = GetGroupSearchUrl();
                     break;
                 case YourStatementPageViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : vm.GroupSubmission==true ? GetGroupReviewUrl() : GetGroupStatusUrl();
+                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : vm.GroupSubmission == true ? GetGroupReviewUrl() : GetGroupStatusUrl();
                     vm.CancelUrl = GetCancelUrl();
                     vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetComplianceUrl();
                     break;
@@ -262,7 +262,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         /// </summary>
         /// <param name="errors">A List of Statement Errors and their description</param>
         /// <returns>The IActionResult to execute</returns>
-        private IActionResult HandleStatementErrors(IEnumerable<(StatementErrors Error, string Message)> errors, object viewModel=null)
+        private IActionResult HandleStatementErrors(IEnumerable<(StatementErrors Error, string Message)> errors, object viewModel = null)
         {
             //Return full page errors which return to the ManageOrganisation page
             var error = errors.FirstOrDefault();
@@ -277,7 +277,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 case StatementErrors.TooLate:
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1155));
                 case StatementErrors.DuplicateName:
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(3901,new {organisationName=error.Message }));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(3901, new { organisationName = error.Message }));
                 case StatementErrors.CoHoTransientError:
                     if (viewModel == null) throw new ArgumentNullException(nameof(viewModel));
                     ModelState.AddModelError(1141);
@@ -288,7 +288,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     throw new NotImplementedException($"{nameof(StatementErrors)} type '{error.Error}' is not recognised");
             }
         }
-        
+
         private async Task<IActionResult> GetAsync<TViewModel>(string organisationIdentifier, int year) where TViewModel : BaseViewModel
         {
             //Try and get the viewmodel from session
@@ -327,7 +327,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             else if (viewModel is GroupReviewViewModel)
             {
                 var reviewViewModel = viewModel as GroupReviewViewModel;
-                
+
                 //Copy changes to the review model
                 var searchViewModel = UnstashModel<GroupSearchViewModel>();
                 if (searchViewModel != null) reviewViewModel.StatementOrganisations = searchViewModel.StatementOrganisations;
@@ -450,7 +450,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
             viewModel = stashedModel;
 
-            ModelState.Exclude(nameof(viewModel.ReturnToReviewPage),nameof(viewModel.Submitted));
+            ModelState.Exclude(nameof(viewModel.ReturnToReviewPage), nameof(viewModel.Submitted));
 
             if (command.IsAny(BaseViewModel.CommandType.Search, BaseViewModel.CommandType.SearchNext, BaseViewModel.CommandType.SearchPrevious))
             {
@@ -505,7 +505,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     }
 
                     //Add the organisation to the view model
-                    var outcome = SubmissionPresenter.IncludeGroupOrganisation(viewModel, addIndex);
+                    var outcome = await SubmissionPresenter.IncludeGroupOrganisationAsync(viewModel, addIndex);
 
                     //Handle any errors
                     if (!outcome.Success) HandleStatementErrors(outcome.Errors);
@@ -520,6 +520,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     var index = viewModel.FindGroupOrganisation(removeOrg);
                     viewModel.StatementOrganisations.RemoveAt(index);
                 }
+
+                //showBanner when including/removing organisation
+                viewModel.ShowBanner = true;
 
                 //Copy changes to the search review model
                 var reviewViewModel = UnstashModel<GroupReviewViewModel>();
@@ -847,7 +850,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             viewModel.DueDiligence = SubmissionPresenter.GetViewModelFromStatementModel<DueDiligencePageViewModel>(statementModel);
             viewModel.Training = SubmissionPresenter.GetViewModelFromStatementModel<TrainingPageViewModel>(statementModel);
             viewModel.Progress = SubmissionPresenter.GetViewModelFromStatementModel<MonitoringProgressPageViewModel>(statementModel);
-            viewModel.DraftModifications=await SubmissionPresenter.CompareToDraftBackupStatement(statementModel);
+            viewModel.DraftModifications = await SubmissionPresenter.CompareToDraftBackupStatement(statementModel);
             viewModel.SubmittedModifications = await SubmissionPresenter.CompareToSubmittedStatement(statementModel);
 
             //Otherwise return the view using the populated ViewModel

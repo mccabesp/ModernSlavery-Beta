@@ -19,7 +19,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(d => d.MaxStatementYears, opt => opt.MapFrom(s => s.StatementYears.GetAttribute<RangeAttribute>().Maximum))
                 .ForMember(d => d.MinTurnover, opt => opt.MapFrom(s => s.Turnover.GetAttribute<RangeAttribute>().Minimum))
                 .ForMember(d => d.MaxTurnover, opt => opt.MapFrom(s => s.Turnover.GetAttribute<RangeAttribute>().Maximum))
-                .ForMember(dest => dest.IncludedOrganisationCount, opt => opt.MapFrom(s=>s.StatementOrganisations.Count(o=>o.Included)))
+                .ForMember(dest => dest.IncludedOrganisationCount, opt => opt.MapFrom(s => s.StatementOrganisations.Count(o => o.Included)))
                 .ForMember(dest => dest.ExcludedOrganisationCount, opt => opt.MapFrom(s => s.StatementOrganisations.Count(o => !o.Included)))
                 .ForMember(dest => dest.StatementOrganisations, opt => opt.Ignore())
                 .ForMember(dest => dest.Sectors, opt => opt.Ignore())
@@ -40,6 +40,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.StatusDetails, opt => opt.Ignore())
                 .ForMember(dest => dest.Statuses, opt => opt.Ignore());
 
+
             CreateMap<Statement, StatementModel>()
                 .ForMember(d => d.Submitted, opt => opt.MapFrom(s => s.StatementId > 0))
                 .ForMember(dest => dest.StatementOrganisations, opt => opt.MapFrom(st => st.StatementOrganisations.Select(s => new StatementModel.StatementOrganisationModel(s))))
@@ -50,7 +51,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => StatementModel.GetStatementYears(s)))
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => StatementModel.GetTurnover(s)))
                 .ForMember(dest => dest.Modifications, opt => opt.MapFrom(s => string.IsNullOrWhiteSpace(s.Modifications) ? null : JsonConvert.DeserializeObject<List<AutoMap.Diff>>(s.Modifications)))
-                .ForMember(dest => dest.GroupSubmission, opt => opt.MapFrom(s=>s.StatementId==0 ? (bool?)null : s.StatementOrganisations.Any()))
+                .ForMember(dest => dest.GroupSubmission, opt => opt.MapFrom(s => s.StatementId == 0 ? (bool?)null : s.StatementOrganisations.Any()))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.Sectors, opt => opt.MapFrom(st => st.Sectors.Select(s => s.StatementSectorTypeId)))
                 .ForMember(dest => dest.Policies, opt => opt.MapFrom(st => st.Policies.Select(s => s.StatementPolicyTypeId)))
@@ -74,6 +75,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.HasForceLabour, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.ForcedLabourDetails)))
                 .ForMember(dest => dest.HasSlaveryInstance, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.SlaveryInstanceDetails)))
                 .ForMember(dest => dest.HasRemediation, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.SlaveryInstanceRemediation)));
+
         }
     }
 

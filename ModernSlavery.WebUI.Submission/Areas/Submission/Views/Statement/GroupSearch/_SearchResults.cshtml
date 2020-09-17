@@ -9,9 +9,8 @@
     </div>
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds" js-live-search-results-block" aria-live="assertive">
-        <div id="loading"></div>
-        <div id="main">
+    <div class="govuk-grid-column-full" js-live-search-results-block" aria-live="assertive">       
+      
             @if (Model.GroupResults.ResultsPage.Results.Count < 1)
             {
                 <div class="govuk-form-group govuk-!-margin-top-5 zero-results">
@@ -25,44 +24,67 @@
             else
             {
 
-                <table class="govuk-table organisation-list">
-                    <tbody class="govuk-table__body">
+    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
 
-                        @for (var addIndex = 0; addIndex < Model.GroupResults.ResultsPage.Results.Count; addIndex++)
-                        {
+        <div class="govuk-summary-list__row header">
+            <dt class="govuk-summary-list__value govuk-!-font-weight-bold">
+                Organisation name
+            </dt>
+            <dt class="govuk-summary-list__value govuk-!-font-weight-bold">
+                Company number
+            </dt>
+            <dt class="govuk-summary-list__value govuk-!-font-weight-bold">
+                Address
+            </dt>
+            <dt class="govuk-summary-list__value govuk-!-font-weight-bold">                
+            </dt>            
+        </div>
 
-                            <tr class="govuk-table__row">
-                                <td class="govuk-table__cell">
-                                    <div>
-                                        <p class="govuk-!-font-weight-bold"> @(Model.GroupResults.ResultsPage.Results[addIndex].OrganisationName)</p> <br />
-                                        <p class="">@(Model.GroupResults.ResultsPage.Results[addIndex].GetFullAddress())</p><br />
-                                        <p>Company number: @(Model.GroupResults.ResultsPage.Results[addIndex].CompanyNumber)</p>
-                                    </div>
-                                </td>
-                                @if (Model.ContainsGroupOrganisation(Model.GroupResults.ResultsPage.Results[addIndex]))
-                                {
-                                    <td class="govuk-table__cell buttons">
-                                        <button type="submit" class="link-button" data-module="govuk-button" name="removeIndex" value="@(addIndex)">Remove</button>
+            
 
-                                    </td>
-                                }
-                                else if (Model.OrganisationId != Model.GroupResults.ResultsPage.Results[addIndex].OrganisationId)
-                                {
-                                    <td class="govuk-table__cell buttons">
-                                        <button class="govuk-button govuk-button--secondary govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="addIndex" value="@(addIndex)">
-                                            Include
-                                        </button>
-                                    </td>
-                                }
+                @for (var addIndex = 0; addIndex < Model.GroupResults.ResultsPage.Results.Count; addIndex++)
+                {
 
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    <div class="govuk-summary-list__row">
+        <dd class="govuk-summary-list__value">
 
+            <p class="govuk-!-font-weight-bold"> @(Model.GroupResults.ResultsPage.Results[addIndex].OrganisationName)</p>
+
+        </dd>
+        <dd class="govuk-summary-list__value wide">
+
+            <p> @(Model.GroupResults.ResultsPage.Results[addIndex].CompanyNumber)</p>
+
+        </dd>
+        <dd class="govuk-summary-list__value">
+            <p class="">@(Model.GroupResults.ResultsPage.Results[addIndex].GetFullAddress())</p>
+
+        </dd>
+        <dd class="govuk-summary-list__value small">
+
+            <p>Company number: @(Model.GroupResults.ResultsPage.Results[addIndex].CompanyNumber)</p>
+
+        </dd>
+       
+        <dd class="govuk-summary-list__actions">
+            @if (Model.ContainsGroupOrganisation(Model.GroupResults.ResultsPage.Results[addIndex]))
+            {
+                <button type="submit" class="link-button" data-module="govuk-button" name="removeIndex" value="@(addIndex)">Remove</button>
+            }
+            else if (Model.OrganisationId != Model.GroupResults.ResultsPage.Results[addIndex].OrganisationId && Model.GroupResults.ResultsPage.Results[addIndex].GetFullAddress() != null)
+            {
+                <button class="govuk-button govuk-button--secondary govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="addIndex" value="@(addIndex)">
+                    Include
+                </button>
+            }
+        </dd>
+    </div>
+   }
+            
+    </dl>
             }
 
-        </div>
+      
     </div>
 </div>
 <partial name="_SearchPagination.cshtml" model="Model.GroupResults.ResultsPage" />

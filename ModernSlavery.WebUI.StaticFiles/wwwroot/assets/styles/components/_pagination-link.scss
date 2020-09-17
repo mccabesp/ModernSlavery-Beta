@@ -31,23 +31,35 @@
     }
 }
 .pagination-prev {
+     border-bottom: 1px solid $govuk-border-colour;     
     .prev-arrow {
         display: inline-block;
         background: url("/assets/images/arrow-previous.svg") no-repeat;
         height: 15px;
         width: 20px;
+       
     }
 }
 
 
 .pagination {
-    margin-bottom: 20px;
+    padding-bottom: 20px;
 
     span {
         color: $govuk-brand-colour;
-        &.pagination-numbers
-            {
-            margin-left:20px;
+    }
+
+    button.pagination-button {
+        border: none;
+        background: none;     
+        cursor: pointer;
+        color: $govuk-brand-colour;
+        font-size: 19px;
+        text-align:left;
+
+        .pagination-numbers{
+            text-decoration:underline;
+            margin-left:25px;
         }
     }
 }

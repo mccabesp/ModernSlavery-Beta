@@ -19,6 +19,7 @@
 .gpg-manage-reports__cell {
     border-bottom: 1px solid #bfc1c3;
     vertical-align: middle;
+    max-width: 220px;
 }
 
 .gpg-manage-reports__desc {

@@ -50,14 +50,14 @@
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
-                            <input asp-for="GroupSubmission" value="false" id="IncludeGoals_False" checked="@(Model.GroupSubmission==false)" class="govuk-radios__input" type="radio" data-aria-controls="conditional-include-goals-conditional">
-                            <label class="govuk-label govuk-radios__label" for="IncludeGoals_False">
+                            <input asp-for="GroupSubmission" value="false" id="GroupSubmission_False" checked="@(Model.GroupSubmission==false)" class="govuk-radios__input" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="GroupSubmission_False">
                                 a single organisation
                             </label>
                         </div>
                         <div class="govuk-radios__item">
-                            <input asp-for="GroupSubmission" value="true" id="IncludeGoals_True" checked="@(Model.GroupSubmission==true)" class="govuk-radios__input" type="radio">
-                            <label class="govuk-label govuk-radios__label" for="IncludeGoals_True">
+                            <input asp-for="GroupSubmission" value="true" id="GroupSubmission_True" checked="@(Model.GroupSubmission==true)" class="govuk-radios__input" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="GroupSubmission_True">
                                 a group of organisations
                             </label>
                         </div>

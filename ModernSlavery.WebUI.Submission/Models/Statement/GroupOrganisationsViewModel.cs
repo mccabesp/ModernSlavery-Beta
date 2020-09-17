@@ -17,7 +17,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public GroupOrganisationsViewModelMapperProfile()
         {
-            CreateMap<StatementModel.StatementOrganisationModel, GroupOrganisationsViewModel.StatementOrganisationViewModel>();
+            CreateMap<StatementModel.StatementOrganisationModel, GroupOrganisationsViewModel.StatementOrganisationViewModel>()
+                .ForMember(s => s.OtherSubmissionsInformation, opt => opt.Ignore());
 
             CreateMap<GroupOrganisationsViewModel.StatementOrganisationViewModel, StatementModel.StatementOrganisationModel>();
 
@@ -50,6 +51,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             public AddressModel Address { get; set; }
             public string CompanyNumber { get; set; }
             public DateTime? DateOfCessation { get; set; }
+            public string OtherSubmissionsInformation { get; set; }
         }
         #endregion
 
@@ -64,7 +66,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            return GroupSubmission.HasValue && (GroupSubmission==false || StatementOrganisations.Any());
+            return GroupSubmission.HasValue && (GroupSubmission == false || StatementOrganisations.Any());
         }
     }
 }

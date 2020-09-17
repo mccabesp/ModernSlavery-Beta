@@ -7,7 +7,8 @@
     var risksComplete = Model.Risks.IsComplete();
     var diligenceComplete = Model.DueDiligence.IsComplete();
     var trainingComplete = Model.Training.IsComplete();
-    var progressComplete = Model.Progress.IsComplete();
+    var progressComplete = Model.Progress.IsComplete();    
+    var requiredStepsComplete = yourStatementComplete && complianceComplete;
 
 }
 @model ReviewAndEditPageViewModel
@@ -24,143 +25,186 @@
             @Html.HiddenFor(m => m.ReturnToReviewPage);
             @Html.HiddenFor(m => m.Submitted);
 
-            <h1 class="govuk-heading-l">
-                @Model.PageTitle
-            </h1>
-
-            <h2 class="govuk-heading-m">
-                (@(Model.ReportingDeadlineYear-1) to @(Model.ReportingDeadlineYear)) modern slavery statement for @(Model.OrganisationName)
-            </h2>
-
-            @if (Model.GroupOrganisations.GroupSubmission == true)
+            @if (!Model.IsComplete())
             {
-                <p class="govuk-body">
-                    You can <a class="govuk-link" href="@Model.GroupReviewUrl">review and edit the organisations</a> included in this group statement,
-                    or <a class="govuk-link" href="@Model.GroupStatusUrl">tell us it's a single organisation</a> instead.
-                </p>
-            }
-            else if (Model.GroupOrganisations.GroupSubmission == false)
-            {
-                <p class="govuk-body">
-                    If your statement is for a group of organisations, you need to <a class="govuk-link" href="@Model.GroupStatusUrl">specify it’s for a group</a> and tell us which organisations are in the group.
-                </p>
-            }
-            else
-            {
-                <p class="govuk-body">
-                    You need to <a class="govuk-link" href="@Model.GroupStatusUrl">tell us if your statement is for a group of organisations or for a single organisation</a>.
-                </p>
-            }
-
-            <p class="govuk-body">
-                If you want to check your answers, click on the relevant link below.
-            </p>
-
-            @*//TODO: get the correct text based on sections completed*@
-            <h2 class="govuk-heading-s govuk-!-margin-bottom-7">@Model.SubTitle</h2>
-
-            <ol class="app-task-list">
-                <li>
-                    <h2 class="govuk-heading-s app-task-list__section">
-                        <span class="app-task-list__section-number">1. </span> Required information about your statement
+                <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+                    <h2 class="govuk-error-summary__title" id="error-summary-title">
+                        We need more information
                     </h2>
-                    <ul class="govuk-list app-task-list__items">
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.YourStatementUrl" aria-describedby="slavery-statement">
-                                    Your modern slavery statement
-                                </a>
-                            </span>
-                            <strong class="govuk-tag @(yourStatementComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(yourStatementComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.ComplianceUrl" aria-describedby="compliance">
-                                    Areas covered by your modern statement
-                                </a>
-                            </span>
-                            <strong class="govuk-tag @(complianceComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="compliance">@(complianceComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                    </ul>
-                </li>
-
-                <li>
-                    <h2 class="govuk-heading-s app-task-list__section">
-                        <span class="app-task-list__section-number">2. </span> Additional information about your statement
-                    </h2>
-                    <ul class="govuk-list app-task-list__items">
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.OrganisationUrl" aria-describedby="organisation">
-                                    Your organisation
-                                </a>
-                            </span>
-                            <strong class="govuk-tag @(organisationComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="organisation">@(organisationComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.PoliciesUrl" aria-describedby="Policies">
-                                    Policies
-                                </a>
-                            </span>
-                            <strong class="govuk-tag @(policiesComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="policies">@(policiesComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.RisksUrl" aria-describedby="supply-risks-part-1">
-                                    Supply chain risks and due diligence (part 1)
-                                </a>
-                            </span>
-                            <strong class="govuk-tag @(risksComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="supply-risks-part-1">@(risksComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.DueDiligenceUrl" aria-describedby="supply-risks-part-2">
-                                    Supply chain risks and due diligence (part 2)
-                                </a>
-                            </span>
-                            <strong class="govuk-tag @(diligenceComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="supply-risks-part-2">@(diligenceComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.TrainingUrl" aria-describedby="training">
-                                    Training
-                                </a>
-                            </span>
-                            <strong class="govuk-tag @(trainingComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="training">@(trainingComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                        <li class="app-task-list__item">
-                            <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.ProgressUrl" aria-describedby="monitoring-progress">
-                                    Monitoring progress
-                                </a>
-                            </span>
-                            <strong class="govuk-tag @(progressComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="monitoring-progress">@(progressComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
-                        </li>
-                    </ul>
-                </li>
-            </ol>
-
-            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.CanSubmit())" name="command" value="@BaseViewModel.CommandType.Submit">
-                Confirm and Submit
-            </button>
-            @if (Model.HasChanged())
-            {
-                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" name="command" value="@BaseViewModel.CommandType.SaveAndExit">
-                    Exit and save changes
-                </button>
-                <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
-                    Exit and lose changes
-                </button>
+                    <div class="govuk-error-summary__body">
+                        @if (!Model.GroupOrganisations.IsComplete() && !requiredStepsComplete)
+                        {
+                        <ul class="govuk-list govuk-list--bullet">                            
+                                <li>
+                                    You need to complete all ‘Required information about your statement’ questions before you can submit and publish your answers.
+                                </li> 
+                            <li>
+                                You need to
+                                <a class="govuk-link" href="@Model.GroupReviewUrl">tell us which organisations are included in your statement</a>
+                                or
+                                <a class="govuk-link" href="@Model.GroupStatusUrl">tell us it's for a single organisation</a> instead.
+                            </li> 
+                        </ul>
+                        }
+                        else if(!requiredStepsComplete)
+                        { 
+                        <p>You need to complete all ‘Required information about your statement’ questions before you can submit and publish your answers.</p>
+                        }
+                        else if (!Model.GroupOrganisations.IsComplete())
+                        {
+                            <p>
+                                 You need to
+                         <a class="govuk-link" href="@Model.GroupReviewUrl">tell us which organisations are included in your statement</a>
+                                 or
+                             <a class="govuk-link" href="@Model.GroupStatusUrl">tell us it's for a single organisation</a> instead.
+                           </p>
+                           }
+                    </div>
+                </div>
             }
-            else
-            {
-                <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.ExitNoChanges">
-                    Exit with no changes
+
+
+                <h1 class="govuk-heading-l">
+                    @Model.PageTitle
+                </h1>
+
+                <h2 class="govuk-heading-s">
+                    @(Model.ReportingDeadlineYear-1) to @(Model.ReportingDeadlineYear) modern slavery statement for @(Model.OrganisationName)
+                </h2>
+
+                @if (Model.GroupOrganisations.GroupSubmission == true)
+                {
+                    <p class="govuk-body">
+                        You can <a class="govuk-link" href="@Model.GroupReviewUrl">review and edit the organisations</a> included in this group statement,
+                        or <a class="govuk-link" href="@Model.GroupStatusUrl">tell us it's a single organisation</a> instead.
+                    </p>
+                }
+                else if (Model.GroupOrganisations.GroupSubmission == false)
+                {
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                Is this statement for a group of organisations?
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            If your statement is for a group of organisations, you need to <a class="govuk-link" href="@Model.GroupStatusUrl">specify it’s for a group</a> and tell us which organisations are in the group.
+                        </div>
+                    </details>
+                }
+                else
+                {
+                    <p class="govuk-body">
+                        You need to <a class="govuk-link" href="@Model.GroupStatusUrl">tell us if your statement is for a group of organisations or for a single organisation</a>.
+                    </p>
+                }
+
+                <p class="govuk-body">
+                    If you want to check your answers, click on the relevant link below.
+                </p>             
+
+                <ol class="app-task-list">
+                    <li>
+                        <h2 class="govuk-heading-s app-task-list__section">
+                            Required information about your statement
+                        </h2>
+                        <ul class="govuk-list app-task-list__items">
+                            <li class="app-task-list__item">
+                                <span class="app-task-list__task-name">
+                                    <a class="govuk-link" href="@Model.YourStatementUrl" aria-describedby="slavery-statement">
+                                        Your modern slavery statement
+                                    </a>
+                                </span>
+                                <strong class="govuk-tag @(yourStatementComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(yourStatementComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            </li>
+                            <li class="app-task-list__item">
+                                <span class="app-task-list__task-name">
+                                    <a class="govuk-link" href="@Model.ComplianceUrl" aria-describedby="compliance">
+                                        Areas covered by your modern statement
+                                    </a>
+                                </span>
+                                <strong class="govuk-tag @(complianceComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="compliance">@(complianceComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <h2 class="govuk-heading-s app-task-list__section">
+                            Additional information about your statement
+                        </h2>
+                        <ul class="govuk-list app-task-list__items">
+                            <li class="app-task-list__item">
+                                <span class="app-task-list__task-name">
+                                    <a class="govuk-link" href="@Model.OrganisationUrl" aria-describedby="organisation">
+                                        Your organisation
+                                    </a>
+                                </span>
+                                <strong class="govuk-tag @(organisationComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="organisation">@(organisationComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            </li>
+                            <li class="app-task-list__item">
+                                <span class="app-task-list__task-name">
+                                    <a class="govuk-link" href="@Model.PoliciesUrl" aria-describedby="Policies">
+                                        Policies
+                                    </a>
+                                </span>
+                                <strong class="govuk-tag @(policiesComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="policies">@(policiesComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            </li>
+                            <li class="app-task-list__item">
+                                <span class="app-task-list__task-name">
+                                    <a class="govuk-link" href="@Model.RisksUrl" aria-describedby="supply-risks-part-1">
+                                        Supply chain risks and due diligence (part 1)
+                                    </a>
+                                </span>
+                                <strong class="govuk-tag @(risksComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="supply-risks-part-1">@(risksComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            </li>
+                            <li class="app-task-list__item">
+                                <span class="app-task-list__task-name">
+                                    <a class="govuk-link" href="@Model.DueDiligenceUrl" aria-describedby="supply-risks-part-2">
+                                        Supply chain risks and due diligence (part 2)
+                                    </a>
+                                </span>
+                                <strong class="govuk-tag @(diligenceComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="supply-risks-part-2">@(diligenceComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            </li>
+                            <li class="app-task-list__item">
+                                <span class="app-task-list__task-name">
+                                    <a class="govuk-link" href="@Model.TrainingUrl" aria-describedby="training">
+                                        Training
+                                    </a>
+                                </span>
+                                <strong class="govuk-tag @(trainingComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="training">@(trainingComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            </li>
+                            <li class="app-task-list__item">
+                                <span class="app-task-list__task-name">
+                                    <a class="govuk-link" href="@Model.ProgressUrl" aria-describedby="monitoring-progress">
+                                        Monitoring progress
+                                    </a>
+                                </span>
+                                <strong class="govuk-tag @(progressComplete ? "" : "govuk-tag--grey") app-task-list__tag" id="monitoring-progress">@(progressComplete ? "COMPLETED" : "NOT COMPLETED")</strong>
+                            </li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.CanSubmit())" name="command" value="@BaseViewModel.CommandType.Submit">
+                    Submit for publication
                 </button>
+                @if (Model.HasChanged())
+                {
+                    <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" name="command" value="@BaseViewModel.CommandType.SaveAndExit">
+                        Exit and save changes
+                    </button>
+                    <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.DiscardAndExit">
+                        Exit and lose changes
+                    </button>
+                }
+                else
+                {
+                    <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.ExitNoChanges">
+                        Exit with no changes
+                    </button>
+                }
             }
-        }
-    </div>
+        </div>
 </div>
 
 
