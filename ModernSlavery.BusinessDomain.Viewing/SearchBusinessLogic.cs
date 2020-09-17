@@ -7,6 +7,7 @@ using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -22,8 +23,9 @@ namespace ModernSlavery.BusinessDomain.Viewing
         public readonly SharedOptions _sharedOptions;
         private readonly IDataRepository _dataRepository;
         private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
-        public ISearchRepository<OrganisationSearchModel> OrganisationSearchRepository { get; set; }
+        private readonly ISearchRepository<OrganisationSearchModel> _organisationSearchRepository;
         public IAuditLogger SearchLog { get; }
+        public bool Disabled => _organisationSearchRepository.Disabled;
         #endregion
 
         #region Constructor
@@ -40,7 +42,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
             _sharedOptions = sharedOptions;
             _dataRepository = dataRepository;
             _reportingDeadlineHelper = reportingDeadlineHelper;
-            OrganisationSearchRepository = organisationSearchRepository;
+            _organisationSearchRepository = organisationSearchRepository;
             SearchLog = searchLog;
         }
         #endregion
@@ -56,19 +58,19 @@ namespace ModernSlavery.BusinessDomain.Viewing
             organisations = LookupSearchableOrganisations(organisations.ToArray()).ToList();
 
             //Make sure we have an index
-            await OrganisationSearchRepository.CreateIndexIfNotExistsAsync(OrganisationSearchRepository.IndexName).ConfigureAwait(false);
+            await _organisationSearchRepository.CreateIndexIfNotExistsAsync(_organisationSearchRepository.IndexName).ConfigureAwait(false);
 
             //Get the old indexes
-            var oldSearchModels = await OrganisationSearchRepository.ListDocumentsAsync(nameof(OrganisationSearchModel.SearchDocumentKey));
+            var oldSearchModels = await _organisationSearchRepository.ListDocumentsAsync(nameof(OrganisationSearchModel.SearchDocumentKey));
 
             //Create the new indexes
             var newSearchModels = CreateOrganisationSearchModels(organisations);
 
-            if (newSearchModels.Any()) await OrganisationSearchRepository.AddOrUpdateDocumentsAsync(newSearchModels).ConfigureAwait(false);
+            if (newSearchModels.Any()) await _organisationSearchRepository.AddOrUpdateDocumentsAsync(newSearchModels).ConfigureAwait(false);
 
             //Remove the retired models
             var retiredModels = oldSearchModels.Except(newSearchModels);
-            if (retiredModels.Any()) await OrganisationSearchRepository.DeleteDocumentsAsync(retiredModels).ConfigureAwait(false);
+            if (retiredModels.Any()) await _organisationSearchRepository.DeleteDocumentsAsync(retiredModels).ConfigureAwait(false);
         }
 
         private IEnumerable<Organisation> LookupSearchableOrganisations(params Organisation[] organisations)
@@ -103,7 +105,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
             var retiredModels = await ListSearchDocumentsAsync(organisation, statementDeadlineYear);
 
             //Batch update the included organisations
-            if (newSearchModels.Any()) await OrganisationSearchRepository.AddOrUpdateDocumentsAsync(newSearchModels);
+            if (newSearchModels.Any()) await _organisationSearchRepository.AddOrUpdateDocumentsAsync(newSearchModels);
 
             //Remove the retired models
             retiredModels = retiredModels.Except(newSearchModels).ToList();
@@ -125,7 +127,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
         public async Task RemoveSearchDocumentsAsync(IEnumerable<OrganisationSearchModel> searchIndexes)
         {
             //Remove the indexes
-            if (searchIndexes.Any()) await OrganisationSearchRepository.DeleteDocumentsAsync(searchIndexes).ConfigureAwait(false);
+            if (searchIndexes.Any()) await _organisationSearchRepository.DeleteDocumentsAsync(searchIndexes).ConfigureAwait(false);
         }
         #endregion
 
@@ -139,7 +141,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
             var filter = $"{nameof(OrganisationSearchModel.ParentOrganisationId)} eq {organisation.OrganisationId}";
             if (statementDeadlineYear>0)filter += $" and {nameof(OrganisationSearchModel.StatementDeadlineYear)} eq {statementDeadlineYear}";
 
-            return await OrganisationSearchRepository.ListDocumentsAsync(selectFields: keyOnly ? nameof(OrganisationSearchModel.SearchDocumentKey) : null, filter: filter);
+            return await _organisationSearchRepository.ListDocumentsAsync(selectFields: keyOnly ? nameof(OrganisationSearchModel.SearchDocumentKey) : null, filter: filter);
         }
         #endregion
 
@@ -331,6 +333,22 @@ namespace ModernSlavery.BusinessDomain.Viewing
                     abbreviations.Remove(prevOrganisationName);
             }
             return abbreviations.ToArray();
+        }
+        #endregion
+
+        #region SearchDocuments
+        public async Task<PagedResult<OrganisationSearchModel>> SearchDocumentsAsync(string searchText,
+            int currentPage,
+            int pageSize = 20,
+            string searchFields = null,
+            string selectFields = null,
+            string orderBy = null,
+            Dictionary<string, Dictionary<object, long>> facets = null,
+            string filter = null,
+            string highlights = null,
+            SearchModes searchMode = SearchModes.Any)
+        {
+            return await _organisationSearchRepository.SearchDocumentsAsync(searchText,currentPage,pageSize,searchFields,selectFields,orderBy,facets, filter,highlights,searchMode);
         }
         #endregion
     }

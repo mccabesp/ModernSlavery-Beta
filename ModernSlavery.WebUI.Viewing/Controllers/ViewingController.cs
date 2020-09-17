@@ -125,7 +125,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         public async Task<IActionResult> SearchResults([FromQuery] SearchResultsQuery searchQuery)
         {
             //Ensure search service is enabled
-            if (ViewingService.SearchBusinessLogic.OrganisationSearchRepository.Disabled)
+            if (ViewingService.SearchBusinessLogic.Disabled)
                 return View("CustomError",
                     WebService.ErrorViewModelFactory.Create(1151, new {featureName = "Search Service"}));
 
